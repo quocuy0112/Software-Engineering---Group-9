@@ -466,7 +466,7 @@ LinkedIn supports two types of content posting:
 **Suggested Additional Features:**
 
 - Job alerts by keyword/location/salary range.
-- Compare 2–3 jobs by skills, salary, and location.
+- Compare 2-3 jobs by skills, salary, and location.
 - Suggest profile optimization for each job, such as skill gaps.
 - Dashboard to track application status across multiple channels.
 - Schedule applications or follow-up reminders.
@@ -537,7 +537,7 @@ LinkedIn supports two types of content posting:
 
 ### 3.8 Notifications Interface
 
-![Notification section](./images/Notify.png)
+![Notification section](./images/notify.png)
 
 #### Current UI:
 
@@ -1161,17 +1161,17 @@ Interaction responsiveness is the response speed after users perform actions suc
 | Article Editor | Good                      | Low noise, focused on writing                                  |
 | Job Posting    | Fairly good               | Long form, multiple steps, needs autosave and better feedback  |
 
-### 5.9 Core Web Vitals — Evaluation Perspective
+### 5.9 Core Web Vitals - Evaluation Perspective
 
 When evaluating the technical performance of a website like LinkedIn, Core Web Vitals can be used as reference criteria. Although this report focuses more on UX than direct technical measurement, the following metrics are still useful for evaluating user experience.
 
 | Metric                          | UX meaning                          | Impact on LinkedIn                                        |
 | ------------------------------- | ----------------------------------- | --------------------------------------------------------- |
-| LCP — Largest Contentful Paint  | Speed of displaying main content    | Important for Feed, Profile, and Jobs                     |
-| INP — Interaction to Next Paint | Responsiveness after interaction    | Important for Like, Save, Apply, Search, and Messaging    |
-| CLS — Cumulative Layout Shift   | Layout stability                    | Important for feeds with images, ads, and recommendations |
-| TTFB — Time to First Byte       | Server response speed               | Affects the initial page load                             |
-| FCP — First Contentful Paint    | Time when the first content appears | Affects the feeling of fast loading                       |
+| LCP - Largest Contentful Paint  | Speed of displaying main content    | Important for Feed, Profile, and Jobs                     |
+| INP - Interaction to Next Paint | Responsiveness after interaction    | Important for Like, Save, Apply, Search, and Messaging    |
+| CLS - Cumulative Layout Shift   | Layout stability                    | Important for feeds with images, ads, and recommendations |
+| TTFB - Time to First Byte       | Server response speed               | Affects the initial page load                             |
+| FCP - First Contentful Paint    | Time when the first content appears | Affects the feeling of fast loading                       |
 
 #### Suggested Evaluation Criteria
 
@@ -1213,7 +1213,7 @@ In which:
 
 By combining these three layers, LinkedIn creates a closed ecosystem where users can build profiles, connect with others, share expertise, search for career opportunities, and develop their careers over time.
 
-### 6.2 Personal Profile — Profile
+### 6.2 Personal Profile - Profile
 
 Profile is the center of the LinkedIn experience. This is where users express their professional identity, experience, skills, and personal achievements. Unlike profiles on regular social networks, a LinkedIn profile functions as an online CV that can be discovered by recruiters, partners, and search engines.
 
@@ -1292,7 +1292,7 @@ Feed helps LinkedIn maintain daily engagement and increase network value. Users 
 - Allow users to create feeds by topic or industry.
 - Reduce the frequency of ads and irrelevant suggestions.
 
-### 6.4 Job Search — Jobs
+### 6.4 Job Search - Jobs
 
 Jobs is one of LinkedIn’s most core features. Users can search for jobs by keyword, location, company, work type, experience, salary, and many other filters. LinkedIn also personalizes job recommendations based on profile, skills, search history, and application behavior.
 
@@ -1346,7 +1346,7 @@ Jobs helps LinkedIn differentiate itself from ordinary social networks. Users no
 - Increase transparency around salary range and hiring process.
 - Build a dashboard to manage the entire application process.
 
-### 6.5 Network & Connections — Network
+### 6.5 Network & Connections - Network
 
 The Network feature helps users expand professional relationships through direct connections, following, people suggestions, and connection invitation management. This is the foundational layer that creates LinkedIn’s network effect.
 
@@ -1953,7 +1953,7 @@ LinkedIn Search / Feed / Hashtag / Network Graph
 People, Posts, Jobs, Companies, Skills, Events
 ```
 
-### 8.2 External SEO — Visibility on Google
+### 8.2 External SEO - Visibility on Google
 
 LinkedIn has many public page types that are indexed by Google. This helps personal profiles, company pages, job postings, and long-form articles appear when users search for names, company names, job titles, skills, or job opportunities.
 
@@ -2139,7 +2139,7 @@ Articles and Newsletters allow users to build long-term expertise. Unlike short 
 - Display basic SEO analytics: impressions from search, external traffic sources, and suggested keywords.
 - Suggest internal links between articles on the same topic.
 
-### 8.7 Internal Discoverability — LinkedIn Search
+### 8.7 Internal Discoverability - LinkedIn Search
 
 LinkedIn Search is the most important internal discoverability tool. Users can search for people, jobs, companies, articles, schools, groups, events, services, and many other content types.
 
@@ -3283,7 +3283,7 @@ Features related to **verified recruiters, job scam warnings, and privacy previe
 
 ### 11.13 Suggested Roadmap
 
-#### Phase 1 — Quick Wins
+#### Phase 1 - Quick Wins
 
 Improvements with low or medium difficulty but high impact:
 
@@ -3296,7 +3296,7 @@ Improvements with low or medium difficulty but high impact:
 - Better empty/error states for Jobs and Messaging.
 - Save scroll position in the Feed.
 
-#### Phase 2 — Core UX Improvements
+#### Phase 2 - Core UX Improvements
 
 Improvements that directly affect the main user journeys:
 
@@ -3309,7 +3309,7 @@ Improvements that directly affect the main user journeys:
 - Salary transparency.
 - Collapsible profile sections on mobile.
 
-#### Phase 3 — Strategic Differentiation
+#### Phase 3 - Strategic Differentiation
 
 Improvements that create long-term differentiation:
 
