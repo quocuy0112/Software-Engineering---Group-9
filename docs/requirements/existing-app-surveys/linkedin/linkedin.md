@@ -1,7 +1,8 @@
 # LinkedIn Platform Research Report
 
-**Author:** Nguyễn Quốc Thành
-**Student ID:** 24127542
+**Author:** Nguyễn Quốc Thành<br>
+**Student ID:** 24127542<br>
+**Reviewer:** Nguyễn Quốc Thành<br>
 **Objective:** To comprehensively analyze LinkedIn: interface, features, strengths/weaknesses, serving the development of a next-generation professional social networking platform.
 
 ## Table of Contents
