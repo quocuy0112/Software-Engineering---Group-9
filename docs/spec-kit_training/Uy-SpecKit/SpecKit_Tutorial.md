@@ -1,4 +1,4 @@
-# Student Information
+# Spec Kit Training Log & Summary
 
 * **Student Name:** Nguyễn Gia Quốc Uy
 * **Student ID:** 24127261
@@ -9,153 +9,90 @@
 
 ---
 
-# Table of Contents
+## My Takeaways from the Spec Kit Tutorials
 
-- [Spec-Driven Development (SDD) Framework](#spec-driven-development-sdd-framework)
-  - [1. `constitution.md` (Project Constitution)](#1-constitutionmd-project-constitution)
-  - [2. `spec.md` (Functional Specification - "Specify")](#2-specmd-functional-specification---specify)
-  - [3. `plan.md` (Technical Plan - "Plan")](#3-planmd-technical-plan---plan)
-  - [4. `tasks.md` (Technical Blueprint - "Task")](#4-tasksmd-technical-blueprint---task)
-  - [5. `clarify.md` (Requirement Clarification - "Clarify")](#5-clarifymd-requirement-clarification---clarify)
-  - [6. `analyze.md` (In-Depth Analysis - "Analyze")](#6-analyzemd-in-depth-analysis---analyze)
-  - [7. Project Folder Structure Tree](#7-project-folder-structure-tree)
+This is my personal summary of what I learned after watching the Spec Kit YouTube tutorials.
+
+The SDD Skill divide a development process into multiple clear phases with the main purpose "think before you code", prevent the fact that AI can make mistake, hallucinate or going off-track.
+
+Some useful information I have collected after watching all the videos on Youtube and research by AI:
 
 ---
 
-# Spec-Driven Development (SDD) Framework
-
-- **Core Concept:** The **Spec-Driven Development (SDD)** methodology implemented by Spec Kit divides the software development lifecycle into clear, structured phases. The core objective is **"Think before you code"** to prevent the AI agent from writing incorrect code or drifting from the original requirements.
-
----
-
-## 1. `constitution.md` (Project Constitution)
-- **Meaning:** 
-  - The supreme and immutable law of the entire project. 
-  - It defines the general rules that the AI must strictly follow, preventing the AI from changing technologies arbitrarily or writing messy code.
-- **Internal Structure:**
-  - **Core Principles:** The core development philosophy of the project.
-  - **Fixed Tech Stack:** Defines the mandatory tech stack and libraries if they are fixed and should not be changed.
-  - **Coding Standards:** Naming conventions (e.g., `camelCase` for variables, `PascalCase` for components), error handling conventions, file and folder naming rules, etc.
-  - **Git Workflow:** Rules for Git branching (e.g., `feature/branch-name`) and commit message formats (e.g., Conventional Commits).
-  - **Testing & Security:** Policies for writing unit tests (e.g., minimum coverage requirements) and security constraints.
+### 1. `constitution.md` (Project Constitution)
+*   **What it is:** This is a main law of our project. Once our group sets these rules, we cannot change them unless we do a formal update following the rules.
+*   **Why it matters:** It stops the AI agent from writing messy code or suddenly switching to a different programming language.
+*   **What we put inside:** 
+    *   Our core coding rules (like using `camelCase` for variables and `PascalCase` for UI components).
+    *   The exact technology stack we agreed to use.
+    *   How we write Git commit messages and create branches (like `feature/branch-name`).
+    *   Testing guidelines to make sure our code actually works.
 
 ---
 
-## 2. `spec.md` (Functional Specification - "Specify")
-- **Meaning:**
-  - Focuses entirely on answering **WHAT** is being built and **WHY** it is needed. 
-  - It describes the **system's business logic** and **MUST NOT** contain any technical details or code.
-- **Internal Structure:**
-  - **Feature Overview:**
-    - Feature Name.
-    - A 1-2 sentence description of the feature and its purpose.
-    - The business or technical context behind this requirement.
-  - **User Stories:**
-    - Simple descriptions of the feature from the user's perspective.
-    - **Structure:** *As a [user role], I want to [action/feature], So that [benefit/value received].*
-    - **Priority Levels:**
-      - Categorize functional requirements into priorities from P1 to P3:
-        - **P1 (Must-Have):** Mandatory requirements. The feature cannot function or be used without them.
-        - **P2 (Should-Have):** Highly recommended for a complete user experience. The system still runs without them, but the user experience will be poor or inconvenient.
-        - **P3 (Could-Have):** Nice-to-have features, typically animations, minor decorations, or non-essential tools. These can be skipped if time is limited.
-      - **Execution Rule:** Force the AI to complete all P1 tasks first. Once the core P1 flow runs successfully without errors, proceed to P2 and then P3.
-  - **Functional Requirements (FR):**
-    - A list of system behaviors. Do not describe technical implementation; focus only on behavior.
-    - **4 Rules for writing FRs:**
-      - Must have a unique ID (e.g., `REQ-01`, `FR-01`).
-      - Must have a priority label (P1, P2, P3).
-      - Must start with system-action phrases (e.g., *"The system must..."*).
-      - Must be testable and must not leak technology stack details.
-    - Each requirement should be presented in a table for readability and easy comparison by priority.
-  - **Out of Scope:**
-    - List what will NOT be done in this feature to prevent the AI from self-inventing or doing extra, unnecessary work.
-  - **Success Criteria:**
-    - Measurable outcomes (how the feature behaves when working correctly, including concrete metrics or test scenarios).
-    - Focused entirely on the user experience.
+### 2. `spec.md` (Functional Specification - "Specify")
+*   **What it is:** This file explains **WHAT** we want to build and **WHY** we need it. 
+*   **The Golden Rule:** **Absolutely no code or technical details in this file.** It is written purely from the user's perspective.
+*   **What we put inside:**
+    *   **User Stories:** Simple statements to explain the user's need. For example: *As a student, I want to see a Kanban board so that I can track my group tasks.*
+    *   **Priority Levels:** We group our features into P1, P2, and P3. 
+        *   *P1 (Must-Have):* Core features that the app cannot run without.
+        *   *P2 (Should-Have):* Important features for a good user experience.
+        *   *P3 (Could-Have):* Nice-to-have extras, like smooth animations.
+        *   *Our rule:* We make the AI complete all P1 features first before starting on P2 or P3.
+    *   **Functional Requirements (FR):** Simple tables listing what the app must do (e.g., *"The system must show an error if the password is too short"*). Each requirement has a unique ID like `REQ-01`.
+    *   **Out of Scope:** A list of things we will **not** build, so we don't waste time on unnecessary features.
 
 ---
 
-## 3. `plan.md` (Technical Plan - "Plan")
-- **Meaning:**
-  - Translates the business requirements of `spec.md` into a **technical architecture and design blueprint** before programming.
-  - Shifts the focus from **What & Why → How**.
-  - Each feature has its own independent `spec.md` and `plan.md`.
-- **Internal Structure:**
-  - **Section 1: Feature Flow:** The execution and data flow diagram/steps specific to this feature.
-  - **Section 2: Tech Stack Decision:** Lists the specific technologies, libraries, or packages chosen for this feature.
-  - **Section 3: Files to Create & Modify:** Lists only the files and directories that need to be created or modified for this feature.
-  - **Section 4: Data Models:** Detailed schema for each database entity, including field names, data types, constraints, and relationships. (Can be moved to a separate file if too complex).
-  - **Section 5: API Contract:** The technical agreement defining exactly how data enters and leaves the system.
-    - **REST API:** Specify HTTP method, route path, request body, response body, and all possible HTTP status codes.
-    - **GraphQL:** Define types, queries, and mutations.
-  - **Section 6: Research Decision:** Records the reasoning behind major technical choices (problems to solve, alternatives considered, final decision, and justification).
-  - **Section 7: Verification Plan:** Testing plan containing automated tests and manual steps to verify that the feature works correctly from an end-user perspective.
+### 3. `plan.md` (Technical Plan - "Plan")
+*   **What it is:** This is where we figure out **HOW** to build the features we wrote in `spec.md`. It is our technical blueprint.
+*   **What we put inside:**
+    *   The database structure (tables, fields, and how they connect).
+    *   Our API paths (endpoints, request bodies, and success/error status codes).
+    *   The exact list of files we need to create or edit.
+    *   Our reasoning for choosing a specific library or tool over other options.
 
 ---
 
-## 4. `tasks.md` (Technical Blueprint - "Task")
-- **Meaning:**
-  - The step where the AI automatically breaks down `plan.md` into a sequential, detailed checklist of actionable tasks that can be executed step-by-step.
-- **Inputs:**
-  - The AI does not need direct user input; it automatically reads:
-    - `spec.md` — to understand user stories and functional requirements.
-    - `plan.md` — to understand technical architecture and file structures.
-    - `constitution.md` — to ensure tasks do not violate project rules.
-    - Any other files as needed.
-- **Output:**
-  - An independent task list file for the feature, divided into logical **Phases**.
-  - Each phase contains 2-3 numbered tasks.
-- **Task Structure:**
-  - **Task ID & Name:** A unique identifier and a short name describing the task.
-  - **Detailed Description:** Clear instructions on what code to write/modify.
-  - **Dependencies:** Lists which task(s) must be completed before starting this task.
+### 4. `tasks.md` (Technical Blueprint - "Task")
+*   **What it is:** A step-by-step checklist. The AI reads our specs, technical plans, and project constitution, then automatically generates this file.
+*   **How it is structured:** It splits the work into logical phases. Each phase has 2-3 specific tasks. Every task shows what code to write, who is doing it, and which tasks must be finished beforehand.
 
 ---
 
-## 5. `clarify.md` (Requirement Clarification - "Clarify")
-- **Meaning:**
-  - The AI reads the newly created `spec.md` to identify ambiguities, gaps, or missed edge-cases. It then asks questions to resolve them.
-  - The user's answers are updated directly back into `spec.md`.
-- **Interaction Format:**
-  - The AI asks 3-5 questions sequentially (one at a time).
-  - Each question includes multiple-choice suggested answers, or the option to write a custom answer.
-- **Output:**
-  - Once completed, a new section named "Clarifications" is appended to the end of `spec.md`.
+### 5. `clarify.md` (Requirement Clarification - "Clarify")
+*   **What it is:** A quick Q&A process. The AI reads our `spec.md` and looks for any confusing points or missing details.
+*   **How it works:** The AI asks us 3 to 5 questions. We choose the options or write our own answers. The AI then automatically updates the "Clarifications" section at the bottom of our `spec.md` file.
 
 ---
 
-## 6. `analyze.md` (In-Depth Analysis - "Analyze")
-- **Meaning:**
-  - An optional quality-assurance step.
-  - The AI reads all generated artifacts (`spec.md`, `plan.md`, `tasks.md`) and cross-checks them to find contradictions, logical gaps, or violations of the project constitution before implementation.
-- **Issues Identified by Analyze:**
-  - Project constitution violations.
-  - Inconsistencies between `spec.md` and `plan.md`.
-  - Task ordering or dependency errors.
+### 6. `analyze.md` (In-Depth Analysis - "Analyze")
+*   **What it is:** The final sanity check. Before any coding starts, the AI reviews our specs, plans, and tasks.
+*   **Goal:** It checks for any mistakes, contradictions, or violations of our project constitution. This helps us find bugs before we even start programming.
 
 ---
 
-## 7. Project Folder Structure Tree
+### 7. How We Organize Spec Kit Files in Our Repo
 
-Below is the directory layout showing how Spec Kit files are organized inside a project repository:
+Here is how our Group 9 repository (`Software-Engineering---Group-9`) is structured to keep these files organized:
 
 ```text
-Software-Engineering---Group-9/ <-- Your project root directory
+Software-Engineering---Group-9/ <-- Our project root folder
 ├── .agents/
-│   └── skills/                  # Contains command instructions for Antigravity (agy)
+│   └── skills/                  # Commands for the AI assistant (agy, copilot, codex,...)
 ├── .specify/
 │   ├── memory/
-│   │   └── constitution.md      # Project CONSTITUTION file (here!)
-│   └── templates/               # Sample template files
-├── specs/                       # Directory of features
+│   │   └── constitution.md      # Project rules and standards (Constitution)
+│   └── templates/               # Sample templates for spec and plan files
+├── specs/                       # Folder where we organize our features
 │   ├── 001-user-login/
-│   │   ├── spec.md              # Functional Specification (What/Why)
-│   │   ├── plan.md              # Technical Design (How)
-│   │   └── tasks.md             # Checklist of implementation tasks
+│   │   ├── spec.md              # What the login feature does
+│   │   ├── plan.md              # How we build the login feature
+│   │   └── tasks.md             # Login task checklist
 │   └── 002-shopping-cart/
 │       ├── spec.md
 │       ├── plan.md
 │       └── tasks.md
-├── src/                         # Main source code directory
+├── src/                         # Our main application code folder
 └── README.md
-```
