@@ -1,3 +1,9 @@
+# About document
+
+- Writer: Nguyễn Quốc Thành
+- Student ID: 24127542
+- Reviewer: Nguyễn Quốc Thành
+
 # What is Spec-Kit?
 
 - SpecKit is the tool open source of GitHub based on **Spec-Driven Development (SDD)**.
