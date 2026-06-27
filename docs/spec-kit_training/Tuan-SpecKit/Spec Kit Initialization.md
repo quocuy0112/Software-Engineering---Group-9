@@ -1,10 +1,10 @@
 # Student Information
 
-**Họ và tên:** Ngô Quốc Tuấn&nbsp;
-
-**Mã số sinh viên:** 24127581&nbsp;
-
-**Lớp:** 24C11&nbsp;
+**Student Name:** Ngô Quốc Tuấn  
+**Student ID:** 24127581  
+**Group:** 09   
+**Class:** 24C11   
+**Course/Project:** Software Engineering 
 
 ---
 
