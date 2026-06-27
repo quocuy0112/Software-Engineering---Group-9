@@ -1,0 +1,65 @@
+# Hybrid CV Scoring System
+
+## Description
+
+The scoring system uses a hybrid algorithm that combines automatic skill/experience matching (Auto Matching) with AI-based CV analysis (LLM) to evaluate how well a candidate fits the Job Description (JD).
+
+**Scoring formula:**
+
+```
+Final Score = 30% × Auto Matching Score + 70% × AI Score
+```
+
+**Score classification (out of 100):**
+
+| Score Range | Match Level | Color Theme |
+|---|---|---|
+| 80 - 100 | High Match | 🟢 Green |
+| 60 - 80 | Moderate Match | 🟡 Yellow |
+| < 60 | Low Match | 🔴 Red |
+
+## Flowchart
+
+```mermaid
+flowchart TD
+    Start([Candidate Submits CV for Campaign]) --> Submitted[Application Received]
+    Submitted -->|CV Parser converts to raw text| Parsed[Parsed CV Text]
+
+    Parsed -->|Skill and Experience Matching| AutoScore[Auto Matching Score<br/>Skill/Experience vs JD]
+    Parsed -->|LLM reads full context| AIScore[AI Score<br/>Deep Semantic Analysis vs JD]
+
+    AutoScore -->|Weight 30 percent| Combine{Weighted Score Aggregation}
+    AIScore -->|Weight 70 percent| Combine
+
+    Combine -->|Total Score = 30% Auto Match + 70% AI| FinalScore[Final Combined Score / 100]
+
+    FinalScore --> Classify{Score Classification}
+
+    Classify -->|80 to 100| Green[High Match - Green Theme]
+    Classify -->|60 to 80| Yellow[Moderate Match - Yellow Theme]
+    Classify -->|Below 60| Red[Low Match - Red Theme]
+
+    style Start fill:#ffffff,stroke:#7c3aed,stroke-width:2px,color:#1a1a1a
+    style Submitted fill:#ffffff,stroke:#7c3aed,stroke-width:2px,color:#1a1a1a
+    style Parsed fill:#ffffff,stroke:#7c3aed,stroke-width:2px,color:#1a1a1a
+    style Combine fill:#ffffff,stroke:#7c3aed,stroke-width:2px,color:#1a1a1a
+    style Classify fill:#ffffff,stroke:#7c3aed,stroke-width:2px,color:#1a1a1a
+
+    style AutoScore fill:#eef0ff,stroke:#6366f1,stroke-width:2px,color:#1a1a1a
+    style AIScore fill:#eef0ff,stroke:#6366f1,stroke-width:2px,color:#1a1a1a
+    style FinalScore fill:#f5f0ff,stroke:#7c3aed,stroke-width:2px,color:#1a1a1a
+
+    style Green fill:#d4f4dd,stroke:#2e8b57,stroke-width:2px,color:#1a1a1a
+    style Yellow fill:#fff3cd,stroke:#b8860b,stroke-width:2px,color:#1a1a1a
+    style Red fill:#fde2e2,stroke:#c0392b,stroke-width:2px,color:#1a1a1a
+```
+
+## Step-by-Step Explanation
+
+1. **Application Received** – The candidate submits a CV and cover letter for a specific recruitment campaign.
+2. **Parsed CV Text** – The CV Parser converts the original CV into normalized raw text.
+3. **Auto Matching Score** – An algorithm directly compares the skills/experience in the CV against the JD requirements.
+4. **AI Score** – An LLM reads the entire text, understands deep context (handling abbreviations and mixed languages), and compares it against the JD to score each criterion in detail.
+5. **Weighted Score Aggregation** – The two scores are combined using a weighted formula: 30% (Auto) / 70% (AI).
+6. **Final Combined Score** – The final aggregated score on a scale of 100.
+7. **Score Classification** – The score is classified and assigned a color theme (green/yellow/red) based on thresholds for visual display.
