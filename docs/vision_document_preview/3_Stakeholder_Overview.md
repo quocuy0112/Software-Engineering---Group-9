@@ -2,7 +2,7 @@
 
 **Author:** Nguyễn Quốc Thành<br>
 **Student ID:** 24127542<br>
-**Reviewer:** Group 9
+**Reviewer:** Nguyễn Quốc Thành
 
 ## Table of Contents
 
