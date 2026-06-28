@@ -1,5 +1,11 @@
 # 4. Product Overview
 
+**Author:** Nguyễn Minh Khôi   
+**Student ID:** 24127066  
+**Reviewer:** Group 9
+
+---
+
 The SmartHire Platform is a recruitment system designed to automate the hiring lifecycle for Small and Medium Enterprises (SMEs) by integrating job management, candidate tracking, and AI-assisted hiring features into a centralized web-based solution.
 
 The platform utilizes a modern technical stack and a decoupled architecture:

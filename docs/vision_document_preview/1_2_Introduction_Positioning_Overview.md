@@ -1,17 +1,15 @@
 # Student Information
 
-**Họ và tên:** Ngô Quốc Tuấn&nbsp;
-
-**Mã số sinh viên:** 24127581&nbsp;
-
-**Lớp:** 24C11&nbsp;
+**Họ và tên:** Ngô Quốc Tuấn   
+**Mã số sinh viên:** 24127581   
+**Reviewer:** Group 9
 
 ---
 
 # SmartHire – Product Documentation
 ---
  
-## Introduction
+## 1. Introduction
  
 ### Purpose
  
@@ -71,7 +69,7 @@ This document is organised into two core positioning frameworks, each presented 
 
 ---
 
-## Product Position Statement
+## 2. Product Position Statement
 
 | Field | Details |
 |---|---|

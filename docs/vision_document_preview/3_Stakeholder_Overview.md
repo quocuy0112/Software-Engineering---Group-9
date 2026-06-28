@@ -1,8 +1,8 @@
-# Stakeholder & User Description
+# 3. Stakeholder & User Description
 
 **Author:** Nguyễn Quốc Thành<br>
 **Student ID:** 24127542<br>
-**Reviewer:** Nguyễn Quốc Thành
+**Reviewer:** Group 9
 
 ## Table of Contents
 
@@ -13,7 +13,7 @@
 5. [Summary of Key Stakeholder and User Needs](#5-summary-of-key-stakeholder-and-user-needs)
 6. [Alternative and Competing Solutions](#6-alternative-and-competing-solutions)
 
-## 1. Overall Project Workflow and Stakeholder Interaction
+## 3.1. Overall Project Workflow and Stakeholder Interaction
 
 ```mermaid
 flowchart TB
@@ -92,7 +92,7 @@ flowchart TB
 
 Detailed Candidate, Recruiter, and Administrator workflows are presented separately in Section 3.
 
-## 2. Stakeholder Summary
+## 3.2. Stakeholder Summary
 
 **Stakeholders** are individuals, groups, or organizations that influence the development of the recruitment platform or are affected by its operation. The main **stakeholders** include _the project owners, development team, candidates, recruiters, hiring companies, platform administrators, and external service providers._
 
@@ -113,11 +113,11 @@ The **Product Owner, Development Team,** and **Recruiters** have the greatest in
 
 Candidates have high interest because the system directly affects their job-search experience, although they normally have less influence over product decisions. Administrators ensure the platform remains trustworthy by preventing fraudulent recruiters, misleading job postings, and abusive behavior.
 
-## 3. User Summary
+## 3.3. User Summary
 
 The platform has three primary user groups: Candidates, Recruiters, and Administrators. Each group has different goals, technical abilities, permissions, and usage patterns.
 
-### 3.1 Candidate
+### 3.3.1 Candidate
 
 | Attribute         | Description                                                                                                                |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------- |
@@ -265,7 +265,7 @@ flowchart TB
     style ROW5 fill:none,stroke:none
 ```
 
-### 3.2 Recruiter / HR Manager
+### 3.3.2 Recruiter / HR Manager
 
 | Attribute         | Description                                                                                                                     |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------- |
@@ -342,7 +342,7 @@ flowchart TB
     AM --> AN[Complete Hiring Process]
 ```
 
-### 3.3 Platform Administrator
+### 3.3.3 Platform Administrator
 
 | Attribute         | Description                                                                                                                  |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -519,7 +519,7 @@ flowchart TB
     M --> N[End Session]
 ```
 
-## 4. User Environment
+## 3.4. User Environment
 
 The recruitment platform is a responsive web application. Its interface and technical design must support different devices and usage contexts for each user group.
 
@@ -553,7 +553,7 @@ Recruiters are likely to use the system for extended periods on desktop devices.
 
 Administrators require precise controls, searchable data tables, moderation histories, and clear confirmation dialogs because their actions may affect user accounts and public job postings.
 
-## 5. Summary of Key Stakeholder and User Needs
+## 3.5. Summary of Key Stakeholder and User Needs
 
 The following requirements summarize the main needs identified for each stakeholder and user group.
 
@@ -587,7 +587,7 @@ The following requirements summarize the main needs identified for each stakehol
 - **Could:** beneficial enhancement when time and resources are available.
 - **Won’t for now:** intentionally excluded from the current release.
 
-## 6. Alternative and Competing Solutions
+## 3.6. Alternative and Competing Solutions
 
 The platform competes with both job-search websites and Applicant Tracking Systems. It may also replace manual recruitment methods used by small organizations.
 
