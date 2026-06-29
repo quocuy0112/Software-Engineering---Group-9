@@ -1,8 +1,8 @@
 # 4. Product Overview
 
 **Author:** Nguyễn Minh Khôi   
-**Student ID:** 24127066  
-**Reviewer:** Group 9
+**Student ID:** 24127066   
+**Reviewer:** Nguyễn Gia Quốc Uy
 
 ---
 
@@ -13,13 +13,14 @@ The platform utilizes a modern technical stack and a decoupled architecture:
 ### Architecture & Security
 - Follows a **Decoupled Client-Server Architecture**.
 - Uses **JSON Web Tokens (JWT)** for stateless authentication and session management.
-- Implements **Role-Based Access Control (RBAC)** to ensure data isolation and secure access between different user roles.
+- Implements **Role-Based Access Control (RBAC)** combined with a **Multi-tenant model**, where a base user account acts as a Candidate, but can simultaneously hold Recruiter or HR Manager permissions for one or multiple companies via company membership records.
 
 ### Frontend Stack
 - Built with:
   - **Next.js (React)**
   - **TypeScript**
   - **Tailwind CSS**
+  - **Shadcn UI**
 - Uses **Zustand** for lightweight state management.
 - Integrates **hello-pangea/dnd** to support drag-and-drop functionality in the Kanban board interface.
 
@@ -36,7 +37,7 @@ The platform utilizes a modern technical stack and a decoupled architecture:
   - **Desktop View**: Optimized for administrative and management tasks with data-dense interfaces.
   - **Mobile/Tablet View**: Optimized for candidates and users who need access while on the go.
   
-## 4.1 Product Perspective
+## 4.1. Product Perspective
 
 SmartHire is a standalone, AI-assisted Recruitment Management Platform that operates as a responsive web application. It serves as a centralized hub connecting job candidates, recruiters, and system administrators throughout the recruitment lifecycle.
 
@@ -54,7 +55,6 @@ The major system components include:
 
 ### Recruiter Portal
 - Job posting management
-- AI-powered job description generation
 - Applicant screening and evaluation
 - Kanban-based recruitment pipeline
 
@@ -65,10 +65,8 @@ The major system components include:
 - System audit management
 
 ### AI Services Layer
-- Semantic CV scoring
-- Gap analysis and recommendations
-- AI resume enhancement
-- AI job description generation
+- Hybrid candidate scoring (rule-based matching + AI semantic analysis)
+- Human-readable score explanations (shared with both recruiter and candidate)
 
 ### External Systems
 - OpenAI API or custom AI model
@@ -109,7 +107,7 @@ graph TD
 
 SmartHire acts as the central platform connecting candidates, recruiters, and administrators while integrating external AI, database, and communication services to support the recruitment lifecycle.
 
-## 4.2 Assumptions and Dependencies
+## 4.2. Assumptions and Dependencies
 
 The successful operation of SmartHire depends on several assumptions and external dependencies. 
 
@@ -125,7 +123,7 @@ The successful operation of SmartHire depends on several assumptions and externa
 ### Dependencies
 
 #### AI Service Dependency
-- The platform depends on either the OpenAI API or a custom-trained lightweight AI model to provide semantic CV scoring, resume enhancement, gap analysis, and job description generation.
+- The platform depends on AI API to provide semantic CV scoring and human-readable score explanations. 
 - AI-powered features may become unavailable or limited if these services experience downtime or API restrictions.
 
 #### Email Service Dependency

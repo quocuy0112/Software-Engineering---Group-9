@@ -1,16 +1,19 @@
-**Author:** Nguyễn Minh Khôi<br>
-**Student ID:** 24127066<br>
-**Reviewer:** Nguyễn Minh Khôi
 # 6. Non-Functional Requirements
 
-## 6.1 Overview
+**Author:** Nguyễn Minh Khôi   
+**Student ID:** 24127066   
+**Reviewer:** Nguyễn Gia Quốc Uy
+
+---
+
+## 6.1. Overview
 
 The following non-functional requirements define the quality attributes, operational constraints, and engineering standards of the SmartHire Recruitment Platform. Unlike functional requirements, these requirements describe how well the system performs rather than what it does.
 
 These requirements apply across all major functional modules, including authentication, candidate profile management, AI-powered CV analysis, job posting management, recruitment pipelines, notifications, analytics, and administrative functions.
 
 
-# 6.2 Performance Requirements
+## 6.2. Performance Requirements
 
 The platform shall provide responsive interactions for all supported users while maintaining stable performance under normal operating conditions.
 
@@ -29,7 +32,7 @@ The platform shall provide responsive interactions for all supported users while
 The system shall support concurrent access from multiple users without significant degradation in response time.
 
 
-# 6.3 Scalability Requirements
+## 6.3. Scalability Requirements
 
 The architecture shall support future growth without requiring major redesign.
 
@@ -50,7 +53,7 @@ The AI service shall be modular so that either:
 can be integrated without changing the business logic.
 
 
-# 6.4 Availability and Reliability
+## 6.4. Availability and Reliability
 
 The SmartHire platform shall provide reliable operation for both recruiters and candidates.
 
@@ -71,7 +74,7 @@ The system shall:
 - use transactional database operations for critical updates.
 
 
-# 6.5 Security Requirements
+## 6.5. Security Requirements
 
 Security is one of the highest priorities because the platform stores sensitive personal and business information.
 
@@ -83,6 +86,7 @@ The system shall:
 - issue stateless JSON Web Tokens (JWT).
 - securely invalidate user sessions after logout.
 - enforce password reset through email verification.
+- store authenticatin tokens using HttpOnly, Secure, SameSite cookies, never in localStorage or sessionStorage, to prevent token theft via client-side scripts injection (XSS)
 
 ## Authorization
 
@@ -93,6 +97,7 @@ Role-Based Access Control (RBAC) shall ensure that:
 - Administrators access moderation and management features.
 
 Unauthorized API requests shall return appropriate HTTP error responses.
+
 
 ## Password Security
 
@@ -118,7 +123,7 @@ The system shall:
 - sanitize uploaded file names.
 
 
-# 6.6 AI Service Requirements
+## 6.6. AI Service Requirements
 
 The AI components shall function as decision-support tools rather than autonomous decision makers.
 
@@ -130,7 +135,7 @@ The platform shall:
 - continue operating when AI services are temporarily unavailable by falling back to rule-based matching where applicable.
 
 
-# 6.7 Usability Requirements
+## 6.7. Usability Requirements
 
 The platform shall provide an intuitive user experience for all user roles.
 
@@ -154,7 +159,7 @@ The application shall support modern accessibility principles including:
 - responsive layouts
 
 
-# 6.8 Compatibility Requirements
+## 6.8. Compatibility Requirements
 
 The platform shall operate correctly on major modern browsers including:
 
@@ -180,7 +185,7 @@ Supported export formats include:
 - Microsoft Excel (.xlsx)
 
 
-# 6.9 Maintainability Requirements
+## 6.9. Maintainability Requirements
 
 The software shall be designed for long-term maintenance.
 
@@ -197,7 +202,7 @@ The implementation shall:
 Business logic, database access, and presentation logic shall remain loosely coupled.
 
 
-# 6.10 Database Requirements
+## 6.10. Database Requirements
 
 The database shall:
 
@@ -211,7 +216,7 @@ The database shall:
 Regular backup procedures shall be supported.
 
 
-# 6.11 File Storage Requirements
+## 6.11. File Storage Requirements
 
 The system shall support secure document management.
 
@@ -228,7 +233,7 @@ Resume uploads shall satisfy the following constraints:
 Deleted files shall no longer be publicly accessible.
 
 
-# 6.12 Notification Requirements
+## 6.12. Notification Requirements
 
 The notification subsystem shall:
 
@@ -241,7 +246,9 @@ The notification subsystem shall:
 Temporary email service failures shall not interrupt other platform operations.
 
 
-# 6.13 Logging and Monitoring
+## 6.13. Logging and Monitoring
+
+The logging requirements below describe back-end level audit logging required for security and debugging purposes. They are independent of the admin-facing "activity log" dashboard feature (Group 12 in 5_Product_Features), which remains optional per team's PA2 prioritization.
 
 The platform shall maintain system logs for:
 
@@ -257,7 +264,7 @@ The platform shall maintain system logs for:
 Logs shall support troubleshooting and security auditing.
 
 
-# 6.14 Legal and Compliance Requirements
+## 6.14. Legal and Compliance Requirements
 
 The platform shall comply with applicable legal and ethical standards.
 
@@ -272,7 +279,7 @@ These include:
 AI-generated recommendations shall remain advisory only and shall not replace human recruitment decisions.
 
 
-# 6.15 Environmental and Platform Constraints
+## 6.15. Environmental and Platform Constraints
 
 The system is designed as a modern web application using the following technology stack.
 
@@ -298,7 +305,7 @@ The platform requires:
 - Email service for verification and notifications
 
 
-# 6.16 Documentation Requirements
+## 6.16. Documentation Requirements
 
 The project shall provide the following documentation:
 
@@ -314,7 +321,7 @@ The project shall provide the following documentation:
 Developer documentation shall be maintained alongside the source code.
 
 
-# 6.17 Priority of Non-Functional Requirements
+## 6.17. Priority of Non-Functional Requirements
 
 | Requirement Category | Priority | Rationale |
 |----------------------|----------|-----------|
@@ -330,6 +337,6 @@ Developer documentation shall be maintained alongside the source code.
 | Documentation | Medium | Improve maintainability and onboarding |
 
 
-# 6.18 Summary
+## 6.18. Summary
 
 The SmartHire Recruitment Platform prioritizes security, reliability, usability, and scalability while providing AI-assisted recruitment capabilities. These non-functional requirements ensure that all functional modules operate consistently, securely, and efficiently under real-world usage, while supporting future system growth and long-term maintainability.

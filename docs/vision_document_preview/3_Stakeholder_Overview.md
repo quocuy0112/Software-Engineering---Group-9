@@ -1,8 +1,10 @@
 # 3. Stakeholder & User Description
 
-**Author:** Nguyễn Quốc Thành<br>
-**Student ID:** 24127542<br>
-**Reviewer:** Nguyễn Quốc Thành
+**Author:** Nguyễn Quốc Thành   
+**Student ID:** 24127542   
+**Reviewer:** Nguyễn Gia Quốc Uy
+
+---
 
 ## Table of Contents
 
@@ -172,12 +174,14 @@ flowchart TB
     %% JOB DISCOVERY
     %% =====================================================
 
-    subgraph ROW3["Job Discovery"]
+    subgraph ROW3["Job Discovery and AI Recommendation"]
         direction RL
 
         N --> O[Search for Jobs]
+        N --> N1[Receive AI Smart Job Matches]
         O --> P[Filter Jobs by Keyword, Location, Salary, Experience and Job Type]
         P --> Q[View Search Results]
+        N1 --> Q
         Q --> R[View Job Details]
         R --> S{Interested in Job?}
     end
@@ -247,16 +251,18 @@ flowchart TB
 
     AJ -->|Offered| AU[Application Status: Offered]
     AU --> AV[Review Job Offer]
-    AV --> AW{Accept Offer?}
+    AV --> AW{Respond to Offer?}
 
-    AW -->|No| AX[Decline Job Offer]
+    AW -->|Decline| AX[Decline Job Offer]
     AX --> AY[Application Status: Offer Declined]
     AY --> AT
 
-    AW -->|Yes| AZ[Accept Job Offer]
-    AZ --> BA[Application Status: Hired]
-    BA --> BB[Receive Hiring Confirmation]
-    BB --> BC[Complete Recruitment Process]
+    AW -->|Accept| AZ[Accept Offer In-App]
+    AZ --> BA[Notify Recruiter of Acceptance]
+    BA --> BB[Wait for Recruiter's Hiring Confirmation]
+    BB --> BC[Application Status: Hired]
+    BC --> BD[Receive Hiring Confirmation Email]
+    BD --> BE[Complete Recruitment Process]
 
     style ROW1 fill:none,stroke:none
     style ROW2 fill:none,stroke:none
@@ -273,7 +279,7 @@ flowchart TB
 | Primary goal      | Find qualified candidates and manage recruitment activities efficiently.                                                        |
 | Main problems     | Large numbers of applications, manual CV screening, scattered candidate information, and slow communication.                    |
 | Technical ability | Medium to high; normally familiar with office software, recruitment platforms, CRM systems, or ATS products.                    |
-| Main activities   | Register company account, create job posts, review applicants, evaluate candidates, update pipeline stages, and export reports. |
+| Main activities   | Request recruiter verification, create/link company account, create job posts, review applicants, evaluate candidates, update pipeline stages, and export reports. |
 | Expected outcome  | Hire suitable candidates while reducing screening time and recruitment workload.                                                |
 
 #### Recruiter workflow
@@ -281,7 +287,8 @@ flowchart TB
 ```mermaid
 flowchart TB
 
-    A[Register Recruiter Account]
+    A[Log in to Base Account / Register Account]
+    --> Upgrade[Request to Become a Recruiter]
     --> B[Submit Company Information and Verification Documents]
     --> C{Administrator Verification}
 
@@ -336,10 +343,12 @@ flowchart TB
     AI --> AJ[Continue with Other Candidates]
     AJ --> Q
 
-    AH -->|Accepted| AK[Move Candidate to Hired Stage]
-    AK --> AL[Close Filled Vacancy]
-    AL --> AM[Generate Recruitment Report]
-    AM --> AN[Complete Hiring Process]
+    AH -->|Accepted| AK[Confirm Hiring Decision]
+    AK --> AL[Send Hiring Confirmation Email]
+    AL --> AM[Move Candidate to Hired Stage]
+    AM --> AN[Close Filled Vacancy]
+    AN --> AO[Generate Recruitment Report]
+    AO --> AP[Complete Hiring Process]
 ```
 
 ### 3.3.3 Platform Administrator

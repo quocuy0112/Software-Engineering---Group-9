@@ -1,8 +1,8 @@
-# Recruiter Verification and Company Role Assignment Flow
+# 5.4.1. Recruiter Verification and Company Role Assignment Flow
 
-**Author:** Nguyễn Quốc Thành<br>
-**Student ID:** 24127542<br>
-**Reviewer:** Nguyễn Quốc Thành
+**Author:** Nguyễn Quốc Thành   
+**Student ID:** 24127542   
+**Reviewer:** Nguyễn Gia Quốc Uy
 
 ---
 

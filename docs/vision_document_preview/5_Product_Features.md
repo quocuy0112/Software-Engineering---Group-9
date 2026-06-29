@@ -2,7 +2,9 @@
 
 **Author:** Nguyễn Gia Quốc Uy   
 **Student ID:** 24127261   
-**Reviewer:** Group 9
+**Reviewer:** Group 9   
+
+---
 
 ## 5.1. Feature Overview
 The table below summarizes the high-level feature groups of the SmartHire system. Each feature group represents a broader capability that may include multiple sub-features, which are described in more detail in the following section.
@@ -18,15 +20,15 @@ The table below summarizes the high-level feature groups of the SmartHire system
 |6| **Application Tracking (Candidate Side)** | Allow candidates to track saved jobs, applied jobs (with a processing status) and recommended matching jobs| High (P0) | 
 |7| **Candidate Screening & Hybrid Scoring System** | Automatically matches skills and analyzes CVs using AI-powered matching algorithm to score and rank candidates for each job posting | High (P0) | 
 |8| **Recruitment Pipeline Kanban Board** | A drag-and-drop interface that lets employers track and update candidate status across recruitment stages. | High (P0) | 
-|9| **Automated Notifications & In-App Alerts** | System will send email and real-time notifications to candidates/employers when application status changes.| Medium (P1) | 
+|9| **Automated Notifications & In-App Alerts** | System will send email and real-time notifications to candidates/employers when application status changes.| High (P0) | 
 |10| **Job Posting Moderation & Quality Assurance** | Allows admins to approve or reject new job postings and handle spam/violation reports. | High (P0) | 
-|11| **User Management & Employer Verification** | Allows admins to look up user accounts, verify business licenses and handle violations| Medium (P1) | 
+|11| **User Management & Employer Verification** | Allows admins to look up user accounts, verify business licenses and handle violations| High (P0) | 
 |12| **Recruitment Analytics & Data Export** | Provide dashboards, statistical reports on recruitment activity and exports candidate data to Excel/CSV| Medium (P1) | 
 
-## 5.3 Feature Descriptions
+## 5.3. Feature Descriptions
 
 ### 5.3.1 Authentication, Authorization & Access Control
-This feature group handles the entire process of registration, login, and role-based access control across the system. Users are split into two distinct roles which are candidates and employers. Users are separated into different access levels, including candidates, employers, and admins. Candidates use the system to manage profiles and apply for jobs, employers use it to post jobs and manage applicants, while admins supervise platform quality and user verification. By enforcing strict access control between these roles, the system helps protect candidates' personal data as well as sensitive internal information belonging to hiring companies.
+This feature group handles the entire process of registration, login, and role-based access control across the system. The platform employs a hybrid RBAC and multi-tenant authorization model. By default, all registered users hold a base Candidate role, allowing them to manage profiles and apply for jobs. To become an employer (Recruiter or HR Manager), users must create or join a company profile and undergo Admin verification. This multi-tenant design allows a single user account to manage recruitment for multiple companies simultaneously, while Admins supervise platform quality and verify business licenses. By enforcing strict access control across these organizational boundaries, the system helps protect both candidates' personal data and sensitive internal information belonging to hiring companies.
 
 ### 5.3.2 Account Setup & Management
 This feature allows candidates and employers to manage their basic account information, such as contact details, profile image, company information, and password settings. Although some profile fields may be optional, keeping account information updated helps both sides communicate more reliably and build trust during the recruitment process. Candidates benefit by presenting themselves more professionally, while employers benefit by making their company identity clearer to potential applicants.
@@ -41,7 +43,7 @@ This feature provides a public space where candidates can freely browse and sear
 This feature gives employers the tools to create, preview, edit, and manage the entire lifecycle of their job postings. While drafting a job description, employers define structured data such as required skills, experience, salary range, and other key details. This not only gives employers full control over what they post, but also lays the groundwork the system later relies on to automatically filter and screen incoming applications.
 
 ### 5.3.6 Application Tracking (Candidate Side)
-This feature lets candidates keep track of jobs they've saved, jobs they've applied to, and jobs the system recommends as a good match for them. For each application, candidates can see exactly where things stand, from “received” and “viewed” all the way through to “shortlisted” or “rejected”, without needing to contact the company directly to ask. Altogether, this gives candidates a single place to follow up on opportunities they care about, making it easier to stay organized while job hunting.
+This feature lets candidates keep track of jobs they've saved, jobs they've applied to, and jobs the system recommends as a good match for them. For each application, candidates can see exactly where things stand, across every stage of the pipeline: **Applied**, **Viewed**, **Shortlisted**, **Interviewing**, **Offered**, through to a final outcome of **Hired**, **Offer_Declined**, **Rejected**, or **Waitlisted**, without needing to contact the company directly to ask. Altogether, this gives candidates a single place to follow up on opportunities they care about, making it easier to stay organized while job hunting.
 
 ### 5.3.7 Candidate Screening & Hybrid Scoring System
 This is essentially the recruitment "control center" that automatically classifies and evaluates candidate applications for each job posting. It works through a hybrid approach that combines rule-based skill/experience matching with AI-powered CV analysis. The biggest benefit here is freeing employers from manually screening hundreds of CVs a day, instead, they can focus their attention on the most promising candidates, ranked by a clear, visual compatibility score out of 100.
