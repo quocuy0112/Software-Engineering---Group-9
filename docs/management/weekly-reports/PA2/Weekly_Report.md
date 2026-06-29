@@ -174,3 +174,105 @@
 *Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
 
 ![Notion Task Tracker](notion_task_11_06.png)
+
+# =============25/06, Sprint 2=============
+
+## 1. Attendance
+
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+
+**Team members present:**
+* Nguyễn Gia Quốc Uy
+* Nguyễn Quốc Thành
+* Nguyễn Quốc Tuấn
+* Lưu Chí Hải
+* Nguyễn Minh Khôi
+
+**Team members absent:**
+* None
+
+---
+
+## 2. Status Reports
+
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+
+### Nguyễn Gia Quốc Uy
+* **Completed tasks:** 
+    - Set up & Initialize Spec Kit
+    - Learn Spec Kit & Save study log.
+* **To-do Tasks:** 
+    - Write the AI Usage Report following the given format.
+    - Re-brief the feature groups in detail.
+    - Translate the 12 product feature groups into English.
+    - Complete constitution.md.
+* **Issues/Obstacles:**
+    - None
+
+### Nguyễn Quốc Thành
+* **Completed tasks:** 
+    - Vision Doc (Stakeholder & User Description)
+    - Learn Spec Kit & Save study log. 
+* **To-do Tasks:** 
+    - Review, comment, and provide feedback on the features that the group has chosen.
+    - Write the AI Usage Report following the given format.
+    - Draw a Mermaid diagram describing an important flow.
+* **Issues/Obstacles:** 
+    - None
+
+### Nguyễn Quốc Tuấn
+* **Completed tasks:** 
+    - Vision Doc (Introduction & Positioning)
+    - Learn Spec Kit & Save study log.
+* **To-do Tasks:** 
+    - Review, comment, and provide feedback on the features that the group has chosen.
+    - Write the AI Usage Report following the given format.
+    - Draw a Mermaid diagram describing an important flow.
+* **Issues/Obstacles:** 
+    - None
+
+### Lưu Chí Hải
+* **Completed tasks:** 
+    - PA2 1st meeting minutes, Project plan
+    - Learn Spec Kit & Save study log.
+* **To-do Tasks:** 
+    - Review, comment, and provide feedback on the features that the group has chosen.
+    - Write the AI Usage Report following the given format.
+    - PA2 2nd meeting minutes.
+* **Issues/Obstacles:** 
+    - None
+
+### Nguyễn Minh Khôi
+* **Completed tasks:** 
+    - Vision Doc (Product Overview)
+    - Learn Spec Kit & Save study log.
+* **To-do Tasks:** 
+    - Review, comment, and provide feedback on the features that the group has chosen.
+    - Write the AI Usage Report following the given format.
+    - Write Vision Doc (Non-Functional Requirements).
+* **Issues/Obstacles:** 
+    - None
+
+---
+
+## 3. Actions & Summary
+
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+
+**Actions:**
+* Each member writes their own AI Usage Report.
+* Each member (except for Project Manager) gives feedback on the features.
+
+**Summary of the meeting:**
+* The team confirmed the completion of Spec Kit training, study logs, and initial PA2 tasks (Vision Doc, Project Plan, Spec Kit initialization).
+* All members are required to write their individual AI Usage Reports and provide feedback on the proposed product features.
+* Tasks: Uy will detail and translate feature groups, Thành and Tuấn will draw Mermaid diagrams, Khôi will write Non-Functional Requirements, and Hải will write the meeting minutes. 
+
+---
+
+## 4. Task Screenshots
+
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+
+![Notion Task Tracker](notion_task_25_06.png)
+
