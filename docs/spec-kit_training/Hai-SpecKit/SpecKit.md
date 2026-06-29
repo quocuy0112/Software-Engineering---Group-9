@@ -6,6 +6,7 @@
 ---
 
 # Learning Journal: Spec-Driven Development and GitHub Spec Kit
+*Performed by: Lưu Chí Hải, Reviewed by: Nguyễn Gia Quốc Uy, Edited by: Lưu Chí Hải*
 
 ## 1. Course Overview & Proof of Completion
 - **Module Name:** Get started with spec-driven development and GitHub Spec Kit
