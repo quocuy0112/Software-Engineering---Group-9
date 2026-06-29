@@ -10,18 +10,18 @@ The table below summarizes the high-level feature groups of the SmartHire system
 ## 5.2. Detailed Feature List
 | No | Group Feature | Short Description | Priority |
 |---|---|---|---|
-|1| **Authentication, Authorization & Access Control**| Allows candidates and employers to register and log in securely (with email verification and password recovery), and applies role-based access control RBAC to protect personal and business data.| |
-|2| **Account Setup & Management** | Allows users to update basic personal/company account information and change their password. | | 
-|3| **Candidate Profile Management** | Allows candidates to build their professional profile via a provided form or by uploading a CV, with a CV Parser that automatically standardizes the data for job applications and scoring. | |
-|4| **Job Board & Advanced Search** | Allows candidates to search, filter, view details of, and apply to approved job postings, along with saving, sharing, and reporting listings. | | 
-|5| **Job Posting Management** | Allows employers to create, preview, edit, and manage the lifecycle of job postings.| |    
-|6| **Application Tracking (Candidate Side)** | Allow candidates to track saved jobs, applied jobs (with a processing status) and recommended matching jobs| | 
-|7| **Candidate Screening & Hybrid Scoring System** | Automatically matches skills and analyzes CVs using AI-powered matching algorithm to score and rank candidates for each job posting | | 
-|8| **Recruitment Pipeline Kanban Board** | A drag-and-drop interface that lets employers track and update candidate status across recruitment stages. | | 
-|9| **Automated Notifications & In-App Alerts** | System will send email and real-time notifications to candidates/employers when application status changes.| | 
-|10| **Job Posting Moderation & Quality Assurance** | Allows admins to approve or reject new job postings and handle spam/violation reports. | | 
-|11| **User Management & Employer Verification** | Allows admins to look up user accounts, verify business licenses and handle violations| | 
-|12| **Recruitment Analytics & Data Export** | Provide dashboards, statistical reports on recruitment activity and exports candidate data to Excel/CSV| | 
+|1| **Authentication, Authorization & Access Control**| Allows candidates and employers to register and log in securely (with email verification and password recovery), and applies role-based access control RBAC to protect personal and business data.| High (P0) |
+|2| **Account Setup & Management** | Allows users to update basic personal/company account information and change their password. | Medium (P1) | 
+|3| **Candidate Profile Management** | Allows candidates to build their professional profile via a provided form or by uploading a CV, with a CV Parser that automatically standardizes the data for job applications and scoring. | High (P0) |
+|4| **Job Board & Advanced Search** | Allows candidates to search, filter, view details of, and apply to approved job postings, along with saving, sharing, and reporting listings. | High (P0) | 
+|5| **Job Posting Management** | Allows employers to create, preview, edit, and manage the lifecycle of job postings.| High (P0) |    
+|6| **Application Tracking (Candidate Side)** | Allow candidates to track saved jobs, applied jobs (with a processing status) and recommended matching jobs| High (P0) | 
+|7| **Candidate Screening & Hybrid Scoring System** | Automatically matches skills and analyzes CVs using AI-powered matching algorithm to score and rank candidates for each job posting | High (P0) | 
+|8| **Recruitment Pipeline Kanban Board** | A drag-and-drop interface that lets employers track and update candidate status across recruitment stages. | High (P0) | 
+|9| **Automated Notifications & In-App Alerts** | System will send email and real-time notifications to candidates/employers when application status changes.| Medium (P1) | 
+|10| **Job Posting Moderation & Quality Assurance** | Allows admins to approve or reject new job postings and handle spam/violation reports. | High (P0) | 
+|11| **User Management & Employer Verification** | Allows admins to look up user accounts, verify business licenses and handle violations| Medium (P1) | 
+|12| **Recruitment Analytics & Data Export** | Provide dashboards, statistical reports on recruitment activity and exports candidate data to Excel/CSV| Medium (P1) | 
 
 ## 5.3 Feature Descriptions
 
