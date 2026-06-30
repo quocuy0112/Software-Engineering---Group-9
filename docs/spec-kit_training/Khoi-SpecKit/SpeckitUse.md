@@ -1,5 +1,8 @@
 # GitHub Spec Kit - Complete Usage Guide
-
+* **Student Name:** Nguyễn Minh Khôi
+* **Student ID:** 24127066
+* **Class:** 24C11
+* **Reviewer:** Group 9
 ## 1. Introduction
 
 **GitHub Spec Kit** is a comprehensive toolkit designed to help developers implement **Spec-Driven Development** workflows. It integrates with GitHub Copilot and AI coding agents to streamline the software development process from planning to implementation.
