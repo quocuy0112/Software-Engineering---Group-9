@@ -1,5 +1,7 @@
 # AI Usage Report For PA2
 
+*Performed by: Ngô Quốc Tuấn | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Ngô Quốc Tuấn*
+
 **Student Name:** Ngô Quốc Tuấn  
 **Student ID:** 24127581
 **Group:** 09   
@@ -7,8 +9,42 @@
 **Course/Project:** Software Engineering 
 
 ---
-
-### Entry 01
+ 
+##  Table of contents
+ 
+1. [Task 1 - JD Field Structure Definition](#task-1---jd-field-structure-definition)
+   - [Use Case 1: Research standard JD sections](#use-case-1-research-standard-jd-sections)
+   - [Use Case 2: Identify filterable/matching metadata fields](#use-case-2-identify-filterablematching-metadata-fields)
+2. [Task 2 - FG1: Authentication, Authorization & Access Control](#task-2---fg1-authentication-authorization--access-control)
+   - [Use Case 1: Multi-role auth & RBAC patterns](#use-case-1-multi-role-auth--rbac-patterns)
+   - [Use Case 2: OAuth vs manual verification for employers](#use-case-2-oauth-vs-manual-verification-for-employers)
+3. [Task 3 - FG3: Candidate Profile Management](#task-3---fg3-candidate-profile-management)
+   - [Use Case 1: Structured job seeker profile schema](#use-case-1-structured-job-seeker-profile-schema)
+   - [Use Case 2: CV parsing technical research](#use-case-2-cv-parsing-technical-research)
+4. [Task 4 - FG4: Job Board & Advanced Search](#task-4---fg4-job-board--advanced-search)
+   - [Use Case 1: Search, filter & results display features](#use-case-1-search-filter--results-display-features)
+5. [Task 5 - FG5: Job Posting Management](#task-5---fg5-job-posting-management)
+   - [Use Case 1: Job posting lifecycle & creation features](#use-case-1-job-posting-lifecycle--creation-features)
+6. [Task 6 - FG7: Candidate Filtering & Combined Scoring System](#task-6---fg7-candidate-filtering--combined-scoring-system)
+   - [Use Case 1: Hybrid rule-based + LLM scoring architecture](#use-case-1-hybrid-rule-based--llm-scoring-architecture)
+7. [Task 7 - FG8: Recruitment Pipeline Kanban Board](#task-7---fg8-recruitment-pipeline-kanban-board)
+   - [Use Case 1: Kanban columns & candidate card design](#use-case-1-kanban-columns--candidate-card-design)
+8. [Task 8 - FG9: Automated Notifications & In-App Alerts](#task-8---fg9-automated-notifications--in-app-alerts)
+   - [Use Case 1: Async email notification best practices](#use-case-1-async-email-notification-best-practices)
+9. [Task 9 - FG10: Job Posting Moderation & Quality Assurance](#task-9---fg10-job-posting-moderation--quality-assurance)
+   - [Use Case 1: Admin moderation queue & report handling](#use-case-1-admin-moderation-queue--report-handling)
+10. [Task 10 - FG11: User Management & Employer Verification](#task-10---fg11-user-management--employer-verification)
+    - [Use Case 1: Account lookup, verification & suspension](#use-case-1-account-lookup-verification--suspension)
+11. [Task 11 - FG12: Recruitment Analytics & Data Export](#task-11---fg12-recruitment-analytics--data-export)
+    - [Use Case 1: Employer & admin analytics features](#use-case-1-employer--admin-analytics-features)
+12. [Task 12 - Document Review & Quality Check](#task-12---document-review--quality-check)
+    - [Use Case 1: Third-party review of V1.4 draft](#use-case-1-third-party-review-of-v14-draft)
+13. [Chat History Evidence](#chat-history-evidence)
+---
+ 
+## Task 1 - JD Field Structure Definition
+ 
+### Use Case 1: Research standard JD sections
  
 | Field | Details |
 |---|---|
@@ -19,9 +55,7 @@
 | **AI-generated content** | A comprehensive 12-section JD structure including: Basic Information (Job ID, Title, Department, Status), Job Overview (Summary, Objectives), Responsibilities, Requirements (Education, Experience, Skills, Certifications), Employment Details (Type, Seniority, Schedule), Salary & Benefits (Min/Max, Currency, Negotiable flag), Workplace Information (Country, City, District, Work Mode), Hiring Process (Interview Rounds, Assessment), Application Information (Deadline, Required Documents), Skill Tags (Required/Preferred), Industry-Specific Requirements, and Metadata (Created By, Version, Approval Status). Also included a hierarchical database-oriented tree structure, a fields-for-matching table, and a recommended JSON schema. |
 | **Student's contribution** | The author used the AI output as a structural reference to understand ATS best practices, then independently defined a simplified version of the JD field list tailored to SmartHire's scope and the Vietnamese market context. Fields not relevant to the project (e.g., Job ID, Metadata versioning, GPA requirement, Security Clearance) were excluded. The author added the interview process section and district-level location as Vietnam-specific requirements, and reordered all fields to match the logical reading flow of a real job posting rather than a database schema. The final item (1) list in the document was authored independently, not copied from the AI output. |
  
----
- 
-### Entry 02
+### Use Case 2: Identify filterable/matching metadata fields
  
 | Field | Details |
 |---|---|
@@ -34,7 +68,9 @@
  
 ---
  
-### Entry 03
+## Task 2 - FG1: Authentication, Authorization & Access Control
+ 
+### Use Case 1: Multi-role auth & RBAC patterns
  
 | Field | Details |
 |---|---|
@@ -45,9 +81,7 @@
 | **AI-generated content** | A structured breakdown across three areas: (1) Registration flows per role — job seeker uses email/OAuth + OTP email verification with immediate activation; employer requires business email, tax ID, and document upload then enters a pending state awaiting admin approval with a separate `/employer/register` path; admin is never self-registered and is provisioned internally with a dedicated login path and extra secret/config gate; (2) Login mechanisms — standard credential login routed through role-appropriate endpoints, password recovery via OTP or reset link for all roles, OAuth for job seekers only since employer accounts require document verification OAuth cannot satisfy, "remember me" for lower-stakes roles, show/hide password toggle; (3) Permission boundaries presented as a table across four dimensions (profile/CV data, job postings, applicant data, account management) showing what each role can read, write, or manage — including the key point that employers should only see applicants to their own postings, not all applicants platform-wide. Also highlighted implementation notes: route-level middleware guards, object-level checks beyond role checks, escalation from pending to active requiring deliberate admin action as the main fraud-prevention checkpoint, and admin login gated by an extra shared secret to prevent brute-force through the same surface as regular accounts. |
 | **Student's contribution** | The AI provided a conceptually accurate overview that confirmed the general direction already planned for SmartHire. The author used it to validate the overall role architecture, then independently specified all concrete implementation details not present in the AI response: password strength constraints (8–25 characters, requiring uppercase, lowercase, digits, and special characters), OTP format (6–8 characters, 10-minute validity, auto-deletion of unverified emails after expiry), exact route naming (`/login` vs. `/admin/login`), the `.env`-based admin secret code mechanism, the "show/hide password" toggle as an explicit sub-feature, and the "remember password" option per login. The author also defined the third-party OAuth scope as Google and LinkedIn specifically for job seekers, which the AI left open-ended. All content in the document was independently authored and not copied from the AI response. |
  
----
- 
-### Entry 04
+### Use Case 2: OAuth vs manual verification for employers
  
 | Field | Details |
 |---|---|
@@ -60,7 +94,9 @@
  
 ---
  
-### Entry 05
+## Task 3 - FG3: Candidate Profile Management
+ 
+### Use Case 1: Structured job seeker profile schema
  
 | Field | Details |
 |---|---|
@@ -71,14 +107,12 @@
 | **AI-generated content** | A 7-section profile schema: (1) Basic Identity & Contact Info — full name, profile photo (optional), phone, email, address (city/district), and social/professional links (LinkedIn, GitHub, portfolio); (2) Career Preferences — desired job title/role, employment type, expected salary range, preferred work locations, availability/notice period; (3) Education History — repeatable entries with institution name, degree/major, graduation year, GPA, and optional honors/coursework; (4) Work Experience — repeatable entries with company name, job title, employment dates, responsibilities, achievements, and a "currently employed here" flag; (5) Skills — tagged from a standardized taxonomy (not free text) split into technical and soft skills, optionally with proficiency level; (6) CV File Upload — PDF and DOCX accepted, typically 5MB limit, auto-parsed via CV parser into plain text as raw input for matching/scoring, with support for multiple stored CVs and a default/primary flag; (7) Supplementary Sections — certifications, languages with proficiency, portfolio items, saved cover letter templates, and references. Also included design notes on the importance of structured fields vs. free text for matching logic, the parallel paths of CV upload vs. form-based profile entry, and skills normalization to prevent "JS" vs. "JavaScript" mismatches. |
 | **Student's contribution** | The AI provided a comprehensive and well-structured profile schema. The author cross-referenced it against SmartHire's scope and retained the core sections relevant to the project: personal info (name, phone, address, avatar, social links), education history, work experience (including projects and achievements), and skill tags. The Career Preferences section was adapted into the Account Management group (Functional Group 2) rather than the CV profile, as it maps more naturally to account-level settings in SmartHire's architecture. The author independently specified the CV template feature (pre-formatted templates with field suggestions by industry), which was not present in the AI response. The CV Parser specification (PDF/DOCX, max 5MB, raw text extraction) was validated against the AI's description and retained verbatim as a design constraint. All content in the document was independently rewritten by the author. |
  
----
- 
-### Entry 06
+### Use Case 2: CV parsing technical research
  
 | Field | Details |
 |---|---|
 | **Tool** | ChatGPT, GPT-4o, OpenAI, chat.openai.com |
-| **Access time** | 23:20, June 27, 2026  |
+| **Access time** | 23:20, June 27, 2026 |
 | **Prompt** | *"How does CV parsing work technically? What are common libraries or approaches to extract structured data from PDF and DOCX resumes?"* |
 | **Purpose** | Technical research to understand how CV parsing works end-to-end, in order to accurately specify the CV Parser feature in Functional Group 3 |
 | **AI-generated content** | A full 6-step CV parsing pipeline: (1) text extraction from DOCX (python-docx, mammoth.js) and PDF (pdfplumber, pdfminer.six, PyMuPDF), with OCR fallback for scanned documents using Tesseract, EasyOCR, or PaddleOCR; (2) text cleaning and normalization (removing duplicate spaces, fixing line breaks, merging wrapped lines); (3) section detection using regex or ML classifiers to identify Education, Experience, Skills, and Certificates blocks; (4) entity extraction using regex for emails/phones/dates and Named Entity Recognition (NER) via spaCy or HuggingFace for names, companies, universities, and skills; (5) data normalization for inconsistent formats (e.g., "JS / Javascript / Java Script" → "JavaScript", "HCMC / TP.HCM" → "Ho Chi Minh City"); (6) structured JSON output. Also provided a library comparison table across Python, Java, JavaScript, and C++, a rule-based vs. ML vs. LLM-based parsing comparison, and a recommended hybrid architecture for SmartHire specifically. |
@@ -86,7 +120,9 @@
  
 ---
  
-### Entry 07
+## Task 4 - FG4: Job Board & Advanced Search
+ 
+### Use Case 1: Search, filter & results display features
  
 | Field | Details |
 |---|---|
@@ -99,7 +135,9 @@
  
 ---
  
-### Entry 08
+## Task 5 - FG5: Job Posting Management
+ 
+### Use Case 1: Job posting lifecycle & creation features
  
 | Field | Details |
 |---|---|
@@ -112,7 +150,9 @@
  
 ---
  
-### Entry 09
+## Task 6 - FG7: Candidate Filtering & Combined Scoring System
+ 
+### Use Case 1: Hybrid rule-based + LLM scoring architecture
  
 | Field | Details |
 |---|---|
@@ -125,7 +165,9 @@
  
 ---
  
-### Entry 10
+## Task 7 - FG8: Recruitment Pipeline Kanban Board
+ 
+### Use Case 1: Kanban columns & candidate card design
  
 | Field | Details |
 |---|---|
@@ -138,7 +180,9 @@
  
 ---
  
-### Entry 11
+## Task 8 - FG9: Automated Notifications & In-App Alerts
+ 
+### Use Case 1: Async email notification best practices
  
 | Field | Details |
 |---|---|
@@ -151,12 +195,14 @@
  
 ---
  
-### Entry 12
+## Task 9 - FG10: Job Posting Moderation & Quality Assurance
+ 
+### Use Case 1: Admin moderation queue & report handling
  
 | Field | Details |
 |---|---|
 | **Tool** | ChatGPT, GPT-4o, OpenAI, chat.openai.com |
-| **Access time** | 23:25, June 27, 2026  |
+| **Access time** | 23:25, June 27, 2026 |
 | **Prompt** | *"What features should an admin moderation queue include for a recruitment platform to review, approve, and reject job postings? Include spam/fraud report handling."* |
 | **Purpose** | To research the full scope of an admin moderation system for a recruitment platform, used as a reference for defining Functional Group 10 — Job Posting Moderation & Quality Assurance |
 | **AI-generated content** | A 14-section moderation system covering: (1) moderation dashboard with widgets for pending count, fraud reports, daily approvals/rejections, average review time, and repeat offenders; (2) a multi-filter moderation queue (by status, employer, date, industry, risk score, deadline); (3) a job review screen displaying full JD content alongside employer profile, company verification status, previous violations, and moderation history; (4) a side-by-side diff view for edited postings highlighting added/deleted text and changed salary or requirements; (5) moderation actions including approve, schedule publication, reject with categorized reason and custom comments; (6) automated employer feedback emails upon rejection with required corrections and resubmission link; (7) a spam detection queue with automatic flagging rules for duplicates, excessive capitalization, suspicious URLs, upfront payment requests, and cryptocurrency scam indicators; (8) a user report submission form with 9 report categories and optional screenshot upload; (9) a report management queue grouped by priority based on report count; (10) a report investigation panel with reporter comments, employer history, previous violations, and uploaded evidence; (11) post-investigation actions including dismiss, hide job, remove permanently, suspend employer, escalate, or ban; (12) a full moderation audit trail logging every action with moderator, timestamp, and reason; (13) an employer reputation scoring system routing high-risk employers to mandatory manual review; (14) moderation analytics (approval rate, rejection reasons, moderator productivity, fraud reports resolved). Also provided a complete status flow diagram from job creation through investigation outcomes. |
@@ -164,7 +210,9 @@
  
 ---
  
-### Entry 13
+## Task 10 - FG11: User Management & Employer Verification
+ 
+### Use Case 1: Account lookup, verification & suspension
  
 | Field | Details |
 |---|---|
@@ -177,7 +225,9 @@
  
 ---
  
-### Entry 14
+## Task 11 - FG12: Recruitment Analytics & Data Export
+ 
+### Use Case 1: Employer & admin analytics features
  
 | Field | Details |
 |---|---|
@@ -190,7 +240,9 @@
  
 ---
  
-### Entry 15
+## Task 12 - Document Review & Quality Check
+ 
+### Use Case 1: Third-party review of V1.4 draft
  
 | Field | Details |
 |---|---|
@@ -200,7 +252,7 @@
 | **Purpose** | To obtain an objective third-party review of the full V1.4 draft before incorporating team member feedback, in order to identify inconsistencies and underspecified areas that the author may have missed |
 | **AI-generated content** | A structured review organized by severity across three categories. Critical inconsistencies: (1) the scoring weight formula in Section 7's main spec text still stated 30/70 while the team's chốt below it resolved 60/40 — the main text was never updated, meaning any developer reading only the bullet list would implement the wrong formula; (2) the statuses "Xem xét" and "Phù hợp" were defined differently between Section 6 (candidate tracking view) and Section 8 (Kanban board) — most critically, "Phù hợp" meant "flagged suitable, still awaiting screening" in Section 6 but "selected/hired" in Section 8, a conflict that would break the conversion funnel in Section 12 and the notification triggers in Section 9; (3) Section 11 required admin to check a business license file but Section 1's registration flow and Section 2's account management had no field where employers could upload one — flagged as a missing feature, not just unclear wording; (4) the job edit → re-approval flow was ambiguous — Section 10 implied edited postings re-enter the moderation queue, but Section 5's edit feature didn't mention whether the live posting goes offline, stays live with old content, or goes live immediately with unreviewed edits. Underspecified descriptions: version history chốt was ambiguous between a full before/after snapshot vs. a diff of changed fields; status-change email triggers were unclear (does "Đã xem" viewing the CV also send an email?); the relationship between CV Parser output and structured profile form was undefined (which source feeds the matching in Section 7?); the autocomplete suggestion dropdown had no defined source; the pre-merger district filter lacked a defined location data model; the AI explanation sub-feature from Hai's suggestion was in the chốt text but missing from the formal bullet list. Missing gaps: no skill-tag taxonomy management feature defined anywhere despite being referenced in four sections; no clarity on whether the application deadline countdown runs while a JD sits in the approval queue; no SLA for overdue moderation items; suspension behavior for an employer's live postings was unspecified; no account deletion feature anywhere; no interview scheduling feature despite an interview invite email being referenced in Section 9; "chiến dịch tuyển dụng" (recruitment campaign) was used loosely without being formally defined as an entity. |
 | **Student's contribution** | The AI's review was comprehensive and identified several issues the author had not caught independently. The author cross-referenced each point against the actual team member feedback received from Thanh, Tuan, Khoi, and Hai, then resolved issues in V2.1 as follows. Critical fixes applied: corrected the scoring weight formula in the Section 7 main spec text from 30/70 to 60/40 to match the chốt; synchronized the candidate status definitions between Sections 6 and 8 into a single canonical pipeline; flagged the business license upload gap as an open issue to be addressed in the registration flow (Section 1) in a subsequent revision. Underspecified items resolved: clarified the version history chốt as a full before/after snapshot of the most recent edit; scoped status-change emails to meaningful transitions only (not "Đã xem"); added the AI score explanation as an explicit sub-feature bullet in Section 7. Items deferred or acknowledged as out of scope: skill-tag taxonomy management, account deletion, interview scheduling, application deadline behavior during approval queue wait, moderation SLA, and the campaign entity definition were all logged as known gaps to be addressed in later PAs. The author did not copy any of the AI's review text directly into the document; all revisions were independently implemented based on the author's own judgment of which issues to resolve at this stage. |
-
+ 
 ---
 
 ## Chat History Evidence
