@@ -83,10 +83,10 @@ Security is one of the highest priorities because the platform stores sensitive 
 The system shall:
 
 - require authenticated login before accessing protected resources.
-- issue stateless JSON Web Tokens (JWT).
+- issue stateless JSON Web Tokens.
 - securely invalidate user sessions after logout.
 - enforce password reset through email verification.
-- store authenticatin tokens using HttpOnly, Secure, SameSite cookies, never in localStorage or sessionStorage, to prevent token theft via client-side scripts injection (XSS)
+- store authentication tokens using HttpOnly, Secure, SameSite cookies, never in localStorage or sessionStorage, to prevent token theft via client-side script injection.
 
 ## Authorization
 

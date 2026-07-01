@@ -230,24 +230,30 @@ flowchart TB
         AI --> AJ{Recruiter Decision}
     end
 
-    AJ -->|Under Review| AK[Application Status: Screening]
-    AK --> AH
+    AJ -->|View CV| AK1[Application Status: Viewed]
+    AK1 --> AH
 
-    AJ -->|Interview| AL[Receive Interview Invitation]
+    AJ -->|Shortlist| AK2[Application Status: Shortlisted]
+    AK2 --> AH
+
+    AJ -->|Interview| AL[Application Status: Interviewing]
     AL --> AM{Accept Interview?}
 
     AM -->|No| AN[Decline or Request Rescheduling]
     AN --> AH
 
     AM -->|Yes| AO[Confirm Interview Schedule]
-    AO --> AP[Attend Interview]
+    AO --> AP[Attend Interview and Test]
     AP --> AQ[Wait for Interview Result]
     AQ --> AJ
 
+    AJ -->|Waitlist| AWL[Application Status: Waitlisted]
+    AWL --> AT[Continue Searching for Other Jobs]
+    AT --> O
+
     AJ -->|Rejected| AR[Application Status: Rejected]
     AR --> AS[Receive Rejection Notification]
-    AS --> AT[Continue Searching for Other Jobs]
-    AT --> O
+    AS --> AT
 
     AJ -->|Offered| AU[Application Status: Offered]
     AU --> AV[Review Job Offer]
@@ -323,23 +329,28 @@ flowchart TB
     U -->|Reject| V[Move Candidate to Rejected Stage]
     V --> W[Send Rejection Notification]
 
-    U -->|Shortlist| X[Move Candidate to Screening Stage]
+    U -->|Shortlist| X[Move Candidate to Shortlisted Stage]
     X --> Y[Contact Candidate]
     Y --> Z[Schedule Interview]
 
-    Z --> AA[Conduct Interview]
-    AA --> AB[Record Interview Feedback]
+    Z --> AA[Move Candidate to Interviewing Stage]
+    AA --> AA1[Conduct Interview & Test]
+    AA1 --> AB[Record Interview Feedback]
     AB --> AC{Final Hiring Decision}
 
     AC -->|Not Selected| AD[Move Candidate to Rejected Stage]
     AD --> AE[Send Final Rejection Notification]
 
-    AC -->|Selected| AF[Move Candidate to Offered Stage]
-    AF --> AG[Send Job Offer]
+    AC -->|Waitlist| AWL[Move Candidate to Waitlisted Stage]
+    AWL --> AJ
+
+    AC -->|Selected| AF[Move Candidate to Selected Stage]
+    AF --> AF1[Move Candidate to Offered Stage]
+    AF1 --> AG[Send Job Offer]
 
     AG --> AH{Candidate Response}
 
-    AH -->|Declined| AI[Update Candidate Status]
+    AH -->|Declined| AI[Move Candidate to Offer Declined Stage]
     AI --> AJ[Continue with Other Candidates]
     AJ --> Q
 
@@ -578,7 +589,7 @@ The following requirements summarize the main needs identified for each stakehol
 | NEED-08 | Recruiter           | Must     | Job-post management           | Recruiters must be able to create, save, edit, publish, close, and extend job postings.                                  |
 | NEED-09 | Recruiter           | Must     | Applicant management          | Recruiters must be able to view applicants and access their profiles, CVs, and cover letters.                            |
 | NEED-10 | Recruiter           | Must     | Candidate ranking             | The platform should compare candidate qualifications with job requirements and support applicant sorting.                |
-| NEED-11 | Recruiter           | Must     | Recruitment pipeline          | Recruiters must be able to move candidates through stages such as Applied, Screening, Interviewing, Offered, and Hired.  |
+| NEED-11 | Recruiter           | Must     | Recruitment pipeline          | Recruiters must be able to move candidates through stages such as Applied, Viewed, Shortlisted, Interviewing, Offered, Hired, Offer Declined, Rejected, and Waitlisted. |
 | NEED-12 | Recruiter           | Should   | Candidate evaluation          | Recruiters should be able to write notes and assign evaluation ratings.                                                  |
 | NEED-13 | Recruiter           | Should   | Automated communication       | Status changes should support automatic or template-based candidate notifications.                                       |
 | NEED-14 | Administrator       | Must     | Recruiter verification        | Administrators must verify company information before allowing recruiters to publish jobs.                               |
