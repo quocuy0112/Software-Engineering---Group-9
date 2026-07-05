@@ -41,7 +41,7 @@ The platform utilizes a modern technical stack and a decoupled architecture:
 
 SmartHire is a standalone, AI-assisted Recruitment Management Platform that operates as a responsive web application. It serves as a centralized hub connecting job candidates, recruiters, and system administrators throughout the recruitment lifecycle.
 
-The system is designed using a client-server architecture where the frontend application communicates with backend services through secure RESTful APIs. SmartHire integrates with external services such as OpenAI API for resume analysis and content generation, email services for notifications, and database systems for persistent data storage.
+The system is designed using a client-server architecture where the frontend application communicates with backend services through secure RESTful APIs. SmartHire integrates with external services such as AI API for resume analysis and content generation, email services for notifications, and database systems for persistent data storage.
 
 SmartHire replaces traditional recruitment methods that rely on spreadsheets, emails, and manual tracking with an automated and structured recruitment workflow. The platform supports the complete hiring process, from job creation and candidate application submission to screening, interviewing, and final hiring decisions.
 
@@ -69,7 +69,7 @@ The major system components include:
 - Human-readable score explanations (shared with both recruiter and candidate)
 
 ### External Systems
-- OpenAI API or custom AI model
+- AI API or custom AI model
 - Email notification service
 - Relational database system (PostgreSQL/MySQL)
 
@@ -100,7 +100,7 @@ graph TD
     SmartHire --> AP
     SmartHire --> AI
 
-    AI --> OpenAI[OpenAI API / Local AI Model]
+    AI --> AI[AI API / Local AI Model]
     SmartHire --> DB[(PostgreSQL / MySQL Database)]
     SmartHire --> Email[Email Notification Service]
 ```
