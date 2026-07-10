@@ -30,18 +30,19 @@ flowchart TB
 
     subgraph USERS["Platform Users"]
         direction LR
-        CANDIDATE["Candidates"]
-        RECRUITER["Recruiters / HR"]
+        CANDIDATE["Candidates<br/>(Base Users)"]
+        RECRUITER["Recruiters / HR<br/>(Company Members)"]
         ADMIN["Platform Administrators"]
     end
 
-    COMPANY["Hiring Companies"] -->|"Authorize"| RECRUITER
+    CANDIDATE -->|"Request verification for"| COMPANY["Hiring Companies"]
+    COMPANY -->|"Grants role (via CompanyMember) to"| RECRUITER
 
     subgraph PLATFORM["Recruitment Platform"]
         direction LR
-        ACCESS["Accounts, Profiles<br/>and Verification"]
-        RECRUITMENT["Jobs, Applications<br/>and Candidate Matching"]
-        OPERATIONS["Pipeline, Communication<br/>and Administration"]
+        ACCESS["Accounts, Profiles, Company<br/>and Recruiter Verification"]
+        RECRUITMENT["Jobs, Applications<br/>and Smart Matching"]
+        OPERATIONS["9-State Kanban Pipeline,<br/>Automated Comm. & Admin"]
 
         ACCESS --> RECRUITMENT --> OPERATIONS
     end
@@ -50,13 +51,13 @@ flowchart TB
         direction LR
         EMAIL["Email"]
         STORAGE["File Storage"]
-        AI["AI Scoring API"]
-        CLOUD["Cloud Infrastructure"]
+        AI["AI API<br/>(CV Scoring & Explanation)"]
+        DATABASE["PostgreSQL or MySQL"]
     end
 
-    CANDIDATE -->|"Searches and applies"| PLATFORM
-    RECRUITER -->|"Posts jobs and hires"| PLATFORM
-    ADMIN -->|"Verifies and moderates"| PLATFORM
+    CANDIDATE -->|"Searches, applies & requests company role"| PLATFORM
+    RECRUITER -->|"Posts jobs, manages pipeline & hires"| PLATFORM
+    ADMIN -->|"Verifies accounts & moderates postings"| PLATFORM
 
     PO -.->|"Sets priorities"| PLATFORM
     DEV -.->|"Builds and maintains"| PLATFORM
@@ -65,7 +66,7 @@ flowchart TB
     PLATFORM --> EMAIL
     PLATFORM --> STORAGE
     PLATFORM --> AI
-    PLATFORM --> CLOUD
+    PLATFORM --> DATABASE
 
     CANDIDATE -.->|"Usability feedback"| PO
     RECRUITER -.->|"Recruitment feedback"| PO
@@ -80,7 +81,7 @@ flowchart TB
     class PO,DEV,SUP,COMPANY stakeholder;
     class CANDIDATE,RECRUITER,ADMIN user;
     class ACCESS,RECRUITMENT,OPERATIONS platform;
-    class EMAIL,STORAGE,AI,CLOUD service;
+    class EMAIL,STORAGE,AI,DATABASE service;
 ```
 
 ### Diagram Legend
