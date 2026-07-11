@@ -1,8 +1,19 @@
-# Vision Document for Group 9
+# SmartHire - Vision Document
 
-**Conclusion Author:** Nguyễn Gia Quốc Uy    
-**Student ID:** 24127261   
-**Reviewer:** Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi   
+| Document Metadata | Value |
+|---|---|
+| Group | 9 |
+| Document Owner | Nguyễn Gia Quốc Uy (Student ID: 24127261) |
+| Reviewers | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi |
+| Version | 1.1 (Working Draft) |
+| Last Updated | 2026-07-10 |
+| Status | Draft for Team Review |
+
+### Revision History
+
+| Version | Date | Author/Editor | Summary | Status |
+|---|---|---|---|---|
+| 1.1 | 2026-07-10 | Nguyễn Gia Quốc Uy and Group 9 | Reconciled the project scope, multi-tenant authorization model, feature priorities, measurable quality targets, company-membership workflow, references, and document presentation. | Draft for Team Review |
 
 ## Changes from PA1 Proposal & How this document was developed
 
@@ -12,10 +23,10 @@ PA1 proposal, based on deeper technical and product discussions within the team.
 - **AI Job Description Generator: Removed.** 
     - Generating a quality JD requires inputting nearly as much detail as writing it manually, providing negligible automation benefit.
 - **AI Resume Enhancement & Gap Analysis: Removed / merged.** 
-    - Resume rewriting was dropped due to the risk of A misrepresenting a candidate's actual qualifications.
-    - Gap-analysis value is instead delivered through the score  explanation already required for the scoring engine (Section 5.3.7), rather than as a separate feature.
+    - Resume rewriting was dropped due to the risk of AI misrepresenting a candidate's actual qualifications.
+    - Gap-analysis value is instead delivered through the score explanation already required for the scoring engine (Section 5.3.7), rather than as a separate feature.
 - **Application status model: Expanded and clarified.** 
-    - PA1's original 5-state model (Applied → Screened → Interviewing → Offered → Hired/Rejected) has been refined into a 9-state canonical pipeline (Applied, Viewed, Shortlisted,Interviewing, Offered, Hired, Offer Declined, Rejected, Waitlisted) to accurately reflect the recruiter decision points identified during workflow design.
+    - PA1's original 5-state model (Applied → Screened → Interviewing → Offered → Hired/Rejected) has been refined into a 9-state canonical pipeline (Applied, Viewed, Shortlisted, Interviewing, Offered, Hired, Offer Declined, Rejected, Waitlisted) to accurately reflect the recruiter decision points identified during workflow design.
 - **Employer registration model: Redesigned.** 
     - PA1 assumed a separate employer registration flow. 
     - The current design instead uses a single base Candidate account that can request Recruiter/HR Manager permissions via a multi-tenant company membership model, allowing one user to manage recruitment for multiple companies.
@@ -25,7 +36,7 @@ PA1 proposal, based on deeper technical and product discussions within the team.
 - **Job matching: Re-scoped from AI to rule-based.** 
     - What PA1 described as "AI-powered job recommendations" is implemented as tag- and location-based Smart Matching, not semantic AI analysis — the AI/LLM capacity is instead concentrated on CV scoring, where it delivers clearer value.
 
-This Vision Document is the consolidated result of individual sections authored by each member of Group 9 over the past three weeks, subsequently cross-checked and reconciled to resolve inconsistencies between documents. Authorship and review credit for each section are recorded below. Open items still requiring team confirmation are noted where applicable.
+This Vision Document consolidates sections authored by members of Group 9 and reconciles the product scope, terminology, priorities, and architectural assumptions across the project documentation. Authorship and review credit for each section are recorded below. Open items requiring team confirmation are identified explicitly.
 
 # 1. Introduction
 
@@ -34,51 +45,63 @@ This Vision Document is the consolidated result of individual sections authored 
 
 ## 1.1. Purpose
 
-This document defines the product positioning for SmartHire, an AI-assisted applicant tracking system built for small and medium-sized enterprises in Vietnam. It serves as a foundational reference for the product team, ensuring all members share a consistent understanding of the problem being solved, the target audience, and the strategic rationale behind the product's design and direction.
+This document defines the product vision, positioning, target users, high-level capabilities, constraints, and quality objectives for SmartHire, an AI-assisted applicant tracking system built for small and medium-sized enterprises in Vietnam. It serves as the shared product baseline for requirements, design, implementation, testing, and stakeholder review.
 
-The document is intended for internal use across product, design, and development functions. It should be consulted at the start of any feature discussion, sprint planning session, or stakeholder presentation to maintain alignment between what is being built and why.
+The document is intended for internal use across product, design, development, and quality-assurance functions. It should be consulted during feature discussions, sprint planning, requirements refinement, and stakeholder presentations to maintain alignment between what is being built and why.
 
-## 1.2. References
+## 1.2. Scope and Out of Scope
+
+### In Scope for the Current Project Release
+
+- Candidate account, profile, and CV management.
+- Approved-job discovery, filtering, saving, and application submission.
+- Company-scoped recruiter access, job-post management, applicant review, and Kanban pipeline management.
+- Hybrid candidate scoring using deterministic matching plus AI-assisted semantic analysis and score explanations.
+- Candidate application tracking, email notifications, and in-app alerts.
+- Employer verification, company membership approval, job moderation, and essential platform administration.
+- Backend security logging and audit records required for troubleshooting, moderation, and accountability.
+
+Recruitment analytics and data export are **P1 (Should)** capabilities: they are planned for the current project but may be deferred until all P0 capabilities are stable.
+
+### Out of Scope for the Current Project Release
+
+- AI-generated job descriptions.
+- AI resume rewriting or resume enhancement.
+- Fully automated candidate rejection or hiring decisions.
+- Semantic AI job recommendations; current Smart Matching uses rules based on tags, preferences, and location.
+- External calendar synchronization, payroll, onboarding, and full human-resource management.
+
+## 1.3. References
 
 | # | Source | Description |
 |---|---|---|
-| 1 | Moore, G. A. — *Crossing the Chasm* (1991) | Origin of the Product Position Statement framework used in this document. The template structures a product's market position across six dimensions: target customer, pain point, product category, core benefit, competitive alternatives, and key differentiator. |
-| 2 | Ries, E. — *The Lean Startup* (2011) | Informs the problem-first approach taken in the Problem Statement section — defining validated pain points before solution design. |
-| 3 | Vietnam Ministry of Planning and Investment — SME Report (2023) | Contextual data on the scale of SMEs in Vietnam and their operational constraints, used to validate the target market definition. |
-| 4 | TopCV, ITviec — Public platform documentation | Referenced as competitive alternatives in the Product Position Statement. |
+| 1 | Geoffrey A. Moore, [*Crossing the Chasm*](https://geoffreyamoore.com/book/) | Basis for the product-positioning structure: target customer, unmet need, product category, primary benefit, alternatives, and differentiation. |
+| 2 | Eric Ries, [*The Lean Startup*](https://www.penguinrandomhouse.com/books/210088/the-lean-startup-by-eric-ries/) (2011) | Supports the problem-first and hypothesis-validation approach used in the Problem Statement. |
+| 3 | Vietnam Ministry of Planning and Investment, [*Voluntary National Review 2023 on the Implementation of the Sustainable Development Goals*](https://fileportalcms.mpi.gov.vn/TinBai/VanBan/2023-08/VNR_Full_Final%28EN%29.pdf) | Provides official context on the composition and importance of SMEs in Vietnam. |
+| 4 | [TopCV](https://www.topcv.vn/) and [ITviec](https://itviec.com/) public product pages | Used as representative local job-platform alternatives in the positioning and competitor analysis. |
+| 5 | National Assembly of Vietnam, [Law No. 91/2025/QH15 on Personal Data Protection](https://vanban.chinhphu.vn/?classid=1&docid=214590&pageid=27160&typegroup=) | Primary legal reference for personal-data processing and protection; effective from 2026-01-01. |
+| 6 | Government of Vietnam, [Decree No. 13/2023/ND-CP on Personal Data Protection](https://vanban.chinhphu.vn/?classid=0&docid=207759&pageid=27160) | Supporting personal-data protection requirements applicable to the system. |
+
+Web references were last accessed on **2026-07-10**.
+
+## 1.4. Glossary
+
+| Term | Definition |
+|---|---|
+| AI | Artificial Intelligence. In SmartHire, AI provides advisory semantic CV analysis and explanations; it does not make final hiring decisions. |
+| ATS | Applicant Tracking System; software used to manage job postings, applications, candidates, and hiring workflows. |
+| CV | Curriculum Vitae; a candidate document containing education, experience, skills, and other professional information. |
+| JD | Job Description; the responsibilities, requirements, and employment details associated with a job posting. |
+| LLM | Large Language Model used by the AI service for contextual CV-to-JD analysis. |
+| Multi-tenant | An authorization model in which company data is isolated and access is granted through a company-specific membership. |
+| P0 / Must | Capability required for the current project release to support the end-to-end core workflow. |
+| P1 / Should | Important capability planned after P0 requirements are stable; it may be deferred without breaking the core workflow. |
+| RBAC | Role-Based Access Control; authorization based on platform roles and company-scoped membership roles. |
+| SME | Small or Medium Enterprise. SmartHire targets Vietnamese SMEs with relatively small recruitment teams. |
 
 # 2. Positioning
 
-### Document Structure
-
-This document is organised into two core positioning frameworks, each presented as a structured table:
-
-**1. Positioning**
- 
-| Section | Description |
-|---|---|
-| **Problem Statement** | Defines the specific problem this product exists to solve, who is affected, what the consequences of inaction are, and what a successful solution would look like. |
-| **Product Position Statement** | Defines the product's strategic market position — who it is for, what pain it resolves, what category it belongs to, why users should choose it, how it differs from alternatives, and what makes it uniquely valuable. |
- 
-**2. Problem Statement** — presented in a structured table:
- 
-| Section | Description |
-|---|---|
-| **The problem of** | What is the specific problem or issue being addressed? |
-| **Affects** | Who is affected, and what elements or factors are impacted? |
-| **The impact of which is** | What is the negative impact or consequence of this problem? |
-| **A successful solution would be** | What would a successful solution achieve? |
- 
-**3. Product Position Statement** — presented in a structured table:
- 
-| Section | Description |
-|---|---|
-| **For** | Target customers — who is the target audience? |
-| **Who** | What pain points or difficulties do they need resolved? |
-| **The SmartHire** | Product name and product category or type. |
-| **That** | What is the core benefit? Why should they buy and use this product? |
-| **Unlike** | How does it differ from current competitors or existing solutions? |
-| **Our product** | In what way is your product superior or unique? |
+This section uses a Problem Statement to define the need and a Product Position Statement to define SmartHire's target market, primary value, alternatives, and differentiation.
 
 ## 2.1. Problem Statement
 
@@ -87,7 +110,7 @@ This document is organised into two core positioning frameworks, each presented 
 | **The problem of** | Vietnamese SMEs managing recruitment manually via disconnected tools (email, spreadsheets) without a structured tracking, screening, or evaluation system. This leads to fragmented, duplicated candidate data and loss of institutional knowledge when recruiters leave. |
 | **Affects** | - **Recruiters & HR staff** wasting time on repetitive administrative tasks instead of high-value sourcing/engagement.<br>- **Hiring managers** lacking visibility into candidate pipelines and evaluation contexts.<br>- **Job candidates** facing poor, delayed updates, which damages the employer's brand.<br>- **Business leadership** unable to make data-driven decisions due to a lack of structured recruitment analytics. |
 | **The impact of which is** | - **Inefficient hiring:** Manual CV screening is slow and prone to bias or errors.<br>- **Candidate stagnation:** Strong early applicants are missed or forgotten due to the lack of objective scoring.<br>- **Low productivity:** Recruiters burn out from copy-pasting data, reformatting CVs, and manual email tasks.<br>- **Weakened talent brand:** Poor candidate communication hurts the company's reputation.<br>- **Zero optimization:** Without structured historical data, the business cannot track performance or improve its funnel. |
-| **A successful solution would be** | A lightweight, user-friendly web platform that:<br>- Automates CV screening and scoring.<br>- Provides a visual recruitment pipeline (Kanban board).<br>- Automates candidate status communications.<br>- Offers real-time analytics dashboards for leadership.<br>- Connects candidates to jobs via Smart Matching.<br>Success is defined by cutting administrative tasks by 80%, ensuring no candidates are missed, and enabling zero-setup adoption for SMEs. |
+| **A successful solution would be** | A lightweight, user-friendly web platform that:<br>- Automates CV screening and scoring.<br>- Provides a visual recruitment pipeline (Kanban board).<br>- Automates candidate status communications.<br>- Adds P1 recruitment analytics and data export after the core workflow is stable.<br>- Connects candidates to jobs via Smart Matching.<br>Success is defined by cutting administrative tasks by 80%, ensuring no candidates are missed, and enabling zero-setup adoption for SMEs. |
 
 ## 2.2. Product Position Statement
 
@@ -104,7 +127,7 @@ This document is organised into two core positioning frameworks, each presented 
 - Smart Job Matching Recommendation (rule-based tags/location)
 - Structured ATS pipeline for recruiters
 - Automated candidate communication
-- Real-time hiring dashboard for admins
+- Planned recruitment analytics and data export for administrators and recruiters
 
 # 3. Stakeholder and User Descriptions
 
@@ -126,7 +149,7 @@ This document is organised into two core positioning frameworks, each presented 
 | Project Supervisor / Academic Reviewer | External | Reviews project quality, requirements, design decisions, implementation, and documentation. | Medium |
 | Third-party Service Providers | External | Provide services such as email delivery, file storage, cloud infrastructure, and AI APIs. | Low to Medium |
 
-#### **Stakeholder analysis**
+### 3.1.1. Stakeholder Analysis
 
 The **Product Owner, Development Team,** and **Recruiters** have the greatest influence because they directly determine the system requirements, technical implementation, and operational value of the platform.
 
@@ -134,7 +157,7 @@ Candidates have high interest because the system directly affects their job-sear
 
 ## 3.2. User Persona Summary
 
-The platform has three primary user groups: Candidates, Recruiters, and Administrators. Each group has different goals, technical abilities, permissions, and usage patterns...
+The platform has three primary user groups: Candidates, Recruiters/HR Managers, and Administrators. Each group has different goals, technical abilities, permissions, and usage patterns.
 
 ### 3.2.1. Candidate
 
@@ -169,7 +192,7 @@ The platform has three primary user groups: Candidates, Recruiters, and Administ
 | Main activities | Verify recruiters, approve job posts, process & export reports, suspend accounts, monitor platform statistics, and review audit logs. |
 | Expected outcome | Maintain a safe recruitment environment with legitimate users and reliable job information. |
 
-## 3.3. User Environment 
+## 3.3. User Environment
 
 The recruitment platform is a responsive web application. Its interface and technical design must support different devices, software platforms, and specific usage contexts for each user group.
 
@@ -221,15 +244,15 @@ To fit into the existing workflow of SMEs, the application must interact with ot
 
 | Problem | Reasons for the Problem | Current Workaround (How it is solved now) | Desired Solution (What solution is wanted) | Relative Importance |
 | :--- | :--- | :--- | :--- | :--- |
-| **Recruiters spend too much time screening CVs manually.** | CVs are unstructured; comparing skills with job descriptions is subjective and slow. | Reading CVs one by one, using simple Ctrl+F keywords, or outsourcing initial screening. | An AI-powered hybrid scoring algorithm to automatically rank CVs based on skills/experience. | **Critical (Must)** |
-| **Candidates face lack of transparency in application status.** | Recruiters rarely update candidates on progress, leading to anxiety and ghosting. | Keeping manual spreadsheets; sending follow-up emails that go unanswered. | A real-time status tracker tied to a Kanban board and automated notifications at each stage. | **High (Should)** |
-| **High risk of fake recruiters and spam job postings.** | Anyone can register and post jobs without verification of business legitimacy. | Reactive reporting after candidates get scammed; manual post-moderation. | Mandatory recruiter business license verification (Tax ID) and Admin approval queues. | **Critical (Must)** |
-| **Fragmented recruitment coordination within hiring teams.** | Recruiter, HR department, and Hiring Managers communicate via separate chat apps or emails. | Sharing Excel sheets, printing CVs, or holding long synchronization meetings. | An interactive Kanban board serving as a shared pipeline for status updates and comments. | **Critical (Must)** |
-| **Repetitive application process for candidates.** | Most job portals redirect to external sites, forcing candidates to re-enter data manually. | Copy-pasting data from resume text into custom application forms repeatedly. | Profile data reuse (1-click apply) and automated parser to extract data from uploaded CVs. | **High (Should)** |
+| **Recruiters spend too much time screening CVs manually.** | CVs are unstructured; comparing skills with job descriptions is subjective and slow. | Reading CVs one by one, using simple Ctrl+F keywords, or outsourcing initial screening. | An AI-powered hybrid scoring algorithm to automatically rank CVs based on skills/experience. | **Critical (P0 / Must)** |
+| **Candidates face lack of transparency in application status.** | Recruiters rarely update candidates on progress, leading to anxiety and ghosting. | Keeping manual spreadsheets; sending follow-up emails that go unanswered. | A real-time status tracker tied to a Kanban board and automated notifications at each stage. | **Critical (P0 / Must)** |
+| **High risk of fake recruiters and spam job postings.** | Anyone can register and post jobs without verification of business legitimacy. | Reactive reporting after candidates get scammed; manual post-moderation. | Mandatory recruiter business license verification (Tax ID) and Admin approval queues. | **Critical (P0 / Must)** |
+| **Fragmented recruitment coordination within hiring teams.** | Recruiters, HR staff, and Hiring Managers communicate through separate chat applications or email. | Sharing Excel sheets, printing CVs, or holding lengthy synchronization meetings. | An interactive Kanban board serving as a shared pipeline for status updates and comments. | **Critical (P0 / Must)** |
+| **Repetitive application process for candidates.** | Most job portals redirect to external sites, forcing candidates to re-enter data manually. | Copy-pasting data from resume text into custom application forms repeatedly. | Profile data reuse (1-click apply) and automated parsing of uploaded CVs. | **Critical (P0 / Must)** |
 
 ### 3.4.2. Detailed Stakeholder and User Needs List
 
-The following requirements summarize the mapping of the identified needs for each user group, along with their priorities:
+The following requirements map the identified needs to user groups. **Must** corresponds to **P0** and is required for the core release; **Should** corresponds to **P1** and is implemented after P0 capabilities are stable.
 
 | ID | User or stakeholder | Priority | Need | Description |
 | :--- | :--- | :--- | :--- | :--- |
@@ -239,36 +262,36 @@ The following requirements summarize the mapping of the identified needs for eac
 | NEED-04 | Candidate | Must | Relevant job discovery | Search and filter jobs by keyword, location, salary, experience, and job type. |
 | NEED-05 | Candidate | Must | Simple application process | Reuse existing profile/CV info to reduce repetitive data entry. |
 | NEED-06 | Candidate | Must | Application transparency | See the real-time status of each submitted application. |
-| NEED-07 | Candidate | Should | Timely notifications | Receive updates when recruiters change application status. |
+| NEED-07 | Candidate | Must | Timely notifications | Receive updates when recruiters change application status. |
 | NEED-08 | Recruiter | Must | Job-post management | Create, save, edit, publish, close, and extend job postings. |
 | NEED-09 | Recruiter | Must | Applicant management | View applicants and access their profiles, CVs, and cover letters. |
 | NEED-10 | Recruiter | Must | Candidate ranking | Compare candidate qualifications with job requirements and sort applicants. |
 | NEED-11 | Recruiter | Must | Recruitment pipeline | Recruiters must be able to move candidates through stages such as Applied, Viewed, Shortlisted, Interviewing, Offered, Hired, Offer Declined, Rejected, and Waitlisted. |
 | NEED-12 | Recruiter | Should | Candidate evaluation | Write feedback notes and assign evaluation ratings. |
-| NEED-13 | Recruiter | Should | Automated communication | Automatic email notifications triggered by pipeline status changes. |
+| NEED-13 | Recruiter | Must | Automated communication | Automatic email and in-app notifications triggered by pipeline status changes. |
 | NEED-14 | Administrator | Must | Recruiter verification | Verify company registration documents before allowing job publication. |
 | NEED-15 | Administrator | Must | Job moderation | Approve, reject, or request revision of job postings. |
 | NEED-16 | Administrator | Must | User management | Search, suspend, and reactivate user accounts. |
-| NEED-17 | Administrator | Should | Auditability | Record administrative and recruitment actions in system logs. |
-| NEED-18 | Product Owner | Must | Business visibility | Dashboard showing platform growth, active postings, and conversion rates. |
+| NEED-17 | Administrator | Must | Backend auditability | Record security-sensitive administrative and recruitment actions in system logs. |
+| NEED-18 | Product Owner | Should | Business visibility | Dashboard showing platform growth, active postings, and conversion rates. |
 | NEED-19 | Development Team | Must | Maintainable architecture | Modular components, consistent REST APIs, and decoupled state management. |
 | NEED-20 | All users | Must | Privacy and security | Secure personal data and CV files against unauthorized access. |
 
-## 3.5. Alternative and Competing Solutions 
+## 3.5. Alternative and Competing Solutions
 
 The platform competes with both job-search websites and Applicant Tracking Systems. It may also replace manual recruitment methods, in-house builds, and informal channels currently used by small organizations.
 
-| Alternative or Competitor | Category | Main Strengths | Limitations or Opportunity for the proposed platfom|
+| Alternative or Competitor | Category | Main Strengths | Limitations or Opportunity for SmartHire |
 |---|---|---|---|
-| LinkedIn | Professional networking and recruitment platform | HR teams already have company pages and personal networks there, so posting a job feels like zero extra setup; large talent pool with strong professional credibility. | Recruiter seat licenses and sponsored posts get expensive fast at SME hiring volumes; once applications come in, there's no structured way to compare or track them, LinkedIn stops being useful right after the "post" step. |
-| Indeed | Job-search and job-advertising platfor | Huge reach, so job ads get seen quickly without much effort; simple to post. | Built for getting applicants in the door, not managing them afterward,HR ends up exporting CVs to email or spreadsheets the moment volume grows, right back to the manual problem.
-| TopCV / VietnamWorks / CareerViet / ITviec | Local job platforms | Vietnamese candidates already look there first; CV templates and services feel familiar to local HR staff; strong local job coverage. | Recruiters juggle applicants across several of these platforms separately, each with its own inbox and no shared pipeline, nothing to unify candidates from different sources into one view. |
-| Greenhouse / Lever | Applicant Tracking Systems | Real pipeline management, structured hiring, interview workflows, and integrations. | Priced and packaged for companies with dedicated recruitment operations and hundreds of open roles; an SME with 1-3 HR staff finds the setup and cost hard to justify for their scale. | 
-| Workday | Enterprise HR and ATS platform | Comprehensive, "does everything" reputation, strong compliance and reporting that larger competitors use as a benchmark. | Implementation alone can take months and require IT support SMEs don't have and completely out of reach for a 10-500 employee company without a dedicated ops team. |
-| In-house build | Homegrown solution | Feels cheaper upfront than a subscription; can be shaped exactly to how the company already works, no vendor lock-in. | Requires ongoing developer time to maintain and extend; when the person who built it leaves, the tool becomes a black box, the same "institutional knowledge walks out the door" risk the platform is meant to solve, just relocated to the tool itself. |
-| Spreadsheets and email | Manual status quo | Already familiar, no new tool to learn, zero cost to start, flexible to adapt on the fly. | Candidate data gets duplicated and outdated across team members' inboxes; there's no single source of truth, and following up with candidates becomes a manual, easy-to-forget task.|
-| Social media groups (Facebook, Zalo groups) | Informal recruitment alternative | Fast to post, free, and reaches passive candidates who aren't actively browsing job boards. | No way to verify candidate authenticity or job posting legitimacy; screening happens ad hoc in comments and DMs, which doesn't scale past a handful of applicants. |
-| Company career pages | Direct recruitment channel | Full control over branding and how the company presents itself to candidates. | Reach is limited to people who already know to look for it; behind that page, the company still needs some way to manage applications, this doesn't replace an ATS, it just adds a landing page in front of one. |
+| LinkedIn | Professional networking and recruitment platform | Established professional networks, company pages, a large talent pool, and strong brand recognition. | Paid recruiter services and sponsored posts may be costly for SMEs, while post-application tracking still requires a separate workflow. |
+| Indeed | Job-search and job-advertising platform | Broad reach and a straightforward job-posting experience. | Primarily supports candidate acquisition; growing application volumes may still require export to email, spreadsheets, or an ATS. |
+| TopCV / VietnamWorks / CareerViet / ITviec | Local job platforms | Familiar Vietnamese recruitment brands, local job coverage, and established candidate audiences. | Applications remain separated by platform, making it difficult for recruiters to maintain a unified cross-source pipeline. |
+| Greenhouse / Lever | Applicant Tracking Systems | Structured pipelines, interview workflows, integrations, and mature recruitment operations. | Pricing, configuration, and operational complexity may be difficult to justify for SMEs with small recruitment teams. |
+| Workday | Enterprise HR and ATS platform | Broad HR capabilities, compliance support, analytics, and enterprise reporting. | Implementation cost, setup effort, and required IT support are generally beyond the needs of the target SME segment. |
+| In-house build | Custom internal solution | Can be tailored to an organization's current processes and data model. | Requires continuing development and maintenance capacity and creates knowledge-continuity risks when key developers leave. |
+| Spreadsheets and email | Manual status quo | Familiar, flexible, and inexpensive to start. | Candidate records become duplicated or outdated, there is no reliable single source of truth, and follow-up remains manual. |
+| Social media groups (Facebook, Zalo groups) | Informal recruitment alternative | Low-cost distribution and access to passive candidates. | Limited identity and job-post verification; screening through comments and direct messages does not scale reliably. |
+| Company career pages | Direct recruitment channel | Full control over employer branding and the candidate-facing experience. | Limited organic reach and no replacement for the internal application-management workflow provided by an ATS. |
 
 # 4. Product Overview
 
@@ -310,9 +333,9 @@ The platform utilizes a modern technical stack and a decoupled architecture:
 
 ## 4.1. Product Perspective
 
-SmartHire is a standalone, AI-assisted Recruitment Management Platform that operates as a responsive web application. It serves as a centralized hub connecting job candidates, recruiters, and system administrators throughout the recruitment lifecycle.
+SmartHire is a standalone, AI-assisted recruitment management platform that operates as a responsive web application. It serves as a centralized hub connecting job candidates, recruiters, and system administrators throughout the recruitment lifecycle.
 
-The system is designed using a client-server architecture where the frontend application communicates with backend services through secure RESTful APIs. SmartHire integrates with external services such as AI API for resume analysis and content generation, email services for notifications, and database systems for persistent data storage.
+The system uses a client-server architecture in which the frontend communicates with backend services through secure RESTful APIs. SmartHire integrates with an AI service for semantic CV analysis and human-readable score explanations, an email service for notifications, and a relational database for persistent data storage.
 
 SmartHire replaces traditional recruitment methods that rely on spreadsheets, emails, and manual tracking with an automated and structured recruitment workflow. The platform supports the complete hiring process, from job creation and candidate application submission to screening, interviewing, and final hiring decisions.
 
@@ -320,9 +343,9 @@ The major system components include:
 
 ### Candidate Portal
 - Profile management
-- Resume builder and CV management
+- CV upload, parsing, and management
 - Job searching and application submission
-- AI-generated feedback and recommendations
+- Application tracking and access to disclosed score explanations
 
 ### Recruiter Portal
 - Job posting management
@@ -371,7 +394,7 @@ graph TD
     SmartHire --> AP
     SmartHire --> AI
 
-    AI --> extAI[AI API / Local AI Model]
+    AI --> extAI[AI API / Another AI Model]
     SmartHire --> DB[(PostgreSQL / MySQL Database)]
     SmartHire --> Email[Email Notification Service]
 ```
@@ -412,7 +435,7 @@ The successful operation of SmartHire depends on several assumptions and externa
 - Continuous availability depends on server uptime, network connectivity, and infrastructure maintenance.
 
 #### Legal and Regulatory Dependency
-- SmartHire must comply with Vietnamese regulations regarding personal data protection, particularly Decree 13/2023/ND-CP.
+- SmartHire must comply with applicable Vietnamese personal-data protection requirements, including Law No. 91/2025/QH15 and supporting requirements under Decree No. 13/2023/ND-CP where applicable.
 - Future regulatory changes may require modifications to data storage, privacy policies, and user consent mechanisms.
 
 These assumptions and dependencies form the foundation upon which SmartHire's functionality, security, scalability, and user experience are built.
@@ -423,61 +446,66 @@ These assumptions and dependencies form the foundation upon which SmartHire's fu
 **Student ID:** 24127261
 
 ## 5.1. Feature Overview
-The table below summarizes the high-level feature groups of the SmartHire system. Each feature group represents a broader capability that may include multiple sub-features, which are described in more detail in the following section.
+The table below summarizes the high-level feature groups of the SmartHire system. Each group may include multiple sub-features, which are described in the following section.
+
+**Priority scheme:**
+
+- **P0 (Must):** required for the current project release and the end-to-end recruitment workflow.
+- **P1 (Should):** important but implemented only after P0 capabilities are stable; it may be deferred without breaking the core workflow.
 
 ## 5.2. Detailed Feature List
 | No | Group Feature | Short Description | Priority |
 |---|---|---|---|
-|1| **Authentication, Authorization & Access Control**| Allows candidates and employers to register and log in securely (with email verification and password recovery), and applies role-based access control RBAC to protect personal and business data.| High (P0) |
-|2| **Account Setup & Management** | Allows users to update basic personal/company account information and change their password. | Medium (P1) | 
-|3| **Candidate Profile Management** | Allows candidates to build their professional profile via a provided form or by uploading a CV, with a CV Parser that automatically standardizes the data for job applications and scoring. | High (P0) |
-|4| **Job Board & Advanced Search** | Allows candidates to search, filter, view details of, and apply to approved job postings, along with saving, sharing, and reporting listings. | High (P0) | 
-|5| **Job Posting Management** | Allows employers to create, preview, edit, and manage the lifecycle of job postings.| High (P0) |    
-|6| **Application Tracking (Candidate Side)** | Allow candidates to track saved jobs, applied jobs (with a processing status) and recommended matching jobs| High (P0) | 
-|7| **Candidate Screening & Hybrid Scoring System** | Automatically matches skills and analyzes CVs using AI-powered matching algorithm to score and rank candidates for each job posting | High (P0) | 
-|8| **Recruitment Pipeline Kanban Board** | A drag-and-drop interface that lets employers track and update candidate status across recruitment stages. | High (P0) | 
-|9| **Automated Notifications & In-App Alerts** | System will send email and real-time notifications to candidates/employers when application status changes.| High (P0) | 
-|10| **Job Posting Moderation & Quality Assurance** | Allows admins to approve or reject new job postings and handle spam/violation reports. | High (P0) | 
-|11| **User Management & Employer Verification** | Allows admins to look up user accounts, verify business licenses and handle violations| High (P0) | 
-|12| **Recruitment Analytics & Data Export** | Provide dashboards, statistical reports on recruitment activity and exports candidate data to Excel/CSV| Medium (P1) | 
+| 1 | **Authentication, Authorization & Access Control** | Allows users to register and log in securely, supports email verification and password recovery, and enforces platform-level and company-scoped authorization. | P0 (Must) |
+| 2 | **Account Setup & Management** | Allows users to update non-critical account information, profile images, and preferences. Password changes remain part of P0 authentication security. | P1 (Should) |
+| 3 | **Candidate Profile Management** | Allows candidates to build a professional profile through a form or CV upload, with a CV parser that standardizes data for applications and scoring. | P0 (Must) |
+| 4 | **Job Board & Advanced Search** | Allows candidates to search, filter, view, save, share, report, and apply to approved job postings. | P0 (Must) |
+| 5 | **Job Posting Management** | Allows company-authorized recruiters to create, preview, edit, and manage the lifecycle of job postings. | P0 (Must) |
+| 6 | **Application Tracking (Candidate Side)** | Allows candidates to track saved jobs, submitted applications, scoring progress, and recommended jobs. | P0 (Must) |
+| 7 | **Candidate Screening & Hybrid Scoring System** | Combines deterministic skills/experience matching with AI-assisted semantic analysis to score and rank applicants for a job posting. | P0 (Must) |
+| 8 | **Recruitment Pipeline Kanban Board** | Provides a drag-and-drop interface for authorized company members to track and update application stages. | P0 (Must) |
+| 9 | **Automated Notifications & In-App Alerts** | Sends email and in-app notifications when relevant application or moderation events occur. | P0 (Must) |
+| 10 | **Job Posting Moderation & Quality Assurance** | Allows administrators to approve or reject job postings and handle spam or violation reports. | P0 (Must) |
+| 11 | **User Management & Employer Verification** | Allows administrators to find user accounts, verify company documents, approve memberships, and handle violations. | P0 (Must) |
+| 12 | **Recruitment Analytics & Data Export** | Provides dashboards, recruitment statistics, and CSV/Excel exports for authorized users. | P1 (Should) |
 
 ## 5.3. Feature Descriptions
 
-### 5.3.1 Authentication, Authorization & Access Control
-This feature group handles the entire process of registration, login, and role-based access control across the system. The platform employs a hybrid RBAC and multi-tenant authorization model. By default, all registered users hold a base Candidate role, allowing them to manage profiles and apply for jobs. To become an employer (Recruiter or HR Manager), users must create or join a company profile and undergo Admin verification. This multi-tenant design allows a single user account to manage recruitment for multiple companies simultaneously, while Admins supervise platform quality and verify business licenses. By enforcing strict access control across these organizational boundaries, the system helps protect both candidates' personal data and sensitive internal information belonging to hiring companies.
+### 5.3.1. Authentication, Authorization & Access Control
+This feature group covers registration, authentication, session security, and authorization. A standard user retains candidate capabilities and may also receive `OWNER`, `HR_MANAGER`, or `RECRUITER` permissions through an approved membership in one or more companies. Recruitment permissions are therefore scoped to a company rather than stored as a replacement for the user's candidate identity. Platform Administrators hold a separate platform-level role for verification, moderation, account management, and audited support operations. The backend validates both the user's platform role and active company membership before granting access to company data.
 
-### 5.3.2 Account Setup & Management
-This feature allows candidates and employers to manage their basic account information, such as contact details, profile image, company information, and password settings. Although some profile fields may be optional, keeping account information updated helps both sides communicate more reliably and build trust during the recruitment process. Candidates benefit by presenting themselves more professionally, while employers benefit by making their company identity clearer to potential applicants.
+### 5.3.2. Account Setup & Management
+This feature allows users to manage contact details, profile images, preferences, and other non-critical account information. Company information is managed separately and only by members with the required company-scoped permission. Password and session-security operations remain part of the P0 authentication feature group.
 
-### 5.3.3 Candidate Profile Management
-This feature lets candidates build and digitize their profile directly on the platform, either by filling out a built-in form or by uploading their own CV file. Having this information stored in a structured format means candidates can apply to multiple jobs quickly, without retyping the same details over and over. On top of that, the system includes a CV Parser that automatically extracts text from uploaded PDF or DOCX files, which then feeds into the matching and scoring system later on.
+### 5.3.3. Candidate Profile Management
+This feature allows candidates to create a structured professional profile through a form or by uploading a PDF or DOCX CV. The CV parser extracts profile data for candidate review and reuse in applications and provides normalized text to the matching and scoring service.
 
-### 5.3.4 Job Board & Advanced Search
-This feature provides a public space where candidates can freely browse and search for job opportunities posted on the platform. With flexible advanced filters, candidates can quickly narrow down results by salary, years of experience, location, or job type to match what they're actually looking for. Overall, this feature bridges the gap between candidates and employers faster, saving job seekers time and improving their chances of finding the right job.
+### 5.3.4. Job Board & Advanced Search
+This feature provides a public catalogue of approved job postings. Candidates can search and filter by criteria such as salary, experience, location, job type, and relevant tags, then view, save, share, report, or apply to a posting.
 
-### 5.3.5 Job Posting Management
-This feature gives employers the tools to create, preview, edit, and manage the entire lifecycle of their job postings. While drafting a job description, employers define structured data such as required skills, experience, salary range, and other key details. This not only gives employers full control over what they post, but also lays the groundwork the system later relies on to automatically filter and screen incoming applications.
+### 5.3.5. Job Posting Management
+This feature allows company-authorized recruiters to create, preview, edit, submit, publish, close, and extend job postings according to the approved lifecycle. Structured requirements such as skills, experience, salary range, location, and job type provide input to search, matching, and candidate screening.
 
-### 5.3.6 Application Tracking (Candidate Side)
-This feature lets candidates keep track of jobs they've saved, jobs they've applied to, and jobs the system recommends as a good match for them. For each application, candidates can see exactly where things stand, across every stage of the pipeline: **Applied**, **Viewed**, **Shortlisted**, **Interviewing**, **Offered**, through to a final outcome of **Hired**, **Offer Declined**, **Rejected**, and **Waitlisted**, without needing to contact the company directly to ask. Altogether, this gives candidates a single place to follow up on opportunities they care about, making it easier to stay organized while job hunting.
+### 5.3.6. Application Tracking (Candidate Side)
+This feature provides candidates with a consolidated view of saved jobs, submitted applications, scoring progress, and rule-based job recommendations. The canonical recruitment stages are **Applied**, **Viewed**, **Shortlisted**, **Interviewing**, **Offered**, **Hired**, **Offer Declined**, **Rejected**, and **Waitlisted**. AI-processing progress is displayed separately through `scoring_status` and does not alter the recruitment stage.
 
-### 5.3.7 Candidate Screening & Hybrid Scoring System
-This is essentially the recruitment "control center" that automatically classifies and evaluates candidate applications for each job posting. It works through a hybrid approach that combines rule-based skill/experience matching with AI-powered CV analysis. The biggest benefit here is freeing employers from manually screening hundreds of CVs a day, instead, they can focus their attention on the most promising candidates, ranked by a clear, visual compatibility score out of 100.
+### 5.3.7. Candidate Screening & Hybrid Scoring System
+This feature evaluates candidate applications for a specific job posting through a hybrid approach that combines rule-based skills and experience matching with AI-assisted semantic CV analysis. It produces a compatibility score and explanation to support recruiter review, while leaving all progression and hiring decisions under human control.
 
-### 5.3.8 Recruitment Pipeline Kanban Board
-This feature provides a visual board that lets employers track a candidate's entire journey through the different stages of the hiring process. By simply dragging and dropping a candidate's card between columns, employers can instantly update that candidate's status in the database. This gives the hiring team a clear, at-a-glance view of how a recruitment campaign is progressing and makes it much easier for team members to coordinate with one another.
+### 5.3.8. Recruitment Pipeline Kanban Board
+This feature provides authorized company members with a visual representation of applications by recruitment stage. Dragging a candidate card to an allowed stage updates the application transactionally, records the actor and time, and triggers any configured notifications.
 
-### 5.3.9 Automated Notifications & In-App Alerts
-This feature keeps candidates and employers in sync throughout the hiring process, without either side having to manually check for updates. Whenever an employer changes a candidate's status (via the Kanban board or other means), the candidate automatically receives a detailed email along with a real-time in-app alert. This keeps everyone informed right away and makes the overall experience feel a lot smoother.
+### 5.3.9. Automated Notifications & In-App Alerts
+This feature communicates application and moderation events without requiring users to poll the system manually. When an authorized recruiter changes an application stage, the system records the event and sends the configured email and in-app notification while preventing duplicate delivery.
 
-### 5.3.10 Job Posting Moderation & Quality Assurance
-This feature is built specifically for Admins to maintain content quality and prevent fraudulent or spammy job postings from flooding the platform. Every new job posting goes into a review queue first, and only becomes visible on the public job board once an Admin approves it. This keeps the recruitment environment trustworthy and protects candidates from scam job listings.
+### 5.3.10. Job Posting Moderation & Quality Assurance
+This feature allows Administrators to review job postings for legitimacy, completeness, spam, and policy violations. A new posting remains unavailable on the public job board until an Administrator approves it; rejection and revision requests include a recorded reason.
 
-### 5.3.11 User Management & Employer Verification
-This feature gives Admins the tools to keep the platform's user community healthy and trustworthy. Admins can search through the full list of candidate and employer accounts to provide support or take action against violations whenever necessary. A key part of this is verifying each employer's business license, which ensures that only legitimate companies are allowed to post jobs on the platform.
+### 5.3.11. User Management & Employer Verification
+This feature allows Administrators to search user accounts, perform audited support or enforcement actions, verify company documents, and review company-membership requests. A tax-ID match never grants access automatically: joining an existing company also requires a valid invitation or approval from an existing `OWNER` before final administrative verification.
 
-### 5.3.12 Recruitment Analytics & Data Export
-This feature group provides statistical reports and data export tools that help both Admins and employers work more efficiently. Employers can gauge how appealing their job postings are by looking at view counts and successful hire rates, while Admins get a broader picture of the platform's overall growth through visual charts and dashboards. On top of that, users can export structured data to CSV or Excel files, making it easy to keep offline records or put together internal company reports.
+### 5.3.12. Recruitment Analytics & Data Export
+This P1 feature provides authorized recruiters with company-scoped metrics such as posting views, application counts, stage conversion, and successful hires. Administrators receive platform-level aggregate metrics. Authorized users may export permitted data to CSV or Excel without gaining access to records outside their tenant or platform role.
 
 ## 5.4. Key User Workflows
 
@@ -503,8 +531,8 @@ Final Score = 60% × Auto Matching Score + 40% × AI Score
 | Score Range | Match Level | Color Theme |
 |---|---|---|
 | 80 - 100 | High Match | 🟢 Green |
-| 60 - 80 | Moderate Match | 🟡 Yellow |
-| < 60 | Low Match | 🔴 Red |
+| 60 - 79 | Moderate Match | 🟡 Yellow |
+| 0 - 59 | Low Match | 🔴 Red |
 
 #### Flowchart
 
@@ -525,7 +553,7 @@ flowchart TD
     Explanation --> Classify{Score Classification}
 
     Classify -->|80 to 100| Green[High Match - Green Theme]
-    Classify -->|60 to 80| Yellow[Moderate Match - Yellow Theme]
+    Classify -->|60 to 79| Yellow[Moderate Match - Yellow Theme]
     Classify -->|Below 60| Red[Low Match - Red Theme]
 
     Green --> Display[Display Score + Explanation]
@@ -562,43 +590,37 @@ flowchart TD
 
 ### 5.4.2. Recruiter Verification & Company Role Assignment
 
-This workflow governs how a base Candidate account is upgraded to Recruiter/HR 
-Manager permissions for a specific company, supporting the multi-tenant model 
-described in Section 5.3.1. A candidate submits company information and a 
-business license for Admin review; once approved, recruiter permissions are 
-granted through a company membership record rather than by changing the user's 
-core role — allowing one person to recruit for multiple companies.
+This workflow governs how a standard user receives company-scoped recruitment permissions under the multi-tenant model described in Section 5.3.1. Approval creates a company membership; it does not replace the user's candidate identity. A tax-ID match is used only to identify an existing company and never grants membership automatically.
 
 ```mermaid
 flowchart TD
-    A([Authenticated Candidate]) --> B[Submit Company Info<br/>+ Business License]
-    B --> C[Server-side File Validation<br/>& Security Scan]
-    C --> D{Company Already<br/>Exists by Tax ID?}
-    
-    D -->|Yes| E[Link to Existing Company]
-    D -->|No| F[Create New Company Record]
-    
-    E --> G[Enter Admin Review Queue]
-    F --> G
-    
-    G --> H{Admin Decision}
-    H -->|Reject| I[Notify User with Reason<br/>May Reapply]
-    H -->|Approve| J[Create Company Membership<br/>Role: OWNER / RECRUITER / HR_MANAGER]
-    
-    J --> K([Access Recruiter Dashboard<br/>for This Company])
+    A([Authenticated User]) --> B{Company Exists<br/>by Tax ID?}
+
+    B -->|No| C[Submit New Company Information<br/>and Business License]
+    C --> D[Server-side Validation<br/>and Malware Scan]
+    D --> H[Enter Admin Review Queue]
+
+    B -->|Yes| E[Submit Company Membership Request]
+    E --> F{Valid Invitation or<br/>Existing OWNER Approval?}
+    F -->|No| G[Reject Request<br/>Do Not Link Company]
+    F -->|Yes| H
+
+    H --> I{Admin Verification Decision}
+    I -->|Reject| J[Notify User with Reason<br/>Request May Be Corrected and Resubmitted]
+    I -->|Approve| K{New or Existing Company?}
+
+    K -->|New| L[Create Company and OWNER Membership]
+    K -->|Existing| M[Create Membership with Approved Role<br/>OWNER / HR_MANAGER / RECRUITER]
+
+    L --> N([Access Recruiter Dashboard<br/>for the Approved Company])
+    M --> N
 ```
 
-**Post-approval lifecycle:** company membership can later change through four 
-events — an Admin revoking access, a user voluntarily leaving a company, 
-ownership transfer between members, or the company itself being deactivated 
-(which unpublishes all its job postings). In every case, the user's underlying 
-Candidate identity remains unaffected — only their company-scoped permissions 
-change.
+**Authorization safeguards:** joining an existing company requires a valid invitation or explicit approval from an existing `OWNER`, followed by Admin verification. New-company requests require validated company information and a malware-scanned business document. All approval, rejection, role-change, and revocation events are written to the backend audit log.
 
-**Design rationale:** recruiter permissions are deliberately kept outside the 
-user's core role (`user.role` stays `CANDIDATE`) because one person may recruit 
-for multiple companies simultaneously — baking the role into the user record 
-would incorrectly constrain this to one company per user.
+**Post-approval lifecycle:** a membership may later change when an Administrator revokes access, a user leaves a company, an `OWNER` transfers ownership, or the company is deactivated. Company deactivation unpublishes its job postings and disables its memberships. The user's candidate profile remains unaffected because only company-scoped permissions change.
+
+**Design rationale:** recruitment permissions remain outside the user's core identity because one person may recruit for multiple companies simultaneously. Storing a single recruiter role directly on the user record would not represent that relationship or enforce tenant isolation correctly.
 
 
 # 6. Non-Functional Requirements
@@ -614,39 +636,45 @@ These requirements apply across all major functional modules, including authenti
 
 ## 6.2. Performance Requirements
 
-The platform shall provide responsive interactions for all supported users while maintaining stable performance under normal operating conditions.
+The platform shall provide responsive interactions under the following acceptance-test baseline unless a test case states otherwise:
 
-| Requirement | Target |
-|------------|--------|
-| Page loading time | ≤ 3 seconds under normal network conditions |
-| Dashboard navigation | ≤ 2 seconds |
-| Search response | ≤ 2 seconds for job searching and filtering |
-| Authentication | Login/Register completed within 3 seconds |
-| Candidate profile update | Saved within 2 seconds |
-| Kanban drag-and-drop update | Visual response within 500 ms |
-| Notification delivery | In-app notification appears within 5 seconds after triggering event |
-| Export CSV/Excel | Complete within 10 seconds for datasets up to 10,000 records |
-| AI semantic scoring | Complete within 20 seconds depending on CV size and AI provider |
+- production build deployed in the staging environment;
+- 100 concurrent active users;
+- seeded data containing at least 10,000 users, 20,000 job postings, and 100,000 applications;
+- simulated client network of at least 10 Mbps download, 2 Mbps upload, and 100 ms round-trip latency;
+- response-time targets evaluated at the 95th percentile (P95) over a 15-minute test; and
+- HTTP error rate below 1%, excluding intentionally rejected validation and authorization requests.
 
-The system shall support concurrent access from multiple users without significant degradation in response time. 
+| ID | Requirement | Acceptance Target |
+|---|---|---|
+| PERF-01 | Public page loading | The primary content becomes usable within 3 seconds under the baseline client network. |
+| PERF-02 | Dashboard navigation | P95 ≤ 2 seconds. |
+| PERF-03 | Job search and filtering | P95 ≤ 2 seconds. |
+| PERF-04 | Login and registration | P95 ≤ 3 seconds, excluding email-delivery time. |
+| PERF-05 | Candidate profile update | P95 ≤ 2 seconds. |
+| PERF-06 | Kanban drag-and-drop update | Visual feedback ≤ 500 ms and server persistence P95 ≤ 2 seconds. |
+| PERF-07 | In-app notification delivery | P95 ≤ 5 seconds after the triggering transaction is committed. |
+| PERF-08 | CSV/Excel export (P1) | Completed within 10 seconds for up to 10,000 records when the P1 export feature is delivered. |
+| PERF-09 | AI semantic scoring | P95 ≤ 30 seconds for a supported CV of up to 5 MB; processing remains asynchronous and never blocks the user interface. |
 
-AI processing must be handled asynchronously. The system shall update the application status to 'Sifting/Processing' and notify the user via real-time alert or email once completed, rather than blocking the user interface.
+If an asynchronous AI request exceeds the target, the system shall keep the scoring status visible, allow other application activities to continue, and notify the user when processing completes or fails.
+
+AI processing shall use a separate `scoring_status` (`Pending`, `Processing`, `Completed`, or `Failed`) rather than adding a temporary value to the canonical recruitment pipeline status.
 
 ## 6.3. Scalability Requirements
 
-The architecture shall support future growth without requiring major redesign.
+The architecture shall meet the following capacity baseline without a major redesign:
 
 The system shall:
 
-- support thousands of registered users.
-- support hundreds of simultaneous active users.
-- support multiple recruiters managing independent recruitment campaigns simultaneously.
-- allow horizontal scaling of frontend and backend services.
-- allow database scaling through indexing and optimization.
-- support migration to cloud deployment if required.
+- store at least 10,000 registered users, 20,000 job postings, and 100,000 applications.
+- support at least 200 simultaneous active users with an HTTP error rate below 1% and P95 response times no more than 20% above the 100-user performance baseline.
+- support at least 20 active recruiters within one company without lost updates or cross-company data exposure.
+- allow stateless frontend and API instances to be horizontally scaled without changing business logic.
+- support database growth through documented indexes, query plans, pagination, and archival procedures.
+- support migration to a cloud deployment through environment-based configuration rather than source-code changes.
 
-The AI service shall be modular so that it can be upgraded without changing the business logic. 
-For future upgrade, we will use API model like Gemini, Claude, OpenAI,...
+The AI integration shall be isolated behind a provider interface so that a supported provider or local model can be replaced without changing recruitment-domain logic.
 
 ## 6.4. Availability and Reliability
 
@@ -654,9 +682,10 @@ The SmartHire platform shall provide reliable operation for both recruiters and 
 
 ### Availability
 
-- Target uptime: **99.5%**
-- Planned maintenance shall be announced beforehand.
-- System recovery after deployment failure shall be possible using rollback procedures.
+- Monthly uptime target: **99.5%**, excluding planned maintenance announced at least 24 hours in advance.
+- Recovery Time Objective (RTO): **≤ 60 minutes** after a failed deployment or recoverable infrastructure incident.
+- Recovery Point Objective (RPO): **≤ 24 hours** for persistent application data.
+- Every production deployment shall have a documented rollback procedure that is tested before final release.
 
 ### Reliability
 
@@ -665,7 +694,7 @@ The system shall:
 - prevent data corruption during unexpected failures.
 - preserve uploaded CV files.
 - ensure recruitment pipeline states remain consistent.
-- prevent duplicate applications caused by accidental refreshes.
+- prevent duplicate applications by enforcing a unique candidate/job-application constraint and idempotent submission handling.
 - use transactional database operations for critical updates.
 
 ## 6.5. Security Requirements
@@ -684,13 +713,18 @@ The system shall:
 
 ### Authorization
 
-Role-Based Access Control (RBAC) shall ensure that:
+Authorization shall combine platform-level roles with company-scoped memberships:
 
-- Candidates access only candidate functions.
-- Recruiters access only recruitment management functions.
-- Administrators access moderation and management features.
+- Every standard user account retains access to its own candidate profile and candidate functions.
+- Recruitment permissions are granted through an active `CompanyMembership` for a specific company; granting membership does not replace the user's candidate identity.
+- A user may hold memberships in multiple companies, and every recruiter request shall include or resolve an active company context.
+- `OWNER`, `HR_MANAGER`, and `RECRUITER` membership roles shall receive only the permissions defined for that company role.
+- Company members may access job posts, applications, candidate documents, evaluations, and analytics only when those records belong to their active company context.
+- `OWNER` may manage company information and company memberships; `HR_MANAGER` and `RECRUITER` permissions shall be limited to their approved recruitment responsibilities.
+- Platform `ADMIN` users may perform verification, moderation, account-management, and audited support actions across companies without becoming company members.
+- The backend shall verify authentication, platform role, membership status, company scope, and resource ownership on every protected request; frontend route guards are not sufficient authorization controls.
 
-Unauthorized API requests shall return appropriate HTTP error responses.
+Unauthenticated requests shall return HTTP `401`; authenticated requests that lack the required platform or company-scoped permission shall return HTTP `403` without exposing data from another tenant.
 
 ### Password Security
 
@@ -725,7 +759,7 @@ Resume uploads shall satisfy the following constraints:
 | Supported formats | PDF, DOCX |
 | Maximum file size | 5 MB |
 | Duplicate protection | Supported |
-| Virus Checking | Recommended before storage | 
+| Malware scanning | Required before a file becomes available to other users or to downstream parsing services |
 | Secure storage | Required |
 
 Deleted files shall no longer be publicly accessible.
@@ -744,20 +778,25 @@ The platform shall:
 
 ## 6.8. Usability Requirements
 
-The platform shall provide an intuitive user experience for all user roles.
+The platform shall meet the following usability acceptance targets:
+
+- at least 90% of representative participants shall complete the primary task for their role without facilitator assistance after no more than 30 minutes of onboarding;
+- the primary tasks are candidate application submission, recruiter applicant-stage update, and administrator verification decision;
+- usability testing shall include at least five representative participants for each primary user group before final acceptance; and
+- the System Usability Scale (SUS) target shall be at least 75.
 
 The interface shall:
 
 - follow consistent navigation patterns.
-- minimize the number of steps required to complete common tasks.
+- complete the primary role workflows with no unnecessary confirmation or repeated data-entry steps.
 - provide responsive layouts for desktop, tablet, and mobile devices.
 - clearly indicate loading, success, and error states.
 - display meaningful validation messages.
 - support drag-and-drop interactions for Kanban recruitment management.
 - provide searchable and filterable tables.
-- minimize recruiter training time.
+- provide role-specific guidance sufficient to meet the 30-minute onboarding target.
 
-The application shall support modern accessibility principles including:
+The primary authentication, application, pipeline, and moderation workflows shall target WCAG 2.1 Level AA, including:
 
 - readable typography
 - sufficient color contrast
@@ -767,7 +806,7 @@ The application shall support modern accessibility principles including:
 
 ## 6.9. Compatibility Requirements
 
-The platform shall operate correctly on major modern browsers including:
+At release time, the platform shall operate correctly on the latest two stable major versions of:
 
 - Google Chrome
 - Microsoft Edge
@@ -776,9 +815,9 @@ The platform shall operate correctly on major modern browsers including:
 
 The frontend shall support:
 
-- Desktop computers
-- Tablets
-- Mobile devices
+- mobile viewports from 360 px wide;
+- tablet viewports from 768 px wide; and
+- desktop viewports up to at least 1440 px wide.
 
 Supported resume formats include:
 
@@ -803,6 +842,8 @@ The implementation shall:
 - follow TypeScript coding standards.
 - use Git for version control.
 - support continuous feature expansion.
+- pass TypeScript compilation, linting, and automated tests in continuous integration before merge.
+- maintain at least 70% automated line coverage for security-sensitive and recruitment-domain service modules.
 
 Business logic, database access, and presentation logic shall remain loosely coupled.
 
@@ -824,16 +865,16 @@ Regular backup procedures shall be supported.
 The notification subsystem shall:
 
 - automatically trigger notifications based on recruitment events.
-- send interview invitations promptly.
+- enqueue interview invitations and status notifications within 5 seconds after the triggering transaction is committed.
 - notify candidates when application status changes.
 - support configurable email templates.
 - prevent duplicate notification delivery.
 
-Temporary email service failures shall not interrupt other platform operations.
+Temporary email-service failures shall not interrupt other platform operations. Failed deliveries shall be retried at least three times with backoff and recorded for administrative troubleshooting.
 
 ## 6.13. Logging and Monitoring
 
-The logging requirements below describe back-end level audit logging required for security and debugging purposes. They are independent of the admin-facing "activity log" dashboard feature (Group 12 in 5_Product_Features), which remains optional per team's PA2 prioritization.
+The requirements below describe mandatory P0 backend audit logging for security, accountability, and debugging. An admin-facing activity-log interface is a separate P1 presentation capability and may be deferred without removing the underlying audit records.
 
 The platform shall maintain system logs for:
 
@@ -850,15 +891,17 @@ Logs shall support troubleshooting and security auditing.
 
 ## 6.14. Legal and Compliance Requirements
 
-The platform shall comply with applicable legal and ethical standards.
+The platform shall comply with applicable legal and ethical standards. The production compliance baseline shall be reviewed before deployment because legal obligations may change during the project lifecycle.
 
 These include:
 
-- Vietnamese Personal Data Protection Decree (Decree 13/2023/ND-CP)
-- secure handling of personal information
-- recruiter identity verification
-- protection of uploaded resumes
-- user consent for personal data processing
+- Law No. 91/2025/QH15 on Personal Data Protection, effective from 2026-01-01;
+- Decree No. 13/2023/ND-CP on Personal Data Protection where its supporting requirements remain applicable;
+- purpose limitation and data minimization for candidate, company, and recruitment data;
+- explicit and recorded user consent where consent is the applicable processing basis;
+- secure handling, retention, deletion, and access control for personal information and uploaded CVs;
+- mechanisms for users to request access, correction, or deletion of their personal data, subject to applicable retention obligations; and
+- recruiter and company verification with access to business documents restricted to authorized Administrators.
 
 AI-generated recommendations shall remain advisory only and shall not replace human recruitment decisions.
 
@@ -877,7 +920,7 @@ The system is designed as a modern web application using the following technolog
 | Backend | Next.js API Routes |
 | Database | PostgreSQL / MySQL |
 | Authentication | JWT |
-| AI Integration | OpenAI API or Local AI Model |
+| AI Integration | OpenAI API or Another AI Model |
 | Version Control | GitHub |
 
 The platform requires:
