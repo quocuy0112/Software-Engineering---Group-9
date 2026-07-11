@@ -101,6 +101,9 @@ Web references were last accessed on **2026-07-10**.
 
 # 2. Positioning
 
+**Author of this Part:** Ngô Quốc Tuấn   
+**Student ID:** 24127581
+
 This section uses a Problem Statement to define the need and a Product Position Statement to define SmartHire's target market, primary value, alternatives, and differentiation.
 
 ## 2.1. Problem Statement
