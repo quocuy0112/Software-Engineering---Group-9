@@ -182,6 +182,8 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 2. **Database-write failure** â€” **Given** a critical registration, verification, 2FA, password reset, or session-revocation write begins, **When** persistence fails before completion, **Then** the critical operation is rolled back or remains safely retryable, the interface reports failure without claiming success, no partial security state grants access, and the failure is audited where persistence remains available.
 3. **Keyboard and mobile accessibility** â€” **Given** each required page at supported mobile and desktop widths, **When** a user navigates using only a keyboard and completes its primary flow, **Then** every control is reachable in logical order, focus is visible, labels and status messages are programmatically associated, state is not conveyed by color alone, the 2FA transition moves focus to the challenge heading or first field, reduced-motion preferences are respected, and no horizontal scrolling is required at a 320 CSS-pixel viewport except for content that intrinsically requires it.
 
+4. **Asynchronous transactional email** - **Given** registration, verification resend, password reset, or a security notification commits valid core data and its Email Delivery Job, **When** the selected Transactional Email Service is slow or unavailable, **Then** the originating HTTP request completes without waiting for external delivery, the committed job remains operationally visible and safely retryable, and no provider secret or complete token is logged.
+
 ### Edge Cases
 
 - Concurrent registrations using equivalent normalized emails result in at most one account; all public responses remain generic.
@@ -199,6 +201,7 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - Idle and absolute session expiration are enforced by the server even if the cookie remains in the browser.
 - Session listings distinguish the current session using non-sensitive metadata such as approximate device/browser, creation time, last-active time, and approximate location when lawfully available; raw credentials and full IP addresses are not displayed.
 - Duplicate form submissions, browser retries, and email-worker retries do not create duplicate accounts, tokens, backup-code sets, notifications, or audit side effects.
+- Concurrent email workers cannot successfully claim or deliver the same due Email Delivery Job more than once; an interrupted claim becomes safely retryable according to a documented recovery interval.
 - Back-button navigation after logout, reset, or 2FA completion cannot restore protected content without a valid server-authorized session.
 
 ## Requirements *(mandatory)*
@@ -214,7 +217,7 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - **FR-004A**: The canonical account states MUST be Pending Verification, Active, Suspended, and Deleted. Successful registration creates Pending Verification; successful email verification changes Pending Verification to Active; Active may become Suspended; Suspended may return to Active; and any non-deleted state may become Deleted only through an authorized workflow.
 - **FR-004B**: Deleted MUST be terminal for authentication and account recovery. Transition to Deleted MUST revoke all sessions and invalidate outstanding verification, reset, pre-authentication, TOTP, and backup-code credentials. Personal-data erasure and any later release of the normalized email MUST follow a separately approved retention/deletion policy and are not defined by this functional group.
 - **FR-005**: Registration responses MUST NOT disclose whether the submitted email is already registered and MUST NOT establish a full authenticated session before verification.
-- **FR-006**: Account creation, base identity assignment, and issuance of the initial verification request MUST preserve all-or-nothing critical state; email delivery failure MUST NOT corrupt or duplicate account data.
+- **FR-006**: Account creation, base identity assignment, issuance of the initial verification request, and creation of its Email Delivery Job MUST preserve all-or-nothing critical state. The originating registration request MUST complete after this transaction commits and MUST NOT wait for external email delivery; delivery failure MUST NOT corrupt or duplicate account data.
 
 #### Email Verification
 
@@ -263,7 +266,7 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - **FR-035**: Reset requests MUST be rate-limited by account/email, IP address, and time window.
 - **FR-036**: Reset tokens MUST be cryptographically unpredictable, stored only as secure non-reversible representations, single-use, and expired 30 minutes after issuance.
 - **FR-037**: Reset URLs MUST be formed only from a trusted configured application URL and MUST NOT trust a request-supplied host or redirect destination.
-- **FR-038**: Reset email delivery SHOULD occur asynchronously; delivery failure MUST preserve account integrity, support safe retry, and not disable unrelated workflows.
+- **FR-038**: Reset email delivery MUST use the same asynchronous Email Delivery Job lifecycle as registration, verification resend, and security notifications; delivery failure MUST preserve account integrity, support safe retry, and not disable unrelated workflows.
 - **FR-039**: `/reset-password` MUST reject missing, malformed, invalid, used, superseded, and expired tokens and MUST require matching new-password confirmation satisfying FR-031.
 - **FR-040**: Successful reset MUST atomically replace the password and consume the reset token, revoke every existing session for the account, queue a password-change security notification, audit the reset without secrets, and send the user to normal login without automatic authentication.
 
@@ -289,8 +292,16 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - **FR-054**: Audit records MUST contain actor (or anonymous request reference), action, target, result, timestamp, and relevant non-sensitive request context; they MUST exclude passwords, TOTP secrets/codes, complete tokens, backup codes, JWTs, raw session identifiers, and unnecessary personal data.
 - **FR-055**: The system MUST support `/register`, `/check-email`, `/verify-email`, `/login`, `/two-factor`, `/forgot-password`, `/reset-password`, `/settings/security`, and `/settings/sessions` with route-appropriate authenticated/unauthenticated access control.
 
-### Non-Functional Requirements
+#### Transactional Email Delivery
 
+- **FR-056**: Transactional email MUST support exactly three approved adapter roles behind the existing provider-independent email boundary: `capture` as the generated default for local development, `smtp` as an optional local-development and team-demonstration adapter, and `resend` as the approved production-oriented adapter. Production deployment remains outside the scope of this academic project.
+- **FR-057**: Email adapter selection MUST use `EMAIL_ADAPTER=capture|smtp|resend` as its sole canonical server-side selector; a duplicate `EMAIL_DRIVER` selector MUST NOT be required. Registration, verification, resend, password-recovery, and notification business services MUST create Email Delivery Jobs and MUST NOT depend directly on Nodemailer, SMTP, Resend, or another provider library.
+- **FR-058**: A due-outbox processor MUST asynchronously claim due `PENDING` or `RETRYABLE` Email Delivery Jobs after their originating transaction commits. Claiming MUST prevent concurrent duplicate processing, and SMTP or other external delivery MUST NOT block the originating registration, resend, recovery, or notification HTTP response.
+- **FR-059**: For every claimed Email Delivery Job, the processor MUST deliver through the selected adapter, increment the attempt count, and atomically record `SENT`, `RETRYABLE`, or `DEAD`. Retryable failures MUST receive a calculated `nextAttemptAt`; failures MUST store only an approved safe error code; timeouts and temporary provider failures MUST be classified as retryable; permanent authentication, configuration, policy, or recipient rejection failures MUST be classified as terminal; and terminal exhaustion or failure MUST create a secret-free audit event.
+- **FR-060**: SMTP configuration MUST be server-only and limited to `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM`, `SMTP_SECURE`, and `SMTP_USE_TLS`. No SMTP setting or credential may use a `NEXT_PUBLIC_` name, and SMTP passwords or provider credentials MUST NOT appear in source code, ordinary logs, client bundles, database records, Email Delivery Job payloads, or audit data.
+- **FR-061**: Gmail-compatible SMTP MUST require a complete email address for `SMTP_USERNAME`, support Google App Password authentication, require STARTTLS with port 587 and `SMTP_SECURE=false`, and MAY support implicit TLS with port 465 and `SMTP_SECURE=true`. `SMTP_FROM` MUST contain a complete email address and reject carriage returns, line feeds, and all control characters. Missing or contradictory settings MUST fail configuration validation without exposing supplied secret values.
+
+### Non-Functional Requirements
 - **NFR-001 â€” Performance**: Under documented normal test conditions, each required page MUST become usable within 3 seconds for at least 95% of measured visits; the plan MUST state environment, dataset, measurement method, and external-email conditions.
 - **NFR-002 â€” Responsiveness**: All required pages MUST support mobile and desktop layouts from 320 CSS pixels wide without loss of actions, labels, messages, or entered non-sensitive values.
 - **NFR-003 â€” Accessibility**: Primary flows MUST satisfy WCAG 2.2 Level AA expectations for keyboard operation, visible focus, associated labels, status/error announcement, contrast, non-color cues, and reduced motion.
@@ -301,6 +312,8 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - **NFR-008 â€” Usability**: Every submission MUST expose clear loading, success, validation, and error states, prevent duplicate form submission, preserve non-sensitive values after recoverable errors, and never communicate state using color alone.
 - **NFR-009 â€” Browser assistance**: Registration, login, password reset, and TOTP interfaces MUST use semantically appropriate field purposes and autocomplete behavior so supported password managers and browsers can fill and save credentials safely.
 - **NFR-010 â€” Testability**: Security timing, rate-limit, expiry, retry, transaction-failure, concurrent-use, and accessibility behavior MUST be verifiable in controlled tests without using production personal data or secrets.
+
+- **NFR-011 - Asynchronous email reliability**: A failure or timeout of the Transactional Email Service MUST not delay completion of an originating request after its Email Delivery Job has committed. Due jobs MUST remain operationally visible until sent or terminally failed, and adapter selection, SMTP transport matrices, safe error classification, retry, timeout, concurrent claim, and secret-exclusion behavior MUST be verifiable without live external email delivery or production secrets.
 
 ### Key Entities
 
@@ -316,7 +329,7 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - **AuthenticationChallenge**: Temporary pre-authentication or security-challenge state that cannot authorize protected resources and is not a full Session.
 - **Rate-Limit Record**: Time-bounded attempt information keyed by the minimum necessary combination of action, account/email reference, IP/network context, and challenge, used to enforce abuse controls without disclosing account existence.
 - **Audit Event**: An immutable security-relevant record containing actor/reference, action, target/reference, result, timestamp, and minimized non-sensitive context.
-- **Email Delivery Job**: An idempotent request to the Transactional Email Service for verification, recovery, or security notification, whose failure does not corrupt the originating account operation.
+- **Email Delivery Job**: An idempotent asynchronous request to the Transactional Email Service for verification, recovery, or security notification. It records due time, `PENDING`, `RETRYABLE`, `SENT`, or `DEAD` state, attempt count, next-attempt time, idempotency identity, safe error code, and provider message reference where available, without storing provider credentials or unnecessary secret content. Its lifecycle is independent of successful completion of the originating HTTP request.
 
 ## Success Criteria *(mandatory)*
 
@@ -328,7 +341,7 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - **SC-004**: In expiry, replay, and concurrency tests, 100% of verification tokens, reset tokens, pre-authentication challenges, and backup codes succeed no more than once and fail after their specified expiry or consumption.
 - **SC-005**: In 100% of tested 2FA-enabled logins, ordinary authenticated resources remain inaccessible until a valid TOTP or unused backup code completes the challenge.
 - **SC-006**: Within 5 seconds of a successful password reset, logout, or explicit session revocation under normal test conditions, every targeted prior session is rejected on its next request.
-- **SC-007**: Security-log inspection across all acceptance scenarios finds zero passwords, complete verification/reset tokens, TOTP secrets/codes, backup codes, JWTs, or raw session identifiers.
+- **SC-007**: Source, client-bundle, database, audit, and security-log inspection across all acceptance scenarios finds zero passwords, email-provider credentials, complete verification/reset tokens, TOTP secrets/codes, backup codes, JWTs, or raw session identifiers outside their explicitly approved protected stores.
 - **SC-008**: Under documented normal conditions, at least 95% of visits make each required page usable within 3 seconds, excluding separately reported Transactional Email Service delivery time.
 - **SC-009**: All primary flows can be completed at a 320 CSS-pixel viewport and using keyboard-only navigation with no inaccessible controls, missing labels, focus loss, color-only state, or unintended horizontal page scrolling.
 - **SC-010**: In simulated email-service and database-write failures, 100% of tested critical operations either complete consistently or fail without partial authorization, duplicate critical records, false success messages, or corruption of existing account state.
@@ -336,6 +349,8 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - **SC-012**: At least 90% of usability-test participants can locate current-session logout, identify the current session, revoke another session, and locate 2FA management without assistance.
 - **SC-013**: Password-policy tests accept compliant Unicode and space-containing passwords without composition requirements and reject 100% of test passwords present in the approved common/compromised-password test corpus without transmitting or logging a complete password or reusable password hash.
 - **SC-014**: Session-boundary tests reject 100% of sessions after 30 minutes of inactivity or 7 days of absolute age and maintain no more than five active sessions per account, revoking the least recently active session when a sixth is created.
+- **SC-015**: In 100% of registration, verification-resend, and password-reset request tests, the response completes after the required transaction and Email Delivery Job commit without waiting for capture, SMTP, Resend, timeout, or provider-failure completion.
+- **SC-016**: In concurrent-worker and retry tests, each logical Email Delivery Job is delivered successfully at most once, every claim increments attempts exactly once, and every completed attempt produces the expected `SENT`, `RETRYABLE`, or `DEAD` state with no duplicate terminal-failure audit event.
 
 ## Assumptions
 
@@ -345,6 +360,7 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - Email OTP MUST NOT be offered as a login factor, alternative second factor, or account-recovery factor in this functional group.
 - â€œGoogle Authenticatorâ€ means only an RFC 6238-compatible TOTP authenticator application and does not imply Google identity or OAuth.
 - Verification and password-reset links are delivered by an approved Transactional Email Service; email delivery time is external to completion of the originating web request.
+- The generated local environment selects `capture`. Individual developers may opt into Gmail-compatible SMTP for local demonstrations using a complete account address and Google App Password. Resend remains the approved production-oriented adapter, while production deployment is not part of this academic feature.
 - Rate-limit thresholds, pre-authentication challenge lifetime, recent-authentication interval, session idle/absolute lifetimes, TOTP skew tolerance, backup-code count/format, and audit/operational retention periods are security policy parameters to be selected and justified during planning, without weakening the fixed behavior in this specification.
 - An approved 2FA recovery procedure will be separately specified before support-assisted TOTP disablement is implemented; until then, a user must have a valid TOTP code after recent authentication and password confirmation to disable 2FA.
 - Session location is approximate and displayed only if derived lawfully and without exposing a complete IP address; absence of location data does not block session management.
@@ -354,13 +370,14 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 ## Dependencies
 
 - A trusted public SmartHire application URL and HTTPS-enabled production deployment configuration.
-- An approved Transactional Email Service with retryable, idempotent delivery integration and operational failure visibility.
+- Approved capture, optional local SMTP, and production-oriented Resend adapters behind one provider-independent service boundary, plus an asynchronous due-outbox processor with idempotent claiming, retry, terminal-failure audit, and operational failure visibility.
 - A single relational database capable of enforcing uniqueness, referential integrity, transactions, authoritative session state, and atomic one-time credential consumption.
 - Secure production key/secret management suitable for password hashing configuration, Better Auth/CSRF secrets, token digests, and required protection of TOTP secrets at rest.
 - Reliable server time synchronization for expiry and RFC 6238 verification.
 
 ## Out of Scope
 
+- Production deployment and operation of Resend or any SMTP relay; this specification defines production-oriented adapter behavior but does not add deployment scope.
 - Google OAuth, â€œSign in with Google,â€ or any social login.
 - SMS OTP, phone-number authentication, passkeys, or WebAuthn.
 - Company membership, employer verification, recruiter authorization, administrator account management, or recruitment permissions beyond base Candidate identity.

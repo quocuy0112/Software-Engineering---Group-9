@@ -6,7 +6,7 @@ This is a validation guide, not implementation code. It proves the approved stor
 
 - Node.js `24.18.x` selected by the root `.nvmrc` or `.node-version`, with npm run from the repository root.
 - Docker Desktop or another compatible Docker Compose runtime. This is the only required local infrastructure dependency.
-- Exact pins: Next.js 16.2.9, Better Auth and its Prisma adapter 1.6.11, Prisma/client 7.7.0, Resend 6.17.2; T002 must select and record exact compatible React Email pins before email work begins.
+- Exact pins: Next.js 16.2.9, Better Auth and its Prisma adapter 1.6.11, Prisma/client 7.7.0, Resend 6.17.2, Nodemailer 9.0.3, and @types/nodemailer 8.0.1; all resolve from the root lockfile.
 - No host PostgreSQL or `psql` installation. PostgreSQL 16.12 runs in Compose on host port `55432` with a health check and persistent named volume.
 - Local `EMAIL_ADAPTER=capture`; no network email, Resend installation, or Resend API key is required for routine setup and validation.
 - SMTP is an optional per-developer local adapter. Gmail uses a complete account address plus Google App Password; generated environments never contain SMTP credentials.
@@ -25,6 +25,8 @@ npm ci
 npm run env:check
 npm run dev
 ```
+
+The planned `npm run dev` command starts both the Next.js application and due-outbox worker through a cross-platform supervisor. Use `npm run dev:web` and `npm run email:worker` separately only for debugging. The worker must be running before expecting capture, SMTP, or Resend delivery; registration and resend responses intentionally return after the outbox commit and do not wait for mail.
 
 Open http://localhost:3000. PostgreSQL is published only at `localhost:55432`, and captured email is stored in `apps/web/.local/mail`. Use `npm run db:down` to stop PostgreSQL without deleting data; use `npm run db:reset` only to delete the local named volume and start clean.
 
@@ -83,7 +85,6 @@ Captured local messages are files beneath the configured `EMAIL_CAPTURE_DIR`; in
 
 Keep capture as the normal acceptance-test adapter. For an explicit Gmail delivery test, place the following only in the untracked `apps/web/.env.local`, run `npm run env:check`, and restart `npm run dev`:
 
-    EMAIL_DRIVER=smtp
     EMAIL_ADAPTER=smtp
     SMTP_HOST=smtp.gmail.com
     SMTP_PORT=587
@@ -94,6 +95,8 @@ Keep capture as the normal acceptance-test adapter. For an explicit Gmail delive
     SMTP_USE_TLS=true
 
 Register a unique address and verify that the existing outbox worker sends the unchanged template. Gmail 587 requires STARTTLS (`secure=false`, `SMTP_USE_TLS=true`). Gmail 465 requires implicit TLS (`secure=true`). Never place SMTP credentials in examples, logs, captured fixtures, database rows, or tracked files.
+
+`EMAIL_ADAPTER` is the only selector; remove `EMAIL_DRIVER` from existing untracked local environments. Validate that `SMTP_USERNAME` is a complete email address and that `SMTP_FROM` contains no CR, LF, or control character. For a split-process demonstration, run `npm run dev:web` and `npm run email:worker` in separate terminals, then stop either with Ctrl+C and verify graceful shutdown/recoverable leases.
 
 ## Better Auth Compatibility Gate
 

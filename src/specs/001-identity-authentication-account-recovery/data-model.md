@@ -93,6 +93,8 @@ Temporary pre-authentication/security state, not a full session and never accept
 
 `id`, `kind`, nullable `userId`, nullable `securityTokenId`, recipient reference/encrypted value, `templateVersion`, allowlisted payload reference, unique `idempotencyKey`, status, attempts, lease owner/expiry, `nextAttemptAt`, provider message ID, safe error code, timestamps. Index `(status,nextAttemptAt)`. FK deletion uses SetNull only where immutable delivery history must remain; never store full token URLs in logs/errors.
 
+Due rows are `PENDING` or `RETRYABLE` with `nextAttemptAt <= now`. A worker transaction claims a bounded batch using `FOR UPDATE SKIP LOCKED` or an equivalently proven atomic mechanism, sets `PROCESSING` plus a unique lease owner and expiry, and commits before provider I/O. Finalization requires the matching lease owner. Expired processing leases are recoverable; attempts increment exactly once per claimed delivery attempt. Terminal transition and its audit event are atomic and idempotent. Provider credentials and raw provider errors are never fields or payload values.
+
 ### AuditEvent
 
 Append-only: `id`, `occurredAt`, actor type, nullable `actorUserId`, nullable `actorSessionId`, action, target type/id, result, correlation ID, keyed IP-prefix digest, user-agent family, schema-validated context. Index actor/time, target/time, action/time, and correlation ID. The application database role has no update/delete permission. Foreign references are logical/nullable so account cleanup cannot erase audit history.
@@ -114,6 +116,7 @@ Pending/Active → Suspended, Suspended → Active, and any state → Deleted co
 
 1. Registration: unique normalized email + `UserAccount` + `AuthProviderAccount` + Candidate identity + verification `SecurityToken` + audit + outbox.
 2. Verification: conditional token consume + state transition + audit.
+3. Email dispatch: originating services commit the outbox row and return. The independent due-outbox processor claims with row-lock skipping and a lease, performs external delivery after claim commit, then conditionally finalizes `SENT`, `RETRYABLE`, or `DEAD`. Capture, SMTP, and Resend share this lifecycle.
 3. Resend/reset request: supersede prior active token + create replacement + outbox + audit, with generic response.
 4. Password reset: conditional token consume + credential update + all-session/challenge revocation + sibling-token supersession + audit + notification. If Better Auth cannot join the Prisma transaction, use an explicit idempotent orchestration/retry state and fail closed.
 5. Session admission: serialize per user, create Better Auth session, enforce absolute/idle fields and five-session cap, audit.

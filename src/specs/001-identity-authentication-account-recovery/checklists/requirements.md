@@ -34,6 +34,8 @@
 ## Notes
 
 - Validation iteration 1 passed all checklist items.
+- Validation iteration 2 passed after formally adding optional local SMTP and asynchronous Email Delivery Job semantics. The amendment preserves the existing authentication, registration, verification-token, TOTP, login, and recovery ownership boundaries.
+- FR-006 and FR-038 were amended; FR-056 through FR-061 and NFR-011 were added without renumbering existing requirements. SC-007 and the Email Delivery Job definition were amended; SC-015 and SC-016 were added.
 - The Constitution Compliance section and FR-041/FR-042 have been propagated to Next.js App Router Route Handlers and one Better Auth opaque PostgreSQL-backed browser session. User stories and functional success criteria remain unchanged.
 - All 27 explicitly requested acceptance topics are represented by measurable Given/When/Then scenarios, including the three cross-cutting failure/accessibility scenarios.
 - No clarification markers remain. Security-policy parameters not fixed by the user or Constitution are documented as planning assumptions and must be selected and justified during `/speckit-plan`.

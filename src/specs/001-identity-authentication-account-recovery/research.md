@@ -86,6 +86,20 @@ Better Auth’s `Verification` table may be used only where its semantics meet e
 
 **Decision**: `EmailService` selects `resend` only in production. React Email templates produce HTML and text. Local development uses React Email preview and a non-network capture adapter. The transactional outbox supplies durable idempotency, leases, retry classification, and audit-safe provider identifiers.
 
+## Decision: Optional SMTP and asynchronous due-outbox processing
+
+**Verified compatibility evidence**: The root workspace resolves Nodemailer `9.0.3`, `@types/nodemailer` `8.0.1`, and Next.js `16.2.9` under Node.js `24.18.0`. Nodemailer is restricted to server-only adapter code and is not an application-service dependency. The current npm audit reports no Nodemailer finding.
+
+**Decision**: `EMAIL_ADAPTER` is the sole adapter selector. Capture remains the generated local default, SMTP is opt-in for local/team demonstrations, and Resend remains production-oriented. `EMAIL_DRIVER` is removed. All adapters run through `EmailOutbox -> due-outbox processor -> EmailService`; originating HTTP requests stop after the outbox transaction commits.
+
+The long-running worker polls due `PENDING` and `RETRYABLE` rows. It claims bounded batches with PostgreSQL `FOR UPDATE SKIP LOCKED` plus a recoverable lease, commits the claim before network I/O, finalizes only its own lease, uses bounded exponential backoff with jitter, and creates one safe terminal-failure audit event. A cross-platform root development supervisor starts Next.js and the worker together and forwards shutdown signals.
+
+Gmail port 587 uses STARTTLS with `secure=false` and required TLS; optional port 465 uses implicit TLS with `secure=true`. Complete-address username validation, Google App Password support, control-character/header-injection rejection, provider-error redaction, and retryable/terminal classification are mandatory.
+
+**Rationale**: One asynchronous worker path makes capture, SMTP, and Resend behavior consistent, prevents provider latency from extending registration/resend requests, and preserves the provider-independent boundary required by the Constitution.
+
+**Alternatives rejected**: awaiting Nodemailer/Resend in Route Handlers or services couples request success to external networks; one-process fire-and-forget loses work on restart; advisory locks without durable leases can strand jobs; a duplicate `EMAIL_DRIVER` selector permits contradictory configuration.
+
 ## Decision: UI and Client State
 
 Tailwind CSS and shadcn/ui are the baseline; React Hook Form and Zod cover forms and validation. Sonner provides supplemental feedback only; inline errors and an accessible summary remain persistent. TanStack Query is added only for a documented server-state benefit. Zustand is optional for non-sensitive shared UI state only. Motion is nonessential and reduced-motion safe. Lenis is not used on authentication pages.

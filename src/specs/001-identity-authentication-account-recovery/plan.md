@@ -5,11 +5,15 @@
 
 ## Summary
 
+Transactional email uses one provider-independent path: `EmailOutbox -> due-outbox processor -> EmailService -> capture | SMTP | Resend`. Capture is the generated local default, SMTP is opt-in for local/team demonstrations, and Resend is production-oriented although production deployment is outside this academic project. Registration, verification-resend, recovery, and notification requests commit their outbox row and return without awaiting provider network delivery.
+
 Deliver the approved P0 identity scope in one Next.js App Router application. Next.js App Router Route Handlers are the only HTTP backend mechanism and call Service → Repository/Data Access → PostgreSQL. Better Auth is the exclusive browser-session owner and uses its secure opaque cookie plus PostgreSQL `Session` row; SmartHire creates no browser JWT, second authentication cookie, or parallel session table. Prisma/Prisma Migrate own schema access and migrations. Resend, behind an email boundary, sends React Email templates; local development uses preview plus a non-network capture adapter.
 
 ## Technical Context
 
 **Runtime**: Node.js `24.18.x`, TypeScript 5.9; root `.nvmrc` and `.node-version` select the same Node line; exact package versions are planning pins and must be locked before implementation
+
+**SMTP dependency decision**: Nodemailer `9.0.3` and `@types/nodemailer` `8.0.1` are exact root-lockfile pins used only by server email integration. Installed-tree evidence confirms Node.js `24.18.0` and Next.js `16.2.9` compatibility. They MUST NOT be imported by client modules, Route Handlers, registration/verification services, or repositories; only the SMTP implementation behind `EmailService` may import Nodemailer. ADR `docs/architecture/adr/transactional-email-adapters-and-worker.md` records the decision.
 
 **Primary dependencies**: Next.js `16.2.9`; Better Auth and `@better-auth/prisma-adapter` `1.6.11`; Prisma and `@prisma/client` `7.7.0`; Resend `6.17.2`; exact React Email package versions are a blocking T002 compatibility outcome and must be recorded in `apps/web/package.json`, the root lockfile, and dependency-compatibility evidence before email work begins; Tailwind CSS; shadcn/ui; React Hook Form; Zod; Sonner; optional TanStack Query, Zustand, and Motion under the restrictions below  
 **Storage**: PostgreSQL 16.12 through root Docker Compose locally (host port `55432`, health check, persistent named volume); PostgreSQL remains the only production database; Prisma ORM and Prisma Migrate run from `apps/web/`
@@ -28,6 +32,8 @@ Deliver the approved P0 identity scope in one Next.js App Router application. Ne
 | VI Quality/accessibility | Measurable test environment; field errors plus summaries; Sonner is supplemental; keyboard/responsive checks. | Pass |
 | VII Architecture | Next.js App Router Route Handlers only; Route Handler → Service → Repository/Data Access → PostgreSQL; one Better Auth opaque PostgreSQL session mechanism; provider boundaries documented. | Pass |
 
+The SMTP decision preserves Principle VII: business services depend on EmailOutbox and `EmailService`, not Nodemailer or provider APIs. Exact library pins and the asynchronous worker are documented here and in the approved ADR; provider failures cannot roll back committed identity state.
+
 The active Constitution is `src/.specify/memory/constitution.md`. It permits the selected opaque database-backed session and technology-specific plan decisions. No waiver or complexity exception is required.
 
 ## Architecture and Layer Boundaries
@@ -41,12 +47,12 @@ Identity services and policy hooks
         |
 Repositories / data access (Prisma) + provider gateways
         |
-PostgreSQL                         Resend
+PostgreSQL            EmailOutbox worker -> EmailService -> capture | SMTP | Resend
 ```
 
 - Route Handlers translate HTTP inputs, cookies, status codes, and validated contracts; they contain no domain policy or direct Prisma calls.
 - Services enforce account state, timeout/cap policy, token consumption, transactions, audit intents, and email outbox creation.
-- Repositories encapsulate Prisma and PostgreSQL behavior. Provider gateways encapsulate Better Auth and Resend.
+- Repositories encapsulate Prisma and PostgreSQL behavior. Provider gateways encapsulate Better Auth; email adapters encapsulate capture, SMTP/Nodemailer, and Resend behind `EmailService`.
 - Better Auth handlers mount with `toNextJsHandler(auth)` at `app/api/auth/[...all]/route.ts`. Pages Router API Routes are prohibited for this feature.
 - Server Components may consume a server-validated session but must not introduce alternate credentials or client-side authorization.
 
@@ -88,7 +94,7 @@ Planning must create, without implementing identity features, the shared setup b
 
 T002 must run through the root npm workspace and lock exact compatible versions in the single root lockfile. Its PostgreSQL/Prisma/Better Auth compatibility chain uses `docker compose up -d`, waits for the container health check, and then uses Prisma validation, migration, and connectivity commands from `apps/web/`. Host `psql`, a host PostgreSQL installation, and Resend are not prerequisites. PostgreSQL inspection, when needed, runs inside the Compose container; routine connectivity proof comes from Prisma.
 
-Local infrastructure requires only Docker Desktop or another compatible Docker Compose runtime. PostgreSQL is pinned to 16.12, published only to host port 55432, and persisted in a named Docker volume. Local email defaults to file capture; Resend remains optional and is not required for setup, startup, or routine validation.
+Local infrastructure requires only Docker Desktop or another compatible Docker Compose runtime. PostgreSQL is pinned to 16.12, published only to host port 55432, and persisted in a named Docker volume. Local email defaults to file capture; SMTP is opt-in for local/team demonstrations; Resend remains optional and is not required for setup, startup, or routine validation. Generated environment files set only `EMAIL_ADAPTER=capture`; the obsolete duplicate `EMAIL_DRIVER` selector is removed from implementation, setup, validation, and examples.
 
 ## Better Auth Ownership and Capability Matrix
 
@@ -128,7 +134,12 @@ The Better Auth JWT plugin is not configured for browser authentication. A futur
 ## Data, Email, and UI Decisions
 
 - `data-model.md` defines Better Auth-owned tables once and documents only necessary SmartHire extensions/relations.
-- Resend is optional and production-only behind `EmailService`; React Email renders HTML and text. Local development defaults to a file-based non-network capture adapter whose directory is created by setup. An idempotent transactional outbox isolates provider failures.
+- Transactional email follows `EmailOutbox -> due-outbox processor -> EmailService -> capture | SMTP | Resend`. Capture is the generated local default, SMTP is opt-in local/team demonstration, and Resend is production-oriented. React Email renders the unchanged HTML/text templates. Registration and resend commit the outbox row and return without invoking an adapter.
+- The due-outbox processor is a long-running server-only process started by `npm run email:worker`. It polls due `PENDING` and `RETRYABLE` rows, transactionally claims a bounded batch using PostgreSQL `FOR UPDATE SKIP LOCKED` or an equivalently proven atomic claim, changes each claim to `PROCESSING` with a lease owner/expiry, and commits before network delivery.
+- A successful attempt records `SENT`, increments attempts once, and stores only the provider message reference. Retryable timeout/connection/temporary-provider failures record `RETRYABLE`, a safe error code, bounded exponential backoff with jitter, and `nextAttemptAt`. Permanent authentication/configuration/policy/recipient failures, exhausted attempts, or non-retryable template failures record `DEAD` and one idempotent terminal-failure audit event.
+- Expired `PROCESSING` leases become due again after the documented recovery interval so worker restarts do not strand mail. Claim ownership is checked when finalizing; concurrent workers cannot finalize another worker's lease. Provider idempotency keys are defense in depth and do not replace PostgreSQL claim/idempotency controls.
+- The worker handles SIGINT/SIGTERM by stopping new polls, allowing a bounded in-flight grace period, releasing or expiring unfinished leases safely, disconnecting from PostgreSQL, and exiting nonzero only for operational startup/fatal-loop failures.
+- Root `npm run dev` should start both Next.js and the email worker with one cross-platform supervisor and forward shutdown signals to both. Separate `npm run dev:web` and `npm run email:worker` commands remain available for debugging. Capture uses the same worker path as SMTP and Resend for consistent request semantics.
 - Tailwind CSS and shadcn/ui form the UI baseline. React Hook Form and Zod handle forms and trust-boundary validation. Sonner supplements persistent inline/summary errors and is never the sole error channel.
 - TanStack Query is used only for documented value. Zustand may hold only non-sensitive shared UI state. Motion is limited to nonessential reduced-motion-safe transitions. Lenis is prohibited on authentication pages.
 
@@ -138,6 +149,8 @@ The Better Auth JWT plugin is not configured for browser authentication. A futur
 - Verification/reset tokens are high-entropy opaque values stored only as keyed digests, expire, and are consumed once. TOTP and backup-code storage remain Better Auth-owned.
 - Persistent rate-limit buckets cover registration, login, resend, reset, and two-factor attempts where multi-instance consistency is needed.
 - Audit events are append-only and allowlisted; never record passwords, cookies, session tokens, token URLs, TOTP material, backup codes, raw IPs, or request bodies.
+- SMTP configuration is server-only. `SMTP_USERNAME` is a complete email address; `SMTP_FROM` rejects CR, LF, and control characters before mailbox parsing; Gmail port 587 requires STARTTLS with `SMTP_SECURE=false` and `SMTP_USE_TLS=true`; optional port 465 requires implicit TLS with `SMTP_SECURE=true`. Google App Passwords are supported but never generated, printed, persisted, audited, or exposed to client bundles.
+- SMTP errors map to allowlisted internal codes. Authentication/configuration/policy/recipient rejection is terminal; connection, timeout, and temporary 4xx provider failure is retryable unless the bounded attempt policy is exhausted. Raw provider errors and credentials never enter EmailOutbox or AuditEvent.
 - Generate the pinned Better Auth schema, compare it with the committed schema, create reviewed Prisma Migrate SQL, test on a production-like copy, deploy expand/contract, and retain forward-fix/restore procedures. Never edit an applied migration.
 
 ## Environment Variables
@@ -149,21 +162,36 @@ The Better Auth JWT plugin is not configured for browser authentication. A futur
 | `BETTER_AUTH_SECRET` | Better Auth server secret |
 | `AUTH_COOKIE_ENV` | Selects production prefixed/Secure cookies or development unprefixed/non-Secure cookies; production mode requires HTTPS |
 | `RESEND_API_KEY`, `EMAIL_FROM` | Production email adapter |
-| `EMAIL_ADAPTER` | `capture` locally, `resend` in production |
+| `EMAIL_ADAPTER` | Sole selector: `capture` by default locally, `smtp` by explicit local/team opt-in, `resend` for production-oriented configuration |
+| `SMTP_HOST`, `SMTP_PORT` | Server-only SMTP endpoint |
+| `SMTP_USERNAME`, `SMTP_PASSWORD` | Server-only SMTP credentials; Gmail uses a complete address and Google App Password |
+| `SMTP_FROM` | Validated server-only mailbox; rejects CR/LF/control characters |
+| `SMTP_SECURE`, `SMTP_USE_TLS` | Server-only implicit-TLS/STARTTLS mode |
 | `TOKEN_HMAC_KEY` | Verification/reset token digest key |
 | `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_PORT` | Root Compose database configuration; local port is `55432` |
 | `EMAIL_CAPTURE_DIR` | Gitignored local file-capture directory |
 
 No browser-session JWT issuer, audience, or signing variables exist.
 
+`EMAIL_DRIVER` is obsolete and MUST be removed from runtime parsing, setup scripts, checks, examples, and developer environment documentation. No SMTP variable may use a `NEXT_PUBLIC_` prefix.
+
 ## Verification Strategy
 
+- Compatibility evidence asserts exact Nodemailer `9.0.3` and `@types/nodemailer` `8.0.1` root-lockfile resolution under Node.js `24.18.0`, TypeScript 5.9, and Next.js `16.2.9`; tests must prove the SMTP module stays server-only.
+- Environment/unit tests cover Gmail 587 STARTTLS, optional 465 implicit TLS, missing or malformed complete-address usernames, CR/LF/control-character and header-injection attempts in `SMTP_FROM`, missing credentials, contradictory secure/TLS settings, redacted validation errors, and absence of `EMAIL_DRIVER`.
+- Adapter tests use mocked transports for successful delivery, authentication failure, timeout/connection failure, retryable temporary response, terminal rejection, safe error mapping, and zero credential logging.
+- PostgreSQL integration tests cover polling due `PENDING` and `RETRYABLE` jobs, transactional concurrent claims, lease expiry/worker restart, bounded backoff, attempt accounting, duplicate-delivery prevention, `DEAD` transition, and exactly one terminal-failure audit event.
+- Regression tests run capture and Resend through the same worker boundary and prove registration/resend responses return after outbox commit without awaiting network delivery.
 - Contract tests validate OpenAPI, generic anti-enumeration responses, cookie attributes, one session mechanism, and no browser JWT schemas.
 - PostgreSQL integration tests cover normalized-email races, one-time tokens, outbox idempotency, concurrent backup-code use, session cap, idle/absolute expiry, reset revocation, and Suspended/Deleted denial.
 - Environment checks verify Node `24.18.x`, npm workspace/one-lockfile invariants, Docker Compose availability, container health, port `55432`, required local files, and capture-directory writability without printing secrets.
 - Version-compatibility tests exercise Better Auth 1.6.11 schema, Prisma adapter, TOTP storage, backup-code regeneration/single-use, list/revoke/logout, and cookie issuance against the Compose PostgreSQL service before implementation is accepted.
 - Accessibility tests require keyboard access, focus management, labels, readable inline errors/summaries, reduced motion, responsive layouts, and no color-only status.
 - Performance evidence records environment, PostgreSQL dataset, cold/warm state, percentile, and Resend/capture conditions.
+
+## Dependency Security Assessment
+
+`npm audit --json` was run on 2026-07-20 without `--force`: 0 critical, 1 high, 5 moderate, 0 low. Nodemailer and `@types/nodemailer` have no reported finding in this audit. The direct high finding is Better Auth GHSA-86j7-9j95-vpqj; its affected OIDC-provider and MCP functionality is not configured, imported, routed, or exposed, so the existing temporary exception remains mandatory and must be reevaluated before release. Moderate findings currently involve the Next.js nested PostCSS chain and Prisma development tooling. No automatic downgrade or architecture-breaking audit fix is approved; exact-pin changes require compatibility reruns and consistent plan/evidence updates.
 
 ## Post-Design Constitution Re-check
 

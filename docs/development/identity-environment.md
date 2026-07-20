@@ -32,3 +32,6 @@ npm run db:verify
 ```
 
 The verifier uses Prisma plus PostgreSQL tools inside the Compose container; it does not require host PostgreSQL or host `psql`.
+## Transactional email worker
+
+The normal `npm run dev` command supervises both the web application and the due EmailOutbox worker. Use `npm run dev:web` and `npm run email:worker` separately for troubleshooting. `EMAIL_ADAPTER` is the only selector: `capture` is default, `smtp` is local/demo opt-in, and `resend` is production-oriented. Never commit provider credentials. Retryable jobs use bounded backoff; expired worker leases recover automatically; DEAD jobs require secret-safe operational review.

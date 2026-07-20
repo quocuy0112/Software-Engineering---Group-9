@@ -25,10 +25,9 @@ check(lockfiles.length === 1 && lockfiles[0] === "package-lock.json", "exactly o
 const workspaces = run("npm", ["query", ".workspace"]); check(workspaces.status === 0 && workspaces.stdout.includes("@smarthire/web"), "@smarthire/web workspace discovery");
 if (await canAccess("apps/web/.env.local")) {
   const appEnvironment = Object.fromEntries((await readFile(resolve(root, "apps/web/.env.local"), "utf8")).split(/\r?\n/).filter(Boolean).map((line) => line.split(/=(.*)/s).slice(0, 2)));
-  const driver = appEnvironment.EMAIL_DRIVER;
   const adapter = appEnvironment.EMAIL_ADAPTER;
-  let emailValid = ["capture", "resend", "smtp"].includes(driver) && driver === adapter;
-  if (driver === "smtp") {
+  let emailValid = ["capture", "resend", "smtp"].includes(adapter);
+  if (adapter === "smtp") {
     const port = Number(appEnvironment.SMTP_PORT);
     const secure = appEnvironment.SMTP_SECURE === "true";
     const useTls = appEnvironment.SMTP_USE_TLS === "true";

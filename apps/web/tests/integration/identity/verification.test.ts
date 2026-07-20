@@ -7,6 +7,7 @@ import { TokenProtector } from "@/lib/security/security-tokens";
 import { BetterAuthGateway } from "@/server/auth/identity/better-auth-gateway";
 import { deliverOutboxMessage } from "@/server/email/workers/email-outbox";
 import { EmailDeliveryError } from "@/server/email/email-service";
+import { CaptureEmailAdapter } from "@/server/email/capture-adapter";
 import { PrismaRegistrationRepository } from "@/server/repositories/identity/prisma-registration-repository";
 import { ResendVerificationService, GENERIC_RESEND_MESSAGE } from "@/server/services/identity/resend-verification";
 import { VerifyEmailService } from "@/server/services/identity/verify-email";
@@ -71,7 +72,7 @@ describe("email verification", () => {
     const fixture = await pending("capture");
     const directory = resolve(process.cwd(), ".local/mail");
     const before = new Set(await readdir(directory).catch(() => []));
-    expect(await deliverOutboxMessage(fixture.outboxId)).toBe(true);
+    expect(await deliverOutboxMessage(fixture.outboxId, new CaptureEmailAdapter())).toBe(true);
     const after = (await readdir(directory)).filter((name) => !before.has(name));
     expect(after).toHaveLength(1);
     const content = await readFile(resolve(directory, after[0]!), "utf8");

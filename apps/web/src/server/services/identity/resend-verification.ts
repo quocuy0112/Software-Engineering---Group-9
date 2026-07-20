@@ -2,14 +2,13 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { rateLimitPolicies, safeRetryMetadata } from "@/lib/rate-limit/policies";
 import { TokenProtector } from "@/lib/security/security-tokens";
-import { deliverOutboxMessage } from "@/server/email/workers/email-outbox";
 import { PrismaVerificationRepository } from "@/server/repositories/identity/prisma-verification-repository";
 import { PrismaRateLimitRepository } from "@/server/repositories/rate-limit/prisma-rate-limit-repository";
 
 export const GENERIC_RESEND_MESSAGE = "If an eligible account exists, a verification email will be sent.";
 
 export class ResendVerificationService {
-  constructor(private readonly repository = new PrismaVerificationRepository(), private readonly limiter = new PrismaRateLimitRepository(), private readonly protector = new TokenProtector(), private readonly deliver = deliverOutboxMessage) {}
+  constructor(private readonly repository = new PrismaVerificationRepository(), private readonly limiter = new PrismaRateLimitRepository(), private readonly protector = new TokenProtector(), deliveryNotUsed?: unknown) { void deliveryNotUsed; }
   async execute(normalizedEmail: string, subject: string, now = new Date()) {
     const decision = await this.limiter.consume({ ...rateLimitPolicies.verificationResend, subject: `${subject}:${normalizedEmail}`, now });
     if (!decision.allowed) {
@@ -18,8 +17,7 @@ export class ResendVerificationService {
     }
     const raw = this.protector.generate();
     try {
-      const outboxId = await this.repository.replaceForPendingUser({ normalizedEmail, tokenDigest: this.protector.digest(raw), protectedToken: this.protector.seal(raw), expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000), correlationId: randomUUID(), now });
-      if (outboxId) await this.deliver(outboxId);
+      await this.repository.replaceForPendingUser({ normalizedEmail, tokenDigest: this.protector.digest(raw), protectedToken: this.protector.seal(raw), expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000), correlationId: randomUUID(), now });
     } catch {}
     return { accepted: true as const, status: 202 as const, message: GENERIC_RESEND_MESSAGE };
   }

@@ -12,8 +12,9 @@ describe("existing email adapters", () => {
     const before = new Set(await readdir(directory).catch(() => []));
     const result = await new CaptureEmailAdapter().send(message);
     expect(result.providerMessageId).toMatch(/^capture:/);
-    const created = (await readdir(directory)).find((name) => !before.has(name));
-    expect(await readFile(resolve(directory, created!), "utf8")).toContain(message.idempotencyKey);
+    const created = (await readdir(directory)).filter((name) => !before.has(name));
+    const bodies = await Promise.all(created.map((name) => readFile(resolve(directory, name), "utf8")));
+    expect(bodies.filter((body) => body.includes(message.idempotencyKey))).toHaveLength(1);
   });
   it("keeps Resend delivery functional through its provider boundary", async () => {
     const send = vi.fn().mockResolvedValue({ data: { id: "resend-message-id" }, error: null });

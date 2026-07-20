@@ -4,6 +4,8 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "next dev",
+    "dev:web": "next dev",
+    "email:worker": "tsx src/server/email/workers/email-worker-entry.ts",
     "build": "next build",
     "lint": "eslint .",
     "format": "prettier --check .",
@@ -61,6 +63,7 @@
     "prettier-plugin-tailwindcss": "0.7.2",
     "prisma": "7.7.0",
     "tailwindcss": "4.1.18",
+    "tsx": "4.20.6",
     "typescript": "5.9.3",
     "vitest": "4.1.10"
   }
