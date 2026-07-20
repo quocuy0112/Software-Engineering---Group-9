@@ -15,21 +15,23 @@ This is a validation guide, not implementation code. It proves the approved stor
 
 From the repository root:
 
-```powershell
+```bash
+git clone <repository-url>
+cd Software-Engineering---Group-9
+npm run env:init
+npm run db:up
 npm ci
-npm run setup:local
-npm run check:environment
-docker compose up -d
-docker compose ps
-npm --workspace apps/web run prisma:validate
-npm --workspace apps/web run prisma:migrate:dev
-npm --workspace apps/web run db:check
-npm --workspace apps/web run dev
+npm run env:check
+npm run dev
 ```
 
-The script names are planning contracts for the shared setup tasks. `setup:local` invokes `scripts/setup-local.mjs`; it generates PostgreSQL and Better Auth secrets without printing them, does not overwrite existing files, creates root `.env` and `apps/web/.env.local`, and creates the gitignored file-email capture directory. If either environment file already exists, preserve it and report only the skipped path, never its contents.
+Open http://localhost:3000. PostgreSQL is published only at `localhost:55432`, and captured email is stored in `apps/web/.local/mail`. Use `npm run db:down` to stop PostgreSQL without deleting data; use `npm run db:reset` only to delete the local named volume and start clean.
 
-`check:environment` invokes `scripts/check-environment.mjs`; it checks Node `24.18.x`, the root npm workspace and sole root lockfile, Docker Compose availability, required environment files, Compose configuration, PostgreSQL health on port `55432`, Prisma connectivity from `apps/web/`, and capture-directory writability without exposing secrets.
+`env:init` invokes `scripts/setup-local.mjs`; it generates PostgreSQL and Better Auth secrets without printing them, does not overwrite existing files, creates root `.env` and `apps/web/.env.local`, and creates the gitignored file-email capture directory. If either environment file already exists, preserve it and report only the skipped path, never its contents.
+
+`env:check` invokes `scripts/check-environment.mjs`; it checks Node `24.18.x`, npm `11.16.x`, the root npm workspace and sole root lockfile, Docker Compose availability, required environment files, Compose configuration, and capture-directory writability without exposing secrets. Prisma connectivity and migrations begin at T015 and are intentionally not part of this scaffold run.
+
+Do not commit `.env`, `apps/web/.env.local`, captured email, private keys, logs, coverage, or test output. Host PostgreSQL and host `psql` are not required, and Resend remains optional for local startup.
 
 If direct database inspection is needed, run the PostgreSQL client inside the container with `docker compose exec`; host `psql` is never a prerequisite. Do not use `docker compose down -v` during routine work because the named volume is the local persistence mechanism.
 

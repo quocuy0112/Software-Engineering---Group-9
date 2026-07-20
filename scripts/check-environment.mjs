@@ -1,0 +1,26 @@
+import { access, constants } from "node:fs";
+import { readdir } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const failures = [];
+const check = (condition, message) => { console.log(`${condition ? "PASS" : "FAIL"} ${message}`); if (!condition) failures.push(message); };
+const run = (command, args) => command === "npm" && process.env.npm_execpath
+  ? spawnSync(process.execPath, [process.env.npm_execpath, ...args], { cwd: root, encoding: "utf8" })
+  : spawnSync(command, args, { cwd: root, encoding: "utf8" });
+const canAccess = (path, mode = constants.F_OK) => new Promise((done) => access(resolve(root, path), mode, (error) => done(!error)));
+check(/^24[.]18[.]/.test(process.versions.node), `Node.js 24.18.x (found ${process.versions.node})`);
+const npmVersion = run("npm", ["--version"]); check(npmVersion.status === 0 && /^11[.]16[.]/.test(npmVersion.stdout.trim()), "npm 11.16.x");
+check(run("docker", ["--version"]).status === 0, "Docker CLI");
+check(run("docker", ["compose", "version"]).status === 0, "Docker Compose");
+check(run("docker", ["compose", "config", "--quiet"]).status === 0, "Compose configuration");
+check(await canAccess(".env"), "root .env exists");
+check(await canAccess("apps/web/.env.local"), "apps/web/.env.local exists");
+check(await canAccess("apps/web/.local/mail", constants.W_OK), "email capture directory is writable");
+const lockfiles = (await readdir(root, { recursive: true })).filter((path) => !path.includes("node_modules") && path.endsWith("package-lock.json"));
+check(lockfiles.length === 1 && lockfiles[0] === "package-lock.json", "exactly one root package-lock.json");
+const workspaces = run("npm", ["query", ".workspace"]); check(workspaces.status === 0 && workspaces.stdout.includes("@smarthire/web"), "@smarthire/web workspace discovery");
+if (failures.length) { console.error(`Environment check failed (${failures.length} checks).`); process.exit(1); }
+console.log("Environment check passed; no secret values were displayed.");

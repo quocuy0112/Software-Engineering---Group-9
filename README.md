@@ -1,92 +1,35 @@
-# Software-Engineering---Group-9
+# SmartHire
+
+SmartHire is a modular full-stack Next.js application. The Spec Kit governance and feature artifacts remain under `src/`; application code lives in the single npm workspace `apps/web`.
+
+## Local onboarding
+
+Required tools: Git, Node.js 24.18.0 with npm 11.16.0, and Docker with Docker Compose. PostgreSQL and `psql` do not need to be installed on the host, and Resend is optional for local development.
 
 ```bash
-Software-Engineering---Group-9/
-│
-├── .agents/
-├── .github/
-├── .vscode/
-├── docs/
-│   └── architecture/
-│       └── decisions/
-│
-├── src/                                      # Spec Kit root, giữ nguyên
-│   ├── .specify/
-│   │   ├── feature.json
-│   │   ├── memory/
-│   │   │   └── constitution.md
-│   │   └── scripts/
-│   │
-│   └── specs/
-│       └── 001-identity-authentication-account-recovery/
-│           ├── checklists/
-│           ├── contracts/
-│           ├── data-model.md
-│           ├── plan.md
-│           ├── quickstart.md
-│           ├── research.md
-│           ├── spec.md
-│           └── tasks.md
-│
-├── apps/
-│   └── web/
-│       ├── src/
-│       │   ├── app/
-│       │   │   ├── (auth)/
-│       │   │   │   ├── register/
-│       │   │   │   ├── login/
-│       │   │   │   ├── verify-email/
-│       │   │   │   ├── forgot-password/
-│       │   │   │   └── reset-password/
-│       │   │   │
-│       │   │   └── api/
-│       │   │       └── auth/
-│       │   │           ├── register/
-│       │   │           ├── verify-email/
-│       │   │           └── resend-verification/
-│       │   │
-│       │   ├── features/
-│       │   │   └── authentication/
-│       │   │       ├── components/
-│       │   │       ├── hooks/
-│       │   │       ├── schemas/
-│       │   │       └── types/
-│       │   │
-│       │   ├── server/
-│       │   │   ├── auth/
-│       │   │   ├── email/
-│       │   │   ├── repositories/
-│       │   │   └── services/
-│       │   │
-│       │   ├── components/
-│       │   │   └── ui/
-│       │   ├── lib/
-│       │   └── types/
-│       │
-│       ├── prisma/
-│       │   ├── schema.prisma
-│       │   └── migrations/
-│       │
-│       ├── tests/
-│       │   ├── unit/
-│       │   ├── integration/
-│       │   └── e2e/
-│       │
-│       ├── public/
-│       ├── .env.example
-│       ├── package.json
-│       └── tsconfig.json
-│
-├── scripts/
-│   ├── setup-local.mjs
-│   └── check-environment.mjs
-│
-├── .env.example
-├── .gitignore
-├── .node-version
-├── .nvmrc
-├── compose.yaml
-├── package.json
-├── package-lock.json
-└── README.md
+git clone <repository-url>
+cd Software-Engineering---Group-9
+npm run env:init
+npm run db:up
+npm ci
+npm run env:check
+npm run dev
 ```
+
+Open the application at http://localhost:3000. PostgreSQL listens only on `localhost:55432`; Docker stores its data in the named `smarthire_postgres_data` volume. Captured local email is written beneath `apps/web/.local/mail`.
+
+Use `npm run db:down` to stop local PostgreSQL while retaining its data. Use `npm run db:reset` only when you intentionally want to delete and recreate local database data.
+
+Never commit `.env`, `apps/web/.env.local`, anything under `apps/web/.local`, captured email, private keys, logs, coverage, or test output. The checked-in `.env.example` files contain placeholders only.
+
+## Common checks
+
+```bash
+npm run env:check
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+Prisma commands are reserved for T015 and later. No Prisma schema or migration is part of the current scaffold.
