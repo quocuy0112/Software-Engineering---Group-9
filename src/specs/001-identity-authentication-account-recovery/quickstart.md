@@ -29,7 +29,16 @@ Open http://localhost:3000. PostgreSQL is published only at `localhost:55432`, a
 
 `env:init` invokes `scripts/setup-local.mjs`; it generates PostgreSQL and Better Auth secrets without printing them, does not overwrite existing files, creates root `.env` and `apps/web/.env.local`, and creates the gitignored file-email capture directory. If either environment file already exists, preserve it and report only the skipped path, never its contents.
 
-`env:check` invokes `scripts/check-environment.mjs`; it checks Node `24.18.x`, npm `11.16.x`, the root npm workspace and sole root lockfile, Docker Compose availability, required environment files, Compose configuration, and capture-directory writability without exposing secrets. Prisma connectivity and migrations begin at T015 and are intentionally not part of this scaffold run.
+`env:check` invokes `scripts/check-environment.mjs`; it checks Node `24.18.x`, npm `11.16.x`, the root npm workspace and sole root lockfile, Docker Compose availability, required environment files, Compose configuration, and capture-directory writability without exposing secrets.
+
+Initialize and verify Prisma connectivity and committed migrations with:
+
+```bash
+npm run db:migrate
+npm run db:verify
+```
+
+The verifier initializes an empty temporary PostgreSQL database from committed migrations, checks status and drift, proves Prisma connectivity, and removes its temporary databases without requiring host PostgreSQL or host `psql`.
 
 Do not commit `.env`, `apps/web/.env.local`, captured email, private keys, logs, coverage, or test output. Host PostgreSQL and host `psql` are not required, and Resend remains optional for local startup.
 

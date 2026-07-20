@@ -23,3 +23,12 @@ Local URLs and adapters:
 - Pre-auth cookie: `smarthire.pre-auth`, `Secure=false`, `SameSite=Lax`
 
 Stop PostgreSQL with `npm run db:down`. Run `npm run db:reset` only to remove the named volume and recreate an empty local database. Never commit environment files, captured mail, private keys, logs, coverage, or test artifacts.
+
+After installation, initialize the schema and verify a fresh temporary database:
+
+```bash
+npm run db:migrate
+npm run db:verify
+```
+
+The verifier uses Prisma plus PostgreSQL tools inside the Compose container; it does not require host PostgreSQL or host `psql`.

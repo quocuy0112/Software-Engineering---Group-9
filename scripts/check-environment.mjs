@@ -1,5 +1,5 @@
 import { access, constants } from "node:fs";
-import { readdir } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -16,11 +16,18 @@ const npmVersion = run("npm", ["--version"]); check(npmVersion.status === 0 && /
 check(run("docker", ["--version"]).status === 0, "Docker CLI");
 check(run("docker", ["compose", "version"]).status === 0, "Docker Compose");
 check(run("docker", ["compose", "config", "--quiet"]).status === 0, "Compose configuration");
+check(run("docker", ["compose", "exec", "-T", "postgres", "pg_isready"]).status === 0, "Compose PostgreSQL health");
 check(await canAccess(".env"), "root .env exists");
 check(await canAccess("apps/web/.env.local"), "apps/web/.env.local exists");
 check(await canAccess("apps/web/.local/mail", constants.W_OK), "email capture directory is writable");
 const lockfiles = (await readdir(root, { recursive: true })).filter((path) => !path.includes("node_modules") && path.endsWith("package-lock.json"));
 check(lockfiles.length === 1 && lockfiles[0] === "package-lock.json", "exactly one root package-lock.json");
 const workspaces = run("npm", ["query", ".workspace"]); check(workspaces.status === 0 && workspaces.stdout.includes("@smarthire/web"), "@smarthire/web workspace discovery");
+if (await canAccess("apps/web/.env.local")) {
+  const appEnvironment = Object.fromEntries((await readFile(resolve(root, "apps/web/.env.local"), "utf8")).split(/\r?\n/).filter(Boolean).map((line) => line.split(/=(.*)/s).slice(0, 2)));
+  const prismaCli = resolve(root, "node_modules/prisma/build/index.js");
+  const connectivity = spawnSync(process.execPath, [prismaCli, "db", "execute", "--stdin"], { cwd: resolve(root, "apps/web"), env: { ...process.env, ...appEnvironment }, input: "SELECT 1;", encoding: "utf8" });
+  check(connectivity.status === 0, "Prisma connects through generated DATABASE_URL/DIRECT_URL");
+}
 if (failures.length) { console.error(`Environment check failed (${failures.length} checks).`); process.exit(1); }
 console.log("Environment check passed; no secret values were displayed.");

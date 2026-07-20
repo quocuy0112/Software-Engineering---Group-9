@@ -32,4 +32,11 @@ npm test
 npm run build
 ```
 
-Prisma commands are reserved for T015 and later. No Prisma schema or migration is part of the current scaffold.
+Initialize or verify a developer database from committed migrations with:
+
+```bash
+npm run db:migrate
+npm run db:verify
+```
+
+`db:verify` proves that an empty PostgreSQL database can be initialized from committed migrations and that Prisma can connect without host PostgreSQL or host `psql`.
