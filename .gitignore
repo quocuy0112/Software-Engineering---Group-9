@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js
+.next/
+out/
+
+# Build output
+dist/
+build/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Database and Prisma local artifacts
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+prisma/dev.db
+prisma/dev.db-journal
+
+# Tests
+coverage/
+test-results/
+playwright-report/
+blob-report/
+.nyc_output/
+
+# Local email captures
+mail-output/
+email-preview/
+.emails/
+
+# Cache
+.cache/
+.turbo/
+.eslintcache
+
+# IDE
+.vscode/
+.idea/
+
+# Operating system
+.DS_Store
+Thumbs.db

@@ -1,0 +1,185 @@
+﻿openapi: 3.1.0
+info:
+  title: SmartHire Identity API
+  version: 0.1.0
+  description: Browser-facing App Router Route Handler contracts. Better Auth owns the single opaque PostgreSQL-backed browser session and its only authentication cookie. All errors/logs omit secrets; protected writes require that server-validated session plus origin/CSRF validation.
+servers:
+  - url: https://{configured-origin}
+paths:
+  /api/identity/register:
+    post:
+      operationId: register
+      security: []
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/RegisterRequest'}}}}
+      responses:
+        '202': {$ref: '#/components/responses/GenericAccepted'}
+        '400': {$ref: '#/components/responses/ValidationError'}
+        '429': {$ref: '#/components/responses/RateLimited'}
+  /api/identity/verification/consume:
+    post:
+      operationId: verifyEmail
+      security: []
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/TokenRequest'}}}}
+      responses:
+        '200': {description: Verification succeeded, content: {application/json: {schema: {$ref: '#/components/schemas/Outcome'}}}}
+        '400': {$ref: '#/components/responses/GenericFailure'}
+  /api/identity/verification/resend:
+    post:
+      operationId: resendVerification
+      security: []
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/EmailRequest'}}}}
+      responses:
+        '202': {$ref: '#/components/responses/GenericAccepted'}
+        '429': {$ref: '#/components/responses/RateLimited'}
+  /api/identity/login:
+    post:
+      operationId: loginPassword
+      security: []
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/LoginRequest'}}}}
+      responses:
+        '200':
+          description: Better Auth authentication completed with its sole session cookie, or a restricted AuthenticationChallenge was created without a Session.
+          headers: {Set-Cookie: {schema: {type: string}}}
+          content: {application/json: {schema: {$ref: '#/components/schemas/LoginOutcome'}}}
+        '401': {$ref: '#/components/responses/GenericAuthFailure'}
+        '429': {$ref: '#/components/responses/RateLimited'}
+  /api/identity/two-factor/complete:
+    post:
+      operationId: completeSecondFactor
+      security: [{preAuthCookie: []}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/SecondFactorRequest'}}}}
+      responses:
+        '200':
+          description: Better Auth completed the second factor, created its sole authoritative Session/cookie, and cleared the non-authenticating challenge cookie.
+          headers: {Set-Cookie: {schema: {type: string}}}
+          content: {application/json: {schema: {$ref: '#/components/schemas/Outcome'}}}
+        '401': {$ref: '#/components/responses/GenericAuthFailure'}
+        '429': {$ref: '#/components/responses/RateLimited'}
+  /api/identity/two-factor/enrollment:
+    post:
+      operationId: startTotpEnrollment
+      security: [{sessionCookie: [], csrfToken: []}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/PasswordProof'}}}}
+      responses:
+        '200': {description: One-time setup secret response; must not be cached or persisted client-side, content: {application/json: {schema: {$ref: '#/components/schemas/TotpSetup'}}}}
+        '401': {$ref: '#/components/responses/RecentAuthRequired'}
+  /api/identity/two-factor/enrollment/verify:
+    post:
+      operationId: verifyTotpEnrollment
+      security: [{sessionCookie: [], csrfToken: []}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/TotpCodeRequest'}}}}
+      responses:
+        '200': {description: 2FA enabled; backup codes returned once, headers: {Cache-Control: {schema: {type: string, const: no-store}}}, content: {application/json: {schema: {$ref: '#/components/schemas/BackupCodesOnce'}}}}
+        '400': {$ref: '#/components/responses/GenericFailure'}
+  /api/identity/two-factor/disable:
+    post:
+      operationId: disableTotp
+      security: [{sessionCookie: [], csrfToken: []}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/DisableTwoFactorRequest'}}}}
+      responses:
+        '204': {description: Disabled}
+        '401': {$ref: '#/components/responses/RecentAuthRequired'}
+  /api/identity/two-factor/backup-codes/regenerate:
+    post:
+      operationId: regenerateBackupCodes
+      security: [{sessionCookie: [], csrfToken: []}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/PasswordProof'}}}}
+      responses:
+        '200': {description: Previous set invalidated; new codes returned once, content: {application/json: {schema: {$ref: '#/components/schemas/BackupCodesOnce'}}}}
+        '401': {$ref: '#/components/responses/RecentAuthRequired'}
+  /api/identity/password/forgot:
+    post:
+      operationId: forgotPassword
+      security: []
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/EmailRequest'}}}}
+      responses:
+        '202': {$ref: '#/components/responses/GenericAccepted'}
+        '429': {$ref: '#/components/responses/RateLimited'}
+  /api/identity/password/reset:
+    post:
+      operationId: resetPassword
+      security: []
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/ResetPasswordRequest'}}}}
+      responses:
+        '204': {description: Password changed; all sessions revoked; normal login required}
+        '400': {$ref: '#/components/responses/GenericFailure'}
+  /api/identity/logout:
+    post:
+      operationId: logout
+      security: [{sessionCookie: [], csrfToken: []}]
+      responses:
+        '204': {description: Current authoritative session revoked and cookie cleared}
+  /api/identity/sessions:
+    get:
+      operationId: listSessions
+      security: [{sessionCookie: []}]
+      responses:
+        '200': {description: Sanitized owned sessions, content: {application/json: {schema: {type: array, items: {$ref: '#/components/schemas/SessionSummary'}}}}}
+  /api/identity/sessions/{sessionReference}:
+    delete:
+      operationId: revokeSession
+      security: [{sessionCookie: [], csrfToken: []}]
+      parameters:
+        - {name: sessionReference, in: path, required: true, schema: {type: string, maxLength: 128}}
+      responses:
+        '204': {description: Owned session revoked idempotently}
+        '404': {description: Not found or not owned; no existence disclosure}
+components:
+  securitySchemes:
+    sessionCookie: {type: apiKey, in: cookie, name: __Host-smarthire.session, description: 'Production Better Auth opaque session cookie: Secure=true; HttpOnly=true; SameSite=Lax; Path=/; no Domain. Development without HTTPS uses unprefixed smarthire.session with Secure=false; it never uses the __Host- prefix.'}
+    preAuthCookie: {type: apiKey, in: cookie, name: __Secure-smarthire.pre-auth, description: 'Production non-authenticating challenge handle: Secure=true; HttpOnly=true; SameSite=Lax; Path=/api/identity/two-factor/complete. Development without HTTPS uses unprefixed smarthire.pre-auth with Secure=false; it never uses the __Secure- prefix.'}
+    csrfToken: {type: apiKey, in: header, name: X-CSRF-Token}
+  schemas:
+    RegisterRequest:
+      type: object
+      additionalProperties: false
+      required: [name, email, password, passwordConfirmation]
+      properties:
+        name: {type: string, minLength: 1, maxLength: 120}
+        email: {type: string, format: email, maxLength: 320}
+        password: {type: string, minLength: 12, maxLength: 128, writeOnly: true}
+        passwordConfirmation: {type: string, minLength: 12, maxLength: 128, writeOnly: true}
+    EmailRequest: {type: object, additionalProperties: false, required: [email], properties: {email: {type: string, format: email, maxLength: 320}}}
+    LoginRequest: {type: object, additionalProperties: false, required: [email, password], properties: {email: {type: string, format: email}, password: {type: string, writeOnly: true}}}
+    TokenRequest: {type: object, additionalProperties: false, required: [token], properties: {token: {type: string, minLength: 32, maxLength: 1024, writeOnly: true}}}
+    PasswordProof: {type: object, additionalProperties: false, required: [currentPassword], properties: {currentPassword: {type: string, writeOnly: true}}}
+    TotpCodeRequest: {type: object, additionalProperties: false, required: [code], properties: {code: {type: string, pattern: '^[0-9]{6}$', writeOnly: true}}}
+    SecondFactorRequest:
+      oneOf:
+        - {type: object, additionalProperties: false, required: [method, code], properties: {method: {const: totp}, code: {type: string, pattern: '^[0-9]{6}$', writeOnly: true}}}
+        - {type: object, additionalProperties: false, required: [method, code], properties: {method: {const: backup_code}, code: {type: string, minLength: 8, maxLength: 128, writeOnly: true}}}
+    DisableTwoFactorRequest:
+      type: object
+      additionalProperties: false
+      required: [currentPassword, code]
+      properties:
+        currentPassword: {type: string, writeOnly: true}
+        code: {type: string, pattern: '^[0-9]{6}$', writeOnly: true}
+    ResetPasswordRequest: {type: object, additionalProperties: false, required: [token, password, passwordConfirmation], properties: {token: {type: string, writeOnly: true}, password: {type: string, minLength: 12, maxLength: 128, writeOnly: true}, passwordConfirmation: {type: string, minLength: 12, maxLength: 128, writeOnly: true}}}
+    LoginOutcome:
+      type: object
+      required: [status, next]
+      properties:
+        status: {enum: [authenticated, second_factor_required]}
+        next: {enum: [authorized_destination, two_factor]}
+    Outcome: {type: object, required: [status], properties: {status: {enum: [success, failure]}}}
+    TotpSetup: {type: object, required: [qrCodeDataUrl, manualKey], properties: {qrCodeDataUrl: {type: string, writeOnly: true}, manualKey: {type: string, writeOnly: true}}}
+    BackupCodesOnce: {type: object, required: [backupCodes], properties: {backupCodes: {type: array, minItems: 10, maxItems: 10, items: {type: string, writeOnly: true}}}}
+    SessionSummary:
+      type: object
+      required: [reference, current, createdAt, lastActiveAt, absoluteExpiresAt, device]
+      properties:
+        reference: {type: string}
+        current: {type: boolean}
+        createdAt: {type: string, format: date-time}
+        lastActiveAt: {type: string, format: date-time}
+        absoluteExpiresAt: {type: string, format: date-time}
+        device: {type: string}
+        approximateLocation: {type: [string, 'null']}
+  responses:
+    GenericAccepted: {description: Same response regardless of account existence, content: {application/json: {schema: {type: object, required: [message], properties: {message: {type: string}}}}}}
+    ValidationError: {description: Field-safe validation errors; no account-existence information}
+    GenericFailure: {description: Generic invalid/expired/used failure without secret echo}
+    GenericAuthFailure: {description: Generic authentication failure}
+    RecentAuthRequired: {description: Recent authentication/current proof required}
+    RateLimited: {description: Generic retry-later response, headers: {Retry-After: {schema: {type: integer, minimum: 1}}}}

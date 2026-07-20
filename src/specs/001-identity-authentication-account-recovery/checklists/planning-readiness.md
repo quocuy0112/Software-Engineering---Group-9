@@ -1,0 +1,18 @@
+﻿# Planning Readiness Checklist
+
+- [x] `plan.md` completes Technical Context and Constitution Check
+- [x] PostgreSQL is the only production database
+- [x] Architecture and layer boundaries are concrete
+- [x] Better Auth compatibility risks are identified and blocking spike tasks exist
+- [x] Dependent session, credential, TOTP, and backup-code implementation cannot proceed until the pinned-version spikes pass
+- [x] Exactly one Better Auth opaque PostgreSQL-backed browser session and cookie are specified
+- [x] Prisma entities, constraints, indexes, states, and transactions are designed
+- [x] All required identity sequences are documented
+- [x] Browser and internal contracts exist
+- [x] Cookie prefixes and paths are contractually valid
+- [x] Email provider and local development strategy are selected
+- [x] Environment variables are defined and classified
+- [x] Accessibility and no-Lenis constraints are planned
+- [x] Test, performance, migration, and rollback approaches are measurable
+- [x] Research contains no unresolved clarification markers
+- [x] Post-design Constitution Check passes
