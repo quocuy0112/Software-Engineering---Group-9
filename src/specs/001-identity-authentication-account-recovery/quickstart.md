@@ -9,6 +9,7 @@ This is a validation guide, not implementation code. It proves the approved stor
 - Exact pins: Next.js 16.2.9, Better Auth and its Prisma adapter 1.6.11, Prisma/client 7.7.0, Resend 6.17.2; T002 must select and record exact compatible React Email pins before email work begins.
 - No host PostgreSQL or `psql` installation. PostgreSQL 16.12 runs in Compose on host port `55432` with a health check and persistent named volume.
 - Local `EMAIL_ADAPTER=capture`; no network email, Resend installation, or Resend API key is required for routine setup and validation.
+- SMTP is an optional per-developer local adapter. Gmail uses a complete account address plus Google App Password; generated environments never contain SMTP credentials.
 - A controlled clock and parallel-test support.
 
 ## Local Setup
@@ -77,6 +78,22 @@ Run root npm workspace scripts for type checking, linting, unit tests, OpenAPI c
 12. Stop the capture worker/Resend adapter during relevant flows. Confirm core transactions remain correct, outbox retry/dead-letter behavior is observable, and generic responses do not disclose provider failures.
 
 Captured local messages are files beneath the configured `EMAIL_CAPTURE_DIR`; inspect those files for demo links and expected HTML/text output. Switching to the optional Resend adapter is outside routine local startup and must not be necessary for any local acceptance scenario.
+
+### Optional Gmail SMTP smoke test
+
+Keep capture as the normal acceptance-test adapter. For an explicit Gmail delivery test, place the following only in the untracked `apps/web/.env.local`, run `npm run env:check`, and restart `npm run dev`:
+
+    EMAIL_DRIVER=smtp
+    EMAIL_ADAPTER=smtp
+    SMTP_HOST=smtp.gmail.com
+    SMTP_PORT=587
+    SMTP_USERNAME=developer@gmail.com
+    SMTP_PASSWORD=<Google App Password>
+    SMTP_FROM="SmartHire <developer@gmail.com>"
+    SMTP_SECURE=false
+    SMTP_USE_TLS=true
+
+Register a unique address and verify that the existing outbox worker sends the unchanged template. Gmail 587 requires STARTTLS (`secure=false`, `SMTP_USE_TLS=true`). Gmail 465 requires implicit TLS (`secure=true`). Never place SMTP credentials in examples, logs, captured fixtures, database rows, or tracked files.
 
 ## Better Auth Compatibility Gate
 

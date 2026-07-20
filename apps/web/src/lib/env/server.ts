@@ -2,6 +2,9 @@ import "server-only";
 import { z } from "zod";
 
 const booleanString = z.enum(["true", "false"]).transform((value) => value === "true");
+const optionalPort = z.preprocess((value) => value === "" || value === undefined ? undefined : value, z.coerce.number().int().min(1).max(65535).optional());
+const optionalBooleanString = z.preprocess((value) => value === "" || value === undefined ? undefined : value, booleanString.optional());
+const smtpFrom = z.string().trim().refine((value) => /^(?:[^<>]*\s)?<[^<>\s@]+@[^<>\s@]+\.[^<>\s@]+>$|^[^<>\s@]+@[^<>\s@]+\.[^<>\s@]+$/.test(value), "must contain a complete email address").optional().or(z.literal(""));
 const schema = z.object({
   APP_ENV: z.enum(["local", "test", "production"]),
   NEXT_PUBLIC_APP_URL: z.string().url(),
@@ -11,12 +14,19 @@ const schema = z.object({
   BETTER_AUTH_SECRET: z.string().min(32),
   TOKEN_SECRET: z.string().min(32),
   AUTH_COOKIE_ENV: z.enum(["local", "production"]),
-  EMAIL_DRIVER: z.enum(["capture", "resend"]),
-  EMAIL_ADAPTER: z.enum(["capture", "resend"]),
+  EMAIL_DRIVER: z.enum(["capture", "resend", "smtp"]),
+  EMAIL_ADAPTER: z.enum(["capture", "resend", "smtp"]),
   EMAIL_CAPTURE_DIRECTORY: z.string().min(1),
   EMAIL_CAPTURE_DIR: z.string().min(1),
   RESEND_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().email().optional().or(z.literal("")),
+  SMTP_HOST: z.string().trim().min(1).optional(),
+  SMTP_PORT: optionalPort,
+  SMTP_USERNAME: z.string().trim().min(1).optional(),
+  SMTP_PASSWORD: z.string().min(1).optional(),
+  SMTP_FROM: smtpFrom,
+  SMTP_SECURE: optionalBooleanString,
+  SMTP_USE_TLS: optionalBooleanString,
   SESSION_COOKIE_NAME: z.string().min(1),
   PRE_AUTH_COOKIE_NAME: z.string().min(1),
   COOKIE_SECURE: booleanString,
@@ -26,6 +36,18 @@ const schema = z.object({
   const appUrl = new URL(env.NEXT_PUBLIC_APP_URL);
   const authUrl = new URL(env.BETTER_AUTH_URL);
   const fail = (path: string, message: string) => ctx.addIssue({ code: "custom", path: [path], message });
+  if (env.EMAIL_DRIVER !== env.EMAIL_ADAPTER) fail("EMAIL_ADAPTER", "must match EMAIL_DRIVER");
+  if (env.EMAIL_DRIVER === "smtp") {
+    if (!env.SMTP_HOST) fail("SMTP_HOST", "is required for SMTP");
+    if (!env.SMTP_PORT) fail("SMTP_PORT", "is required for SMTP");
+    if (!env.SMTP_USERNAME) fail("SMTP_USERNAME", "is required for SMTP");
+    if (!env.SMTP_PASSWORD) fail("SMTP_PASSWORD", "is required for SMTP");
+    if (!env.SMTP_FROM) fail("SMTP_FROM", "is required for SMTP");
+    if (env.SMTP_SECURE === undefined) fail("SMTP_SECURE", "is required for SMTP");
+    if (env.SMTP_USE_TLS === undefined) fail("SMTP_USE_TLS", "is required for SMTP");
+    if (env.SMTP_HOST?.toLowerCase() === "smtp.gmail.com" && env.SMTP_PORT === 587 && (env.SMTP_SECURE !== false || env.SMTP_USE_TLS !== true)) fail("SMTP_SECURE", "Gmail port 587 requires secure=false and STARTTLS");
+    if (env.SMTP_HOST?.toLowerCase() === "smtp.gmail.com" && env.SMTP_PORT === 465 && env.SMTP_SECURE !== true) fail("SMTP_SECURE", "Gmail port 465 requires secure=true");
+  }
   if (appUrl.origin !== authUrl.origin) fail("BETTER_AUTH_URL", "must exactly match the public application origin");
   if (production) {
     if (appUrl.protocol !== "https:") fail("NEXT_PUBLIC_APP_URL", "production requires HTTPS");

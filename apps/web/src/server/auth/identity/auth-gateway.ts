@@ -6,6 +6,7 @@ export type SessionSummary = {
 };
 
 export interface AuthGateway {
+  preparePasswordForCredential(password: string): Promise<string>;
   getSession(headers: Headers): Promise<{ userId: string; sessionId: string } | null>;
   listSessions(headers: Headers): Promise<SessionSummary[]>;
   revokeSession(headers: Headers, token: string): Promise<void>;

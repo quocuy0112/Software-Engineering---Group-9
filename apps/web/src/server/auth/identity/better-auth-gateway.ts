@@ -1,8 +1,12 @@
 import "server-only";
 import { auth } from "@/server/auth/config";
+import { hashPassword } from "better-auth/crypto";
 import type { AuthGateway, SessionSummary } from "./auth-gateway";
 
 export class BetterAuthGateway implements AuthGateway {
+  async preparePasswordForCredential(password: string) {
+    return hashPassword(password);
+  }
   async getSession(headers: Headers) {
     const result = await auth.api.getSession({ headers });
     return result ? { userId: result.user.id, sessionId: result.session.id } : null;

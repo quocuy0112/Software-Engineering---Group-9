@@ -10,3 +10,18 @@ describe("server environment", () => {
   it("rejects unsafe production origins", () => { expect(() => parseServerEnvironment({ ...local, APP_ENV: "production", AUTH_COOKIE_ENV: "production" })).toThrow(/NEXT_PUBLIC_APP_URL/); });
   it("redacts invalid secret values", () => { const secret = "short-secret"; expect(() => parseServerEnvironment({ ...local, BETTER_AUTH_SECRET: secret })).toThrowError(new RegExp(`^(?!.*${secret}).*$`)); });
 });
+
+describe("SMTP environment validation", () => {
+  const smtp = { ...local, EMAIL_DRIVER: "smtp", EMAIL_ADAPTER: "smtp", SMTP_HOST: "smtp.gmail.com", SMTP_PORT: "587", SMTP_USERNAME: "developer@gmail.com", SMTP_PASSWORD: "app-password", SMTP_FROM: "SmartHire <developer@gmail.com>", SMTP_SECURE: "false", SMTP_USE_TLS: "true" };
+  it("accepts Gmail STARTTLS on port 587", () => expect(parseServerEnvironment(smtp)).toMatchObject({ SMTP_PORT: 587, SMTP_SECURE: false, SMTP_USE_TLS: true }));
+  it("accepts Gmail implicit TLS on port 465", () => expect(parseServerEnvironment({ ...smtp, SMTP_PORT: "465", SMTP_SECURE: "true", SMTP_USE_TLS: "false" })).toMatchObject({ SMTP_PORT: 465, SMTP_SECURE: true }));
+  it.each([
+    ["missing username", { SMTP_USERNAME: undefined }],
+    ["missing password", { SMTP_PASSWORD: undefined }],
+    ["invalid port", { SMTP_PORT: "70000" }],
+    ["invalid sender", { SMTP_FROM: "SmartHire developer-at-gmail" }],
+    ["sender without complete address", { SMTP_FROM: "SmartHire" }],
+    ["587 cannot use implicit TLS", { SMTP_PORT: "587", SMTP_SECURE: "true" }],
+    ["465 requires implicit TLS", { SMTP_PORT: "465", SMTP_SECURE: "false" }],
+  ])("rejects %s", (_name, override) => expect(() => parseServerEnvironment({ ...smtp, ...override })).toThrow());
+});

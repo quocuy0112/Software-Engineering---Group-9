@@ -1,0 +1,49 @@
+import { z } from "zod";
+
+export const authenticationAuditAction = z.enum([
+  "registration.accepted",
+  "registration.rejected",
+  "verification.succeeded",
+  "verification.failed",
+  "verification.resent",
+  "verification.resend_ignored",
+  "rate_limit.denied",
+  "email.delivery_failed",
+  "password.policy_rejected",
+  "password.compromised_rejected",
+  "login.succeeded",
+  "login.failed",
+  "logout.succeeded",
+  "session.revoked",
+  "session.revoked_all",
+  "totp.enrollment_started",
+  "totp.enabled",
+  "totp.disabled",
+  "totp.challenge_succeeded",
+  "totp.challenge_failed",
+  "backup_codes.regenerated",
+  "backup_code.consumed",
+  "password_reset.requested",
+  "password_reset.succeeded",
+  "password_reset.failed",
+  "account.activated",
+  "account.suspended",
+  "account.deleted",
+]);
+
+export const authenticationAuditEventSchema = z.object({
+  occurredAt: z.date(),
+  actorType: z.enum(["anonymous", "user", "system"]),
+  actorUserId: z.string().min(1).nullable().optional(),
+  actorSessionId: z.string().min(1).nullable().optional(),
+  action: authenticationAuditAction,
+  targetType: z.enum(["user_account", "email_verification", "request", "email_outbox", "session", "two_factor", "password_reset"]),
+  targetId: z.string().min(1).nullable().optional(),
+  result: z.enum(["SUCCESS", "FAILURE", "DENIED"]),
+  correlationId: z.string().min(8).max(128),
+  ipPrefixDigest: z.string().max(128).nullable().optional(),
+  userAgentFamily: z.string().max(80).nullable().optional(),
+  context: z.record(z.string(), z.union([z.string().max(160), z.number(), z.boolean(), z.null()])),
+}).strict();
+
+export type AuthenticationAuditEvent = z.infer<typeof authenticationAuditEventSchema>;
