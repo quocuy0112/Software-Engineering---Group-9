@@ -103,7 +103,7 @@ The database is the authoritative source of recruitment state.
   records MUST be prevented through constraints or idempotency controls.
 - The canonical application states are **Applied, Viewed, Shortlisted,
   Interviewing, Offered, Hired, Offer Declined, Rejected, and Waitlisted**.
-- The Hired state MUST only be set by an explicit Recruiter confirmation action   (triggering the hiring confirmation email) - never automatically from a candidate's in-app offer acceptance, which MUST only notify the recruiter.
+- The Hired state MUST only be set by an explicit Recruiter confirmation action (triggering the hiring confirmation email) - never automatically from a candidate's in-app offer acceptance, which MUST only notify the recruiter.
 - Every allowed state transition MUST be explicitly defined and validated on the
   server.
 - The Kanban interface MUST NOT bypass state-transition, authorization, or
@@ -187,7 +187,7 @@ business rules, persistence, and external services.
 - Backend APIs MUST use Next.js API Routes with a layered separation between
   routes/controllers, services, and repositories or data-access code.
 - Persistent domain data MUST use one relational database. The implementation
-  plan MUST select either PostgreSQL or MySQL before database implementation; it
+  plan MUST select PostgreSQL before database implementation; it
   MUST NOT leave both as simultaneous production choices.
 - Authentication MUST use JWT-based sessions implemented according to Principle
   II.
