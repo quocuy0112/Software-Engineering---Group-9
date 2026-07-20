@@ -182,26 +182,74 @@ workflow that excludes supported users is incomplete.
 The implementation MUST preserve clear boundaries between presentation,
 business rules, persistence, and external services.
 
-- The frontend MUST use Next.js and TypeScript with the approved Tailwind CSS,
-  Shadcn UI, and Zustand stack unless this constitution is amended.
-- Backend APIs MUST use Next.js API Routes with a layered separation between
-  routes/controllers, services, and repositories or data-access code.
-- Persistent domain data MUST use one relational database. The implementation
-  plan MUST select PostgreSQL before database implementation; it
-  MUST NOT leave both as simultaneous production choices.
-- Authentication MUST use JWT-based sessions implemented according to Principle
-  II.
-- Shared API inputs and outputs MUST be typed and validated at trust boundaries.
-- Business logic MUST NOT depend directly on one AI provider. The implementation
-  plan MUST select the initial provider/model and preserve a replaceable AI
-  service boundary.
-- Email, file storage, AI, and other external-service failures MUST NOT corrupt
-  core recruitment data or disable unrelated workflows.
-- Presentation, business logic, data access, and external-service integration
-  MUST remain loosely coupled.
+- The primary frontend MUST use Next.js and TypeScript with the approved
+  Tailwind CSS and shadcn/ui baseline.
+- Zustand MAY be used for documented non-sensitive shared client state, but it
+  MUST NOT be required for every functional group.
+- Authentication credentials, session tokens, passwords, TOTP secrets, backup
+  codes, verification tokens, and password-reset tokens MUST NOT be stored in
+  Zustand or other client-side state stores.
 
-**Rationale:** Stable boundaries allow later specifications and plans to change
-providers or implementation details without rewriting the recruitment domain.
+- Backend endpoints MUST use the approved Next.js server-routing mechanism
+  defined in the active architecture baseline.
+- The approved mechanism MAY use App Router Route Handlers under
+  `app/api/**/route.ts` or Pages Router API Routes when explicitly documented.
+- The same endpoint MUST NOT be implemented using both routing mechanisms.
+- Backend code MUST preserve layered separation between transport handlers,
+  services, and repositories or data-access code.
+
+- Persistent domain data MUST use PostgreSQL as the single approved relational
+  production database unless this constitution is intentionally amended.
+- Database access MUST preserve transactional integrity, referential integrity,
+  duplicate prevention, and safe migration or recovery behavior.
+
+- SmartHire MUST use exactly one exclusive server-controlled browser-session
+  mechanism.
+- Browser session credentials MUST be stored only in cookies configured with
+  `HttpOnly`, `Secure` in production, and an appropriate `SameSite` policy.
+- Browser session credentials MUST NOT be stored in `localStorage`,
+  `sessionStorage`, Zustand, TanStack Query caches, or other persistent
+  client-side state.
+- The approved browser-session mechanism MAY use opaque database-backed
+  sessions, signed cookie sessions, or JWT-based sessions, provided that it
+  satisfies Principle II.
+- The session mechanism MUST support server-side validation, expiration,
+  revocation, logout, account-state enforcement, password-reset revocation,
+  and security-event auditing.
+- The application MUST NOT operate two independent browser-session mechanisms
+  simultaneously.
+- The implementation plan MUST identify the exclusive session owner and
+  describe session creation, expiration, revocation, and persistence behavior.
+- JWTs MAY be used for explicitly documented service-to-service authorization,
+  but they MUST NOT create a second browser-session mechanism.
+
+- Shared API inputs and outputs MUST be typed and validated at server trust
+  boundaries.
+
+- Business logic MUST NOT depend directly on a specific AI, email, file-storage,
+  authentication, or other external-service provider.
+- The implementation plan or an approved Architecture Decision Record MUST
+  select each initial provider or library and preserve a replaceable service
+  boundary.
+
+- Email, file storage, authentication, AI, and other external-service failures
+  MUST NOT corrupt core recruitment data or disable unrelated workflows.
+
+- Presentation, business logic, data access, authentication integration, and
+  external-service integration MUST remain loosely coupled.
+
+- Replacing an implementation library, provider, ORM, routing mechanism,
+  directory structure, or equivalent technical mechanism MUST NOT require a
+  constitutional amendment when all constitutional product, security, privacy,
+  data-integrity, and quality requirements remain satisfied.
+- Technology-specific selections MUST be documented in the active
+  architecture baseline, implementation plan, or an Architecture Decision
+  Record.
+
+**Rationale:** Stable architectural boundaries allow later specifications and
+plans to change providers, libraries, routing mechanisms, session
+implementations, or other technical details without rewriting the recruitment
+domain or weakening mandatory security and quality properties.
 
 ## Mandatory Product Boundaries
 
