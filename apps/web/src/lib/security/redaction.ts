@@ -5,6 +5,9 @@ export const REDACTED = "[REDACTED]";
 
 export function redactText(value: string): string {
   return value
+    .replace(/\b(Cookie\s*:)\s*[^\r\n]+/gi, `$1 ${REDACTED}`)
+    .replace(/\b(Authorization\s*:)\s*[^\r\n]+/gi, `$1 ${REDACTED}`)
+    .replace(/\b((?:smtp_)?password|authorization|token|secret|otp|backup.?code|jwt)\s*([=:])\s*[^\s,;]+/gi, `$1$2${REDACTED}`)
     .replace(URL_SECRET, `$1${REDACTED}`)
     .replace(/\bBearer\s+[^\s]+/gi, `Bearer ${REDACTED}`)
     .replace(/\b(?:\d{6}|[A-Z0-9]{4}(?:-[A-Z0-9]{4}){2,})\b/g, REDACTED);

@@ -13,5 +13,5 @@
 - [x] Prisma adapter-pg 7.7.0 and PostgreSQL driver 8.16.3 resolve from the root lockfile.
 - [x] Vitest is pinned to 4.1.10, resolving the prior critical development-server advisory.
 - [x] PostCSS is pinned to 8.5.10; remaining nested findings are recorded by npm audit.
-- [x] Current `npm audit --json` assessment (2026-07-20): 0 critical, 1 high, 5 moderate, 0 low; no Nodemailer finding. The Better Auth high finding remains governed by `checklists/npm-security-exception.md`; moderate findings affect Next/PostCSS and Prisma development tooling. No `npm audit fix --force` was run.
-- [ ] Before implementation acceptance, executable compatibility tests must cover SMTP 587/465 modes, malformed username/from/header injection, safe auth/timeout classification, concurrent claims, retry/restart/DEAD transitions, duplicate prevention, and capture/Resend regressions.
+- [x] Current `npm audit` assessment (2026-07-21): 0 critical, 1 accepted high, 5 moderate, 0 low; no Nodemailer finding. The Better Auth high finding remains governed by `checklists/npm-security-exception.md`; moderate findings affect Next/PostCSS and Prisma development tooling. No `npm audit fix --force` was run.
+- [x] Executable compatibility tests cover SMTP 587/465 modes, malformed username/from/header injection, safe auth/timeout classification, PostgreSQL concurrent claims, deterministic retry/restart/DEAD transitions, terminal non-redelivery, duplicate prevention, and capture/Resend regressions. Full Vitest passed 75/75 and lifecycle Playwright passed 2/2 on 2026-07-21.

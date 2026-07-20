@@ -9,6 +9,7 @@ describe("append-only audit repository", () => {
   it("exposes insert and PostgreSQL rejects update/delete", async () => {
     const repository = new PrismaAuditRepository();
     const created = await repository.append({ occurredAt: new Date(), actorType: "system", action: "registration.rejected", targetType: "request", result: "FAILURE", correlationId: id, context: {} });
+    expect(await prisma.auditEvent.findUnique({where:{id:created}})).not.toBeNull();
     await expect(prisma.auditEvent.update({ where: { id: created }, data: { result: "SUCCESS" } })).rejects.toThrow();
     await expect(prisma.auditEvent.delete({ where: { id: created } })).rejects.toThrow();
   });

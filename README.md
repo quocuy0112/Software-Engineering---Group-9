@@ -35,6 +35,8 @@ Use the complete Gmail address and a Google App Password, not the normal account
 
 `npm run dev` starts both Next.js and the asynchronous EmailOutbox worker. For debugging, run `npm run dev:web` and `npm run email:worker` in separate terminals. Registration and resend return after committing the outbox row; the worker later processes due PENDING/RETRYABLE rows. Capture remains the generated default and uses this same worker path.
 
+For secret-safe worker recovery, inspect only status, attempt count, due time, and lease expiry (never payloads or credentials). `PENDING` and due `RETRYABLE` jobs are picked up automatically. A `PROCESSING` job is reclaimed after its lease expires if a worker is interrupted. Restart `npm run email:worker` to resume due work. `DEAD` means bounded retries are exhausted or the provider rejected the request permanently; resolve the configuration/provider problem and create an explicitly reviewed replacement outbox request rather than editing a terminal row in place.
+
 Use `npm run db:down` to stop local PostgreSQL while retaining its data. Use `npm run db:reset` only when you intentionally want to delete and recreate local database data.
 
 Never commit `.env`, `apps/web/.env.local`, anything under `apps/web/.local`, captured email, private keys, logs, coverage, or test output. The checked-in `.env.example` files contain placeholders only.

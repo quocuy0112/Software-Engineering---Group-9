@@ -17,6 +17,7 @@
 - [x] Local HTTP uses only unprefixed cookies with `Secure=false`; prefixed production cookies remain Secure-only
 - [x] Append-only audit, concurrency/transactions, constraints/indexes, migrations, cleanup, recovery, and rollback are planned
 - [x] Security, accessibility, contract, integration, E2E, and measured performance tests are planned
+- [x] Transactional email uses one server-only adapter selector, leased PostgreSQL `SKIP LOCKED` claims, bounded retry/DEAD transitions, unique terminal audit, secret-safe errors, and a supervised worker with verified no-orphan teardown
 
 ## Implementation gate
 

@@ -7,4 +7,5 @@ describe("secret redaction", () => {
     expect(result).not.toMatch(/hidden|session=x|token=raw|Bearer abc|123456|ABCD-EFGH-IJKL/);
     expect(redactText("https://example.test/?token=raw")).not.toContain("raw");
   });
+  it.each(["password=hunter2","Cookie: smarthire.session=opaque","Authorization: Bearer abc.def","?token=raw-value","123456","ABCD-EFGH-IJKL","SMTP_PASSWORD=app-secret"])("redacts prohibited corpus entry",(value)=>expect(redactText(value)).not.toContain(value.split(/[=: ]/).at(-1)));
 });

@@ -96,6 +96,8 @@ Keep capture as the normal acceptance-test adapter. For an explicit Gmail delive
 
 Register a unique address and verify that the existing outbox worker sends the unchanged template. Gmail 587 requires STARTTLS (`secure=false`, `SMTP_USE_TLS=true`). Gmail 465 requires implicit TLS (`secure=true`). Never place SMTP credentials in examples, logs, captured fixtures, database rows, or tracked files.
 
+Operational inspection is metadata-only: check `status`, `attempts`, `nextAttemptAt`, `leaseExpiresAt`, and `safeErrorCode`, never token-bearing payloads or provider credentials. Starting the worker resumes PENDING, due RETRYABLE, and expired PROCESSING leases. SENT and DEAD rows are terminal and are not delivered again. Resolve a DEAD row's safe operational error before creating an explicitly reviewed replacement request; do not mutate the terminal row.
+
 `EMAIL_ADAPTER` is the only selector; remove `EMAIL_DRIVER` from existing untracked local environments. Validate that `SMTP_USERNAME` is a complete email address and that `SMTP_FROM` contains no CR, LF, or control character. For a split-process demonstration, run `npm run dev:web` and `npm run email:worker` in separate terminals, then stop either with Ctrl+C and verify graceful shutdown/recoverable leases.
 
 ## Better Auth Compatibility Gate
