@@ -1,0 +1,2 @@
+import "server-only"; import { BetterAuthSessionGateway } from "@/server/auth/identity/better-auth-session-gateway"; import { PrismaSessionPolicyRepository } from "@/server/repositories/identity/prisma-session-policy-repository";
+export class RevokeSessionService {constructor(private readonly repository=new PrismaSessionPolicyRepository(),private readonly gateway=new BetterAuthSessionGateway()){}async execute(reference:string,userId:string,headers:Headers){const token=await this.repository.tokenForOwned(reference,userId);if(token)await this.gateway.revoke(headers,token);}}

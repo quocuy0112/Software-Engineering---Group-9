@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+:root { color-scheme: light; --background: #f8fafc; --foreground: #0f172a; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--background); color: var(--foreground); font-family: Arial, Helvetica, sans-serif; }
+.auth-page { min-height: 100dvh; display: grid; place-items: center; padding: 1rem; }
+.auth-card { width: min(100%, 32rem); background: white; border: 1px solid #cbd5e1; border-radius: .75rem; padding: clamp(1rem, 5vw, 2rem); box-shadow: 0 12px 30px rgb(15 23 42 / .08); }
+.auth-card form { display: grid; gap: 1rem; }
+.field { display: grid; gap: .35rem; }
+.auth-card label { font-weight: 600; }
+.auth-card input { width: 100%; min-height: 2.75rem; border: 1px solid #64748b; border-radius: .4rem; padding: .65rem; font: inherit; }
+.auth-card input[aria-invalid="true"] { border-color: #b91c1c; }
+.auth-card [role="alert"] { color: #991b1b; margin: 0; }
+.auth-card button { min-height: 2.75rem; border: 0; border-radius: .4rem; padding: .7rem 1rem; background: #1d4ed8; color: white; font: inherit; font-weight: 700; cursor: pointer; }
+.auth-card button:disabled { opacity: .65; cursor: wait; }
+.auth-card :focus-visible { outline: 3px solid #f59e0b; outline-offset: 2px; }
+.password-control { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .5rem; align-items: center; }
+.auth-card .secondary-action { background: #e2e8f0; color: #0f172a; }
+.security-page { min-height: 100dvh; padding: clamp(.5rem, 3vw, 2rem); }
+.security-card { width: min(100%, 64rem); margin-inline: auto; overflow-wrap: anywhere; }
+.auth-motion { transition: opacity 160ms ease, transform 160ms ease; }
+@media (max-width: 320px) { .auth-page { padding: .5rem; } .auth-card { padding: 1rem; border-radius: .5rem; } }
+@media (prefers-reduced-motion: reduce) { .auth-motion { transition: none; animation: none; } }
