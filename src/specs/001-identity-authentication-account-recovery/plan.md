@@ -9,9 +9,11 @@ Deliver the approved P0 identity scope in one Next.js App Router application. Ne
 
 ## Technical Context
 
-**Runtime**: Node.js 24 LTS, TypeScript 5.9; exact package versions are planning pins and must be locked before implementation  
-**Primary dependencies**: Next.js `16.2.9`; Better Auth and `@better-auth/prisma-adapter` `1.6.11`; Prisma and `@prisma/client` `7.7.0`; Resend `6.17.2`; exact React Email package versions are a blocking T002 compatibility outcome and must be recorded in `package.json`, the lockfile, and dependency-compatibility evidence before email work begins; Tailwind CSS; shadcn/ui; React Hook Form; Zod; Sonner; optional TanStack Query, Zustand, and Motion under the restrictions below  
-**Storage**: PostgreSQL only in production; Prisma ORM and Prisma Migrate  
+**Runtime**: Node.js `24.18.x`, TypeScript 5.9; root `.nvmrc` and `.node-version` select the same Node line; exact package versions are planning pins and must be locked before implementation
+
+**Primary dependencies**: Next.js `16.2.9`; Better Auth and `@better-auth/prisma-adapter` `1.6.11`; Prisma and `@prisma/client` `7.7.0`; Resend `6.17.2`; exact React Email package versions are a blocking T002 compatibility outcome and must be recorded in `apps/web/package.json`, the root lockfile, and dependency-compatibility evidence before email work begins; Tailwind CSS; shadcn/ui; React Hook Form; Zod; Sonner; optional TanStack Query, Zustand, and Motion under the restrictions below  
+**Storage**: PostgreSQL 16.12 through root Docker Compose locally (host port `55432`, health check, persistent named volume); PostgreSQL remains the only production database; Prisma ORM and Prisma Migrate run from `apps/web/`
+
 **Testing**: unit, OpenAPI contract, PostgreSQL integration, component/accessibility, and browser E2E tests with controlled clock and concurrency cases  
 **Performance target**: authentication page load ≤3 seconds and identity interactions ≤2 seconds under the environment and dataset defined in `quickstart.md`  
 **Scope**: registration, email verification, password login, Better Auth TOTP and backup codes, password recovery, session management, account-state enforcement, audit, rate limiting, and transactional email only. No email OTP, social login, trusted devices, email change, passkeys, SMS, Python/FastAPI backend, or AI.
@@ -33,7 +35,7 @@ The active Constitution is `src/.specify/memory/constitution.md`. It permits the
 ```text
 Browser / Server Components
         |
-app/api/**/route.ts (Route Handlers and Better Auth catch-all)
+apps/web/src/app/api/**/route.ts (Route Handlers and Better Auth catch-all)
         |
 Identity services and policy hooks
         |
@@ -48,22 +50,45 @@ PostgreSQL                         Resend
 - Better Auth handlers mount with `toNextJsHandler(auth)` at `app/api/auth/[...all]/route.ts`. Pages Router API Routes are prohibited for this feature.
 - Server Components may consume a server-validated session but must not introduce alternate credentials or client-side authorization.
 
-## Project Structure
+## Repository and Project Structure
 
 ```text
-src/
-├── app/
-│   ├── (auth)/
-│   └── api/
-│       ├── auth/[...all]/route.ts
-│       └── identity/**/route.ts
-├── features/identity/{services,repositories,schemas,integrations}/
-├── lib/{auth,db,email,audit,security}/
-├── emails/
-└── generated/prisma/
-prisma/{schema.prisma,migrations/}
-tests/{unit,contract,integration,components,e2e}/
+./
+├── package.json                 # npm workspace root; includes apps/web
+├── package-lock.json            # the only lockfile
+├── .nvmrc
+├── .node-version
+├── compose.yaml                 # PostgreSQL 16.12, host 55432, health check, volume
+├── .env.example
+├── scripts/{setup-local.mjs,check-environment.mjs}
+├── apps/web/
+│   ├── .env.example
+│   ├── prisma/{schema.prisma,migrations/}
+│   ├── src/
+│   │   ├── app/{(auth),api/{auth/[...all],identity/**}/route.ts}
+│   │   ├── features/identity/
+│   │   ├── server/{auth,services,repositories,email}/
+│   │   └── components/ui/
+│   └── tests/{unit,contract,integration,components,e2e}/
+└── src/
+    ├── .specify/{feature.json,memory/constitution.md}
+    └── specs/001-identity-authentication-account-recovery/
 ```
+
+- The repository remains one modular full-stack Next.js application under `apps/web/`; no separate frontend or backend application is permitted.
+- Route Handlers live only in `apps/web/src/app/api/**/route.ts`. Feature UI modules live in `apps/web/src/features/`; server authentication integration in `apps/web/src/server/auth/`; business services in `apps/web/src/server/services/`; repositories in `apps/web/src/server/repositories/`; email adapters in `apps/web/src/server/email/`; shared UI in `apps/web/src/components/ui/`.
+- Prisma commands and migrations execute with `apps/web/` as their working directory. Tests live under `apps/web/tests/`.
+- Spec Kit stays nested under `src/`; neither `src/.specify/` nor `src/specs/` is moved.
+
+## Local-First Setup and Compatibility Chain
+
+Planning must create, without implementing identity features, the shared setup baseline at the repository root: npm workspace configuration, the single root `package-lock.json`, `.nvmrc`, `.node-version`, `compose.yaml`, `.env.example`, `apps/web/.env.example`, `scripts/setup-local.mjs`, `scripts/check-environment.mjs`, root `.gitignore` rules, and matching onboarding in `README.md` and this feature's `quickstart.md`.
+
+`scripts/setup-local.mjs` must be cross-platform, generate strong local PostgreSQL and Better Auth secrets without printing them, never overwrite an existing environment file, create both root `.env` and `apps/web/.env.local`, and create the gitignored local email-capture directory. Root `.env` configures Compose; `apps/web/.env.local` configures Next.js. Example files contain placeholders only.
+
+T002 must run through the root npm workspace and lock exact compatible versions in the single root lockfile. Its PostgreSQL/Prisma/Better Auth compatibility chain uses `docker compose up -d`, waits for the container health check, and then uses Prisma validation, migration, and connectivity commands from `apps/web/`. Host `psql`, a host PostgreSQL installation, and Resend are not prerequisites. PostgreSQL inspection, when needed, runs inside the Compose container; routine connectivity proof comes from Prisma.
+
+Local infrastructure requires only Docker Desktop or another compatible Docker Compose runtime. PostgreSQL is pinned to 16.12, published only to host port 55432, and persisted in a named Docker volume. Local email defaults to file capture; Resend remains optional and is not required for setup, startup, or routine validation.
 
 ## Better Auth Ownership and Capability Matrix
 
@@ -86,8 +111,8 @@ The Better Auth JWT plugin is not configured for browser authentication. A futur
 
 ## Session and Challenge Design
 
-- Production uses Better Auth’s only browser authentication cookie named `__Host-smarthire.session` with `Secure=true`, `HttpOnly=true`, `SameSite=Lax`, `Path=/`, and no `Domain` attribute. Development without HTTPS uses the unprefixed `smarthire.session` with `Secure=false`; an insecure cookie must never retain the `__Host-` prefix.
-- `AuthenticationChallenge` is temporary pre-authentication state, never a `Session`. Production uses `__Secure-smarthire.pre-auth` with `Secure=true`, `HttpOnly=true`, `SameSite=Lax`, and `Path=/api/identity/two-factor/complete`. Development without HTTPS uses unprefixed `smarthire.pre-auth` with `Secure=false` and the same path. The challenge cannot authorize protected resources.
+- Production uses Better Auth’s only browser authentication cookie named `__Host-smarthire.session` with `Secure=true`, `HttpOnly=true`, `SameSite=Lax`, `Path=/`, and no `Domain` attribute. Local HTTP uses the unprefixed `smarthire.session` with `Secure=false`; `Secure=false` is allowed only for unprefixed local HTTP cookies, and an insecure cookie must never retain the `__Host-` prefix.
+- `AuthenticationChallenge` is temporary pre-authentication state, never a `Session`. Production uses `__Secure-smarthire.pre-auth` with `Secure=true`, `HttpOnly=true`, `SameSite=Lax`, and `Path=/api/identity/two-factor/complete`. Local HTTP uses unprefixed `smarthire.pre-auth` with `Secure=false` and the same path; `Secure=false` is never used with a prefixed cookie. The challenge cannot authorize protected resources.
 - Password login delegates credential and two-factor ownership to Better Auth. A full session exists only after all required factors complete.
 - Every protected request performs Better Auth server validation, then SmartHire account-state/idle/absolute policy. Invalid, expired, revoked, Suspended, or Deleted sessions are rejected and revoked where possible.
 - Session creation runs the five-active-session service. Scheduled cleanup removes expired/revoked rows and sessions belonging to ineligible states; request-time checks remain authoritative.
@@ -103,7 +128,7 @@ The Better Auth JWT plugin is not configured for browser authentication. A futur
 ## Data, Email, and UI Decisions
 
 - `data-model.md` defines Better Auth-owned tables once and documents only necessary SmartHire extensions/relations.
-- Resend is production-only behind `EmailService`; React Email renders HTML and text. Local development uses React Email preview and a non-network capture adapter. An idempotent transactional outbox isolates provider failures.
+- Resend is optional and production-only behind `EmailService`; React Email renders HTML and text. Local development defaults to a file-based non-network capture adapter whose directory is created by setup. An idempotent transactional outbox isolates provider failures.
 - Tailwind CSS and shadcn/ui form the UI baseline. React Hook Form and Zod handle forms and trust-boundary validation. Sonner supplements persistent inline/summary errors and is never the sole error channel.
 - TanStack Query is used only for documented value. Zustand may hold only non-sensitive shared UI state. Motion is limited to nonessential reduced-motion-safe transitions. Lenis is prohibited on authentication pages.
 
@@ -126,6 +151,8 @@ The Better Auth JWT plugin is not configured for browser authentication. A futur
 | `RESEND_API_KEY`, `EMAIL_FROM` | Production email adapter |
 | `EMAIL_ADAPTER` | `capture` locally, `resend` in production |
 | `TOKEN_HMAC_KEY` | Verification/reset token digest key |
+| `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_PORT` | Root Compose database configuration; local port is `55432` |
+| `EMAIL_CAPTURE_DIR` | Gitignored local file-capture directory |
 
 No browser-session JWT issuer, audience, or signing variables exist.
 
@@ -133,7 +160,8 @@ No browser-session JWT issuer, audience, or signing variables exist.
 
 - Contract tests validate OpenAPI, generic anti-enumeration responses, cookie attributes, one session mechanism, and no browser JWT schemas.
 - PostgreSQL integration tests cover normalized-email races, one-time tokens, outbox idempotency, concurrent backup-code use, session cap, idle/absolute expiry, reset revocation, and Suspended/Deleted denial.
-- Version-compatibility tests exercise Better Auth 1.6.11 schema, Prisma adapter, TOTP storage, backup-code regeneration/single-use, list/revoke/logout, and cookie issuance before implementation is accepted.
+- Environment checks verify Node `24.18.x`, npm workspace/one-lockfile invariants, Docker Compose availability, container health, port `55432`, required local files, and capture-directory writability without printing secrets.
+- Version-compatibility tests exercise Better Auth 1.6.11 schema, Prisma adapter, TOTP storage, backup-code regeneration/single-use, list/revoke/logout, and cookie issuance against the Compose PostgreSQL service before implementation is accepted.
 - Accessibility tests require keyboard access, focus management, labels, readable inline errors/summaries, reduced motion, responsive layouts, and no color-only status.
 - Performance evidence records environment, PostgreSQL dataset, cold/warm state, percentile, and Resend/capture conditions.
 

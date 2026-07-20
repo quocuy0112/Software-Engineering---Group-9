@@ -13,6 +13,8 @@
 - [x] Better Auth exclusively owns TOTP and backup-code behavior; pinned-version storage protection and atomic-use tests are implementation gates
 - [x] Password, rate-limit, generic anti-enumeration, redirect, origin/CSRF, and redaction policies are defined
 - [x] Resend failures are isolated through an idempotent outbox and local development is non-network
+- [x] Local setup generates secrets without printing or overwriting them; environment and capture artifacts are gitignored
+- [x] Local HTTP uses only unprefixed cookies with `Secure=false`; prefixed production cookies remain Secure-only
 - [x] Append-only audit, concurrency/transactions, constraints/indexes, migrations, cleanup, recovery, and rollback are planned
 - [x] Security, accessibility, contract, integration, E2E, and measured performance tests are planned
 

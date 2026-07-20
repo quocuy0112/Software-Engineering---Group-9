@@ -2,7 +2,7 @@
 info:
   title: SmartHire Identity API
   version: 0.1.0
-  description: Browser-facing App Router Route Handler contracts. Better Auth owns the single opaque PostgreSQL-backed browser session and its only authentication cookie. All errors/logs omit secrets; protected writes require that server-validated session plus origin/CSRF validation.
+  description: Browser-facing contracts implemented only by apps/web/src/app/api/**/route.ts in the modular full-stack Next.js application. Better Auth owns the single opaque PostgreSQL-backed browser session and its only authentication cookie. All errors/logs omit secrets; protected writes require that server-validated session plus origin/CSRF validation.
 servers:
   - url: https://{configured-origin}
 paths:

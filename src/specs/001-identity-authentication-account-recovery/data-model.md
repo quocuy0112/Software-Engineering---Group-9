@@ -1,5 +1,7 @@
 # Data Model: Identity, Authentication, and Account Recovery
 
+The authoritative Prisma schema and migrations are planned at `apps/web/prisma/schema.prisma` and `apps/web/prisma/migrations/`. Prisma CLI and migration commands run with `apps/web/` as the working directory against PostgreSQL; this document does not relocate Spec Kit artifacts from `src/specs/`.
+
 PostgreSQL is the only production database; Prisma and Prisma Migrate own data access and migrations. Better Auth-owned tables appear once below. Names describe responsibilities even if pinned Better Auth physical model names remain lowercase/default for adapter compatibility.
 
 ## Enums

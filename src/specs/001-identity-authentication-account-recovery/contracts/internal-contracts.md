@@ -1,5 +1,7 @@
 ﻿# Internal Integration Contracts
 
+Implementation boundaries map to `apps/web/src/server/email/`, `apps/web/src/server/auth/`, `apps/web/src/server/services/`, and `apps/web/src/server/repositories/`. Browser-facing handlers remain in `apps/web/src/app/api/**/route.ts`; these paths are modules of the same Next.js application, not separate services.
+
 ## EmailService
 
 Accepts typed intents only: `VerificationEmail`, `PasswordResetEmail`, `PasswordChangedEmail`, and `SecurityAlertEmail`. Each intent contains internal IDs, recipient reference, template version, locale, and an opaque link value held only in the worker's protected memory. It returns provider message ID or a classified retryable/permanent error. Callers never import Resend directly.
