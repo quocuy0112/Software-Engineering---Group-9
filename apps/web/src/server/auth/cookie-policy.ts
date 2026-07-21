@@ -1,4 +1,5 @@
 import type { ServerEnvironment } from "@/lib/env/server";
+import { PRE_AUTH_COOKIE_MAX_AGE_SECONDS, PRE_AUTH_COOKIE_PATH } from "@/lib/security/cookies";
 
 export type AuthCookiePolicy = {
   sessionName: string;
@@ -23,7 +24,10 @@ export function betterAuthCookieOptions(policy: AuthCookiePolicy) {
     defaultCookieAttributes: policy.attributes,
     cookies: {
       session_token: { name: policy.sessionName, attributes: policy.attributes },
-      two_factor: { name: policy.preAuthName, attributes: { ...policy.attributes, path: "/api/auth/two-factor" } },
+      two_factor: {
+        name: policy.preAuthName,
+        attributes: { ...policy.attributes, path: PRE_AUTH_COOKIE_PATH, maxAge: PRE_AUTH_COOKIE_MAX_AGE_SECONDS },
+      },
     },
   };
 }

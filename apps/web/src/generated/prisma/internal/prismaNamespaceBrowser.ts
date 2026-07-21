@@ -194,6 +194,7 @@ export const AuthenticationChallengeScalarFieldEnum = {
   maxAttempts: 'maxAttempts',
   consumedAt: 'consumedAt',
   contextDigest: 'contextDigest',
+  verifiedTotpStep: 'verifiedTotpStep',
   createdAt: 'createdAt'
 } as const
 

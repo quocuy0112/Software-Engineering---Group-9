@@ -40,7 +40,7 @@ function totp(secret: string, forTime = Date.now()): string {
   return String(binary % 1_000_000).padStart(6, "0");
 }
 
-async function registerVerifyAndSignIn(page: Page): Promise<void> {
+async function registerVerifyAndSignIn(page: Page): Promise<string> {
   const email = `totp-e2e-${Date.now()}-${Math.random().toString(16).slice(2)}@example.test`;
   const mail = resolve(process.cwd(), ".local/mail");
   const before = new Set(await readdir(mail).catch(() => []));
@@ -72,16 +72,24 @@ async function registerVerifyAndSignIn(page: Page): Promise<void> {
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL(/\/settings\/sessions/);
+  return email;
 }
 
 test("enrolls TOTP end-to-end: QR, manual key, six-digit verify, and ten one-time backup codes", async ({ page }) => {
-  await registerVerifyAndSignIn(page);
+  await page.setExtraHTTPHeaders({ "x-forwarded-for": `e2e-${Date.now()}-${Math.random().toString(16).slice(2)}` });
+  const email = await registerVerifyAndSignIn(page);
 
   await page.goto("/settings/security");
   await expect(page.getByRole("heading", { name: "Set up two-factor authentication" })).toBeVisible();
 
   await page.getByLabel("Current password", { exact: true }).fill(password);
+  await expect(page.getByRole("button", { name: "Continue" })).toBeEnabled();
+  const enrollmentStart = page.waitForResponse((response) => response.url().endsWith("/api/identity/two-factor/enrollment") && response.request().method() === "POST");
   await page.getByRole("button", { name: "Continue" }).click();
+  const startResponse = await enrollmentStart;
+  const startBody = (await startResponse.json().catch(() => ({}))) as { message?: string };
+  expect(startResponse.status(), `Enrollment start failed (${startResponse.status()}): ${startBody.message ?? "no safe response body"}`).toBe(200);
+  expect(startBody.message ?? "").not.toMatch(/password|secret|token|cookie|otpauth/i);
 
   // Real QR image rendered server-side plus the manual setup key (the base32 secret).
   const qr = page.getByRole("img", { name: /QR code/i });
@@ -98,9 +106,25 @@ test("enrolls TOTP end-to-end: QR, manual key, six-digit verify, and ten one-tim
   await expect(page.getByRole("heading", { name: "Save your backup codes" })).toBeVisible();
   await expect(page.locator(".backup-codes li")).toHaveCount(10);
   await expect(page.locator("[data-warning]")).toContainText("shown only once");
+
+  // A 2FA account receives only a pre-auth challenge after password login.
+  await page.context().clearCookies();
+  await page.goto("/login");
+  await page.getByLabel("Email address").fill(email);
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/\/two-factor/);
+  await expect(page.getByLabel("Authentication code")).toBeFocused();
+  await page.getByLabel("Authentication code").fill("000000");
+  await page.getByLabel("Authentication code").press("Enter");
+  await expect(page.getByRole("status")).toContainText("could not be completed");
+  await page.getByLabel("Authentication code").fill(totp(manualKey));
+  await page.getByLabel("Authentication code").press("Enter");
+  await expect(page).toHaveURL(/\/settings\/sessions/);
 });
 
 test("enrollment UI is keyboard-operable and has no 320px overflow", async ({ page }) => {
+  await page.setExtraHTTPHeaders({ "x-forwarded-for": `e2e-${Date.now()}-${Math.random().toString(16).slice(2)}` });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await registerVerifyAndSignIn(page);
 
@@ -117,4 +141,12 @@ test("enrollment UI is keyboard-operable and has no 320px overflow", async ({ pa
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
   ).toBe(true);
+
+  // Missing/expired challenge state stays generic, keyboard-operable, and 320px-safe.
+  await page.context().clearCookies();
+  await page.goto("/two-factor");
+  await page.getByLabel("Authentication code").fill("123456");
+  await page.getByLabel("Authentication code").press("Enter");
+  await expect(page.getByRole("status")).toContainText("could not be completed");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 });

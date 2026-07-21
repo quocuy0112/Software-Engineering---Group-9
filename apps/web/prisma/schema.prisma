@@ -181,11 +181,13 @@ model AuthenticationChallenge {
   maxAttempts   Int              @default(5)
   consumedAt    DateTime?
   contextDigest String?
+  verifiedTotpStep BigInt?
   createdAt     DateTime         @default(now())
   user          UserAccount      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([handleDigest, expiresAt])
   @@index([userId, expiresAt])
+  @@index([userId, verifiedTotpStep])
 }
 
 model RateLimitBucket {

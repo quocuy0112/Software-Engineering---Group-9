@@ -1,5 +1,121 @@
-import "server-only"; import { randomUUID } from "node:crypto"; import type { LoginData } from "@/features/identity/schemas/login"; import { rateLimitPolicies,safeRetryMetadata } from "@/lib/rate-limit/policies"; import { PrismaRateLimitRepository } from "@/server/repositories/rate-limit/prisma-rate-limit-repository"; import { PrismaAuditRepository } from "@/server/repositories/audit/prisma-audit-repository"; import { PrismaSessionPolicyRepository } from "@/server/repositories/identity/prisma-session-policy-repository"; import { BetterAuthSessionGateway } from "@/server/auth/identity/better-auth-session-gateway"; import { SessionService } from "./session-service";
-export const GENERIC_LOGIN_ERROR="Email or password is incorrect.";
-export class LoginWithPasswordService {constructor(private readonly gateway=new BetterAuthSessionGateway(),private readonly sessions=new PrismaSessionPolicyRepository(),private readonly limiter=new PrismaRateLimitRepository(),private readonly audit=new PrismaAuditRepository()){}
- async execute(data:LoginData,request:{headers:Headers;subject:string;now?:Date}){const now=request.now??new Date(),correlationId=randomUUID();const decision=await this.limiter.consume({...rateLimitPolicies.login,subject:`${request.subject}:${data.email}`,now});if(!decision.allowed){await this.record("login.failed","DENIED",correlationId,now,"throttled");return Response.json({message:GENERIC_LOGIN_ERROR},{status:429,headers:{"Retry-After":String(safeRetryMetadata(decision).retryAfterSeconds)}});}const account=await this.sessions.accountByEmail(data.email);const upstream=await this.gateway.signIn(data.email,data.password,request.headers).catch(()=>null);const cookies=upstream?.headers.getSetCookie()??[];const sessionCookie=cookies.find((value)=>value.startsWith("smarthire.session=")||value.startsWith("__Host-smarthire.session="));const preAuthCookie=cookies.find((value)=>value.startsWith("smarthire.pre-auth=")||value.startsWith("__Secure-smarthire.pre-auth="));const active=account?.state==="ACTIVE";if(!upstream?.ok||(!sessionCookie&&!preAuthCookie)||!active){await this.record("login.failed","FAILURE",correlationId,now,account?"denied":"invalid");return Response.json({message:GENERIC_LOGIN_ERROR},{status:401});}if(sessionCookie){await new SessionService(this.sessions).enforceCreated(account.id);}await this.record("login.succeeded","SUCCESS",correlationId,now,preAuthCookie?"factor_required":"complete",account.id);const headers=new Headers({"Content-Type":"application/json","Cache-Control":"no-store"});for(const cookie of cookies)headers.append("Set-Cookie",cookie);return new Response(JSON.stringify({message:preAuthCookie?"Additional verification is required.":"Signed in.",requiresTwoFactor:Boolean(preAuthCookie)}),{status:200,headers});}
- private record(action:"login.succeeded"|"login.failed",result:"SUCCESS"|"FAILURE"|"DENIED",correlationId:string,occurredAt:Date,reason:string,targetId?:string){return this.audit.append({occurredAt,actorType:"anonymous",action,targetType:targetId?"user_account":"request",targetId,result,correlationId,context:{reason}});}}
+import "server-only";
+import { randomUUID } from "node:crypto";
+import type { LoginData } from "@/features/identity/schemas/login";
+import {
+  rateLimitPolicies,
+  safeRetryMetadata,
+} from "@/lib/rate-limit/policies";
+import { PrismaRateLimitRepository } from "@/server/repositories/rate-limit/prisma-rate-limit-repository";
+import { PrismaAuditRepository } from "@/server/repositories/audit/prisma-audit-repository";
+import { PrismaSessionPolicyRepository } from "@/server/repositories/identity/prisma-session-policy-repository";
+import { PrismaPreAuthRepository } from "@/server/repositories/identity/prisma-pre-auth-repository";
+import { BetterAuthSessionGateway } from "@/server/auth/identity/better-auth-session-gateway";
+import {
+  encodePreAuth,
+  setPreAuthCookie,
+} from "@/server/auth/identity/pre-auth-cookie";
+import { SessionService } from "./session-service";
+export const GENERIC_LOGIN_ERROR = "Email or password is incorrect.";
+const cookieValue = (line: string) =>
+  line.slice(line.indexOf("=") + 1, line.indexOf(";"));
+export class LoginWithPasswordService {
+  constructor(
+    private gateway = new BetterAuthSessionGateway(),
+    private sessions = new PrismaSessionPolicyRepository(),
+    private limiter = new PrismaRateLimitRepository(),
+    private audit = new PrismaAuditRepository(),
+    private challenges = new PrismaPreAuthRepository(),
+  ) {}
+  async execute(
+    data: LoginData,
+    request: { headers: Headers; subject: string; now?: Date },
+  ) {
+    const now = request.now ?? new Date(),
+      cid = randomUUID();
+    const d = await this.limiter.consume({
+      ...rateLimitPolicies.login,
+      subject: `${request.subject}:${data.email}`,
+      now,
+    });
+    if (!d.allowed)
+      return Response.json(
+        { message: GENERIC_LOGIN_ERROR },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(safeRetryMetadata(d).retryAfterSeconds),
+          },
+        },
+      );
+    const account = await this.sessions.accountByEmail(data.email);
+    const upstream = await this.gateway
+      .signIn(data.email, data.password, request.headers)
+      .catch(() => null);
+    const cookies = upstream?.headers.getSetCookie() ?? [],
+      session = cookies.find((v) =>
+        /^(smarthire\.session|__Host-smarthire\.session)=/.test(v),
+      ),
+      provisional = cookies.find((v) =>
+        /^(smarthire\.pre-auth|__Secure-smarthire\.pre-auth)=/.test(v),
+      );
+    if (
+      !upstream?.ok ||
+      account?.state !== "ACTIVE" ||
+      (!session && !provisional)
+    ) {
+      await this.record("login.failed", "FAILURE", cid, now, account?.id);
+      return Response.json({ message: GENERIC_LOGIN_ERROR }, { status: 401 });
+    }
+    const headers = new Headers({
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+    });
+    if (account.twoFactorEnabled) {
+      if (!provisional)
+        return Response.json({ message: GENERIC_LOGIN_ERROR }, { status: 401 });
+      const binding = cookieValue(provisional),
+        challenge = await this.challenges.create(account.id, binding, now);
+      headers.append(
+        "Set-Cookie",
+        setPreAuthCookie(encodePreAuth(challenge.token, binding)),
+      );
+      await this.record("login.succeeded", "SUCCESS", cid, now, account.id);
+      return new Response(
+        JSON.stringify({
+          message: "Additional verification is required.",
+          requiresTwoFactor: true,
+        }),
+        { status: 200, headers },
+      );
+    }
+    if (!session)
+      return Response.json({ message: GENERIC_LOGIN_ERROR }, { status: 401 });
+    for (const c of cookies) headers.append("Set-Cookie", c);
+    await new SessionService(this.sessions).enforceCreated(account.id);
+    await this.record("login.succeeded", "SUCCESS", cid, now, account.id);
+    return new Response(
+      JSON.stringify({ message: "Signed in.", requiresTwoFactor: false }),
+      { status: 200, headers },
+    );
+  }
+  private record(
+    action: "login.succeeded" | "login.failed",
+    result: "SUCCESS" | "FAILURE",
+    correlationId: string,
+    occurredAt: Date,
+    targetId?: string,
+  ) {
+    return this.audit
+      .append({
+        occurredAt,
+        actorType: "anonymous",
+        action,
+        targetType: targetId ? "user_account" : "request",
+        targetId,
+        result,
+        correlationId,
+        context: { reason: result === "SUCCESS" ? "accepted" : "denied" },
+      })
+      .catch(() => undefined);
+  }
+}

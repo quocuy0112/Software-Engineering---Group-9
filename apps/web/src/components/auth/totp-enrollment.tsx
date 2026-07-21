@@ -138,7 +138,7 @@ export function TotpEnrollment() {
             error={passwordForm.formState.errors.currentPassword?.message}
             {...passwordForm.register("currentPassword")}
           />
-          <button type="submit" disabled={passwordForm.formState.isSubmitting}>
+          <button type="submit" disabled={passwordForm.formState.isSubmitting || !proof}>
             {passwordForm.formState.isSubmitting ? "Starting…" : "Continue"}
           </button>
           <FormFeedback status={status} />

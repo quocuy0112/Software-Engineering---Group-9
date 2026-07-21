@@ -130,14 +130,14 @@ All database-dependent work from T015 through T035 uses the healthy PostgreSQL 1
 
 **Independent test**: 2FA password success creates only a five-minute restricted challenge; valid TOTP creates a rotated full session; invalid/expired/over-limit never authorize.
 
-- [ ] T070 [P] [US5] Define challenge/TOTP schemas in `apps/web/src/features/identity/schemas/two-factor.ts` | Deps: T048 | Parallel: Yes | Story: US5 | Done when: six-digit TOTP/bounded backup inputs and generic outputs match contract.
-- [ ] T071 [US5] Implement HMAC-bound five-minute single-use pre-auth repository in `apps/web/src/server/repositories/identity/prisma-pre-auth-repository.ts` | Deps: T018, T042 | Parallel: No | Story: US5 | Done when: counters/expiry/account binding and concurrent consume work.
-- [ ] T072 [US5] Change password login to create only pre-auth for 2FA accounts in `apps/web/src/server/services/identity/login-with-password.ts` | Deps: T049, T071 | Parallel: No | Story: US5 | Done when: no full Session/cookie exists before factor completion.
-- [ ] T073 [US5] Implement TOTP completion with skew/replay protection in `apps/web/src/server/services/identity/complete-two-factor.ts` | Deps: T028, T051, T064, T071 | Parallel: No | Story: US5 | Done when: valid code consumes challenge/creates rotated session and failures remain generic.
-- [ ] T074 [US5] Implement the `__Secure-smarthire.pre-auth` challenge-cookie flow and completion Route Handler in `apps/web/src/app/api/identity/two-factor/complete/route.ts` | Deps: T073, T100 | Parallel: No | Story: US5 | Done when: the path-scoped five-minute non-authenticating cookie clears and successful TOTP/backup completion produces the same Better Auth session/cookie system as password-only login.
-- [ ] T075 [US5] Implement two-factor page/focus transfer in `apps/web/src/app/(auth)/two-factor/page.tsx` and `apps/web/src/components/auth/two-factor-challenge.tsx` | Deps: T074 | Parallel: No | Story: US5 | Done when: heading/field focus, generic live status, keyboard submit, and no persistence work.
-- [ ] T076 [P] [US5] Generate pre-auth expiry/attempt/replay tests in `apps/web/tests/unit/identity/pre-auth-challenge.test.ts` | Deps: T071, T073 | Parallel: Yes | Story: US5 | Done when: five-minute, five-attempt, binding, single-use, and replay cases pass.
-- [ ] T077 [P] [US5] Generate challenge component tests in `apps/web/tests/components/auth/two-factor-challenge.test.tsx` | Deps: T075 | Parallel: Yes | Story: US5 | Done when: focus, keyboard, loading, invalid/expired, and no-storage pass.
+- [X] T070 [P] [US5] Define challenge/TOTP schemas in `apps/web/src/features/identity/schemas/two-factor.ts` | Deps: T048 | Parallel: Yes | Story: US5 | Done when: six-digit TOTP/bounded backup inputs and generic outputs match contract.
+- [X] T071 [US5] Implement HMAC-bound five-minute single-use pre-auth repository in `apps/web/src/server/repositories/identity/prisma-pre-auth-repository.ts` | Deps: T018, T042 | Parallel: No | Story: US5 | Done when: counters/expiry/account binding and concurrent consume work.
+- [X] T072 [US5] Change password login to create only pre-auth for 2FA accounts in `apps/web/src/server/services/identity/login-with-password.ts` | Deps: T049, T071 | Parallel: No | Story: US5 | Done when: no full Session/cookie exists before factor completion.
+- [X] T073 [US5] Implement TOTP completion with skew/replay protection in `apps/web/src/server/services/identity/complete-two-factor.ts` | Deps: T028, T051, T064, T071 | Parallel: No | Story: US5 | Done when: valid code consumes challenge/creates rotated session and failures remain generic.
+- [X] T074 [US5] Implement the `__Secure-smarthire.pre-auth` challenge-cookie flow and completion Route Handler in `apps/web/src/app/api/identity/two-factor/complete/route.ts` | Deps: T073, T100 | Parallel: No | Story: US5 | Done when: the path-scoped five-minute non-authenticating cookie clears and successful TOTP/backup completion produces the same Better Auth session/cookie system as password-only login.
+- [X] T075 [US5] Implement two-factor page/focus transfer in `apps/web/src/app/(auth)/two-factor/page.tsx` and `apps/web/src/components/auth/two-factor-challenge.tsx` | Deps: T074 | Parallel: No | Story: US5 | Done when: heading/field focus, generic live status, keyboard submit, and no persistence work.
+- [X] T076 [P] [US5] Generate pre-auth expiry/attempt/replay tests in `apps/web/tests/unit/identity/pre-auth-challenge.test.ts` | Deps: T071, T073 | Parallel: Yes | Story: US5 | Done when: five-minute, five-attempt, binding, single-use, and replay cases pass.
+- [X] T077 [P] [US5] Generate challenge component tests in `apps/web/tests/components/auth/two-factor-challenge.test.tsx` | Deps: T075 | Parallel: Yes | Story: US5 | Done when: focus, keyboard, loading, invalid/expired, and no-storage pass.
 
 ## Phase 10: Backup codes and 2FA management
 
@@ -306,5 +306,3 @@ Foundation
 - No task authorizes Python/FastAPI, social/email OTP, trusted devices, Lenis on protected flows, or secrets in client state/storage/logs.
 - Regenerate the task list only after a material change to the Constitution, specification, architecture plan, data model, or API contracts.
 - If pinned Better Auth fails required session, TOTP protection, backup-code atomic-use, or reset-revocation tests, stop for an approved extension/ADR; never add a second browser session or duplicate TOTP/backup owner.
-
-

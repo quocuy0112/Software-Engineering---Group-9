@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import { createCookieGetter, getCookies } from "better-auth/cookies";
+import { clearCookieAttributes, identityCookiePolicy, PRE_AUTH_COOKIE_MAX_AGE_SECONDS, PRE_AUTH_COOKIE_PATH } from "@/lib/security/cookies";
 import { authCookiePolicy, betterAuthCookieOptions } from "@/server/auth/cookie-policy";
 
 describe("exclusive browser-session credential", () => {
@@ -22,7 +23,47 @@ describe("exclusive browser-session credential", () => {
     expect(sessionCookie.attributes).toMatchObject({ secure: true, httpOnly: true, sameSite: "lax", path: "/" });
     expect(sessionCookie.attributes).not.toHaveProperty("domain");
     expect(preAuthCookie.name).toBe("__Secure-smarthire.pre-auth");
-    expect(preAuthCookie.attributes.path).toBe("/api/auth/two-factor");
+    expect(preAuthCookie.attributes).toMatchObject({
+      secure: true,
+      httpOnly: true,
+      sameSite: "lax",
+      path: PRE_AUTH_COOKIE_PATH,
+      maxAge: PRE_AUTH_COOKIE_MAX_AGE_SECONDS,
+    });
+    expect(preAuthCookie.attributes).not.toHaveProperty("domain");
+  });
+
+  it("uses a five-minute route-scoped non-authenticating challenge cookie and matching clear attributes", () => {
+    const local = identityCookiePolicy({
+      APP_ENV: "local",
+      SESSION_COOKIE_NAME: "smarthire.session",
+      PRE_AUTH_COOKIE_NAME: "smarthire.pre-auth",
+      COOKIE_SECURE: false,
+    });
+    expect(local.session).toEqual({
+      name: "smarthire.session",
+      attributes: { httpOnly: true, secure: false, sameSite: "lax", path: "/" },
+    });
+    expect(local.preAuth).toEqual({
+      name: "smarthire.pre-auth",
+      attributes: {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        path: PRE_AUTH_COOKIE_PATH,
+        maxAge: 300,
+      },
+    });
+    expect(clearCookieAttributes(local.preAuth.attributes)).toEqual({
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      path: PRE_AUTH_COOKIE_PATH,
+      expires: new Date(0),
+      maxAge: 0,
+    });
+    expect(local.preAuth.attributes).not.toHaveProperty("domain");
+    expect(local.preAuth.name).not.toBe(local.session.name);
   });
 
   it("contains no JWT browser plugin or second session owner", async () => {

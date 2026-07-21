@@ -29,11 +29,13 @@ export type AggregateAuthenticationChallenge = {
 export type AuthenticationChallengeAvgAggregateOutputType = {
   attemptCount: number | null
   maxAttempts: number | null
+  verifiedTotpStep: number | null
 }
 
 export type AuthenticationChallengeSumAggregateOutputType = {
   attemptCount: number | null
   maxAttempts: number | null
+  verifiedTotpStep: bigint | null
 }
 
 export type AuthenticationChallengeMinAggregateOutputType = {
@@ -46,6 +48,7 @@ export type AuthenticationChallengeMinAggregateOutputType = {
   maxAttempts: number | null
   consumedAt: Date | null
   contextDigest: string | null
+  verifiedTotpStep: bigint | null
   createdAt: Date | null
 }
 
@@ -59,6 +62,7 @@ export type AuthenticationChallengeMaxAggregateOutputType = {
   maxAttempts: number | null
   consumedAt: Date | null
   contextDigest: string | null
+  verifiedTotpStep: bigint | null
   createdAt: Date | null
 }
 
@@ -72,6 +76,7 @@ export type AuthenticationChallengeCountAggregateOutputType = {
   maxAttempts: number
   consumedAt: number
   contextDigest: number
+  verifiedTotpStep: number
   createdAt: number
   _all: number
 }
@@ -80,11 +85,13 @@ export type AuthenticationChallengeCountAggregateOutputType = {
 export type AuthenticationChallengeAvgAggregateInputType = {
   attemptCount?: true
   maxAttempts?: true
+  verifiedTotpStep?: true
 }
 
 export type AuthenticationChallengeSumAggregateInputType = {
   attemptCount?: true
   maxAttempts?: true
+  verifiedTotpStep?: true
 }
 
 export type AuthenticationChallengeMinAggregateInputType = {
@@ -97,6 +104,7 @@ export type AuthenticationChallengeMinAggregateInputType = {
   maxAttempts?: true
   consumedAt?: true
   contextDigest?: true
+  verifiedTotpStep?: true
   createdAt?: true
 }
 
@@ -110,6 +118,7 @@ export type AuthenticationChallengeMaxAggregateInputType = {
   maxAttempts?: true
   consumedAt?: true
   contextDigest?: true
+  verifiedTotpStep?: true
   createdAt?: true
 }
 
@@ -123,6 +132,7 @@ export type AuthenticationChallengeCountAggregateInputType = {
   maxAttempts?: true
   consumedAt?: true
   contextDigest?: true
+  verifiedTotpStep?: true
   createdAt?: true
   _all?: true
 }
@@ -223,6 +233,7 @@ export type AuthenticationChallengeGroupByOutputType = {
   maxAttempts: number
   consumedAt: Date | null
   contextDigest: string | null
+  verifiedTotpStep: bigint | null
   createdAt: Date
   _count: AuthenticationChallengeCountAggregateOutputType | null
   _avg: AuthenticationChallengeAvgAggregateOutputType | null
@@ -259,6 +270,7 @@ export type AuthenticationChallengeWhereInput = {
   maxAttempts?: Prisma.IntFilter<"AuthenticationChallenge"> | number
   consumedAt?: Prisma.DateTimeNullableFilter<"AuthenticationChallenge"> | Date | string | null
   contextDigest?: Prisma.StringNullableFilter<"AuthenticationChallenge"> | string | null
+  verifiedTotpStep?: Prisma.BigIntNullableFilter<"AuthenticationChallenge"> | bigint | number | null
   createdAt?: Prisma.DateTimeFilter<"AuthenticationChallenge"> | Date | string
   user?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
 }
@@ -273,6 +285,7 @@ export type AuthenticationChallengeOrderByWithRelationInput = {
   maxAttempts?: Prisma.SortOrder
   consumedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   contextDigest?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedTotpStep?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   user?: Prisma.UserAccountOrderByWithRelationInput
 }
@@ -290,6 +303,7 @@ export type AuthenticationChallengeWhereUniqueInput = Prisma.AtLeast<{
   maxAttempts?: Prisma.IntFilter<"AuthenticationChallenge"> | number
   consumedAt?: Prisma.DateTimeNullableFilter<"AuthenticationChallenge"> | Date | string | null
   contextDigest?: Prisma.StringNullableFilter<"AuthenticationChallenge"> | string | null
+  verifiedTotpStep?: Prisma.BigIntNullableFilter<"AuthenticationChallenge"> | bigint | number | null
   createdAt?: Prisma.DateTimeFilter<"AuthenticationChallenge"> | Date | string
   user?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
 }, "id" | "handleDigest">
@@ -304,6 +318,7 @@ export type AuthenticationChallengeOrderByWithAggregationInput = {
   maxAttempts?: Prisma.SortOrder
   consumedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   contextDigest?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedTotpStep?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.AuthenticationChallengeCountOrderByAggregateInput
   _avg?: Prisma.AuthenticationChallengeAvgOrderByAggregateInput
@@ -325,6 +340,7 @@ export type AuthenticationChallengeScalarWhereWithAggregatesInput = {
   maxAttempts?: Prisma.IntWithAggregatesFilter<"AuthenticationChallenge"> | number
   consumedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"AuthenticationChallenge"> | Date | string | null
   contextDigest?: Prisma.StringNullableWithAggregatesFilter<"AuthenticationChallenge"> | string | null
+  verifiedTotpStep?: Prisma.BigIntNullableWithAggregatesFilter<"AuthenticationChallenge"> | bigint | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"AuthenticationChallenge"> | Date | string
 }
 
@@ -337,6 +353,7 @@ export type AuthenticationChallengeCreateInput = {
   maxAttempts?: number
   consumedAt?: Date | string | null
   contextDigest?: string | null
+  verifiedTotpStep?: bigint | number | null
   createdAt?: Date | string
   user: Prisma.UserAccountCreateNestedOneWithoutChallengesInput
 }
@@ -351,6 +368,7 @@ export type AuthenticationChallengeUncheckedCreateInput = {
   maxAttempts?: number
   consumedAt?: Date | string | null
   contextDigest?: string | null
+  verifiedTotpStep?: bigint | number | null
   createdAt?: Date | string
 }
 
@@ -363,6 +381,7 @@ export type AuthenticationChallengeUpdateInput = {
   maxAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   consumedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contextDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedTotpStep?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserAccountUpdateOneRequiredWithoutChallengesNestedInput
 }
@@ -377,6 +396,7 @@ export type AuthenticationChallengeUncheckedUpdateInput = {
   maxAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   consumedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contextDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedTotpStep?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -390,6 +410,7 @@ export type AuthenticationChallengeCreateManyInput = {
   maxAttempts?: number
   consumedAt?: Date | string | null
   contextDigest?: string | null
+  verifiedTotpStep?: bigint | number | null
   createdAt?: Date | string
 }
 
@@ -402,6 +423,7 @@ export type AuthenticationChallengeUpdateManyMutationInput = {
   maxAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   consumedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contextDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedTotpStep?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -415,6 +437,7 @@ export type AuthenticationChallengeUncheckedUpdateManyInput = {
   maxAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   consumedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contextDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedTotpStep?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -438,12 +461,14 @@ export type AuthenticationChallengeCountOrderByAggregateInput = {
   maxAttempts?: Prisma.SortOrder
   consumedAt?: Prisma.SortOrder
   contextDigest?: Prisma.SortOrder
+  verifiedTotpStep?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type AuthenticationChallengeAvgOrderByAggregateInput = {
   attemptCount?: Prisma.SortOrder
   maxAttempts?: Prisma.SortOrder
+  verifiedTotpStep?: Prisma.SortOrder
 }
 
 export type AuthenticationChallengeMaxOrderByAggregateInput = {
@@ -456,6 +481,7 @@ export type AuthenticationChallengeMaxOrderByAggregateInput = {
   maxAttempts?: Prisma.SortOrder
   consumedAt?: Prisma.SortOrder
   contextDigest?: Prisma.SortOrder
+  verifiedTotpStep?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -469,12 +495,14 @@ export type AuthenticationChallengeMinOrderByAggregateInput = {
   maxAttempts?: Prisma.SortOrder
   consumedAt?: Prisma.SortOrder
   contextDigest?: Prisma.SortOrder
+  verifiedTotpStep?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type AuthenticationChallengeSumOrderByAggregateInput = {
   attemptCount?: Prisma.SortOrder
   maxAttempts?: Prisma.SortOrder
+  verifiedTotpStep?: Prisma.SortOrder
 }
 
 export type AuthenticationChallengeCreateNestedManyWithoutUserInput = {
@@ -531,6 +559,14 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type NullableBigIntFieldUpdateOperationsInput = {
+  set?: bigint | number | null
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
+}
+
 export type AuthenticationChallengeCreateWithoutUserInput = {
   id?: string
   handleDigest: string
@@ -540,6 +576,7 @@ export type AuthenticationChallengeCreateWithoutUserInput = {
   maxAttempts?: number
   consumedAt?: Date | string | null
   contextDigest?: string | null
+  verifiedTotpStep?: bigint | number | null
   createdAt?: Date | string
 }
 
@@ -552,6 +589,7 @@ export type AuthenticationChallengeUncheckedCreateWithoutUserInput = {
   maxAttempts?: number
   consumedAt?: Date | string | null
   contextDigest?: string | null
+  verifiedTotpStep?: bigint | number | null
   createdAt?: Date | string
 }
 
@@ -594,6 +632,7 @@ export type AuthenticationChallengeScalarWhereInput = {
   maxAttempts?: Prisma.IntFilter<"AuthenticationChallenge"> | number
   consumedAt?: Prisma.DateTimeNullableFilter<"AuthenticationChallenge"> | Date | string | null
   contextDigest?: Prisma.StringNullableFilter<"AuthenticationChallenge"> | string | null
+  verifiedTotpStep?: Prisma.BigIntNullableFilter<"AuthenticationChallenge"> | bigint | number | null
   createdAt?: Prisma.DateTimeFilter<"AuthenticationChallenge"> | Date | string
 }
 
@@ -606,6 +645,7 @@ export type AuthenticationChallengeCreateManyUserInput = {
   maxAttempts?: number
   consumedAt?: Date | string | null
   contextDigest?: string | null
+  verifiedTotpStep?: bigint | number | null
   createdAt?: Date | string
 }
 
@@ -618,6 +658,7 @@ export type AuthenticationChallengeUpdateWithoutUserInput = {
   maxAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   consumedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contextDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedTotpStep?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -630,6 +671,7 @@ export type AuthenticationChallengeUncheckedUpdateWithoutUserInput = {
   maxAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   consumedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contextDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedTotpStep?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -642,6 +684,7 @@ export type AuthenticationChallengeUncheckedUpdateManyWithoutUserInput = {
   maxAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   consumedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contextDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedTotpStep?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -657,6 +700,7 @@ export type AuthenticationChallengeSelect<ExtArgs extends runtime.Types.Extensio
   maxAttempts?: boolean
   consumedAt?: boolean
   contextDigest?: boolean
+  verifiedTotpStep?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["authenticationChallenge"]>
@@ -671,6 +715,7 @@ export type AuthenticationChallengeSelectCreateManyAndReturn<ExtArgs extends run
   maxAttempts?: boolean
   consumedAt?: boolean
   contextDigest?: boolean
+  verifiedTotpStep?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["authenticationChallenge"]>
@@ -685,6 +730,7 @@ export type AuthenticationChallengeSelectUpdateManyAndReturn<ExtArgs extends run
   maxAttempts?: boolean
   consumedAt?: boolean
   contextDigest?: boolean
+  verifiedTotpStep?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["authenticationChallenge"]>
@@ -699,10 +745,11 @@ export type AuthenticationChallengeSelectScalar = {
   maxAttempts?: boolean
   consumedAt?: boolean
   contextDigest?: boolean
+  verifiedTotpStep?: boolean
   createdAt?: boolean
 }
 
-export type AuthenticationChallengeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "handleDigest" | "userId" | "purpose" | "expiresAt" | "attemptCount" | "maxAttempts" | "consumedAt" | "contextDigest" | "createdAt", ExtArgs["result"]["authenticationChallenge"]>
+export type AuthenticationChallengeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "handleDigest" | "userId" | "purpose" | "expiresAt" | "attemptCount" | "maxAttempts" | "consumedAt" | "contextDigest" | "verifiedTotpStep" | "createdAt", ExtArgs["result"]["authenticationChallenge"]>
 export type AuthenticationChallengeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
 }
@@ -728,6 +775,7 @@ export type $AuthenticationChallengePayload<ExtArgs extends runtime.Types.Extens
     maxAttempts: number
     consumedAt: Date | null
     contextDigest: string | null
+    verifiedTotpStep: bigint | null
     createdAt: Date
   }, ExtArgs["result"]["authenticationChallenge"]>
   composites: {}
@@ -1162,6 +1210,7 @@ export interface AuthenticationChallengeFieldRefs {
   readonly maxAttempts: Prisma.FieldRef<"AuthenticationChallenge", 'Int'>
   readonly consumedAt: Prisma.FieldRef<"AuthenticationChallenge", 'DateTime'>
   readonly contextDigest: Prisma.FieldRef<"AuthenticationChallenge", 'String'>
+  readonly verifiedTotpStep: Prisma.FieldRef<"AuthenticationChallenge", 'BigInt'>
   readonly createdAt: Prisma.FieldRef<"AuthenticationChallenge", 'DateTime'>
 }
     

@@ -1,0 +1,11 @@
+import "server-only";
+import { randomUUID } from "node:crypto";
+import { BetterAuthSessionGateway } from "@/server/auth/identity/better-auth-session-gateway";
+import { decodePreAuth,providerCookieHeader } from "@/server/auth/identity/pre-auth-cookie";
+import { PrismaPreAuthRepository } from "@/server/repositories/identity/prisma-pre-auth-repository";
+import { PrismaSessionPolicyRepository } from "@/server/repositories/identity/prisma-session-policy-repository";
+import { PrismaAuditRepository } from "@/server/repositories/audit/prisma-audit-repository";
+import { SessionService } from "./session-service";
+export class CompleteTwoFactorService {constructor(private challenges=new PrismaPreAuthRepository(),private gateway=new BetterAuthSessionGateway(),private sessions=new PrismaSessionPolicyRepository(),private audit=new PrismaAuditRepository()){}
+ async execute(cookie:string,code:string,headers:Headers,now=new Date()){const state=decodePreAuth(cookie);if(!state)return null;const claim=await this.challenges.claimAttempt(state.handle,state.binding,now);if(!claim)return null;const forwarded=new Headers(headers);forwarded.set("cookie",providerCookieHeader(state.binding));const response=await this.gateway.verifyTotp(code,forwarded).catch(()=>null);const session=response?.headers.getSetCookie().find(v=>/^(smarthire\.session|__Host-smarthire\.session)=/.test(v));if(!response?.ok||!session){await this.challenges.releaseFailed(claim.id,claim.claimTime);await this.record("FAILURE",claim.userId,now);return null;}const step=BigInt(Math.floor(now.getTime()/30000));if(!await this.challenges.finalize(claim.id,claim.userId,claim.claimTime,step)){const h=new Headers({cookie:session.split(";",1)[0]});await this.gateway.signOut(h).catch(()=>null);return null;}await new SessionService(this.sessions).enforceCreated(claim.userId);await this.record("SUCCESS",claim.userId,now);return {sessionCookie:session};}
+ private record(result:"SUCCESS"|"FAILURE",userId:string,occurredAt:Date){return this.audit.append({occurredAt,actorType:"anonymous",action:result==="SUCCESS"?"totp.challenge_succeeded":"totp.challenge_failed",targetType:"two_factor",targetId:userId,result,correlationId:randomUUID(),context:{reason:result==="SUCCESS"?"verified":"rejected"}}).catch(()=>undefined);}}

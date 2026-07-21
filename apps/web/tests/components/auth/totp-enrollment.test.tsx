@@ -46,8 +46,9 @@ describe("TOTP enrollment UI", () => {
   });
 
   it("shows inline validation before submitting", async () => {
-    mockFetch();
+    const fetchMock = mockFetch();
     render(<TotpEnrollment />);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith("/api/identity/sessions", expect.anything()));
     fireEvent.click(screen.getByRole("button", { name: "Continue" }));
     expect(await screen.findByText("Enter your current password.")).toBeVisible();
   });
