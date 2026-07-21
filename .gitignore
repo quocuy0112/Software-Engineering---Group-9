@@ -54,3 +54,4 @@ npm-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
+node_modules

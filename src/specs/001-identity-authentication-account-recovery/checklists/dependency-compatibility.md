@@ -15,3 +15,11 @@
 - [x] PostCSS is pinned to 8.5.10; remaining nested findings are recorded by npm audit.
 - [x] Current `npm audit` assessment (2026-07-21): 0 critical, 1 accepted high, 5 moderate, 0 low; no Nodemailer finding. The Better Auth high finding remains governed by `checklists/npm-security-exception.md`; moderate findings affect Next/PostCSS and Prisma development tooling. No `npm audit fix --force` was run.
 - [x] Executable compatibility tests cover SMTP 587/465 modes, malformed username/from/header injection, safe auth/timeout classification, PostgreSQL concurrent claims, deterministic retry/restart/DEAD transitions, terminal non-redelivery, duplicate prevention, and capture/Resend regressions. Full Vitest passed 75/75 and lifecycle Playwright passed 2/2 on 2026-07-21.
+
+## TOTP QR dependency approval
+
+- [x] qrcode is pinned exactly to 1.5.4 and @types/qrcode to 1.5.6 in apps/web/package.json and the sole root package-lock.json.
+- [x] Lockfile compatibility retains Node.js 24.18.0, npm 11.16.0, TypeScript 5.9, Next.js 16.2.9, and Better Auth 1.6.11.
+- [x] Approval covers the T061–T069 TOTP enrollment increment, including cross-cutting gate T180, behind `totp-qr-code.ts`.
+- [x] Audit after resolution: 0 critical, 1 accepted high, 5 moderate, 0 low; no QR-package finding; no force fix was run.
+- [ ] T180 directly blocks T065 and its executable test must verify deterministic local QR generation, encoded URI correctness, zero network access, and absence from client imports/bundles.

@@ -24,30 +24,23 @@ function Find-SpecifyRoot {
     }
 }
 
-# Get repository root, prioritizing .specify directory over git
-# This prevents using a parent git repo when spec-kit is initialized in a subdirectory
+# Return the actual Git repository root; Spec Kit may be nested under src/.
 function Get-RepoRoot {
-    # First, look for .specify directory (spec-kit's own marker)
-    $specifyRoot = Find-SpecifyRoot
-    if ($specifyRoot) {
-        return $specifyRoot
-    }
-
-    # Fallback to git if no .specify found
     try {
-        $result = git rev-parse --show-toplevel 2>$null
-        if ($LASTEXITCODE -eq 0) {
-            return $result
-        }
-    } catch {
-        # Git command failed
-    }
-
-    # Final fallback to script location for non-git repos
-    # Use -LiteralPath to handle paths with wildcard characters
+        $result = git -C (Get-Location).Path rev-parse --show-toplevel 2>$null
+        if ($LASTEXITCODE -eq 0) { return (Resolve-Path -LiteralPath $result).Path }
+    } catch {}
+    $root = Find-SpecifyRoot
+    if ($root) { return $root }
     return (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path
 }
-
+function Get-SpecifyDirectory { return (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../..")).Path }
+function Get-SpecsDirectory {
+    param([string]$RepoRoot = (Get-RepoRoot))
+    $nested = Join-Path (Split-Path (Get-SpecifyDirectory) -Parent) 'specs'
+    if (Test-Path -LiteralPath $nested -PathType Container) { return $nested }
+    return (Join-Path $RepoRoot 'specs')
+}
 function Get-CurrentBranch {
     # First check if SPECIFY_FEATURE environment variable is set
     if ($env:SPECIFY_FEATURE) {
@@ -68,7 +61,7 @@ function Get-CurrentBranch {
     }
 
     # For non-git repos, try to find the latest feature directory
-    $specsDir = Join-Path $repoRoot "specs"
+    $specsDir = Get-SpecsDirectory -RepoRoot $repoRoot
     
     if (Test-Path $specsDir) {
         $latestFeature = ""
@@ -172,7 +165,7 @@ function Test-FeatureJsonMatchesFeatureDir {
         [Parameter(Mandatory = $true)][string]$ActiveFeatureDir
     )
 
-    $featureJson = Join-Path (Join-Path $RepoRoot '.specify') 'feature.json'
+    $featureJson = Join-Path (Get-SpecifyDirectory) 'feature.json'
     if (-not (Test-Path -LiteralPath $featureJson -PathType Leaf)) {
         return $false
     }
@@ -238,7 +231,7 @@ function Find-FeatureDirByPrefix {
         [Parameter(Mandatory = $true)][string]$RepoRoot,
         [Parameter(Mandatory = $true)][string]$Branch
     )
-    $specsDir = Join-Path $RepoRoot 'specs'
+    $specsDir = Get-SpecsDirectory -RepoRoot $RepoRoot
     $branchName = Get-SpecKitEffectiveBranchName $Branch
 
     $prefix = $null
@@ -290,7 +283,7 @@ function Get-FeaturePathsEnv {
     #   1. SPECIFY_FEATURE_DIRECTORY env var (explicit override)
     #   2. .specify/feature.json "feature_directory" key (persisted by /speckit-specify)
     #   3. Branch-name-based prefix lookup (same as scripts/bash/common.sh)
-    $featureJson = Join-Path $repoRoot '.specify/feature.json'
+    $featureJson = Join-Path (Get-SpecifyDirectory) 'feature.json'
     if ($env:SPECIFY_FEATURE_DIRECTORY) {
         $featureDir = $env:SPECIFY_FEATURE_DIRECTORY
         # Normalize relative paths to absolute under repo root
@@ -433,14 +426,14 @@ function Resolve-Template {
         [Parameter(Mandatory=$true)][string]$RepoRoot
     )
 
-    $base = Join-Path $RepoRoot '.specify/templates'
+    $base = Join-Path (Get-SpecifyDirectory) 'templates'
 
     # Priority 1: Project overrides
     $override = Join-Path $base "overrides/$TemplateName.md"
     if (Test-Path $override) { return $override }
 
     # Priority 2: Installed presets (sorted by priority from .registry)
-    $presetsDir = Join-Path $RepoRoot '.specify/presets'
+    $presetsDir = Join-Path (Get-SpecifyDirectory) 'presets'
     if (Test-Path $presetsDir) {
         $registryFile = Join-Path $presetsDir '.registry'
         $sortedPresets = @()
@@ -475,7 +468,7 @@ function Resolve-Template {
     }
 
     # Priority 3: Extension-provided templates
-    $extDir = Join-Path $RepoRoot '.specify/extensions'
+    $extDir = Join-Path (Get-SpecifyDirectory) 'extensions'
     if (Test-Path $extDir) {
         foreach ($ext in Get-ChildItem -Path $extDir -Directory -ErrorAction SilentlyContinue | Where-Object { $_.Name -notlike '.*' } | Sort-Object Name) {
             $candidate = Join-Path $ext.FullName "templates/$TemplateName.md"
@@ -499,7 +492,7 @@ function Resolve-TemplateContent {
         [Parameter(Mandatory=$true)][string]$RepoRoot
     )
 
-    $base = Join-Path $RepoRoot '.specify/templates'
+    $base = Join-Path (Get-SpecifyDirectory) 'templates'
 
     # Collect all layers (highest priority first)
     $layerPaths = @()
@@ -513,7 +506,7 @@ function Resolve-TemplateContent {
     }
 
     # Priority 2: Installed presets (sorted by priority from .registry)
-    $presetsDir = Join-Path $RepoRoot '.specify/presets'
+    $presetsDir = Join-Path (Get-SpecifyDirectory) 'presets'
     if (Test-Path $presetsDir) {
         $registryFile = Join-Path $presetsDir '.registry'
         $sortedPresets = @()
@@ -623,7 +616,7 @@ except Exception:
     }
 
     # Priority 3: Extension-provided templates (always "replace")
-    $extDir = Join-Path $RepoRoot '.specify/extensions'
+    $extDir = Join-Path (Get-SpecifyDirectory) 'extensions'
     if (Test-Path $extDir) {
         foreach ($ext in Get-ChildItem -Path $extDir -Directory -ErrorAction SilentlyContinue | Where-Object { $_.Name -notlike '.*' } | Sort-Object Name) {
             $candidate = Join-Path $ext.FullName "templates/$TemplateName.md"

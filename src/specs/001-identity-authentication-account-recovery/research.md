@@ -69,6 +69,11 @@ The application manifest belongs at `apps/web/package.json`, registered by the r
 
 **Unverified/blocking details**: Documentation establishes ownership and nominal single-use behavior, but it does not prove that `1.6.11` encrypts TOTP/backup values at rest to SmartHire’s required standard or that concurrent submission is atomic through the Prisma adapter. Version-locked PostgreSQL tests and source/schema inspection are required. A SmartHire TOTP persistence-encryption extension may be introduced only if the spike proves it necessary, Better Auth integration supports it safely, and an approved ADR documents it. The extension must preserve Better Auth ownership and must not create parallel TOTP or backup-code storage.
 
+
+### Local QR decision
+
+Exact `qrcode` 1.5.4 and `@types/qrcode` 1.5.6 are approved for the T061–T069 enrollment increment, including gate T180. Local generation avoids disclosure to an external provider, preserves Better Auth ownership, and keeps the implementation replaceable behind the enrollment service. External QR services, remote secret-bearing URLs, client generation, browser storage, and rendered-image persistence were rejected. See `docs/architecture/adr/local-totp-qr-generation.md` for authoritative operational and security rules.
+
 ## Decision: Account and Token Ownership
 
 Use unambiguous names:
