@@ -15,6 +15,8 @@ Deliver the approved P0 identity scope in one Next.js App Router application. Ne
 
 **SMTP dependency decision**: Nodemailer `9.0.3` and `@types/nodemailer` `8.0.1` are exact root-lockfile pins used only by server email integration. Installed-tree evidence confirms Node.js `24.18.0` and Next.js `16.2.9` compatibility. They MUST NOT be imported by client modules, Route Handlers, registration/verification services, or repositories; only the SMTP implementation behind `EmailService` may import Nodemailer. ADR `docs/architecture/adr/transactional-email-adapters-and-worker.md` records the decision.
 
+
+**TOTP QR dependency decision**: Exact `qrcode` 1.5.4 and `@types/qrcode` 1.5.6 are approved for the T061–T069 enrollment increment, including gate T180, and resolve through the sole root lockfile. The replaceable server-only boundary is `apps/web/src/server/auth/identity/totp-qr-code.ts`. T180 directly blocks T065 and proves only pre-implementation compatibility; the QR ADR defines detailed boundary and security rules.
 **Primary dependencies**: Next.js `16.2.9`; Better Auth and `@better-auth/prisma-adapter` `1.6.11`; Prisma and `@prisma/client` `7.7.0`; Resend `6.17.2`; exact React Email package versions are a blocking T002 compatibility outcome and must be recorded in `apps/web/package.json`, the root lockfile, and dependency-compatibility evidence before email work begins; Tailwind CSS; shadcn/ui; React Hook Form; Zod; Sonner; optional TanStack Query, Zustand, and Motion under the restrictions below  
 **Storage**: PostgreSQL 16.12 through root Docker Compose locally (host port `55432`, health check, persistent named volume); PostgreSQL remains the only production database; Prisma ORM and Prisma Migrate run from `apps/web/`
 
@@ -145,6 +147,7 @@ The Better Auth JWT plugin is not configured for browser authentication. A futur
 
 ## Security and Operations
 
+- The server-only `totp-qr-code.ts` utility accepts only the Better Auth-generated `otpauth` URI and safe rendering options, exposes a minimal typed interface, rejects malformed or unexpected input, generates locally without network access, and never persists or logs secret-bearing input or output.
 - Keep Better Auth trusted-origin/CSRF protections enabled; custom writes validate origin/fetch metadata and the applicable Better Auth CSRF mechanism.
 - Verification/reset tokens are high-entropy opaque values stored only as keyed digests, expire, and are consumed once. TOTP and backup-code storage remain Better Auth-owned.
 - Persistent rate-limit buckets cover registration, login, resend, reset, and two-factor attempts where multi-instance consistency is needed.
@@ -177,6 +180,7 @@ No browser-session JWT issuer, audience, or signing variables exist.
 
 ## Verification Strategy
 
+- T180 directly blocks T065. Its executable real-library test verifies exact pins and runtime compatibility, local generation plus content verification, zero network requests, npm audit evidence, and server-only/no-client imports before enrollment implementation begins.
 - Compatibility evidence asserts exact Nodemailer `9.0.3` and `@types/nodemailer` `8.0.1` root-lockfile resolution under Node.js `24.18.0`, TypeScript 5.9, and Next.js `16.2.9`; tests must prove the SMTP module stays server-only.
 - Environment/unit tests cover Gmail 587 STARTTLS, optional 465 implicit TLS, missing or malformed complete-address usernames, CR/LF/control-character and header-injection attempts in `SMTP_FROM`, missing credentials, contradictory secure/TLS settings, redacted validation errors, and absence of `EMAIL_DRIVER`.
 - Adapter tests use mocked transports for successful delivery, authentication failure, timeout/connection failure, retryable temporary response, terminal rejection, safe error mapping, and zero credential logging.
@@ -191,7 +195,7 @@ No browser-session JWT issuer, audience, or signing variables exist.
 
 ## Dependency Security Assessment
 
-`npm audit --json` was run on 2026-07-20 without `--force`: 0 critical, 1 high, 5 moderate, 0 low. Nodemailer and `@types/nodemailer` have no reported finding in this audit. The direct high finding is Better Auth GHSA-86j7-9j95-vpqj; its affected OIDC-provider and MCP functionality is not configured, imported, routed, or exposed, so the existing temporary exception remains mandatory and must be reevaluated before release. Moderate findings currently involve the Next.js nested PostCSS chain and Prisma development tooling. No automatic downgrade or architecture-breaking audit fix is approved; exact-pin changes require compatibility reruns and consistent plan/evidence updates.
+`npm audit --json` was rerun on 2026-07-21 after exact QR-package resolution, without `--force`: 0 critical, 1 high, 5 moderate, 0 low. `qrcode` 1.5.4, `@types/qrcode` 1.5.6, Nodemailer, and `@types/nodemailer` have no reported finding. The Better Auth high finding remains governed by `checklists/npm-security-exception.md` because affected OIDC-provider and MCP functionality is not configured, imported, routed, or exposed. Moderate findings remain in the Next.js nested PostCSS chain and Prisma development tooling. No automatic downgrade or `npm audit fix --force` is approved; T180 must record the current assessment when its executable compatibility evidence runs.
 
 ## Post-Design Constitution Re-check
 

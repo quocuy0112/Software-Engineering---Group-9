@@ -1,3 +1,1 @@
-{
-  "feature_directory": "specs/001-identity-authentication-account-recovery"
-}
+{"feature_directory":"src/specs/001-identity-authentication-account-recovery"}

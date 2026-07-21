@@ -13,7 +13,7 @@
 - [X] T005 [P] Configure Vitest and React Testing Library in `apps/web/vitest.config.ts` and `apps/web/tests/setup.ts` | Deps: T002 | Parallel: Yes | Story: Shared | Done when: a DOM smoke test passes.
 - [X] T006 [P] Configure Playwright desktop and 320px mobile projects in `apps/web/playwright.config.ts` | Deps: T002 | Parallel: Yes | Story: Shared | Done when: both profiles are discovered.
 - [X] T007 Create the approved modular layers under `apps/web/src/app/`, `apps/web/src/features/identity/`, `apps/web/src/server/auth/`, `apps/web/src/server/services/`, `apps/web/src/server/repositories/`, `apps/web/src/server/email/`, `apps/web/src/components/`, `apps/web/src/lib/`, `apps/web/prisma/`, and `apps/web/tests/` | Deps: T001 | Parallel: No | Story: Shared | Done when: UI, transport, authentication, service, repository, email, shared-library, Prisma, and test imports resolve inside the single Next.js application.
-- [X] T008 Enforce Route Handler → Service → Repository/Data Access boundaries in `apps/web/eslint.config.mjs` and `apps/web/tests/architecture/layer-boundaries.test.ts` | Deps: T003, T007 | Parallel: No | Story: Cross-cutting | Done when: UI-to-Prisma/Resend, Route-Handler-to-Prisma, and any `pages/api` implementation fail static tests.
+- [X] T008 Enforce Route Handler â†’ Service â†’ Repository/Data Access boundaries in `apps/web/eslint.config.mjs` and `apps/web/tests/architecture/layer-boundaries.test.ts` | Deps: T003, T007 | Parallel: No | Story: Cross-cutting | Done when: UI-to-Prisma/Resend, Route-Handler-to-Prisma, and any `pages/api` implementation fail static tests.
 
 ## Phase 2: Environment validation
 
@@ -70,7 +70,7 @@ All database-dependent work from T015 through T035 uses the healthy PostgreSQL 1
 - [X] T124 Implement the transactional email outbox, `EmailService`, pinned Resend/React Email adapter, file-capture adapter, worker, retry/idempotency, and terminal-failure audit in `apps/web/src/server/email/email-service.ts`, `apps/web/src/server/email/resend-adapter.ts`, `apps/web/src/server/email/capture-adapter.ts`, `apps/web/src/server/repositories/email/outbox-repository.ts`, and `apps/web/src/server/email/workers/email-outbox.ts` | Deps: T002, T018, T113 | Parallel: No | Story: Cross-cutting | Done when: only T002-approved exact React Email packages are used, committed rows send after commit, local capture writes beneath `EMAIL_CAPTURE_DIR` without network access, Resend remains optional, failures retry/dead-letter, and provider failure cannot corrupt or duplicate account state.
 - [X] T042 Implement the token-protection foundation in `apps/web/src/lib/security/security-tokens.ts` | Deps: T010, T018, T124 | Parallel: No | Story: Cross-cutting | Done when: 256-bit generation, keyed digest, constant-time comparison, one-time lifecycle, redaction, and deterministic clock tests pass before any workflow creates tokens.
 
-## Phase 6: Increment 1 — Registration and Email Verification
+## Phase 6: Increment 1 â€” Registration and Email Verification
 
 **Scope**: This increment delivers US1 registration and US2 email verification only. It is not the complete Identity, Authentication, and Account Recovery functional group.
 
@@ -110,15 +110,21 @@ All database-dependent work from T015 through T035 uses the healthy PostgreSQL 1
 
 **Independent test**: Recently authenticated user confirms password, receives protected setup once, verifies six-digit 30-second TOTP, and sees ten backup codes once.
 
+### Cross-cutting dependency gate
+
+
 - [ ] T061 [P] [US4] Inspect pinned TwoFactor persistence and document any approved encryption extension in `src/specs/001-identity-authentication-account-recovery/checklists/better-auth-two-factor-storage.md` | Deps: T010, T035 | Parallel: Yes | Story: US4 | Done when: Better Auth ownership remains exclusive and plaintext-at-rest risk is resolved or implementation is stopped for an ADR.
+- [ ] T180 [P] [US4] Validate pre-implementation QR dependency compatibility in `apps/web/package.json`, `package-lock.json`, `apps/web/tests/compatibility/qrcode-1.5.4.test.ts`, and the dependency checklist | Deps: T035, T061 | Parallel: Yes | Story: US4 / Cross-cutting dependency gate | Done when: the sole root lockfile resolves exact `qrcode` 1.5.4 and `@types/qrcode` 1.5.6 under Node.js 24.18.0 with Next.js 16.2.9 and TypeScript 5.9; the actual qrcode library generates a non-empty QR from a deterministic test `otpauth` URI and decoding or equivalent verification proves the content matches that supplied URI; zero network requests occur; server-only import compatibility passes; no browser/client import exists; and the current npm audit assessment is recorded.
+### TOTP enrollment implementation tasks
+
 - [ ] T062 [P] [US4] Test pinned TOTP storage/protection and any approved extension in `apps/web/tests/integration/auth/better-auth-totp-storage.test.ts` | Deps: T061 | Parallel: Yes | Story: US4 | Done when: PostgreSQL storage, tamper, rotation, and redaction requirements pass.
 - [ ] T063 [US4] Implement 10-minute recent-auth/current-password guard in `apps/web/src/server/services/identity/require-recent-auth.ts` | Deps: T029, T051 | Parallel: No | Story: US4, US6 | Done when: stale sessions/wrong passwords fail sensitive actions.
 - [ ] T064 [US4] Implement the Better Auth two-factor gateway without a parallel repository in `apps/web/src/server/auth/identity/better-auth-two-factor-gateway.ts` | Deps: T035, T061 | Parallel: No | Story: US4 | Done when: pinned Better Auth exclusively owns enrollment state, TOTP secret, backup codes, login verification, regeneration, and disablement.
-- [ ] T065 [US4] Implement enrollment start/initial verification in `apps/web/src/server/services/identity/enroll-totp.ts` | Deps: T028, T063, T064 | Parallel: No | Story: US4 | Done when: unique secret, QR/manual key, six-digit/30-second verification, attempt cap, and enable transaction pass.
-- [ ] T066 [US4] Implement no-store enrollment handlers in `apps/web/src/app/api/identity/two-factor/enrollment/route.ts` and `apps/web/src/app/api/identity/two-factor/enrollment/verify/route.ts` | Deps: T065 | Parallel: No | Story: US4 | Done when: setup/backup response is one-time and session+CSRF protected.
-- [ ] T067 [US4] Implement security enrollment UI in `apps/web/src/app/settings/security/page.tsx` and `apps/web/src/components/auth/totp-enrollment.tsx` | Deps: T066 | Parallel: No | Story: US4 | Done when: QR/manual, code/password proof, one-time codes, labels, and feedback work without persistence.
+- [ ] T065 [US4] Implement enrollment in `apps/web/src/server/services/identity/enroll-totp.ts` and the server-only QR boundary in `apps/web/src/server/auth/identity/totp-qr-code.ts` | Deps: T028, T063, T064, T180 | Parallel: No | Story: US4 | Done when: only after T180 passes, the minimal typed utility accepts the Better Auth-generated otpauth URI and safe rendering options, rejects malformed input, uses qrcode 1.5.4 locally with executable real-library evidence and no external requests, provides manual-key fallback, preserves Better Auth ownership, performs no persistence, and redacts secret-bearing input/output.
+- [ ] T066 [US4] Implement no-store enrollment handlers in `apps/web/src/app/api/identity/two-factor/enrollment/route.ts` and `apps/web/src/app/api/identity/two-factor/enrollment/verify/route.ts` | Deps: T065 | Parallel: No | Story: US4 | Done when: an authenticated ACTIVE session plus CSRF and same-origin validation are required; every enrollment/setup/backup response is one-time and explicitly sends `Cache-Control: no-store`; no cacheable response contains enrollment data; response bodies are secret-safe; and no `otpauth` URI, TOTP secret, password, submitted code, QR payload, or backup code enters logs.
+- [ ] T067 [US4] Implement security enrollment UI in apps/web/src/app/settings/security/page.tsx and apps/web/src/components/auth/totp-enrollment.tsx | Deps: T066 | Parallel: No | Story: US4 | Done when: QR/manual, code/password proof, one-time codes, labels, and feedback work without persistence; local QR compatibility is complete before the UI is marked complete.
 - [ ] T068 [P] [US4] Generate enrollment UI tests in `apps/web/tests/components/auth/totp-enrollment.test.tsx` | Deps: T067 | Parallel: Yes | Story: US4 | Done when: invalid code, focus, loading, and show-once pass.
-- [ ] T069 [P] [US4] Generate enrollment service tests in `apps/web/tests/unit/identity/enroll-totp.test.ts` | Deps: T065 | Parallel: Yes | Story: US4 | Done when: recent-auth, password, limits, encryption, verification, and audit intent pass.
+- [ ] T069 [P] [US4] Generate enrollment and completed QR utility tests in `apps/web/tests/unit/identity/enroll-totp.test.ts` and `apps/web/tests/unit/auth/totp-qr-code.test.ts` | Deps: T065 | Parallel: Yes | Story: US4 | Done when: tests use the real qrcode library and cover a valid Better Auth-generated `otpauth` URI; malformed URI and non-otpauth protocol rejection; required issuer, account, and secret fields; safe rendering-option validation with bounded dimensions/approved output; zero external requests; no filesystem or database persistence; no logging of the URI, secret, QR output, password, TOTP code, or backup codes; redacted errors; manual-key fallback; and existing recent-auth, limits, encryption, verification, and safe audit intent.
 
 ## Phase 9: TOTP login challenge
 
@@ -180,17 +186,17 @@ All database-dependent work from T015 through T035 uses the healthy PostgreSQL 1
 ## Phase 14: Accessible UI and responsive behavior
 
 - [X] T118 [P] Implement accessible password input in `apps/web/src/components/auth/password-field.tsx` | Deps: T004 | Parallel: Yes | Story: US1, US3, US4, US6, US8 | Done when: visible label, show/hide name, paste, and autocomplete pass keyboard/screen-reader tests.
-- [X] T119 [P] Implement field/error/status summary and focus helper in `apps/web/src/components/auth/form-feedback.tsx` and `apps/web/src/lib/accessibility/focus.ts` | Deps: T004 | Parallel: Yes | Story: US1–US8 | Done when: associations/live announcements/focus transitions pass.
-- [X] T120 [P] Implement duplicate-submission/loading guard in `apps/web/src/components/auth/use-safe-submit.ts` | Deps: T002 | Parallel: Yes | Story: US1–US8 | Done when: rapid activation causes one mutation and exposes busy/disabled state.
-- [X] T121 [P] Implement reduced-motion-aware wrapper in `apps/web/src/components/auth/auth-motion.tsx` | Deps: T004 | Parallel: Yes | Story: US1–US9 | Done when: nonessential Motion stops when reduced motion is requested.
-- [X] T122 Implement responsive 320px auth shell in `apps/web/src/app/(auth)/layout.tsx` and `apps/web/src/components/auth/auth-shell.tsx` | Deps: T004 | Parallel: No | Story: US1–US8 | Done when: no action/label/status is lost or horizontally clipped.
+- [X] T119 [P] Implement field/error/status summary and focus helper in `apps/web/src/components/auth/form-feedback.tsx` and `apps/web/src/lib/accessibility/focus.ts` | Deps: T004 | Parallel: Yes | Story: US1â€“US8 | Done when: associations/live announcements/focus transitions pass.
+- [X] T120 [P] Implement duplicate-submission/loading guard in `apps/web/src/components/auth/use-safe-submit.ts` | Deps: T002 | Parallel: Yes | Story: US1â€“US8 | Done when: rapid activation causes one mutation and exposes busy/disabled state.
+- [X] T121 [P] Implement reduced-motion-aware wrapper in `apps/web/src/components/auth/auth-motion.tsx` | Deps: T004 | Parallel: Yes | Story: US1â€“US9 | Done when: nonessential Motion stops when reduced motion is requested.
+- [X] T122 Implement responsive 320px auth shell in `apps/web/src/app/(auth)/layout.tsx` and `apps/web/src/components/auth/auth-shell.tsx` | Deps: T004 | Parallel: No | Story: US1â€“US8 | Done when: no action/label/status is lost or horizontally clipped.
 - [X] T123 Implement responsive security shell in `apps/web/src/app/settings/layout.tsx` and `apps/web/src/components/auth/security-shell.tsx` | Deps: T004 | Parallel: No | Story: US4, US6, US9 | Done when: settings/session controls work mobile and desktop.
 - [ ] T125 [P] Configure React Email local preview in `apps/web/src/server/email/preview/` and `apps/web/package.json` | Deps: T040, T091, T095 | Parallel: Yes | Story: US1, US2, US7, US8 | Done when: all templates preview without network sends and file capture remains the default local driver.
-- [ ] T126 Wire inline plus Sonner loading/success/error feedback through `apps/web/src/components/auth/` | Deps: T119, T120 | Parallel: No | Story: US1–US9 | Done when: toast never replaces inline status and color is not sole cue.
+- [ ] T126 Wire inline plus Sonner loading/success/error feedback through `apps/web/src/components/auth/` | Deps: T119, T120 | Parallel: No | Story: US1â€“US9 | Done when: toast never replaces inline status and color is not sole cue.
 - [ ] T127 Restrict TanStack Query to sanitized resend/session mutations in `apps/web/src/app/providers.tsx` and `apps/web/src/features/identity/client/query-options.ts` | Deps: T002, T056 | Parallel: No | Story: US2, US9 | Done when: cache contains no password/token/code/secret.
-- [X] T128 [P] Enforce Zustand UI-only/no browser-secret policy in `apps/web/src/features/shared/stores/ui.ts` and `apps/web/tests/architecture/client-secret-storage.test.ts` | Deps: T007 | Parallel: Yes | Story: US1–US9 | Done when: static tests reject secrets in Zustand/localStorage/sessionStorage.
-- [X] T129 [P] Add no-Lenis route test in `apps/web/tests/architecture/no-lenis-auth-routes.test.ts` | Deps: T122, T123 | Parallel: Yes | Story: US1–US9 | Done when: auth/verification/recovery/security routes import no Lenis.
-- [ ] T130 [P] Generate shared accessibility/responsive tests in `apps/web/tests/components/auth/shared-accessibility.test.tsx` | Deps: T118, T119, T120, T121, T122, T123, T126 | Parallel: Yes | Story: US1–US9 | Done when: automated labels, keyboard, focus, feedback, motion, duplicate prevention, and 320px behavior pass without claiming human completion rates.
+- [X] T128 [P] Enforce Zustand UI-only/no browser-secret policy in `apps/web/src/features/shared/stores/ui.ts` and `apps/web/tests/architecture/client-secret-storage.test.ts` | Deps: T007 | Parallel: Yes | Story: US1â€“US9 | Done when: static tests reject secrets in Zustand/localStorage/sessionStorage.
+- [X] T129 [P] Add no-Lenis route test in `apps/web/tests/architecture/no-lenis-auth-routes.test.ts` | Deps: T122, T123 | Parallel: Yes | Story: US1â€“US9 | Done when: auth/verification/recovery/security routes import no Lenis.
+- [ ] T130 [P] Generate shared accessibility/responsive tests in `apps/web/tests/components/auth/shared-accessibility.test.tsx` | Deps: T118, T119, T120, T121, T122, T123, T126 | Parallel: Yes | Story: US1â€“US9 | Done when: automated labels, keyboard, focus, feedback, motion, duplicate prevention, and 320px behavior pass without claiming human completion rates.
 
 ## Phase 15: Integration tests
 
@@ -204,9 +210,9 @@ All database-dependent work from T015 through T035 uses the healthy PostgreSQL 1
 - [ ] T138 [P] Test Better Auth TOTP enrollment/challenge in `apps/web/tests/integration/identity/totp.test.ts` | Deps: T066, T074, T107 | Parallel: Yes | Story: US4, US5 | Done when: Better Auth ownership, required storage protection or approved ADR extension, initial gate, no pre-session, expiry, limits, replay, and sole-session behavior pass.
 - [ ] T139 [P] Test backup/management in `apps/web/tests/integration/identity/backup-and-management.test.ts` | Deps: T084, T080 | Parallel: Yes | Story: US5, US6 | Done when: one-use/reuse/regeneration/disable/rotation pass.
 - [ ] T140 [P] Test recovery enumeration/revocation in `apps/web/tests/integration/identity/password-recovery.test.ts` | Deps: T096, T108 | Parallel: Yes | Story: US7, US8 | Done when: parity, 30-minute/one-use, hash, all-session revoke, and notification pass.
-- [ ] T141 [P] Test CSRF/origin/redirect/rate-limit attacks in `apps/web/tests/integration/security/auth-http-security.test.ts` | Deps: T103, T106, T107, T108 | Parallel: Yes | Story: US1–US9 | Done when: cross-origin, open redirect, and limit bypass attempts fail.
+- [ ] T141 [P] Test CSRF/origin/redirect/rate-limit attacks in `apps/web/tests/integration/security/auth-http-security.test.ts` | Deps: T103, T106, T107, T108 | Parallel: Yes | Story: US1â€“US9 | Done when: cross-origin, open redirect, and limit bypass attempts fail.
 - [ ] T142 [P] Test email retry/idempotency/capture in `apps/web/tests/integration/email/outbox.test.ts` | Deps: T124 | Parallel: Yes | Story: US1, US2, US7, US8 | Done when: failures never corrupt accounts or duplicate logical mail.
-- [ ] T143 Run contract/integration suites and record `src/specs/001-identity-authentication-account-recovery/checklists/integration-results.md` | Deps: T131, T132, T133, T134, T135, T136, T137, T138, T139, T140, T141, T142 | Parallel: No | Story: US1–US9 | Done when: clean migrated PostgreSQL passes with zero forbidden secrets in output.
+- [ ] T143 Run contract/integration suites and record `src/specs/001-identity-authentication-account-recovery/checklists/integration-results.md` | Deps: T131, T132, T133, T134, T135, T136, T137, T138, T139, T140, T141, T142 | Parallel: No | Story: US1â€“US9 | Done when: clean migrated PostgreSQL passes with zero forbidden secrets in output.
 
 ## Phase 16: End-to-end tests
 
@@ -218,18 +224,18 @@ All database-dependent work from T015 through T035 uses the healthy PostgreSQL 1
 - [ ] T149 [P] Generate disable/regenerate flows in `apps/web/tests/e2e/auth/two-factor-management.spec.ts` | Deps: T085 | Parallel: Yes | Story: US6 | Done when: proof gates and old-code invalidation pass.
 - [ ] T150 [P] Generate recovery flows in `apps/web/tests/e2e/auth/password-recovery.spec.ts` | Deps: T092, T097 | Parallel: Yes | Story: US7, US8 | Done when: request parity, expired/reuse, revocation, notification, login redirect pass.
 - [ ] T151 [P] Generate session flows in `apps/web/tests/e2e/auth/sessions.spec.ts` | Deps: T057 | Parallel: Yes | Story: US9 | Done when: listing/revoke/logout/immediate rejection/eviction pass.
-- [ ] T152 [P] Generate keyboard/focus/labels/motion/mobile audit in `apps/web/tests/e2e/auth/accessibility.spec.ts` | Deps: T130 | Parallel: Yes | Story: US1–US9 | Done when: primary flows pass keyboard-only at 320px/desktop with reduced motion.
+- [ ] T152 [P] Generate keyboard/focus/labels/motion/mobile audit in `apps/web/tests/e2e/auth/accessibility.spec.ts` | Deps: T130 | Parallel: Yes | Story: US1â€“US9 | Done when: primary flows pass keyboard-only at 320px/desktop with reduced motion.
 - [ ] T153 [P] Generate database/email failure fixtures/flows in `apps/web/tests/e2e/auth/failure-recovery.spec.ts` and `apps/web/tests/e2e/fixtures/failures.ts` | Deps: T124, T143 | Parallel: Yes | Story: US1, US2, US7, US8 | Done when: recoverable errors appear without false success/partial auth.
-- [ ] T154 Run Playwright and record `src/specs/001-identity-authentication-account-recovery/checklists/e2e-results.md` | Deps: T144, T145, T146, T147, T148, T149, T150, T151, T152, T153 | Parallel: No | Story: US1–US9 | Done when: every automated workflow, keyboard, accessibility, and viewport scenario passes without claiming human completion rates.
+- [ ] T154 Run Playwright and record `src/specs/001-identity-authentication-account-recovery/checklists/e2e-results.md` | Deps: T144, T145, T146, T147, T148, T149, T150, T151, T152, T153 | Parallel: No | Story: US1â€“US9 | Done when: every automated workflow, keyboard, accessibility, and viewport scenario passes without claiming human completion rates.
 
 ## Phase 17: Documentation and release validation
 
-- [ ] T155 Update validation commands/troubleshooting in `src/specs/001-identity-authentication-account-recovery/quickstart.md` | Deps: T143, T154 | Parallel: No | Story: US1–US9 | Done when: clean checkout reproduces Docker Compose health, Prisma migration/connectivity, email capture, tests, and build without host PostgreSQL or `psql`.
+- [ ] T155 Update validation commands/troubleshooting in `src/specs/001-identity-authentication-account-recovery/quickstart.md` | Deps: T143, T154 | Parallel: No | Story: US1â€“US9 | Done when: clean checkout reproduces Docker Compose health, Prisma migration/connectivity, email capture, tests, and build without host PostgreSQL or `psql`.
 - [ ] T156 [P] Document Resend domain/DKIM/SPF/DMARC, key rotation, outbox alerts, and capture in `docs/operations/transactional-email.md` | Deps: T124, T142 | Parallel: Yes | Story: US1, US2, US7, US8 | Done when: production/local failure procedures are complete.
-- [ ] T157 [P] Document session/TOTP/token key rotation and incident revocation in `docs/operations/authentication-security.md` | Deps: T100, T116 | Parallel: Yes | Story: US3–US9 | Done when: operators can rotate/revoke without secret exposure.
-- [ ] T158 Verify automated page performance and record evidence in `src/specs/001-identity-authentication-account-recovery/checklists/performance-results.md` | Deps: T154 | Parallel: No | Story: US1–US9 | Done when: 100 runs/page document environment, dataset, method, external-email condition, and p95 ≤3 seconds or block release.
-- [ ] T159 Run security, secret-log, dependency, migration, and Better Auth compatibility review in `src/specs/001-identity-authentication-account-recovery/checklists/security-design.md` | Deps: T035, T117, T143, T154, T158 | Parallel: No | Story: US1–US9 | Done when: every gate passes, append-only production-equivalent evidence exists, and secret scan has zero findings.
-- [ ] T160 Define and execute post-implementation usability studies for SC-001 and SC-012 in `src/specs/001-identity-authentication-account-recovery/checklists/usability-study.md` | Deps: T154, T159 | Parallel: No | Story: US1, US9 | Done when: protocol defines first-time target participants, sample size, tasks, assistance rules, evidence capture, and evaluates ≥95% registration and ≥90% session/2FA-management completion thresholds; until executed these criteria remain explicitly post-implementation validation.
+- [ ] T157 [P] Document session/TOTP/token key rotation and incident revocation in `docs/operations/authentication-security.md` | Deps: T100, T116 | Parallel: Yes | Story: US3â€“US9 | Done when: operators can rotate/revoke without secret exposure.
+- [ ] T158 Verify automated page performance and record evidence in `src/specs/001-identity-authentication-account-recovery/checklists/performance-results.md` | Deps: T154 | Parallel: No | Story: US1â€“US9 | Done when: 100 runs/page document environment, dataset, method, external-email condition, and p95 â‰¤3 seconds or block release.
+- [ ] T159 Run security, secret-log, dependency, migration, and Better Auth compatibility review in `src/specs/001-identity-authentication-account-recovery/checklists/security-design.md` | Deps: T035, T117, T143, T154, T158 | Parallel: No | Story: US1â€“US9 | Done when: every gate passes, append-only production-equivalent evidence exists, and secret scan has zero findings.
+- [ ] T160 Define and execute post-implementation usability studies for SC-001 and SC-012 in `src/specs/001-identity-authentication-account-recovery/checklists/usability-study.md` | Deps: T154, T159 | Parallel: No | Story: US1, US9 | Done when: protocol defines first-time target participants, sample size, tasks, assistance rules, evidence capture, and evaluates â‰¥95% registration and â‰¥90% session/2FA-management completion thresholds; until executed these criteria remain explicitly post-implementation validation.
 
 +## Phase 18: Optional SMTP and asynchronous EmailOutbox synchronization
 
@@ -267,25 +273,27 @@ All database-dependent work from T015 through T035 uses the healthy PostgreSQL 1
 5. Login/sessions, TOTP/backup management, and recovery follow their explicit dependencies; contract/integration tasks T131 through T143 precede E2E tasks T144 through T154, then release validation T155 through T160.
 6. Optional SMTP/asynchronous outbox synchronization follows T161 -> T162 -> T163 -> T164 -> T165 -> T166 -> T167; T168 -> T169 and T170 validate adapters; T171 -> T172 -> T173 -> T174 implement claim/retry/DEAD; T175 -> T176 add operations; T177 and T178 prove non-blocking/restart/concurrency behavior; T179 is the only completion gate.
 
+**TOTP enrollment increment**: T061 and T063 may begin after their dependencies; T061 -> T180 establishes the QR dependency gate; T063 -> T064 and T180 -> T065 -> T066 prepare the protected flow; T067 follows T066; T068 follows T067; T069 follows T065. T070 and later login-challenge work remain outside this increment.
+
 ### User-story graph
 
 ```text
 Foundation
- ├─ US1 Register → US2 Verify → US3 Login → US9 Sessions
- │                           └→ US4 Enroll → US5 2FA Login → US6 Manage 2FA
- └─ US7 Request Reset → US8 Reset Password → US9 revocation proof
+ â”œâ”€ US1 Register â†’ US2 Verify â†’ US3 Login â†’ US9 Sessions
+ â”‚                           â””â†’ US4 Enroll â†’ US5 2FA Login â†’ US6 Manage 2FA
+ â””â”€ US7 Request Reset â†’ US8 Reset Password â†’ US9 revocation proof
 ```
 
 ### Parallel opportunities
 
-- T004–T006 after T002; T014/T034; T040/T042; T061/T078/T087; TOTP and recovery streams after T060.
+- T004â€“T006 after T002; T014/T034; T040/T042; T061/T078/T087; TOTP and recovery streams after T060.
 - Contract/integration tasks run in parallel by explicit dependencies and separate target files; the same applies to Playwright tasks.
 - T170 may run in parallel with T168 after T167 because it modifies a distinct regression-test file; all other T161-T179 work is sequential or explicitly dependency-gated where target files overlap.
 - `[P]` is valid only after all listed dependencies complete and no shared target file conflicts.
 
 ## Implementation strategy
 
-**Increment 1 — Registration and Email Verification**: T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013, T014, T015, T016, T017, T018, T019, T020, T021, T022, T023, T024, T025, T026, T027, T028, T029, T030, T031, T032, T033, T035, T100, T101, T102, T103, T104, T105, T109, T110, T111, T112, T113, T117, T124, T042, T036, T037, T038, T039, T040, T041, T043, T044, T045, T046, T047, T106, T114, T118, T119, T120, T121, T122, T126, T128, T130, T131, T135, T136, T141, T142, T143, T144, T145, T152, T153, T154, T155, T158, and T159. This increment is not the complete Identity, Authentication, and Account Recovery functional group.
+**Increment 1 â€” Registration and Email Verification**: T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013, T014, T015, T016, T017, T018, T019, T020, T021, T022, T023, T024, T025, T026, T027, T028, T029, T030, T031, T032, T033, T035, T100, T101, T102, T103, T104, T105, T109, T110, T111, T112, T113, T117, T124, T042, T036, T037, T038, T039, T040, T041, T043, T044, T045, T046, T047, T106, T114, T118, T119, T120, T121, T122, T126, T128, T130, T131, T135, T136, T141, T142, T143, T144, T145, T152, T153, T154, T155, T158, and T159. This increment is not the complete Identity, Authentication, and Account Recovery functional group.
 
 **Incremental delivery**: (1) register/verify, (2) login/sessions, (3) TOTP/backup/management, (4) recovery/revocation, (5) full evidence/demo.
 
