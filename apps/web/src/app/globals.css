@@ -19,5 +19,21 @@ body { margin: 0; background: var(--background); color: var(--foreground); font-
 .security-page { min-height: 100dvh; padding: clamp(.5rem, 3vw, 2rem); }
 .security-card { width: min(100%, 64rem); margin-inline: auto; overflow-wrap: anywhere; }
 .auth-motion { transition: opacity 160ms ease, transform 160ms ease; }
-@media (max-width: 320px) { .auth-page { padding: .5rem; } .auth-card { padding: 1rem; border-radius: .5rem; } }
-@media (prefers-reduced-motion: reduce) { .auth-motion { transition: none; animation: none; } }
+.totp-enrollment { display: grid; gap: 1rem; max-width: 32rem; }
+.totp-enrollment form { display: grid; gap: 1rem; }
+.totp-enrollment label { font-weight: 600; }
+.totp-enrollment input { width: 100%; min-height: 2.75rem; border: 1px solid #64748b; border-radius: .4rem; padding: .65rem; font: inherit; }
+.totp-enrollment input[aria-invalid="true"] { border-color: #b91c1c; }
+.totp-enrollment [role="alert"] { color: #991b1b; margin: 0; }
+.totp-enrollment button { min-height: 2.75rem; border: 0; border-radius: .4rem; padding: .7rem 1rem; background: #1d4ed8; color: white; font: inherit; font-weight: 700; cursor: pointer; }
+.totp-enrollment button:disabled { opacity: .65; cursor: wait; }
+.totp-enrollment .secondary-action { background: #e2e8f0; color: #0f172a; }
+.totp-enrollment :focus-visible { outline: 3px solid #f59e0b; outline-offset: 2px; }
+.totp-qr { display: block; width: min(100%, 240px); height: auto; image-rendering: pixelated; background: white; padding: .5rem; border: 1px solid #cbd5e1; border-radius: .5rem; }
+.totp-manual { overflow-wrap: anywhere; }
+.totp-manual code, .backup-codes code { font-family: ui-monospace, "Cascadia Code", Menlo, Consolas, monospace; }
+.totp-enrollment [data-warning] { border: 1px solid #b45309; background: #fffbeb; color: #92400e; padding: .75rem; border-radius: .5rem; }
+.backup-codes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+.backup-codes li { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: .4rem; padding: .5rem; text-align: center; overflow-wrap: anywhere; }
+@media (max-width: 320px) { .auth-page { padding: .5rem; } .auth-card { padding: 1rem; border-radius: .5rem; } .backup-codes { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .auth-motion { transition: none; animation: none; } .totp-enrollment * { transition: none !important; animation: none !important; } }
