@@ -2,8 +2,13 @@
   "name": "smarthire",
   "private": true,
   "version": "0.0.0",
-  "workspaces": ["apps/*"],
-  "engines": { "node": "24.18.x", "npm": "11.16.x" },
+  "workspaces": [
+    "apps/*"
+  ],
+  "engines": {
+    "node": "24.18.x",
+    "npm": "11.16.x"
+  },
   "packageManager": "npm@11.16.0",
   "overrides": {
     "@better-auth/core": "1.6.11",

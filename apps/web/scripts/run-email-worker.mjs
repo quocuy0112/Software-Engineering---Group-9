@@ -1,6 +1,9 @@
 import { registerHooks } from "node:module";
 
-const emptyServerOnlyMarker = new URL("./server-only-marker.mjs", import.meta.url).href;
+const emptyServerOnlyMarker = new URL(
+  "./server-only-marker.mjs",
+  import.meta.url,
+).href;
 
 registerHooks({
   resolve(specifier, context, nextResolve) {

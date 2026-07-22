@@ -31,19 +31,34 @@ export const authenticationAuditAction = z.enum([
   "account.deleted",
 ]);
 
-export const authenticationAuditEventSchema = z.object({
-  occurredAt: z.date(),
-  actorType: z.enum(["anonymous", "user", "system"]),
-  actorUserId: z.string().min(1).nullable().optional(),
-  actorSessionId: z.string().min(1).nullable().optional(),
-  action: authenticationAuditAction,
-  targetType: z.enum(["user_account", "email_verification", "request", "email_outbox", "session", "two_factor", "password_reset"]),
-  targetId: z.string().min(1).nullable().optional(),
-  result: z.enum(["SUCCESS", "FAILURE", "DENIED"]),
-  correlationId: z.string().min(8).max(128),
-  ipPrefixDigest: z.string().max(128).nullable().optional(),
-  userAgentFamily: z.string().max(80).nullable().optional(),
-  context: z.record(z.string(), z.union([z.string().max(160), z.number(), z.boolean(), z.null()])),
-}).strict();
+export const authenticationAuditEventSchema = z
+  .object({
+    occurredAt: z.date(),
+    actorType: z.enum(["anonymous", "user", "system"]),
+    actorUserId: z.string().min(1).nullable().optional(),
+    actorSessionId: z.string().min(1).nullable().optional(),
+    action: authenticationAuditAction,
+    targetType: z.enum([
+      "user_account",
+      "email_verification",
+      "request",
+      "email_outbox",
+      "session",
+      "two_factor",
+      "password_reset",
+    ]),
+    targetId: z.string().min(1).nullable().optional(),
+    result: z.enum(["SUCCESS", "FAILURE", "DENIED"]),
+    correlationId: z.string().min(8).max(128),
+    ipPrefixDigest: z.string().max(128).nullable().optional(),
+    userAgentFamily: z.string().max(80).nullable().optional(),
+    context: z.record(
+      z.string(),
+      z.union([z.string().max(160), z.number(), z.boolean(), z.null()]),
+    ),
+  })
+  .strict();
 
-export type AuthenticationAuditEvent = z.infer<typeof authenticationAuditEventSchema>;
+export type AuthenticationAuditEvent = z.infer<
+  typeof authenticationAuditEventSchema
+>;

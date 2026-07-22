@@ -1,4 +1,5 @@
-const SECRET_KEY = /(password|cookie|token|secret|otp|backup.?code|authorization|jwt)/i;
+const SECRET_KEY =
+  /(password|cookie|token|secret|otp|backup.?code|authorization|jwt)/i;
 const URL_SECRET = /([?&](?:token|code|secret|password)=)[^&\s]+/gi;
 
 export const REDACTED = "[REDACTED]";
@@ -7,7 +8,10 @@ export function redactText(value: string): string {
   return value
     .replace(/\b(Cookie\s*:)\s*[^\r\n]+/gi, `$1 ${REDACTED}`)
     .replace(/\b(Authorization\s*:)\s*[^\r\n]+/gi, `$1 ${REDACTED}`)
-    .replace(/\b((?:smtp_)?password|authorization|token|secret|otp|backup.?code|jwt)\s*([=:])\s*[^\s,;]+/gi, `$1$2${REDACTED}`)
+    .replace(
+      /\b((?:smtp_)?password|authorization|token|secret|otp|backup.?code|jwt)\s*([=:])\s*[^\s,;]+/gi,
+      `$1$2${REDACTED}`,
+    )
     .replace(URL_SECRET, `$1${REDACTED}`)
     .replace(/\bBearer\s+[^\s]+/gi, `Bearer ${REDACTED}`)
     .replace(/\b(?:\d{6}|[A-Z0-9]{4}(?:-[A-Z0-9]{4}){2,})\b/g, REDACTED);
@@ -26,7 +30,12 @@ export function redactUnknown(value: unknown): unknown {
 }
 
 export function safeErrorCode(error: unknown): string {
-  if (error && typeof error === "object" && "code" in error && typeof error.code === "string") {
+  if (
+    error &&
+    typeof error === "object" &&
+    "code" in error &&
+    typeof error.code === "string"
+  ) {
     return redactText(error.code).slice(0, 80);
   }
   return "INTERNAL_ERROR";
