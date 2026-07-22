@@ -108,6 +108,14 @@ Gmail port 587 uses STARTTLS with `secure=false` and required TLS; optional port
 
 Tailwind CSS and shadcn/ui are the baseline; React Hook Form and Zod cover forms and validation. Sonner provides supplemental feedback only; inline errors and an accessible summary remain persistent. TanStack Query is added only for a documented server-state benefit. Zustand is optional for non-sensitive shared UI state only. Motion is nonessential and reduced-motion safe. Lenis is not used on authentication pages.
 
+## Decision: Server-First Identity Navigation Shells
+
+Use App Router route groups to separate the public (auth) shell from the protected (workspace) shell without changing public URLs. The protected layout validates the sole Better Auth session on the server and supplies only minimized navigation data plus an ephemeral CSRF proof required by the existing logout route. Active-link and mobile-menu state are presentation-only client state and never authorize access. Ordinary navigation uses Next.js Link; router APIs remain limited to post-action or state-dependent transitions.
+
+The root / becomes a protected foundational identity Dashboard because login already defaults to the protected settings area and the feature has no approved public marketing-page requirement. The Dashboard provides quick links and explicitly labelled future workspace areas without implementing or simulating recruitment-domain data.
+
+**Alternatives rejected**: a client-only session provider duplicates authorization state; every page independently fetching the current session increases coupling and visible loading; merging identity APIs into one endpoint weakens existing transport boundaries; a simulated jobs/recruiter dashboard exceeds this feature scope; full-page internal anchors discard App Router navigation benefits.
+
 ## Remaining Research Risks
 
 1. Confirm Better Auth 1.6.11 TOTP-secret and backup-code at-rest format and the exact extension hook for application-managed encryption if required.

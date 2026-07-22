@@ -22,7 +22,7 @@ Deliver the approved P0 identity scope in one Next.js App Router application. Ne
 
 **Testing**: unit, OpenAPI contract, PostgreSQL integration, component/accessibility, and browser E2E tests with controlled clock and concurrency cases  
 **Performance target**: authentication page load ≤3 seconds and identity interactions ≤2 seconds under the environment and dataset defined in `quickstart.md`  
-**Scope**: registration, email verification, password login, Better Auth TOTP and backup codes, password recovery, session management, account-state enforcement, audit, rate limiting, and transactional email only. No email OTP, social login, trusted devices, email change, passkeys, SMS, Python/FastAPI backend, or AI.
+**Scope**: registration, email verification, password login, Better Auth TOTP and backup codes, password recovery, session management, account-state enforcement, audit, rate limiting, transactional email, and shared identity navigation/workspace integration only. The workspace addition is limited to authentication-aware shells and a foundational account Dashboard; it does not add recruitment-domain behavior. No email OTP, social login, trusted devices, email change, passkeys, SMS, Python/FastAPI backend, or AI.
 
 ## Constitution Check
 
@@ -43,6 +43,8 @@ The active Constitution is `src/.specify/memory/constitution.md`. It permits the
 ```text
 Browser / Server Components
         |
+App Router route-group layouts: (auth) public shell | (workspace) server-authenticated shell
+        |
 apps/web/src/app/api/**/route.ts (Route Handlers and Better Auth catch-all)
         |
 Identity services and policy hooks
@@ -57,6 +59,7 @@ PostgreSQL            EmailOutbox worker -> EmailService -> capture | SMTP | Res
 - Repositories encapsulate Prisma and PostgreSQL behavior. Provider gateways encapsulate Better Auth; email adapters encapsulate capture, SMTP/Nodemailer, and Resend behind `EmailService`.
 - Better Auth handlers mount with `toNextJsHandler(auth)` at `app/api/auth/[...all]/route.ts`. Pages Router API Routes are prohibited for this feature.
 - Server Components may consume a server-validated session but must not introduce alternate credentials or client-side authorization.
+- The (workspace) layout validates the Better Auth session once at the shared server boundary for /, /settings/security, and /settings/sessions, then passes only a minimized display/navigation projection and ephemeral CSRF proof to the client shell. The shell never fetches or persists a second session.
 
 ## Repository and Project Structure
 
@@ -144,6 +147,8 @@ The Better Auth JWT plugin is not configured for browser authentication. A futur
 - Root `npm run dev` should start both Next.js and the email worker with one cross-platform supervisor and forward shutdown signals to both. Separate `npm run dev:web` and `npm run email:worker` commands remain available for debugging. Capture uses the same worker path as SMTP and Resend for consistent request semantics.
 - Tailwind CSS and shadcn/ui form the UI baseline. React Hook Form and Zod handle forms and trust-boundary validation. Sonner supplements persistent inline/summary errors and is never the sole error channel.
 - TanStack Query is used only for documented value. Zustand may hold only non-sensitive shared UI state. Motion is limited to nonessential reduced-motion-safe transitions. Lenis is prohibited on authentication pages.
+- Public identity pages share the (auth) layout and AuthShell, with route-specific cross-links implemented using Next.js Link. Protected Dashboard and settings pages share the (workspace) layout and WorkspaceShell, with active navigation derived from the current pathname for presentation only.
+- The foundational Dashboard contains identity-workspace orientation, quick links, and explicitly labelled future placeholders only. It performs no recruitment-domain queries and displays no fabricated Candidate, Recruiter, job, application, notification, or analytics data.
 
 ## Security and Operations
 
@@ -191,6 +196,7 @@ No browser-session JWT issuer, audience, or signing variables exist.
 - Environment checks verify Node `24.18.x`, npm workspace/one-lockfile invariants, Docker Compose availability, container health, port `55432`, required local files, and capture-directory writability without printing secrets.
 - Version-compatibility tests exercise Better Auth 1.6.11 schema, Prisma adapter, TOTP storage, backup-code regeneration/single-use, list/revoke/logout, and cookie issuance against the Compose PostgreSQL service before implementation is accepted.
 - Accessibility tests require keyboard access, focus management, labels, readable inline errors/summaries, reduced motion, responsive layouts, and no color-only status.
+- Navigation component tests cover semantic landmarks, labelled/expanded mobile controls, active-page state, internal Link destinations, sign-out busy/error behavior, reduced motion, and 320px overflow. Serial Playwright flows prove Visitor cross-links and Authenticated User Dashboard -> Security -> Sessions -> Sign out transitions using response, URL, and destination landmarks.
 - Performance evidence records environment, PostgreSQL dataset, cold/warm state, percentile, and Resend/capture conditions.
 
 ## Dependency Security Assessment

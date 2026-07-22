@@ -39,14 +39,6 @@ export function SessionList() {
     setStatus(response.ok ? "Session revoked." : "Unable to revoke session.");
     if (response.ok) await load();
   }
-  async function logout() {
-    const response = await fetch("/api/identity/logout", {
-      method: "POST",
-      headers: { "x-csrf-token": proof },
-    });
-    if (response.ok) window.location.assign("/login");
-    else setStatus("Unable to sign out.");
-  }
   return (
     <section>
       <h1>Sessions</h1>
@@ -73,9 +65,6 @@ export function SessionList() {
           </li>
         ))}
       </ul>
-      <button type="button" onClick={() => void logout()}>
-        Sign out
-      </button>
     </section>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { PASSWORD_RECOVERY_GENERIC_RESPONSE } from "@/features/identity/schemas/password-recovery";
 
@@ -29,8 +30,8 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <main className="auth-shell">
-      <form onSubmit={submit} className="auth-card" noValidate aria-busy={busy}>
+    <section className="auth-form-content">
+      <form onSubmit={submit} noValidate aria-busy={busy}>
         <h1>Forgot your password?</h1>
         <p>Enter your email and we’ll send reset instructions if the account is eligible.</p>
         <label htmlFor="forgot-email">Email address</label>
@@ -47,8 +48,8 @@ export function ForgotPasswordForm() {
           {busy ? "Sending…" : "Send reset instructions"}
         </button>
         <p role="status" aria-live="polite">{status}</p>
-        <a href="/login">Back to sign in</a>
+        <Link href="/login">Back to sign in</Link>
       </form>
-    </main>
+    </section>
   );
 }

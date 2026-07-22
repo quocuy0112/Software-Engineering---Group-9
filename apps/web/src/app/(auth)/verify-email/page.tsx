@@ -45,6 +45,7 @@ function VerificationResult() {
         safely.
       </p>
       <ResendVerificationForm />
+      <Link href="/login">Back to sign in</Link>
     </>
   );
 }

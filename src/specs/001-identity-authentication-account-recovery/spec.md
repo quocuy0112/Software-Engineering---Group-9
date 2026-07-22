@@ -176,6 +176,23 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 
 ---
 
+### User Story 10 - Navigate the Identity Workspace (Priority: P1)
+
+As a Visitor or Authenticated User, I want consistent navigation between identity pages and protected account pages so that I can understand where I am and reach the next safe action without guessing URLs.
+
+**Why this priority**: Registration, recovery, security, and session management form one account workflow. Isolated pages make otherwise complete security features difficult to discover and use.
+
+**Independent Test**: Navigate the public authentication routes using their visible links, authenticate, move between Dashboard, Security, and Sessions using the shared workspace navigation, then sign out and confirm protected pages are unavailable.
+
+**Acceptance Scenarios**:
+
+1. **Public authentication navigation** - **Given** a Visitor is on Login, Register, Forgot Password, Reset Password, Check Email, Verify Email, or the two-factor challenge, **When** the user follows a related navigation action, **Then** the destination is an approved internal route and no account, token, verification, reset, or factor state is disclosed.
+2. **Protected workspace navigation** - **Given** an Authenticated User enters Dashboard, Security, or Sessions, **When** the page renders, **Then** one server-validated authenticated workspace shell exposes SmartHire branding, Dashboard, Security, Sessions, active-page state, and Sign out without creating or persisting a second client authentication state.
+3. **Foundational dashboard** - **Given** an Authenticated User opens /, **When** the dashboard renders, **Then** it provides safe identity-workspace guidance and quick links while future Candidate or Recruiter capabilities are clearly marked unavailable and no fabricated business data is displayed.
+4. **Responsive keyboard navigation** - **Given** a 320 CSS-pixel viewport or keyboard-only operation, **When** the user opens and uses the public or protected navigation, **Then** every control remains labelled, focus-visible, operable, non-overflowing, and understandable without color alone.
+
+---
+
 ### Cross-Cutting Acceptance Scenarios
 
 1. **Email-service failure** â€” **Given** registration, verification resend, password reset, or security notification has committed valid core data, **When** the Transactional Email Service is unavailable, **Then** account and credential data remain consistent, no duplicate critical record is created by retry, unrelated workflows remain available, delivery is retried or reported through an operationally visible non-secret failure, and the user sees a safe recoverable state.
@@ -301,6 +318,16 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - **FR-060**: SMTP configuration MUST be server-only and limited to `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM`, `SMTP_SECURE`, and `SMTP_USE_TLS`. No SMTP setting or credential may use a `NEXT_PUBLIC_` name, and SMTP passwords or provider credentials MUST NOT appear in source code, ordinary logs, client bundles, database records, Email Delivery Job payloads, or audit data.
 - **FR-061**: Gmail-compatible SMTP MUST require a complete email address for `SMTP_USERNAME`, support Google App Password authentication, require STARTTLS with port 587 and `SMTP_SECURE=false`, and MAY support implicit TLS with port 465 and `SMTP_SECURE=true`. `SMTP_FROM` MUST contain a complete email address and reject carriage returns, line feeds, and all control characters. Missing or contradictory settings MUST fail configuration validation without exposing supplied secret values.
 
+#### Identity Navigation and Workspace Integration
+
+- **FR-062**: /login, /register, /forgot-password, /reset-password, /verify-email, /check-email, and /two-factor MUST use one shared public authentication shell with a SmartHire home/brand link, consistent responsive presentation, and route-appropriate safe help or return actions.
+- **FR-063**: Login MUST link to Create account and Forgot password; Register MUST link to Sign in; recovery and verification result pages MUST provide an approved internal return path without disclosing account existence, factor configuration, verification state, or reset-token validity beyond the existing generic result.
+- **FR-064**: /, /settings/security, and /settings/sessions MUST use one authenticated workspace shell whose server layout validates the sole Better Auth session before rendering protected navigation or content. Client navigation state MUST NOT authorize access or duplicate the session.
+- **FR-065**: The authenticated workspace shell MUST expose SmartHire branding, Dashboard, Security, Sessions, active-page state, and Sign out. Ordinary internal navigation MUST use Next.js Link; router APIs are reserved for state-dependent or post-action transitions.
+- **FR-066**: The foundational Dashboard MUST provide identity-workspace orientation and quick links only. Candidate profiles, job search, recommendations, recruiter workflows, applications, notifications, administration, analytics, and invented business data MUST NOT be implemented by this increment; future areas MUST be labelled as unavailable or Coming later.
+- **FR-067**: Shared navigation MUST remain keyboard operable, visibly focusable, screen-reader labelled, reduced-motion safe, and free from horizontal overflow at 320 CSS pixels. A responsive menu control MUST expose its expanded state and controlled region programmatically.
+- **FR-068**: Protected child pages MUST NOT duplicate workspace header/navigation markup or independently fetch a session solely to render the shell. Sign out MUST use the existing authoritative logout operation with same-origin/CSRF protection and must not expose session credentials.
+
 ### Non-Functional Requirements
 - **NFR-001 â€” Performance**: Under documented normal test conditions, each required page MUST become usable within 3 seconds for at least 95% of measured visits; the plan MUST state environment, dataset, measurement method, and external-email conditions.
 - **NFR-002 â€” Responsiveness**: All required pages MUST support mobile and desktop layouts from 320 CSS pixels wide without loss of actions, labels, messages, or entered non-sensitive values.
@@ -314,6 +341,8 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - **NFR-010 â€” Testability**: Security timing, rate-limit, expiry, retry, transaction-failure, concurrent-use, and accessibility behavior MUST be verifiable in controlled tests without using production personal data or secrets.
 
 - **NFR-011 - Asynchronous email reliability**: A failure or timeout of the Transactional Email Service MUST not delay completion of an originating request after its Email Delivery Job has committed. Due jobs MUST remain operationally visible until sent or terminally failed, and adapter selection, SMTP transport matrices, safe error classification, retry, timeout, concurrent claim, and secret-exclusion behavior MUST be verifiable without live external email delivery or production secrets.
+
+- **NFR-012 - Navigation cohesion**: Dashboard, Security, Sessions, and public authentication transitions MUST expose a visible destination landmark and complete within the Constitution dashboard-navigation target under the documented local test environment; browser tests MUST synchronize on response, URL, and destination state rather than arbitrary sleeps or networkidle.
 
 ### Key Entities
 
@@ -352,6 +381,9 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - **SC-015**: In 100% of registration, verification-resend, and password-reset request tests, the response completes after the required transaction and Email Delivery Job commit without waiting for capture, SMTP, Resend, timeout, or provider-failure completion.
 - **SC-016**: In concurrent-worker and retry tests, each logical Email Delivery Job is delivered successfully at most once, every claim increments attempts exactly once, and every completed attempt produces the expected `SENT`, `RETRYABLE`, or `DEAD` state with no duplicate terminal-failure audit event.
 
+- **SC-017**: Component and browser tests find all required public cross-links and protected Dashboard/Security/Sessions/Sign-out actions, expose correct active state, and complete keyboard navigation at desktop and 320 CSS-pixel widths with zero horizontal overflow.
+- **SC-018**: In 100% of tested direct and back-button visits after logout or without a valid Better Auth session, /, /settings/security, and /settings/sessions redirect safely to Login and render no protected workspace content.
+
 ## Assumptions
 
 - The active Spec Kit project root is `src`, so the requested relative path resolves to `src/specs/001-identity-authentication-account-recovery/spec.md` in this repository.
@@ -377,6 +409,7 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 
 ## Out of Scope
 
+- Candidate profiles, job search, job recommendations, recruiter dashboards, job posting, applications, notifications, administration, and business analytics are excluded from the foundational identity Dashboard.
 - Production deployment and operation of Resend or any SMTP relay; this specification defines production-oriented adapter behavior but does not add deployment scope.
 - Google OAuth, â€œSign in with Google,â€ or any social login.
 - SMS OTP, phone-number authentication, passkeys, or WebAuthn.
@@ -385,7 +418,6 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - User-profile editing beyond the minimum name and email held for the account.
 - Trusted-device or â€œremember this deviceâ€ behavior.
 - Automatic support bypass of TOTP; any approved recovery procedure requires separate definition and authorization controls.
-
 
 
 

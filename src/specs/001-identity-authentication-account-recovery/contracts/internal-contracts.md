@@ -18,6 +18,14 @@ Accepts only a discriminated event schema containing actor/reference, action, ta
 
 Wraps pinned Better Auth server APIs. Better Auth exclusively owns the opaque browser session, secure authentication cookie, TOTP configuration, and backup-code behavior. The gateway never issues a SmartHire browser JWT, exposes a raw session token through a SmartHire response, or creates parallel TOTP/backup storage. SmartHire services add account-state, 30-minute idle, seven-day absolute, five-session-cap, password-reset revocation, and audit policy around verified Better Auth operations.
 
+## Identity Navigation Shell Contracts
+
+AuthShell is a public presentation boundary for the approved identity routes. It exposes only static SmartHire branding, safe internal navigation targets, child page content, and generic help text. It receives no account, session, verification, reset, TOTP, backup-code, or challenge state.
+
+WorkspaceShell is rendered only after the (workspace) server layout validates an ACTIVE Better Auth session. Its client-visible input is limited to a display-safe navigation projection and the ephemeral CSRF proof needed by the existing logout Route Handler. It MUST NOT receive a session token, raw session identifier, password, factor material, or protected database row; MUST NOT persist its input in browser storage or caches; and MUST treat pathname-derived active state as presentation only.
+
+The shell owns shared SmartHire branding, Dashboard/Security/Sessions links, responsive menu state, and Sign out presentation. Protected child pages own their existing forms and domain-specific API calls and do not duplicate shell markup or fetch authentication state solely for navigation. Sign out continues to call the existing /api/identity/logout contract and redirects only after an observed successful response.
+
 ## Future service-token ADR boundary (documentation only; not an active runtime contract)
 
 May issue short-lived JWTs only to authenticated server workloads in a future feature. Required claims would include `iss`, exact `aud`, service-principal `sub`, narrow `scope`, `iat`, short `exp`, `jti`, and key ID. No browser, browser cookie, Better Auth JWT plugin, endpoint, or receiving service is implemented here.

@@ -10,7 +10,7 @@ import { PasswordField } from "./password-field";
 import { FormFeedback } from "./form-feedback";
 
 export function LoginForm({
-  returnTo = "/settings/sessions",
+  returnTo = "/",
 }: {
   returnTo?: string;
 }) {

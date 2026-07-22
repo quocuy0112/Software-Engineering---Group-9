@@ -41,12 +41,23 @@ test("verified account signs in with one opaque cookie, reaches settings, and si
   await page.getByLabel("Email address").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+  const dashboardMenuButton = page.getByRole("button", { name: "Menu" });
+  if (await dashboardMenuButton.isVisible()) {
+    await dashboardMenuButton.click();
+  }
+  await page.getByRole("link", { name: "Sessions", exact: true }).click();
   await expect(page).toHaveURL(/\/settings\/sessions/);
   await expect(page.getByText(/\(current\)/)).toBeVisible();
   const cookies = await page.context().cookies();
   expect(
     cookies.filter((cookie) => cookie.name === "smarthire.session"),
   ).toHaveLength(1);
+  const menuButton = page.getByRole("button", { name: "Menu" });
+  if (await menuButton.isVisible()) {
+    await menuButton.click();
+  }
   await page.getByRole("button", { name: "Sign out" }).click();
   await expect(page).toHaveURL(/\/login$/);
   expect(
