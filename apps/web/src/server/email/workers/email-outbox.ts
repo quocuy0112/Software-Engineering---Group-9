@@ -16,6 +16,8 @@ import {
   VerifyEmailTemplate,
   verificationEmailText,
 } from "../templates/verify-email";
+import { ResetPasswordTemplate, resetPasswordEmailText } from "../templates/reset-password";
+import { PasswordChangedTemplate, passwordChangedEmailText } from "../templates/password-changed";
 import { EmailDeliveryError, type EmailService } from "../email-service";
 const protector = new TokenProtector();
 export function selectedEmailAdapter(): EmailService {
@@ -41,18 +43,36 @@ export async function deliverClaimedOutbox(
   try {
     if (!row.user) throw new Error("MISSING_RECIPIENT");
     const payload = row.payloadRef as { protectedToken?: string };
-    if (!payload.protectedToken) throw new Error("MISSING_PROTECTED_TOKEN");
-    const token = protector.unseal(payload.protectedToken);
-    const url = new URL("/verify-email", serverEnvironment.NEXT_PUBLIC_APP_URL);
-    url.searchParams.set("token", token);
+    let subject: string;
+    let html: string;
+    let text: string;
+    if (row.kind === "PASSWORD_CHANGED") {
+      subject = "Your SmartHire password was changed";
+      html = await render(createElement(PasswordChangedTemplate));
+      text = passwordChangedEmailText();
+    } else {
+      if (!payload.protectedToken) throw new Error("MISSING_PROTECTED_TOKEN");
+      const token = protector.unseal(payload.protectedToken);
+      if (row.kind === "RESET_PASSWORD") {
+        const url = new URL("/reset-password", serverEnvironment.NEXT_PUBLIC_APP_URL);
+        url.hash = `token=${encodeURIComponent(token)}`;
+        subject = "Reset your SmartHire password";
+        html = await render(createElement(ResetPasswordTemplate, { resetUrl: url.toString() }));
+        text = resetPasswordEmailText(url.toString());
+      } else {
+        const url = new URL("/verify-email", serverEnvironment.NEXT_PUBLIC_APP_URL);
+        url.searchParams.set("token", token);
+        subject = "Verify your SmartHire email";
+        html = await render(createElement(VerifyEmailTemplate, { verificationUrl: url.toString() }));
+        text = verificationEmailText(url.toString());
+      }
+    }
     const delivery = await adapter.send({
       kind: row.kind,
       recipient: row.user.email,
-      subject: "Verify your SmartHire email",
-      html: await render(
-        createElement(VerifyEmailTemplate, { verificationUrl: url.toString() }),
-      ),
-      text: verificationEmailText(url.toString()),
+      subject,
+      html,
+      text,
       idempotencyKey: row.idempotencyKey,
     });
     return (

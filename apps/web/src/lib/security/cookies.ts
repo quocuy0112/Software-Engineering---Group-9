@@ -1,4 +1,5 @@
 import type { ServerEnvironment } from "@/lib/env/server";
+import { serverEnvironment } from "@/lib/env/runtime";
 
 type CookieEnvironment = Pick<
   ServerEnvironment,
@@ -47,4 +48,18 @@ export function clearCookieAttributes<
   const rest = { ...attributes } as Omit<T, "maxAge"> & { maxAge?: number };
   delete rest.maxAge;
   return { ...rest, expires: new Date(0), maxAge: 0 };
+}
+
+export function clearSessionCookie() {
+  const policy = identityCookiePolicy(serverEnvironment);
+  const attributes = clearCookieAttributes(policy.session.attributes);
+  return [
+    `${policy.session.name}=`,
+    `Path=${attributes.path}`,
+    "HttpOnly",
+    "SameSite=Lax",
+    attributes.secure && "Secure",
+    "Max-Age=0",
+    `Expires=${attributes.expires.toUTCString()}`,
+  ].filter(Boolean).join("; ");
 }
