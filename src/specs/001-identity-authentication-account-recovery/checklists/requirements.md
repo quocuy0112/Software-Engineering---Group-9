@@ -39,4 +39,3 @@
 - The Constitution Compliance section and FR-041/FR-042 have been propagated to Next.js App Router Route Handlers and one Better Auth opaque PostgreSQL-backed browser session. User stories and functional success criteria remain unchanged.
 - All 27 explicitly requested acceptance topics are represented by measurable Given/When/Then scenarios, including the three cross-cutting failure/accessibility scenarios.
 - No clarification markers remain. Security-policy parameters not fixed by the user or Constitution are documented as planning assumptions and must be selected and justified during `/speckit-plan`.
-

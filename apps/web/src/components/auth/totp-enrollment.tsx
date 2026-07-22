@@ -11,7 +11,12 @@ import {
 import { PasswordField } from "./password-field";
 import { FormFeedback } from "./form-feedback";
 
-type Setup = { qrCodeDataUrl: string; manualKey: string; issuer: string; accountLabel: string };
+type Setup = {
+  qrCodeDataUrl: string;
+  manualKey: string;
+  issuer: string;
+  accountLabel: string;
+};
 type Stage = "password" | "verify" | "complete";
 
 /**
@@ -38,7 +43,10 @@ export function TotpEnrollment() {
     const controller = new AbortController();
     const timer = setTimeout(() => {
       void (async () => {
-        const response = await fetch("/api/identity/sessions", { cache: "no-store", signal: controller.signal });
+        const response = await fetch("/api/identity/sessions", {
+          cache: "no-store",
+          signal: controller.signal,
+        });
         if (!response.ok) return;
         const body = (await response.json()) as { csrfProof: string };
         setProof(body.csrfProof);
@@ -130,15 +138,25 @@ export function TotpEnrollment() {
       <h1 id="totp-title">Set up two-factor authentication</h1>
 
       {stage === "password" ? (
-        <form onSubmit={startEnrollment} noValidate aria-busy={passwordForm.formState.isSubmitting}>
-          <p>Confirm your current password to begin. You will scan a QR code with your authenticator app.</p>
+        <form
+          onSubmit={startEnrollment}
+          noValidate
+          aria-busy={passwordForm.formState.isSubmitting}
+        >
+          <p>
+            Confirm your current password to begin. You will scan a QR code with
+            your authenticator app.
+          </p>
           <PasswordField
             label="Current password"
             autoComplete="current-password"
             error={passwordForm.formState.errors.currentPassword?.message}
             {...passwordForm.register("currentPassword")}
           />
-          <button type="submit" disabled={passwordForm.formState.isSubmitting || !proof}>
+          <button
+            type="submit"
+            disabled={passwordForm.formState.isSubmitting || !proof}
+          >
             {passwordForm.formState.isSubmitting ? "Starting…" : "Continue"}
           </button>
           <FormFeedback status={status} />
@@ -146,10 +164,14 @@ export function TotpEnrollment() {
       ) : null}
 
       {stage === "verify" && setup ? (
-        <form onSubmit={verifyCode} noValidate aria-busy={codeForm.formState.isSubmitting}>
+        <form
+          onSubmit={verifyCode}
+          noValidate
+          aria-busy={codeForm.formState.isSubmitting}
+        >
           <p>
-            Scan this QR code in your authenticator app for <strong>{setup.issuer}</strong> (
-            {setup.accountLabel}).
+            Scan this QR code in your authenticator app for{" "}
+            <strong>{setup.issuer}</strong> ({setup.accountLabel}).
           </p>
           {/* Base64 data-URL QR rendered server-side; next/image cannot optimize a data URI. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -180,7 +202,9 @@ export function TotpEnrollment() {
             ) : null}
           </div>
           <button type="submit" disabled={codeForm.formState.isSubmitting}>
-            {codeForm.formState.isSubmitting ? "Verifying…" : "Verify and enable"}
+            {codeForm.formState.isSubmitting
+              ? "Verifying…"
+              : "Verify and enable"}
           </button>
           <button type="button" className="secondary-action" onClick={cancel}>
             Cancel
@@ -193,8 +217,9 @@ export function TotpEnrollment() {
         <div aria-labelledby="backup-title">
           <h2 id="backup-title">Save your backup codes</h2>
           <p role="alert" data-warning>
-            Store these ten backup codes somewhere safe now. They are shown only once and each can be
-            used a single time if you lose your authenticator.
+            Store these ten backup codes somewhere safe now. They are shown only
+            once and each can be used a single time if you lose your
+            authenticator.
           </p>
           <ul className="backup-codes">
             {backupCodes.map((code) => (

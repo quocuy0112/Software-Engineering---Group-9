@@ -29,10 +29,16 @@ describe("renderTotpQrCode (real qrcode 1.5.4)", () => {
     // Use the real library's segment optimizer to prove the encoded content
     // reconstructs the supplied URI byte-for-byte.
     const QRCode = (await import("qrcode")).default;
-    const segments = QRCode.create(VALID_URI, { errorCorrectionLevel: "M" }).segments;
+    const segments = QRCode.create(VALID_URI, {
+      errorCorrectionLevel: "M",
+    }).segments;
     // Byte-mode segments carry a Buffer; alphanumeric carry a string. Coerce both.
     const reconstructed = segments
-      .map((segment) => (typeof segment.data === "string" ? segment.data : Buffer.from(segment.data).toString()))
+      .map((segment) =>
+        typeof segment.data === "string"
+          ? segment.data
+          : Buffer.from(segment.data).toString(),
+      )
       .join("");
     expect(reconstructed).toBe(VALID_URI);
   });
@@ -45,7 +51,9 @@ describe("renderTotpQrCode (real qrcode 1.5.4)", () => {
   });
 
   it("rejects a malformed URI", async () => {
-    await expect(renderTotpQrCode("not a uri")).rejects.toBeInstanceOf(TotpQrError);
+    await expect(renderTotpQrCode("not a uri")).rejects.toBeInstanceOf(
+      TotpQrError,
+    );
   });
 
   it("rejects a non-otpauth protocol", async () => {
@@ -59,20 +67,30 @@ describe("renderTotpQrCode (real qrcode 1.5.4)", () => {
 
   it("rejects a URI missing the secret", async () => {
     await expect(
-      renderTotpQrCode("otpauth://totp/SmartHire:demo@example.test?issuer=SmartHire"),
+      renderTotpQrCode(
+        "otpauth://totp/SmartHire:demo@example.test?issuer=SmartHire",
+      ),
     ).rejects.toBeInstanceOf(TotpQrError);
   });
 
   it("rejects a URI missing the issuer", async () => {
     await expect(
-      renderTotpQrCode(`otpauth://totp/SmartHire:demo@example.test?secret=${SECRET}`),
+      renderTotpQrCode(
+        `otpauth://totp/SmartHire:demo@example.test?secret=${SECRET}`,
+      ),
     ).rejects.toBeInstanceOf(TotpQrError);
   });
 
   it("rejects invalid rendering options", async () => {
-    await expect(renderTotpQrCode(VALID_URI, { width: 16 })).rejects.toBeInstanceOf(TotpQrError);
-    await expect(renderTotpQrCode(VALID_URI, { width: 4096 })).rejects.toBeInstanceOf(TotpQrError);
-    await expect(renderTotpQrCode(VALID_URI, { margin: -1 })).rejects.toBeInstanceOf(TotpQrError);
+    await expect(
+      renderTotpQrCode(VALID_URI, { width: 16 }),
+    ).rejects.toBeInstanceOf(TotpQrError);
+    await expect(
+      renderTotpQrCode(VALID_URI, { width: 4096 }),
+    ).rejects.toBeInstanceOf(TotpQrError);
+    await expect(
+      renderTotpQrCode(VALID_URI, { margin: -1 }),
+    ).rejects.toBeInstanceOf(TotpQrError);
     await expect(
       // @ts-expect-error deliberately invalid level
       renderTotpQrCode(VALID_URI, { errorCorrectionLevel: "Z" }),

@@ -1,6 +1,9 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
-import { rateLimitPolicies, safeRetryMetadata } from "@/lib/rate-limit/policies";
+import {
+  rateLimitPolicies,
+  safeRetryMetadata,
+} from "@/lib/rate-limit/policies";
 import { PrismaRateLimitRepository } from "@/server/repositories/rate-limit/prisma-rate-limit-repository";
 import { PrismaAuditRepository } from "@/server/repositories/audit/prisma-audit-repository";
 import {
@@ -9,7 +12,10 @@ import {
 } from "@/server/auth/identity/better-auth-two-factor-gateway";
 import { RequireRecentAuthService } from "./require-recent-auth";
 import { requireSession } from "@/server/auth/require-session";
-import { buildTotpSetup, TotpQrError } from "@/server/auth/identity/totp-qr-code";
+import {
+  buildTotpSetup,
+  TotpQrError,
+} from "@/server/auth/identity/totp-qr-code";
 
 const BACKUP_CODE_COUNT = 10;
 
@@ -24,7 +30,11 @@ export type EnrollmentSetup = {
   accountLabel: string;
 };
 
-export type EnrollmentDenied = { ok: false; status: 401 | 429 | 502; retryAfterSeconds?: number };
+export type EnrollmentDenied = {
+  ok: false;
+  status: 401 | 429 | 502;
+  retryAfterSeconds?: number;
+};
 export type StartResult = EnrollmentSetup | EnrollmentDenied;
 
 export type VerifyGranted = { ok: true; backupCodes: string[] };
@@ -69,28 +79,60 @@ export class EnrollTotpService {
   }
 
   /** Step 1: verify recent auth + password, start Better Auth enrollment, render local QR. */
-  async start(currentPassword: string, request: RequestContext): Promise<StartResult> {
+  async start(
+    currentPassword: string,
+    request: RequestContext,
+  ): Promise<StartResult> {
     const now = request.now ?? new Date();
     const correlationId = randomUUID();
 
     const recent = await this.recentAuth.execute(currentPassword, request);
     if (!recent.ok) {
-      return { ok: false, status: recent.status, retryAfterSeconds: recent.retryAfterSeconds };
+      return {
+        ok: false,
+        status: recent.status,
+        retryAfterSeconds: recent.retryAfterSeconds,
+      };
     }
 
-    let setup: { qrCodeDataUrl: string; manualKey: string; issuer: string; accountLabel: string };
+    let setup: {
+      qrCodeDataUrl: string;
+      manualKey: string;
+      issuer: string;
+      accountLabel: string;
+    };
     try {
-      const enrollment = await this.gateway.startEnrollment(request.headers, currentPassword);
+      const enrollment = await this.gateway.startEnrollment(
+        request.headers,
+        currentPassword,
+      );
       // Render the QR locally and derive the manual-entry fallback. buildTotpSetup
       // validates the otpauth URI and throws a redacted TotpQrError on malformed input.
       setup = await buildTotpSetup(enrollment.otpauthUri);
     } catch (error) {
-      const reason = error instanceof TotpQrError ? "qr_render_failed" : "gateway_unavailable";
-      await this.record("totp.enrollment_started", "FAILURE", correlationId, now, recent, reason);
+      const reason =
+        error instanceof TotpQrError
+          ? "qr_render_failed"
+          : "gateway_unavailable";
+      await this.record(
+        "totp.enrollment_started",
+        "FAILURE",
+        correlationId,
+        now,
+        recent,
+        reason,
+      );
       return { ok: false, status: 502 };
     }
 
-    await this.record("totp.enrollment_started", "SUCCESS", correlationId, now, recent, "started");
+    await this.record(
+      "totp.enrollment_started",
+      "SUCCESS",
+      correlationId,
+      now,
+      recent,
+      "started",
+    );
     return {
       ok: true,
       qrCodeDataUrl: setup.qrCodeDataUrl,
@@ -111,34 +153,79 @@ export class EnrollTotpService {
       now,
     });
     if (!decision.allowed) {
-      await this.record("totp.enabled", "DENIED", correlationId, now, null, "throttled");
-      return { ok: false, status: 429, retryAfterSeconds: safeRetryMetadata(decision).retryAfterSeconds };
+      await this.record(
+        "totp.enabled",
+        "DENIED",
+        correlationId,
+        now,
+        null,
+        "throttled",
+      );
+      return {
+        ok: false,
+        status: 429,
+        retryAfterSeconds: safeRetryMetadata(decision).retryAfterSeconds,
+      };
     }
 
     // The verify step carries only the six-digit code (no password, per contract),
     // so re-establish the caller identity from the Better Auth session directly.
     const session = await requireSession(request.headers, now);
     if (!session) {
-      await this.record("totp.enabled", "FAILURE", correlationId, now, null, "no_session");
+      await this.record(
+        "totp.enabled",
+        "FAILURE",
+        correlationId,
+        now,
+        null,
+        "no_session",
+      );
       return { ok: false, status: 401 };
     }
     const actor = { userId: session.userId, sessionId: session.sessionId };
 
-    const verified = await this.gateway.verifyInitialTotp(request.headers, code);
+    const verified = await this.gateway.verifyInitialTotp(
+      request.headers,
+      code,
+    );
     if (!verified) {
-      await this.record("totp.enabled", "FAILURE", correlationId, now, actor, "verification_failed");
+      await this.record(
+        "totp.enabled",
+        "FAILURE",
+        correlationId,
+        now,
+        actor,
+        "verification_failed",
+      );
       return { ok: false, status: 401 };
     }
 
     // 2FA is now enabled; reveal the codes Better Auth stored (encrypted) at enrollment
     // start, exactly once. Better Auth remains the sole owner and decryptor.
-    const backupCodes = await this.revealBackupCodes(request.headers, session.userId);
+    const backupCodes = await this.revealBackupCodes(
+      request.headers,
+      session.userId,
+    );
     if (!backupCodes) {
-      await this.record("totp.enabled", "FAILURE", correlationId, now, actor, "backup_reveal_failed");
+      await this.record(
+        "totp.enabled",
+        "FAILURE",
+        correlationId,
+        now,
+        actor,
+        "backup_reveal_failed",
+      );
       return { ok: false, status: 502 };
     }
 
-    await this.record("totp.enabled", "SUCCESS", correlationId, now, actor, "enabled");
+    await this.record(
+      "totp.enabled",
+      "SUCCESS",
+      correlationId,
+      now,
+      actor,
+      "enabled",
+    );
     return { ok: true, backupCodes };
   }
 
@@ -147,7 +234,10 @@ export class EnrollTotpService {
    * enrollment start, decrypted through Better Auth. Returns null unless exactly
    * ten codes surface, so the caller can fail safely.
    */
-  private async revealBackupCodes(headers: Headers, userId: string): Promise<string[] | null> {
+  private async revealBackupCodes(
+    headers: Headers,
+    userId: string,
+  ): Promise<string[] | null> {
     try {
       const codes = await this.gateway.revealBackupCodes(headers, userId);
       return codes.length === BACKUP_CODE_COUNT ? codes : null;

@@ -2,16 +2,24 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { verifyPassword } from "better-auth/crypto";
 import { prisma } from "@/lib/db/prisma";
-import { rateLimitPolicies, safeRetryMetadata } from "@/lib/rate-limit/policies";
+import {
+  rateLimitPolicies,
+  safeRetryMetadata,
+} from "@/lib/rate-limit/policies";
 import { PrismaRateLimitRepository } from "@/server/repositories/rate-limit/prisma-rate-limit-repository";
 import { PrismaAuditRepository } from "@/server/repositories/audit/prisma-audit-repository";
 import { requireSession } from "@/server/auth/require-session";
 
 /** Sensitive actions require re-proof no older than ten minutes. */
 export const RECENT_AUTH_WINDOW_MS = 10 * 60 * 1000;
-export const RECENT_AUTH_ERROR = "Please confirm your current password to continue.";
+export const RECENT_AUTH_ERROR =
+  "Please confirm your current password to continue.";
 
-export type RecentAuthDenied = { ok: false; status: 401 | 429; retryAfterSeconds?: number };
+export type RecentAuthDenied = {
+  ok: false;
+  status: 401 | 429;
+  retryAfterSeconds?: number;
+};
 export type RecentAuthGranted = { ok: true; userId: string; sessionId: string };
 export type RecentAuthResult = RecentAuthDenied | RecentAuthGranted;
 
@@ -51,7 +59,11 @@ export class RequireRecentAuthService {
     });
     if (!decision.allowed) {
       await this.record("DENIED", correlationId, now, "throttled");
-      return { ok: false, status: 429, retryAfterSeconds: safeRetryMetadata(decision).retryAfterSeconds };
+      return {
+        ok: false,
+        status: 429,
+        retryAfterSeconds: safeRetryMetadata(decision).retryAfterSeconds,
+      };
     }
 
     const session = await requireSession(request.headers, now);
@@ -65,7 +77,14 @@ export class RequireRecentAuthService {
       select: { state: true },
     });
     if (account?.state !== "ACTIVE") {
-      await this.record("FAILURE", correlationId, now, "inactive", session.userId, session.sessionId);
+      await this.record(
+        "FAILURE",
+        correlationId,
+        now,
+        "inactive",
+        session.userId,
+        session.sessionId,
+      );
       return { ok: false, status: 401 };
     }
 
@@ -73,8 +92,18 @@ export class RequireRecentAuthService {
       where: { id: session.sessionId, userId: session.userId },
       select: { createdAt: true },
     });
-    if (!sessionRow || sessionRow.createdAt.getTime() + RECENT_AUTH_WINDOW_MS <= now.getTime()) {
-      await this.record("FAILURE", correlationId, now, "stale", session.userId, session.sessionId);
+    if (
+      !sessionRow ||
+      sessionRow.createdAt.getTime() + RECENT_AUTH_WINDOW_MS <= now.getTime()
+    ) {
+      await this.record(
+        "FAILURE",
+        correlationId,
+        now,
+        "stale",
+        session.userId,
+        session.sessionId,
+      );
       return { ok: false, status: 401 };
     }
 
@@ -83,10 +112,20 @@ export class RequireRecentAuthService {
       select: { password: true },
     });
     const verified = credential?.password
-      ? await verifyPassword({ hash: credential.password, password: currentPassword }).catch(() => false)
+      ? await verifyPassword({
+          hash: credential.password,
+          password: currentPassword,
+        }).catch(() => false)
       : false;
     if (!verified) {
-      await this.record("FAILURE", correlationId, now, "wrong_password", session.userId, session.sessionId);
+      await this.record(
+        "FAILURE",
+        correlationId,
+        now,
+        "wrong_password",
+        session.userId,
+        session.sessionId,
+      );
       return { ok: false, status: 401 };
     }
 

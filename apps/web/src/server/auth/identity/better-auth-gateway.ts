@@ -9,13 +9,20 @@ export class BetterAuthGateway implements AuthGateway {
   }
   async getSession(headers: Headers) {
     const result = await auth.api.getSession({ headers });
-    return result ? { userId: result.user.id, sessionId: result.session.id } : null;
+    return result
+      ? { userId: result.user.id, sessionId: result.session.id }
+      : null;
   }
 
   async listSessions(headers: Headers): Promise<SessionSummary[]> {
     const current = await auth.api.getSession({ headers });
     const sessions = await auth.api.listSessions({ headers });
-    return sessions.map((session) => ({ id: session.id, userId: session.userId, expiresAt: session.expiresAt, current: session.id === current?.session.id }));
+    return sessions.map((session) => ({
+      id: session.id,
+      userId: session.userId,
+      expiresAt: session.expiresAt,
+      current: session.id === current?.session.id,
+    }));
   }
 
   async revokeSession(headers: Headers, token: string) {
@@ -43,7 +50,10 @@ export class BetterAuthGateway implements AuthGateway {
   }
 
   async regenerateBackupCodes(headers: Headers, password: string) {
-    const result = await auth.api.generateBackupCodes({ headers, body: { password } });
+    const result = await auth.api.generateBackupCodes({
+      headers,
+      body: { password },
+    });
     return result.backupCodes;
   }
 }

@@ -17,7 +17,10 @@ export interface EmailService {
 }
 
 export class EmailDeliveryError extends Error {
-  constructor(public readonly code: string, public readonly retryable: boolean) {
+  constructor(
+    public readonly code: string,
+    public readonly retryable: boolean,
+  ) {
     super("Email delivery failed");
     this.name = "EmailDeliveryError";
   }

@@ -1,5 +1,68 @@
-import {afterEach,describe,expect,it,vi} from "vitest";import {cleanup,fireEvent,render,screen,waitFor} from "@testing-library/react";import {TwoFactorChallenge} from "@/components/auth/two-factor-challenge";
-const replace=vi.fn(),refresh=vi.fn();vi.mock("next/navigation",()=>({useRouter:()=>({replace,refresh})}));afterEach(()=>{cleanup();vi.restoreAllMocks();sessionStorage.clear();localStorage.clear();});
-describe("two-factor challenge",()=>{it("focuses, labels, pastes numeric input and submits with Enter",async()=>{const fetch=vi.spyOn(globalThis,"fetch").mockResolvedValue(new Response(JSON.stringify({message:"ok"}),{status:200}));render(<TwoFactorChallenge/>);const input=screen.getByLabelText("Authentication code") as HTMLInputElement;expect(document.activeElement).toBe(input);fireEvent.change(input,{target:{value:"12 34-56"}});expect(input.value).toBe("123456");fireEvent.keyDown(input,{key:"Enter",code:"Enter"});fireEvent.submit(input.closest("form")!);await waitFor(()=>expect(fetch).toHaveBeenCalledTimes(1));expect((fetch.mock.calls[0][1]?.body as string)).toContain("123456");expect(input.value).toBe("");});
-it("prevents duplicate submission, exposes busy/live state, and gives generic errors",async()=>{let done!:(v:Response)=>void;vi.spyOn(globalThis,"fetch").mockReturnValue(new Promise(r=>done=r));render(<TwoFactorChallenge/>);const input=screen.getByLabelText("Authentication code");fireEvent.change(input,{target:{value:"123456"}});const form=input.closest("form")!;fireEvent.submit(form);fireEvent.submit(form);expect(globalThis.fetch).toHaveBeenCalledTimes(1);expect(form).toHaveAttribute("aria-busy","true");done(new Response("{}",{status:401}));await screen.findByText(/could not be completed/i);expect(screen.getByRole("status")).toHaveAttribute("aria-live","polite");expect(localStorage.length+sessionStorage.length).toBe(0);});
-it("clears sensitive state on unmount and fits a 320px-safe layout",()=>{const {unmount,container}=render(<TwoFactorChallenge/>);fireEvent.change(screen.getByLabelText("Authentication code"),{target:{value:"123456"}});unmount();expect(container.textContent).toBe("");expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(document.documentElement.clientWidth);});});
+import { afterEach, describe, expect, it, vi } from "vitest";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import { TwoFactorChallenge } from "@/components/auth/two-factor-challenge";
+const replace = vi.fn(),
+  refresh = vi.fn();
+vi.mock("next/navigation", () => ({ useRouter: () => ({ replace, refresh }) }));
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+  sessionStorage.clear();
+  localStorage.clear();
+});
+describe("two-factor challenge", () => {
+  it("focuses, labels, pastes numeric input and submits with Enter", async () => {
+    const fetch = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(
+        new Response(JSON.stringify({ message: "ok" }), { status: 200 }),
+      );
+    render(<TwoFactorChallenge />);
+    const input = screen.getByLabelText(
+      "Authentication code",
+    ) as HTMLInputElement;
+    expect(document.activeElement).toBe(input);
+    fireEvent.change(input, { target: { value: "12 34-56" } });
+    expect(input.value).toBe("123456");
+    fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
+    fireEvent.submit(input.closest("form")!);
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+    expect(fetch.mock.calls[0][1]?.body as string).toContain("123456");
+    expect(input.value).toBe("");
+  });
+  it("prevents duplicate submission, exposes busy/live state, and gives generic errors", async () => {
+    let done!: (v: Response) => void;
+    vi.spyOn(globalThis, "fetch").mockReturnValue(
+      new Promise((r) => (done = r)),
+    );
+    render(<TwoFactorChallenge />);
+    const input = screen.getByLabelText("Authentication code");
+    fireEvent.change(input, { target: { value: "123456" } });
+    const form = input.closest("form")!;
+    fireEvent.submit(form);
+    fireEvent.submit(form);
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+    expect(form).toHaveAttribute("aria-busy", "true");
+    done(new Response("{}", { status: 401 }));
+    await screen.findByText(/could not be completed/i);
+    expect(screen.getByRole("status")).toHaveAttribute("aria-live", "polite");
+    expect(localStorage.length + sessionStorage.length).toBe(0);
+  });
+  it("clears sensitive state on unmount and fits a 320px-safe layout", () => {
+    const { unmount, container } = render(<TwoFactorChallenge />);
+    fireEvent.change(screen.getByLabelText("Authentication code"), {
+      target: { value: "123456" },
+    });
+    unmount();
+    expect(container.textContent).toBe("");
+    expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(
+      document.documentElement.clientWidth,
+    );
+  });
+});

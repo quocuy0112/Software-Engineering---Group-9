@@ -1,5 +1,6 @@
 import "server-only";
 import { auth } from "@/server/auth/config";
+import { serverEnvironment } from "@/lib/env/runtime";
 
 /**
  * The only enrollment data the service layer is allowed to observe.
@@ -25,7 +26,10 @@ export interface TwoFactorGateway {
    * secret plus backup codes, and returns the otpauth URI. The account is not
    * yet verified — `skipVerificationOnEnable` is false in config.
    */
-  startEnrollment(headers: Headers, password: string): Promise<TwoFactorEnrollmentStart>;
+  startEnrollment(
+    headers: Headers,
+    password: string,
+  ): Promise<TwoFactorEnrollmentStart>;
   /**
    * Verifies the user's first six-digit TOTP code, which flips the stored
    * TwoFactor row to verified and enables 2FA on the account.
@@ -37,11 +41,41 @@ export interface TwoFactorGateway {
    * initial TOTP verification succeeds, so the codes surface exactly once.
    */
   revealBackupCodes(headers: Headers, userId: string): Promise<string[]>;
+  consumeBackupCode(
+    headers: Headers,
+    code: string,
+  ): Promise<{ sessionCookie: string | null }>;
+  regenerateBackupCodes(headers: Headers, password: string): Promise<string[]>;
+  disableTwoFactor(headers: Headers, password: string): Promise<boolean>;
 }
 
 export class BetterAuthTwoFactorGateway implements TwoFactorGateway {
-  async startEnrollment(headers: Headers, password: string): Promise<TwoFactorEnrollmentStart> {
-    const result = await auth.api.enableTwoFactor({ headers, body: { password } });
+  private async request(path: string, body: unknown, headers: Headers) {
+    const forwarded = new Headers(headers);
+    forwarded.set("content-type", "application/json");
+    forwarded.set(
+      "origin",
+      new URL(serverEnvironment.NEXT_PUBLIC_APP_URL).origin,
+    );
+    return auth.handler(
+      new Request(
+        new URL(`/api/auth${path}`, serverEnvironment.BETTER_AUTH_URL),
+        {
+          method: "POST",
+          headers: forwarded,
+          body: JSON.stringify(body),
+        },
+      ),
+    );
+  }
+  async startEnrollment(
+    headers: Headers,
+    password: string,
+  ): Promise<TwoFactorEnrollmentStart> {
+    const result = await auth.api.enableTwoFactor({
+      headers,
+      body: { password },
+    });
     return { otpauthUri: result.totpURI, backupCodes: result.backupCodes };
   }
 
@@ -54,8 +88,43 @@ export class BetterAuthTwoFactorGateway implements TwoFactorGateway {
     }
   }
 
-  async revealBackupCodes(_headers: Headers, userId: string): Promise<string[]> {
+  async revealBackupCodes(
+    _headers: Headers,
+    userId: string,
+  ): Promise<string[]> {
     const result = await auth.api.viewBackupCodes({ body: { userId } });
     return result.backupCodes;
+  }
+
+  async consumeBackupCode(headers: Headers, code: string) {
+    const response = await this.request(
+      "/two-factor/verify-backup-code",
+      { code, trustDevice: false },
+      headers,
+    );
+    const sessionCookie = response.ok
+      ? (response.headers
+          .getSetCookie()
+          .find((value) =>
+            /^(smarthire\.session|__Host-smarthire\.session)=/.test(value),
+          ) ?? null)
+      : null;
+    return { sessionCookie };
+  }
+
+  async regenerateBackupCodes(headers: Headers, password: string) {
+    const result = await auth.api.generateBackupCodes({
+      headers,
+      body: { password },
+    });
+    return result.backupCodes;
+  }
+
+  async disableTwoFactor(headers: Headers, password: string) {
+    const result = await auth.api.disableTwoFactor({
+      headers,
+      body: { password },
+    });
+    return result.status === true;
   }
 }

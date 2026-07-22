@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import { EnrollTotpService } from "@/server/services/identity/enroll-totp";
 import type { TwoFactorGateway } from "@/server/auth/identity/better-auth-two-factor-gateway";
-import type { RequireRecentAuthService, RecentAuthResult } from "@/server/services/identity/require-recent-auth";
+import type {
+  RequireRecentAuthService,
+  RecentAuthResult,
+} from "@/server/services/identity/require-recent-auth";
 
 const SECRET = "JBSWY3DPEHPK3PXP";
 const VALID_URI = `otpauth://totp/SmartHire:demo@example.test?secret=${SECRET}&issuer=SmartHire&algorithm=SHA1&digits=6&period=30`;
@@ -13,7 +16,14 @@ function tenCodes(): string[] {
 // Minimal in-memory limiter/audit doubles so the unit test needs no database.
 function fakeLimiter(allowed = true) {
   return {
-    consume: vi.fn().mockResolvedValue({ allowed, limit: 5, remaining: allowed ? 4 : 0, retryAfterSeconds: allowed ? 0 : 42 }),
+    consume: vi
+      .fn()
+      .mockResolvedValue({
+        allowed,
+        limit: 5,
+        remaining: allowed ? 4 : 0,
+        retryAfterSeconds: allowed ? 0 : 42,
+      }),
     subjectDigest: vi.fn((subject: string) => subject),
   } as never;
 }
@@ -24,20 +34,33 @@ function fakeAudit() {
 }
 
 function recentAuth(result: RecentAuthResult): RequireRecentAuthService {
-  return { execute: vi.fn().mockResolvedValue(result) } as unknown as RequireRecentAuthService;
+  return {
+    execute: vi.fn().mockResolvedValue(result),
+  } as unknown as RequireRecentAuthService;
 }
 
 function gateway(overrides: Partial<TwoFactorGateway> = {}): TwoFactorGateway {
   return {
-    startEnrollment: vi.fn().mockResolvedValue({ otpauthUri: VALID_URI, backupCodes: tenCodes() }),
+    startEnrollment: vi
+      .fn()
+      .mockResolvedValue({ otpauthUri: VALID_URI, backupCodes: tenCodes() }),
     verifyInitialTotp: vi.fn().mockResolvedValue(true),
     revealBackupCodes: vi.fn().mockResolvedValue(tenCodes()),
+    consumeBackupCode: vi
+      .fn()
+      .mockResolvedValue({ sessionCookie: "smarthire.session=test" }),
+    regenerateBackupCodes: vi.fn().mockResolvedValue(tenCodes()),
+    disableTwoFactor: vi.fn().mockResolvedValue(true),
     ...overrides,
   };
 }
 
 const request = { headers: new Headers(), subject: "test-subject" };
-const granted: RecentAuthResult = { ok: true, userId: "user-1", sessionId: "session-1" };
+const granted: RecentAuthResult = {
+  ok: true,
+  userId: "user-1",
+  sessionId: "session-1",
+};
 
 describe("EnrollTotpService.start", () => {
   it("renders a real QR and manual key after recent-auth passes", async () => {
@@ -51,7 +74,9 @@ describe("EnrollTotpService.start", () => {
     const result = await service.start("Correct Passphrase 2026!", request);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.qrCodeDataUrl.startsWith("data:image/png;base64,")).toBe(true);
+    expect(result.qrCodeDataUrl.startsWith("data:image/png;base64,")).toBe(
+      true,
+    );
     expect(result.manualKey).toBe(SECRET);
     expect(result.issuer).toBe("SmartHire");
     expect(result.accountLabel).toBe("demo@example.test");
@@ -66,14 +91,20 @@ describe("EnrollTotpService.start", () => {
       audit: fakeAudit().repo,
     });
     const result = await service.start("wrong password", request);
-    expect(result).toEqual({ ok: false, status: 401, retryAfterSeconds: undefined });
+    expect(result).toEqual({
+      ok: false,
+      status: 401,
+      retryAfterSeconds: undefined,
+    });
     expect(start).not.toHaveBeenCalled();
   });
 
   it("returns a redacted 502 and does not leak the URI when the gateway fails", async () => {
     const { repo, append } = fakeAudit();
     const service = new EnrollTotpService({
-      gateway: gateway({ startEnrollment: vi.fn().mockRejectedValue(new Error("boom")) as never }),
+      gateway: gateway({
+        startEnrollment: vi.fn().mockRejectedValue(new Error("boom")) as never,
+      }),
       recentAuth: recentAuth(granted),
       limiter: fakeLimiter(),
       audit: repo,

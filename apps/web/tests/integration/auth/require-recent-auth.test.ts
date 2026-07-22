@@ -14,7 +14,12 @@ const password = "Recent Auth Passphrase 2026!";
 const createdEmails = new Set<string>();
 
 function sameOriginHeaders(extra: Record<string, string> = {}) {
-  return new Headers({ origin: "http://localhost:3000", "sec-fetch-site": "same-origin", "user-agent": "vitest", ...extra });
+  return new Headers({
+    origin: "http://localhost:3000",
+    "sec-fetch-site": "same-origin",
+    "user-agent": "vitest",
+    ...extra,
+  });
 }
 
 async function activeAccount() {
@@ -25,20 +30,30 @@ async function activeAccount() {
     name: "Recent Auth User",
     email,
     normalizedEmail: email,
-    credentialPassword: await new BetterAuthGateway().preparePasswordForCredential(password),
+    credentialPassword:
+      await new BetterAuthGateway().preparePasswordForCredential(password),
     tokenDigest: protector.digest(protector.generate()),
     protectedToken: protector.seal(protector.generate()),
     expiresAt: new Date(Date.now() + 86400000),
     correlationId: id,
   });
-  await prisma.userAccount.update({ where: { normalizedEmail: email }, data: { state: "ACTIVE", emailVerified: true } });
+  await prisma.userAccount.update({
+    where: { normalizedEmail: email },
+    data: { state: "ACTIVE", emailVerified: true },
+  });
   createdEmails.add(email);
   return email;
 }
 
 async function signInCookie(email: string) {
-  const response = await new BetterAuthSessionGateway().signIn(email, password, sameOriginHeaders());
-  const cookie = response.headers.getSetCookie().find((value) => value.startsWith("smarthire.session="));
+  const response = await new BetterAuthSessionGateway().signIn(
+    email,
+    password,
+    sameOriginHeaders(),
+  );
+  const cookie = response.headers
+    .getSetCookie()
+    .find((value) => value.startsWith("smarthire.session="));
   const pair = cookie?.split(";", 1)[0];
   expect(pair).toBeTruthy();
   return pair as string;
@@ -46,10 +61,14 @@ async function signInCookie(email: string) {
 
 afterEach(async () => {
   for (const email of createdEmails) {
-    const user = await prisma.userAccount.findUnique({ where: { normalizedEmail: email } });
+    const user = await prisma.userAccount.findUnique({
+      where: { normalizedEmail: email },
+    });
     if (user) {
       await prisma.session.deleteMany({ where: { userId: user.id } });
-      await prisma.authProviderAccount.deleteMany({ where: { userId: user.id } });
+      await prisma.authProviderAccount.deleteMany({
+        where: { userId: user.id },
+      });
       await prisma.candidateIdentity.deleteMany({ where: { userId: user.id } });
       await prisma.userAccount.delete({ where: { id: user.id } });
     }
@@ -79,10 +98,13 @@ describe("RequireRecentAuthService", () => {
   it("denies when the current password is wrong without revealing the reason", async () => {
     const email = await activeAccount();
     const cookie = await signInCookie(email);
-    const result = await new RequireRecentAuthService().execute("wrong password", {
-      headers: sameOriginHeaders({ cookie }),
-      subject: randomUUID(),
-    });
+    const result = await new RequireRecentAuthService().execute(
+      "wrong password",
+      {
+        headers: sameOriginHeaders({ cookie }),
+        subject: randomUUID(),
+      },
+    );
     expect(result).toMatchObject({ ok: false, status: 401 });
   });
 
@@ -101,7 +123,10 @@ describe("RequireRecentAuthService", () => {
   it("denies when the owning account is no longer ACTIVE", async () => {
     const email = await activeAccount();
     const cookie = await signInCookie(email);
-    await prisma.userAccount.update({ where: { normalizedEmail: email }, data: { state: "SUSPENDED" } });
+    await prisma.userAccount.update({
+      where: { normalizedEmail: email },
+      data: { state: "SUSPENDED" },
+    });
     const result = await new RequireRecentAuthService().execute(password, {
       headers: sameOriginHeaders({ cookie }),
       subject: randomUUID(),
@@ -114,13 +139,18 @@ describe("RequireRecentAuthService", () => {
     const service = new RequireRecentAuthService();
     let throttled: Awaited<ReturnType<typeof service.execute>> | null = null;
     for (let attempt = 0; attempt < 7; attempt += 1) {
-      const outcome = await service.execute("wrong password", { headers: sameOriginHeaders(), subject });
+      const outcome = await service.execute("wrong password", {
+        headers: sameOriginHeaders(),
+        subject,
+      });
       if (!outcome.ok && outcome.status === 429) {
         throttled = outcome;
         break;
       }
     }
     expect(throttled).toMatchObject({ ok: false, status: 429 });
-    expect((throttled as { retryAfterSeconds: number }).retryAfterSeconds).toBeGreaterThan(0);
+    expect(
+      (throttled as { retryAfterSeconds: number }).retryAfterSeconds,
+    ).toBeGreaterThan(0);
   });
 });

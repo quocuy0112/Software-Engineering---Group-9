@@ -72,7 +72,9 @@ describe("PostgreSQL pre-auth challenges", () => {
       );
     expect(claims.filter(Boolean)).toHaveLength(1);
     const claim = claims.find(Boolean)!;
-    expect(await r.finalize(claim.id, id, claim.claimTime, BigInt(123))).toBe(true);
+    expect(await r.finalize(claim.id, id, claim.claimTime, BigInt(123))).toBe(
+      true,
+    );
     expect(await r.claimAttempt(c.token, "b", now)).toBeNull();
   });
 });

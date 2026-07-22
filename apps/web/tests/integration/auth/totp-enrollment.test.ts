@@ -41,13 +41,17 @@ async function activeAccount() {
     name: "Enrollment User",
     email,
     normalizedEmail: email,
-    credentialPassword: await new BetterAuthGateway().preparePasswordForCredential(password),
+    credentialPassword:
+      await new BetterAuthGateway().preparePasswordForCredential(password),
     tokenDigest: protector.digest(protector.generate()),
     protectedToken: protector.seal(protector.generate()),
     expiresAt: new Date(Date.now() + 86400000),
     correlationId: id,
   });
-  await prisma.userAccount.update({ where: { normalizedEmail: email }, data: { state: "ACTIVE", emailVerified: true } });
+  await prisma.userAccount.update({
+    where: { normalizedEmail: email },
+    data: { state: "ACTIVE", emailVerified: true },
+  });
   createdEmails.add(email);
   return email;
 }
@@ -56,46 +60,69 @@ async function signIn(email: string) {
   const response = await new BetterAuthSessionGateway().signIn(
     email,
     password,
-    new Headers({ origin: "http://localhost:3000", "sec-fetch-site": "same-origin", "user-agent": "vitest" }),
+    new Headers({
+      origin: "http://localhost:3000",
+      "sec-fetch-site": "same-origin",
+      "user-agent": "vitest",
+    }),
   );
-  const cookie = response.headers.getSetCookie().find((value) => value.startsWith("smarthire.session="));
+  const cookie = response.headers
+    .getSetCookie()
+    .find((value) => value.startsWith("smarthire.session="));
   const pair = cookie?.split(";", 1)[0];
   expect(pair).toBeTruthy();
-  const sessionId = (await auth.api.getSession({ headers: requestHeaders(pair as string) }))?.session.id;
+  const sessionId = (
+    await auth.api.getSession({ headers: requestHeaders(pair as string) })
+  )?.session.id;
   expect(sessionId).toBeTruthy();
   return { cookie: pair as string, sessionId: sessionId as string };
 }
 
 function startRequest(cookie: string, proof: string, body: unknown) {
-  return new Request("http://localhost:3000/api/identity/two-factor/enrollment", {
-    method: "POST",
-    headers: requestHeaders(cookie, { "x-csrf-token": proof }),
-    body: JSON.stringify(body),
-  });
+  return new Request(
+    "http://localhost:3000/api/identity/two-factor/enrollment",
+    {
+      method: "POST",
+      headers: requestHeaders(cookie, { "x-csrf-token": proof }),
+      body: JSON.stringify(body),
+    },
+  );
 }
 
 function verifyRequest(cookie: string, proof: string, body: unknown) {
-  return new Request("http://localhost:3000/api/identity/two-factor/enrollment/verify", {
-    method: "POST",
-    headers: requestHeaders(cookie, { "x-csrf-token": proof }),
-    body: JSON.stringify(body),
-  });
+  return new Request(
+    "http://localhost:3000/api/identity/two-factor/enrollment/verify",
+    {
+      method: "POST",
+      headers: requestHeaders(cookie, { "x-csrf-token": proof }),
+      body: JSON.stringify(body),
+    },
+  );
 }
 
 async function currentTotpCode(userId: string) {
   const stored = await prisma.twoFactor.findFirstOrThrow({ where: { userId } });
-  const decryptedSecret = await symmetricDecrypt({ key: serverEnvironment.BETTER_AUTH_SECRET, data: stored.secret });
-  const { code } = await auth.api.generateTOTP({ body: { secret: decryptedSecret } });
+  const decryptedSecret = await symmetricDecrypt({
+    key: serverEnvironment.BETTER_AUTH_SECRET,
+    data: stored.secret,
+  });
+  const { code } = await auth.api.generateTOTP({
+    body: { secret: decryptedSecret },
+  });
   return code;
 }
 
 afterEach(async () => {
   for (const email of createdEmails) {
-    const user = await prisma.userAccount.findUnique({ where: { normalizedEmail: email } });
+    const user = await prisma.userAccount.findUnique({
+      where: { normalizedEmail: email },
+    });
     if (user) {
       await prisma.session.deleteMany({ where: { userId: user.id } });
       await prisma.twoFactor.deleteMany({ where: { userId: user.id } });
-      await prisma.authProviderAccount.deleteMany({ where: { userId: user.id } });
+      await prisma.authProviderAccount.deleteMany({
+        where: { userId: user.id },
+      });
       await prisma.candidateIdentity.deleteMany({ where: { userId: user.id } });
       await prisma.userAccount.delete({ where: { id: user.id } });
     }
@@ -109,27 +136,46 @@ describe("TOTP enrollment route handlers (real Better Auth + qrcode)", () => {
     const { cookie, sessionId } = await signIn(email);
     const proof = csrfProof(sessionId);
 
-    const started = await startEnrollment(startRequest(cookie, proof, { currentPassword: password }));
+    const started = await startEnrollment(
+      startRequest(cookie, proof, { currentPassword: password }),
+    );
     expect(started.status, await started.clone().text()).toBe(200);
     expect(started.headers.get("Cache-Control")).toContain("no-store");
-    const setup = (await started.json()) as { qrCodeDataUrl: string; manualKey: string; issuer: string; accountLabel: string };
+    const setup = (await started.json()) as {
+      qrCodeDataUrl: string;
+      manualKey: string;
+      issuer: string;
+      accountLabel: string;
+    };
     expect(setup.qrCodeDataUrl.startsWith("data:image/png;base64,")).toBe(true);
     expect(setup.manualKey.length).toBeGreaterThan(0);
     expect(setup.issuer).toBe("SmartHire");
     // The response must not leak the raw otpauth URI or secret in any string field.
     expect(JSON.stringify(setup)).not.toContain("otpauth://");
 
-    const userId = (await prisma.userAccount.findUniqueOrThrow({ where: { normalizedEmail: email } })).id;
+    const userId = (
+      await prisma.userAccount.findUniqueOrThrow({
+        where: { normalizedEmail: email },
+      })
+    ).id;
     const code = await currentTotpCode(userId);
 
-    const verified = await verifyEnrollment(verifyRequest(cookie, proof, { code }));
+    const verified = await verifyEnrollment(
+      verifyRequest(cookie, proof, { code }),
+    );
     expect(verified.status, await verified.clone().text()).toBe(200);
     expect(verified.headers.get("Cache-Control")).toContain("no-store");
     const body = (await verified.json()) as { backupCodes: string[] };
     expect(body.backupCodes).toHaveLength(10);
     expect(new Set(body.backupCodes).size).toBe(10);
-    expect((await prisma.userAccount.findUniqueOrThrow({ where: { id: userId } })).twoFactorEnabled).toBe(true);
-    expect((await prisma.twoFactor.findUniqueOrThrow({ where: { userId } })).verified).toBe(true);
+    expect(
+      (await prisma.userAccount.findUniqueOrThrow({ where: { id: userId } }))
+        .twoFactorEnabled,
+    ).toBe(true);
+    expect(
+      (await prisma.twoFactor.findUniqueOrThrow({ where: { userId } }))
+        .verified,
+    ).toBe(true);
   });
 
   it("rejects an invalid initial TOTP code without enabling 2FA", async () => {
@@ -137,13 +183,24 @@ describe("TOTP enrollment route handlers (real Better Auth + qrcode)", () => {
     const { cookie, sessionId } = await signIn(email);
     const proof = csrfProof(sessionId);
 
-    const started = await startEnrollment(startRequest(cookie, proof, { currentPassword: password }));
+    const started = await startEnrollment(
+      startRequest(cookie, proof, { currentPassword: password }),
+    );
     expect(started.status).toBe(200);
 
-    const verified = await verifyEnrollment(verifyRequest(cookie, proof, { code: "000000" }));
+    const verified = await verifyEnrollment(
+      verifyRequest(cookie, proof, { code: "000000" }),
+    );
     expect(verified.status).toBe(401);
-    const userId = (await prisma.userAccount.findUniqueOrThrow({ where: { normalizedEmail: email } })).id;
-    expect((await prisma.userAccount.findUniqueOrThrow({ where: { id: userId } })).twoFactorEnabled).toBe(false);
+    const userId = (
+      await prisma.userAccount.findUniqueOrThrow({
+        where: { normalizedEmail: email },
+      })
+    ).id;
+    expect(
+      (await prisma.userAccount.findUniqueOrThrow({ where: { id: userId } }))
+        .twoFactorEnabled,
+    ).toBe(false);
   });
 
   it("rejects enrollment start with a wrong current password", async () => {
@@ -151,16 +208,24 @@ describe("TOTP enrollment route handlers (real Better Auth + qrcode)", () => {
     const { cookie, sessionId } = await signIn(email);
     const proof = csrfProof(sessionId);
 
-    const started = await startEnrollment(startRequest(cookie, proof, { currentPassword: "wrong password" }));
+    const started = await startEnrollment(
+      startRequest(cookie, proof, { currentPassword: "wrong password" }),
+    );
     expect(started.status).toBe(401);
-    expect(await prisma.twoFactor.count({ where: { user: { normalizedEmail: email } } })).toBe(0);
+    expect(
+      await prisma.twoFactor.count({
+        where: { user: { normalizedEmail: email } },
+      }),
+    ).toBe(0);
   });
 
   it("rejects a request that fails CSRF proof", async () => {
     const email = await activeAccount();
     const { cookie } = await signIn(email);
 
-    const started = await startEnrollment(startRequest(cookie, "invalid-proof", { currentPassword: password }));
+    const started = await startEnrollment(
+      startRequest(cookie, "invalid-proof", { currentPassword: password }),
+    );
     expect(started.status).toBe(403);
     expect(started.headers.get("Cache-Control")).toContain("no-store");
   });
@@ -169,7 +234,11 @@ describe("TOTP enrollment route handlers (real Better Auth + qrcode)", () => {
     const started = await startEnrollment(
       new Request("http://localhost:3000/api/identity/two-factor/enrollment", {
         method: "POST",
-        headers: new Headers({ origin: "http://localhost:3000", "sec-fetch-site": "same-origin", "content-type": "application/json" }),
+        headers: new Headers({
+          origin: "http://localhost:3000",
+          "sec-fetch-site": "same-origin",
+          "content-type": "application/json",
+        }),
         body: JSON.stringify({ currentPassword: password }),
       }),
     );
@@ -181,9 +250,14 @@ describe("TOTP enrollment route handlers (real Better Auth + qrcode)", () => {
     const { cookie, sessionId } = await signIn(email);
     const proof = csrfProof(sessionId);
     // Suspend after sign-in; the session guard must now deny sensitive actions.
-    await prisma.userAccount.update({ where: { normalizedEmail: email }, data: { state: "SUSPENDED" } });
+    await prisma.userAccount.update({
+      where: { normalizedEmail: email },
+      data: { state: "SUSPENDED" },
+    });
 
-    const started = await startEnrollment(startRequest(cookie, proof, { currentPassword: password }));
+    const started = await startEnrollment(
+      startRequest(cookie, proof, { currentPassword: password }),
+    );
     expect(started.status).toBe(401);
   });
 });

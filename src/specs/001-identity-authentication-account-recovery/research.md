@@ -4,14 +4,14 @@
 
 ## Version Baseline
 
-| Component | Planning pin | Primary source |
-|---|---:|---|
-| Better Auth | `better-auth@1.6.11` | [Better Auth releases](https://github.com/better-auth/better-auth/releases) |
-| Better Auth Prisma adapter | `@better-auth/prisma-adapter@1.6.11` | [Prisma adapter](https://www.better-auth.com/docs/adapters/prisma) |
-| Next.js | `next@16.2.9` | [Next.js releases](https://github.com/vercel/next.js/releases), [Route Handlers](https://nextjs.org/docs/app/getting-started/route-handlers) |
-| Prisma CLI/client | `prisma@7.7.0`, `@prisma/client@7.7.0` | [Prisma releases](https://github.com/prisma/prisma/releases), [release policy](https://www.prisma.io/docs/orm/more/releases) |
-| Resend Node SDK | `resend@6.17.2` | [resend-node releases](https://github.com/resend/resend-node/releases), [send API](https://resend.com/docs/api-reference/emails/send-email) |
-| React Email | Exact stable package versions are a blocking T002 compatibility outcome | [React Email releases](https://github.com/resend/react-email/releases) |
+| Component                  |                                                            Planning pin | Primary source                                                                                                                               |
+| -------------------------- | ----------------------------------------------------------------------: | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Better Auth                |                                                    `better-auth@1.6.11` | [Better Auth releases](https://github.com/better-auth/better-auth/releases)                                                                  |
+| Better Auth Prisma adapter |                                    `@better-auth/prisma-adapter@1.6.11` | [Prisma adapter](https://www.better-auth.com/docs/adapters/prisma)                                                                           |
+| Next.js                    |                                                           `next@16.2.9` | [Next.js releases](https://github.com/vercel/next.js/releases), [Route Handlers](https://nextjs.org/docs/app/getting-started/route-handlers) |
+| Prisma CLI/client          |                                  `prisma@7.7.0`, `@prisma/client@7.7.0` | [Prisma releases](https://github.com/prisma/prisma/releases), [release policy](https://www.prisma.io/docs/orm/more/releases)                 |
+| Resend Node SDK            |                                                         `resend@6.17.2` | [resend-node releases](https://github.com/resend/resend-node/releases), [send API](https://resend.com/docs/api-reference/emails/send-email)  |
+| React Email                | Exact stable package versions are a blocking T002 compatibility outcome | [React Email releases](https://github.com/resend/react-email/releases)                                                                       |
 
 The application manifest belongs at `apps/web/package.json`, registered by the root npm workspace. There must be one root `package-lock.json` and no nested lockfile. T002 must compatibility-test and select exact React Email package versions, then record them in the workspace manifest, root lockfile, and `checklists/dependency-compatibility.md` before any template, adapter, preview, or email integration task proceeds. No unbounded `latest` range is allowed.
 
@@ -49,15 +49,15 @@ The application manifest belongs at `apps/web/package.json`, registered by the r
 
 **Direct support vs extensions**:
 
-| Requirement | Classification |
-|---|---|
-| Database session, server validation, configured expiry, current logout, list, selected/all revocation | Verified Better Auth capability |
-| Independent 30-minute idle timeout | SmartHire `lastActivityAt` extension plus validation/touch hook; not claimed native |
-| Independent 7-day absolute timeout | Configure Better Auth expiry and enforce `createdAt + 7d` ceiling in SmartHire policy tests |
-| Five active sessions | SmartHire serialized session-cap service; not claimed native |
-| Password-reset revocation | SmartHire reset orchestration calls Better Auth all-session revocation |
-| Suspended/Deleted rejection/revocation | SmartHire account-state hooks/services plus scheduled cleanup |
-| Authentication audit events | SmartHire append-only audit hooks/services |
+| Requirement                                                                                           | Classification                                                                              |
+| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Database session, server validation, configured expiry, current logout, list, selected/all revocation | Verified Better Auth capability                                                             |
+| Independent 30-minute idle timeout                                                                    | SmartHire `lastActivityAt` extension plus validation/touch hook; not claimed native         |
+| Independent 7-day absolute timeout                                                                    | Configure Better Auth expiry and enforce `createdAt + 7d` ceiling in SmartHire policy tests |
+| Five active sessions                                                                                  | SmartHire serialized session-cap service; not claimed native                                |
+| Password-reset revocation                                                                             | SmartHire reset orchestration calls Better Auth all-session revocation                      |
+| Suspended/Deleted rejection/revocation                                                                | SmartHire account-state hooks/services plus scheduled cleanup                               |
+| Authentication audit events                                                                           | SmartHire append-only audit hooks/services                                                  |
 
 **Future JWT boundary**: JWT may later authorize service-to-service calls with a separate audience and principal. It is not part of this feature and cannot be accepted as a browser session.
 
@@ -68,7 +68,6 @@ The application manifest belongs at `apps/web/package.json`, registered by the r
 **Decision**: Better Auth is authoritative for TOTP enrollment/login/disablement and backup-code generation, storage, regeneration, and consumption. SmartHire does not create normalized `BackupCodeSet`/`BackupCode` ownership or a second TOTP implementation. Email OTP and trusted-device options are disabled.
 
 **Unverified/blocking details**: Documentation establishes ownership and nominal single-use behavior, but it does not prove that `1.6.11` encrypts TOTP/backup values at rest to SmartHire’s required standard or that concurrent submission is atomic through the Prisma adapter. Version-locked PostgreSQL tests and source/schema inspection are required. A SmartHire TOTP persistence-encryption extension may be introduced only if the spike proves it necessary, Better Auth integration supports it safely, and an approved ADR documents it. The extension must preserve Better Auth ownership and must not create parallel TOTP or backup-code storage.
-
 
 ### Local QR decision
 

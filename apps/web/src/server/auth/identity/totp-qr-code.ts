@@ -59,13 +59,17 @@ function assertOtpauthUri(uri: unknown): URL {
   return parsed;
 }
 
-function normalizeOptions(options: TotpQrOptions = {}): Required<TotpQrOptions> {
+function normalizeOptions(
+  options: TotpQrOptions = {},
+): Required<TotpQrOptions> {
   const width = options.width ?? 240;
   const margin = options.margin ?? 4;
   const errorCorrectionLevel = options.errorCorrectionLevel ?? "M";
 
-  if (!Number.isInteger(width) || width < MIN_WIDTH || width > MAX_WIDTH) throw new TotpQrError();
-  if (!Number.isInteger(margin) || margin < 0 || margin > MAX_MARGIN) throw new TotpQrError();
+  if (!Number.isInteger(width) || width < MIN_WIDTH || width > MAX_WIDTH)
+    throw new TotpQrError();
+  if (!Number.isInteger(margin) || margin < 0 || margin > MAX_MARGIN)
+    throw new TotpQrError();
   if (!VALID_LEVELS.has(errorCorrectionLevel)) throw new TotpQrError();
 
   return { width, margin, errorCorrectionLevel };
@@ -75,7 +79,10 @@ function normalizeOptions(options: TotpQrOptions = {}): Required<TotpQrOptions> 
  * Renders the supplied otpauth URI to a PNG data URL. The URI and secret never
  * leave this function; on any failure a generic {@link TotpQrError} is thrown.
  */
-export async function renderTotpQrCode(otpauthUri: string, options: TotpQrOptions = {}): Promise<string> {
+export async function renderTotpQrCode(
+  otpauthUri: string,
+  options: TotpQrOptions = {},
+): Promise<string> {
   const validated = assertOtpauthUri(otpauthUri);
   const rendering = normalizeOptions(options);
   try {
@@ -123,7 +130,12 @@ export function parseTotpManualSetup(otpauthUri: string): TotpManualSetup {
 export async function buildTotpSetup(
   otpauthUri: string,
   options: TotpQrOptions = {},
-): Promise<{ qrCodeDataUrl: string; manualKey: string; issuer: string; accountLabel: string }> {
+): Promise<{
+  qrCodeDataUrl: string;
+  manualKey: string;
+  issuer: string;
+  accountLabel: string;
+}> {
   const qrCodeDataUrl = await renderTotpQrCode(otpauthUri, options);
   const manual = parseTotpManualSetup(otpauthUri);
   return { qrCodeDataUrl, ...manual };

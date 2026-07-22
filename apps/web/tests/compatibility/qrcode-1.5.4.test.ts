@@ -24,7 +24,9 @@ function reconstructFromSegments(uri: string): string {
 describe("qrcode 1.5.4 compatibility gate (real library)", () => {
   it("resolves the exact pinned versions from the sole root lockfile", () => {
     const qrcodePkg = require("qrcode/package.json") as { version: string };
-    const typesPkg = require("@types/qrcode/package.json") as { version: string };
+    const typesPkg = require("@types/qrcode/package.json") as {
+      version: string;
+    };
     expect(qrcodePkg.version).toBe("1.5.4");
     expect(typesPkg.version).toBe("1.5.6");
   });

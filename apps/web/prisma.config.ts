@@ -6,5 +6,8 @@ loadEnvironment({ path: ".env.local", quiet: true });
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: { path: "prisma/migrations" },
-  datasource: { url: env("DIRECT_URL"), shadowDatabaseUrl: process.env.SHADOW_DATABASE_URL },
+  datasource: {
+    url: env("DIRECT_URL"),
+    shadowDatabaseUrl: process.env.SHADOW_DATABASE_URL,
+  },
 });
