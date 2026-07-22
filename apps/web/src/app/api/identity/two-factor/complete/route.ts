@@ -11,11 +11,15 @@ import {
 } from "@/server/auth/identity/pre-auth-cookie";
 import { CompleteTwoFactorService } from "@/server/services/identity/complete-two-factor";
 export async function POST(request: Request) {
-  const safe = () =>
-    Response.json(
+  const safe = (status = 401, retryAfterSeconds?: number) => {
+    const headers = new Headers(noStoreHeaders);
+    if (retryAfterSeconds !== undefined)
+      headers.set("Retry-After", String(retryAfterSeconds));
+    return Response.json(
       { message: TWO_FACTOR_GENERIC_ERROR },
-      { status: 401, headers: noStoreHeaders },
+      { status, headers },
     );
+  };
   if (!validateSameOrigin(request, serverEnvironment.NEXT_PUBLIC_APP_URL))
     return Response.json(
       { message: "Request rejected." },
@@ -35,6 +39,8 @@ export async function POST(request: Request) {
     parsed.data.factor,
   );
   if (!result) return safe();
+  if ("rateLimited" in result)
+    return safe(429, result.retryAfterSeconds);
   const headers = new Headers(noStoreHeaders);
   headers.append("Set-Cookie", result.sessionCookie);
   headers.append("Set-Cookie", clearPreAuthCookie());

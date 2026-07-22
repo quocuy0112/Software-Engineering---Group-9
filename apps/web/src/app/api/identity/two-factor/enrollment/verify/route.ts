@@ -39,11 +39,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const subject =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
   const result = await new EnrollTotpService().verify(parsed.data.code, {
     headers: request.headers,
-    subject,
+    subject: current.userId,
   });
   if (!result.ok) {
     const headers = new Headers(noStoreHeaders);

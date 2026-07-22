@@ -1,5 +1,9 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
+import {
+  rateLimitPolicies,
+  safeRetryMetadata,
+} from "@/lib/rate-limit/policies";
 import { BetterAuthSessionGateway } from "@/server/auth/identity/better-auth-session-gateway";
 import { BetterAuthTwoFactorGateway } from "@/server/auth/identity/better-auth-two-factor-gateway";
 import {
@@ -9,7 +13,11 @@ import {
 import { PrismaPreAuthRepository } from "@/server/repositories/identity/prisma-pre-auth-repository";
 import { PrismaSessionPolicyRepository } from "@/server/repositories/identity/prisma-session-policy-repository";
 import { PrismaAuditRepository } from "@/server/repositories/audit/prisma-audit-repository";
+import { PrismaRateLimitRepository } from "@/server/repositories/rate-limit/prisma-rate-limit-repository";
 import { SessionService } from "./session-service";
+type CompletionResult =
+  | { sessionCookie: string }
+  | { rateLimited: true; retryAfterSeconds: number };
 export class CompleteTwoFactorService {
   constructor(
     private challenges = new PrismaPreAuthRepository(),
@@ -17,6 +25,7 @@ export class CompleteTwoFactorService {
     private sessions = new PrismaSessionPolicyRepository(),
     private audit = new PrismaAuditRepository(),
     private backupGateway = new BetterAuthTwoFactorGateway(),
+    private limiter = new PrismaRateLimitRepository(),
   ) {}
   async execute(
     cookie: string,
@@ -24,9 +33,19 @@ export class CompleteTwoFactorService {
     headers: Headers,
     now = new Date(),
     factor: "totp" | "backup-code" = "totp",
-  ) {
+  ): Promise<CompletionResult | null> {
     const state = decodePreAuth(cookie);
     if (!state) return null;
+    const decision = await this.limiter.consume({
+      ...rateLimitPolicies.totpChallenge,
+      subject: `challenge:${state.handle}`,
+      now,
+    });
+    if (!decision.allowed)
+      return {
+        rateLimited: true,
+        retryAfterSeconds: safeRetryMetadata(decision).retryAfterSeconds,
+      };
     const claim = await this.challenges.claimAttempt(
       state.handle,
       state.binding,

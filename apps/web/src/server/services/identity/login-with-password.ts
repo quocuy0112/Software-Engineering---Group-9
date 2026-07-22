@@ -15,6 +15,7 @@ import {
   setPreAuthCookie,
 } from "@/server/auth/identity/pre-auth-cookie";
 import { SessionService } from "./session-service";
+import { noStoreHeaders } from "@/lib/security/response-headers";
 export const GENERIC_LOGIN_ERROR = "Email or password is incorrect.";
 const cookieValue = (line: string) =>
   line.slice(line.indexOf("=") + 1, line.indexOf(";"));
@@ -43,6 +44,7 @@ export class LoginWithPasswordService {
         {
           status: 429,
           headers: {
+            ...noStoreHeaders,
             "Retry-After": String(safeRetryMetadata(d).retryAfterSeconds),
           },
         },
@@ -64,7 +66,10 @@ export class LoginWithPasswordService {
       (!session && !provisional)
     ) {
       await this.record("login.failed", "FAILURE", cid, now, account?.id);
-      return Response.json({ message: GENERIC_LOGIN_ERROR }, { status: 401 });
+      return Response.json(
+        { message: GENERIC_LOGIN_ERROR },
+        { status: 401, headers: noStoreHeaders },
+      );
     }
     const headers = new Headers({
       "Content-Type": "application/json",
@@ -89,7 +94,10 @@ export class LoginWithPasswordService {
       );
     }
     if (!session)
-      return Response.json({ message: GENERIC_LOGIN_ERROR }, { status: 401 });
+      return Response.json(
+        { message: GENERIC_LOGIN_ERROR },
+        { status: 401, headers: noStoreHeaders },
+      );
     for (const c of cookies) headers.append("Set-Cookie", c);
     await new SessionService(this.sessions).enforceCreated(account.id);
     await this.record("login.succeeded", "SUCCESS", cid, now, account.id);

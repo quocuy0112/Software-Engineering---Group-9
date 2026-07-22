@@ -203,6 +203,34 @@ describe("TOTP enrollment route handlers (real Better Auth + qrcode)", () => {
     ).toBe(false);
   });
 
+  it("limits enrollment verification to five account-bound attempts", async () => {
+    const email = await activeAccount();
+    const { cookie, sessionId } = await signIn(email);
+    const proof = csrfProof(sessionId);
+
+    const started = await startEnrollment(
+      startRequest(cookie, proof, { currentPassword: password }),
+    );
+    expect(started.status).toBe(200);
+
+    const responses: Response[] = [];
+    for (let attempt = 0; attempt < 6; attempt += 1)
+      responses.push(
+        await verifyEnrollment(
+          verifyRequest(cookie, proof, { code: "000000" }),
+        ),
+      );
+
+    expect(responses.slice(0, 5).every(({ status }) => status === 401)).toBe(
+      true,
+    );
+    expect(responses[5]?.status).toBe(429);
+    expect(responses[5]?.headers.get("Retry-After")).toMatch(/^\d+$/);
+    expect(await responses[5]?.json()).toEqual({
+      message: "That code could not be verified.",
+    });
+  });
+
   it("rejects enrollment start with a wrong current password", async () => {
     const email = await activeAccount();
     const { cookie, sessionId } = await signIn(email);

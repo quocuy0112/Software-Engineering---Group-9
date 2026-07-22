@@ -1,17 +1,15 @@
 import { registrationSchema } from "@/features/identity/schemas/registration";
 import { serverEnvironment } from "@/lib/env/runtime";
+import { validateSameOrigin } from "@/lib/security/csrf";
+import { noStoreHeaders } from "@/lib/security/response-headers";
 import { RegisterAccountService } from "@/server/services/identity/register-account";
 
-function trustedRequest(request: Request) {
-  const origin = request.headers.get("origin");
-  return (
-    !origin || origin === new URL(serverEnvironment.NEXT_PUBLIC_APP_URL).origin
-  );
-}
-
 export async function POST(request: Request) {
-  if (!trustedRequest(request))
-    return Response.json({ message: "Request rejected." }, { status: 403 });
+  if (!validateSameOrigin(request, serverEnvironment.NEXT_PUBLIC_APP_URL))
+    return Response.json(
+      { message: "Request rejected." },
+      { status: 403, headers: noStoreHeaders },
+    );
   const parsed = registrationSchema.safeParse(
     await request.json().catch(() => null),
   );
@@ -21,17 +19,14 @@ export async function POST(request: Request) {
         message: "Review the highlighted fields.",
         fields: parsed.error.flatten().fieldErrors,
       },
-      { status: 400 },
+      { status: 400, headers: noStoreHeaders },
     );
-  const subject =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
   const outcome = await new RegisterAccountService().execute(parsed.data, {
-    subject,
+    subject: "anonymous",
   });
-  const headers =
-    !outcome.accepted && outcome.retryAfterSeconds
-      ? { "Retry-After": String(outcome.retryAfterSeconds) }
-      : undefined;
+  const headers = new Headers(noStoreHeaders);
+  if (!outcome.accepted && outcome.retryAfterSeconds)
+    headers.set("Retry-After", String(outcome.retryAfterSeconds));
   return Response.json(
     { message: outcome.message },
     { status: outcome.accepted ? 202 : outcome.status, headers },

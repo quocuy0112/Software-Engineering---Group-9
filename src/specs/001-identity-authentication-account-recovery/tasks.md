@@ -173,9 +173,9 @@ All database-dependent work from T015 through T035 uses the healthy PostgreSQL 1
 
 ## Phase 12: Workflow security wiring
 
-- [ ] T106 Wire registration/resend throttling in `apps/web/src/app/api/identity/register/route.ts` and `apps/web/src/app/api/identity/verification/resend/route.ts` | Deps: T039, T045, T105 | Parallel: No | Story: US1, US2 | Done when: limits block without enumeration.
-- [ ] T107 Wire login/OTP attempt limits in `apps/web/src/app/api/identity/login/route.ts` and `apps/web/src/app/api/identity/two-factor/complete/route.ts` | Deps: T053, T074, T105 | Parallel: No | Story: US3, US5 | Done when: IP/account/challenge limits and five attempts are generic.
-- [ ] T108 Wire forgot/enrollment limits in `apps/web/src/app/api/identity/password/forgot/route.ts` and `apps/web/src/app/api/identity/two-factor/enrollment/verify/route.ts` | Deps: T090, T066, T105 | Parallel: No | Story: US4, US7 | Done when: windows and minimum resend intervals pass.
+- [x] T106 Wire registration/resend throttling in `apps/web/src/app/api/identity/register/route.ts` and `apps/web/src/app/api/identity/verification/resend/route.ts` | Deps: T039, T045, T105 | Parallel: No | Story: US1, US2 | Done when: limits block without enumeration.
+- [x] T107 Wire login/OTP attempt limits in `apps/web/src/app/api/identity/login/route.ts` and `apps/web/src/app/api/identity/two-factor/complete/route.ts` | Deps: T053, T074, T105 | Parallel: No | Story: US3, US5 | Done when: IP/account/challenge limits and five attempts are generic.
+- [x] T108 Wire forgot/enrollment limits in `apps/web/src/app/api/identity/password/forgot/route.ts` and `apps/web/src/app/api/identity/two-factor/enrollment/verify/route.ts` | Deps: T090, T066, T105 | Parallel: No | Story: US4, US7 | Done when: windows and minimum resend intervals pass.
 
 ## Phase 13: Authentication audit integration
 
