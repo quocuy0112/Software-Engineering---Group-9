@@ -88,6 +88,14 @@ export class EnrollTotpService {
 
     const recent = await this.recentAuth.execute(currentPassword, request);
     if (!recent.ok) {
+      await this.record(
+        "totp.enrollment_started",
+        recent.status === 429 ? "DENIED" : "FAILURE",
+        correlationId,
+        now,
+        null,
+        "recent_auth_failed",
+      );
       return {
         ok: false,
         status: recent.status,

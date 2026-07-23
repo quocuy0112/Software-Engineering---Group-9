@@ -42,8 +42,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const subject =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
+  // The authenticated account is a stable server-derived limiter subject.
+  // Never trust a browser-supplied forwarding header for production policy.
+  const subject = `user:${current.userId}`;
   const result = await new EnrollTotpService().start(
     parsed.data.currentPassword,
     { headers: request.headers, subject },

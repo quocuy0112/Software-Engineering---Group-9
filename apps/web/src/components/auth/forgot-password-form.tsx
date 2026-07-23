@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { PASSWORD_RECOVERY_GENERIC_RESPONSE } from "@/features/identity/schemas/password-recovery";
+import { AuthStatus } from "./auth-status";
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
@@ -47,7 +48,7 @@ export function ForgotPasswordForm() {
         <button type="submit" disabled={busy || email.trim().length === 0}>
           {busy ? "Sending…" : "Send reset instructions"}
         </button>
-        <p role="status" aria-live="polite">{status}</p>
+        <AuthStatus status={status} />
         <Link href="/login">Back to sign in</Link>
       </form>
     </section>

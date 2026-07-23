@@ -19,6 +19,7 @@ body {
   display: grid;
   place-items: center;
   padding: 1rem;
+  overflow-x: hidden;
 }
 .auth-card {
   width: min(100%, 32rem);
@@ -163,6 +164,7 @@ body {
 .workspace-page {
   min-height: 100dvh;
   padding: clamp(0.75rem, 3vw, 2rem);
+  overflow-x: hidden;
 }
 .workspace-header {
   width: min(100%, 72rem);

@@ -23,13 +23,41 @@ export class RegenerateBackupCodesService {
     const now = request.now ?? new Date(),
       cid = randomUUID(),
       recent = await this.recent.execute(currentPassword, request);
-    if (!recent.ok) return recent;
+    if (!recent.ok) {
+      await this.audit
+        .append({
+          occurredAt: now,
+          actorType: "anonymous",
+          action: "backup_codes.regenerated",
+          targetType: "request",
+          result: recent.status === 429 ? "DENIED" : "FAILURE",
+          correlationId: cid,
+          context: { reason: "recent_auth_failed" },
+        })
+        .catch(() => undefined);
+      return recent;
+    }
     if (
       !(await this.gateway
         .verifyInitialTotp(request.headers, code)
         .catch(() => false))
-    )
+    ) {
+      await this.audit
+        .append({
+          occurredAt: now,
+          actorType: "user",
+          actorUserId: recent.userId,
+          actorSessionId: recent.sessionId,
+          action: "backup_codes.regenerated",
+          targetType: "two_factor",
+          targetId: recent.userId,
+          result: "FAILURE",
+          correlationId: cid,
+          context: { reason: "invalid_code" },
+        })
+        .catch(() => undefined);
       return { ok: false, status: 401 };
+    }
     try {
       const codes = await this.gateway.regenerateBackupCodes(
         request.headers,

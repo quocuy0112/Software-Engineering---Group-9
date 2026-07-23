@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { PASSWORD_RESET_GENERIC_ERROR } from "@/features/identity/schemas/password-recovery";
+import { AuthStatus } from "./auth-status";
 
 export function ResetPasswordForm() {
   const [token, setToken] = useState(() => {
@@ -84,9 +85,7 @@ export function ResetPasswordForm() {
         >
           {busy ? "Resetting…" : "Reset password"}
         </button>
-        <p role="status" aria-live="polite">
-          {status}
-        </p>
+        <AuthStatus status={status} tone={status === PASSWORD_RESET_GENERIC_ERROR ? "error" : "success"} />
         <Link href="/login">Back to sign in</Link>
       </form>
     </section>

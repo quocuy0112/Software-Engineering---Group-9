@@ -34,24 +34,33 @@ export class CompleteTwoFactorService {
     now = new Date(),
     factor: "totp" | "backup-code" = "totp",
   ): Promise<CompletionResult | null> {
+    const correlationId = randomUUID();
     const state = decodePreAuth(cookie);
-    if (!state) return null;
+    if (!state) {
+      await this.record("FAILURE", undefined, now, factor, "invalid_cookie", correlationId);
+      return null;
+    }
     const decision = await this.limiter.consume({
       ...rateLimitPolicies.totpChallenge,
       subject: `challenge:${state.handle}`,
       now,
     });
-    if (!decision.allowed)
+    if (!decision.allowed) {
+      await this.record("DENIED", undefined, now, factor, "throttled", correlationId);
       return {
         rateLimited: true,
         retryAfterSeconds: safeRetryMetadata(decision).retryAfterSeconds,
       };
+    }
     const claim = await this.challenges.claimAttempt(
       state.handle,
       state.binding,
       now,
     );
-    if (!claim) return null;
+    if (!claim) {
+      await this.record("FAILURE", undefined, now, factor, "invalid_or_bound_challenge", correlationId);
+      return null;
+    }
     const forwarded = new Headers(headers);
     forwarded.set("cookie", providerCookieHeader(state.binding));
     let session: string | null = null;
@@ -75,7 +84,7 @@ export class CompleteTwoFactorService {
     }
     if (!session) {
       await this.challenges.releaseFailed(claim.id, claim.claimTime);
-      await this.record("FAILURE", claim.userId, now);
+      await this.record("FAILURE", claim.userId, now, factor, "factor_rejected", correlationId);
       return null;
     }
     const step =
@@ -90,30 +99,37 @@ export class CompleteTwoFactorService {
     ) {
       const h = new Headers({ cookie: session.split(";", 1)[0] });
       await this.gateway.signOut(h).catch(() => null);
+      await this.record("FAILURE", claim.userId, now, factor, "challenge_finalize_failed", correlationId);
       return null;
     }
     await new SessionService(this.sessions).enforceCreated(claim.userId);
-    await this.record("SUCCESS", claim.userId, now);
+    await this.record("SUCCESS", claim.userId, now, factor, "verified", correlationId);
     return { sessionCookie: session };
   }
   private record(
-    result: "SUCCESS" | "FAILURE",
-    userId: string,
+    result: "SUCCESS" | "FAILURE" | "DENIED",
+    userId: string | undefined,
     occurredAt: Date,
+    factor: "totp" | "backup-code",
+    reason: string,
+    correlationId: string,
   ) {
+    const action =
+      factor === "backup-code"
+        ? "backup_code.consumed"
+        : result === "SUCCESS"
+          ? "totp.challenge_succeeded"
+          : "totp.challenge_failed";
     return this.audit
       .append({
         occurredAt,
         actorType: "anonymous",
-        action:
-          result === "SUCCESS"
-            ? "totp.challenge_succeeded"
-            : "totp.challenge_failed",
+        action,
         targetType: "two_factor",
-        targetId: userId,
+        targetId: userId ?? null,
         result,
-        correlationId: randomUUID(),
-        context: { reason: result === "SUCCESS" ? "verified" : "rejected" },
+        correlationId,
+        context: { reason },
       })
       .catch(() => undefined);
   }

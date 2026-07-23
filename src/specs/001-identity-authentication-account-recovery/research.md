@@ -106,7 +106,7 @@ Gmail port 587 uses STARTTLS with `secure=false` and required TLS; optional port
 
 ## Decision: UI and Client State
 
-Tailwind CSS and shadcn/ui are the baseline; React Hook Form and Zod cover forms and validation. Sonner provides supplemental feedback only; inline errors and an accessible summary remain persistent. TanStack Query is added only for a documented server-state benefit. Zustand is optional for non-sensitive shared UI state only. Motion is nonessential and reduced-motion safe. Lenis is not used on authentication pages.
+Tailwind CSS and shadcn/ui are the baseline; React Hook Form and Zod cover forms and validation. Sonner provides supplemental feedback only; inline errors and an accessible summary remain persistent. TanStack Query is limited to the documented server-state benefit of sanitized session-list/revoke and verification-resend mutations. The exact approved package is `@tanstack/react-query` `5.101.4`; query keys, cached values, and mutation payloads exclude passwords, tokens, TOTP codes, backup codes, and secret-bearing responses. Zustand is optional for non-sensitive shared UI state only. Motion is nonessential and reduced-motion safe. Lenis is not used on authentication pages.
 
 ## Decision: Server-First Identity Navigation Shells
 

@@ -9,11 +9,12 @@
 - [x] `npm ls nodemailer @types/nodemailer next --workspace @smarthire/web --depth=0` resolves Nodemailer 9.0.3, @types/nodemailer 8.0.1, and Next.js 16.2.9 under Node.js 24.18.0/npm 11.16.0.
 - [x] Nodemailer is approved only for server-side SMTP adapter use behind EmailService; capture remains the generated default and Resend remains production-oriented.
 - [x] React Email components are pinned exactly and resolve from the root lockfile.
+- [x] TanStack Query is pinned exactly to `5.101.4`; its real QueryClient compatibility test passes, and usage is restricted to sanitized session/resend operations with no credential, token, code, or secret in query keys, cached values, or mutation variables. The audit total remains the existing 4 moderate/3 high baseline.
 - [x] The repository contains exactly one root package lock.
 - [x] Prisma adapter-pg 7.7.0 and PostgreSQL driver 8.16.3 resolve from the root lockfile.
 - [x] Vitest is pinned to 4.1.10, resolving the prior critical development-server advisory.
 - [x] PostCSS is pinned to 8.5.10; remaining nested findings are recorded by npm audit.
-- [x] Current `npm audit` assessment (2026-07-21): 0 critical, 1 accepted high, 5 moderate, 0 low; no Nodemailer finding. The Better Auth high finding remains governed by `checklists/npm-security-exception.md`; moderate findings affect Next/PostCSS and Prisma development tooling. No `npm audit fix --force` was run.
+- [x] Current `npm audit` assessment (2026-07-22): 0 critical, 3 accepted high dependency nodes, 4 moderate, 0 low; no Nodemailer, QR, React Email, or TanStack Query finding. Better Auth OIDC/MCP and Next.js transitive sharp/libvips findings are governed by `checklists/npm-security-exception.md`; the enabled identity runtime exposes neither affected feature. No `npm audit fix --force` was run.
 - [x] Executable compatibility tests cover SMTP 587/465 modes, malformed username/from/header injection, safe auth/timeout classification, PostgreSQL concurrent claims, deterministic retry/restart/DEAD transitions, terminal non-redelivery, duplicate prevention, and capture/Resend regressions. Full Vitest passed 75/75 and lifecycle Playwright passed 2/2 on 2026-07-21.
 
 ## TOTP QR dependency approval

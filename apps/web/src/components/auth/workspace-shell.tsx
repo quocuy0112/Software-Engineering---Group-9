@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { WorkspaceNavigation } from "./workspace-navigation";
+import { AuthStatus } from "./auth-status";
 
 export function WorkspaceShell({
   children,
@@ -43,9 +44,7 @@ export function WorkspaceShell({
         </Link>
         <WorkspaceNavigation busy={busy} onSignOut={() => void signOut()} />
       </header>
-      <p className="workspace-status" role="status" aria-live="polite">
-        {status}
-      </p>
+      <div className="workspace-status"><AuthStatus status={status} tone="error" /></div>
       <section className="workspace-content">{children}</section>
     </main>
   );

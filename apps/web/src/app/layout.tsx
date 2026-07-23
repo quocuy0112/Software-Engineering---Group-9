@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { serverEnvironment } from "@/lib/env/runtime";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "SmartHire",
@@ -14,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-app-environment={serverEnvironment.APP_ENV}>
       <body suppressHydrationWarning>
-        {children}
+        <Providers>{children}</Providers>
         <Toaster richColors />
       </body>
     </html>

@@ -59,6 +59,32 @@ If direct database inspection is needed, run the PostgreSQL client inside the co
 
 Run root npm workspace scripts for type checking, linting, unit tests, OpenAPI contract tests, Compose PostgreSQL integration tests, component/accessibility tests, production build, and browser E2E tests. All application commands target `apps/web/`, Prisma commands execute from that workspace, and the only lockfile remains at the repository root. Expected results:
 
+From the repository root, the reproducible release sequence is:
+
+```bash
+npm run env:check
+npm run db:verify
+npm run typecheck
+npm run lint
+npm test
+npm run test:e2e --workspace @smarthire/web -- --project=desktop-chromium
+npm run test:e2e --workspace @smarthire/web -- --project=mobile-320
+npm run build
+npm run perf:pages --workspace @smarthire/web
+```
+
+The E2E command starts and stops the configured local Next.js/worker stack. The performance command expects `npm run dev:web` to be running in another terminal and measures 100 warm Chromium navigations per public identity page by default.
+
+### Troubleshooting
+
+- If Compose is unavailable, start Docker Desktop and rerun `npm run db:up`; do not install or fall back to host PostgreSQL.
+- If port `55432` is occupied, stop the conflicting local process instead of silently changing the approved port.
+- If Prisma reports unapplied migrations or drift, run `npm run db:verify` and follow `docs/operations/database-migrations.md`; never edit an applied migration.
+- If E2E startup reports port `3000` in use, stop the existing development server before rerunning because Playwright intentionally sets `reuseExistingServer=false`.
+- If captured mail does not appear, confirm `EMAIL_ADAPTER=capture`, the capture directory is writable, and the worker is running. Do not switch to SMTP/Resend to fix local acceptance.
+- If Playwright browsers are missing, install the pinned Chromium binary for the existing Playwright version, then rerun the same workspace command.
+
+
 - no Pages Router API Route or FastAPI application backend exists;
 - no browser JWT, Better Auth JWT plugin, second browser-session cookie, duplicate `Session`, or `tokenDigest` substitution for Better Auth `Session.token` exists;
 - no output includes passwords, cookies/session tokens, token URLs, TOTP secrets/codes, backup codes, or raw rate-limit subjects;

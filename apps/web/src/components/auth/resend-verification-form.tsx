@@ -1,25 +1,32 @@
 "use client";
 
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { AuthStatus } from "./auth-status";
+import { resendVerificationMutationOptions } from "@/features/identity/client/query-options";
 
 export function ResendVerificationForm() {
   const [status, setStatus] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [email, setEmail] = useState("");
+  const resend = useMutation(
+    resendVerificationMutationOptions(async () => {
+      const response = await fetch("/api/identity/verification/resend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const result = (await response.json()) as { message: string };
+      setStatus(result.message);
+      return { ok: response.ok };
+    }),
+  );
+  const busy = resend.isPending;
   return (
     <form
       onSubmit={async (event) => {
         event.preventDefault();
         if (busy) return;
-        setBusy(true);
-        const data = new FormData(event.currentTarget);
-        const response = await fetch("/api/identity/verification/resend", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: data.get("email") }),
-        });
-        const result = (await response.json()) as { message: string };
-        setStatus(result.message);
-        setBusy(false);
+        resend.mutate();
       }}
     >
       <label htmlFor="resend-email">Email address</label>
@@ -28,14 +35,14 @@ export function ResendVerificationForm() {
         name="email"
         type="email"
         autoComplete="email"
+        value={email}
+        onChange={(event) => setEmail(event.target.value)}
         required
       />
       <button disabled={busy} type="submit">
         {busy ? "Sending…" : "Resend verification"}
       </button>
-      <p role="status" aria-live="polite">
-        {status}
-      </p>
+      <AuthStatus status={status} />
     </form>
   );
 }

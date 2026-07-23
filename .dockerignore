@@ -1,0 +1,16 @@
+.git/
+node_modules/
+**/node_modules/
+**/.next/
+**/out/
+**/dist/
+**/build/
+**/coverage/
+**/test-results/
+**/playwright-report/
+**/.local/
+*.log
+logs/
+.env
+.env.*
+apps/web/.env.local

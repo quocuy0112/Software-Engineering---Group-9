@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { AuthStatus } from "./auth-status";
 export function TwoFactorManagement() {
   const [proof, setProof] = useState(""),
     [password, setPassword] = useState(""),
@@ -105,9 +106,7 @@ export function TwoFactorManagement() {
           </button>
         </div>
       ) : null}
-      <p role="status" aria-live="polite">
-        {status}
-      </p>
+      <AuthStatus status={status} tone={status.includes("could not") ? "error" : "success"} />
     </section>
   );
 }

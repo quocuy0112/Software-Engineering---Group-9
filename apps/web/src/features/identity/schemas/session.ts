@@ -1,5 +1,11 @@
 import { z } from "zod";
-export const sessionReferenceSchema = z.string().uuid();
+
+export const sessionReferenceSchema = z
+  .string()
+  .min(20)
+  .max(64)
+  .regex(/^[A-Za-z0-9_-]+$/);
+
 export const publicSessionSchema = z
   .object({
     reference: sessionReferenceSchema,
@@ -10,5 +16,6 @@ export const publicSessionSchema = z
     approximateLocation: z.string().max(80),
   })
   .strict();
+
 export const publicSessionsSchema = z.array(publicSessionSchema);
 export type PublicSession = z.infer<typeof publicSessionSchema>;

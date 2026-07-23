@@ -1,48 +1,43 @@
 "use client";
-import { useEffect, useState } from "react";
-import type { PublicSession } from "@/features/identity/schemas/session";
+
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  revokeSessionMutationOptions,
+  sessionListQueryOptions,
+} from "@/features/identity/client/query-options";
+import { AuthStatus } from "./auth-status";
 
 export function SessionList() {
-  const [sessions, setSessions] = useState<PublicSession[]>([]),
-    [proof, setProof] = useState(""),
-    [status, setStatus] = useState("Loading sessions.");
-  async function load(signal?: AbortSignal) {
-    const response = await fetch("/api/identity/sessions", {
-      cache: "no-store",
-      signal,
-    });
-    if (!response.ok) {
-      setStatus("Unable to load sessions.");
-      return;
-    }
-    const body = (await response.json()) as {
-      sessions: PublicSession[];
-      csrfProof: string;
-    };
-    setSessions(body.sessions);
-    setProof(body.csrfProof);
-    setStatus("");
-  }
-  useEffect(() => {
-    const controller = new AbortController();
-    const timer = setTimeout(() => void load(controller.signal), 0);
-    return () => {
-      clearTimeout(timer);
-      controller.abort();
-    };
-  }, []);
-  async function revoke(reference: string) {
-    const response = await fetch(`/api/identity/sessions/${reference}`, {
-      method: "DELETE",
-      headers: { "x-csrf-token": proof },
-    });
-    setStatus(response.ok ? "Session revoked." : "Unable to revoke session.");
-    if (response.ok) await load();
-  }
+  const [proof, setProof] = useState("");
+  const queryClient = useQueryClient();
+  const sessionsQuery = useQuery(sessionListQueryOptions(setProof));
+  const revokeMutation = useMutation({
+    ...revokeSessionMutationOptions(proof),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["identity", "sessions"],
+      });
+    },
+  });
+  const sessions = sessionsQuery.data ?? [];
+  const status = sessionsQuery.isPending
+    ? "Loading sessions."
+    : sessionsQuery.isError
+      ? "Unable to load sessions."
+      : revokeMutation.isSuccess
+        ? "Session revoked."
+        : revokeMutation.isError
+          ? "Unable to revoke session."
+          : "";
+
   return (
     <section>
       <h1>Sessions</h1>
-      <p role="status">{status}</p>
+      <AuthStatus
+        status={status}
+        tone={status.startsWith("Unable") ? "error" : "message"}
+      />
       <ul>
         {sessions.map((session) => (
           <li key={session.reference}>
@@ -57,7 +52,8 @@ export function SessionList() {
             {!session.current ? (
               <button
                 type="button"
-                onClick={() => void revoke(session.reference)}
+                onClick={() => revokeMutation.mutate(session.reference)}
+                disabled={revokeMutation.isPending}
               >
                 Revoke session
               </button>

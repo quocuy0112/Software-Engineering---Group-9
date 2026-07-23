@@ -10,6 +10,9 @@ import { identityCookiePolicy } from "@/lib/security/cookies";
 import { encodePreAuth } from "@/server/auth/identity/pre-auth-cookie";
 import { PrismaRateLimitRepository } from "@/server/repositories/rate-limit/prisma-rate-limit-repository";
 import { serverEnvironment } from "@/lib/env/runtime";
+import { trustedInternalRedirect } from "@/lib/security/trusted-redirect";
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
 
 const repository = new PrismaRateLimitRepository();
 const subjects: Array<{ scope: string; subject: string }> = [];
@@ -50,6 +53,50 @@ afterEach(async () => {
 });
 
 describe("workflow security throttling route wiring", () => {
+  it("rejects cross-origin writes, unsafe redirects, and forwarded-header limit bypass", async () => {
+    const crossOrigin = await register(
+      new Request(`${origin}/api/identity/register`, {
+        method: "POST",
+        headers: {
+          origin: "https://attacker.example",
+          "sec-fetch-site": "cross-site",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({}),
+      }),
+    );
+    expect(crossOrigin.status).toBe(403);
+    expect(trustedInternalRedirect("https://attacker.example/path", origin)).toBe("/");
+    expect(trustedInternalRedirect("//attacker.example/path", origin)).toBe("/");
+
+    const email = `forwarded-${randomUUID()}@example.test`;
+    subjects.push({ scope: "registration", subject: `anonymous:${email}` });
+    const responses = [];
+    for (let index = 0; index < 6; index += 1) {
+      responses.push(
+        await register(
+          request(
+            "/api/identity/register",
+            {
+              name: "Forwarded Attempt",
+              email,
+              password: "smarthire1234",
+              passwordConfirmation: "smarthire1234",
+            },
+            { "x-forwarded-for": `203.0.113.${index + 1}` },
+          ),
+        ),
+      );
+    }
+    expect(responses.at(-1)?.status).toBe(429);
+
+    const managementSources = await Promise.all([
+      "two-factor/enrollment/route.ts",
+      "two-factor/backup-codes/regenerate/route.ts",
+      "two-factor/disable/route.ts",
+    ].map((file) => readFile(resolve(process.cwd(), "src/app/api/identity", file), "utf8")));
+    expect(managementSources.join("\n")).not.toContain("x-forwarded-for");
+  });
   it("throttles registration and resend without account enumeration", async () => {
     const registrationEmail = `limit-${randomUUID()}@example.test`;
     const registrationSubject = `anonymous:${registrationEmail}`;

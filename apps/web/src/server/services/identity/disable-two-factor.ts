@@ -23,7 +23,20 @@ export class DisableTwoFactorService {
     const now = request.now ?? new Date(),
       cid = randomUUID(),
       recent = await this.recent.execute(currentPassword, request);
-    if (!recent.ok) return recent;
+    if (!recent.ok) {
+      await this.audit
+        .append({
+          occurredAt: now,
+          actorType: "anonymous",
+          action: "totp.disabled",
+          targetType: "request",
+          result: recent.status === 429 ? "DENIED" : "FAILURE",
+          correlationId: cid,
+          context: { reason: "recent_auth_failed" },
+        })
+        .catch(() => undefined);
+      return recent;
+    }
     const valid = await this.gateway
       .verifyInitialTotp(request.headers, code)
       .catch(() => false);
