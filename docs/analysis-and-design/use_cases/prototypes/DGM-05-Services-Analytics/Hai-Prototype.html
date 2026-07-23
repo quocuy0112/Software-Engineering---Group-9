@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartHire — AI Hiring Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4F5F8;
+    --surface:#FFFFFF;
+    --surface-2:#EBEEF4;
+    --ink:#12182B;
+    --ink-soft:#5B6478;
+    --ink-faint:#9AA1B4;
+    --border:#E3E6EE;
+    --brand:#23315C;
+    --brand-soft:#E7EAF3;
+    --signal:#12B5A6;
+    --signal-soft:#E1F7F4;
+    --alert:#E2574C;
+    --alert-soft:#FBE8E6;
+    --amber:#EF9E1D;
+    --amber-soft:#FCF0DA;
+    --success:#2FB380;
+    --success-soft:#E4F6EE;
+    --radius-sm:8px;
+    --radius-md:14px;
+    --radius-lg:22px;
+    --shadow-sm:0 1px 2px rgba(18,24,43,.05), 0 1px 1px rgba(18,24,43,.04);
+    --shadow-md:0 10px 30px rgba(18,24,43,.08);
+    --font-display:'Be Vietnam Pro', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+  }
+
+  *,*::before,*::after{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-display);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.45;
+  }
+  h1,h2,h3,h4{ margin:0; font-family:var(--font-display); }
+  p{ margin:0; }
+  ul{ margin:0; padding:0; list-style:none; }
+  button{ font-family:inherit; cursor:pointer; }
+  a{ color:inherit; text-decoration:none; }
+
+  :focus-visible{ outline:2px solid var(--signal); outline-offset:2px; border-radius:4px; }
+
+  .mono{ font-family:var(--font-mono); }
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+  }
+  .uc-tag{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:.03em;
+    color:var(--ink-faint);
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:5px;
+    padding:2px 7px;
+  }
+
+  /* ---------- App shell ---------- */
+  .app{ max-width:1280px; margin:0 auto; padding:0 28px 80px; }
+
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    padding:18px 0 14px;
+    flex-wrap:wrap;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand .logo{ width:34px; height:34px; flex:none; }
+  .brand .wordmark{ font-size:19px; font-weight:800; letter-spacing:-.01em; color:var(--ink); }
+  .brand .proto-badge{
+    font-family:var(--font-mono);
+    font-size:10px;
+    letter-spacing:.04em;
+    color:var(--ink-faint);
+    background:var(--surface-2);
+    border:1px dashed var(--border);
+    border-radius:5px;
+    padding:2px 6px;
+    margin-left:4px;
+  }
+
+  .role-switch{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:5px;
+    box-shadow:var(--shadow-sm);
+  }
+  .role-switch .rs-label{
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    padding-left:10px;
+  }
+  .role-btn{
+    display:flex; align-items:center; gap:6px;
+    background:transparent;
+    border:none;
+    border-radius:999px;
+    padding:7px 14px;
+    font-size:13.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    transition:background .15s ease, color .15s ease;
+  }
+  .role-btn svg{ width:15px; height:15px; }
+  .role-btn:hover{ background:var(--surface-2); }
+  .role-btn.active{ background:var(--brand); color:#fff; }
+
+  .topbar-right{ display:flex; align-items:center; gap:14px; }
+
+  .icon-btn{
+    position:relative;
+    width:40px; height:40px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    color:var(--ink-soft);
+    box-shadow:var(--shadow-sm);
+    transition:color .15s ease, border-color .15s ease;
+  }
+  .icon-btn:hover{ color:var(--ink); border-color:var(--ink-faint); }
+  .icon-btn svg{ width:19px; height:19px; }
+  .badge-dot{
+    position:absolute; top:-4px; right:-4px;
+    min-width:17px; height:17px; padding:0 4px;
+    background:var(--alert); color:#fff;
+    border-radius:999px;
+    font-family:var(--font-mono);
+    font-size:10px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    border:2px solid var(--paper);
+  }
+  .badge-dot.hidden{ display:none; }
+
+  .identity{ display:flex; align-items:center; gap:9px; }
+  .avatar{
+    width:38px; height:38px; border-radius:11px;
+    background:var(--brand); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-weight:700; font-size:13px;
+    flex:none;
+  }
+  .identity-text{ display:flex; flex-direction:column; line-height:1.25; }
+  .identity-name{ font-size:13.5px; font-weight:700; }
+  .identity-role{ font-size:11px; color:var(--ink-faint); font-family:var(--font-mono); }
+
+  /* ---------- Tabs ---------- */
+  .tabs{
+    display:flex; gap:4px;
+    border-bottom:1px solid var(--border);
+    overflow-x:auto;
+    scrollbar-width:none;
+    margin-bottom:28px;
+  }
+  .tabs::-webkit-scrollbar{ display:none; }
+  .tab{
+    flex:none;
+    background:transparent;
+    border:none;
+    padding:13px 16px 12px;
+    display:flex; flex-direction:column; align-items:flex-start; gap:3px;
+    border-bottom:2px solid transparent;
+    color:var(--ink-soft);
+    transition:color .15s ease, border-color .15s ease;
+  }
+  .tab:hover{ color:var(--ink); }
+  .tab .tab-label{ font-size:14px; font-weight:600; white-space:nowrap; }
+  .tab .tab-role{
+    font-family:var(--font-mono); font-size:9.5px; letter-spacing:.05em;
+    text-transform:uppercase; color:var(--ink-faint);
+    padding:1px 6px; border-radius:4px;
+  }
+  .tab.active{ color:var(--ink); border-color:var(--brand); }
+  .tab.role-match .tab-role{ color:var(--brand); background:var(--brand-soft); }
+
+  /* ---------- Screens ---------- */
+  .screen{ display:none; animation:fadeIn .25s ease; }
+  .screen.active{ display:block; }
+  @keyframes fadeIn{ from{ opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+
+  .screen-header{ margin-bottom:22px; }
+  .breadcrumb{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-faint); margin-bottom:8px; }
+  .screen-title-row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:space-between; }
+  .screen-title{ font-size:24px; font-weight:800; letter-spacing:-.01em; }
+  .screen-sub{ font-size:13.5px; color:var(--ink-soft); margin-top:3px; }
+
+  .pill{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:12px; font-weight:600;
+    padding:5px 11px; border-radius:999px;
+    border:1px solid transparent;
+  }
+  .pill-amber{ background:var(--amber-soft); color:#9A6A00; }
+  .pill-success{ background:var(--success-soft); color:#177A52; }
+  .pill-alert{ background:var(--alert-soft); color:#A73127; }
+  .pill-muted{ background:var(--surface-2); color:var(--ink-soft); }
+  .pill-brand{ background:var(--brand-soft); color:var(--brand); }
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-sm);
+  }
+  .card-pad{ padding:22px 24px; }
+  .card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px; }
+  .card-head h3{ font-size:15px; font-weight:700; }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:7px;
+    font-size:13.5px; font-weight:600;
+    padding:10px 16px;
+    border-radius:11px;
+    border:1px solid transparent;
+    transition:transform .1s ease, background .15s ease, box-shadow .15s ease;
+    white-space:nowrap;
+  }
+  .btn svg{ width:15px; height:15px; }
+  .btn:active{ transform:translateY(1px); }
+  .btn-solid{ background:var(--brand); color:#fff; box-shadow:var(--shadow-sm); }
+  .btn-solid:hover{ background:#1a2547; }
+  .btn-outline{ background:var(--surface); border-color:var(--border); color:var(--ink); }
+  .btn-outline:hover{ border-color:var(--ink-faint); }
+  .btn-outline-alert{ background:var(--surface); border-color:var(--alert-soft); color:var(--alert); }
+  .btn-outline-alert:hover{ background:var(--alert-soft); }
+  .btn-signal{ background:var(--signal); color:#fff; }
+  .btn-signal:hover{ background:#0e9d90; }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; box-shadow:none; }
+  .btn-sm{ padding:7px 12px; font-size:12.5px; border-radius:9px; }
+
+  /* ---------- Demo control box ---------- */
+  .demo-box{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    border:1px dashed var(--border);
+    background:var(--surface-2);
+    border-radius:12px;
+    padding:9px 14px;
+    margin-bottom:18px;
+  }
+  .demo-box .demo-label{
+    font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--ink-faint);
+  }
+  .demo-pills{ display:flex; gap:6px; flex-wrap:wrap; }
+  .demo-pill{
+    font-family:var(--font-mono); font-size:11.5px;
+    padding:5px 11px; border-radius:8px;
+    background:var(--surface); border:1px solid var(--border); color:var(--ink-soft);
+  }
+  .demo-pill.active{ background:var(--brand); color:#fff; border-color:var(--brand); }
+
+  /* ---------- Eval screen (UI-01) ---------- */
+  .eval-grid{ display:grid; grid-template-columns:1fr 1.15fr; gap:20px; align-items:start; }
+  @media (max-width:880px){ .eval-grid{ grid-template-columns:1fr; } }
+
+  .profile-avatar{
+    width:56px; height:56px; border-radius:16px; background:var(--brand-soft); color:var(--brand);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-weight:700; font-size:18px;
+  }
+  .profile-name-row{ display:flex; gap:14px; align-items:center; margin-bottom:16px; }
+  .profile-name{ font-size:16.5px; font-weight:700; }
+  .profile-meta{ font-size:12.5px; color:var(--ink-faint); font-family:var(--font-mono); }
+
+  .bullet-list li{ display:flex; gap:9px; font-size:13.5px; color:var(--ink-soft); padding:6px 0; }
+  .bullet-list li::before{ content:''; width:5px; height:5px; margin-top:7px; border-radius:999px; background:var(--ink-faint); flex:none; }
+
+  .chip-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+  .link-chip{
+    font-size:12.5px; padding:6px 12px; border-radius:9px;
+    background:var(--surface-2); border:1px solid var(--border); color:var(--ink-soft);
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .link-chip:hover{ color:var(--brand); border-color:var(--brand-soft); }
+
+  .divider{ height:1px; background:var(--border); margin:18px 0; }
+
+  .ring-gauge{ position:relative; width:150px; height:150px; margin:6px auto 4px; --pct:0; }
+  .ring-gauge svg{ width:100%; height:100%; overflow:visible; }
+  .ring-track{ fill:none; stroke:var(--border); stroke-width:11; }
+  .ring-value{ fill:none; stroke:var(--signal); stroke-width:11; stroke-linecap:round;
+    stroke-dasharray:339.3; stroke-dashoffset:calc(339.3 - (339.3 * var(--pct) / 100));
+    transition:stroke-dashoffset .9s cubic-bezier(.4,0,.2,1), stroke .3s ease; }
+  .ring-label{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .ring-number{ font-family:var(--font-mono); font-size:34px; font-weight:700; line-height:1; }
+  .ring-suffix{ font-family:var(--font-mono); font-size:12px; color:var(--ink-faint); margin-top:2px; }
+  .ring-caption{ text-align:center; font-size:12.5px; color:var(--ink-soft); margin-top:2px; }
+
+  .ring-gauge.scanning svg{ animation:spin 1.2s linear infinite; }
+  .ring-gauge.scanning .ring-value{ stroke-dasharray:64 275.3; stroke:var(--signal); }
+  .ring-gauge.scanning .ring-label{ opacity:0; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .ring-gauge.error .ring-value{ stroke:var(--alert); stroke-dasharray:0 339.3; }
+  .ring-gauge.error .ring-label .ring-number,
+  .ring-gauge.error .ring-label .ring-suffix{ display:none; }
+  .ring-gauge .ring-error-icon{ display:none; color:var(--alert); }
+  .ring-gauge.error .ring-error-icon{ display:block; }
+  .ring-gauge .ring-error-icon svg{ width:30px; height:30px; }
+
+  .state-block{ display:none; }
+  .state-block.active{ display:block; }
+
+  .sw-cols{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:18px; }
+  @media (max-width:560px){ .sw-cols{ grid-template-columns:1fr; } }
+  .sw-col h4{ font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-faint); margin-bottom:8px; font-family:var(--font-mono); }
+  .sw-item{ display:flex; gap:8px; font-size:13px; padding:5px 0; color:var(--ink-soft); }
+  .sw-item svg{ width:14px; height:14px; flex:none; margin-top:2px; }
+  .sw-item.good svg{ color:var(--success); }
+  .sw-item.watch svg{ color:var(--amber); }
+
+  .explain-card{ background:var(--signal-soft); border-radius:12px; padding:14px 16px; margin-top:16px; font-size:13px; color:#0B5C54; line-height:1.6; }
+
+  .skeleton{ background:linear-gradient(90deg, var(--surface-2) 25%, #F4F6FA 37%, var(--surface-2) 63%); background-size:400% 100%; animation:shimmer 1.4s ease infinite; border-radius:8px; }
+  @keyframes shimmer{ 0%{background-position:100% 0;} 100%{background-position:0 0;} }
+  .skel-line{ height:12px; margin-bottom:10px; }
+
+  .error-msg{ display:flex; align-items:center; gap:10px; background:var(--alert-soft); color:#A73127; border-radius:12px; padding:12px 14px; font-size:13.5px; font-weight:500; margin-top:14px; }
+  .error-msg svg{ width:17px; height:17px; flex:none; }
+
+  .footer-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:22px; padding-top:18px; border-top:1px solid var(--border); }
+
+  /* ---------- Applications screen (UI-02) ---------- */
+  .apps-grid{ display:grid; grid-template-columns:300px 1fr; gap:20px; align-items:start; }
+  @media (max-width:820px){ .apps-grid{ grid-template-columns:1fr; } }
+  .app-list-item{
+    display:block; width:100%; text-align:left;
+    padding:14px 16px; border-radius:14px; border:1px solid transparent;
+    margin-bottom:8px; background:transparent;
+  }
+  .app-list-item:hover{ background:var(--surface-2); }
+  .app-list-item.selected{ background:var(--surface); border-color:var(--border); box-shadow:var(--shadow-sm); }
+  .app-role{ font-size:13.5px; font-weight:700; }
+  .app-company{ font-size:12px; color:var(--ink-faint); margin-top:2px; }
+  .app-status{ margin-top:8px; }
+
+  .stepper{ display:flex; align-items:center; margin:18px 0 20px; }
+  .step{ display:flex; flex-direction:column; align-items:center; flex:1; position:relative; }
+  .step-dot{ width:11px; height:11px; border-radius:999px; background:var(--border); z-index:1; }
+  .step.done .step-dot{ background:var(--signal); }
+  .step-label{ font-size:11px; color:var(--ink-faint); margin-top:7px; font-family:var(--font-mono); text-align:center; }
+  .step.done .step-label{ color:var(--ink-soft); }
+  .step::after{ content:''; position:absolute; top:5px; left:50%; width:100%; height:2px; background:var(--border); }
+  .step.done::after{ background:var(--signal); }
+  .step:last-child::after{ display:none; }
+
+  .app-detail{ display:none; }
+  .app-detail.active{ display:block; }
+
+  .hidden-score{ display:flex; align-items:center; gap:10px; background:var(--surface-2); border-radius:12px; padding:13px 15px; font-size:13.5px; color:var(--ink-soft); }
+  .hidden-score svg{ width:17px; height:17px; color:var(--ink-faint); flex:none; }
+
+  .score-row{ display:flex; align-items:center; gap:16px; }
+  .mini-ring{ position:relative; width:70px; height:70px; flex:none; --pct:0; }
+  .mini-ring svg{ width:100%; height:100%; }
+  .mini-ring .ring-track{ stroke-width:7; }
+  .mini-ring .ring-value{ stroke-width:7; stroke-dasharray:339.3; stroke-dashoffset:calc(339.3 - (339.3 * var(--pct) / 100)); stroke:var(--signal); }
+  .mini-ring .ring-label{ display:flex; }
+  .mini-ring .ring-number{ font-size:16px; }
+  .mini-ring .ring-suffix{ display:none; }
+
+  /* ---------- Notifications (UI-03) ---------- */
+  .notif-list-item{
+    display:flex; gap:12px; align-items:flex-start;
+    width:100%; text-align:left; background:transparent; border:none;
+    padding:14px 6px; border-radius:12px; border-bottom:1px solid var(--border);
+  }
+  .notif-list-item:last-child{ border-bottom:none; }
+  .notif-list-item:hover{ background:var(--surface-2); }
+  .notif-icon{
+    width:36px; height:36px; border-radius:10px; flex:none;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .notif-icon svg{ width:17px; height:17px; }
+  .notif-icon.ai{ background:var(--signal-soft); color:var(--signal); }
+  .notif-icon.status{ background:var(--success-soft); color:var(--success); }
+  .notif-icon.report{ background:var(--brand-soft); color:var(--brand); }
+  .notif-icon.alert{ background:var(--alert-soft); color:var(--alert); }
+  .notif-text{ font-size:13.5px; color:var(--ink-soft); line-height:1.45; }
+  .notif-list-item.unread .notif-text{ color:var(--ink); font-weight:600; }
+  .notif-time{ font-size:11px; color:var(--ink-faint); font-family:var(--font-mono); margin-top:3px; }
+  .unread-dot{ width:7px; height:7px; border-radius:999px; background:var(--signal); flex:none; margin-top:6px; }
+
+  .empty-state{ text-align:center; padding:50px 20px; }
+  .empty-state svg{ width:56px; height:56px; color:var(--ink-faint); margin-bottom:14px; }
+  .empty-state p{ font-size:14px; color:var(--ink-soft); font-weight:600; }
+
+  /* ---------- Notification dropdown ---------- */
+  .notif-backdrop{ position:fixed; inset:0; background:transparent; z-index:90; display:none; }
+  .notif-backdrop.open{ display:block; }
+  .notif-panel{
+    position:fixed; top:76px; right:max(16px, calc(50vw - 610px));
+    width:min(380px, calc(100vw - 32px)); max-height:70vh; overflow:auto;
+    background:var(--surface); border:1px solid var(--border); border-radius:18px;
+    box-shadow:var(--shadow-md);
+    z-index:95; opacity:0; transform:translateY(-8px); pointer-events:none;
+    transition:opacity .15s ease, transform .15s ease;
+  }
+  .notif-panel.open{ opacity:1; transform:none; pointer-events:auto; }
+  .notif-panel-head{ display:flex; align-items:center; justify-content:space-between; padding:16px 18px 10px; }
+  .notif-panel-head h3{ font-size:14.5px; font-weight:700; }
+  .notif-panel-body{ padding:0 14px 12px; }
+
+  /* ---------- Company / Admin dashboards ---------- */
+  .metric-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:20px; }
+  .metric-row.four{ grid-template-columns:repeat(4,1fr); }
+  @media (max-width:820px){ .metric-row, .metric-row.four{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:520px){ .metric-row, .metric-row.four{ grid-template-columns:1fr; } }
+  .metric-card{ padding:18px 20px; }
+  .metric-num{ font-family:var(--font-mono); font-size:26px; font-weight:700; margin-top:8px; }
+  .metric-trend{ font-size:12px; margin-top:6px; font-family:var(--font-mono); }
+  .trend-up{ color:var(--success); }
+  .trend-down{ color:var(--alert); }
+
+  .charts-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:880px){ .charts-grid{ grid-template-columns:1fr; } }
+
+  .donut-wrap{ display:flex; align-items:center; gap:20px; flex-wrap:wrap; }
+  .donut-wrap svg{ width:150px; height:150px; flex:none; transform:rotate(-90deg); }
+  .legend{ flex:1; min-width:160px; }
+  .legend-item{ display:flex; align-items:center; gap:9px; font-size:13px; padding:5px 0; }
+  .legend-swatch{ width:10px; height:10px; border-radius:3px; flex:none; }
+  .legend-pct{ margin-left:auto; font-family:var(--font-mono); color:var(--ink-soft); }
+
+  .funnel-row{ margin-bottom:14px; }
+  .funnel-labels{ display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:6px; color:var(--ink-soft); }
+  .funnel-track{ background:var(--surface-2); border-radius:8px; height:14px; overflow:hidden; }
+  .funnel-fill{ height:100%; background:linear-gradient(90deg, var(--brand), var(--signal)); border-radius:8px; }
+
+  .line-chart-wrap{ width:100%; }
+  .line-chart-wrap svg{ width:100%; height:auto; display:block; }
+  .axis-labels{ display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); padding:0 20px; margin-top:2px; }
+
+  .gauge-track{ background:var(--surface-2); border-radius:999px; height:16px; overflow:hidden; display:flex; }
+  .gauge-fill{ height:100%; }
+  .gauge-caption{ display:flex; justify-content:space-between; font-size:12.5px; margin-top:8px; }
+
+  .banner{
+    display:flex; align-items:center; gap:12px;
+    background:var(--alert-soft); border:1px solid #F3C6C1; color:#A73127;
+    border-radius:14px; padding:13px 16px; margin-bottom:20px;
+  }
+  .banner.hidden{ display:none; }
+  .banner svg{ width:19px; height:19px; flex:none; }
+  .banner p{ font-size:13.5px; font-weight:600; flex:1; }
+  .banner a{ font-size:13px; font-weight:700; text-decoration:underline; white-space:nowrap; }
+
+  .highlight-pulse{ animation:pulseRing 1.4s ease 2; }
+  @keyframes pulseRing{ 0%,100%{ box-shadow:0 0 0 0 rgba(226,87,76,0); } 50%{ box-shadow:0 0 0 6px rgba(226,87,76,.18); } }
+
+  .no-data-block{ text-align:center; padding:44px 20px; color:var(--ink-soft); }
+  .no-data-block svg{ width:44px; height:44px; color:var(--ink-faint); margin-bottom:12px; }
+
+  .export-wrap{ position:relative; }
+  .export-menu{
+    position:absolute; top:calc(100% + 6px); right:0;
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    box-shadow:var(--shadow-md); padding:6px; display:none; min-width:150px; z-index:20;
+  }
+  .export-menu.open{ display:block; }
+  .export-menu button{
+    display:flex; width:100%; align-items:center; gap:8px;
+    background:transparent; border:none; padding:9px 10px; border-radius:8px;
+    font-size:13px; color:var(--ink); text-align:left;
+  }
+  .export-menu button:hover{ background:var(--surface-2); }
+
+  /* ---------- Toasts ---------- */
+  .toast-container{ position:fixed; bottom:22px; right:22px; z-index:999; display:flex; flex-direction:column; gap:10px; align-items:flex-end; }
+  .toast{
+    display:flex; align-items:center; gap:10px;
+    background:var(--ink); color:#fff;
+    padding:12px 16px; border-radius:12px;
+    font-size:13px; font-weight:500;
+    box-shadow:var(--shadow-md);
+    max-width:320px;
+    animation:toastIn .25s ease;
+  }
+  .toast svg{ width:16px; height:16px; flex:none; }
+  .toast.success{ background:#1A5C42; }
+  .toast.error{ background:#7A2A22; }
+  .toast.leaving{ animation:toastOut .2s ease forwards; }
+  @keyframes toastIn{ from{ opacity:0; transform:translateY(8px);} to{ opacity:1; transform:none;} }
+  @keyframes toastOut{ to{ opacity:0; transform:translateY(6px);} }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001s !important; transition-duration:0.001s !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 34 34" fill="none">
+        <circle cx="17" cy="17" r="15" stroke="#23315C" stroke-width="2.4"/>
+        <circle cx="17" cy="17" r="8.5" stroke="#12B5A6" stroke-width="2.4" stroke-dasharray="34 20"/>
+        <circle cx="17" cy="17" r="2.4" fill="#23315C"/>
+      </svg>
+      <span class="wordmark">SmartHire</span>
+      <span class="proto-badge">PROTOTYPE · v0.1</span>
+    </div>
+
+    <div class="role-switch" role="group" aria-label="View as role">
+      <span class="rs-label">View as</span>
+      <button class="role-btn active" data-role="recruiter">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7.5" width="18" height="12" rx="2"/><path d="M8 7.5V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1.5"/></svg>
+        Recruiter
+      </button>
+      <button class="role-btn" data-role="candidate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.4"/><path d="M4.5 20c1.5-4 4.2-6 7.5-6s6 2 7.5 6"/></svg>
+        Candidate
+      </button>
+      <button class="role-btn" data-role="admin">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></svg>
+        Admin
+      </button>
+    </div>
+
+    <div class="topbar-right">
+      <button class="icon-btn" id="bellBtn" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 16v-5a6 6 0 0 0-12 0v5l-1.5 2.5h15L18 16z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+        <span class="badge-dot" id="bellBadge">2</span>
+      </button>
+      <div class="identity">
+        <div class="avatar" id="idAvatar">BT</div>
+        <div class="identity-text">
+          <span class="identity-name" id="idName">Bảo Trần</span>
+          <span class="identity-role" id="idRole">Recruiter · TalentForce</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" data-screen="eval" data-roles="recruiter">
+      <span class="tab-label">Evaluation</span>
+      <span class="tab-role">Recruiter · UI-01</span>
+    </button>
+    <button class="tab" data-screen="apps" data-roles="candidate">
+      <span class="tab-label">Applications</span>
+      <span class="tab-role">Candidate · UI-02</span>
+    </button>
+    <button class="tab" data-screen="notifications" data-roles="all">
+      <span class="tab-label">Notifications</span>
+      <span class="tab-role">All roles · UI-03</span>
+    </button>
+    <button class="tab" data-screen="company" data-roles="recruiter">
+      <span class="tab-label">Company Analytics</span>
+      <span class="tab-role">Recruiter · UI-04</span>
+    </button>
+    <button class="tab" data-screen="admin" data-roles="admin">
+      <span class="tab-label">Admin</span>
+      <span class="tab-role">Admin · UI-05</span>
+    </button>
+  </nav>
+
+  <main>
+
+    <!-- ============ UI-01 EVALUATION ============ -->
+    <section class="screen" data-screen="eval" id="screen-eval">
+      <div class="screen-header">
+        <div class="breadcrumb">Candidates / Senior Backend Engineer / Nguyễn Minh Anh</div>
+        <div class="screen-title-row">
+          <div>
+            <h1 class="screen-title">Nguyễn Minh Anh</h1>
+            <p class="screen-sub">Applied for Senior Backend Engineer · Applied 3 days ago</p>
+          </div>
+          <span class="pill pill-amber">In Review</span>
+        </div>
+      </div>
+
+      <div class="eval-grid">
+        <!-- Profile -->
+        <div class="card card-pad">
+          <div class="profile-name-row">
+            <div class="profile-avatar">MA</div>
+            <div>
+              <div class="profile-name">Nguyễn Minh Anh</div>
+              <div class="profile-meta">nguyenm***@gmail.com · Ho Chi Minh City</div>
+            </div>
+          </div>
+          <h4 class="eyebrow" style="margin-bottom:8px;">Résumé summary</h4>
+          <ul class="bullet-list">
+            <li>5+ years backend engineering experience (Node.js, Go)</li>
+            <li>Led migration to microservices architecture at a fintech scale-up</li>
+            <li>B.Sc. Computer Science — Đại học Bách Khoa TP.HCM</li>
+            <li>Mentored a team of 4 junior engineers</li>
+          </ul>
+          <div class="divider"></div>
+          <h4 class="eyebrow" style="margin-bottom:8px;">Portfolio</h4>
+          <div class="chip-row">
+            <span class="link-chip">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-4 1-4-2-6-2m12 4v-3.4c0-1 .3-1.6 1-2.2-3.4-.4-7-1.7-7-7.4 0-1.6.6-3 1.5-4a5 5 0 0 1 .2-3.8s1.3-.4 4.3 1.5a15 15 0 0 1 8 0c3-2 4.3-1.5 4.3-1.5.5 1.3.5 2.7.2 3.8 1 1 1.5 2.4 1.5 4 0 5.7-3.6 7-7 7.4.5.5.9 1.3.9 2.6V19"/></svg>
+              github.com/minhanh-dev
+            </span>
+            <span class="link-chip">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18z"/></svg>
+              minhanh.dev
+            </span>
+          </div>
+        </div>
+
+        <!-- AI Screening -->
+        <div class="card card-pad">
+          <div class="card-head">
+            <h3>AI Screening Results</h3>
+            <span class="uc-tag">UC-SCR-02</span>
+          </div>
+
+          <div class="demo-box">
+            <span class="demo-label">Preview state</span>
+            <div class="demo-pills">
+              <button class="demo-pill active" data-eval-state="ready">Ready</button>
+              <button class="demo-pill" data-eval-state="scanning">Scanning</button>
+              <button class="demo-pill" data-eval-state="error">Error</button>
+            </div>
+          </div>
+
+          <!-- READY -->
+          <div class="state-block active" data-eval-block="ready">
+            <div class="ring-gauge" id="mainRing" style="--pct:85">
+              <svg viewBox="0 0 140 140">
+                <circle class="ring-track" cx="70" cy="70" r="54"/>
+                <circle class="ring-value" cx="70" cy="70" r="54" transform="rotate(-90 70 70)"/>
+              </svg>
+              <div class="ring-label"><span class="ring-number">85</span><span class="ring-suffix">/ 100</span></div>
+            </div>
+            <p class="ring-caption">Match Score</p>
+
+            <div class="sw-cols">
+              <div class="sw-col">
+                <h4>Strengths</h4>
+                <div class="sw-item good"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l5 5L20 7"/></svg>Strong system design experience</div>
+                <div class="sw-item good"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l5 5L20 7"/></svg>Node.js &amp; Go match the core stack</div>
+                <div class="sw-item good"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l5 5L20 7"/></svg>Prior microservices migration leadership</div>
+              </div>
+              <div class="sw-col">
+                <h4>Watch-outs</h4>
+                <div class="sw-item watch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L2.6 18a1.8 1.8 0 0 0 1.6 2.7h15.6a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z"/></svg>No AWS/GCP certification on file</div>
+                <div class="sw-item watch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L2.6 18a1.8 1.8 0 0 0 1.6 2.7h15.6a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z"/></svg>Limited exposure to streaming systems</div>
+              </div>
+            </div>
+
+            <div class="explain-card">
+              <strong>AI Explanation ·</strong> Score weighted toward backend architecture depth and leadership signals in the résumé. Skill-match against the job's required stack (Node.js, Go, distributed systems) accounts for 60% of the score; team-leadership indicators account for 25%; the remaining 15% reflects gaps in cloud certification.
+            </div>
+          </div>
+
+          <!-- SCANNING -->
+          <div class="state-block" data-eval-block="scanning">
+            <div class="ring-gauge scanning" style="--pct:0">
+              <svg viewBox="0 0 140 140">
+                <circle class="ring-track" cx="70" cy="70" r="54"/>
+                <circle class="ring-value" cx="70" cy="70" r="54" transform="rotate(-90 70 70)"/>
+              </svg>
+              <div class="ring-label"><span class="ring-number">–</span></div>
+            </div>
+            <p class="ring-caption mono" style="color:var(--signal); font-weight:600;">AI is screening candidate's profile... <span class="uc-tag" style="margin-left:6px;">UC-SCR-01</span></p>
+            <div class="skeleton skel-line" style="width:70%; margin-top:20px;"></div>
+            <div class="skeleton skel-line" style="width:90%;"></div>
+            <div class="skeleton skel-line" style="width:55%;"></div>
+            <div class="skeleton" style="height:70px; margin-top:10px;"></div>
+          </div>
+
+          <!-- ERROR -->
+          <div class="state-block" data-eval-block="error">
+            <div class="ring-gauge error">
+              <svg viewBox="0 0 140 140">
+                <circle class="ring-track" cx="70" cy="70" r="54"/>
+                <circle class="ring-value" cx="70" cy="70" r="54" transform="rotate(-90 70 70)"/>
+              </svg>
+              <div class="ring-label"></div>
+              <div class="ring-error-icon" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9L2.6 18a1.8 1.8 0 0 0 1.6 2.7h15.6a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z"/></svg>
+              </div>
+            </div>
+            <div class="error-msg">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9L2.6 18a1.8 1.8 0 0 0 1.6 2.7h15.6a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z"/></svg>
+              System failed to generate score. <span class="uc-tag" style="margin-left:6px;">UC-SCR-04</span>
+            </div>
+            <button class="btn btn-signal" id="retryBtn" style="margin-top:14px; width:100%; justify-content:center;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4v5h5M20 20v-5h-5M4.5 9a8 8 0 0 1 14-3.5M19.5 15a8 8 0 0 1-14 3.5"/></svg>
+              Retry AI Scoring
+            </button>
+          </div>
+
+          <div class="footer-actions">
+            <button class="btn btn-solid" data-action="approve">Approve</button>
+            <button class="btn btn-outline-alert" data-action="reject">Reject</button>
+            <button class="btn btn-outline" data-action="schedule">Schedule Interview</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ UI-02 APPLICATIONS ============ -->
+    <section class="screen" data-screen="apps" id="screen-apps">
+      <div class="screen-header">
+        <h1 class="screen-title">My Applications</h1>
+        <p class="screen-sub">Track the status of every role you've applied to</p>
+      </div>
+
+      <div class="apps-grid">
+        <div>
+          <button class="app-list-item selected" data-app="0">
+            <div class="app-role">Senior Backend Engineer</div>
+            <div class="app-company">TalentForce Co.</div>
+            <div class="app-status"><span class="pill pill-brand">Interview Scheduled</span></div>
+          </button>
+          <button class="app-list-item" data-app="1">
+            <div class="app-role">Product Manager</div>
+            <div class="app-company">Nimbus Labs</div>
+            <div class="app-status"><span class="pill pill-amber">Under Review</span></div>
+          </button>
+          <button class="app-list-item" data-app="2">
+            <div class="app-role">UX Designer</div>
+            <div class="app-company">Northstar Studio</div>
+            <div class="app-status"><span class="pill pill-muted">Not Selected</span></div>
+          </button>
+        </div>
+
+        <div class="card card-pad">
+          <!-- App 0 -->
+          <div class="app-detail active" data-app-detail="0">
+            <div class="screen-title-row">
+              <div>
+                <h3 style="font-size:17px; font-weight:700;">Senior Backend Engineer</h3>
+                <p class="screen-sub">TalentForce Co. · Applied 3 days ago</p>
+              </div>
+              <span class="pill pill-brand">Interview Scheduled</span>
+            </div>
+            <div class="stepper">
+              <div class="step done"><div class="step-dot"></div><div class="step-label">Applied</div></div>
+              <div class="step done"><div class="step-dot"></div><div class="step-label">Screening</div></div>
+              <div class="step done"><div class="step-dot"></div><div class="step-label">Interview</div></div>
+              <div class="step"><div class="step-dot"></div><div class="step-label">Offer</div></div>
+            </div>
+            <h4 class="eyebrow" style="margin-bottom:10px;">Assessment Result</h4>
+            <div class="score-row">
+              <div class="mini-ring" style="--pct:85">
+                <svg viewBox="0 0 140 140" style="transform:rotate(-90deg)">
+                  <circle class="ring-track" cx="70" cy="70" r="54"/>
+                  <circle class="ring-value" cx="70" cy="70" r="54"/>
+                </svg>
+                <div class="ring-label"><span class="ring-number">85</span></div>
+              </div>
+              <p style="font-size:13.5px; color:var(--ink-soft);">You're a strong match for this role's backend architecture requirements. The team was especially impressed by your microservices migration experience.</p>
+            </div>
+          </div>
+
+          <!-- App 1 -->
+          <div class="app-detail" data-app-detail="1">
+            <div class="screen-title-row">
+              <div>
+                <h3 style="font-size:17px; font-weight:700;">Product Manager</h3>
+                <p class="screen-sub">Nimbus Labs · Applied 6 days ago</p>
+              </div>
+              <span class="pill pill-amber">Under Review</span>
+            </div>
+            <div class="stepper">
+              <div class="step done"><div class="step-dot"></div><div class="step-label">Applied</div></div>
+              <div class="step done"><div class="step-dot"></div><div class="step-label">Screening</div></div>
+              <div class="step"><div class="step-dot"></div><div class="step-label">Interview</div></div>
+              <div class="step"><div class="step-dot"></div><div class="step-label">Offer</div></div>
+            </div>
+            <h4 class="eyebrow" style="margin-bottom:10px;">Assessment Result</h4>
+            <div class="hidden-score">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/><path d="M4 4l16 16" stroke-width="1.8"/></svg>
+              Your application is being evaluated.
+            </div>
+          </div>
+
+          <!-- App 2 -->
+          <div class="app-detail" data-app-detail="2">
+            <div class="screen-title-row">
+              <div>
+                <h3 style="font-size:17px; font-weight:700;">UX Designer</h3>
+                <p class="screen-sub">Northstar Studio · Applied 14 days ago</p>
+              </div>
+              <span class="pill pill-muted">Not Selected</span>
+            </div>
+            <div class="stepper">
+              <div class="step done"><div class="step-dot"></div><div class="step-label">Applied</div></div>
+              <div class="step done"><div class="step-dot"></div><div class="step-label">Screening</div></div>
+              <div class="step done"><div class="step-dot"></div><div class="step-label">Interview</div></div>
+              <div class="step"><div class="step-dot"></div><div class="step-label">Offer</div></div>
+            </div>
+            <h4 class="eyebrow" style="margin-bottom:10px;">Feedback</h4>
+            <p style="font-size:13.5px; color:var(--ink-soft);">Thank you for applying. The team decided to move forward with another candidate for this round.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ UI-03 NOTIFICATIONS ============ -->
+    <section class="screen" data-screen="notifications" id="screen-notifications">
+      <div class="screen-header">
+        <div class="screen-title-row">
+          <h1 class="screen-title">Notifications</h1>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-outline btn-sm" id="settingsBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+              Settings
+            </button>
+            <button class="btn btn-outline btn-sm" id="markAllBtn">Mark all as read</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-box">
+        <span class="demo-label">Preview state</span>
+        <div class="demo-pills">
+          <button class="demo-pill active" data-notif-state="list">With notifications</button>
+          <button class="demo-pill" data-notif-state="empty">Empty state</button>
+        </div>
+      </div>
+
+      <div class="card card-pad">
+        <ul id="notifFullList" class="state-block active" data-notif-block="list"></ul>
+        <div class="state-block empty-state" data-notif-block="empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12l5 5L20 7"/><circle cx="12" cy="12" r="10" stroke-width="1.4"/></svg>
+          <p>You're all caught up!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ UI-04 COMPANY ANALYTICS ============ -->
+    <section class="screen" data-screen="company" id="screen-company">
+      <div class="screen-header">
+        <div class="screen-title-row">
+          <div>
+            <h1 class="screen-title">Recruitment Analytics</h1>
+            <p class="screen-sub">TalentForce Co. · Last 30 days</p>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <span class="pill pill-muted">All Jobs ▾</span>
+            <div class="export-wrap">
+              <button class="btn btn-outline" id="companyExportBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+                Export Data
+              </button>
+              <div class="export-menu" id="companyExportMenu">
+                <button data-format="CSV">Export as CSV</button>
+                <button data-format="PDF">Export as PDF</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-box">
+        <span class="demo-label">Preview state</span>
+        <div class="demo-pills">
+          <button class="demo-pill active" data-company-state="data">Has data</button>
+          <button class="demo-pill" data-company-state="nodata">No data</button>
+          <button class="demo-pill" data-company-state="unauthorized">Unauthorized user</button>
+        </div>
+      </div>
+
+      <div class="state-block active" data-company-block="data">
+        <div class="metric-row">
+          <div class="card metric-card">
+            <span class="eyebrow">Total Candidates</span>
+            <div class="metric-num">128</div>
+            <div class="metric-trend trend-up">▲ 8% vs last period</div>
+          </div>
+          <div class="card metric-card">
+            <span class="eyebrow">Time-to-Hire</span>
+            <div class="metric-num">18 days</div>
+            <div class="metric-trend trend-down">▼ 3 days faster</div>
+          </div>
+          <div class="card metric-card">
+            <span class="eyebrow">Conversion Rate</span>
+            <div class="metric-num">12.4%</div>
+            <div class="metric-trend trend-up">▲ 1.2pt</div>
+          </div>
+        </div>
+
+        <div class="charts-grid">
+          <div class="card card-pad">
+            <div class="card-head"><h3>Source of Hire</h3><span class="uc-tag">UC-ANL-01</span></div>
+            <div class="donut-wrap">
+              <svg viewBox="0 0 140 140">
+                <circle cx="70" cy="70" r="54" fill="none" stroke="var(--border)" stroke-width="16"/>
+                <circle cx="70" cy="70" r="54" fill="none" stroke="var(--brand)" stroke-width="16" stroke-dasharray="115.4 339.3" stroke-dashoffset="0"/>
+                <circle cx="70" cy="70" r="54" fill="none" stroke="var(--signal)" stroke-width="16" stroke-dasharray="95 339.3" stroke-dashoffset="-115.4"/>
+                <circle cx="70" cy="70" r="54" fill="none" stroke="var(--amber)" stroke-width="16" stroke-dasharray="74.6 339.3" stroke-dashoffset="-210.4"/>
+                <circle cx="70" cy="70" r="54" fill="none" stroke="var(--ink-faint)" stroke-width="16" stroke-dasharray="54.3 339.3" stroke-dashoffset="-285"/>
+              </svg>
+              <div class="legend">
+                <div class="legend-item"><span class="legend-swatch" style="background:var(--brand)"></span>Referrals<span class="legend-pct">34%</span></div>
+                <div class="legend-item"><span class="legend-swatch" style="background:var(--signal)"></span>Job Boards<span class="legend-pct">28%</span></div>
+                <div class="legend-item"><span class="legend-swatch" style="background:var(--amber)"></span>LinkedIn<span class="legend-pct">22%</span></div>
+                <div class="legend-item"><span class="legend-swatch" style="background:var(--ink-faint)"></span>Career Site<span class="legend-pct">16%</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card card-pad">
+            <div class="card-head"><h3>Hiring Funnel</h3><span class="uc-tag">UC-ANL-01</span></div>
+            <div class="funnel-row">
+              <div class="funnel-labels"><span>Sourcing</span><span class="mono">128</span></div>
+              <div class="funnel-track"><div class="funnel-fill" style="width:100%"></div></div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-labels"><span>Interview</span><span class="mono">46</span></div>
+              <div class="funnel-track"><div class="funnel-fill" style="width:36%"></div></div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-labels"><span>Offer</span><span class="mono">12</span></div>
+              <div class="funnel-track"><div class="funnel-fill" style="width:9.4%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="state-block" data-company-block="nodata">
+        <div class="card no-data-block">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3v18h18M7 15l4-4 3 3 5-6"/></svg>
+          <p>Not enough data to generate analytics for this period</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ UI-05 ADMIN ============ -->
+    <section class="screen" data-screen="admin" id="screen-admin">
+      <div class="screen-header">
+        <div class="screen-title-row">
+          <div>
+            <h1 class="screen-title">Platform Analytics</h1>
+            <p class="screen-sub">All companies · Last 30 days</p>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <span class="pill pill-muted">Last 30 days ▾</span>
+            <button class="btn btn-solid" id="adminExportBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+              Export Global Report
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-box">
+        <span class="demo-label">Preview state</span>
+        <div class="demo-pills">
+          <button class="demo-pill active" data-banner-state="show">Show warning banner</button>
+          <button class="demo-pill" data-banner-state="hide">Hide warning banner</button>
+        </div>
+      </div>
+
+      <div class="banner" id="adminBanner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9L2.6 18a1.8 1.8 0 0 0 1.6 2.7h15.6a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z"/></svg>
+        <p>High failure rate detected in AI Scoring service.</p>
+        <a href="#" id="viewDetailsLink">View details</a>
+      </div>
+
+      <div class="metric-row four">
+        <div class="card metric-card">
+          <span class="eyebrow">Active Companies</span>
+          <div class="metric-num">342</div>
+          <div class="metric-trend trend-up">▲ 14 this month</div>
+        </div>
+        <div class="card metric-card">
+          <span class="eyebrow">Total AI Screenings</span>
+          <div class="metric-num">12,840</div>
+          <div class="metric-trend trend-up">▲ 6.1%</div>
+        </div>
+        <div class="card metric-card">
+          <span class="eyebrow">System Uptime</span>
+          <div class="metric-num">99.95%</div>
+          <div class="metric-trend trend-up">▲ steady</div>
+        </div>
+        <div class="card metric-card">
+          <span class="eyebrow">Revenue (MRR)</span>
+          <div class="metric-num">$48.2K</div>
+          <div class="metric-trend trend-up">▲ 3.4%</div>
+        </div>
+      </div>
+
+      <div class="card card-pad" style="margin-bottom:18px;">
+        <div class="card-head"><h3>Traffic Over Time</h3><span class="uc-tag">UC-ANL-02</span></div>
+        <div class="line-chart-wrap">
+          <svg viewBox="0 0 560 160" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--signal)" stop-opacity="0.28"/>
+                <stop offset="100%" stop-color="var(--signal)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M20,150 106.7,125 193.3,94 280,107 366.7,62 453.3,30 540,44 540,150 20,150 Z" fill="url(#areaGrad)"/>
+            <polyline points="20,150 106.7,125 193.3,94 280,107 366.7,62 453.3,30 540,44" fill="none" stroke="var(--signal)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="20" cy="150" r="3.5" fill="var(--signal)"/>
+            <circle cx="106.7" cy="125" r="3.5" fill="var(--signal)"/>
+            <circle cx="193.3" cy="94" r="3.5" fill="var(--signal)"/>
+            <circle cx="280" cy="107" r="3.5" fill="var(--signal)"/>
+            <circle cx="366.7" cy="62" r="3.5" fill="var(--signal)"/>
+            <circle cx="453.3" cy="30" r="3.5" fill="var(--signal)"/>
+            <circle cx="540" cy="44" r="3.5" fill="var(--signal)"/>
+          </svg>
+          <div class="axis-labels"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+        </div>
+      </div>
+
+      <div class="charts-grid" id="aiScreeningChart">
+        <div class="card card-pad">
+          <div class="card-head"><h3>AI Screening Success / Fail Rate</h3><span class="uc-tag">UC-ANL-02</span></div>
+          <div class="donut-wrap">
+            <svg viewBox="0 0 140 140">
+              <circle cx="70" cy="70" r="54" fill="none" stroke="var(--border)" stroke-width="16"/>
+              <circle cx="70" cy="70" r="54" fill="none" stroke="var(--success)" stroke-width="16" stroke-dasharray="308.8 339.3" stroke-dashoffset="0"/>
+              <circle cx="70" cy="70" r="54" fill="none" stroke="var(--alert)" stroke-width="16" stroke-dasharray="30.5 339.3" stroke-dashoffset="-308.8"/>
+            </svg>
+            <div class="legend">
+              <div class="legend-item"><span class="legend-swatch" style="background:var(--success)"></span>Success<span class="legend-pct">91%</span></div>
+              <div class="legend-item"><span class="legend-swatch" style="background:var(--alert)"></span>Failed<span class="legend-pct">9%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-pad">
+          <div class="card-head"><h3>Notification Delivery Rate</h3><span class="uc-tag">UC-NOT-03</span></div>
+          <div class="gauge-track">
+            <div class="gauge-fill" style="width:96.2%; background:var(--success);"></div>
+            <div class="gauge-fill" style="width:3.8%; background:var(--alert);"></div>
+          </div>
+          <div class="gauge-caption">
+            <span style="color:var(--success); font-weight:600;">96.2% delivered</span>
+            <span style="color:var(--alert); font-weight:600;">3.8% failed</span>
+          </div>
+          <p style="font-size:12.5px; color:var(--ink-faint); margin-top:12px;">Failed deliveries are automatically retried up to 3 times before being logged.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="notif-backdrop" id="notifBackdrop"></div>
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-panel-head">
+    <h3>Notifications</h3>
+    <button class="btn btn-outline btn-sm" id="markAllBtnDropdown">Mark all read</button>
+  </div>
+  <div class="notif-panel-body">
+    <ul id="notifDropdownList"></ul>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+(function(){
+  var ICONS = {
+    ai: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/></svg>',
+    status: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12l5 5L20 7"/></svg>',
+    report: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V9m6 10V4m6 15v-7"/></svg>',
+    alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9L2.6 18a1.8 1.8 0 0 0 1.6 2.7h15.6a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z"/></svg>'
+  };
+
+  var notifications = [
+    {id:1, unread:true, type:'ai', text:"AI Screening complete for Nguyễn Minh Anh — Senior Backend Engineer", time:'2m ago', target:'eval'},
+    {id:2, unread:true, type:'status', text:'Your application moved to Interview stage — Senior Backend Engineer', time:'1h ago', target:'apps'},
+    {id:3, unread:false, type:'report', text:'Weekly recruitment summary is ready', time:'Yesterday', target:'company'},
+    {id:4, unread:false, type:'alert', text:'High failure rate detected in AI Scoring service', time:'2 days ago', target:'admin'}
+  ];
+
+  var identities = {
+    recruiter:{name:'Bảo Trần', label:'Recruiter · TalentForce', initials:'BT'},
+    candidate:{name:'Nguyễn Minh Anh', label:'Candidate', initials:'MA'},
+    admin:{name:'System Admin', label:'Platform Administrator', initials:'SA'}
+  };
+  var primaryScreen = {recruiter:'eval', candidate:'apps', admin:'admin'};
+
+  var state = { role:'recruiter', screen:'eval' };
+
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+
+  function showToast(message, type){
+    var container = $('#toastContainer');
+    var el = document.createElement('div');
+    el.className = 'toast' + (type ? ' '+type : '');
+    var icon = type==='success'
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l5 5L20 7"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>';
+    el.innerHTML = icon + '<span>' + message + '</span>';
+    container.appendChild(el);
+    setTimeout(function(){
+      el.classList.add('leaving');
+      setTimeout(function(){ el.remove(); }, 220);
+    }, 3000);
+  }
+
+  function setScreen(screenId){
+    state.screen = screenId;
+    $all('.screen').forEach(function(s){ s.classList.toggle('active', s.dataset.screen===screenId); });
+    $all('.tab').forEach(function(t){ t.classList.toggle('active', t.dataset.screen===screenId); });
+    window.scrollTo({top:0, behavior:'instant' in window ? 'instant':'auto'});
+  }
+
+  function setRole(role){
+    state.role = role;
+    $all('.role-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.role===role); });
+    $all('.tab').forEach(function(t){
+      var roles = t.dataset.roles.split(',');
+      t.classList.toggle('role-match', roles.indexOf(role)>-1 || roles.indexOf('all')>-1);
+    });
+    var id = identities[role];
+    $('#idName').textContent = id.name;
+    $('#idRole').textContent = id.label;
+    $('#idAvatar').textContent = id.initials;
+    setScreen(primaryScreen[role]);
+  }
+
+  $all('.role-btn').forEach(function(b){
+    b.addEventListener('click', function(){ setRole(b.dataset.role); });
+  });
+  $all('.tab').forEach(function(t){
+    t.addEventListener('click', function(){ setScreen(t.dataset.screen); });
+  });
+
+  /* ---------- Notifications ---------- */
+  function renderNotifItem(n){
+    var li = document.createElement('li');
+    li.innerHTML =
+      '<button class="notif-list-item' + (n.unread?' unread':'') + '" data-target="'+n.target+'" data-id="'+n.id+'">' +
+        '<span class="notif-icon ' + n.type + '">' + ICONS[n.type] + '</span>' +
+        '<span style="flex:1;">' +
+          '<span class="notif-text">' + n.text + '</span>' +
+          '<div class="notif-time">' + n.time + '</div>' +
+        '</span>' +
+        (n.unread ? '<span class="unread-dot"></span>' : '') +
+      '</button>';
+    return li;
+  }
+
+  function renderNotifLists(){
+    var full = $('#notifFullList');
+    var dropdown = $('#notifDropdownList');
+    full.innerHTML = '';
+    dropdown.innerHTML = '';
+    notifications.forEach(function(n){
+      full.appendChild(renderNotifItem(n));
+      dropdown.appendChild(renderNotifItem(n));
+    });
+    $all('.notif-list-item').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = parseInt(btn.dataset.id,10);
+        var n = notifications.filter(function(x){return x.id===id;})[0];
+        if(n && n.unread){ n.unread=false; renderNotifLists(); updateBadge(); }
+        closeNotifPanel();
+        setScreen(btn.dataset.target);
+        if(btn.dataset.target==='admin'){
+          setTimeout(function(){
+            var chart = $('#aiScreeningChart');
+            chart.classList.add('highlight-pulse');
+            chart.scrollIntoView({behavior:'smooth', block:'center'});
+            setTimeout(function(){ chart.classList.remove('highlight-pulse'); }, 2800);
+          }, 120);
+        }
+      });
+    });
+    updateBadge();
+  }
+
+  function updateBadge(){
+    var count = notifications.filter(function(n){return n.unread;}).length;
+    var badge = $('#bellBadge');
+    badge.textContent = count;
+    badge.classList.toggle('hidden', count===0);
+  }
+
+  function markAllRead(){
+    notifications.forEach(function(n){ n.unread=false; });
+    renderNotifLists();
+  }
+  $('#markAllBtn').addEventListener('click', markAllRead);
+  $('#markAllBtnDropdown').addEventListener('click', markAllRead);
+  $('#settingsBtn').addEventListener('click', function(){ showToast('Opening notification settings...'); });
+
+  function openNotifPanel(){ $('#notifPanel').classList.add('open'); $('#notifBackdrop').classList.add('open'); }
+  function closeNotifPanel(){ $('#notifPanel').classList.remove('open'); $('#notifBackdrop').classList.remove('open'); }
+  $('#bellBtn').addEventListener('click', function(e){
+    e.stopPropagation();
+    $('#notifPanel').classList.contains('open') ? closeNotifPanel() : openNotifPanel();
+  });
+  $('#notifBackdrop').addEventListener('click', closeNotifPanel);
+
+  /* Notifications screen: list/empty demo toggle */
+  $all('[data-notif-state]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      $all('[data-notif-state]').forEach(function(b){ b.classList.toggle('active', b===btn); });
+      $all('[data-notif-block]').forEach(function(b){ b.classList.toggle('active', b.dataset.notifBlock===btn.dataset.notifState); });
+    });
+  });
+
+  renderNotifLists();
+
+  /* ---------- Eval screen state ---------- */
+  var evalTimer = null;
+  function setEvalState(s){
+    $all('[data-eval-state]').forEach(function(b){ b.classList.toggle('active', b.dataset.evalState===s); });
+    $all('[data-eval-block]').forEach(function(b){ b.classList.toggle('active', b.dataset.evalBlock===s); });
+  }
+  $all('[data-eval-state]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      clearTimeout(evalTimer);
+      setEvalState(btn.dataset.evalState);
+      if(btn.dataset.evalState==='scanning'){ showToast("AI is screening candidate's profile..."); }
+    });
+  });
+  $('#retryBtn').addEventListener('click', function(){
+    showToast('AI is retrying scoring...');
+    setEvalState('scanning');
+    $all('[data-eval-state]').forEach(function(b){ b.classList.toggle('active', b.dataset.evalState==='scanning'); });
+    clearTimeout(evalTimer);
+    evalTimer = setTimeout(function(){
+      setEvalState('ready');
+      $all('[data-eval-state]').forEach(function(b){ b.classList.toggle('active', b.dataset.evalState==='ready'); });
+      showToast('AI scoring complete — Match Score updated', 'success');
+    }, 1700);
+  });
+  $all('[data-action]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var map = {approve:'Candidate approved', reject:'Candidate rejected', schedule:'Interview scheduled'};
+      showToast(map[btn.dataset.action], btn.dataset.action==='reject' ? 'error' : 'success');
+    });
+  });
+
+  /* ---------- Applications screen ---------- */
+  $all('.app-list-item').forEach(function(item){
+    item.addEventListener('click', function(){
+      $all('.app-list-item').forEach(function(i){ i.classList.toggle('selected', i===item); });
+      $all('.app-detail').forEach(function(d){ d.classList.toggle('active', d.dataset.appDetail===item.dataset.app); });
+    });
+  });
+
+  /* ---------- Company dashboard ---------- */
+  $all('[data-company-state]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      $all('[data-company-state]').forEach(function(b){ b.classList.toggle('active', b===btn); });
+      var s = btn.dataset.companyState;
+      $all('[data-company-block]').forEach(function(b){
+        b.classList.toggle('active', b.dataset.companyBlock === (s==='unauthorized' ? 'data' : s));
+      });
+      var exportBtn = $('#companyExportBtn');
+      exportBtn.disabled = (s==='unauthorized');
+      exportBtn.title = s==='unauthorized' ? "You don't have permission to export data" : '';
+    });
+  });
+
+  $('#companyExportBtn').addEventListener('click', function(e){
+    e.stopPropagation();
+    if(this.disabled) return;
+    $('#companyExportMenu').classList.toggle('open');
+  });
+  $all('#companyExportMenu button').forEach(function(b){
+    b.addEventListener('click', function(){
+      showToast('Exporting data as ' + b.dataset.format + '...');
+      $('#companyExportMenu').classList.remove('open');
+    });
+  });
+  document.addEventListener('click', function(){ $('#companyExportMenu').classList.remove('open'); });
+
+  /* ---------- Admin dashboard ---------- */
+  $('#adminExportBtn').addEventListener('click', function(){ showToast('Preparing platform report...'); });
+  $all('[data-banner-state]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      $all('[data-banner-state]').forEach(function(b){ b.classList.toggle('active', b===btn); });
+      $('#adminBanner').classList.toggle('hidden', btn.dataset.bannerState==='hide');
+    });
+  });
+  $('#viewDetailsLink').addEventListener('click', function(e){
+    e.preventDefault();
+    var chart = $('#aiScreeningChart');
+    chart.classList.add('highlight-pulse');
+    chart.scrollIntoView({behavior:'smooth', block:'center'});
+    setTimeout(function(){ chart.classList.remove('highlight-pulse'); }, 2800);
+  });
+
+  /* ---------- init ---------- */
+  setRole('recruiter');
+})();
+</script>
+
+</body>
+</html>
