@@ -5,7 +5,7 @@ import { forgotPasswordSchema, PASSWORD_RECOVERY_GENERIC_RESPONSE, PASSWORD_RESE
 import { POST as forgot } from "@/app/api/identity/password/forgot/route";
 import { POST as reset } from "@/app/api/identity/password/reset/route";
 
-const origin = "http://localhost:3000";
+const origin = "http://localhost:3001";
 const post = (path: string, body: unknown) => new Request(`${origin}${path}`, { method: "POST", headers: { origin, "sec-fetch-site": "same-origin", "content-type": "application/json" }, body: JSON.stringify(body) });
 
 describe("password recovery HTTP contract", () => {

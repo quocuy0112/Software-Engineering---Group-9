@@ -23,7 +23,7 @@ function uniqueClientIp() {
 
 function requestHeaders(cookie: string, extra: Record<string, string> = {}) {
   return new Headers({
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3001",
     "sec-fetch-site": "same-origin",
     "content-type": "application/json",
     "user-agent": "vitest",
@@ -61,7 +61,7 @@ async function signIn(email: string) {
     email,
     password,
     new Headers({
-      origin: "http://localhost:3000",
+      origin: "http://localhost:3001",
       "sec-fetch-site": "same-origin",
       "user-agent": "vitest",
     }),
@@ -80,7 +80,7 @@ async function signIn(email: string) {
 
 function startRequest(cookie: string, proof: string, body: unknown) {
   return new Request(
-    "http://localhost:3000/api/identity/two-factor/enrollment",
+    "http://localhost:3001/api/identity/two-factor/enrollment",
     {
       method: "POST",
       headers: requestHeaders(cookie, { "x-csrf-token": proof }),
@@ -91,7 +91,7 @@ function startRequest(cookie: string, proof: string, body: unknown) {
 
 function verifyRequest(cookie: string, proof: string, body: unknown) {
   return new Request(
-    "http://localhost:3000/api/identity/two-factor/enrollment/verify",
+    "http://localhost:3001/api/identity/two-factor/enrollment/verify",
     {
       method: "POST",
       headers: requestHeaders(cookie, { "x-csrf-token": proof }),
@@ -260,10 +260,10 @@ describe("TOTP enrollment route handlers (real Better Auth + qrcode)", () => {
 
   it("rejects an unauthenticated request", async () => {
     const started = await startEnrollment(
-      new Request("http://localhost:3000/api/identity/two-factor/enrollment", {
+      new Request("http://localhost:3001/api/identity/two-factor/enrollment", {
         method: "POST",
         headers: new Headers({
-          origin: "http://localhost:3000",
+          origin: "http://localhost:3001",
           "sec-fetch-site": "same-origin",
           "content-type": "application/json",
         }),

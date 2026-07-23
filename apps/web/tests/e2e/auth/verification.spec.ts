@@ -18,7 +18,7 @@ test("shows generic invalid/reused outcomes and supports safe resend", async ({ 
   await expect.poll(async () => {
     for (const name of (await readdir(mailDirectory)).filter((item) => !before.has(item))) {
       const body = await readFile(resolve(mailDirectory, name), "utf8");
-      link = body.match(/http:\/\/localhost:3000\/verify-email\?token=[A-Za-z0-9._~-]+/)?.[0] ?? link;
+      link = body.match(/http:\/\/localhost:3001\/verify-email\?token=[A-Za-z0-9._~-]+/)?.[0] ?? link;
     }
     return Boolean(link);
   }).toBe(true);

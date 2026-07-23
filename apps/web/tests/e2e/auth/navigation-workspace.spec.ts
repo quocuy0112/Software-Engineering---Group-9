@@ -10,14 +10,14 @@ async function openWorkspaceLink(page: Page, name: "Security" | "Sessions") {
   const responsePromise = page.waitForResponse(
     (response) =>
       response.url().includes(
-        name === "Security" ? "/settings/security" : "/settings/sessions",
+        name === "Security" ? "/profile/security" : "/profile/sessions",
       ) && response.status() === 200,
   );
   const startedAt = Date.now();
   await page.getByRole("link", { name, exact: true }).click();
   await responsePromise;
   await expect(page).toHaveURL(
-    name === "Security" ? /\/settings\/security$/ : /\/settings\/sessions$/,
+    name === "Security" ? /\/profile\/security$/ : /\/profile\/sessions$/,
     { timeout: 15_000 },
   );
   await expect(page.getByRole("heading", { name })).toBeVisible();
@@ -72,7 +72,7 @@ test("connects public auth pages and the protected identity workspace", async ({
         if (body.includes("To: " + email))
           verificationLink =
             body.match(
-              /http:\/\/localhost:3000\/verify-email\?token=[A-Za-z0-9._~-]+/,
+              /http:\/\/localhost:3001\/verify-email\?token=[A-Za-z0-9._~-]+/,
             )?.[0] ?? "";
       }
       return Boolean(verificationLink);
@@ -94,13 +94,16 @@ test("connects public auth pages and the protected identity workspace", async ({
   await page.getByRole("button", { name: "Sign in" }).click();
   expect((await loginResponse).status()).toBe(200);
   await expect(page).toHaveURL(/\/$/, { timeout: 15_000 });
-  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
-  const dashboardMenu = page.getByRole("button", {
+  await expect(page.getByRole("link", { name: "Profile" })).toBeVisible();
+  await page.getByRole("link", { name: "Profile" }).click();
+  await expect(page).toHaveURL(/\/profile$/);
+  await expect(page.getByRole("heading", { name: "Profile" })).toBeVisible();
+  const profileMenu = page.getByRole("button", {
     name: "Open workspace menu",
   });
-  if (await dashboardMenu.isVisible()) await dashboardMenu.click();
+  if (await profileMenu.isVisible()) await profileMenu.click();
   await expect(
-    page.getByRole("link", { name: "Dashboard", exact: true }),
+    page.getByRole("link", { name: "Profile", exact: true }),
   ).toHaveAttribute("aria-current", "page");
 
   await openWorkspaceLink(page, "Security");
@@ -150,6 +153,8 @@ test("connects public auth pages and the protected identity workspace", async ({
   ).toBeVisible();
 
   await page.goto("/");
+  await expect(page.getByRole("link", { name: "Sign up" })).toHaveAttribute("href", "/register");
+  await expect(page.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/login");
+  await page.goto("/dashboard");
   await expect(page).toHaveURL(/\/login\?returnTo=%2F$/);
-  await expect(page.getByRole("heading", { name: "Dashboard" })).toHaveCount(0);
 });

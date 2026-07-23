@@ -8,7 +8,7 @@ import {
 } from "@/features/identity/client/query-options";
 import { AuthStatus } from "./auth-status";
 
-export function SessionList() {
+export function SessionList({ embedded = false }: { embedded?: boolean }) {
   const [proof, setProof] = useState("");
   const queryClient = useQueryClient();
   const sessionsQuery = useQuery(sessionListQueryOptions(setProof));
@@ -32,25 +32,49 @@ export function SessionList() {
           : "";
 
   return (
-    <section>
-      <h1>Sessions</h1>
+    <section className={embedded ? "sessions-page sessions-page--embedded" : "sessions-page"}>
+      {!embedded ? (
+        <header className="page-heading">
+          <div>
+            <p className="workspace-kicker">ACTIVE ACCESS</p>
+            <h1 id="workspace-page-title">Sessions</h1>
+            <p className="page-heading-copy">
+              Review the devices that can currently access your SmartHire account.
+            </p>
+          </div>
+          <span className="page-heading-badge">{sessions.length} active</span>
+        </header>
+      ) : null}
       <AuthStatus
         status={status}
         tone={status.startsWith("Unable") ? "error" : "message"}
       />
-      <ul>
+      <div className="sessions-panel-heading">
+        <div>
+          <p className="panel-kicker">SIGNED-IN DEVICES</p>
+          <h2>Signed-in devices</h2>
+        </div>
+        <p>Revoke any device you do not recognize.</p>
+      </div>
+      <ul className="session-list">
         {sessions.map((session) => (
-          <li key={session.reference}>
-            <strong>
-              {session.device}
-              {session.current ? " (current)" : ""}
-            </strong>
-            <p>
-              {session.approximateLocation} · Last active{" "}
-              {new Date(session.lastActiveAt).toLocaleString()}
-            </p>
+          <li className="session-item" key={session.reference}>
+            <span className="session-device-icon" aria-hidden="true">
+              □
+            </span>
+            <div className="session-details">
+              <strong>
+                {session.device}
+                {session.current ? " (current)" : ""}
+              </strong>
+              <p>
+                {session.approximateLocation} · Last active{" "}
+                {new Date(session.lastActiveAt).toLocaleString()}
+              </p>
+            </div>
             {!session.current ? (
               <button
+                className="session-revoke-button"
                 type="button"
                 onClick={() => revokeMutation.mutate(session.reference)}
                 disabled={revokeMutation.isPending}
@@ -61,6 +85,12 @@ export function SessionList() {
           </li>
         ))}
       </ul>
+      {!sessionsQuery.isPending && sessions.length === 0 ? (
+        <div className="session-empty">
+          <span aria-hidden="true">□</span>
+          <p>No active sessions are available to display.</p>
+        </div>
+      ) : null}
     </section>
   );
 }

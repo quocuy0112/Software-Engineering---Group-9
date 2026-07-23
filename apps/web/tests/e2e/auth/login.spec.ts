@@ -38,7 +38,7 @@ test("rejects unverified/invalid/throttled login and preserves a safe redirect",
   const results: number[] = [];
   for (let index = 0; index < 11; index += 1) {
     const response = await page.request.post("/api/identity/login", {
-      headers: { origin: "http://localhost:3000", "sec-fetch-site": "same-origin" },
+      headers: { origin: "http://localhost:3001", "sec-fetch-site": "same-origin" },
       data: { email: throttledEmail, password: "wrong password 2026" },
     });
     results.push(response.status());

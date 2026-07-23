@@ -6,7 +6,7 @@ import { POST as login } from "@/app/api/identity/login/route";
 import { POST as logout } from "@/app/api/identity/logout/route";
 import { GET as sessions } from "@/app/api/identity/sessions/route";
 
-const origin = "http://localhost:3000";
+const origin = "http://localhost:3001";
 
 describe("login and session HTTP contract", () => {
   it("accepts only the documented login shape and keeps return paths non-secret", () => {

@@ -148,7 +148,7 @@ describe("email verification", () => {
     );
     expect(after).toHaveLength(1);
     const content = await readFile(resolve(directory, after[0]!), "utf8");
-    expect(content).toContain("http://localhost:3000/verify-email?token=");
+    expect(content).toContain("http://localhost:3001/verify-email?token=");
     expect(content).toContain("X-SmartHire-Idempotency-Key");
     const row = await prisma.emailOutbox.findUniqueOrThrow({
       where: { id: fixture.outboxId },

@@ -11,7 +11,7 @@ import {
 
 describe("reset password email", () => {
   it("renders a configured-origin reset link, expiry, and text alternative without logging", () => {
-    const resetUrl = "http://localhost:3000/reset-password?token=opaque";
+    const resetUrl = "http://localhost:3001/reset-password?token=opaque";
     const html = renderToStaticMarkup(<ResetPasswordTemplate resetUrl={resetUrl} />);
     expect(html).toContain(resetUrl);
     expect(html).toContain("30 minutes");

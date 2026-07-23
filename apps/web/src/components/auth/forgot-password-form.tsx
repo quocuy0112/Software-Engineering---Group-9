@@ -21,7 +21,9 @@ export function ForgotPasswordForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      const result = (await response.json().catch(() => null)) as { message?: string } | null;
+      const result = (await response.json().catch(() => null)) as {
+        message?: string;
+      } | null;
       setStatus(result?.message ?? PASSWORD_RECOVERY_GENERIC_RESPONSE);
     } catch {
       setStatus(PASSWORD_RECOVERY_GENERIC_RESPONSE);
@@ -32,9 +34,19 @@ export function ForgotPasswordForm() {
 
   return (
     <section className="auth-form-content">
-      <form onSubmit={submit} noValidate aria-busy={busy}>
-        <h1>Forgot your password?</h1>
-        <p>Enter your email and we’ll send reset instructions if the account is eligible.</p>
+      <form className="auth-form" onSubmit={submit} noValidate aria-busy={busy}>
+        <div className="auth-form-heading">
+          <p className="form-kicker">ACCOUNT RECOVERY</p>
+          <h1>Forgot your password?</h1>
+          <p>
+            Enter your email and we’ll send reset instructions if the account is
+            eligible.
+          </p>
+        </div>
+        <p>
+          Enter your email and we’ll send reset instructions if the account is
+          eligible.
+        </p>
         <label htmlFor="forgot-email">Email address</label>
         <input
           id="forgot-email"

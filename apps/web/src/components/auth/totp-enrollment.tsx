@@ -27,7 +27,11 @@ type Stage = "password" | "verify" | "complete";
  * sessionStorage, global stores, query caches, the URL, analytics, or logs, and
  * all sensitive state is cleared on completion, cancellation, and unmount.
  */
-export function TotpEnrollment() {
+export function TotpEnrollment({
+  onEnabled,
+}: {
+  onEnabled?: () => void;
+}) {
   const [proof, setProof] = useState("");
   const [stage, setStage] = useState<Stage>("password");
   const [setup, setSetup] = useState<Setup | null>(null);
@@ -43,13 +47,18 @@ export function TotpEnrollment() {
     const controller = new AbortController();
     const timer = setTimeout(() => {
       void (async () => {
-        const response = await fetch("/api/identity/sessions", {
-          cache: "no-store",
-          signal: controller.signal,
-        });
-        if (!response.ok) return;
-        const body = (await response.json()) as { csrfProof: string };
-        setProof(body.csrfProof);
+        try {
+          const response = await fetch("/api/identity/sessions", {
+            cache: "no-store",
+            signal: controller.signal,
+          });
+          if (!response.ok) return;
+          const body = (await response.json()) as { csrfProof: string };
+          setProof(body.csrfProof);
+        } catch {
+          // Navigation can abort this background request during route changes.
+          return;
+        }
       })();
     }, 0);
     return () => {
@@ -123,6 +132,7 @@ export function TotpEnrollment() {
     setBackupCodes(body.backupCodes);
     setStage("complete");
     setStatus("Two-factor authentication is now enabled.");
+    onEnabled?.();
   });
 
   function cancel() {
@@ -134,8 +144,19 @@ export function TotpEnrollment() {
   }
 
   return (
-    <section className="totp-enrollment" aria-labelledby="totp-title">
-      <h1 id="totp-title">Set up two-factor authentication</h1>
+    <section
+      className="totp-enrollment security-panel"
+      aria-labelledby="totp-title"
+    >
+      <div className="security-panel-heading">
+        <span className="security-panel-icon" aria-hidden="true">
+          ◇
+        </span>
+        <div>
+          <p className="panel-kicker">RECOMMENDED</p>
+          <h2 id="totp-title">Set up two-factor authentication</h2>
+        </div>
+      </div>
 
       {stage === "password" ? (
         <form

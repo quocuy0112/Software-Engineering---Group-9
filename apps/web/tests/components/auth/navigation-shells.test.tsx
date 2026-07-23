@@ -2,10 +2,11 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { WorkspaceShell } from "@/components/auth/workspace-shell";
-import DashboardPage from "@/app/(workspace)/page";
+import { ProfileNavigation } from "@/components/auth/profile-navigation";
+import DashboardPage from "@/app/(workspace)/dashboard/page";
 
 vi.mock("next/navigation", () => ({
-  usePathname: () => "/settings/security",
+  usePathname: () => "/profile/security",
 }));
 
 describe("identity navigation shells", () => {
@@ -46,15 +47,27 @@ describe("identity navigation shells", () => {
 
   it("marks the active workspace destination and controls the mobile menu", () => {
     render(
-      <WorkspaceShell csrfProof="proof">
+      <WorkspaceShell
+        csrfProof="proof"
+        profile={{ name: "Thao Nguyen", email: "thao@example.test" }}
+      >
         <h1>Security</h1>
       </WorkspaceShell>,
     );
 
-    expect(screen.getByRole("link", { name: "Security" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Profile" })).toHaveAttribute(
       "aria-current",
       "page",
     );
+    expect(
+      screen.getByRole("link", { name: "Open profile for Thao Nguyen" }),
+    ).toHaveAttribute("href", "/profile");
+    expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute(
+      "href",
+      "/dashboard",
+    );
+    expect(screen.getByText("Thao Nguyen")).toBeVisible();
+    expect(screen.getByText("thao@example.test")).toBeVisible();
     const menu = screen.getByRole("button", { name: "Open workspace menu" });
     expect(menu).toHaveAttribute("aria-expanded", "false");
     fireEvent.click(menu);
@@ -70,16 +83,37 @@ describe("identity navigation shells", () => {
     ).toBeVisible();
     expect(screen.getByRole("link", { name: /Security/ })).toHaveAttribute(
       "href",
-      "/settings/security",
+      "/profile/security",
     );
     expect(screen.getByRole("link", { name: /Sessions/ })).toHaveAttribute(
       "href",
-      "/settings/sessions",
+      "/profile/sessions",
     );
     expect(screen.getByText(/coming later/i)).toBeVisible();
     expect(screen.queryByText(/jobs|applications|analytics/i)).toBeNull();
   });
 
+  it("exposes directly addressable profile tabs with active state", () => {
+    render(<ProfileNavigation active="security" />);
+
+    expect(screen.getByRole("navigation", { name: "Profile" })).toBeVisible();
+    expect(screen.getByRole("link", { name: "Overview" })).toHaveAttribute(
+      "href",
+      "/profile",
+    );
+    expect(screen.getByRole("link", { name: "Security" })).toHaveAttribute(
+      "href",
+      "/profile/security",
+    );
+    expect(screen.getByRole("link", { name: "Security" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(screen.getByRole("link", { name: "Sessions" })).toHaveAttribute(
+      "href",
+      "/profile/sessions",
+    );
+  });
   it("prevents duplicate sign-out and announces a generic failure", async () => {
     let release!: () => void;
     const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(

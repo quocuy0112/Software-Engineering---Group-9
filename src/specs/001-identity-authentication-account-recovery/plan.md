@@ -5,7 +5,7 @@
 
 ## Summary
 
-Transactional email uses one provider-independent path: `EmailOutbox -> due-outbox processor -> EmailService -> capture | SMTP | Resend`. Capture is the generated local default, SMTP is opt-in for local/team demonstrations, and Resend is production-oriented although production deployment is outside this academic project. Registration, verification-resend, recovery, and notification requests commit their outbox row and return without awaiting provider network delivery.
+Transactional email uses one provider-independent path: `EmailOutbox -> due-outbox processor -> EmailService -> capture | SMTP | Resend`. Capture is the generated local default, SMTP is opt-in for local/team demonstrations, and Resend is production-oriented although production deployment is outside this academic project. Registration, verification-resend, normal password reset, full account recovery, and notification requests commit their outbox row and return without awaiting provider network delivery.
 
 Deliver the approved P0 identity scope in one Next.js App Router application. Next.js App Router Route Handlers are the only HTTP backend mechanism and call Service → Repository/Data Access → PostgreSQL. Better Auth is the exclusive browser-session owner and uses its secure opaque cookie plus PostgreSQL `Session` row; SmartHire creates no browser JWT, second authentication cookie, or parallel session table. Prisma/Prisma Migrate own schema access and migrations. Resend, behind an email boundary, sends React Email templates; local development uses preview plus a non-network capture adapter.
 
@@ -22,7 +22,7 @@ Deliver the approved P0 identity scope in one Next.js App Router application. Ne
 
 **Testing**: unit, OpenAPI contract, PostgreSQL integration, component/accessibility, and browser E2E tests with controlled clock and concurrency cases  
 **Performance target**: authentication page load ≤3 seconds and identity interactions ≤2 seconds under the environment and dataset defined in `quickstart.md`  
-**Scope**: registration, email verification, password login, Better Auth TOTP and backup codes, password recovery, session management, account-state enforcement, audit, rate limiting, transactional email, and shared identity navigation/workspace integration only. The workspace addition is limited to authentication-aware shells and a foundational account Dashboard; it does not add recruitment-domain behavior. No email OTP, social login, trusted devices, email change, passkeys, SMS, Python/FastAPI backend, or AI.
+**Scope**: registration, email verification, password login, Better Auth TOTP and backup codes, password recovery, session management, account-state enforcement, audit, rate limiting, transactional email, and shared identity navigation/workspace/Profile integration only. The workspace addition is limited to authentication-aware shells, a foundational account Dashboard, and directly addressable Profile Overview/Security/Sessions pages; it does not add recruitment-domain behavior. No email OTP, social login, trusted devices, email change, passkeys, SMS, Python/FastAPI backend, or AI.
 
 ## Constitution Check
 
@@ -43,7 +43,7 @@ The active Constitution is `src/.specify/memory/constitution.md`. It permits the
 ```text
 Browser / Server Components
         |
-App Router route-group layouts: (auth) public shell | (workspace) server-authenticated shell
+        App Router route-group layouts: (auth) public auth shell | public Home | (workspace) server-authenticated shell
         |
 apps/web/src/app/api/**/route.ts (Route Handlers and Better Auth catch-all)
         |
@@ -59,7 +59,17 @@ PostgreSQL            EmailOutbox worker -> EmailService -> capture | SMTP | Res
 - Repositories encapsulate Prisma and PostgreSQL behavior. Provider gateways encapsulate Better Auth; email adapters encapsulate capture, SMTP/Nodemailer, and Resend behind `EmailService`.
 - Better Auth handlers mount with `toNextJsHandler(auth)` at `app/api/auth/[...all]/route.ts`. Pages Router API Routes are prohibited for this feature.
 - Server Components may consume a server-validated session but must not introduce alternate credentials or client-side authorization.
-- The (workspace) layout validates the Better Auth session once at the shared server boundary for /, /settings/security, and /settings/sessions, then passes only a minimized display/navigation projection and ephemeral CSRF proof to the client shell. The shell never fetches or persists a second session.
+- The canonical public Home is `/`; `/home` is a server-side redirect to `/`. The `(workspace)` layout validates the Better Auth session once at the shared server boundary for `/dashboard`, `/profile`, `/profile/security`, and `/profile/sessions`, then passes only a minimized display/navigation projection and ephemeral CSRF proof to the client shell. Legacy `/settings` routes redirect server-side into Profile. The shell never fetches or persists a second session.
+
+### Authenticated Workspace and Profile Integration
+
+- The server-authenticated (workspace) layout is authoritative for Dashboard and all Profile routes. It obtains the ACTIVE Better Auth session once through a request-memoized server helper and derives only a safe display projection: name, email, account-created date, and two-factor enabled state.
+- The top-right account control and desktop/mobile navigation use Next.js Link. Pathname state is presentation-only and cannot authorize access.
+- Profile uses directly addressable App Router destinations: /profile for Overview, /profile/security for password recovery plus Better Auth-owned 2FA/backup management, and /profile/sessions for sanitized owned-session management. A shared Profile layout owns tabs and headings without one oversized client component.
+- Legacy /settings/security and /settings/sessions pages are server redirects to their exact Profile destinations. Query strings are intentionally discarded so obsolete links cannot forward reset, verification, factor, or other secret-bearing parameters.
+- A correct current password submitted with a sensitive request is renewed proof when the existing session is older than ten minutes. The session must still be valid and ACTIVE; a wrong password, missing session, inactive account, or throttled request fails generically.
+- Better Auth remains the sole TOTP, backup-code, and browser-session owner. Enrollment verification and disablement can rotate its session; gateway calls request response headers and the custom Route Handler forwards only the resulting authoritative Set-Cookie header with no-store response headers.
+- Profile Security chooses enrollment or management from authoritative twoFactorEnabled state. It never calls enrollment while 2FA is already enabled, preventing silent secret rotation. Password visibility uses accessible icon buttons and retains browser/password-manager metadata.
 
 ## Repository and Project Structure
 
@@ -147,7 +157,7 @@ The Better Auth JWT plugin is not configured for browser authentication. A futur
 - Root `npm run dev` should start both Next.js and the email worker with one cross-platform supervisor and forward shutdown signals to both. Separate `npm run dev:web` and `npm run email:worker` commands remain available for debugging. Capture uses the same worker path as SMTP and Resend for consistent request semantics.
 - Tailwind CSS and shadcn/ui form the UI baseline. React Hook Form and Zod handle forms and trust-boundary validation. Sonner supplements persistent inline/summary errors and is never the sole error channel.
 - TanStack Query is used only for documented value. Zustand may hold only non-sensitive shared UI state. Motion is limited to nonessential reduced-motion-safe transitions. Lenis is prohibited on authentication pages.
-- Public identity pages share the (auth) layout and AuthShell, with route-specific cross-links implemented using Next.js Link. Protected Dashboard and settings pages share the (workspace) layout and WorkspaceShell, with active navigation derived from the current pathname for presentation only.
+- Public identity pages share the (auth) layout and AuthShell, with route-specific cross-links implemented using Next.js Link. Protected Dashboard and Profile pages share the (workspace) layout and WorkspaceShell, with active navigation derived from the current pathname for presentation only. Profile Overview, Security, and Sessions use nested App Router pages and a shared Profile navigation layout.
 - The foundational Dashboard contains identity-workspace orientation, quick links, and explicitly labelled future placeholders only. It performs no recruitment-domain queries and displays no fabricated Candidate, Recruiter, job, application, notification, or analytics data.
 
 ## Security and Operations

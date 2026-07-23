@@ -28,7 +28,7 @@ npm run dev
 
 The planned `npm run dev` command starts both the Next.js application and due-outbox worker through a cross-platform supervisor. Use `npm run dev:web` and `npm run email:worker` separately only for debugging. The worker must be running before expecting capture, SMTP, or Resend delivery; registration and resend responses intentionally return after the outbox commit and do not wait for mail.
 
-Open http://localhost:3000. PostgreSQL is published only at `localhost:55432`, and captured email is stored in `apps/web/.local/mail`. Use `npm run db:down` to stop PostgreSQL without deleting data; use `npm run db:reset` only to delete the local named volume and start clean.
+Open http://localhost:3001. PostgreSQL is published only at `localhost:55432`, and captured email is stored in `apps/web/.local/mail`. Use `npm run db:down` to stop PostgreSQL without deleting data; use `npm run db:reset` only to delete the local named volume and start clean.
 
 `env:init` invokes `scripts/setup-local.mjs`; it generates PostgreSQL and Better Auth secrets without printing them, does not overwrite existing files, creates root `.env` and `apps/web/.env.local`, and creates the gitignored file-email capture directory. If either environment file already exists, preserve it and report only the skipped path, never its contents.
 

@@ -39,6 +39,7 @@ export class ResetPasswordService {
     try {
       await this.passwordGateway.updatePassword(consumed.userId, newPassword);
       await this.passwordGateway.revokeAllSessions(consumed.userId);
+      await this.passwordGateway.disableTwoFactorForPasswordReset(consumed.userId);
       await prisma.authenticationChallenge.deleteMany({ where: { userId: consumed.userId } });
       await prisma.emailOutbox.upsert({
         where: { idempotencyKey: `password-changed:${consumed.tokenId}` },
@@ -61,7 +62,7 @@ export class ResetPasswordService {
         targetId: consumed.tokenId,
         result: "SUCCESS",
         correlationId: randomUUID(),
-        context: { sessionRevocation: "all" },
+        context: { sessionRevocation: "all", twoFactorRevocation: "disabled" },
       });
     } catch {
       await this.recordFailure(now, "provider_or_persistence_failure");

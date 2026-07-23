@@ -39,8 +39,10 @@ export async function POST(request: Request) {
       { message: "Verification could not be completed." },
       { status: result.status, headers: noStoreHeaders },
     );
+  const headers = new Headers(noStoreHeaders);
+  if (result.sessionCookie) headers.append("Set-Cookie", result.sessionCookie);
   return Response.json(
     { message: "Two-factor authentication disabled." },
-    { headers: noStoreHeaders },
+    { headers },
   );
 }

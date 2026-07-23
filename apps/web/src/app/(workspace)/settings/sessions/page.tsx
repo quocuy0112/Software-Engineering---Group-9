@@ -1,5 +1,5 @@
-import { SessionList } from "@/components/auth/session-list";
+import { redirect } from "next/navigation";
 
 export default function SessionsPage() {
-  return <SessionList />;
+  redirect("/profile/sessions");
 }

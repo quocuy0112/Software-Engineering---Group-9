@@ -14,7 +14,7 @@ const password = "Challenge Password 2026!",
   emails: string[] = [];
 const base = () =>
   new Headers({
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3001",
     "sec-fetch-site": "same-origin",
     "content-type": "application/json",
     "x-forwarded-for": randomUUID(),
@@ -139,7 +139,7 @@ describe("TOTP login challenge", () => {
       h = base();
     h.set("cookie", pre);
     const response = await complete(
-      new Request("http://localhost:3000/api/identity/two-factor/complete", {
+      new Request("http://localhost:3001/api/identity/two-factor/complete", {
         method: "POST",
         headers: h,
         body: JSON.stringify({ factor: "totp", code }),
@@ -183,7 +183,7 @@ describe("TOTP login challenge", () => {
       (
         await complete(
           new Request(
-            "http://localhost:3000/api/identity/two-factor/complete",
+            "http://localhost:3001/api/identity/two-factor/complete",
             {
               method: "POST",
               headers: h,

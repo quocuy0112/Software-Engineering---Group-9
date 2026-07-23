@@ -37,11 +37,10 @@ export class RegenerateBackupCodesService {
         .catch(() => undefined);
       return recent;
     }
-    if (
-      !(await this.gateway
-        .verifyInitialTotp(request.headers, code)
-        .catch(() => false))
-    ) {
+    const verification = await this.gateway
+      .verifyInitialTotp(request.headers, code)
+      .catch(() => ({ verified: false, sessionCookie: null }));
+    if (!verification.verified) {
       await this.audit
         .append({
           occurredAt: now,

@@ -49,7 +49,7 @@ test("lists, revokes, evicts, and signs out opaque database sessions", async ({
         if (body.includes(`To: ${email}`)) {
           link =
             body.match(
-              /http:\/\/localhost:3000\/verify-email\?token=[A-Za-z0-9._~-]+/,
+              /http:\/\/localhost:3001\/verify-email\?token=[A-Za-z0-9._~-]+/,
             )?.[0] ?? "";
         }
       }

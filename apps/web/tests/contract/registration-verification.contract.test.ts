@@ -5,7 +5,7 @@ import { registrationSchema, verificationTokenSchema } from "@/features/identity
 import { POST as register } from "@/app/api/identity/register/route";
 import { POST as verify } from "@/app/api/identity/verification/consume/route";
 
-const origin = "http://localhost:3000";
+const origin = "http://localhost:3001";
 const request = (url: string, body: unknown) =>
   new Request(`${origin}${url}`, {
     method: "POST",

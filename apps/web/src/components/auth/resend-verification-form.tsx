@@ -23,6 +23,7 @@ export function ResendVerificationForm() {
   const busy = resend.isPending;
   return (
     <form
+      className="auth-form auth-form--compact"
       onSubmit={async (event) => {
         event.preventDefault();
         if (busy) return;

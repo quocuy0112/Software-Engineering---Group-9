@@ -38,7 +38,7 @@ async function account(
 }
 const headers = () =>
   new Headers({
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3001",
     "sec-fetch-site": "same-origin",
     "user-agent": "vitest",
   });

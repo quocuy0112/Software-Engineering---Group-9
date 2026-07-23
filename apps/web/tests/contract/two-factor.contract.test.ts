@@ -27,9 +27,9 @@ describe("two-factor and cookie contract", () => {
   });
 
   it("rejects a normal session cookie as pre-auth proof with a generic no-store response", async () => {
-    const response = await complete(new Request("http://localhost:3000/api/identity/two-factor/complete", {
+    const response = await complete(new Request("http://localhost:3001/api/identity/two-factor/complete", {
       method: "POST",
-      headers: { origin: "http://localhost:3000", "sec-fetch-site": "same-origin", "content-type": "application/json", cookie: "smarthire.session=opaque" },
+      headers: { origin: "http://localhost:3001", "sec-fetch-site": "same-origin", "content-type": "application/json", cookie: "smarthire.session=opaque" },
       body: JSON.stringify({ factor: "totp", code: "123456" }),
     }));
     expect(response.status).toBe(401);

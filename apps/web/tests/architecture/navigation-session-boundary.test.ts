@@ -11,7 +11,7 @@ describe("navigation session boundary", () => {
 
   it("keeps child pages free of duplicated shell markup and session fetches", async () => {
     const pages = [
-      "src/app/(workspace)/page.tsx",
+      "src/app/(workspace)/dashboard/page.tsx",
       "src/app/(workspace)/settings/security/page.tsx",
       "src/app/(workspace)/settings/sessions/page.tsx",
     ];

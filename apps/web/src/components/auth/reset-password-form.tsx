@@ -57,8 +57,12 @@ export function ResetPasswordForm() {
 
   return (
     <section className="auth-form-content">
-      <form onSubmit={submit} noValidate aria-busy={busy}>
-        <h1>Choose a new password</h1>
+      <form className="auth-form" onSubmit={submit} noValidate aria-busy={busy}>
+        <div className="auth-form-heading">
+          <p className="form-kicker">SECURE YOUR ACCOUNT</p>
+          <h1>Choose a new password</h1>
+          <p>Use a strong, unique password you do not use anywhere else.</p>
+        </div>
         <label htmlFor="reset-password">New password</label>
         <input
           id="reset-password"
@@ -85,7 +89,10 @@ export function ResetPasswordForm() {
         >
           {busy ? "Resetting…" : "Reset password"}
         </button>
-        <AuthStatus status={status} tone={status === PASSWORD_RESET_GENERIC_ERROR ? "error" : "success"} />
+        <AuthStatus
+          status={status}
+          tone={status === PASSWORD_RESET_GENERIC_ERROR ? "error" : "success"}
+        />
         <Link href="/login">Back to sign in</Link>
       </form>
     </section>

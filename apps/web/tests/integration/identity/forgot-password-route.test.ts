@@ -9,11 +9,11 @@ const limiter = new PrismaRateLimitRepository();
 const subjectDigest = limiter.subjectDigest(`anonymous:${email}`);
 
 function request(body: unknown) {
-  return new Request("http://localhost:3000/api/identity/password/forgot", {
+  return new Request("http://localhost:3001/api/identity/password/forgot", {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      origin: "http://localhost:3000",
+      origin: "http://localhost:3001",
       "sec-fetch-site": "same-origin",
     },
     body: JSON.stringify(body),

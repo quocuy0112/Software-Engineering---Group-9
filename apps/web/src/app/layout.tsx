@@ -5,8 +5,9 @@ import { Toaster } from "sonner";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "SmartHire",
-  description: "SmartHire local workspace",
+  title: "SmartHire | Talent Workspace",
+  description:
+    "A secure talent workspace designed to help candidates and hiring teams make meaningful connections.",
 };
 
 export default function RootLayout({

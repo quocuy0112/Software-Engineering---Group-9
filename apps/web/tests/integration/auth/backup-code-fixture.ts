@@ -5,7 +5,7 @@ import { symmetricDecrypt } from "better-auth/crypto";
 import { serverEnvironment } from "@/lib/env/runtime";
 
 export const fixturePassword = "Backup Code Fixture 2026!";
-const origin = "http://localhost:3000";
+const origin = "http://localhost:3001";
 export function requestHeaders(cookie?: string) {
   const h = new Headers({
     origin,

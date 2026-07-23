@@ -1,6 +1,6 @@
 import { chromium } from "@playwright/test";
 
-const baseUrl = process.env.PERF_BASE_URL ?? "http://localhost:3000";
+const baseUrl = process.env.PERF_BASE_URL ?? "http://localhost:3001";
 const iterations = Number.parseInt(process.env.PERF_ITERATIONS ?? "100", 10);
 const routes = (
   process.env.PERF_ROUTES ??

@@ -84,7 +84,7 @@ test("resets once, revokes all sessions, sends notification, and requires the ne
         if (body.includes(`To: ${email}`)) {
           verificationLink =
             body.match(
-              /http:\/\/localhost:3000\/verify-email\?token=[A-Za-z0-9._~-]+/,
+              /http:\/\/localhost:3001\/verify-email\?token=[A-Za-z0-9._~-]+/,
             )?.[0] ?? verificationLink;
         }
       }
@@ -123,7 +123,7 @@ test("resets once, revokes all sessions, sends notification, and requires the ne
           if (body.includes(`To: ${email}`)) {
             resetLink =
               body.match(
-                /http:\/\/localhost:3000\/reset-password#token=[A-Za-z0-9._~-]+/,
+                /http:\/\/localhost:3001\/reset-password#token=[A-Za-z0-9._~-]+/,
               )?.[0] ?? resetLink;
           }
         }

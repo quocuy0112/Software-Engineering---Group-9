@@ -14,6 +14,16 @@ export type TwoFactorEnrollmentStart = {
   backupCodes: string[];
 };
 
+export type TwoFactorVerification = {
+  verified: boolean;
+  sessionCookie: string | null;
+};
+
+export type TwoFactorDisablement = {
+  disabled: boolean;
+  sessionCookie: string | null;
+};
+
 /**
  * Minimal typed boundary over Better Auth's two-factor plugin. Better Auth
  * remains the exclusive owner of enrollment state, the TOTP secret, backup
@@ -34,7 +44,10 @@ export interface TwoFactorGateway {
    * Verifies the user's first six-digit TOTP code, which flips the stored
    * TwoFactor row to verified and enables 2FA on the account.
    */
-  verifyInitialTotp(headers: Headers, code: string): Promise<boolean>;
+  verifyInitialTotp(
+    headers: Headers,
+    code: string,
+  ): Promise<TwoFactorVerification>;
   /**
    * Reveals the backup codes Better Auth generated and stored (encrypted) at
    * enrollment start, decrypted through Better Auth. Called only after the
@@ -46,10 +59,23 @@ export interface TwoFactorGateway {
     code: string,
   ): Promise<{ sessionCookie: string | null }>;
   regenerateBackupCodes(headers: Headers, password: string): Promise<string[]>;
-  disableTwoFactor(headers: Headers, password: string): Promise<boolean>;
+  disableTwoFactor(
+    headers: Headers,
+    password: string,
+  ): Promise<TwoFactorDisablement>;
 }
 
 export class BetterAuthTwoFactorGateway implements TwoFactorGateway {
+  private sessionCookie(headers: Headers) {
+    return (
+      headers
+        .getSetCookie()
+        .find((value) =>
+          /^(smarthire\.session|__Host-smarthire\.session)=/.test(value),
+        ) ?? null
+    );
+  }
+
   private async request(path: string, body: unknown, headers: Headers) {
     const forwarded = new Headers(headers);
     forwarded.set("content-type", "application/json");
@@ -79,12 +105,22 @@ export class BetterAuthTwoFactorGateway implements TwoFactorGateway {
     return { otpauthUri: result.totpURI, backupCodes: result.backupCodes };
   }
 
-  async verifyInitialTotp(headers: Headers, code: string): Promise<boolean> {
+  async verifyInitialTotp(
+    headers: Headers,
+    code: string,
+  ): Promise<TwoFactorVerification> {
     try {
-      await auth.api.verifyTOTP({ headers, body: { code } });
-      return true;
+      const result = await auth.api.verifyTOTP({
+        headers,
+        body: { code },
+        returnHeaders: true,
+      });
+      return {
+        verified: true,
+        sessionCookie: this.sessionCookie(result.headers),
+      };
     } catch {
-      return false;
+      return { verified: false, sessionCookie: null };
     }
   }
 
@@ -103,11 +139,7 @@ export class BetterAuthTwoFactorGateway implements TwoFactorGateway {
       headers,
     );
     const sessionCookie = response.ok
-      ? (response.headers
-          .getSetCookie()
-          .find((value) =>
-            /^(smarthire\.session|__Host-smarthire\.session)=/.test(value),
-          ) ?? null)
+      ? this.sessionCookie(response.headers)
       : null;
     return { sessionCookie };
   }
@@ -124,7 +156,11 @@ export class BetterAuthTwoFactorGateway implements TwoFactorGateway {
     const result = await auth.api.disableTwoFactor({
       headers,
       body: { password },
+      returnHeaders: true,
     });
-    return result.status === true;
+    return {
+      disabled: result.response.status === true,
+      sessionCookie: this.sessionCookie(result.headers),
+    };
   }
 }

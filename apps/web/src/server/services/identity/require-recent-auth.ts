@@ -10,7 +10,7 @@ import { PrismaRateLimitRepository } from "@/server/repositories/rate-limit/pris
 import { PrismaAuditRepository } from "@/server/repositories/audit/prisma-audit-repository";
 import { requireSession } from "@/server/auth/require-session";
 
-/** Sensitive actions require re-proof no older than ten minutes. */
+/** Sensitive actions require fresh proof. A valid current password renews it. */
 export const RECENT_AUTH_WINDOW_MS = 10 * 60 * 1000;
 export const RECENT_AUTH_ERROR =
   "Please confirm your current password to continue.";
@@ -32,8 +32,12 @@ type Dependencies = {
  * Confirms the caller recently authenticated before a sensitive action:
  *  - valid Better Auth session (policy-enforced, ACTIVE-only),
  *  - the owning UserAccount is ACTIVE,
- *  - the session was established within the recent-auth window,
  *  - the supplied current password verifies through Better Auth only.
+ *
+ * A password supplied for this request is the renewed proof required when the
+ * session itself is older than the recent-auth window. Rejecting an otherwise
+ * valid session before checking that password made every sensitive action
+ * permanently fail after ten minutes.
  * Failures are generic and never leak which check failed. No password value is logged.
  */
 export class RequireRecentAuthService {
@@ -82,25 +86,6 @@ export class RequireRecentAuthService {
         correlationId,
         now,
         "inactive",
-        session.userId,
-        session.sessionId,
-      );
-      return { ok: false, status: 401 };
-    }
-
-    const sessionRow = await prisma.session.findFirst({
-      where: { id: session.sessionId, userId: session.userId },
-      select: { createdAt: true },
-    });
-    if (
-      !sessionRow ||
-      sessionRow.createdAt.getTime() + RECENT_AUTH_WINDOW_MS <= now.getTime()
-    ) {
-      await this.record(
-        "FAILURE",
-        correlationId,
-        now,
-        "stale",
         session.userId,
         session.sessionId,
       );

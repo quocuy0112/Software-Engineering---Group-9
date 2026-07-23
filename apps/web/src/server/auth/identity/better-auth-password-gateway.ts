@@ -14,4 +14,18 @@ export class BetterAuthPasswordGateway {
     const context = await auth.$context;
     await context.internalAdapter.deleteSessions(userId);
   }
+
+  /**
+   * Password-reset possession is the renewed account proof for this flow.
+   * Clear Better Auth's authoritative factor state before the account can
+   * authenticate again, including the encrypted secret and backup codes.
+   */
+  async disableTwoFactorForPasswordReset(userId: string): Promise<void> {
+    const context = await auth.$context;
+    await context.internalAdapter.updateUser(userId, { twoFactorEnabled: false });
+    await context.adapter.deleteMany({
+      model: "TwoFactor",
+      where: [{ field: "userId", value: userId }],
+    });
+  }
 }

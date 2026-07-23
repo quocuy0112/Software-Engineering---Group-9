@@ -35,6 +35,17 @@ describe("shared auth primitives", () => {
       screen.getByRole("button", { name: "Show current password" }),
     );
     expect(input.type).toBe("text");
+    const hide = screen.getByRole("button", {
+      name: "Hide current password",
+    });
+    expect(hide).toHaveAttribute("aria-pressed", "true");
+    expect(hide.querySelector("svg")).toBeTruthy();
+    expect(screen.queryByText("Hide")).toBeNull();
+    fireEvent.click(hide);
+    expect(input.type).toBe("password");
+    expect(
+      screen.getByRole("button", { name: "Show current password" }),
+    ).toHaveAttribute("aria-pressed", "false");
   });
   it("announces and focuses the error summary", () => {
     render(<FormFeedback errors={["Email is required"]} status="Waiting" />);

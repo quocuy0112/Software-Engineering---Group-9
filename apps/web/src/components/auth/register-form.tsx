@@ -57,9 +57,17 @@ export function RegisterForm() {
       </div>
     );
   return (
-    <form onSubmit={submit} noValidate aria-busy={isSubmitting}>
-      <h1>Create your SmartHire account</h1>
-      <p>All accounts begin with a Candidate identity.</p>
+    <form
+      className="auth-form"
+      onSubmit={submit}
+      noValidate
+      aria-busy={isSubmitting}
+    >
+      <div className="auth-form-heading">
+        <p className="form-kicker">START YOUR JOURNEY</p>
+        <h1>Create your SmartHire account</h1>
+        <p>All accounts begin with a Candidate identity.</p>
+      </div>
       <Field label="Full name" error={errors.name?.message}>
         <input autoComplete="name" {...register("name")} />
       </Field>

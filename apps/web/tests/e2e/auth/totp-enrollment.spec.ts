@@ -66,7 +66,7 @@ async function registerVerifyAndSignIn(page: Page): Promise<string> {
         if (body.includes(`To: ${email}`)) {
           link =
             body.match(
-              /http:\/\/localhost:3000\/verify-email\?token=[A-Za-z0-9._~-]+/,
+              /http:\/\/localhost:3001\/verify-email\?token=[A-Za-z0-9._~-]+/,
             )?.[0] ?? "";
         }
       }
@@ -108,7 +108,7 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   });
   const email = await registerVerifyAndSignIn(page);
 
-  await page.goto("/settings/security");
+  await page.goto("/profile/security");
   await expect(
     page.getByRole("heading", { name: "Set up two-factor authentication" }),
   ).toBeVisible();
@@ -225,7 +225,7 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   expect(
     completedCookies.filter((cookie) => cookie.name === "smarthire.session"),
   ).toHaveLength(1);
-  await page.goto("/settings/security");
+  await page.goto("/profile/security");
   await expect(page).toHaveURL(/\/settings\/security/);
 
   await page.context().clearCookies();
@@ -259,7 +259,7 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   });
 
   // Regeneration displays ten replacement codes once and invalidates old ones.
-  await page.goto("/settings/security");
+  await page.goto("/profile/security");
   const management = page.getByRole("region", {
     name: "Two-factor management",
   });
@@ -304,7 +304,7 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await expect(page).toHaveURL(/\/settings\/sessions(?:\?.*)?$/, { timeout: 15_000 });
 
   // Disablement removes the second-factor requirement for the next login.
-  await page.goto("/settings/security");
+  await page.goto("/profile/security");
   const disablePanel = page.getByRole("region", { name: "Two-factor management" });
   await disablePanel.getByLabel("Current password").fill(password);
   await disablePanel.getByLabel("Six-digit TOTP code").fill(totp(manualKey));
@@ -346,7 +346,7 @@ test("enrollment UI is keyboard-operable and has no 320px overflow", async ({
   await page.emulateMedia({ reducedMotion: "reduce" });
   await registerVerifyAndSignIn(page);
 
-  await page.goto("/settings/security");
+  await page.goto("/profile/security");
   await expect(
     page.getByRole("heading", { name: "Set up two-factor authentication" }),
   ).toBeVisible();

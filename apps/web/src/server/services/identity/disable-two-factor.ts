@@ -7,7 +7,7 @@ import {
 import { RequireRecentAuthService } from "./require-recent-auth";
 import { PrismaAuditRepository } from "@/server/repositories/audit/prisma-audit-repository";
 export type DisableTwoFactorResult =
-  | { ok: true }
+  | { ok: true; sessionCookie: string | null }
   | { ok: false; status: 401 | 429 | 502; retryAfterSeconds?: number };
 export class DisableTwoFactorService {
   constructor(
@@ -37,10 +37,10 @@ export class DisableTwoFactorService {
         .catch(() => undefined);
       return recent;
     }
-    const valid = await this.gateway
+    const verification = await this.gateway
       .verifyInitialTotp(request.headers, code)
-      .catch(() => false);
-    if (!valid) {
+      .catch(() => ({ verified: false, sessionCookie: null }));
+    if (!verification.verified) {
       await this.record(
         "FAILURE",
         recent.userId,
@@ -51,10 +51,10 @@ export class DisableTwoFactorService {
       );
       return { ok: false, status: 401 };
     }
-    const disabled = await this.gateway
+    const disablement = await this.gateway
       .disableTwoFactor(request.headers, currentPassword)
-      .catch(() => false);
-    if (!disabled) {
+      .catch(() => ({ disabled: false, sessionCookie: null }));
+    if (!disablement.disabled) {
       await this.record(
         "FAILURE",
         recent.userId,
@@ -73,7 +73,7 @@ export class DisableTwoFactorService {
       now,
       "disabled",
     );
-    return { ok: true };
+    return { ok: true, sessionCookie: disablement.sessionCookie };
   }
   private record(
     result: "SUCCESS" | "FAILURE",

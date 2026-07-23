@@ -3,8 +3,8 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "next dev",
-    "dev:web": "next dev",
+    "dev": "next dev -p 3001",
+    "dev:web": "next dev -p 3001",
     "email:worker": "tsx scripts/run-email-worker.mjs",
     "email:preview": "tsx src/server/email/preview/index.ts",
     "perf:pages": "node scripts/measure-page-performance.mjs",
