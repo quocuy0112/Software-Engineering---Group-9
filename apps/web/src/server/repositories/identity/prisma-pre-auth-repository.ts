@@ -23,6 +23,22 @@ export class PrismaPreAuthRepository {
     });
     return { token, expiresAt: new Date(now.getTime() + PRE_AUTH_LIFETIME_MS) };
   }
+  async userIdForHandle(
+    token: string,
+    browserBinding: string,
+  ): Promise<string | null> {
+    const row = await prisma.authenticationChallenge.findFirst({
+      where: {
+        handleDigest: this.protector.digest(token),
+        contextDigest: this.protector.digest(`browser:${browserBinding}`),
+        purpose: "PASSWORD_LOGIN_2FA",
+        consumedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+      select: { userId: true },
+    });
+    return row?.userId ?? null;
+  }
   async claimAttempt(
     token: string,
     browserBinding: string,

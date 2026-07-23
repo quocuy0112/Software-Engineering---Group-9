@@ -6,7 +6,7 @@ This is a validation guide, not implementation code. It proves the approved stor
 
 - Node.js `24.18.x` selected by the root `.nvmrc` or `.node-version`, with npm run from the repository root.
 - Docker Desktop or another compatible Docker Compose runtime. This is the only required local infrastructure dependency.
-- Exact pins: Next.js 16.2.9, Better Auth and its Prisma adapter 1.6.11, Prisma/client 7.7.0, Resend 6.17.2, Nodemailer 9.0.3, and @types/nodemailer 8.0.1; all resolve from the root lockfile.
+- Exact pins: Next.js 16.2.11, Better Auth and its Prisma adapter 1.6.13, Prisma/client 7.9.0, Resend 6.17.2, Nodemailer 9.0.3, and @types/nodemailer 8.0.1; all resolve from the root lockfile.
 - No host PostgreSQL or `psql` installation. PostgreSQL 16.12 runs in Compose on host port `55432` with a health check and persistent named volume.
 - Local `EMAIL_ADAPTER=capture`; no network email, Resend installation, or Resend API key is required for routine setup and validation.
 - SMTP is an optional per-developer local adapter. Gmail uses a complete account address plus Google App Password; generated environments never contain SMTP credentials.
@@ -51,7 +51,7 @@ If direct database inspection is needed, run the PostgreSQL client inside the co
 
 1. Install only from the root lockfile; fail if the resolved Better Auth/schema CLI, Prisma/client, Next.js, Resend, or T002-approved React Email versions differ from their pins.
 2. Wait for the Compose PostgreSQL health check, then prove application connectivity using the Prisma-backed `db:check` workspace script.
-3. From `apps/web/`, generate the Better Auth 1.6.11 Prisma schema and diff it against `apps/web/prisma/schema.prisma`. Confirm there is one each of user/account/session/verification/two-factor ownership and no custom browser JWT/session table.
+3. From `apps/web/`, generate the Better Auth 1.6.13 Prisma schema and diff it against `apps/web/prisma/schema.prisma`. Confirm there is one each of user/account/session/verification/two-factor ownership and no custom browser JWT/session table.
 4. Create and apply reviewed Prisma Migrate SQL under `apps/web/prisma/migrations/`; never edit/reset an applied production migration.
 5. Validate `src/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml` as OpenAPI 3.1 and lint all `apps/web/src/app/api/**/route.ts` handlers against the no-direct-Prisma layering rule.
 
@@ -128,7 +128,7 @@ Operational inspection is metadata-only: check `status`, `attempts`, `nextAttemp
 
 ## Better Auth Compatibility Gate
 
-Before implementation is accepted, inspect and test Better Auth 1.6.11 primary schema/source behavior for:
+Before implementation is accepted, inspect and test Better Auth 1.6.13 primary schema/source behavior for:
 
 - Prisma adapter model/field compatibility and opaque database sessions;
 - TOTP secret and backup-code storage protection at rest;

@@ -20,6 +20,21 @@ export class PrismaOutboxRepository {
   }) {
     return this.db.emailOutbox.create({ data: input });
   }
+  async enqueueIdempotent(input: {
+    kind: EmailKind;
+    userId: string;
+    securityTokenId: string;
+    recipientRef: string;
+    templateVersion: string;
+    payloadRef: Prisma.InputJsonValue;
+    idempotencyKey: string;
+  }) {
+    return this.db.emailOutbox.upsert({
+      where: { idempotencyKey: input.idempotencyKey },
+      update: {},
+      create: input,
+    });
+  }
   async claimDue(
     owner: string,
     now: Date,

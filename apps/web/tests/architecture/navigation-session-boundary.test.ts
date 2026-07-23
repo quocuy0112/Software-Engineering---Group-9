@@ -4,7 +4,12 @@ import { describe, expect, it } from "vitest";
 describe("navigation session boundary", () => {
   it("authenticates the workspace once at the server layout boundary", async () => {
     const layout = await readFile("src/app/(workspace)/layout.tsx", "utf8");
-    expect(layout).toContain("requireSession");
+    expect(layout).toContain("getWorkspaceContext");
+    const context = await readFile(
+      "src/server/auth/get-workspace-context.ts",
+      "utf8",
+    );
+    expect(context).toContain("requireSession");
     expect(layout).toContain("WorkspaceShell");
     expect(layout).not.toMatch(/localStorage|sessionStorage|fetch\(/);
   });

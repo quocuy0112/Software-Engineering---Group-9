@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { PASSWORD_RESET_GENERIC_ERROR } from "@/features/identity/schemas/password-recovery";
 import { AuthStatus } from "./auth-status";
+import { PasswordField } from "./password-field";
 
 export function ResetPasswordForm() {
   const [token, setToken] = useState(() => {
@@ -63,19 +64,17 @@ export function ResetPasswordForm() {
           <h1>Choose a new password</h1>
           <p>Use a strong, unique password you do not use anywhere else.</p>
         </div>
-        <label htmlFor="reset-password">New password</label>
-        <input
+        <PasswordField
+          label="New password"
           id="reset-password"
-          type="password"
           autoComplete="new-password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           required
         />
-        <label htmlFor="reset-confirm-password">Confirm new password</label>
-        <input
+        <PasswordField
+          label="Confirm new password"
           id="reset-confirm-password"
-          type="password"
           autoComplete="new-password"
           value={confirmation}
           onChange={(event) => setConfirmation(event.target.value)}

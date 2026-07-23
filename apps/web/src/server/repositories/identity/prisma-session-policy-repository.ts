@@ -42,7 +42,23 @@ export class PrismaSessionPolicyRepository {
     return prisma.$transaction(async (tx) => {
       const row = await tx.session.findFirst({
         where: { id, userId },
-        include: { user: { select: { state: true } } },
+        include: {
+          user: {
+            select: {
+              state: true,
+              passwordResetOperations: {
+                where: { finalizedAt: null },
+                select: { id: true },
+                take: 1,
+              },
+              fullAccountRecoveryOperations: {
+                where: { status: { in: ["CONFIRMED_HOLD", "COMPLETING"] } },
+                select: { id: true },
+                take: 1,
+              },
+            },
+          },
+        },
       });
       if (!row) return null;
       const expired =
@@ -50,7 +66,9 @@ export class PrismaSessionPolicyRepository {
         row.expiresAt <= now ||
         row.absoluteExpiresAt <= now ||
         row.lastActivityAt.getTime() + IDLE_MS <= now.getTime() ||
-        row.user.state !== "ACTIVE";
+        row.user.state !== "ACTIVE" ||
+        row.user.passwordResetOperations.length > 0 ||
+        row.user.fullAccountRecoveryOperations.length > 0;
       if (expired) {
         await tx.session.deleteMany({ where: { id, userId } });
         return null;

@@ -28,10 +28,13 @@ describe("password recovery HTTP contract", () => {
     expect(await changed.json()).toEqual({ message: PASSWORD_RESET_GENERIC_ERROR });
   });
 
-  it("documents successful revocation and never models returned credentials", async () => {
+  it("documents the fail-closed saga, 2FA preservation, and never models returned credentials", async () => {
     const openapi = await readFile(resolve(process.cwd(), "../../src/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml"), "utf8");
     expect(openapi).toContain("required: [token, newPassword, confirmPassword]");
-    expect(openapi).toContain("Password changed; all sessions revoked; normal login required");
+    expect(openapi).toContain("idempotent reset saga");
+    expect(openapi).toContain("TOTP and unused backup codes preserved");
+    expect(openapi).toContain("'503': {$ref: '#/components/responses/ResetIncomplete'}");
+    expect(openapi).toContain("login stays blocked until mandatory cleanup and finalization complete");
     expect(openapi).not.toMatch(/resetToken:|sessionToken:/);
   });
 });

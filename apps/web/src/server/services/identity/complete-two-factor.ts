@@ -14,6 +14,8 @@ import { PrismaPreAuthRepository } from "@/server/repositories/identity/prisma-p
 import { PrismaSessionPolicyRepository } from "@/server/repositories/identity/prisma-session-policy-repository";
 import { PrismaAuditRepository } from "@/server/repositories/audit/prisma-audit-repository";
 import { PrismaRateLimitRepository } from "@/server/repositories/rate-limit/prisma-rate-limit-repository";
+import { PrismaPasswordResetRepository } from "@/server/repositories/identity/prisma-password-reset-repository";
+import { PrismaAccountRecoveryRepository } from "@/server/repositories/identity/prisma-account-recovery-repository";
 import { SessionService } from "./session-service";
 type CompletionResult =
   | { sessionCookie: string }
@@ -26,6 +28,8 @@ export class CompleteTwoFactorService {
     private audit = new PrismaAuditRepository(),
     private backupGateway = new BetterAuthTwoFactorGateway(),
     private limiter = new PrismaRateLimitRepository(),
+    private resetOperations = new PrismaPasswordResetRepository(),
+    private recoveryOperations = new PrismaAccountRecoveryRepository(),
   ) {}
   async execute(
     cookie: string,
@@ -38,6 +42,25 @@ export class CompleteTwoFactorService {
     const state = decodePreAuth(cookie);
     if (!state) {
       await this.record("FAILURE", undefined, now, factor, "invalid_cookie", correlationId);
+      return null;
+    }
+    const challengeUserId = await this.challenges
+      .userIdForHandle(state.handle, state.binding)
+      .catch(() => null);
+    if (
+      challengeUserId &&
+      (await this.recoveryOperations
+        .hasBlockingForUser(challengeUserId)
+        .catch(() => true))
+    ) {
+      await this.record(
+        "FAILURE",
+        challengeUserId,
+        now,
+        factor,
+        "credential_recovery_incomplete",
+        correlationId,
+      );
       return null;
     }
     const decision = await this.limiter.consume({
@@ -59,6 +82,36 @@ export class CompleteTwoFactorService {
     );
     if (!claim) {
       await this.record("FAILURE", undefined, now, factor, "invalid_or_bound_challenge", correlationId);
+      return null;
+    }
+    if (
+      await this.recoveryOperations
+        .hasBlockingForUser(claim.userId)
+        .catch(() => true)
+    ) {
+      await this.record(
+        "FAILURE",
+        claim.userId,
+        now,
+        factor,
+        "credential_recovery_incomplete",
+        correlationId,
+      );
+      return null;
+    }
+    if (
+      await this.resetOperations
+        .hasIncompleteForUser(claim.userId)
+        .catch(() => true)
+    ) {
+      await this.record(
+        "FAILURE",
+        claim.userId,
+        now,
+        factor,
+        "password_reset_incomplete",
+        correlationId,
+      );
       return null;
     }
     const forwarded = new Headers(headers);

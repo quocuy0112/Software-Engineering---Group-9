@@ -4,7 +4,7 @@ const password = "correct horse 2026";
 
 test("rejects unverified/invalid/throttled login and preserves a safe redirect", async ({ page }) => {
   await page.goto("/settings/sessions");
-  await expect(page).toHaveURL(/\/login\?returnTo=%2F$/);
+  await expect(page).toHaveURL(/\/login\?returnTo=%2Fdashboard$/);
 
   const email = `unverified-${Date.now()}-${Math.random().toString(16).slice(2)}@example.test`;
   await page.goto("/register");

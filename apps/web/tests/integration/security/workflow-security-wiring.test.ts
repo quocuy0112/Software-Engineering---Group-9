@@ -53,6 +53,31 @@ afterEach(async () => {
 });
 
 describe("workflow security throttling route wiring", () => {
+  it("keeps normal reset secret-free and never disables Better Auth two-factor state", async () => {
+    const [serviceSource, gatewaySource] = await Promise.all([
+      readFile(
+        resolve(
+          process.cwd(),
+          "src/server/services/identity/reset-password.ts",
+        ),
+        "utf8",
+      ),
+      readFile(
+        resolve(
+          process.cwd(),
+          "src/server/auth/identity/better-auth-password-gateway.ts",
+        ),
+        "utf8",
+      ),
+    ]);
+    const resetSources = `${serviceSource}\n${gatewaySource}`;
+    expect(resetSources).not.toContain("disableTwoFactorForPasswordReset");
+    expect(resetSources).not.toMatch(/model:\s*["']TwoFactor["']/);
+    expect(resetSources).not.toMatch(/console\.(?:log|info|warn|error)/);
+    expect(serviceSource).toContain("SESSION_REVOCATION_FAILED");
+    expect(serviceSource).toContain("CHALLENGE_INVALIDATION_FAILED");
+  });
+
   it("rejects cross-origin writes, unsafe redirects, and forwarded-header limit bypass", async () => {
     const crossOrigin = await register(
       new Request(`${origin}/api/identity/register`, {

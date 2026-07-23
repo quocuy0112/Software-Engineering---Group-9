@@ -4,6 +4,7 @@ import { prismaAdapter } from "@better-auth/prisma-adapter";
 import { twoFactor } from "better-auth/plugins";
 import { prisma } from "@/lib/db/prisma";
 import { serverEnvironment } from "@/lib/env/runtime";
+import { preserveExternalBetterAuthSignInRateLimit } from "./identity/better-auth-internal-request";
 import { authCookiePolicy, betterAuthCookieOptions } from "./cookie-policy";
 
 const cookiePolicy = authCookiePolicy(serverEnvironment);
@@ -14,6 +15,11 @@ export const auth = betterAuth({
   secret: serverEnvironment.BETTER_AUTH_SECRET,
   trustedOrigins: [serverEnvironment.NEXT_PUBLIC_APP_URL],
   database: prismaAdapter(prisma, { provider: "postgresql" }),
+  rateLimit: {
+    customRules: {
+      "/sign-in/email": preserveExternalBetterAuthSignInRateLimit,
+    },
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,
@@ -76,9 +82,25 @@ export const auth = betterAuth({
         before: async (session) => {
           const user = await prisma.userAccount.findUnique({
             where: { id: session.userId },
-            select: { state: true },
+            select: {
+              state: true,
+              passwordResetOperations: {
+                where: { finalizedAt: null },
+                select: { id: true },
+                take: 1,
+              },
+              fullAccountRecoveryOperations: {
+                where: { status: { in: ["CONFIRMED_HOLD", "COMPLETING"] } },
+                select: { id: true },
+                take: 1,
+              },
+            },
           });
-          return user?.state === "ACTIVE" ? { data: session } : false;
+          return user?.state === "ACTIVE" &&
+            user.passwordResetOperations.length === 0 &&
+            user.fullAccountRecoveryOperations.length === 0
+            ? { data: session }
+            : false;
         },
       },
     },

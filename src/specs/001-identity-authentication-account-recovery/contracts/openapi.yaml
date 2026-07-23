@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: SmartHire Identity API
   version: 0.1.0
-  description: Browser-facing contracts implemented only by apps/web/src/app/api/**/route.ts in the modular full-stack Next.js application. Better Auth owns the single opaque PostgreSQL-backed browser session and its only authentication cookie. All errors/logs omit secrets; protected writes require that server-validated session plus origin/CSRF validation.
+  description: Browser-facing contracts implemented only by apps/web/src/app/api/**/route.ts in the modular full-stack Next.js application. Better Auth owns the single opaque PostgreSQL-backed browser session and its only authentication cookie. All errors/logs omit secrets; state-changing browser writes require same-origin validation, and recovery proofs arrive only in URL fragments before being POSTed.
 servers:
   - url: https://{configured-origin}
 paths:
@@ -101,8 +101,46 @@ paths:
       security: []
       requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/ResetPasswordRequest'}}}}
       responses:
-        '200': {description: Password changed; all sessions revoked; normal login required}
+        '200': {description: Password changed through the idempotent reset saga; all sessions and authentication challenges revoked; TOTP and unused backup codes preserved; normal login with the existing second factor required}
         '400': {$ref: '#/components/responses/GenericFailure'}
+        '503': {$ref: '#/components/responses/ResetIncomplete'}
+  /api/identity/account-recovery/request:
+    post:
+      operationId: requestFullAccountRecovery
+      security: []
+      description: Enumeration-safe request; only eligible verified 2FA accounts receive a confirmation message.
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/EmailRequest'}}}}
+      responses:
+        '202': {$ref: '#/components/responses/GenericAccepted'}
+        '429': {$ref: '#/components/responses/RateLimited'}
+  /api/identity/account-recovery/confirm:
+    post:
+      operationId: confirmFullAccountRecovery
+      security: []
+      description: Consuming one verified-email proof starts one 24-hour hold, revokes sessions/challenges, and queues one-time completion and cancellation links. Proofs are never returned by the API.
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/RecoveryProofRequest'}}}}
+      responses:
+        '202': {description: Confirmation accepted; the 24-hour hold is active and login is blocked, content: {application/json: {schema: {$ref: '#/components/schemas/RecoveryHoldOutcome'}}}}
+        '400': {$ref: '#/components/responses/GenericFailure'}
+  /api/identity/account-recovery/cancel:
+    post:
+      operationId: cancelFullAccountRecovery
+      security: []
+      description: A valid cancellation proof is single-use and may cancel an incomplete recovery operation before the hold ends.
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/RecoveryProofRequest'}}}}
+      responses:
+        '200': {description: Cancellation processed without disclosing account state, content: {application/json: {schema: {$ref: '#/components/schemas/Outcome'}}}}
+        '400': {$ref: '#/components/responses/GenericFailure'}
+  /api/identity/account-recovery/complete:
+    post:
+      operationId: completeFullAccountRecovery
+      security: []
+      description: Deferred MVP contract. Completion is allowed only after the 24-hour hold; it changes the Better Auth password and disables old TOTP and backup codes only in this full-recovery completion step, then requires a new login.
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/CompleteRecoveryRequest'}}}}
+      responses:
+        '200': {description: Full recovery completed; old 2FA disabled, sessions/challenges revoked, notification/audit durable, and no automatic login}
+        '400': {$ref: '#/components/responses/GenericFailure'}
+        '409': {$ref: '#/components/responses/RecoveryHoldActive'}
   /api/identity/logout:
     post:
       operationId: logout
@@ -163,6 +201,15 @@ components:
         currentPassword: {type: string, writeOnly: true}
         code: {type: string, pattern: '^[0-9]{6}$', writeOnly: true}
     ResetPasswordRequest: {type: object, additionalProperties: false, required: [token, newPassword, confirmPassword], properties: {token: {type: string, writeOnly: true}, newPassword: {type: string, minLength: 12, maxLength: 128, writeOnly: true}, confirmPassword: {type: string, minLength: 12, maxLength: 128, writeOnly: true}}}
+    RecoveryProofRequest: {type: object, additionalProperties: false, required: [proof], properties: {proof: {type: string, minLength: 32, maxLength: 1024, writeOnly: true}}}
+    CompleteRecoveryRequest:
+      type: object
+      additionalProperties: false
+      required: [completionProof, newPassword, confirmPassword]
+      properties:
+        completionProof: {type: string, minLength: 32, maxLength: 1024, writeOnly: true}
+        newPassword: {type: string, minLength: 12, maxLength: 128, writeOnly: true}
+        confirmPassword: {type: string, minLength: 12, maxLength: 128, writeOnly: true}
     LoginOutcome:
       type: object
       additionalProperties: false
@@ -191,6 +238,15 @@ components:
       properties:
         sessions: {type: array, items: {$ref: '#/components/schemas/SessionSummary'}}
         csrfProof: {type: string, writeOnly: true}
+    RecoveryHoldOutcome:
+      type: object
+      additionalProperties: false
+      required: [status, holdEndsAt, lowerAssuranceNotice, message]
+      properties:
+        status: {const: hold-active}
+        holdEndsAt: {type: string, format: date-time}
+        lowerAssuranceNotice: {type: string}
+        message: {type: string}
   responses:
     GenericAccepted: {description: Same response regardless of account existence, content: {application/json: {schema: {type: object, required: [message], properties: {message: {type: string}}}}}}
     ValidationError: {description: Field-safe validation errors; no account-existence information}
@@ -198,3 +254,5 @@ components:
     GenericAuthFailure: {description: Generic authentication failure}
     RecentAuthRequired: {description: Recent authentication/current proof required}
     RateLimited: {description: Generic retry-later response, headers: {Retry-After: {schema: {type: integer, minimum: 1}}}}
+    ResetIncomplete: {description: Generic fail-closed reset response; the durable reset operation remains retryable, and login stays blocked until mandatory cleanup and finalization complete}
+    RecoveryHoldActive: {description: Generic response indicating that the 24-hour security hold has not elapsed; no password or factor state is changed}

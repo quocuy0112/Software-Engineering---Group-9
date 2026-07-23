@@ -68,7 +68,7 @@ afterAll(async () => {
 });
 
 describe.sequential(
-  "Better Auth 1.6.11 TOTP storage protection (PostgreSQL)",
+  "Better Auth 1.6.13 TOTP storage protection (PostgreSQL)",
   () => {
     it("bootstraps an ACTIVE account", async () => {
       const response = await request("/sign-up/email", {

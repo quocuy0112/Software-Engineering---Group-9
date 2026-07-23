@@ -132,7 +132,6 @@ export function TotpEnrollment({
     setBackupCodes(body.backupCodes);
     setStage("complete");
     setStatus("Two-factor authentication is now enabled.");
-    onEnabled?.();
   });
 
   function cancel() {
@@ -255,6 +254,7 @@ export function TotpEnrollment({
               clearSensitive();
               setStage("password");
               setStatus("Backup codes dismissed.");
+              onEnabled?.();
             }}
           >
             I&apos;ve saved my backup codes

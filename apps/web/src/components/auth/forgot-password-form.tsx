@@ -61,6 +61,9 @@ export function ForgotPasswordForm() {
           {busy ? "Sending…" : "Send reset instructions"}
         </button>
         <AuthStatus status={status} />
+        <Link href="/account-recovery">
+          Lost your password and access to two-factor authentication?
+        </Link>
         <Link href="/login">Back to sign in</Link>
       </form>
     </section>

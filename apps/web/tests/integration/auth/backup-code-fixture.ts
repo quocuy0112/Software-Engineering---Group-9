@@ -99,6 +99,9 @@ export async function cleanupFixture(userId: string) {
   await prisma.authenticationChallenge.deleteMany({ where: { userId } });
   await prisma.session.deleteMany({ where: { userId } });
   await prisma.twoFactor.deleteMany({ where: { userId } });
+  await prisma.passwordResetOperation.deleteMany({ where: { userId } });
+  await prisma.fullAccountRecoveryOperation.deleteMany({ where: { userId } });
+  await prisma.emailOutbox.deleteMany({ where: { userId } });
   await prisma.authProviderAccount.deleteMany({ where: { userId } });
   await prisma.candidateIdentity.deleteMany({ where: { userId } });
   await prisma.securityToken.deleteMany({ where: { userId } });

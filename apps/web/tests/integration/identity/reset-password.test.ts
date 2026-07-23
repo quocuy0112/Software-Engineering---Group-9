@@ -1,92 +1,216 @@
 import { randomUUID } from "node:crypto";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
+import { auth } from "@/server/auth/config";
 import { prisma } from "@/lib/db/prisma";
 import { TokenProtector } from "@/lib/security/security-tokens";
-import { BetterAuthGateway } from "@/server/auth/identity/better-auth-gateway";
-import { BetterAuthSessionGateway } from "@/server/auth/identity/better-auth-session-gateway";
-import { PrismaRegistrationRepository } from "@/server/repositories/identity/prisma-registration-repository";
 import { PrismaPasswordResetRepository } from "@/server/repositories/identity/prisma-password-reset-repository";
 import { ResetPasswordService } from "@/server/services/identity/reset-password";
+import { LoginWithPasswordService } from "@/server/services/identity/login-with-password";
+import {
+  authRequest,
+  cleanupFixture,
+  cookie,
+  enabledFixture,
+} from "../auth/backup-code-fixture";
 
-const createdUserIds: string[] = [];
 const protector = new TokenProtector();
+const replacementPassword = "Preserved factors password 2026!";
+const users: string[] = [];
 
-async function activeUser() {
-  const id = randomUUID();
-  const email = `reset-service-${id}@example.test`;
-  const password = "correct horse 2026";
-  const made = await new PrismaRegistrationRepository().create({
-    name: "Reset Service User",
-    email,
-    normalizedEmail: email,
-    credentialPassword: await new BetterAuthGateway().preparePasswordForCredential(password),
-    tokenDigest: protector.digest(protector.generate()),
-    protectedToken: protector.seal(protector.generate()),
-    expiresAt: new Date(Date.now() + 86_400_000),
-    correlationId: id,
-  });
-  createdUserIds.push(made.userId);
-  await prisma.userAccount.update({ where: { id: made.userId }, data: { state: "ACTIVE", emailVerified: true } });
-  return { email, password, userId: made.userId };
-}
-
-afterAll(async () => {
-  await prisma.emailOutbox.deleteMany({ where: { userId: { in: createdUserIds } } });
-  await prisma.securityToken.deleteMany({ where: { userId: { in: createdUserIds } } });
-  await prisma.session.deleteMany({ where: { userId: { in: createdUserIds } } });
-  await prisma.authProviderAccount.deleteMany({ where: { userId: { in: createdUserIds } } });
-  await prisma.candidateIdentity.deleteMany({ where: { userId: { in: createdUserIds } } });
-  await prisma.userAccount.deleteMany({ where: { id: { in: createdUserIds } } });
-  await prisma.$disconnect();
+afterEach(async () => {
+  for (const userId of users) await cleanupFixture(userId);
+  users.length = 0;
 });
 
-describe("password reset service", () => {
-  it("uses Better Auth hashing, changes the credential once, and rejects token reuse", async () => {
-    const user = await activeUser();
-    const raw = protector.generate();
+async function issue(email: string, rawToken: string, now: Date) {
+  await new PrismaPasswordResetRepository().replaceForActiveUser({
+    normalizedEmail: email,
+    rawToken,
+    protectedToken: protector.seal(rawToken),
+    correlationId: randomUUID(),
+    now,
+  });
+}
+
+async function preAuthWithPassword(email: string, password: string) {
+  const response = await authRequest("/sign-in/email", { email, password });
+  return {
+    response,
+    preAuth: cookie(response, "smarthire.pre-auth"),
+    session: cookie(response, "smarthire.session"),
+  };
+}
+
+describe("password reset preservation saga", () => {
+  it("preserves Better Auth TOTP and unused backup codes while revoking every old session and challenge", async () => {
+    const fixture = await enabledFixture();
+    users.push(fixture.userId);
+    const beforeFactor = await prisma.twoFactor.findUniqueOrThrow({
+      where: { userId: fixture.userId },
+    });
+    const extraLogin = await preAuthWithPassword(
+      fixture.email,
+      "Backup Code Fixture 2026!",
+    );
+    expect(extraLogin.preAuth).not.toBeNull();
+    expect(
+      await prisma.session.count({ where: { userId: fixture.userId } }),
+    ).toBeGreaterThan(0);
+    await prisma.authenticationChallenge.createMany({
+      data: [
+        {
+          userId: fixture.userId,
+          handleDigest: `reset-challenge-${randomUUID()}`,
+          purpose: "PASSWORD_LOGIN_2FA",
+          expiresAt: new Date(Date.now() + 300_000),
+        },
+        {
+          userId: fixture.userId,
+          handleDigest: `recent-challenge-${randomUUID()}`,
+          purpose: "RECENT_AUTH",
+          expiresAt: new Date(Date.now() + 300_000),
+        },
+      ],
+    });
+
+    const rawToken = protector.generate();
     const now = new Date();
-    await new PrismaPasswordResetRepository().replaceForActiveUser({ normalizedEmail: user.email, rawToken: raw, protectedToken: protector.seal(raw), correlationId: randomUUID(), now });
-    const newPassword = "new correct horse 2026";
-    const sessionHeaders = new Headers({ origin: "http://localhost:3001", "sec-fetch-site": "same-origin" });
-    await new BetterAuthSessionGateway().signIn(user.email, user.password, sessionHeaders);
-    await prisma.authenticationChallenge.create({ data: { userId: user.userId, handleDigest: `reset-challenge-${randomUUID()}`, purpose: "PASSWORD_LOGIN_2FA", expiresAt: new Date(Date.now() + 300000) } });
-    await prisma.userAccount.update({
-      where: { id: user.userId },
-      data: { twoFactorEnabled: true },
-    });
-    await prisma.twoFactor.create({
-      data: { id: randomUUID(), userId: user.userId, secret: "encrypted-secret", backupCodes: "encrypted-backup-codes", verified: true },
-    });
-    await expect(new ResetPasswordService().execute(raw, newPassword, new Date(now.getTime() + 1))).resolves.toMatchObject({ ok: true, userId: user.userId });
-    expect(await prisma.session.count({ where: { userId: user.userId } })).toBe(0);
-    expect(await prisma.authenticationChallenge.count({ where: { userId: user.userId } })).toBe(0);
-    const resetAccount = await prisma.userAccount.findUniqueOrThrow({
-      where: { id: user.userId },
+    await issue(fixture.email, rawToken, now);
+    const result = await new ResetPasswordService().execute(
+      rawToken,
+      replacementPassword,
+      new Date(now.getTime() + 1),
+    );
+    expect(result).toMatchObject({ ok: true, userId: fixture.userId });
+
+    expect(
+      await prisma.session.count({ where: { userId: fixture.userId } }),
+    ).toBe(0);
+    expect(
+      await prisma.authenticationChallenge.count({
+        where: { userId: fixture.userId },
+      }),
+    ).toBe(0);
+    const account = await prisma.userAccount.findUniqueOrThrow({
+      where: { id: fixture.userId },
       select: { twoFactorEnabled: true },
     });
-    expect(resetAccount.twoFactorEnabled).toBe(false);
-    expect(await prisma.twoFactor.findUnique({ where: { userId: user.userId } })).toBeNull();
-    const notification = await prisma.emailOutbox.findMany({ where: { userId: user.userId, kind: "PASSWORD_CHANGED" } });
-    expect(notification).toHaveLength(1);
-    expect(notification[0].idempotencyKey).toMatch(/^password-changed:/);
-    expect(notification[0].payloadRef).toEqual({});
-    expect(await prisma.auditEvent.count({ where: { action: "password_reset.succeeded", targetId: { not: null } } })).toBeGreaterThan(0);
-    await expect(new ResetPasswordService().execute(raw, "another correct horse 2026", new Date(now.getTime() + 2))).resolves.toMatchObject({ ok: false });
+    expect(account.twoFactorEnabled).toBe(true);
+    const afterFactor = await prisma.twoFactor.findUniqueOrThrow({
+      where: { userId: fixture.userId },
+    });
+    expect(afterFactor).toEqual(beforeFactor);
+    expect(
+      await prisma.emailOutbox.count({
+        where: { userId: fixture.userId, kind: "PASSWORD_CHANGED" },
+      }),
+    ).toBe(1);
+    const operation = await prisma.passwordResetOperation.findFirstOrThrow({
+      where: { userId: fixture.userId },
+    });
+    expect(operation).toMatchObject({
+      status: "FINALIZED",
+      failureCode: null,
+      executionOwner: null,
+    });
+    expect(operation.passwordUpdatedAt).not.toBeNull();
+    expect(operation.sessionsRevokedAt).not.toBeNull();
+    expect(operation.challengesInvalidatedAt).not.toBeNull();
+    expect(operation.notificationEnqueuedAt).not.toBeNull();
+    expect(operation.auditFinalizedAt).not.toBeNull();
+    expect(operation.finalizedAt).not.toBeNull();
+    expect(
+      await prisma.auditEvent.count({
+        where: { id: { in: [operation.auditIntentKey, operation.finalAuditId!] } },
+      }),
+    ).toBe(2);
+    const persistedEvidence = JSON.stringify({
+      operation,
+      audits: await prisma.auditEvent.findMany({
+        where: {
+          id: { in: [operation.auditIntentKey, operation.finalAuditId!] },
+        },
+      }),
+    });
+    for (const secret of [
+      rawToken,
+      replacementPassword,
+      fixture.secret,
+      ...fixture.backupCodes,
+      fixture.session,
+    ]) {
+      expect(persistedEvidence).not.toContain(secret);
+    }
 
-    const credential = await prisma.authProviderAccount.findFirstOrThrow({ where: { userId: user.userId, providerId: "credential" } });
-    expect(credential.password).not.toBe(newPassword);
-    const headers = new Headers({ origin: "http://localhost:3001", "sec-fetch-site": "same-origin" });
-    expect((await new BetterAuthSessionGateway().signIn(user.email, user.password, headers)).ok).toBe(false);
-    expect((await new BetterAuthSessionGateway().signIn(user.email, newPassword, headers)).ok).toBe(true);
-  });
+    await expect(
+      new ResetPasswordService().execute(
+        rawToken,
+        replacementPassword,
+        new Date(now.getTime() + 2),
+      ),
+    ).resolves.toMatchObject({ ok: false, retryable: false });
+    expect(
+      await prisma.emailOutbox.count({
+        where: { userId: fixture.userId, kind: "PASSWORD_CHANGED" },
+      }),
+    ).toBe(1);
 
-  it("rejects an exactly expired token without changing the password", async () => {
-    const user = await activeUser();
-    const raw = protector.generate();
-    const now = new Date();
-    await new PrismaPasswordResetRepository().replaceForActiveUser({ normalizedEmail: user.email, rawToken: raw, protectedToken: protector.seal(raw), correlationId: randomUUID(), now });
-    await expect(new ResetPasswordService().execute(raw, "new correct horse 2026", new Date(now.getTime() + 30 * 60 * 1000))).resolves.toMatchObject({ ok: false });
-    const headers = new Headers({ origin: "http://localhost:3001", "sec-fetch-site": "same-origin" });
-    expect((await new BetterAuthSessionGateway().signIn(user.email, user.password, headers)).ok).toBe(true);
-  });
+    const oldPassword = await preAuthWithPassword(
+      fixture.email,
+      "Backup Code Fixture 2026!",
+    );
+    expect(oldPassword.response.ok).toBe(false);
+    const smartHireLogin = await new LoginWithPasswordService().execute(
+      { email: fixture.email, password: replacementPassword },
+      {
+        headers: new Headers({
+          origin: "http://localhost:3001",
+          "sec-fetch-site": "same-origin",
+        }),
+        subject: `reset-preservation:${randomUUID()}`,
+      },
+    );
+    expect(await smartHireLogin.json()).toMatchObject({
+      requiresTwoFactor: true,
+    });
+    expect(
+      smartHireLogin.headers
+        .getSetCookie()
+        .some((value) => /^smarthire\.session=/.test(value)),
+    ).toBe(false);
+    expect(
+      smartHireLogin.headers
+        .getSetCookie()
+        .some((value) => /^smarthire\.pre-auth=/.test(value)),
+    ).toBe(true);
+    const totpLogin = await preAuthWithPassword(
+      fixture.email,
+      replacementPassword,
+    );
+    expect(totpLogin.response.ok).toBe(true);
+    expect(totpLogin.preAuth).not.toBeNull();
+
+    const totp = await auth.api.generateTOTP({
+      body: { secret: fixture.secret },
+    });
+    const totpCompletion = await authRequest(
+      "/two-factor/verify-totp",
+      { code: totp.code, trustDevice: false },
+      totpLogin.preAuth!,
+    );
+    expect(totpCompletion.ok).toBe(true);
+    expect(cookie(totpCompletion, "smarthire.session")).not.toBeNull();
+
+    const backupLogin = await preAuthWithPassword(
+      fixture.email,
+      replacementPassword,
+    );
+    const backupCompletion = await authRequest(
+      "/two-factor/verify-backup-code",
+      { code: fixture.backupCodes[0], trustDevice: false },
+      backupLogin.preAuth!,
+    );
+    expect(backupCompletion.ok).toBe(true);
+    expect(cookie(backupCompletion, "smarthire.session")).not.toBeNull();
+  }, 60_000);
 });

@@ -17,6 +17,7 @@ enum AccountState {
 enum TokenPurpose {
   VERIFY_EMAIL
   RESET_PASSWORD
+  ACCOUNT_RECOVERY_CONFIRMATION
 }
 
 enum TokenStatus {
@@ -29,6 +30,45 @@ enum TokenStatus {
 enum ChallengePurpose {
   PASSWORD_LOGIN_2FA
   RECENT_AUTH
+}
+
+enum PasswordResetOperationStatus {
+  CLAIMED
+  PASSWORD_UPDATED
+  SESSIONS_REVOKED
+  CHALLENGES_INVALIDATED
+  NOTIFICATION_ENQUEUED
+  FAILED_RETRYABLE
+  FINALIZED
+}
+
+enum PasswordResetFailureCode {
+  PASSWORD_UPDATE_FAILED
+  SESSION_REVOCATION_FAILED
+  CHALLENGE_INVALIDATION_FAILED
+  NOTIFICATION_ENQUEUE_FAILED
+  AUDIT_FINALIZATION_FAILED
+  OPERATION_FINALIZATION_FAILED
+}
+
+enum FullAccountRecoveryStatus {
+  CONFIRMED_HOLD
+  CANCELLED
+  COMPLETING
+  COMPLETED
+}
+
+enum FullAccountRecoveryFailureCode {
+  HOLD_SESSION_REVOCATION_FAILED
+  HOLD_CHALLENGE_INVALIDATION_FAILED
+  HOLD_NOTIFICATION_ENQUEUE_FAILED
+  PASSWORD_UPDATE_FAILED
+  TWO_FACTOR_DISABLE_FAILED
+  SESSION_REVOCATION_FAILED
+  CHALLENGE_INVALIDATION_FAILED
+  NOTIFICATION_ENQUEUE_FAILED
+  AUDIT_FINALIZATION_FAILED
+  OPERATION_FINALIZATION_FAILED
 }
 
 enum AuditResult {
@@ -71,6 +111,8 @@ model UserAccount {
   twoFactor         TwoFactor?
   candidateIdentity CandidateIdentity?
   securityTokens    SecurityToken[]
+  passwordResetOperations PasswordResetOperation[]
+  fullAccountRecoveryOperations FullAccountRecoveryOperation[]
   challenges        AuthenticationChallenge[]
   outbox            EmailOutbox[]
 
@@ -166,9 +208,99 @@ model SecurityToken {
   createdByRequestId String
   user               UserAccount   @relation(fields: [userId], references: [id], onDelete: Cascade)
   outbox             EmailOutbox[]
+  passwordResetOperation PasswordResetOperation?
+  fullAccountRecoveryOperation FullAccountRecoveryOperation?
 
   @@index([expiresAt, status])
   @@index([userId, purpose, status])
+}
+
+model PasswordResetOperation {
+  id                         String                       @id
+  userId                     String
+  securityTokenId            String                       @unique
+  operationKey               String                       @unique
+  status                     PasswordResetOperationStatus @default(CLAIMED)
+  auditIntentKey             String                       @unique
+  notificationIdempotencyKey String                       @unique
+  notificationOutboxId       String?                      @unique
+  finalAuditId               String?                      @unique
+  passwordUpdatedAt          DateTime?
+  sessionsRevokedAt          DateTime?
+  challengesInvalidatedAt    DateTime?
+  notificationEnqueuedAt     DateTime?
+  auditFinalizedAt           DateTime?
+  failureCode                PasswordResetFailureCode?
+  retryAt                    DateTime?
+  executionOwner             String?
+  leaseExpiresAt             DateTime?
+  finalizedAt                DateTime?
+  createdAt                  DateTime                     @default(now())
+  updatedAt                  DateTime                     @updatedAt
+  user                       UserAccount                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  securityToken              SecurityToken                @relation(fields: [securityTokenId], references: [id], onDelete: Cascade)
+
+  @@index([userId, finalizedAt])
+  @@index([status, retryAt])
+  @@index([leaseExpiresAt])
+}
+
+model FullAccountRecoveryOperation {
+  id                                    String                         @id
+  userId                                String
+  confirmationTokenId                   String                         @unique
+  operationKey                          String                         @unique
+  status                                FullAccountRecoveryStatus      @default(CONFIRMED_HOLD)
+  confirmationProofDigest               String                         @unique
+  confirmationExpiresAt                 DateTime
+  confirmationConsumedAt                DateTime
+  confirmationFinalizedAt               DateTime?
+  completionProofDigest                 String                         @unique
+  completionProofCiphertext             String
+  completionProofExpiresAt              DateTime
+  completionConsumedAt                  DateTime?
+  completionKey                         String?                        @unique
+  cancellationProofDigest               String                         @unique
+  cancellationProofCiphertext           String
+  cancellationProofExpiresAt            DateTime
+  cancellationConsumedAt                DateTime?
+  holdStartedAt                         DateTime
+  holdEndsAt                            DateTime
+  holdSessionsRevokedAt                 DateTime?
+  holdChallengesInvalidatedAt           DateTime?
+  confirmationAuditIntentKey            String                         @unique
+  confirmationFinalAuditId              String?                        @unique
+  pendingNotificationIdempotencyKey     String                         @unique
+  pendingNotificationOutboxId           String?                        @unique
+  pendingNotificationEnqueuedAt         DateTime?
+  cancellationNotificationIdempotencyKey String                        @unique
+  cancellationNotificationOutboxId      String?                        @unique
+  cancellationAuditId                   String?                        @unique
+  cancelledAt                           DateTime?
+  completionAuditIntentKey              String                         @unique
+  completionNotificationIdempotencyKey  String                         @unique
+  completionNotificationOutboxId        String?                        @unique
+  completionFinalAuditId                String?                        @unique
+  passwordUpdatedAt                     DateTime?
+  twoFactorDisabledAt                   DateTime?
+  completionSessionsRevokedAt           DateTime?
+  completionChallengesInvalidatedAt     DateTime?
+  completionNotificationEnqueuedAt      DateTime?
+  completionAuditFinalizedAt            DateTime?
+  failureCode                           FullAccountRecoveryFailureCode?
+  retryAt                               DateTime?
+  executionOwner                        String?
+  leaseExpiresAt                        DateTime?
+  completedAt                           DateTime?
+  createdAt                             DateTime                       @default(now())
+  updatedAt                             DateTime                       @updatedAt
+  user                                  UserAccount                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  confirmationToken                     SecurityToken                  @relation(fields: [confirmationTokenId], references: [id], onDelete: Restrict)
+
+  @@index([userId, status])
+  @@index([status, holdEndsAt])
+  @@index([status, retryAt])
+  @@index([leaseExpiresAt])
 }
 
 model AuthenticationChallenge {

@@ -1,6 +1,7 @@
 import "server-only";
 import { auth } from "@/server/auth/config";
 import { serverEnvironment } from "@/lib/env/runtime";
+import { markInternalBetterAuthRequest } from "./better-auth-internal-request";
 export class BetterAuthSessionGateway {
   private request(path: string, body: unknown, headers: Headers) {
     const forwarded = new Headers(headers);
@@ -10,9 +11,11 @@ export class BetterAuthSessionGateway {
       new URL(serverEnvironment.NEXT_PUBLIC_APP_URL).origin,
     );
     return auth.handler(
-      new Request(
+      markInternalBetterAuthRequest(
+        new Request(
         new URL(`/api/auth${path}`, serverEnvironment.BETTER_AUTH_URL),
         { method: "POST", headers: forwarded, body: JSON.stringify(body) },
+        ),
       ),
     );
   }

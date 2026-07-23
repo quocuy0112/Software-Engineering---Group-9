@@ -6,10 +6,10 @@
 
 | Component                  |                                                            Planning pin | Primary source                                                                                                                               |
 | -------------------------- | ----------------------------------------------------------------------: | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Better Auth                |                                                    `better-auth@1.6.11` | [Better Auth releases](https://github.com/better-auth/better-auth/releases)                                                                  |
-| Better Auth Prisma adapter |                                    `@better-auth/prisma-adapter@1.6.11` | [Prisma adapter](https://www.better-auth.com/docs/adapters/prisma)                                                                           |
-| Next.js                    |                                                           `next@16.2.9` | [Next.js releases](https://github.com/vercel/next.js/releases), [Route Handlers](https://nextjs.org/docs/app/getting-started/route-handlers) |
-| Prisma CLI/client          |                                  `prisma@7.7.0`, `@prisma/client@7.7.0` | [Prisma releases](https://github.com/prisma/prisma/releases), [release policy](https://www.prisma.io/docs/orm/more/releases)                 |
+| Better Auth                |                                                    `better-auth@1.6.13` | [Better Auth releases](https://github.com/better-auth/better-auth/releases)                                                                  |
+| Better Auth Prisma adapter |                                    `@better-auth/prisma-adapter@1.6.13` | [Prisma adapter](https://www.better-auth.com/docs/adapters/prisma)                                                                           |
+| Next.js                    |                                                           `next@16.2.11` | [Next.js releases](https://github.com/vercel/next.js/releases), [Route Handlers](https://nextjs.org/docs/app/getting-started/route-handlers) |
+| Prisma CLI/client          |                                  `prisma@7.9.0`, `@prisma/client@7.9.0` | [Prisma releases](https://github.com/prisma/prisma/releases), [release policy](https://www.prisma.io/docs/orm/more/releases)                 |
 | Resend Node SDK            |                                                         `resend@6.17.2` | [resend-node releases](https://github.com/resend/resend-node/releases), [send API](https://resend.com/docs/api-reference/emails/send-email)  |
 | React Email                | Exact stable package versions are a blocking T002 compatibility outcome | [React Email releases](https://github.com/resend/react-email/releases)                                                                       |
 
@@ -67,7 +67,7 @@ The application manifest belongs at `apps/web/package.json`, registered by the r
 
 **Decision**: Better Auth is authoritative for TOTP enrollment/login/disablement and backup-code generation, storage, regeneration, and consumption. SmartHire does not create normalized `BackupCodeSet`/`BackupCode` ownership or a second TOTP implementation. Email OTP and trusted-device options are disabled.
 
-**Unverified/blocking details**: Documentation establishes ownership and nominal single-use behavior, but it does not prove that `1.6.11` encrypts TOTP/backup values at rest to SmartHire’s required standard or that concurrent submission is atomic through the Prisma adapter. Version-locked PostgreSQL tests and source/schema inspection are required. A SmartHire TOTP persistence-encryption extension may be introduced only if the spike proves it necessary, Better Auth integration supports it safely, and an approved ADR documents it. The extension must preserve Better Auth ownership and must not create parallel TOTP or backup-code storage.
+**Unverified/blocking details**: Documentation establishes ownership and nominal single-use behavior, but it does not prove that `1.6.13` encrypts TOTP/backup values at rest to SmartHire’s required standard or that concurrent submission is atomic through the Prisma adapter. Version-locked PostgreSQL tests and source/schema inspection are required. A SmartHire TOTP persistence-encryption extension may be introduced only if the spike proves it necessary, Better Auth integration supports it safely, and an approved ADR documents it. The extension must preserve Better Auth ownership and must not create parallel TOTP or backup-code storage.
 
 ### Local QR decision
 
@@ -92,7 +92,7 @@ Better Auth’s `Verification` table may be used only where its semantics meet e
 
 ## Decision: Optional SMTP and asynchronous due-outbox processing
 
-**Verified compatibility evidence**: The root workspace resolves Nodemailer `9.0.3`, `@types/nodemailer` `8.0.1`, and Next.js `16.2.9` under Node.js `24.18.0`. Nodemailer is restricted to server-only adapter code and is not an application-service dependency. The current npm audit reports no Nodemailer finding.
+**Verified compatibility evidence**: The root workspace resolves Nodemailer `9.0.3`, `@types/nodemailer` `8.0.1`, and Next.js `16.2.11` under Node.js `24.18.0`. Nodemailer is restricted to server-only adapter code and is not an application-service dependency. The current npm audit reports no Nodemailer finding.
 
 **Decision**: `EMAIL_ADAPTER` is the sole adapter selector. Capture remains the generated local default, SMTP is opt-in for local/team demonstrations, and Resend remains production-oriented. `EMAIL_DRIVER` is removed. All adapters run through `EmailOutbox -> due-outbox processor -> EmailService`; originating HTTP requests stop after the outbox transaction commits.
 
@@ -112,7 +112,13 @@ Tailwind CSS and shadcn/ui are the baseline; React Hook Form and Zod cover forms
 
 Use App Router route groups to separate the public (auth) shell from the protected (workspace) shell without changing public URLs. The protected layout validates the sole Better Auth session on the server and supplies only minimized navigation data plus an ephemeral CSRF proof required by the existing logout route. Active-link and mobile-menu state are presentation-only client state and never authorize access. Ordinary navigation uses Next.js Link; router APIs remain limited to post-action or state-dependent transitions.
 
-The root / becomes a protected foundational identity Dashboard because the feature has no approved public marketing-page requirement. Authenticated security and session management live under the protected Profile area. The Dashboard provides quick links and explicitly labelled future workspace areas without implementing or simulating recruitment-domain data.
+The root `/` is the canonical public SmartHire Home. `/home` is a
+server-side compatibility redirect to `/`. Authenticated security and session
+management live under the protected Profile area, and `/dashboard` is the
+protected foundational identity Dashboard. Authenticated users may see
+Dashboard/Profile controls on `/`; unauthenticated visitors are not redirected
+from Home. The Dashboard provides quick links and explicitly labelled future
+workspace areas without implementing or simulating recruitment-domain data.
 
 **Alternatives rejected**: a client-only session provider duplicates authorization state; every page independently fetching the current session increases coupling and visible loading; merging identity APIs into one endpoint weakens existing transport boundaries; a simulated jobs/recruiter dashboard exceeds this feature scope; full-page internal anchors discard App Router navigation benefits.
 
@@ -132,7 +138,7 @@ account control, but raw Better Auth session identifiers/tokens, TOTP material,
 backup codes, passwords, and CSRF values other than the existing ephemeral
 logout proof never enter the projection or persistent client state.
 
-**Verified behavior**: Better Auth 1.6.11 can rotate its authoritative session
+**Verified behavior**: Better Auth 1.6.13 can rotate its authoritative session
 during initial TOTP verification and TOTP disablement. Server API calls support
 returnHeaders so a provider gateway can capture the new Set-Cookie value. The
 custom SmartHire handlers must forward that cookie; otherwise the browser keeps
@@ -152,10 +158,68 @@ flow. Hash-only single-page navigation was also rejected in favor of App Router
 pages because direct URLs, browser history, active state, and focused E2E tests
 are clearer.
 
+## Decision: Normal Password-Reset Saga
+
+Normal password reset is a fail-closed saga across SmartHire persistence and
+Better Auth; it is not represented as one transaction spanning both providers.
+The durable `PasswordResetOperation` has one token-claim owner, an audit-intent
+reference, ordered milestone flags, a stable notification idempotency key,
+allowlisted failure state, and finalization state. The milestones are:
+
+1. claim the HMAC-digested reset token and create the operation;
+2. update the Better Auth password while leaving its TOTP and unused
+   backup-code state untouched;
+3. revoke every Better Auth session;
+4. invalidate authentication challenges and superseded reset proofs;
+5. enqueue one password-change notification; and
+6. append the final audit event and finalize the operation.
+
+Retries load the same operation and resume the first incomplete milestone.
+SmartHire-side effects are idempotent. Because a provider response can be
+ambiguous, a retry of the same submitted password is allowed to converge on
+the same credential state, but it never creates a session or changes 2FA.
+Concurrent submissions cannot create a second operation owner, terminal audit
+event, or notification. A claimed or partially completed operation blocks
+password login, second-factor completion, and protected access until mandatory
+cleanup, notification enqueue, audit finalization, and operation finalization
+are durable. This explicitly documents the compensation boundary instead of
+claiming a cross-provider database transaction.
+
+## Decision: Full Account-Recovery Policy (Deferred Runtime Workflow)
+
+Full account recovery is separate from normal password reset and is only for
+loss of the password, TOTP access, and backup codes. Its MVP policy is:
+
+- accept an enumeration-safe request for any email address;
+- send a verified-email confirmation proof only for an eligible account;
+- store only HMAC digests of single-use confirmation, completion, and
+  cancellation proofs;
+- on confirmation, create one `FullAccountRecoveryOperation`, revoke sessions
+  and authentication challenges, issue one completion proof and one
+  cancellation proof, and begin a 24-hour security hold;
+- block password login and second-factor completion while recovery is pending;
+- accept the one-time cancellation proof before completion, persist
+  cancellation, and notify the user;
+- after the hold, accept the completion proof and policy-compliant password,
+  change the Better Auth password, and disable the old TOTP/backup-code state
+  only as part of the full-recovery completion step;
+- revoke sessions/challenges again, write durable audit and notification
+  records, require a new login, and never log the user in automatically; and
+- state in the UI and notifications that email-only recovery is lower
+  assurance than possession of the original password and second factor.
+
+The operation record remains an orchestration record and never becomes a
+second credential, session, TOTP, or backup-code owner. Browser links carry
+proofs in URL fragments only; the API consumes them in POST bodies and returns
+no proof values.
+
 ## Remaining Research Risks
 
-1. Confirm Better Auth 1.6.11 TOTP-secret and backup-code at-rest format and the exact extension hook for application-managed encryption if required.
+1. Confirm Better Auth 1.6.13 TOTP-secret and backup-code at-rest format and the exact extension hook for application-managed encryption if required.
 2. Prove atomic backup-code single use under concurrent PostgreSQL requests.
 3. Prove session hooks can enforce idle/absolute limits and five-session cap without issuing an unvalidated session or racing concurrent logins.
-4. Confirm all-session revocation behavior when invoked from the custom password-reset transaction and define compensation/retry if database work cannot share one transaction.
-5. T002 must select and compatibility-test exact React Email packages with React/Next.js 16.2.9 and record the result before dependent email tasks begin.
+4. Confirm all-session revocation behavior when invoked from the reset saga
+   and define compensation/retry when SmartHire persistence and Better Auth
+   cannot share one transaction; the saga must remain fail-closed and
+   idempotent.
+5. T002 must select and compatibility-test exact React Email packages with React/Next.js 16.2.11 and record the result before dependent email tasks begin.

@@ -126,6 +126,18 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="dashboard-links" aria-label="Dashboard shortcuts">
+            <Link href="/profile">
+              <span className="shortcut-icon" aria-hidden="true">
+                â—‹
+              </span>
+              <span>
+                <strong>Profile</strong>
+                <small>Review your account overview</small>
+              </span>
+              <span className="shortcut-arrow" aria-hidden="true">
+                â†’
+              </span>
+            </Link>
             <Link href="/profile/security">
               <span className="shortcut-icon" aria-hidden="true">
                 ◇

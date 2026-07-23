@@ -20,3 +20,19 @@ export async function failResendRequest(page: Page) {
     }),
   );
 }
+
+export async function failAccountRecoveryRequest(page: Page) {
+  await page.route("**/api/identity/account-recovery/request", (route) =>
+    route.fulfill({
+      status: 503,
+      headers: {
+        "content-type": "application/json",
+        "cache-control": "no-store",
+      },
+      body: JSON.stringify({
+        message:
+          "If the account is eligible, account-recovery instructions will be sent.",
+      }),
+    }),
+  );
+}
