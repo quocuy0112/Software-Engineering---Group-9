@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import { parseServerEnvironment } from "@/lib/env/server";
 const local = {
   APP_ENV: "local",
-  NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+  NEXT_PUBLIC_APP_URL: "http://localhost:3001",
   DATABASE_URL: "postgresql://user:pass@localhost:55432/db",
   DIRECT_URL: "postgresql://user:pass@localhost:55432/db",
-  BETTER_AUTH_URL: "http://localhost:3000",
+  BETTER_AUTH_URL: "http://localhost:3001",
   BETTER_AUTH_SECRET: "a".repeat(32),
   TOKEN_SECRET: "b".repeat(32),
   AUTH_COOKIE_ENV: "local",

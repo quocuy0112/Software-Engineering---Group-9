@@ -22,3 +22,16 @@
 ## Implementation gate
 
 Any unchecked item blocks `/speckit-implement`. Failure of Better Auth 1.6.11 TOTP/backup-code protection, atomic-use, session-hook ordering, or reset-revocation tests blocks implementation pending an approved extension/ADR. It must never produce duplicate authentication ownership.
+
+## Final automated review (2026-07-22)
+
+- [x] Full Vitest suite: 66 files, 241 tests passed.
+- [x] Better Auth/dependency compatibility: 4 files, 15 tests passed after the final manifest update.
+- [x] Desktop and 320px mobile Playwright: 30/30 passed.
+- [x] Fresh migration, drift, and Prisma connectivity verification passed against PostgreSQL 16.12.
+- [x] Configured-secret value scan found no match in tracked text files.
+- [x] Runtime scan found no OIDC-provider, MCP, or JWT-plugin surface.
+- [x] npm audit: 0 critical, 3 high dependency nodes, 4 moderate, 0 low; the scoped Better Auth and sharp/Next exposure decisions are recorded in `npm-security-exception.md`.
+- [x] Production build, lint, type-check, and the 100-run/page performance gate passed.
+
+Automated release gates pass under the documented temporary dependency exceptions. Human usability thresholds remain a separate post-implementation gate and are not claimed here.

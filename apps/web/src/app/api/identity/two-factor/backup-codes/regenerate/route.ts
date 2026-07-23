@@ -28,8 +28,7 @@ export async function POST(request: Request) {
       { message: "Verification could not be completed." },
       { status: 400, headers: noStoreHeaders },
     );
-  const subject =
-      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local",
+  const subject = `user:${current.userId}`,
     result = await new RegenerateBackupCodesService().execute(
       parsed.data.currentPassword,
       parsed.data.code,

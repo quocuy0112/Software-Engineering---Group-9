@@ -1,6 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-export function TwoFactorManagement() {
+import { AuthStatus } from "./auth-status";
+export function TwoFactorManagement({
+  onDisabled,
+}: {
+  onDisabled?: () => void;
+}) {
   const [proof, setProof] = useState(""),
     [password, setPassword] = useState(""),
     [code, setCode] = useState(""),
@@ -44,6 +49,7 @@ export function TwoFactorManagement() {
       } else {
         setCodes([]);
         setStatus("Two-factor authentication disabled.");
+        onDisabled?.();
       }
     } finally {
       setBusy(false);
@@ -52,44 +58,74 @@ export function TwoFactorManagement() {
     }
   }
   return (
-    <section role="region" aria-labelledby="two-factor-management-title">
-      <h2 id="two-factor-management-title">Two-factor management</h2>
-      <p>Regenerating codes invalidates every older backup code.</p>
-      <label htmlFor="management-password">Current password</label>
-      <input
-        id="management-password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <label htmlFor="management-code">Six-digit TOTP code</label>
-      <input
-        id="management-code"
-        inputMode="numeric"
-        maxLength={6}
-        value={code}
-        onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-      />
-      <button
-        type="button"
-        disabled={busy || !proof || !password || code.length !== 6}
-        onClick={() => {
-          if (window.confirm("Regenerate backup codes? All older codes will stop working."))
-            void submit("/api/identity/two-factor/backup-codes/regenerate");
-        }}
-      >
-        Regenerate backup codes
-      </button>
-      <button
-        type="button"
-        disabled={busy || !proof || !password || code.length !== 6}
-        onClick={() => {
-          if (window.confirm("Disable two-factor authentication?"))
-            void submit("/api/identity/two-factor/disable");
-        }}
-      >
-        Disable two-factor authentication
-      </button>
+    <section
+      className="security-panel security-panel--management"
+      role="region"
+      aria-labelledby="two-factor-management-title"
+    >
+      <div className="security-panel-heading">
+        <span
+          className="security-panel-icon security-panel-icon--mint"
+          aria-hidden="true"
+        >
+          ◎
+        </span>
+        <div>
+          <p className="panel-kicker">RECOVERY CONTROLS</p>
+          <h2 id="two-factor-management-title">Two-factor management</h2>
+        </div>
+      </div>
+      <p className="security-panel-copy">
+        Regenerating codes invalidates every older backup code.
+      </p>
+      <div className="field">
+        <label htmlFor="management-password">Current password</label>
+        <input
+          id="management-password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+      <div className="field">
+        <label htmlFor="management-code">Six-digit TOTP code</label>
+        <input
+          id="management-code"
+          inputMode="numeric"
+          maxLength={6}
+          value={code}
+          onChange={(e) =>
+            setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+          }
+        />
+      </div>
+      <div className="security-actions">
+        <button
+          type="button"
+          disabled={busy || !proof || !password || code.length !== 6}
+          onClick={() => {
+            if (
+              window.confirm(
+                "Regenerate backup codes? All older codes will stop working.",
+              )
+            )
+              void submit("/api/identity/two-factor/backup-codes/regenerate");
+          }}
+        >
+          Regenerate backup codes
+        </button>
+        <button
+          className="danger-action"
+          type="button"
+          disabled={busy || !proof || !password || code.length !== 6}
+          onClick={() => {
+            if (window.confirm("Disable two-factor authentication?"))
+              void submit("/api/identity/two-factor/disable");
+          }}
+        >
+          Disable two-factor authentication
+        </button>
+      </div>
       {codes.length > 0 ? (
         <div role="alert" aria-live="polite">
           <h3>Save your ten new backup codes</h3>
@@ -105,9 +141,10 @@ export function TwoFactorManagement() {
           </button>
         </div>
       ) : null}
-      <p role="status" aria-live="polite">
-        {status}
-      </p>
+      <AuthStatus
+        status={status}
+        tone={status.includes("could not") ? "error" : "success"}
+      />
     </section>
   );
 }

@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { PASSWORD_RESET_GENERIC_ERROR } from "@/features/identity/schemas/password-recovery";
+import { AuthStatus } from "./auth-status";
 
 export function ResetPasswordForm() {
   const [token, setToken] = useState(() => {
@@ -54,9 +56,13 @@ export function ResetPasswordForm() {
   }
 
   return (
-    <main className="auth-shell">
-      <form onSubmit={submit} className="auth-card" noValidate aria-busy={busy}>
-        <h1>Choose a new password</h1>
+    <section className="auth-form-content">
+      <form className="auth-form" onSubmit={submit} noValidate aria-busy={busy}>
+        <div className="auth-form-heading">
+          <p className="form-kicker">SECURE YOUR ACCOUNT</p>
+          <h1>Choose a new password</h1>
+          <p>Use a strong, unique password you do not use anywhere else.</p>
+        </div>
         <label htmlFor="reset-password">New password</label>
         <input
           id="reset-password"
@@ -83,11 +89,12 @@ export function ResetPasswordForm() {
         >
           {busy ? "Resetting…" : "Reset password"}
         </button>
-        <p role="status" aria-live="polite">
-          {status}
-        </p>
-        <a href="/login">Back to sign in</a>
+        <AuthStatus
+          status={status}
+          tone={status === PASSWORD_RESET_GENERIC_ERROR ? "error" : "success"}
+        />
+        <Link href="/login">Back to sign in</Link>
       </form>
-    </main>
+    </section>
   );
 }

@@ -22,7 +22,7 @@ export async function requireSession(headers: Headers, now = new Date()) {
         actorSessionId: current.session.id,
         action: "session.revoked",
         targetType: "session",
-        targetId: current.session.id,
+        targetId: null,
         result: "DENIED",
         correlationId: randomUUID(),
         context: { reason: "policy_enforcement" },

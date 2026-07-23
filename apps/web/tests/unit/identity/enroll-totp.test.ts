@@ -44,13 +44,17 @@ function gateway(overrides: Partial<TwoFactorGateway> = {}): TwoFactorGateway {
     startEnrollment: vi
       .fn()
       .mockResolvedValue({ otpauthUri: VALID_URI, backupCodes: tenCodes() }),
-    verifyInitialTotp: vi.fn().mockResolvedValue(true),
+    verifyInitialTotp: vi
+      .fn()
+      .mockResolvedValue({ verified: true, sessionCookie: null }),
     revealBackupCodes: vi.fn().mockResolvedValue(tenCodes()),
     consumeBackupCode: vi
       .fn()
       .mockResolvedValue({ sessionCookie: "smarthire.session=test" }),
     regenerateBackupCodes: vi.fn().mockResolvedValue(tenCodes()),
-    disableTwoFactor: vi.fn().mockResolvedValue(true),
+    disableTwoFactor: vi
+      .fn()
+      .mockResolvedValue({ disabled: true, sessionCookie: null }),
     ...overrides,
   };
 }

@@ -49,7 +49,7 @@ test("registers without a session, captures email, and verifies the account", as
   ).find((entry) => entry.body.includes(`To: ${email.toLowerCase()}`))?.name;
   const message = await readFile(resolve(mailDirectory, created!), "utf8");
   const link = message.match(
-    /http:\/\/localhost:3000\/verify-email\?token=[A-Za-z0-9._~-]+/,
+    /http:\/\/localhost:3001\/verify-email\?token=[A-Za-z0-9._~-]+/,
   )?.[0];
   expect(link).toBeTruthy();
   await page.goto(link!);
@@ -62,6 +62,14 @@ test("keeps keyboard-accessible validation visible at 320px", async ({
   page,
 }) => {
   await page.goto("/register");
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("link", { name: "SmartHire" })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("link", { name: "Sign in", exact: true })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("link", { name: "Create account", exact: true })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("link", { name: "Forgot password", exact: true })).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(page.getByLabel("Full name")).toBeFocused();
   await page.getByRole("button", { name: "Create account" }).click();

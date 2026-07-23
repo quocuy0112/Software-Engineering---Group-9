@@ -35,7 +35,7 @@ describe("sole Better Auth session creation", () => {
   it("creates one opaque database session and no second auth cookie", async () => {
     const f = await active(),
       headers = new Headers({
-        origin: "http://localhost:3000",
+        origin: "http://localhost:3001",
         "sec-fetch-site": "same-origin",
       });
     const response = await new LoginWithPasswordService().execute(f, {
@@ -66,7 +66,7 @@ describe("owned session operations", () => {
   it("lists sanitized data, revokes one idempotently, and rejects the old cookie", async () => {
     const f = await active(),
       base = new Headers({
-        origin: "http://localhost:3000",
+        origin: "http://localhost:3001",
         "sec-fetch-site": "same-origin",
         "user-agent": "desktop",
       }),

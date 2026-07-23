@@ -53,8 +53,7 @@ export async function POST(request: Request) {
     );
   }
 
-  return Response.json(
-    { backupCodes: result.backupCodes },
-    { headers: noStoreHeaders },
-  );
+  const headers = new Headers(noStoreHeaders);
+  if (result.sessionCookie) headers.append("Set-Cookie", result.sessionCookie);
+  return Response.json({ backupCodes: result.backupCodes }, { headers });
 }

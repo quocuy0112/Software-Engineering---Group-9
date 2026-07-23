@@ -27,7 +27,7 @@ const files = [
   ],
   [
     "apps/web/.env.local",
-    `APP_ENV=local\nNEXT_PUBLIC_APP_URL=http://localhost:3000\nDATABASE_URL=${databaseUrl}\nDIRECT_URL=${databaseUrl}\nBETTER_AUTH_URL=http://localhost:3000\nBETTER_AUTH_SECRET=${authSecret}\nTOKEN_SECRET=${tokenSecret}\nAUTH_COOKIE_ENV=local\nEMAIL_ADAPTER=capture\nEMAIL_CAPTURE_DIRECTORY=.local/mail\nEMAIL_CAPTURE_DIR=.local/mail\nRESEND_API_KEY=\nEMAIL_FROM=\nSMTP_HOST=\nSMTP_PORT=\nSMTP_USERNAME=\nSMTP_PASSWORD=\nSMTP_FROM=\nSMTP_SECURE=\nSMTP_USE_TLS=\nSESSION_COOKIE_NAME=smarthire.session\nPRE_AUTH_COOKIE_NAME=smarthire.pre-auth\nCOOKIE_SECURE=false\nCOOKIE_SAME_SITE=lax\n`,
+    `APP_ENV=local\nNEXT_PUBLIC_APP_URL=http://localhost:3001\nDATABASE_URL=${databaseUrl}\nDIRECT_URL=${databaseUrl}\nBETTER_AUTH_URL=http://localhost:3001\nBETTER_AUTH_SECRET=${authSecret}\nTOKEN_SECRET=${tokenSecret}\nAUTH_COOKIE_ENV=local\nEMAIL_ADAPTER=capture\nEMAIL_CAPTURE_DIRECTORY=.local/mail\nEMAIL_CAPTURE_DIR=.local/mail\nRESEND_API_KEY=\nEMAIL_FROM=\nSMTP_HOST=\nSMTP_PORT=\nSMTP_USERNAME=\nSMTP_PASSWORD=\nSMTP_FROM=\nSMTP_SECURE=\nSMTP_USE_TLS=\nSESSION_COOKIE_NAME=smarthire.session\nPRE_AUTH_COOKIE_NAME=smarthire.pre-auth\nCOOKIE_SECURE=false\nCOOKIE_SAME_SITE=lax\n`,
   ],
 ];
 for (const [relativePath, contents] of files) {

@@ -16,7 +16,7 @@ npm run env:check
 npm run dev
 ```
 
-Open the application at http://localhost:3000. PostgreSQL listens only on `localhost:55432`; Docker stores its data in the named `smarthire_postgres_data` volume. Captured local email is written beneath `apps/web/.local/mail`.
+Open the application at http://localhost:3001. PostgreSQL listens only on `localhost:55432`; Docker stores its data in the named `smarthire_postgres_data` volume. Captured local email is written beneath `apps/web/.local/mail`.
 
 ### Optional Gmail SMTP for local delivery
 

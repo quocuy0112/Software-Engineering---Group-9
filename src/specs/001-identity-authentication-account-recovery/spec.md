@@ -31,6 +31,13 @@ Any later plan proposing a different backend mechanism, browser-storage authenti
 - Q: What idle, absolute, and simultaneous-session limits apply? → A: 30-minute idle timeout, 7-day absolute timeout, and maximum 5 simultaneous sessions; a sixth session revokes the least recently active session.
 - Q: What are the canonical account lifecycle states and transitions? → A: Pending Verification, Active, Suspended, and Deleted; Deleted is terminal for authentication and recovery, while erasure and possible email reuse follow a separately approved retention/deletion policy.
 
+### Session 2026-07-23
+
+- Q: What is the canonical public and protected routing? → A: `/` is the public SmartHire Home; `/home` redirects server-side to `/`; `/dashboard`, `/profile`, `/profile/security`, and `/profile/sessions` are protected; `/settings/security` redirects to `/profile/security`; `/settings/sessions` redirects to `/profile/sessions`; authenticated users may see Dashboard/Profile controls on `/`; successful full Login redirects to `/dashboard`; a provisional two-factor challenge cannot access protected routes. A Visitor opening `/` is not required to redirect to `/login`.
+- Q: What does normal password reset do to two-factor authentication? → A: It updates the password through Better Auth, preserves TOTP and unused backup codes, revokes all sessions, invalidates authentication challenges, consumes the reset token exactly once, queues one idempotent notification, requires a new login, and leaves the existing TOTP or backup-code requirement enabled. It MUST NOT disable 2FA.
+- Q: How does a user recover an account after losing the password, TOTP access, and backup codes? → A: A separate full account-recovery workflow uses verified-email confirmation, an enumeration-safe request, HMAC-digested single-use proofs, a 24-hour security hold, session/challenge revocation, login blocking while pending, one-time cancellation proof, password change after the hold, and 2FA/backup-code disablement only at completion. It never automatically logs the user in, emits notification and durable audit records, and documents email-only recovery as lower assurance. This workflow is specified but not implemented in the current artifact-reconciliation increment.
+- Q: What happens when password-reset steps cross Better Auth and SmartHire persistence boundaries? → A: The reset is an idempotent fail-closed saga with a token claim, durable audit intent, Better Auth password update, session revocation, challenge invalidation, notification enqueue, and finalization. Retries resume the claimed operation; concurrent submissions have one winner; partial mandatory cleanup leaves login blocked until cleanup completes. No single cross-provider database transaction is claimed.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 â€” Register an Account (Priority: P1)
@@ -176,10 +183,106 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 
 ---
 
+### User Story 10 - Navigate Public Home and the Identity Workspace (Priority: P1)
+
+As a Visitor or Authenticated User, I want a canonical public Home and consistent navigation between identity pages and protected account pages so that I can understand where I am and reach the next safe action without guessing URLs.
+
+**Why this priority**: Registration, recovery, security, and session management form one account workflow. Isolated pages make otherwise complete security features difficult to discover and use.
+
+**Independent Test**: Open public `/`, follow `/home` to `/`, use public authentication links, authenticate, move between `/dashboard`, Profile, Security, and Sessions using the shared workspace navigation, then sign out and confirm protected pages are unavailable while `/` remains public.
+
+**Acceptance Scenarios**:
+
+1. **Public Home and compatibility route** - **Given** a Visitor or Authenticated User opens `/`, **When** the page renders, **Then** the canonical public SmartHire Home is shown; authenticated users may additionally see Dashboard/Profile controls, and `/home` server-redirects to `/` without exposing protected content.
+2. **Public authentication navigation** - **Given** a Visitor is on Login, Register, Forgot Password, Reset Password, Check Email, Verify Email, or the two-factor challenge, **When** the user follows a related navigation action, **Then** the destination is an approved internal route and no account, token, verification, reset, or factor state is disclosed.
+3. **Protected workspace navigation** - **Given** an Authenticated User enters `/dashboard` or any Profile destination, **When** the page renders, **Then** one server-validated authenticated workspace shell exposes SmartHire branding, Dashboard, Profile, a safe account control, active-page state, and Sign out without creating or persisting a second client authentication state.
+4. **Successful login destination and challenge boundary** - **Given** Login succeeds fully, **When** no second factor is required or the two-factor challenge completes, **Then** the user is redirected to `/dashboard`; a provisional challenge alone cannot access `/dashboard` or any Profile route.
+5. **Foundational dashboard** - **Given** an Authenticated User opens `/dashboard`, **When** the dashboard renders, **Then** it provides safe identity-workspace guidance and quick links while future Candidate or Recruiter capabilities are clearly marked unavailable and no fabricated business data is displayed.
+6. **Responsive keyboard navigation** - **Given** a 320 CSS-pixel viewport or keyboard-only operation, **When** the user opens and uses the public or protected navigation, **Then** every control remains labelled, focus-visible, operable, non-overflowing, and understandable without color alone.
+
+---
+
+### User Story 11 - Manage One Unified Authenticated Profile (Priority: P1)
+
+As an Authenticated User, I want my account overview, password-recovery entry
+point, two-factor controls, backup codes, and sessions grouped under Profile so
+that security management is discoverable without exposing credentials or
+creating another client authentication state.
+
+**Why this priority**: The existing security capabilities are implemented, but
+separate settings destinations make them harder to discover and increase the
+risk of inconsistent navigation or accidental TOTP re-enrollment.
+
+**Independent Test**: Authenticate, open Profile from the account control,
+navigate directly and with Back/Forward between Overview, Security, and
+Sessions, exercise 2FA management with a renewed current-password proof, then
+sign out and confirm all Profile routes reject the prior session.
+
+**Acceptance Scenarios**:
+
+1. **Public Home and protected Dashboard routing** - **Given** a Visitor opens `/`, **When** no valid ACTIVE Better Auth session exists, **Then** the public SmartHire Home renders without redirecting to Login; given any user opens `/dashboard`, `/profile`, `/profile/security`, or `/profile/sessions`, **Then** the server protects the destination before rendering content, and a valid session renders the destination without a client authentication flash.
+2. **Safe account control** - **Given** an Authenticated User sees the workspace shell, **When** the header renders, **Then** a safe user icon and display name link to /profile without exposing a session token, raw session identifier, factor material, or client-stored authorization state.
+3. **Directly addressable Profile areas** - **Given** an Authenticated User, **When** they visit /profile, /profile/security, or /profile/sessions, **Then** the URL identifies Overview, Security, or Sessions, the active tab is programmatic, and browser Back/Forward works.
+4. **Legacy settings compatibility** - **Given** an old internal link to /settings/security or /settings/sessions, **When** it is requested, **Then** a server redirect reaches /profile/security or /profile/sessions without preserving query strings or secret parameters.
+5. **2FA state-safe management** - **Given** 2FA is disabled, **When** Security renders, **Then** enrollment may produce a protected local QR/manual key; **Given** 2FA is enabled, **When** Security renders, **Then** only management controls are offered and no replacement secret is generated until an explicitly approved enrollment action exists.
+6. **Renewed proof and session rotation** - **Given** an ACTIVE session older than the recent-auth interval, **When** the user supplies the correct current password for a sensitive 2FA action, **Then** that password renews proof for the request; successful Better Auth enrollment or disablement forwards its replacement session cookie to the browser.
+7. **Accessible password visibility** - **Given** any supported password field, **When** the user toggles visibility, **Then** an eye/eye-off icon changes the input type while a descriptive accessible name, pressed state, keyboard operation, paste, and autocomplete remain intact.
+
+---
+
+### User Story 12 - Complete Full Account Recovery After Loss of All Factors (Priority: P1)
+
+As a user who has lost the password, TOTP access, and backup codes, I want a
+separately controlled recovery process so that verified email can begin a
+lower-assurance recovery without silently bypassing the security hold or
+creating an automatic session.
+
+**Why this priority**: Normal password reset must preserve 2FA, so users who
+lose every factor need an explicit, auditable, higher-friction recovery path.
+
+**Independent Test**: Request recovery with known and unknown email addresses,
+confirm a disposable account through its email proof, verify the 24-hour hold,
+test login blocking and one-time cancellation, then complete after the hold and
+verify password replacement, old 2FA/backup-code disablement, notifications,
+audit records, and required new login.
+
+**Acceptance Scenarios**:
+
+1. **Enumeration-safe request** - **Given** any email address, **When** a full
+   recovery request is submitted, **Then** the response and timing are
+   materially indistinguishable, and only an eligible account receives a
+   confirmation message with no proof value logged.
+2. **Verified-email confirmation and hold** - **Given** a valid unexpired
+   HMAC-digested single-use confirmation proof, **When** it is consumed,
+   **Then** one durable recovery operation enters a 24-hour security hold,
+   existing sessions and authentication challenges are revoked, a completion
+   proof and one-time cancellation proof are issued safely, and the operation
+   is audited.
+3. **Pending recovery login block** - **Given** recovery is pending or inside
+   its hold, **When** password or second-factor login is attempted, **Then** no
+   session or provisional challenge is created and the generic blocked outcome
+   is returned without revealing recovery details.
+4. **Cancellation** - **Given** a valid unused cancellation proof before the
+   hold ends, **When** cancellation is submitted, **Then** the operation is
+   durably cancelled once, the proof cannot be reused, the user is notified,
+   and ordinary login remains governed by the account's existing credentials.
+5. **Post-hold completion** - **Given** the hold has elapsed and a valid
+   completion proof is supplied with a policy-compliant new password, **When**
+   recovery completes, **Then** Better Auth changes the password, old TOTP and
+   backup codes are disabled only in this completion step, sessions and
+   challenges are revoked, notification and durable audit records are written,
+   no session is created automatically, and a subsequent login is required.
+6. **Lower assurance disclosure** - **Given** the recovery UI or notification
+   describes the workflow, **Then** it explicitly states that email-only
+   recovery is lower assurance than possession of the original password and
+   second factor.
+
+---
+
 ### Cross-Cutting Acceptance Scenarios
 
-1. **Email-service failure** â€” **Given** registration, verification resend, password reset, or security notification has committed valid core data, **When** the Transactional Email Service is unavailable, **Then** account and credential data remain consistent, no duplicate critical record is created by retry, unrelated workflows remain available, delivery is retried or reported through an operationally visible non-secret failure, and the user sees a safe recoverable state.
-2. **Database-write failure** â€” **Given** a critical registration, verification, 2FA, password reset, or session-revocation write begins, **When** persistence fails before completion, **Then** the critical operation is rolled back or remains safely retryable, the interface reports failure without claiming success, no partial security state grants access, and the failure is audited where persistence remains available.
+1. **Email-service failure** â€” **Given** registration, verification resend, normal password reset, full recovery, or security notification has committed valid core data, **When** the Transactional Email Service is unavailable, **Then** account and credential data remain consistent, no duplicate critical record is created by retry, unrelated workflows remain available, delivery is retried or reported through an operationally visible non-secret failure, and the user sees a safe recoverable state.
+2. **Database-write or provider failure** â€” **Given** a critical registration, verification, 2FA, normal password-reset saga, full-recovery, or session-revocation step begins, **When** persistence or Better Auth work fails before completion, **Then** the operation rolls back where one provider controls the write or remains in a durable fail-closed retry state across providers, the interface reports failure without claiming success, no partial security state grants access, mandatory reset cleanup blocks login until complete, and the failure is audited where persistence remains available.
 3. **Keyboard and mobile accessibility** â€” **Given** each required page at supported mobile and desktop widths, **When** a user navigates using only a keyboard and completes its primary flow, **Then** every control is reachable in logical order, focus is visible, labels and status messages are programmatically associated, state is not conveyed by color alone, the 2FA transition moves focus to the challenge heading or first field, reduced-motion preferences are respected, and no horizontal scrolling is required at a 320 CSS-pixel viewport except for content that intrinsically requires it.
 
 4. **Asynchronous transactional email** - **Given** registration, verification resend, password reset, or a security notification commits valid core data and its Email Delivery Job, **When** the selected Transactional Email Service is slow or unavailable, **Then** the originating HTTP request completes without waiting for external delivery, the committed job remains operationally visible and safely retryable, and no provider secret or complete token is logged.
@@ -203,6 +306,10 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - Duplicate form submissions, browser retries, and email-worker retries do not create duplicate accounts, tokens, backup-code sets, notifications, or audit side effects.
 - Concurrent email workers cannot successfully claim or deliver the same due Email Delivery Job more than once; an interrupted claim becomes safely retryable according to a documented recovery interval.
 - Back-button navigation after logout, reset, or 2FA completion cannot restore protected content without a valid server-authorized session.
+- A normal reset never disables TOTP or invalidates unused backup codes; after reset, a new login still requires the existing second factor when 2FA remains enabled.
+- A reset saga token claim has one durable operation owner; concurrent submissions cannot update the password or enqueue the notification twice, and a claimed operation can be retried idempotently until mandatory cleanup and finalization complete.
+- During a full account-recovery hold, password login and second-factor completion are blocked, existing sessions and challenges remain revoked, and cancellation succeeds only with the single-use cancellation proof before the hold ends.
+- Full recovery completion changes the password and disables old TOTP/backup credentials only once, after the 24-hour hold; it never creates an authenticated session automatically.
 
 ## Requirements *(mandatory)*
 
@@ -237,7 +344,7 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 
 #### TOTP Enrollment and Management
 
-- **FR-017**: `/settings/security` MUST require recent authentication and current-password confirmation before starting TOTP enrollment, disabling TOTP, or regenerating backup codes.
+- **FR-017**: Canonical Profile Security at `/profile/security` MUST require a valid ACTIVE session and current-password confirmation before starting TOTP enrollment, disabling TOTP, or regenerating backup codes; `/settings/security` is a compatibility redirect only.
 - **FR-017A**: TOTP enrollment MUST be optional for every user covered by this functional group. No role in this group is required to enable 2FA; a future role-based mandate requires separate approval and specification.
 - **FR-018**: TOTP enrollment MUST create a unique secret per account, strongly protect it at rest, never log it, and display both a scannable QR code and manual setup key over a protected interaction.
 - **FR-019**: TOTP MUST be compatible with RFC 6238 authenticators, use six-digit codes and a 30-second time step, and apply a documented limited clock-skew tolerance.
@@ -268,7 +375,9 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - **FR-037**: Reset URLs MUST be formed only from a trusted configured application URL and MUST NOT trust a request-supplied host or redirect destination.
 - **FR-038**: Reset email delivery MUST use the same asynchronous Email Delivery Job lifecycle as registration, verification resend, and security notifications; delivery failure MUST preserve account integrity, support safe retry, and not disable unrelated workflows.
 - **FR-039**: `/reset-password` MUST reject missing, malformed, invalid, used, superseded, and expired tokens and MUST require matching new-password confirmation satisfying FR-031.
-- **FR-040**: Successful reset MUST atomically replace the password and consume the reset token, revoke every existing session for the account, queue a password-change security notification, audit the reset without secrets, and send the user to normal login without automatic authentication.
+- **FR-040**: Successful normal reset MUST update the Better Auth credential, consume the reset token exactly once, revoke every existing Better Auth session, invalidate outstanding authentication challenges, queue one idempotent password-change security notification, audit the reset without secrets, preserve TOTP and unused backup codes, and send the user to normal login without automatic authentication. Normal reset MUST NOT disable 2FA.
+- **FR-040A**: Normal reset MUST execute as an idempotent fail-closed saga across SmartHire persistence and Better Auth: claim the token, write a durable audit intent and operation state, update the Better Auth password, revoke sessions, invalidate challenges, enqueue the notification, and finalize the operation. A retry MUST resume the same claimed operation; concurrent submissions MUST have one operation owner; a token MUST NOT be consumed more than once; and login MUST remain blocked when mandatory cleanup or notification enqueue is incomplete.
+- **FR-040B**: Full account recovery MUST be a separate workflow for a user who has lost the password, TOTP access, and backup codes. It MUST provide an enumeration-safe request, verified-email confirmation, HMAC-digested single-use proofs, a 24-hour security hold, session and challenge revocation, login blocking while pending, one-time cancellation proof, password change only after the hold, durable audit and notification records, and no automatic login. Old TOTP and backup codes MUST be disabled only at full-recovery completion, and the product MUST document email-only recovery as lower assurance.
 
 #### Sessions, Authorization, Cookies, and CSRF
 
@@ -279,7 +388,7 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - **FR-044**: Sensitive actions MUST require recent authentication using a documented recency interval and renewed proof when the interval has elapsed.
 - **FR-045**: State-changing authenticated requests MUST use CSRF protection appropriate to the cookie-based session strategy.
 - **FR-046**: Logout MUST invalidate the current server-side session and clear the authentication cookie using the same path/domain/security scope with which it was set.
-- **FR-047**: `/settings/sessions` MUST list only sessions owned by the Authenticated User, identify the current session, and show useful non-secret metadata without exposing Better Auth session tokens, raw session identifiers, complete IP addresses, or other credentials.
+- **FR-047**: Canonical Profile Sessions at `/profile/sessions` MUST list only sessions owned by the Authenticated User, identify the current session, and show useful non-secret metadata without exposing Better Auth session tokens, raw session identifiers, complete IP addresses, or other credentials; `/settings/sessions` is a compatibility redirect only.
 - **FR-048**: Users MUST be able to revoke another owned session without ending the current session; revoked and expired sessions MUST fail on their next attempted use.
 - **FR-049**: Session creation, expiration where operationally relevant, logout, revocation, identifier rotation, and rejected use of revoked sessions MUST follow the audit policy.
 
@@ -290,7 +399,7 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - **FR-052**: No registration, authentication, verification-resend, or password-reset response or observably different behavior may expose whether an account exists, except where a user has already authenticated or proven control of the relevant account context.
 - **FR-053**: Rate-limit policy values and challenge lifetimes MUST be documented in the implementation plan, consistently enforced at the server, testable, and configurable without weakening the generic-response rules.
 - **FR-054**: Audit records MUST contain actor (or anonymous request reference), action, target, result, timestamp, and relevant non-sensitive request context; they MUST exclude passwords, TOTP secrets/codes, complete tokens, backup codes, JWTs, raw session identifiers, and unnecessary personal data.
-- **FR-055**: The system MUST support `/register`, `/check-email`, `/verify-email`, `/login`, `/two-factor`, `/forgot-password`, `/reset-password`, `/settings/security`, and `/settings/sessions` with route-appropriate authenticated/unauthenticated access control.
+- **FR-055**: The system MUST support public SmartHire Home at `/`, a server-side `/home` redirect to `/`, public `/register`, `/check-email`, `/verify-email`, `/login`, `/two-factor`, `/forgot-password`, and `/reset-password`, protected `/dashboard`, `/profile`, `/profile/security`, and `/profile/sessions`, and server-side compatibility redirects from `/settings/security` and `/settings/sessions`. Fully successful Login MUST redirect to `/dashboard`; a provisional two-factor challenge MUST NOT authorize any protected route.
 
 #### Transactional Email Delivery
 
@@ -301,11 +410,27 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - **FR-060**: SMTP configuration MUST be server-only and limited to `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM`, `SMTP_SECURE`, and `SMTP_USE_TLS`. No SMTP setting or credential may use a `NEXT_PUBLIC_` name, and SMTP passwords or provider credentials MUST NOT appear in source code, ordinary logs, client bundles, database records, Email Delivery Job payloads, or audit data.
 - **FR-061**: Gmail-compatible SMTP MUST require a complete email address for `SMTP_USERNAME`, support Google App Password authentication, require STARTTLS with port 587 and `SMTP_SECURE=false`, and MAY support implicit TLS with port 465 and `SMTP_SECURE=true`. `SMTP_FROM` MUST contain a complete email address and reject carriage returns, line feeds, and all control characters. Missing or contradictory settings MUST fail configuration validation without exposing supplied secret values.
 
+#### Identity Navigation and Workspace Integration
+
+- **FR-062**: /login, /register, /forgot-password, /reset-password, /verify-email, /check-email, and /two-factor MUST use one shared public authentication shell with a SmartHire home/brand link, consistent responsive presentation, and route-appropriate safe help or return actions.
+- **FR-063**: Login MUST link to Create account and Forgot password; Register MUST link to Sign in; recovery and verification result pages MUST provide an approved internal return path without disclosing account existence, factor configuration, verification state, or reset-token validity beyond the existing generic result.
+- **FR-064**: `/dashboard`, `/profile`, `/profile/security`, and `/profile/sessions` MUST use one authenticated workspace shell whose server layout validates the sole Better Auth session before rendering protected navigation or content. `/` is the canonical public SmartHire Home and is not required to redirect unauthenticated visitors to `/login`. Client navigation state MUST NOT authorize access or duplicate the session.
+- **FR-065**: The authenticated workspace shell MUST expose SmartHire branding, a `/dashboard` link, Profile, a safe account control, active-page state, and Sign out. Profile navigation MUST expose Overview, Security, and Sessions. Authenticated users MAY see Dashboard/Profile controls on public `/`. Ordinary internal navigation MUST use Next.js Link; router APIs are reserved for state-dependent or post-action transitions.
+- **FR-066**: The foundational Dashboard MUST provide identity-workspace orientation and quick links only. Candidate profiles, job search, recommendations, recruiter workflows, applications, notifications, administration, analytics, and invented business data MUST NOT be implemented by this increment; future areas MUST be labelled as unavailable or Coming later.
+- **FR-067**: Shared navigation MUST remain keyboard operable, visibly focusable, screen-reader labelled, reduced-motion safe, and free from horizontal overflow at 320 CSS pixels. A responsive menu control MUST expose its expanded state and controlled region programmatically.
+- **FR-068**: Protected child pages MUST NOT duplicate workspace header/navigation markup or independently fetch a session solely to render the shell. Sign out MUST use the existing authoritative logout operation with same-origin/CSRF protection and must not expose session credentials.
+- **FR-069**: `/dashboard`, `/profile`, `/profile/security`, and `/profile/sessions` MUST use a server-validated ACTIVE Better Auth session boundary. Invalid, absent, expired, revoked, Pending Verification, Suspended, Deleted, and provisional pre-auth challenge states MUST redirect safely to `/login` before protected content renders. `/` MUST render the public Home instead of requiring authentication, and `/home` MUST redirect server-side to `/`.
+- **FR-070**: The authenticated workspace shell MUST expose Dashboard and Profile navigation plus a top-right safe account control containing a non-sensitive icon and display name linked to /profile; the display projection MUST NOT authorize access or contain raw session/factor credentials.
+- **FR-071**: /profile, /profile/security, and /profile/sessions MUST be protected, directly linkable Profile destinations with accessible active state and browser history behavior. /settings/security and /settings/sessions MUST redirect server-side to the corresponding Profile destination without forwarding query strings or secret parameters.
+- **FR-072**: Profile Security MUST expose the existing normal password-recovery entry point, Better Auth-owned TOTP enrollment or management according to authoritative account state, and one-time backup-code behavior. Normal password reset MUST preserve enabled 2FA and unused backup codes. It MUST NOT offer enrollment while 2FA is already enabled or create a parallel TOTP/backup owner.
+- **FR-073**: A correct current password supplied for a sensitive action MUST serve as renewed proof when the session is older than the documented recent-auth interval. When pinned Better Auth rotates the authoritative session during TOTP enrollment or disablement, the custom Route Handler MUST forward the resulting Set-Cookie value with no-store protections.
+- **FR-074**: Password visibility controls MUST use eye/eye-off visual states with descriptive accessible names and aria-pressed; they MUST remain keyboard operable and preserve the approved autocomplete, paste, validation, and password-manager behavior.
+
 ### Non-Functional Requirements
 - **NFR-001 â€” Performance**: Under documented normal test conditions, each required page MUST become usable within 3 seconds for at least 95% of measured visits; the plan MUST state environment, dataset, measurement method, and external-email conditions.
 - **NFR-002 â€” Responsiveness**: All required pages MUST support mobile and desktop layouts from 320 CSS pixels wide without loss of actions, labels, messages, or entered non-sensitive values.
 - **NFR-003 â€” Accessibility**: Primary flows MUST satisfy WCAG 2.2 Level AA expectations for keyboard operation, visible focus, associated labels, status/error announcement, contrast, non-color cues, and reduced motion.
-- **NFR-004 â€” Reliability**: A failure of the Transactional Email Service MUST not corrupt account data, activate an account in Pending Verification, consume an otherwise retryable user action incorrectly, or disable login and session management.
+- **NFR-004 â€” Reliability**: A failure of the Transactional Email Service MUST not corrupt account data, activate an account in Pending Verification, consume an otherwise retryable user action incorrectly, or disable unrelated login and session management. A normal password-reset saga MUST fail closed and block login only when its mandatory cleanup is incomplete; a pending full-recovery operation MUST block login by policy.
 - **NFR-005 â€” Security**: Sensitive traffic MUST use HTTPS in production; secret material MUST be protected throughout its lifecycle and excluded from ordinary application logs, analytics, URLs other than the required opaque verification/reset token, and client-side persistent storage.
 - **NFR-006 â€” Privacy**: Processing and retention of account, session, request-context, and audit data MUST be purpose-limited, minimized, and handled consistently with applicable Vietnamese personal-data requirements, including Decree 13/2023/ND-CP.
 - **NFR-007 â€” Availability target**: Identity flows SHOULD contribute to the projectâ€™s 99.5% availability design target; any measured claim MUST state the deployment period and exclusions.
@@ -314,6 +439,8 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - **NFR-010 â€” Testability**: Security timing, rate-limit, expiry, retry, transaction-failure, concurrent-use, and accessibility behavior MUST be verifiable in controlled tests without using production personal data or secrets.
 
 - **NFR-011 - Asynchronous email reliability**: A failure or timeout of the Transactional Email Service MUST not delay completion of an originating request after its Email Delivery Job has committed. Due jobs MUST remain operationally visible until sent or terminally failed, and adapter selection, SMTP transport matrices, safe error classification, retry, timeout, concurrent claim, and secret-exclusion behavior MUST be verifiable without live external email delivery or production secrets.
+
+- **NFR-012 - Navigation cohesion**: Dashboard, Profile Overview, Profile Security, Profile Sessions, and public authentication transitions MUST expose a visible destination landmark and complete within the Constitution dashboard-navigation target under the documented local test environment; browser tests MUST synchronize on response, URL, and destination state rather than arbitrary sleeps or networkidle.
 
 ### Key Entities
 
@@ -352,6 +479,16 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - **SC-015**: In 100% of registration, verification-resend, and password-reset request tests, the response completes after the required transaction and Email Delivery Job commit without waiting for capture, SMTP, Resend, timeout, or provider-failure completion.
 - **SC-016**: In concurrent-worker and retry tests, each logical Email Delivery Job is delivered successfully at most once, every claim increments attempts exactly once, and every completed attempt produces the expected `SENT`, `RETRYABLE`, or `DEAD` state with no duplicate terminal-failure audit event.
 
+- **SC-017**: Component and browser tests find all required public cross-links and protected Dashboard/Profile/Overview/Security/Sessions/Sign-out actions, expose correct active state, and complete keyboard navigation at desktop and 320 CSS-pixel widths with zero horizontal overflow.
+- **SC-018**: In 100% of tested direct and back-button visits after logout or without a valid Better Auth session, /, /profile, /profile/security, /profile/sessions, /settings/security, and /settings/sessions redirect safely to Login and render no protected workspace content.
+- **SC-019**: Component and browser tests prove /profile, /profile/security, and /profile/sessions are directly addressable, expose correct active state, support Back/Forward, and receive the exact legacy redirects with no protected-content flash at desktop and 320 CSS pixels.
+- **SC-020**: In tested enrollment and disablement flows, every Better Auth replacement session cookie reaches the browser and the immediately following protected Profile request succeeds using the same exclusive session mechanism.
+- **SC-021**: In tested accounts with 2FA enabled, opening or revisiting Profile Security performs zero enrollment-start requests and does not replace the stored TOTP secret; disabled accounts receive one local QR/manual setup response only after valid renewed proof.
+- **SC-022**: Automated component and browser accessibility checks find every password visibility toggle by a descriptive accessible name, confirm eye/eye-off state changes, and complete keyboard operation without replacing visible labels or autocomplete metadata.
+- **SC-023**: In 100% of normal password-reset tests, Better Auth records the new password while the pre-reset TOTP state and every unused backup code remain valid; all sessions and authentication challenges are revoked, the reset notification is enqueued once, and the next successful login still requires the existing second factor.
+- **SC-024**: In 100% of injected normal-reset failures and concurrent submissions, exactly one token claim and password update can win, the durable audit intent and operation state permit idempotent retry, no mandatory cleanup is skipped, and login remains blocked until cleanup and notification enqueue finalize.
+- **SC-025**: In 100% of full-recovery tests, the request is enumeration-safe, one verified-email proof starts exactly one 24-hour hold, sessions/challenges are revoked, pending login is blocked, cancellation proof is single-use, completion after the hold changes the password and disables old 2FA only then, notification/audit records exist, and no automatic login occurs.
+
 ## Assumptions
 
 - The active Spec Kit project root is `src`, so the requested relative path resolves to `src/specs/001-identity-authentication-account-recovery/spec.md` in this repository.
@@ -362,7 +499,7 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - Verification and password-reset links are delivered by an approved Transactional Email Service; email delivery time is external to completion of the originating web request.
 - The generated local environment selects `capture`. Individual developers may opt into Gmail-compatible SMTP for local demonstrations using a complete account address and Google App Password. Resend remains the approved production-oriented adapter, while production deployment is not part of this academic feature.
 - Rate-limit thresholds, pre-authentication challenge lifetime, recent-authentication interval, session idle/absolute lifetimes, TOTP skew tolerance, backup-code count/format, and audit/operational retention periods are security policy parameters to be selected and justified during planning, without weakening the fixed behavior in this specification.
-- An approved 2FA recovery procedure will be separately specified before support-assisted TOTP disablement is implemented; until then, a user must have a valid TOTP code after recent authentication and password confirmation to disable 2FA.
+- Full account recovery is specified as the separately controlled path for users who lose the password, TOTP access, and backup codes; its implementation is deferred from the current artifact-reconciliation increment. Ordinary 2FA disablement still requires recent authentication, current-password proof, and a valid TOTP code. Email-only recovery is explicitly lower assurance.
 - Session location is approximate and displayed only if derived lawfully and without exposing a complete IP address; absence of location data does not block session management.
 - The account email field is the login identifier. Changing an email address and broader profile editing are outside this group.
 - Company membership, employer verification, recruiter/administrator authority, recruitment authorization beyond base Candidate identity, and AI functionality are outside this group.
@@ -377,6 +514,7 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 
 ## Out of Scope
 
+- Candidate profiles, job search, job recommendations, recruiter dashboards, job posting, applications, notifications, administration, and business analytics are excluded from the foundational identity Dashboard.
 - Production deployment and operation of Resend or any SMTP relay; this specification defines production-oriented adapter behavior but does not add deployment scope.
 - Google OAuth, â€œSign in with Google,â€ or any social login.
 - SMS OTP, phone-number authentication, passkeys, or WebAuthn.
@@ -385,10 +523,4 @@ As an Authenticated User, I want to review and revoke sessions or log out so tha
 - User-profile editing beyond the minimum name and email held for the account.
 - Trusted-device or â€œremember this deviceâ€ behavior.
 - Automatic support bypass of TOTP; any approved recovery procedure requires separate definition and authorization controls.
-
-
-
-
-
-
-
+- Runtime implementation of the full account-recovery workflow is deferred from this artifact-reconciliation increment; the approved MVP policy and future implementation tasks are documented here.

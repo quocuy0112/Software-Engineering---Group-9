@@ -47,12 +47,25 @@ describe("password reset service", () => {
     const now = new Date();
     await new PrismaPasswordResetRepository().replaceForActiveUser({ normalizedEmail: user.email, rawToken: raw, protectedToken: protector.seal(raw), correlationId: randomUUID(), now });
     const newPassword = "new correct horse 2026";
-    const sessionHeaders = new Headers({ origin: "http://localhost:3000", "sec-fetch-site": "same-origin" });
+    const sessionHeaders = new Headers({ origin: "http://localhost:3001", "sec-fetch-site": "same-origin" });
     await new BetterAuthSessionGateway().signIn(user.email, user.password, sessionHeaders);
     await prisma.authenticationChallenge.create({ data: { userId: user.userId, handleDigest: `reset-challenge-${randomUUID()}`, purpose: "PASSWORD_LOGIN_2FA", expiresAt: new Date(Date.now() + 300000) } });
+    await prisma.userAccount.update({
+      where: { id: user.userId },
+      data: { twoFactorEnabled: true },
+    });
+    await prisma.twoFactor.create({
+      data: { id: randomUUID(), userId: user.userId, secret: "encrypted-secret", backupCodes: "encrypted-backup-codes", verified: true },
+    });
     await expect(new ResetPasswordService().execute(raw, newPassword, new Date(now.getTime() + 1))).resolves.toMatchObject({ ok: true, userId: user.userId });
     expect(await prisma.session.count({ where: { userId: user.userId } })).toBe(0);
     expect(await prisma.authenticationChallenge.count({ where: { userId: user.userId } })).toBe(0);
+    const resetAccount = await prisma.userAccount.findUniqueOrThrow({
+      where: { id: user.userId },
+      select: { twoFactorEnabled: true },
+    });
+    expect(resetAccount.twoFactorEnabled).toBe(false);
+    expect(await prisma.twoFactor.findUnique({ where: { userId: user.userId } })).toBeNull();
     const notification = await prisma.emailOutbox.findMany({ where: { userId: user.userId, kind: "PASSWORD_CHANGED" } });
     expect(notification).toHaveLength(1);
     expect(notification[0].idempotencyKey).toMatch(/^password-changed:/);
@@ -62,7 +75,7 @@ describe("password reset service", () => {
 
     const credential = await prisma.authProviderAccount.findFirstOrThrow({ where: { userId: user.userId, providerId: "credential" } });
     expect(credential.password).not.toBe(newPassword);
-    const headers = new Headers({ origin: "http://localhost:3000", "sec-fetch-site": "same-origin" });
+    const headers = new Headers({ origin: "http://localhost:3001", "sec-fetch-site": "same-origin" });
     expect((await new BetterAuthSessionGateway().signIn(user.email, user.password, headers)).ok).toBe(false);
     expect((await new BetterAuthSessionGateway().signIn(user.email, newPassword, headers)).ok).toBe(true);
   });
@@ -73,7 +86,7 @@ describe("password reset service", () => {
     const now = new Date();
     await new PrismaPasswordResetRepository().replaceForActiveUser({ normalizedEmail: user.email, rawToken: raw, protectedToken: protector.seal(raw), correlationId: randomUUID(), now });
     await expect(new ResetPasswordService().execute(raw, "new correct horse 2026", new Date(now.getTime() + 30 * 60 * 1000))).resolves.toMatchObject({ ok: false });
-    const headers = new Headers({ origin: "http://localhost:3000", "sec-fetch-site": "same-origin" });
+    const headers = new Headers({ origin: "http://localhost:3001", "sec-fetch-site": "same-origin" });
     expect((await new BetterAuthSessionGateway().signIn(user.email, user.password, headers)).ok).toBe(true);
   });
 });

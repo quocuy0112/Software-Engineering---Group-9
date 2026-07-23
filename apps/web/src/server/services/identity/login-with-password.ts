@@ -38,7 +38,15 @@ export class LoginWithPasswordService {
       subject: `${request.subject}:${data.email}`,
       now,
     });
-    if (!d.allowed)
+    if (!d.allowed) {
+      await this.record(
+        "rate_limit.denied",
+        "DENIED",
+        cid,
+        now,
+        undefined,
+        "login_throttled",
+      );
       return Response.json(
         { message: GENERIC_LOGIN_ERROR },
         {
@@ -49,6 +57,7 @@ export class LoginWithPasswordService {
           },
         },
       );
+    }
     const account = await this.sessions.accountByEmail(data.email);
     const upstream = await this.gateway
       .signIn(data.email, data.password, request.headers)
@@ -107,11 +116,12 @@ export class LoginWithPasswordService {
     );
   }
   private record(
-    action: "login.succeeded" | "login.failed",
-    result: "SUCCESS" | "FAILURE",
+    action: "login.succeeded" | "login.failed" | "rate_limit.denied",
+    result: "SUCCESS" | "FAILURE" | "DENIED",
     correlationId: string,
     occurredAt: Date,
     targetId?: string,
+    reason = result === "SUCCESS" ? "accepted" : "denied",
   ) {
     return this.audit
       .append({
@@ -122,7 +132,7 @@ export class LoginWithPasswordService {
         targetId,
         result,
         correlationId,
-        context: { reason: result === "SUCCESS" ? "accepted" : "denied" },
+        context: { reason },
       })
       .catch(() => undefined);
   }

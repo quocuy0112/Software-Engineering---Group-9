@@ -35,7 +35,7 @@ describe("registration and verification contracts", () => {
     expect(normalizeEmail(" USER@EXAMPLE.TEST ")).toBe("user@example.test");
   });
   it("renders one trusted verification link in accessible HTML and text", () => {
-    const url = "http://localhost:3000/verify-email?token=protected-value";
+    const url = "http://localhost:3001/verify-email?token=protected-value";
     const html = renderToStaticMarkup(
       createElement(VerifyEmailTemplate, { verificationUrl: url }),
     );

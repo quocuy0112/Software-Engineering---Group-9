@@ -33,6 +33,7 @@ export class RegisterAccountService {
     ),
     private readonly protector = new TokenProtector(),
     deliveryNotUsed?: unknown,
+    private readonly audit = new PrismaAuditRepository(),
   ) {
     void deliveryNotUsed;
   }
@@ -47,13 +48,25 @@ export class RegisterAccountService {
       correlationId,
       now: request.now,
     });
-    if (!policy.accepted)
+    if (!policy.accepted) {
+      await this.audit
+        .append({
+          occurredAt: request.now ?? new Date(),
+          actorType: "anonymous",
+          action: "registration.rejected",
+          targetType: "request",
+          result: "DENIED",
+          correlationId,
+          context: { reason: policy.code.toLowerCase() },
+        })
+        .catch(() => undefined);
       return {
         accepted: false,
         status: policy.code === "RATE_LIMITED" ? 429 : 400,
         message: policy.message,
         retryAfterSeconds: policy.retryAfterSeconds,
       };
+    }
     const token = this.protector.generate();
     const now = request.now ?? new Date();
     try {
@@ -69,20 +82,34 @@ export class RegisterAccountService {
         expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
         correlationId,
       });
+      await this.audit
+        .append({
+          occurredAt: now,
+          actorType: "anonymous",
+          action: "registration.accepted",
+          targetType: "request",
+          result: "SUCCESS",
+          correlationId,
+          context: { reason: "accepted" },
+        })
+        .catch(() => undefined);
     } catch (error) {
-      if (!(error instanceof DuplicateRegistrationError)) {
-        await new PrismaAuditRepository()
-          .append({
-            occurredAt: now,
-            actorType: "anonymous",
-            action: "registration.rejected",
-            targetType: "request",
-            result: "FAILURE",
-            correlationId,
-            context: { reason: "persistence" },
-          })
-          .catch(() => undefined);
-      }
+      await this.audit
+        .append({
+          occurredAt: now,
+          actorType: "anonymous",
+          action: "registration.rejected",
+          targetType: "request",
+          result: "FAILURE",
+          correlationId,
+          context: {
+            reason:
+              error instanceof DuplicateRegistrationError
+                ? "duplicate"
+                : "persistence",
+          },
+        })
+        .catch(() => undefined);
     }
     return { accepted: true, message: GENERIC_REGISTRATION_MESSAGE };
   }

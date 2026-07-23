@@ -106,7 +106,51 @@ Gmail port 587 uses STARTTLS with `secure=false` and required TLS; optional port
 
 ## Decision: UI and Client State
 
-Tailwind CSS and shadcn/ui are the baseline; React Hook Form and Zod cover forms and validation. Sonner provides supplemental feedback only; inline errors and an accessible summary remain persistent. TanStack Query is added only for a documented server-state benefit. Zustand is optional for non-sensitive shared UI state only. Motion is nonessential and reduced-motion safe. Lenis is not used on authentication pages.
+Tailwind CSS and shadcn/ui are the baseline; React Hook Form and Zod cover forms and validation. Sonner provides supplemental feedback only; inline errors and an accessible summary remain persistent. TanStack Query is limited to the documented server-state benefit of sanitized session-list/revoke and verification-resend mutations. The exact approved package is `@tanstack/react-query` `5.101.4`; query keys, cached values, and mutation payloads exclude passwords, tokens, TOTP codes, backup codes, and secret-bearing responses. Zustand is optional for non-sensitive shared UI state only. Motion is nonessential and reduced-motion safe. Lenis is not used on authentication pages.
+
+## Decision: Server-First Identity Navigation Shells
+
+Use App Router route groups to separate the public (auth) shell from the protected (workspace) shell without changing public URLs. The protected layout validates the sole Better Auth session on the server and supplies only minimized navigation data plus an ephemeral CSRF proof required by the existing logout route. Active-link and mobile-menu state are presentation-only client state and never authorize access. Ordinary navigation uses Next.js Link; router APIs remain limited to post-action or state-dependent transitions.
+
+The root / becomes a protected foundational identity Dashboard because the feature has no approved public marketing-page requirement. Authenticated security and session management live under the protected Profile area. The Dashboard provides quick links and explicitly labelled future workspace areas without implementing or simulating recruitment-domain data.
+
+**Alternatives rejected**: a client-only session provider duplicates authorization state; every page independently fetching the current session increases coupling and visible loading; merging identity APIs into one endpoint weakens existing transport boundaries; a simulated jobs/recruiter dashboard exceeds this feature scope; full-page internal anchors discard App Router navigation benefits.
+
+## Decision: Unified Protected Profile and Better Auth Session Rotation
+
+**Decision**: Replace top-level Security and Sessions navigation with one
+Profile destination and directly addressable nested pages: /profile,
+/profile/security, and /profile/sessions. A shared Profile layout supplies
+Overview/Security/Sessions navigation while distinct server/client components
+keep account projection, 2FA management, and sanitized session queries
+separate. Legacy settings destinations redirect server-side to the exact
+Profile page and discard incoming query strings.
+
+**Decision**: The workspace layout passes only a display-safe account
+projection after ACTIVE-session validation. Name and email may render in the
+account control, but raw Better Auth session identifiers/tokens, TOTP material,
+backup codes, passwords, and CSRF values other than the existing ephemeral
+logout proof never enter the projection or persistent client state.
+
+**Verified behavior**: Better Auth 1.6.11 can rotate its authoritative session
+during initial TOTP verification and TOTP disablement. Server API calls support
+returnHeaders so a provider gateway can capture the new Set-Cookie value. The
+custom SmartHire handlers must forward that cookie; otherwise the browser keeps
+an invalidated prior session even when the security operation succeeds.
+
+**Decision**: Current-password verification is the renewed proof required after
+the ten-minute recent-auth interval. The caller still needs a valid ACTIVE
+session and the request remains rate-limited and audited. Rejecting an old
+session before verifying the submitted current password was rejected because
+it made renewal impossible and conflicted with the renewed-proof requirement.
+
+**Decision**: Profile Security reads authoritative twoFactorEnabled state and
+renders exactly one of enrollment or management. Showing both was rejected
+because starting Better Auth enrollment for an already enabled account can
+replace the active authenticator secret before the user completes the new QR
+flow. Hash-only single-page navigation was also rejected in favor of App Router
+pages because direct URLs, browser history, active state, and focused E2E tests
+are clearer.
 
 ## Remaining Research Risks
 

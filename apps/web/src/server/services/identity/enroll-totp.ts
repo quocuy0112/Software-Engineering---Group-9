@@ -37,7 +37,11 @@ export type EnrollmentDenied = {
 };
 export type StartResult = EnrollmentSetup | EnrollmentDenied;
 
-export type VerifyGranted = { ok: true; backupCodes: string[] };
+export type VerifyGranted = {
+  ok: true;
+  backupCodes: string[];
+  sessionCookie: string | null;
+};
 export type VerifyResult = VerifyGranted | EnrollmentDenied;
 
 type RequestContext = { headers: Headers; subject: string; now?: Date };
@@ -88,6 +92,14 @@ export class EnrollTotpService {
 
     const recent = await this.recentAuth.execute(currentPassword, request);
     if (!recent.ok) {
+      await this.record(
+        "totp.enrollment_started",
+        recent.status === 429 ? "DENIED" : "FAILURE",
+        correlationId,
+        now,
+        null,
+        "recent_auth_failed",
+      );
       return {
         ok: false,
         status: recent.status,
@@ -184,11 +196,11 @@ export class EnrollTotpService {
     }
     const actor = { userId: session.userId, sessionId: session.sessionId };
 
-    const verified = await this.gateway.verifyInitialTotp(
+    const verification = await this.gateway.verifyInitialTotp(
       request.headers,
       code,
     );
-    if (!verified) {
+    if (!verification.verified) {
       await this.record(
         "totp.enabled",
         "FAILURE",
@@ -226,7 +238,11 @@ export class EnrollTotpService {
       actor,
       "enabled",
     );
-    return { ok: true, backupCodes };
+    return {
+      ok: true,
+      backupCodes,
+      sessionCookie: verification.sessionCookie,
+    };
   }
 
   /**

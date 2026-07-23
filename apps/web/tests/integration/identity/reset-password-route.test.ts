@@ -10,10 +10,10 @@ vi.mock("@/server/services/identity/reset-password", () => ({
 import { POST } from "@/app/api/identity/password/reset/route";
 
 function request(body: unknown, sameOrigin = true) {
-  return new Request("http://localhost:3000/api/identity/password/reset", {
+  return new Request("http://localhost:3001/api/identity/password/reset", {
     method: "POST",
     headers: sameOrigin
-      ? { "content-type": "application/json", origin: "http://localhost:3000", "sec-fetch-site": "same-origin" }
+      ? { "content-type": "application/json", origin: "http://localhost:3001", "sec-fetch-site": "same-origin" }
       : { "content-type": "application/json", origin: "https://evil.example", "sec-fetch-site": "cross-site" },
     body: JSON.stringify(body),
   });

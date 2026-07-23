@@ -28,8 +28,7 @@ export async function POST(request: Request) {
       { message: "Verification could not be completed." },
       { status: 400, headers: noStoreHeaders },
     );
-  const subject =
-      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local",
+  const subject = `user:${current.userId}`,
     result = await new DisableTwoFactorService().execute(
       parsed.data.currentPassword,
       parsed.data.code,
@@ -40,8 +39,10 @@ export async function POST(request: Request) {
       { message: "Verification could not be completed." },
       { status: result.status, headers: noStoreHeaders },
     );
+  const headers = new Headers(noStoreHeaders);
+  if (result.sessionCookie) headers.append("Set-Cookie", result.sessionCookie);
   return Response.json(
     { message: "Two-factor authentication disabled." },
-    { headers: noStoreHeaders },
+    { headers },
   );
 }

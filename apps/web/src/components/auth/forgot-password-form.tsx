@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { PASSWORD_RECOVERY_GENERIC_RESPONSE } from "@/features/identity/schemas/password-recovery";
+import { AuthStatus } from "./auth-status";
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
@@ -19,7 +21,9 @@ export function ForgotPasswordForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      const result = (await response.json().catch(() => null)) as { message?: string } | null;
+      const result = (await response.json().catch(() => null)) as {
+        message?: string;
+      } | null;
       setStatus(result?.message ?? PASSWORD_RECOVERY_GENERIC_RESPONSE);
     } catch {
       setStatus(PASSWORD_RECOVERY_GENERIC_RESPONSE);
@@ -29,10 +33,20 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <main className="auth-shell">
-      <form onSubmit={submit} className="auth-card" noValidate aria-busy={busy}>
-        <h1>Forgot your password?</h1>
-        <p>Enter your email and we’ll send reset instructions if the account is eligible.</p>
+    <section className="auth-form-content">
+      <form className="auth-form" onSubmit={submit} noValidate aria-busy={busy}>
+        <div className="auth-form-heading">
+          <p className="form-kicker">ACCOUNT RECOVERY</p>
+          <h1>Forgot your password?</h1>
+          <p>
+            Enter your email and we’ll send reset instructions if the account is
+            eligible.
+          </p>
+        </div>
+        <p>
+          Enter your email and we’ll send reset instructions if the account is
+          eligible.
+        </p>
         <label htmlFor="forgot-email">Email address</label>
         <input
           id="forgot-email"
@@ -46,9 +60,9 @@ export function ForgotPasswordForm() {
         <button type="submit" disabled={busy || email.trim().length === 0}>
           {busy ? "Sending…" : "Send reset instructions"}
         </button>
-        <p role="status" aria-live="polite">{status}</p>
-        <a href="/login">Back to sign in</a>
+        <AuthStatus status={status} />
+        <Link href="/login">Back to sign in</Link>
       </form>
-    </main>
+    </section>
   );
 }

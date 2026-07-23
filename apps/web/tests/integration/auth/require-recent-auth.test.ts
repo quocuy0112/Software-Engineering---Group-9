@@ -15,7 +15,7 @@ const createdEmails = new Set<string>();
 
 function sameOriginHeaders(extra: Record<string, string> = {}) {
   return new Headers({
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3001",
     "sec-fetch-site": "same-origin",
     "user-agent": "vitest",
     ...extra,
@@ -108,7 +108,7 @@ describe("RequireRecentAuthService", () => {
     expect(result).toMatchObject({ ok: false, status: 401 });
   });
 
-  it("denies when authentication is older than the ten-minute window", async () => {
+  it("accepts a correct current password as renewed proof after the ten-minute window", async () => {
     const email = await activeAccount();
     const cookie = await signInCookie(email);
     const stale = new Date(Date.now() + RECENT_AUTH_WINDOW_MS + 60_000);
@@ -117,7 +117,7 @@ describe("RequireRecentAuthService", () => {
       subject: randomUUID(),
       now: stale,
     });
-    expect(result).toMatchObject({ ok: false, status: 401 });
+    expect(result.ok).toBe(true);
   });
 
   it("denies when the owning account is no longer ACTIVE", async () => {

@@ -9,11 +9,7 @@ import {
 import { PasswordField } from "./password-field";
 import { FormFeedback } from "./form-feedback";
 
-export function LoginForm({
-  returnTo = "/settings/sessions",
-}: {
-  returnTo?: string;
-}) {
+export function LoginForm({ returnTo = "/" }: { returnTo?: string }) {
   const [status, setStatus] = useState("");
   const {
     register,
@@ -49,8 +45,17 @@ export function LoginForm({
     window.location.assign(returnTo);
   });
   return (
-    <form onSubmit={submit} noValidate aria-busy={isSubmitting}>
-      <h1 id="page-title">Sign in to SmartHire</h1>
+    <form
+      className="auth-form"
+      onSubmit={submit}
+      noValidate
+      aria-busy={isSubmitting}
+    >
+      <div className="auth-form-heading">
+        <p className="form-kicker">WELCOME BACK</p>
+        <h1 id="page-title">Sign in to SmartHire</h1>
+        <p>Continue to your secure talent workspace.</p>
+      </div>
       <div className="field">
         <label htmlFor="login-email">Email address</label>
         <input

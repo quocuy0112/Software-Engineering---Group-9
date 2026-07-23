@@ -66,7 +66,7 @@ async function registerVerifyAndSignIn(page: Page): Promise<string> {
         if (body.includes(`To: ${email}`)) {
           link =
             body.match(
-              /http:\/\/localhost:3000\/verify-email\?token=[A-Za-z0-9._~-]+/,
+              /http:\/\/localhost:3001\/verify-email\?token=[A-Za-z0-9._~-]+/,
             )?.[0] ?? "";
         }
       }
@@ -82,8 +82,21 @@ async function registerVerifyAndSignIn(page: Page): Promise<string> {
   await page.getByLabel("Email address").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page).toHaveURL(/\/settings\/sessions/);
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
   return email;
+}
+
+async function selectBackupCode(page: Page): Promise<void> {
+  const button = page.getByRole("button", { name: "Backup code" });
+  await expect(button).toBeEnabled();
+  await expect(async () => {
+    if ((await button.getAttribute("aria-pressed")) !== "true") {
+      await button.click();
+    }
+    await expect(button).toHaveAttribute("aria-pressed", "true");
+  }).toPass({ timeout: 5_000 });
+  await expect(page.getByLabel("Backup code")).toBeVisible();
 }
 
 test("enrolls TOTP and completes backup-code login end-to-end", async ({
@@ -95,7 +108,7 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   });
   const email = await registerVerifyAndSignIn(page);
 
-  await page.goto("/settings/security");
+  await page.goto("/profile/security");
   await expect(
     page.getByRole("heading", { name: "Set up two-factor authentication" }),
   ).toBeVisible();
@@ -191,7 +204,7 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   expect(
     provisionalCookies.some((cookie) => cookie.name === "smarthire.session"),
   ).toBe(false);
-  await page.getByRole("button", { name: "Backup code" }).click();
+  await selectBackupCode(page);
   await page.getByLabel("Backup code").fill(backupCode);
   const backupCompletion = page.waitForResponse(
     (response) =>
@@ -212,7 +225,7 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   expect(
     completedCookies.filter((cookie) => cookie.name === "smarthire.session"),
   ).toHaveLength(1);
-  await page.goto("/settings/security");
+  await page.goto("/profile/security");
   await expect(page).toHaveURL(/\/settings\/security/);
 
   await page.context().clearCookies();
@@ -220,7 +233,7 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await page.getByLabel("Email address").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await page.getByRole("button", { name: "Backup code" }).click();
+  await selectBackupCode(page);
   await page.getByLabel("Backup code").fill(backupCode);
   await page.getByLabel("Backup code").press("Enter");
   await expect(page.getByRole("status")).toContainText(
@@ -246,7 +259,7 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   });
 
   // Regeneration displays ten replacement codes once and invalidates old ones.
-  await page.goto("/settings/security");
+  await page.goto("/profile/security");
   const management = page.getByRole("region", {
     name: "Two-factor management",
   });
@@ -276,7 +289,7 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await page.getByLabel("Email address").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await page.getByRole("button", { name: "Backup code" }).click();
+  await selectBackupCode(page);
   await page.getByLabel("Backup code").fill(oldCode);
   await page.getByRole("button", { name: "Verify" }).click();
   await expect(page.getByRole("status")).toContainText("could not be completed");
@@ -291,7 +304,7 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await expect(page).toHaveURL(/\/settings\/sessions(?:\?.*)?$/, { timeout: 15_000 });
 
   // Disablement removes the second-factor requirement for the next login.
-  await page.goto("/settings/security");
+  await page.goto("/profile/security");
   const disablePanel = page.getByRole("region", { name: "Two-factor management" });
   await disablePanel.getByLabel("Current password").fill(password);
   await disablePanel.getByLabel("Six-digit TOTP code").fill(totp(manualKey));
@@ -314,11 +327,11 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await page.getByLabel("Email address").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page).toHaveURL(/\/settings\/sessions(?:\?.*)?$/, { timeout: 15_000 });
-  await expect(page.getByRole("heading", { name: /^Sessions$/i })).toBeVisible();
+  await expect(page).toHaveURL(/\/$/, { timeout: 15_000 });
+  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
   await page.context().clearCookies();
   await page.goto("/two-factor");
-  await page.getByRole("button", { name: "Backup code" }).click();
+  await selectBackupCode(page);
   await page.getByLabel("Backup code").fill(replacementCode);
   await page.getByRole("button", { name: "Verify" }).click();
   await expect(page.getByRole("status")).toContainText("could not be completed");
@@ -333,7 +346,7 @@ test("enrollment UI is keyboard-operable and has no 320px overflow", async ({
   await page.emulateMedia({ reducedMotion: "reduce" });
   await registerVerifyAndSignIn(page);
 
-  await page.goto("/settings/security");
+  await page.goto("/profile/security");
   await expect(
     page.getByRole("heading", { name: "Set up two-factor authentication" }),
   ).toBeVisible();

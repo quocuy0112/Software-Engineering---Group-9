@@ -16,7 +16,7 @@ npm run dev
 
 Local URLs and adapters:
 
-- Application: http://localhost:3000
+- Application: http://localhost:3001
 - PostgreSQL: `localhost:55432`, bound to loopback only
 - Email: file capture at `apps/web/.local/mail`
 - Session cookie: `smarthire.session`, `Secure=false`, `SameSite=Lax`

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { TWO_FACTOR_GENERIC_ERROR } from "@/features/identity/schemas/two-factor";
+import { AuthStatus } from "./auth-status";
 export function TwoFactorChallenge() {
   const router = useRouter(),
     input = useRef<HTMLInputElement>(null),
@@ -32,7 +33,7 @@ export function TwoFactorChallenge() {
         return;
       }
       setStatus("Verification complete.");
-      router.replace("/settings/sessions");
+      router.replace("/profile#sessions");
     } catch {
       setStatus(TWO_FACTOR_GENERIC_ERROR);
     } finally {
@@ -99,9 +100,7 @@ export function TwoFactorChallenge() {
         >
           {busy ? "Verifying…" : "Verify"}
         </button>
-        <p id="two-factor-status" role="status" aria-live="polite">
-          {status}
-        </p>
+        <AuthStatus id="two-factor-status" status={status} tone="error" />
         <a href="/login">Back to sign in</a>
       </form>
       <style jsx>{`

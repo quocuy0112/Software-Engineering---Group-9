@@ -1,3 +1,5 @@
+import { AuthStatus } from "./auth-status";
+
 export function FormFeedback({
   title = "Please review the form",
   errors = [],
@@ -19,11 +21,7 @@ export function FormFeedback({
           </ul>
         </div>
       ) : null}
-      {status ? (
-        <p role="status" aria-live="polite">
-          {status}
-        </p>
-      ) : null}
+      {status ? <AuthStatus status={status} tone="error" /> : null}
     </>
   );
 }

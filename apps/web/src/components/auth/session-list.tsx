@@ -1,71 +1,83 @@
 "use client";
-import { useEffect, useState } from "react";
-import type { PublicSession } from "@/features/identity/schemas/session";
 
-export function SessionList() {
-  const [sessions, setSessions] = useState<PublicSession[]>([]),
-    [proof, setProof] = useState(""),
-    [status, setStatus] = useState("Loading sessions.");
-  async function load(signal?: AbortSignal) {
-    const response = await fetch("/api/identity/sessions", {
-      cache: "no-store",
-      signal,
-    });
-    if (!response.ok) {
-      setStatus("Unable to load sessions.");
-      return;
-    }
-    const body = (await response.json()) as {
-      sessions: PublicSession[];
-      csrfProof: string;
-    };
-    setSessions(body.sessions);
-    setProof(body.csrfProof);
-    setStatus("");
-  }
-  useEffect(() => {
-    const controller = new AbortController();
-    const timer = setTimeout(() => void load(controller.signal), 0);
-    return () => {
-      clearTimeout(timer);
-      controller.abort();
-    };
-  }, []);
-  async function revoke(reference: string) {
-    const response = await fetch(`/api/identity/sessions/${reference}`, {
-      method: "DELETE",
-      headers: { "x-csrf-token": proof },
-    });
-    setStatus(response.ok ? "Session revoked." : "Unable to revoke session.");
-    if (response.ok) await load();
-  }
-  async function logout() {
-    const response = await fetch("/api/identity/logout", {
-      method: "POST",
-      headers: { "x-csrf-token": proof },
-    });
-    if (response.ok) window.location.assign("/login");
-    else setStatus("Unable to sign out.");
-  }
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  revokeSessionMutationOptions,
+  sessionListQueryOptions,
+} from "@/features/identity/client/query-options";
+import { AuthStatus } from "./auth-status";
+
+export function SessionList({ embedded = false }: { embedded?: boolean }) {
+  const [proof, setProof] = useState("");
+  const queryClient = useQueryClient();
+  const sessionsQuery = useQuery(sessionListQueryOptions(setProof));
+  const revokeMutation = useMutation({
+    ...revokeSessionMutationOptions(proof),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["identity", "sessions"],
+      });
+    },
+  });
+  const sessions = sessionsQuery.data ?? [];
+  const status = sessionsQuery.isPending
+    ? "Loading sessions."
+    : sessionsQuery.isError
+      ? "Unable to load sessions."
+      : revokeMutation.isSuccess
+        ? "Session revoked."
+        : revokeMutation.isError
+          ? "Unable to revoke session."
+          : "";
+
   return (
-    <section>
-      <h1>Sessions</h1>
-      <p role="status">{status}</p>
-      <ul>
-        {sessions.map((session) => (
-          <li key={session.reference}>
-            <strong>
-              {session.device}
-              {session.current ? " (current)" : ""}
-            </strong>
-            <p>
-              {session.approximateLocation} · Last active{" "}
-              {new Date(session.lastActiveAt).toLocaleString()}
+    <section className={embedded ? "sessions-page sessions-page--embedded" : "sessions-page"}>
+      {!embedded ? (
+        <header className="page-heading">
+          <div>
+            <p className="workspace-kicker">ACTIVE ACCESS</p>
+            <h1 id="workspace-page-title">Sessions</h1>
+            <p className="page-heading-copy">
+              Review the devices that can currently access your SmartHire account.
             </p>
+          </div>
+          <span className="page-heading-badge">{sessions.length} active</span>
+        </header>
+      ) : null}
+      <AuthStatus
+        status={status}
+        tone={status.startsWith("Unable") ? "error" : "message"}
+      />
+      <div className="sessions-panel-heading">
+        <div>
+          <p className="panel-kicker">SIGNED-IN DEVICES</p>
+          <h2>Signed-in devices</h2>
+        </div>
+        <p>Revoke any device you do not recognize.</p>
+      </div>
+      <ul className="session-list">
+        {sessions.map((session) => (
+          <li className="session-item" key={session.reference}>
+            <span className="session-device-icon" aria-hidden="true">
+              □
+            </span>
+            <div className="session-details">
+              <strong>
+                {session.device}
+                {session.current ? " (current)" : ""}
+              </strong>
+              <p>
+                {session.approximateLocation} · Last active{" "}
+                {new Date(session.lastActiveAt).toLocaleString()}
+              </p>
+            </div>
             {!session.current ? (
               <button
+                className="session-revoke-button"
                 type="button"
-                onClick={() => void revoke(session.reference)}
+                onClick={() => revokeMutation.mutate(session.reference)}
+                disabled={revokeMutation.isPending}
               >
                 Revoke session
               </button>
@@ -73,9 +85,12 @@ export function SessionList() {
           </li>
         ))}
       </ul>
-      <button type="button" onClick={() => void logout()}>
-        Sign out
-      </button>
+      {!sessionsQuery.isPending && sessions.length === 0 ? (
+        <div className="session-empty">
+          <span aria-hidden="true">□</span>
+          <p>No active sessions are available to display.</p>
+        </div>
+      ) : null}
     </section>
   );
 }

@@ -8,13 +8,13 @@ import { serverEnvironment } from "@/lib/env/runtime";
 const runId = randomUUID();
 const email = `totp-store-${runId}@example.test`;
 const password = "Storage Protection Passphrase 2026!";
-const baseURL = "http://localhost:3000/api/auth";
+const baseURL = "http://localhost:3001/api/auth";
 
 async function request(
   path: string,
   options: { body?: unknown; cookie?: string } = {},
 ) {
-  const headers = new Headers({ origin: "http://localhost:3000" });
+  const headers = new Headers({ origin: "http://localhost:3001" });
   if (options.body !== undefined)
     headers.set("content-type", "application/json");
   if (options.cookie) headers.set("cookie", options.cookie);

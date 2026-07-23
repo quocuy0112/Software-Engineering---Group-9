@@ -8,8 +8,45 @@ import {
   RegisterAccountService,
   GENERIC_REGISTRATION_MESSAGE,
 } from "@/server/services/identity/register-account";
+import { registrationSchema } from "@/features/identity/schemas/registration";
 
 describe("registration persistence", () => {
+  it("creates one graph under concurrent normalized duplicate registration", async () => {
+    const suffix = randomUUID();
+    const email = `Concurrent-${suffix}@Example.Test`;
+    const service = new RegisterAccountService(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      vi.fn().mockResolvedValue(true),
+    );
+    const input = registrationSchema.parse({
+      name: "Concurrent Candidate",
+      email,
+      password: "correct horse 2026",
+      passwordConfirmation: "correct horse 2026",
+    });
+    const [first, second] = await Promise.all([
+      service.execute(input, { subject: randomUUID() }),
+      service.execute(
+        registrationSchema.parse({
+          ...input,
+          email: `  ${email.toLocaleLowerCase("en-US")}  `,
+        }),
+        { subject: randomUUID() },
+      ),
+    ]);
+    expect(first.message).toBe(second.message);
+    const users = await prisma.userAccount.findMany({
+      where: { normalizedEmail: email.toLocaleLowerCase("en-US") },
+      include: { candidateIdentity: true, securityTokens: true, outbox: true },
+    });
+    expect(users).toHaveLength(1);
+    expect(users[0]?.candidateIdentity).not.toBeNull();
+    expect(users[0]?.securityTokens).toHaveLength(1);
+    expect(users[0]?.outbox).toHaveLength(1);
+  });
   it("creates one complete Pending Verification graph and no browser session", async () => {
     const suffix = randomUUID();
     const email = `candidate-${suffix}@example.test`;

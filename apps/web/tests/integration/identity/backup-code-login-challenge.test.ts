@@ -43,7 +43,7 @@ describe("SmartHire backup-code challenge completion", () => {
       .split(";", 1)[0];
     const h = requestHeaders(pre);
     const result = await complete(
-      new Request("http://localhost:3000/api/identity/two-factor/complete", {
+      new Request("http://localhost:3001/api/identity/two-factor/complete", {
         method: "POST",
         headers: h,
         body: JSON.stringify({ factor: "backup-code", code: f.backupCodes[0] }),
