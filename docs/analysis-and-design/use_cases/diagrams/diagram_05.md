@@ -1,4 +1,16 @@
-```mermaid
+## 1. Use Case Diagram
+
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+
+*Below is the static render of the Diagram for PDF. The Mermaid source code is attached underneath for reference.*
+
+![Diagram 5 - Supporting Services and Analytics](./rendered_diagrams/Diagram_05.png)
+
+## 2. Mermaid Source Code
+
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+
+```text
 ---
 config:
   theme: neutral

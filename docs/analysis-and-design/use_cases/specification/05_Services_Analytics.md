@@ -4,7 +4,17 @@
 
 ## 1. Use Case Diagram
 
-```mermaid
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+
+*Below is the static render of the Diagram for PDF. The Mermaid source code is attached underneath for reference.*
+
+![Diagram 5 - Supporting Services and Analytics](../diagrams/rendered_diagrams/Diagram_05.png)
+
+## 2. Mermaid Source Code
+
+*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+
+```text
 ---
 config:
   theme: neutral
@@ -67,7 +77,7 @@ flowchart TB
     UC_ANL_03 -. "«extend»" .-> UC_ANL_02
 ```
 
-## 2. Traceability Summary
+## 3. Traceability Summary
 
 | Use Case ID | Use Case Name | Actor(s) | Covered Requirements |
 | :--- | :--- | :--- | :--- |
@@ -83,9 +93,9 @@ flowchart TB
 
 ---
 
-## 3. Use Case Specifications
+## 4. Use Case Specifications
 
-### 3.1. UC-SCR-01: Execute Hybrid Candidate Screening
+### 4.1. UC-SCR-01: Execute Hybrid Candidate Screening
 
 *   **Use-case ID:** UC-SCR-01
 *   **Use-case Name:** Execute Hybrid Candidate Screening
@@ -114,7 +124,7 @@ flowchart TB
 
 ---
 
-### 3.2. UC-SCR-02: View Candidate Score and Explanation
+### 4.2. UC-SCR-02: View Candidate Score and Explanation
 
 *   **Use-case ID:** UC-SCR-02
 *   **Use-case Name:** View Candidate Score and Explanation
@@ -138,7 +148,7 @@ flowchart TB
 
 ---
 
-### 3.3. UC-SCR-04: Retry Failed Scoring
+### 4.3. UC-SCR-04: Retry Failed Scoring
 
 *   **Use-case ID:** UC-SCR-04
 *   **Use-case Name:** Retry Failed Scoring
@@ -162,7 +172,7 @@ flowchart TB
 
 ---
 
-### 3.4. UC-NOT-01: Receive Event Notification
+### 4.4. UC-NOT-01: Receive Event Notification
 
 *   **Use-case ID:** UC-NOT-01
 *   **Use-case Name:** Receive Event Notification
@@ -183,7 +193,7 @@ flowchart TB
 
 ---
 
-### 3.5. UC-NOT-02: Manage In-App Notifications
+### 4.5. UC-NOT-02: Manage In-App Notifications
 
 *   **Use-case ID:** UC-NOT-02
 *   **Use-case Name:** Manage In-App Notifications
@@ -208,7 +218,7 @@ flowchart TB
 
 ---
 
-### 3.6. UC-NOT-03: Retry Failed Notification Delivery
+### 4.6. UC-NOT-03: Retry Failed Notification Delivery
 
 *   **Use-case ID:** UC-NOT-03
 *   **Use-case Name:** Retry Failed Notification Delivery
@@ -229,7 +239,7 @@ flowchart TB
 
 ---
 
-### 3.7. UC-ANL-01: View Company Recruitment Analytics
+### 4.7. UC-ANL-01: View Company Recruitment Analytics
 
 *   **Use-case ID:** UC-ANL-01
 *   **Use-case Name:** View Company Recruitment Analytics
@@ -256,7 +266,7 @@ flowchart TB
 
 ---
 
-### 3.8. UC-ANL-02: View Platform Analytics
+### 4.8. UC-ANL-02: View Platform Analytics
 
 *   **Use-case ID:** UC-ANL-02
 *   **Use-case Name:** View Platform Analytics
@@ -280,7 +290,7 @@ flowchart TB
 
 ---
 
-### 3.9. UC-ANL-03: Export Authorized Data
+### 4.9. UC-ANL-03: Export Authorized Data
 
 *   **Use-case ID:** UC-ANL-03
 *   **Use-case Name:** Export Authorized Data
