@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartHire — Recruitment Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4F5F8;
+    --surface:#FFFFFF;
+    --surface-2:#EBEEF4;
+    --ink:#12182B;
+    --ink-soft:#5B6478;
+    --ink-faint:#9AA1B4;
+    --border:#E3E6EE;
+    --brand:#23315C;
+    --brand-soft:#E7EAF3;
+    --signal:#12B5A6;
+    --signal-soft:#E1F7F4;
+    --alert:#E2574C;
+    --alert-soft:#FBE8E6;
+    --amber:#EF9E1D;
+    --amber-soft:#FCF0DA;
+    --success:#2FB380;
+    --success-soft:#E4F6EE;
+    --violet:#7C5CBF;
+    --violet-soft:#EEE8F9;
+    --radius-sm:8px;
+    --radius-md:14px;
+    --radius-lg:22px;
+    --shadow-sm:0 1px 2px rgba(18,24,43,.05), 0 1px 1px rgba(18,24,43,.04);
+    --shadow-md:0 10px 30px rgba(18,24,43,.08);
+    --font-display:'Be Vietnam Pro', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+  }
+  *,*::before,*::after{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{ background:var(--paper); color:var(--ink); font-family:var(--font-display); -webkit-font-smoothing:antialiased; line-height:1.45; }
+  h1,h2,h3,h4{ margin:0; font-family:var(--font-display); }
+  p{ margin:0; }
+  ul{ margin:0; padding:0; list-style:none; }
+  button{ font-family:inherit; cursor:pointer; }
+  a{ color:inherit; text-decoration:none; }
+  input,textarea,select{ font-family:inherit; }
+  :focus-visible{ outline:2px solid var(--signal); outline-offset:2px; border-radius:4px; }
+
+  .mono{ font-family:var(--font-mono); }
+  .eyebrow{ font-family:var(--font-mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); }
+  .uc-tag{ display:inline-flex; align-items:center; gap:4px; font-family:var(--font-mono); font-size:10.5px; letter-spacing:.03em; color:var(--ink-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px; }
+
+  .app{ max-width:1320px; margin:0 auto; padding:0 28px 90px; }
+
+  .topbar{ display:flex; align-items:center; justify-content:space-between; gap:20px; padding:18px 0 14px; flex-wrap:wrap; }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand .logo{ width:34px; height:34px; flex:none; }
+  .brand .wordmark{ font-size:19px; font-weight:800; letter-spacing:-.01em; color:var(--ink); }
+  .brand .proto-badge{ font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; color:var(--ink-faint); background:var(--surface-2); border:1px dashed var(--border); border-radius:5px; padding:2px 6px; margin-left:4px; }
+
+  .role-switch{ display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:5px; box-shadow:var(--shadow-sm); }
+  .role-switch .rs-label{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-faint); padding-left:10px; }
+  .role-btn{ display:flex; align-items:center; gap:6px; background:transparent; border:none; border-radius:999px; padding:7px 14px; font-size:13px; font-weight:600; color:var(--ink-soft); transition:background .15s ease, color .15s ease; white-space:nowrap; }
+  .role-btn svg{ width:15px; height:15px; }
+  .role-btn:hover{ background:var(--surface-2); }
+  .role-btn.active{ background:var(--brand); color:#fff; }
+
+  .topbar-right{ display:flex; align-items:center; gap:14px; }
+  .icon-btn{ position:relative; width:40px; height:40px; display:flex; align-items:center; justify-content:center; background:var(--surface); border:1px solid var(--border); border-radius:12px; color:var(--ink-soft); box-shadow:var(--shadow-sm); }
+  .icon-btn:hover{ color:var(--ink); border-color:var(--ink-faint); }
+  .icon-btn svg{ width:19px; height:19px; }
+  .badge-dot{ position:absolute; top:-4px; right:-4px; min-width:17px; height:17px; padding:0 4px; background:var(--alert); color:#fff; border-radius:999px; font-family:var(--font-mono); font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; border:2px solid var(--paper); }
+  .badge-dot.hidden{ display:none; }
+  .identity{ display:flex; align-items:center; gap:9px; }
+  .avatar{ width:38px; height:38px; border-radius:11px; background:var(--brand); color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:700; font-size:13px; flex:none; }
+  .identity-text{ display:flex; flex-direction:column; line-height:1.25; }
+  .identity-name{ font-size:13.5px; font-weight:700; }
+  .identity-role{ font-size:11px; color:var(--ink-faint); font-family:var(--font-mono); }
+
+  .tabs{ display:flex; gap:4px; border-bottom:1px solid var(--border); overflow-x:auto; scrollbar-width:none; margin-bottom:26px; }
+  .tabs::-webkit-scrollbar{ display:none; }
+  .tab{ flex:none; background:transparent; border:none; padding:13px 16px 12px; display:flex; flex-direction:column; align-items:flex-start; gap:3px; border-bottom:2px solid transparent; color:var(--ink-soft); }
+  .tab:hover{ color:var(--ink); }
+  .tab .tab-label{ font-size:14px; font-weight:600; white-space:nowrap; }
+  .tab .tab-role{ font-family:var(--font-mono); font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-faint); }
+  .tab.active{ color:var(--ink); border-color:var(--brand); }
+  .tab.disabled{ opacity:.35; pointer-events:none; }
+
+  .screen{ display:none; animation:fadeIn .25s ease; }
+  .screen.active{ display:block; }
+  @keyframes fadeIn{ from{ opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+
+  .screen-header{ margin-bottom:20px; }
+  .breadcrumb{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-faint); margin-bottom:8px; }
+  .screen-title-row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:space-between; }
+  .screen-title{ font-size:24px; font-weight:800; letter-spacing:-.01em; }
+  .screen-sub{ font-size:13.5px; color:var(--ink-soft); margin-top:3px; }
+
+  .pill{ display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:5px 11px; border-radius:999px; border:1px solid transparent; white-space:nowrap; }
+  .pill-amber{ background:var(--amber-soft); color:#9A6A00; }
+  .pill-success{ background:var(--success-soft); color:#177A52; }
+  .pill-alert{ background:var(--alert-soft); color:#A73127; }
+  .pill-muted{ background:var(--surface-2); color:var(--ink-soft); }
+  .pill-brand{ background:var(--brand-soft); color:var(--brand); }
+  .pill-violet{ background:var(--violet-soft); color:var(--violet); }
+
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); }
+  .card-pad{ padding:22px 24px; }
+  .card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+  .card-head h3{ font-size:15px; font-weight:700; }
+
+  .btn{ display:inline-flex; align-items:center; gap:7px; font-size:13.5px; font-weight:600; padding:10px 16px; border-radius:11px; border:1px solid transparent; transition:transform .1s ease, background .15s ease, box-shadow .15s ease; white-space:nowrap; }
+  .btn svg{ width:15px; height:15px; }
+  .btn:active{ transform:translateY(1px); }
+  .btn-solid{ background:var(--brand); color:#fff; box-shadow:var(--shadow-sm); }
+  .btn-solid:hover{ background:#1a2547; }
+  .btn-outline{ background:var(--surface); border-color:var(--border); color:var(--ink); }
+  .btn-outline:hover{ border-color:var(--ink-faint); }
+  .btn-outline-alert{ background:var(--surface); border-color:var(--alert-soft); color:var(--alert); }
+  .btn-outline-alert:hover{ background:var(--alert-soft); }
+  .btn-signal{ background:var(--signal); color:#fff; }
+  .btn-signal:hover{ background:#0e9d90; }
+  .btn:disabled{ opacity:.4; cursor:not-allowed; box-shadow:none; }
+  .btn-sm{ padding:7px 12px; font-size:12.5px; border-radius:9px; }
+  .btn-ghost{ background:transparent; color:var(--ink-soft); }
+  .btn-ghost:hover{ background:var(--surface-2); color:var(--ink); }
+
+  .demo-box{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; border:1px dashed var(--border); background:var(--surface-2); border-radius:12px; padding:9px 14px; margin-bottom:18px; }
+  .demo-box .demo-label{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); }
+  .demo-pills{ display:flex; gap:6px; flex-wrap:wrap; }
+  .demo-pill{ font-family:var(--font-mono); font-size:11.5px; padding:5px 11px; border-radius:8px; background:var(--surface); border:1px solid var(--border); color:var(--ink-soft); }
+  .demo-pill.active{ background:var(--brand); color:#fff; border-color:var(--brand); }
+
+  .divider{ height:1px; background:var(--border); margin:18px 0; }
+  .skeleton{ background:linear-gradient(90deg, var(--surface-2) 25%, #F4F6FA 37%, var(--surface-2) 63%); background-size:400% 100%; animation:shimmer 1.4s ease infinite; border-radius:8px; }
+  @keyframes shimmer{ 0%{background-position:100% 0;} 100%{background-position:0 0;} }
+  .skel-line{ height:12px; margin-bottom:10px; }
+  .state-block{ display:none; }
+  .state-block.active{ display:block; }
+
+  .error-msg{ display:flex; align-items:center; gap:10px; background:var(--alert-soft); color:#A73127; border-radius:12px; padding:12px 14px; font-size:13.5px; font-weight:500; margin-top:14px; }
+  .error-msg svg{ width:17px; height:17px; flex:none; }
+  .field-error{ font-size:12px; color:var(--alert); margin-top:5px; display:flex; align-items:center; gap:5px; }
+  .field-error svg{ width:13px; height:13px; }
+
+  .empty-state{ text-align:center; padding:50px 20px; }
+  .empty-state svg{ width:52px; height:52px; color:var(--ink-faint); margin-bottom:14px; }
+  .empty-state p{ font-size:14px; color:var(--ink-soft); font-weight:600; }
+  .empty-state span{ font-size:12.5px; color:var(--ink-faint); display:block; margin-top:4px; }
+
+  /* ---------- Form elements ---------- */
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--ink); }
+  .field .hint{ font-size:11.5px; color:var(--ink-faint); margin-top:5px; }
+  .field input[type=text], .field input[type=number], .field textarea, .field select{
+    width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-size:13.5px; color:var(--ink); background:var(--surface);
+  }
+  .field textarea{ resize:vertical; min-height:80px; }
+  .field input:focus, .field textarea:focus, .field select:focus{ border-color:var(--brand); }
+  .field.invalid input, .field.invalid textarea{ border-color:var(--alert); background:var(--alert-soft); }
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:600px){ .field-row{ grid-template-columns:1fr; } }
+
+  /* ---------- Modal ---------- */
+  .modal-backdrop{ position:fixed; inset:0; background:rgba(18,24,43,.45); z-index:200; display:none; align-items:flex-start; justify-content:center; overflow:auto; padding:40px 16px; }
+  .modal-backdrop.open{ display:flex; }
+  .modal{ background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-md); width:100%; max-width:640px; padding:0; animation:modalIn .2s ease; }
+  @keyframes modalIn{ from{ opacity:0; transform:translateY(10px);} to{ opacity:1; transform:none; } }
+  .modal-head{ display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid var(--border); }
+  .modal-head h3{ font-size:16px; font-weight:700; }
+  .modal-body{ padding:22px 24px; max-height:65vh; overflow:auto; }
+  .modal-foot{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:16px 24px; border-top:1px solid var(--border); flex-wrap:wrap; }
+  .modal-close{ background:transparent; border:none; color:var(--ink-faint); width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:8px; }
+  .modal-close:hover{ background:var(--surface-2); color:var(--ink); }
+  .modal-close svg{ width:18px; height:18px; }
+
+  .wizard-steps{ display:flex; align-items:center; gap:0; margin-bottom:4px; }
+  .wizard-step{ display:flex; align-items:center; gap:7px; font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); }
+  .wizard-step .num{ width:20px; height:20px; border-radius:999px; background:var(--surface-2); display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:700; }
+  .wizard-step.done .num{ background:var(--signal); color:#fff; }
+  .wizard-step.current .num{ background:var(--brand); color:#fff; }
+  .wizard-step.current{ color:var(--ink); font-weight:600; }
+  .wizard-sep{ width:22px; height:1px; background:var(--border); margin:0 6px; }
+
+  /* ---------- Job Postings ---------- */
+  .job-toolbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+  .filter-pills{ display:flex; gap:6px; flex-wrap:wrap; }
+  .filter-pill{ font-size:12.5px; font-weight:600; padding:6px 13px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:var(--ink-soft); }
+  .filter-pill.active{ background:var(--ink); color:#fff; border-color:var(--ink); }
+
+  .job-list{ display:flex; flex-direction:column; gap:10px; }
+  .job-row{ display:flex; align-items:center; gap:16px; padding:16px 18px; border-radius:16px; }
+  .job-row-main{ flex:1; min-width:0; }
+  .job-row-title{ font-size:14.5px; font-weight:700; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .job-row-meta{ font-size:12px; color:var(--ink-faint); font-family:var(--font-mono); margin-top:4px; }
+  .job-row-stats{ display:flex; gap:20px; text-align:center; }
+  .job-stat{ min-width:56px; }
+  .job-stat-num{ font-family:var(--font-mono); font-size:16px; font-weight:700; }
+  .job-stat-label{ font-size:10.5px; color:var(--ink-faint); }
+  .job-row-actions{ position:relative; }
+  .kebab-menu{ position:absolute; top:calc(100% + 6px); right:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow-md); padding:6px; display:none; min-width:190px; z-index:30; }
+  .kebab-menu.open{ display:block; }
+  .kebab-menu button{ display:flex; width:100%; align-items:center; gap:8px; background:transparent; border:none; padding:9px 10px; border-radius:8px; font-size:13px; color:var(--ink); text-align:left; }
+  .kebab-menu button:hover{ background:var(--surface-2); }
+  .kebab-menu button.danger{ color:var(--alert); }
+  .kebab-menu button:disabled{ opacity:.4; cursor:not-allowed; }
+  .kebab-menu hr{ border:none; border-top:1px solid var(--border); margin:5px 2px; }
+
+  /* ---------- Preview ---------- */
+  .preview-shell{ border:1px solid var(--border); border-radius:16px; padding:24px; background:var(--paper); }
+  .preview-badge{ display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:3px 8px; margin-bottom:12px; }
+  .preview-title{ font-size:20px; font-weight:800; }
+  .preview-meta-row{ display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; color:var(--ink-soft); margin-top:6px; }
+  .preview-section{ margin-top:18px; }
+  .preview-section h4{ font-size:12.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-faint); font-family:var(--font-mono); margin-bottom:8px; }
+  .preview-section p, .preview-section li{ font-size:13.5px; color:var(--ink); line-height:1.6; }
+  .preview-section li{ display:flex; gap:8px; padding:3px 0; }
+  .preview-section li::before{ content:''; width:5px; height:5px; margin-top:7px; border-radius:999px; background:var(--brand); flex:none; }
+
+  /* ---------- Screening & Ranking ---------- */
+  .screen-grid{ display:grid; grid-template-columns:320px 1fr; gap:20px; align-items:start; }
+  @media (max-width:900px){ .screen-grid{ grid-template-columns:1fr; } }
+  .cand-list-item{ display:block; width:100%; text-align:left; padding:13px 15px; border-radius:14px; border:1px solid transparent; margin-bottom:8px; background:transparent; }
+  .cand-list-item:hover{ background:var(--surface-2); }
+  .cand-list-item.selected{ background:var(--surface); border-color:var(--border); box-shadow:var(--shadow-sm); }
+  .cand-row-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .cand-name{ font-size:13.5px; font-weight:700; }
+  .cand-score{ font-family:var(--font-mono); font-size:12.5px; font-weight:700; padding:2px 8px; border-radius:7px; }
+  .score-high{ background:var(--success-soft); color:#177A52; }
+  .score-mid{ background:var(--amber-soft); color:#9A6A00; }
+  .score-low{ background:var(--alert-soft); color:#A73127; }
+  .cand-sub{ font-size:11.5px; color:var(--ink-faint); font-family:var(--font-mono); margin-top:3px; }
+  .rank-badge{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); width:20px; flex:none; }
+
+  .ring-gauge{ position:relative; width:130px; height:130px; margin:6px auto 4px; --pct:0; }
+  .ring-gauge svg{ width:100%; height:100%; overflow:visible; }
+  .ring-track{ fill:none; stroke:var(--border); stroke-width:11; }
+  .ring-value{ fill:none; stroke:var(--signal); stroke-width:11; stroke-linecap:round; stroke-dasharray:339.3; stroke-dashoffset:calc(339.3 - (339.3 * var(--pct) / 100)); transition:stroke-dashoffset .9s cubic-bezier(.4,0,.2,1); }
+  .ring-label{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .ring-number{ font-family:var(--font-mono); font-size:30px; font-weight:700; line-height:1; }
+  .ring-suffix{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); margin-top:2px; }
+  .ring-caption{ text-align:center; font-size:12.5px; color:var(--ink-soft); margin-top:2px; }
+  .ring-gauge.scanning svg{ animation:spin 1.2s linear infinite; }
+  .ring-gauge.scanning .ring-value{ stroke-dasharray:64 275.3; }
+  .ring-gauge.scanning .ring-label{ opacity:0; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .ring-gauge.error .ring-value{ stroke:var(--alert); stroke-dasharray:0 339.3; }
+  .ring-gauge.error .ring-label .ring-number, .ring-gauge.error .ring-label .ring-suffix{ display:none; }
+  .ring-error-icon{ display:none; position:absolute; inset:0; align-items:center; justify-content:center; color:var(--alert); }
+  .ring-gauge.error .ring-error-icon{ display:flex; }
+  .ring-error-icon svg{ width:28px; height:28px; }
+
+  .subscore-row{ display:flex; gap:10px; margin-top:16px; }
+  .subscore{ flex:1; background:var(--surface-2); border-radius:12px; padding:10px 12px; text-align:center; }
+  .subscore-num{ font-family:var(--font-mono); font-size:17px; font-weight:700; }
+  .subscore-label{ font-size:10.5px; color:var(--ink-faint); margin-top:2px; }
+  .explain-card{ background:var(--signal-soft); border-radius:12px; padding:14px 16px; margin-top:16px; font-size:13px; color:#0B5C54; line-height:1.6; }
+  .footer-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:20px; padding-top:16px; border-top:1px solid var(--border); }
+
+  /* ---------- Kanban ---------- */
+  .kanban-scroll{ overflow-x:auto; padding-bottom:8px; }
+  .kanban-board{ display:flex; gap:14px; min-width:max-content; }
+  .kanban-col{ width:250px; flex:none; background:var(--surface-2); border-radius:16px; padding:12px; min-height:120px; }
+  .kanban-col.drag-over{ background:var(--brand-soft); outline:2px dashed var(--brand); }
+  .kanban-col-head{ display:flex; align-items:center; justify-content:space-between; padding:4px 6px 12px; }
+  .kanban-col-title{ font-size:12.5px; font-weight:700; }
+  .kanban-col-count{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); background:var(--surface); border-radius:999px; padding:1px 8px; }
+  .kanban-card{ background:var(--surface); border:1px solid var(--border); border-radius:13px; padding:12px 13px; margin-bottom:9px; box-shadow:var(--shadow-sm); cursor:grab; }
+  .kanban-card:active{ cursor:grabbing; }
+  .kanban-card.dragging{ opacity:.4; }
+  .kanban-card-name{ font-size:13px; font-weight:700; }
+  .kanban-card-role{ font-size:11px; color:var(--ink-faint); margin-top:2px; }
+  .kanban-card-foot{ display:flex; align-items:center; justify-content:space-between; margin-top:10px; }
+  .kanban-move-btn{ background:var(--surface-2); border:none; border-radius:8px; padding:5px 8px; font-size:11px; color:var(--ink-soft); display:flex; align-items:center; gap:4px; }
+  .kanban-move-btn:hover{ background:var(--brand-soft); color:var(--brand); }
+  .kanban-move-btn:disabled{ opacity:.35; cursor:not-allowed; }
+  .kanban-empty{ text-align:center; padding:20px 8px; font-size:11.5px; color:var(--ink-faint); }
+  .readonly-banner{ display:flex; align-items:center; gap:10px; background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:10px 14px; margin-bottom:16px; font-size:12.5px; color:var(--ink-soft); }
+  .readonly-banner svg{ width:16px; height:16px; flex:none; color:var(--ink-faint); }
+
+  /* ---------- Stage history timeline ---------- */
+  .timeline{ position:relative; padding-left:24px; }
+  .timeline::before{ content:''; position:absolute; left:5px; top:4px; bottom:4px; width:2px; background:var(--border); }
+  .timeline-item{ position:relative; padding-bottom:20px; }
+  .timeline-item:last-child{ padding-bottom:0; }
+  .timeline-dot{ position:absolute; left:-24px; top:2px; width:12px; height:12px; border-radius:999px; background:var(--brand); border:2px solid var(--surface); }
+  .timeline-stage{ font-size:13.5px; font-weight:700; }
+  .timeline-meta{ font-size:11.5px; color:var(--ink-faint); font-family:var(--font-mono); margin-top:2px; }
+  .timeline-note{ font-size:12.5px; color:var(--ink-soft); margin-top:5px; }
+
+  /* ---------- Toasts ---------- */
+  /* ---------- Notification dropdown ---------- */
+  .notif-backdrop{ position:fixed; inset:0; background:transparent; z-index:90; display:none; }
+  .notif-backdrop.open{ display:block; }
+  .notif-panel{ position:fixed; top:76px; right:max(16px, calc(50vw - 640px)); width:min(380px, calc(100vw - 32px)); max-height:70vh; overflow:auto;
+    background:var(--surface); border:1px solid var(--border); border-radius:18px; box-shadow:var(--shadow-md);
+    z-index:95; opacity:0; transform:translateY(-8px); pointer-events:none; transition:opacity .15s ease, transform .15s ease; }
+  .notif-panel.open{ opacity:1; transform:none; pointer-events:auto; }
+  .notif-panel-head{ display:flex; align-items:center; justify-content:space-between; padding:16px 18px 10px; }
+  .notif-panel-head h3{ font-size:14.5px; font-weight:700; }
+  .notif-panel-body{ padding:0 8px 8px; }
+  .notif-item{ display:flex; gap:11px; align-items:flex-start; width:100%; text-align:left; background:transparent; border:none; padding:12px 10px; border-radius:12px; }
+  .notif-item:hover{ background:var(--surface-2); }
+  .notif-dot-icon{ width:32px; height:32px; border-radius:9px; flex:none; background:var(--signal-soft); color:var(--signal); display:flex; align-items:center; justify-content:center; }
+  .notif-dot-icon svg{ width:15px; height:15px; }
+  .notif-item-text{ font-size:13px; color:var(--ink-soft); line-height:1.4; }
+  .notif-item.unread .notif-item-text{ color:var(--ink); font-weight:600; }
+  .notif-item-time{ font-size:10.5px; color:var(--ink-faint); font-family:var(--font-mono); margin-top:3px; }
+  .notif-unread-dot{ width:7px; height:7px; border-radius:999px; background:var(--signal); flex:none; margin-top:6px; }
+  .notif-empty{ text-align:center; padding:30px 14px; font-size:12.5px; color:var(--ink-faint); }
+
+  .toast-container{ position:fixed; bottom:22px; right:22px; z-index:999; display:flex; flex-direction:column; gap:10px; align-items:flex-end; }
+  .toast{ display:flex; align-items:center; gap:10px; background:var(--ink); color:#fff; padding:12px 16px; border-radius:12px; font-size:13px; font-weight:500; box-shadow:var(--shadow-md); max-width:340px; animation:toastIn .25s ease; }
+  .toast svg{ width:16px; height:16px; flex:none; }
+  .toast.success{ background:#1A5C42; }
+  .toast.error{ background:#7A2A22; }
+  .toast.leaving{ animation:toastOut .2s ease forwards; }
+  @keyframes toastIn{ from{ opacity:0; transform:translateY(8px);} to{ opacity:1; transform:none;} }
+  @keyframes toastOut{ to{ opacity:0; transform:translateY(6px);} }
+
+  @media (prefers-reduced-motion: reduce){ *{ animation-duration:0.001s !important; transition-duration:0.001s !important; } }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 34 34" fill="none">
+        <circle cx="17" cy="17" r="15" stroke="#23315C" stroke-width="2.4"/>
+        <circle cx="17" cy="17" r="8.5" stroke="#12B5A6" stroke-width="2.4" stroke-dasharray="34 20"/>
+        <circle cx="17" cy="17" r="2.4" fill="#23315C"/>
+      </svg>
+      <span class="wordmark">SmartHire</span>
+      <span class="proto-badge">PROTOTYPE · Job Posting · Screening · Pipeline</span>
+    </div>
+
+    <div class="role-switch" role="group" aria-label="View as role">
+      <span class="rs-label">View as</span>
+      <button class="role-btn active" data-role="recruiter">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7.5" width="18" height="12" rx="2"/><path d="M8 7.5V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1.5"/></svg>
+        Recruiter
+      </button>
+      <button class="role-btn" data-role="hrm">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c1.3-3.6 3.6-5.4 6.5-5.4s5.2 1.8 6.5 5.4"/><circle cx="18" cy="8.5" r="2.4"/><path d="M15.5 14.6c2.3.3 3.9 1.9 4.9 4.6"/></svg>
+        HR Manager
+      </button>
+      <button class="role-btn" data-role="owner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></svg>
+        Company Owner
+      </button>
+    </div>
+
+    <div class="topbar-right">
+      <button class="icon-btn" id="bellBtn" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 16v-5a6 6 0 0 0-12 0v5l-1.5 2.5h15L18 16z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+        <span class="badge-dot" id="bellBadge">2</span>
+      </button>
+      <div class="identity">
+        <div class="avatar" id="idAvatar">BT</div>
+        <div class="identity-text">
+          <span class="identity-name" id="idName">Quốc Tuấn</span>
+          <span class="identity-role" id="idRole">Recruiter · TalentForce</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-screen="jobs" data-roles="recruiter,hrm,owner">
+      <span class="tab-label">Job Postings</span>
+      <span class="tab-role">UC-POST-01→04</span>
+    </button>
+    <button class="tab" data-screen="screening" data-roles="recruiter,hrm">
+      <span class="tab-label">Screening &amp; Ranking</span>
+      <span class="tab-role">UC-SCR-01 / 03</span>
+    </button>
+    <button class="tab" data-screen="pipeline" data-roles="recruiter,hrm,owner">
+      <span class="tab-label">Recruitment Pipeline</span>
+      <span class="tab-role">UC-PIPE-01→03</span>
+    </button>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- SCREEN: JOB POSTINGS (UC-POST-04, entry to 01/02/03)          -->
+  <!-- ============================================================ -->
+  <section class="screen active" data-screen="jobs" id="screen-jobs">
+    <div class="screen-header">
+      <div class="screen-title-row">
+        <div>
+          <h1 class="screen-title">Job Postings</h1>
+          <p class="screen-sub">TalentForce Co. · <span class="uc-tag">UC-POST-04</span> View Company Job Postings</p>
+        </div>
+        <button class="btn btn-solid" id="newJobBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          New Job Posting
+        </button>
+      </div>
+    </div>
+
+    <div class="job-toolbar">
+      <div class="filter-pills" id="jobFilterPills">
+        <button class="filter-pill active" data-status="all">All (<span id="cnt-all">0</span>)</button>
+        <button class="filter-pill" data-status="draft">Draft (<span id="cnt-draft">0</span>)</button>
+        <button class="filter-pill" data-status="pending">Pending Review (<span id="cnt-pending">0</span>)</button>
+        <button class="filter-pill" data-status="published">Published (<span id="cnt-published">0</span>)</button>
+        <button class="filter-pill" data-status="paused">Paused (<span id="cnt-paused">0</span>)</button>
+        <button class="filter-pill" data-status="closed">Closed (<span id="cnt-closed">0</span>)</button>
+      </div>
+    </div>
+
+    <div class="card card-pad">
+      <div class="job-list" id="jobList"></div>
+      <div class="empty-state" id="jobEmptyState" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+        <p>No job postings match this filter</p>
+        <span>Try a different status, or create a new posting.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SCREEN: SCREENING & RANKING (UC-SCR-01 include UC-SCR-03)     -->
+  <!-- ============================================================ -->
+  <section class="screen" data-screen="screening" id="screen-screening">
+    <div class="screen-header">
+      <div class="screen-title-row">
+        <div>
+          <h1 class="screen-title">Screening &amp; Ranking</h1>
+          <p class="screen-sub">Senior Backend Engineer · TalentForce Co. · <span class="uc-tag">UC-SCR-03</span> Review and Rank Applicants</p>
+        </div>
+        <select id="screeningJobSelect" class="mono" style="padding:8px 12px; border-radius:10px; border:1px solid var(--border); font-size:12.5px;"></select>
+      </div>
+    </div>
+
+    <div class="demo-box">
+      <span class="demo-label">Preview state</span>
+      <div class="demo-pills">
+        <button class="demo-pill active" data-eval-state="ready">Ready</button>
+        <button class="demo-pill" data-eval-state="scanning">AI scanning · UC-SCR-01</button>
+        <button class="demo-pill" data-eval-state="error">Scoring failed</button>
+      </div>
+    </div>
+
+    <div class="screen-grid">
+      <div class="card card-pad">
+        <div class="card-head"><h3>Ranked Candidates</h3><span class="uc-tag">Hybrid score</span></div>
+        <div id="candList"></div>
+      </div>
+
+      <div class="card card-pad">
+        <div class="card-head"><h3 id="candDetailName">—</h3><span class="uc-tag">UC-SCR-01</span></div>
+
+        <div class="state-block active" data-eval-block="ready">
+          <div class="ring-gauge" id="mainRing" style="--pct:0">
+            <svg viewBox="0 0 140 140">
+              <circle class="ring-track" cx="70" cy="70" r="54"/>
+              <circle class="ring-value" cx="70" cy="70" r="54" transform="rotate(-90 70 70)"/>
+            </svg>
+            <div class="ring-label"><span class="ring-number" id="ringNum">0</span><span class="ring-suffix">/ 100 hybrid</span></div>
+          </div>
+          <p class="ring-caption">Overall Match Score</p>
+
+          <div class="subscore-row">
+            <div class="subscore"><div class="subscore-num" id="subResume">–</div><div class="subscore-label">Resume-model score</div></div>
+            <div class="subscore"><div class="subscore-num" id="subSkill">–</div><div class="subscore-label">Skill-test score</div></div>
+          </div>
+
+          <div class="explain-card" id="explainCard">AI explanation will appear here.</div>
+
+          <div class="footer-actions">
+            <button class="btn btn-solid" data-action="advance">Advance to Pipeline</button>
+            <button class="btn btn-outline-alert" data-action="reject">Reject</button>
+            <button class="btn btn-outline" data-action="rescan">Re-run Screening</button>
+          </div>
+        </div>
+
+        <div class="state-block" data-eval-block="scanning">
+          <div class="ring-gauge scanning" style="--pct:0">
+            <svg viewBox="0 0 140 140">
+              <circle class="ring-track" cx="70" cy="70" r="54"/>
+              <circle class="ring-value" cx="70" cy="70" r="54" transform="rotate(-90 70 70)"/>
+            </svg>
+            <div class="ring-label"><span class="ring-number">–</span></div>
+          </div>
+          <p class="ring-caption mono" style="color:var(--signal); font-weight:600;">AI is running hybrid screening (resume model + skill test)...</p>
+          <div class="skeleton skel-line" style="width:70%; margin-top:20px;"></div>
+          <div class="skeleton skel-line" style="width:90%;"></div>
+          <div class="skeleton" style="height:60px; margin-top:10px;"></div>
+        </div>
+
+        <div class="state-block" data-eval-block="error">
+          <div class="ring-gauge error">
+            <svg viewBox="0 0 140 140">
+              <circle class="ring-track" cx="70" cy="70" r="54"/>
+              <circle class="ring-value" cx="70" cy="70" r="54" transform="rotate(-90 70 70)"/>
+            </svg>
+            <div class="ring-label"></div>
+            <div class="ring-error-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9L2.6 18a1.8 1.8 0 0 0 1.6 2.7h15.6a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z"/></svg></div>
+          </div>
+          <div class="error-msg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9L2.6 18a1.8 1.8 0 0 0 1.6 2.7h15.6a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z"/></svg>
+            The hybrid screening service could not generate a score for this candidate.
+          </div>
+          <button class="btn btn-signal" id="retryScoreBtn" style="margin-top:14px; width:100%; justify-content:center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4v5h5M20 20v-5h-5M4.5 9a8 8 0 0 1 14-3.5M19.5 15a8 8 0 0 1-14 3.5"/></svg>
+            Retry Screening
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SCREEN: RECRUITMENT PIPELINE (UC-PIPE-01→03)                  -->
+  <!-- ============================================================ -->
+  <section class="screen" data-screen="pipeline" id="screen-pipeline">
+    <div class="screen-header">
+      <div class="screen-title-row">
+        <div>
+          <h1 class="screen-title">Recruitment Pipeline</h1>
+          <p class="screen-sub">Senior Backend Engineer · TalentForce Co. · <span class="uc-tag">UC-PIPE-01</span> Kanban Board</p>
+        </div>
+        <select id="pipelineJobSelect" class="mono" style="padding:8px 12px; border-radius:10px; border:1px solid var(--border); font-size:12.5px;"></select>
+      </div>
+    </div>
+
+    <div class="readonly-banner" id="ownerReadonlyBanner" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+      Company Owner has view-only access to the pipeline. Drag-and-drop and stage buttons are disabled for this role.
+    </div>
+
+    <div class="kanban-scroll">
+      <div class="kanban-board" id="kanbanBoard"></div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- MODAL: New / Edit Job — UC-POST-01 draft → UC-POST-02 preview -->
+<!-- ============================================================ -->
+<div class="modal-backdrop" id="jobModalBackdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="wizard-steps" id="wizardSteps">
+          <div class="wizard-step current" data-wstep="draft"><span class="num">1</span>Draft</div>
+          <div class="wizard-sep"></div>
+          <div class="wizard-step" data-wstep="preview"><span class="num">2</span>Preview &amp; Submit</div>
+        </div>
+      </div>
+      <button class="modal-close" id="jobModalClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+
+    <div class="modal-body">
+      <!-- STEP 1: DRAFT -->
+      <div class="state-block active" data-wpanel="draft">
+        <p class="eyebrow" style="margin-bottom:14px;">UC-POST-01 · Create and Manage Job Draft</p>
+
+        <div class="field" id="f-title">
+          <label>Job title</label>
+          <input type="text" id="in-title" placeholder="e.g. Senior Backend Engineer">
+          <div class="field-error" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>Job title is required.</div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Department</label>
+            <select id="in-dept">
+              <option>Engineering</option>
+              <option>Product</option>
+              <option>Design</option>
+              <option>Sales</option>
+              <option>People &amp; HR</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Employment type</label>
+            <select id="in-type">
+              <option>Full-time</option>
+              <option>Part-time</option>
+              <option>Contract</option>
+              <option>Internship</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Location</label>
+            <input type="text" id="in-location" placeholder="e.g. Ho Chi Minh City (Hybrid)">
+          </div>
+          <div class="field">
+            <label>Salary range (optional)</label>
+            <input type="text" id="in-salary" placeholder="e.g. $2,000 – $3,200 / month">
+          </div>
+        </div>
+
+        <div class="field" id="f-desc">
+          <label>Job description</label>
+          <textarea id="in-desc" placeholder="Describe the role, team, and impact..."></textarea>
+          <div class="field-error" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>Description must be at least 20 characters.</div>
+        </div>
+
+        <div class="field">
+          <label>Requirements (one per line)</label>
+          <textarea id="in-reqs" placeholder="5+ years backend experience&#10;Strong in distributed systems&#10;..."></textarea>
+        </div>
+
+        <p class="hint" style="margin-top:-6px;">Draft saves automatically. You can leave and resume anytime before submitting.</p>
+      </div>
+
+      <!-- STEP 2: PREVIEW & SUBMIT -->
+      <div class="state-block" data-wpanel="preview">
+        <p class="eyebrow" style="margin-bottom:14px;">UC-POST-02 · Preview and Submit Job Posting <span class="uc-tag">«extend» UC-POST-01</span></p>
+
+        <div class="demo-box">
+          <span class="demo-label">Preview state</span>
+          <div class="demo-pills">
+            <button class="demo-pill active" data-submit-state="ok">Valid</button>
+            <button class="demo-pill" data-submit-state="duplicate">Duplicate title warning</button>
+          </div>
+        </div>
+
+        <div class="preview-shell">
+          <span class="preview-badge">Candidate-facing preview</span>
+          <div class="preview-title" id="pv-title">Job title</div>
+          <div class="preview-meta-row">
+            <span id="pv-dept-type">—</span><span>·</span><span id="pv-location">—</span><span>·</span><span id="pv-salary">—</span>
+          </div>
+          <div class="preview-section">
+            <h4>About the role</h4>
+            <p id="pv-desc">—</p>
+          </div>
+          <div class="preview-section">
+            <h4>Requirements</h4>
+            <ul id="pv-reqs"></ul>
+          </div>
+        </div>
+
+        <div class="error-msg state-block" data-submit-block="duplicate" style="margin-top:16px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9L2.6 18a1.8 1.8 0 0 0 1.6 2.7h15.6a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z"/></svg>
+          Another posting with this title already exists for this company. You can still submit, but consider renaming it to avoid confusing applicants.
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-ghost" id="wizardBackBtn" style="visibility:hidden;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg>
+        Back
+      </button>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-outline" id="saveDraftBtn">Save as Draft</button>
+        <button class="btn btn-solid" id="wizardNextBtn">
+          Continue to Preview
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- MODAL: Stage History — UC-PIPE-03 (includes UC-PIPE-02)       -->
+<!-- ============================================================ -->
+<div class="modal-backdrop" id="historyModalBackdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3 id="historyModalName">Candidate</h3>
+        <p class="eyebrow" style="margin-top:4px;">UC-PIPE-03 · View Application Stage History</p>
+      </div>
+      <button class="modal-close" id="historyModalClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="timeline" id="historyTimeline"></div>
+    </div>
+    <div class="modal-foot" style="justify-content:flex-end;">
+      <button class="btn btn-outline" id="historyCloseBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="notif-backdrop" id="notifBackdrop"></div>
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-panel-head">
+    <h3>Notifications</h3>
+    <button class="btn btn-outline btn-sm" id="markAllReadBtn">Mark all read</button>
+  </div>
+  <div class="notif-panel-body" id="notifPanelBody"></div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+
+  /* ============================ STATE ============================ */
+  var identities = {
+    recruiter:{name:'Quốc Tuấn', label:'Recruiter · TalentForce', initials:'QT'},
+    hrm:{name:'Quốc Thành', label:'HR Manager · TalentForce', initials:'QT'},
+    owner:{name:'Quốc Uy', label:'Company Owner · TalentForce', initials:'QU'}
+  };
+  var appState = { role:'recruiter', screen:'jobs', activeJobId:null, activeCandId:null };
+
+  var jobs = [
+    { id:'j1', title:'Senior Backend Engineer', dept:'Engineering', type:'Full-time', location:'Ho Chi Minh City (Hybrid)', salary:'$2,000 – $3,200 / month',
+      desc:'Own core backend services powering our matching engine. Partner closely with product and data teams to ship reliable, well-tested systems at scale.',
+      reqs:['5+ years backend engineering experience','Strong in distributed systems and API design','Experience with Node.js or Go'],
+      status:'published', applicants:14, updatedAt:'2 days ago' },
+    { id:'j2', title:'Product Manager', dept:'Product', type:'Full-time', location:'Hanoi (On-site)', salary:'Negotiable',
+      desc:'Lead the roadmap for our candidate-facing applications, from discovery through launch.',
+      reqs:['3+ years product management experience','Track record shipping consumer or B2B SaaS products'],
+      status:'pending', applicants:6, updatedAt:'6 hours ago' },
+    { id:'j3', title:'UX Designer', dept:'Design', type:'Contract', location:'Remote', salary:'$1,500 – $2,200 / month',
+      desc:'Design end-to-end flows for our applicant and recruiter experiences.',
+      reqs:['Portfolio showing end-to-end product design','Comfortable with design systems'],
+      status:'paused', applicants:9, updatedAt:'5 days ago' },
+    { id:'j4', title:'Junior QA Engineer', dept:'Engineering', type:'Internship', location:'Ho Chi Minh City', salary:'Stipend',
+      desc:'Support manual and automated testing across our web platform.',
+      reqs:['Familiarity with testing fundamentals','Currently pursuing or recently completed a CS degree'],
+      status:'closed', applicants:22, updatedAt:'3 weeks ago' },
+    { id:'j5', title:'Talent Sourcing Specialist', dept:'People & HR', type:'Full-time', location:'Hanoi (Hybrid)', salary:'Negotiable',
+      desc:'', reqs:[], status:'draft', applicants:0, updatedAt:'Just now' }
+  ];
+
+  var STAGES = [
+    {id:'applied', label:'Applied'},
+    {id:'screening', label:'Screening'},
+    {id:'interview', label:'Interview'},
+    {id:'offer', label:'Offer'},
+    {id:'hired', label:'Hired'},
+    {id:'rejected', label:'Rejected'}
+  ];
+
+  var candidatesByJob = {
+    j1: [
+      { id:'c1', name:'Nguyễn Minh Anh', resumeScore:88, skillScore:81, stage:'interview',
+        history:[
+          {stage:'Applied', at:'Jul 12, 09:14', actor:'System', note:'Application submitted via careers page.'},
+          {stage:'Screening', at:'Jul 12, 09:20', actor:'AI Screening', note:'Hybrid score computed: 85/100.'},
+          {stage:'Interview', at:'Jul 15, 14:02', actor:'Quốc Tuấn', note:'Moved to interview after resume review.'}
+        ]},
+      { id:'c2', name:'Trần Gia Bảo', resumeScore:74, skillScore:79, stage:'screening',
+        history:[
+          {stage:'Applied', at:'Jul 13, 11:02', actor:'System', note:'Application submitted via careers page.'},
+          {stage:'Screening', at:'Jul 13, 11:05', actor:'AI Screening', note:'Hybrid score computed: 76/100.'}
+        ]},
+      { id:'c3', name:'Lê Thu Trang', resumeScore:52, skillScore:48, stage:'rejected',
+        history:[
+          {stage:'Applied', at:'Jul 10, 08:40', actor:'System', note:'Application submitted via careers page.'},
+          {stage:'Screening', at:'Jul 10, 08:44', actor:'AI Screening', note:'Hybrid score computed: 50/100.'},
+          {stage:'Rejected', at:'Jul 11, 10:15', actor:'Quốc Thành', note:'Score below threshold for this role.'}
+        ]},
+      { id:'c4', name:'Phạm Đức Huy', resumeScore:91, skillScore:88, stage:'offer',
+        history:[
+          {stage:'Applied', at:'Jul 8, 09:00', actor:'System', note:'Application submitted via referral.'},
+          {stage:'Screening', at:'Jul 8, 09:05', actor:'AI Screening', note:'Hybrid score computed: 90/100.'},
+          {stage:'Interview', at:'Jul 10, 15:30', actor:'Quốc Tuấn', note:'Strong system design interview.'},
+          {stage:'Offer', at:'Jul 16, 17:00', actor:'Quốc Thành', note:'Offer drafted, pending approval.'}
+        ]},
+      { id:'c5', name:'Võ Hải Đăng', resumeScore:66, skillScore:70, stage:'applied',
+        history:[ {stage:'Applied', at:'Jul 17, 13:22', actor:'System', note:'Application submitted via careers page.'} ]}
+    ],
+    j2: [
+      { id:'c6', name:'Đỗ Khánh Linh', resumeScore:80, skillScore:0, stage:'applied',
+        history:[ {stage:'Applied', at:'Jul 16, 10:00', actor:'System', note:'Application submitted via LinkedIn.'} ]}
+    ],
+    j3: [], j4: [], j5: []
+  };
+
+  var notifications = [
+    {id:1, unread:true, text:'AI hybrid screening complete for Nguyễn Minh Anh — Senior Backend Engineer', time:'2m ago'},
+    {id:2, unread:true, text:'Product Manager posting is pending your review before publishing', time:'1h ago'},
+    {id:3, unread:false, text:'Junior QA Engineer posting was closed automatically after 30 days', time:'2 days ago'}
+  ];
+
+  /* ============================ TOASTS ============================ */
+  function showToast(message, type){
+    var container = $('#toastContainer');
+    var el = document.createElement('div');
+    el.className = 'toast' + (type ? ' '+type : '');
+    var icon = type==='success'
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l5 5L20 7"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>';
+    el.innerHTML = icon + '<span>' + message + '</span>';
+    container.appendChild(el);
+    setTimeout(function(){ el.classList.add('leaving'); setTimeout(function(){ el.remove(); }, 220); }, 3200);
+  }
+
+  /* ============================ ROLE + TABS ============================ */
+  function setRole(role){
+    appState.role = role;
+    $all('.role-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.role===role); });
+    $all('.tab').forEach(function(t){
+      var roles = t.dataset.roles.split(',');
+      var allowed = roles.indexOf(role) > -1;
+      t.classList.toggle('disabled', !allowed);
+    });
+    var id = identities[role];
+    $('#idName').textContent = id.name; $('#idRole').textContent = id.label; $('#idAvatar').textContent = id.initials;
+    $('#newJobBtn').style.display = (role==='owner') ? 'none' : 'inline-flex';
+    $('#ownerReadonlyBanner').style.display = (role==='owner') ? 'flex' : 'none';
+    // if current screen disallowed for role, jump to jobs
+    var currentTab = $('.tab[data-screen="'+appState.screen+'"]');
+    if(currentTab && currentTab.classList.contains('disabled')) setScreen('jobs');
+    renderJobs(); renderKanban();
+  }
+  $all('.role-btn').forEach(function(b){ b.addEventListener('click', function(){ setRole(b.dataset.role); }); });
+
+  function setScreen(screenId){
+    var tab = $('.tab[data-screen="'+screenId+'"]');
+    if(tab && tab.classList.contains('disabled')) return;
+    appState.screen = screenId;
+    $all('.screen').forEach(function(s){ s.classList.toggle('active', s.dataset.screen===screenId); });
+    $all('.tab').forEach(function(t){ t.classList.toggle('active', t.dataset.screen===screenId); });
+  }
+  $all('.tab').forEach(function(t){ t.addEventListener('click', function(){ setScreen(t.dataset.screen); }); });
+
+  /* ============================ NOTIFICATIONS BELL ============================ */
+  var BELL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 16v-5a6 6 0 0 0-12 0v5l-1.5 2.5h15L18 16z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>';
+
+  function updateBadge(){
+    var count = notifications.filter(function(n){return n.unread;}).length;
+    var badge = $('#bellBadge'); badge.textContent = count; badge.classList.toggle('hidden', count===0);
+  }
+
+  function renderNotifPanel(){
+    var body = $('#notifPanelBody');
+    body.innerHTML = '';
+    if(!notifications.length){
+      body.innerHTML = '<div class="notif-empty">All caught up!</div>';
+      return;
+    }
+    notifications.forEach(function(n){
+      var item = document.createElement('button');
+      item.className = 'notif-item' + (n.unread ? ' unread' : '');
+      item.dataset.id = n.id;
+      item.innerHTML =
+        '<span class="notif-dot-icon">'+BELL_ICON+'</span>'+
+        '<span style="flex:1;">'+
+          '<span class="notif-item-text">'+n.text+'</span>'+
+          '<div class="notif-item-time">'+n.time+'</div>'+
+        '</span>'+
+        (n.unread ? '<span class="notif-unread-dot"></span>' : '');
+      item.addEventListener('click', function(){
+        n.unread = false;
+        renderNotifPanel();
+        updateBadge();
+      });
+      body.appendChild(item);
+    });
+  }
+
+  function openNotifPanel(){ $('#notifPanel').classList.add('open'); $('#notifBackdrop').classList.add('open'); renderNotifPanel(); }
+  function closeNotifPanel(){ $('#notifPanel').classList.remove('open'); $('#notifBackdrop').classList.remove('open'); }
+
+  $('#bellBtn').addEventListener('click', function(e){
+    e.stopPropagation();
+    $('#notifPanel').classList.contains('open') ? closeNotifPanel() : openNotifPanel();
+  });
+  $('#notifBackdrop').addEventListener('click', closeNotifPanel);
+  $('#markAllReadBtn').addEventListener('click', function(){
+    notifications.forEach(function(n){ n.unread = false; });
+    renderNotifPanel();
+    updateBadge();
+    showToast('All notifications marked as read', 'success');
+  });
+
+  updateBadge();
+
+  /* ============================ JOB POSTINGS (UC-POST-04) ============================ */
+  var STATUS_META = {
+    draft:{label:'Draft', pill:'pill-muted'},
+    pending:{label:'Pending Review', pill:'pill-amber'},
+    published:{label:'Published', pill:'pill-success'},
+    paused:{label:'Paused', pill:'pill-violet'},
+    closed:{label:'Closed', pill:'pill-alert'}
+  };
+  var currentFilter = 'all';
+
+  function renderJobs(){
+    var counts = {all:jobs.length, draft:0, pending:0, published:0, paused:0, closed:0};
+    jobs.forEach(function(j){ counts[j.status]++; });
+    Object.keys(counts).forEach(function(k){ var el = $('#cnt-'+k); if(el) el.textContent = counts[k]; });
+
+    var visible = jobs.filter(function(j){ return currentFilter==='all' || j.status===currentFilter; });
+    var list = $('#jobList'); list.innerHTML = '';
+    $('#jobEmptyState').style.display = visible.length ? 'none' : 'block';
+
+    visible.forEach(function(j){
+      var meta = STATUS_META[j.status];
+      var row = document.createElement('div');
+      row.className = 'job-row card';
+      row.innerHTML =
+        '<div class="job-row-main">'+
+          '<div class="job-row-title">'+j.title+' <span class="pill '+meta.pill+'">'+meta.label+'</span></div>'+
+          '<div class="job-row-meta">'+j.dept+' · '+j.type+' · '+j.location+' · updated '+j.updatedAt+'</div>'+
+        '</div>'+
+        '<div class="job-row-stats">'+
+          '<div class="job-stat"><div class="job-stat-num">'+j.applicants+'</div><div class="job-stat-label">Applicants</div></div>'+
+        '</div>'+
+        '<div class="job-row-actions">'+
+          '<button class="btn btn-outline btn-sm kebab-btn">Actions ▾</button>'+
+          '<div class="kebab-menu" data-jobid="'+j.id+'"></div>'+
+        '</div>';
+      list.appendChild(row);
+
+      var kebabBtn = row.querySelector('.kebab-btn');
+      var menu = row.querySelector('.kebab-menu');
+      menu.innerHTML = buildActionsMenu(j);
+      kebabBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        $all('.kebab-menu').forEach(function(m){ if(m!==menu) m.classList.remove('open'); });
+        menu.classList.toggle('open');
+      });
+    });
+    populateJobSelects();
+  }
+
+  function buildActionsMenu(j){
+    var isOwner = appState.role === 'owner';
+    var canEditDraft = !isOwner && (j.status==='draft');
+    var html = '';
+    if(canEditDraft) html += '<button data-act="continue-draft">Continue draft (UC-POST-01)</button>';
+    if(j.status==='pending' && !isOwner) html += '<button data-act="view-preview">Preview &amp; Submit (UC-POST-02)</button>';
+    html += '<hr>';
+    // Lifecycle: UC-POST-03 — available to rec, hrm, owner
+    html += '<button data-act="publish" '+(j.status==='published'?'disabled':'')+'>Publish</button>';
+    html += '<button data-act="pause" '+(j.status!=='published'?'disabled':'')+'>Pause</button>';
+    html += '<button data-act="reopen" '+(j.status!=='paused' && j.status!=='closed'?'disabled':'')+'>Reopen</button>';
+    html += '<button data-act="duplicate">Duplicate</button>';
+    html += '<button class="danger" data-act="close" '+(j.status==='closed'?'disabled':'')+'>Close posting</button>';
+    return html;
+  }
+
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('.kebab-menu button');
+    if(btn){
+      var menu = btn.closest('.kebab-menu');
+      var jobId = menu.dataset.jobid;
+      var job = jobs.filter(function(j){return j.id===jobId;})[0];
+      handleJobAction(btn.dataset.act, job);
+      menu.classList.remove('open');
+      return;
+    }
+    if(!e.target.closest('.job-row-actions')) $all('.kebab-menu').forEach(function(m){ m.classList.remove('open'); });
+  });
+
+  function handleJobAction(act, job){
+    if(!job) return;
+    switch(act){
+      case 'continue-draft': openJobModal(job); break;
+      case 'view-preview': openJobModal(job, 'preview'); break;
+      case 'publish': job.status='published'; job.updatedAt='Just now'; showToast('"'+job.title+'" is now published', 'success'); renderJobs(); break;
+      case 'pause': job.status='paused'; job.updatedAt='Just now'; showToast('"'+job.title+'" paused'); renderJobs(); break;
+      case 'reopen': job.status='published'; job.updatedAt='Just now'; showToast('"'+job.title+'" reopened', 'success'); renderJobs(); break;
+      case 'close': job.status='closed'; job.updatedAt='Just now'; showToast('"'+job.title+'" closed'); renderJobs(); break;
+      case 'duplicate':
+        var copy = JSON.parse(JSON.stringify(job));
+        copy.id = 'j' + (jobs.length+1);
+        copy.title = job.title + ' (Copy)';
+        copy.status = 'draft'; copy.applicants = 0; copy.updatedAt = 'Just now';
+        jobs.unshift(copy);
+        showToast('Duplicated as draft: "'+copy.title+'"', 'success');
+        renderJobs();
+        break;
+    }
+  }
+
+  $all('.filter-pill').forEach(function(p){
+    p.addEventListener('click', function(){
+      currentFilter = p.dataset.status;
+      $all('.filter-pill').forEach(function(x){ x.classList.toggle('active', x===p); });
+      renderJobs();
+    });
+  });
+
+  /* ============================ JOB MODAL — UC-POST-01 / UC-POST-02 ============================ */
+  var editingJob = null;
+  function openJobModal(job, step){
+    editingJob = job || { id:'j'+(jobs.length+1), title:'', dept:'Engineering', type:'Full-time', location:'', salary:'', desc:'', reqs:[], status:'draft', applicants:0, updatedAt:'Just now' };
+    $('#in-title').value = editingJob.title;
+    $('#in-dept').value = editingJob.dept;
+    $('#in-type').value = editingJob.type;
+    $('#in-location').value = editingJob.location;
+    $('#in-salary').value = editingJob.salary;
+    $('#in-desc').value = editingJob.desc;
+    $('#in-reqs').value = (editingJob.reqs||[]).join('\n');
+    setWizardStep(step || 'draft');
+    $('#jobModalBackdrop').classList.add('open');
+  }
+  $('#newJobBtn').addEventListener('click', function(){ openJobModal(null); });
+  $('#jobModalClose').addEventListener('click', function(){ $('#jobModalBackdrop').classList.remove('open'); });
+  $('#jobModalBackdrop').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('open'); });
+
+  function setWizardStep(step){
+    $all('[data-wpanel]').forEach(function(p){ p.classList.toggle('active', p.dataset.wpanel===step); });
+    $all('.wizard-step').forEach(function(s){
+      s.classList.remove('current','done');
+      if(s.dataset.wstep===step) s.classList.add('current');
+      else if(step==='preview' && s.dataset.wstep==='draft') s.classList.add('done');
+    });
+    $('#wizardBackBtn').style.visibility = step==='draft' ? 'hidden' : 'visible';
+    $('#wizardNextBtn').textContent = '';
+    if(step==='draft'){
+      $('#wizardNextBtn').innerHTML = 'Continue to Preview <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>';
+    } else {
+      $('#wizardNextBtn').innerHTML = 'Submit Posting <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l5 5L20 7"/></svg>';
+    }
+    editingJob._step = step;
+  }
+
+  $('#wizardBackBtn').addEventListener('click', function(){ setWizardStep('draft'); });
+
+  function validateDraft(){
+    var ok = true;
+    var title = $('#in-title').value.trim();
+    var desc = $('#in-desc').value.trim();
+    var fTitle = $('#f-title'), fDesc = $('#f-desc');
+    fTitle.classList.toggle('invalid', title.length===0);
+    fTitle.querySelector('.field-error').style.display = title.length===0 ? 'flex' : 'none';
+    if(title.length===0) ok = false;
+    fDesc.classList.toggle('invalid', desc.length>0 && desc.length<20);
+    fDesc.querySelector('.field-error').style.display = (desc.length>0 && desc.length<20) ? 'flex' : 'none';
+    if(desc.length>0 && desc.length<20) ok = false;
+    return ok;
+  }
+
+  function syncEditingFromForm(){
+    editingJob.title = $('#in-title').value.trim();
+    editingJob.dept = $('#in-dept').value;
+    editingJob.type = $('#in-type').value;
+    editingJob.location = $('#in-location').value.trim();
+    editingJob.salary = $('#in-salary').value.trim() || 'Negotiable';
+    editingJob.desc = $('#in-desc').value.trim();
+    editingJob.reqs = $('#in-reqs').value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+  }
+
+  function renderPreview(){
+    $('#pv-title').textContent = editingJob.title || 'Untitled role';
+    $('#pv-dept-type').textContent = editingJob.dept + ' · ' + editingJob.type;
+    $('#pv-location').textContent = editingJob.location || 'Location not set';
+    $('#pv-salary').textContent = editingJob.salary || 'Negotiable';
+    $('#pv-desc').textContent = editingJob.desc || 'No description provided yet.';
+    var reqsEl = $('#pv-reqs'); reqsEl.innerHTML = '';
+    (editingJob.reqs||[]).forEach(function(r){ var li=document.createElement('li'); li.textContent=r; reqsEl.appendChild(li); });
+
+    var isDup = jobs.some(function(j){ return j.id!==editingJob.id && j.title.trim().toLowerCase()===editingJob.title.trim().toLowerCase() && j.title.trim().length>0; });
+    $all('[data-submit-state]').forEach(function(b){ b.classList.toggle('active', (b.dataset.submitState==='duplicate')===isDup); });
+    $('[data-submit-block="duplicate"]').classList.toggle('active', isDup);
+  }
+  $all('[data-submit-state]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      $all('[data-submit-state]').forEach(function(b){ b.classList.toggle('active', b===btn); });
+      $('[data-submit-block="duplicate"]').classList.toggle('active', btn.dataset.submitState==='duplicate');
+    });
+  });
+
+  $('#saveDraftBtn').addEventListener('click', function(){
+    syncEditingFromForm();
+    if(!jobs.some(function(j){return j.id===editingJob.id;})){ editingJob.status='draft'; jobs.unshift(editingJob); }
+    editingJob.updatedAt = 'Just now';
+    renderJobs();
+    showToast('Draft saved', 'success');
+    $('#jobModalBackdrop').classList.remove('open');
+  });
+
+  $('#wizardNextBtn').addEventListener('click', function(){
+    if(editingJob._step === 'draft'){
+      if(!validateDraft()) return;
+      syncEditingFromForm();
+      renderPreview();
+      setWizardStep('preview');
+    } else {
+      // Submit — UC-POST-02 extends UC-POST-01
+      syncEditingFromForm();
+      if(!jobs.some(function(j){return j.id===editingJob.id;})){ jobs.unshift(editingJob); }
+      editingJob.status = 'pending';
+      editingJob.updatedAt = 'Just now';
+      renderJobs();
+      showToast('"'+editingJob.title+'" submitted for review', 'success');
+      $('#jobModalBackdrop').classList.remove('open');
+    }
+  });
+
+  /* ============================ SCREENING & RANKING (UC-SCR-01 / 03) ============================ */
+  function populateJobSelects(){
+    var opts = jobs.map(function(j){ return '<option value="'+j.id+'">'+j.title+'</option>'; }).join('');
+    ['#screeningJobSelect','#pipelineJobSelect'].forEach(function(sel){
+      var el = $(sel);
+      var prev = el.value;
+      el.innerHTML = opts;
+      if(prev && jobs.some(function(j){return j.id===prev;})) el.value = prev;
+      else el.value = jobs[0] ? jobs[0].id : '';
+    });
+  }
+  function hybridScore(c){ return Math.round(c.resumeScore*0.6 + c.skillScore*0.4); }
+  function scoreClass(s){ return s>=75 ? 'score-high' : s>=50 ? 'score-mid' : 'score-low'; }
+
+  function renderCandidateList(){
+    var jobId = $('#screeningJobSelect').value;
+    var list = (candidatesByJob[jobId]||[]).slice().sort(function(a,b){ return hybridScore(b)-hybridScore(a); });
+    var wrap = $('#candList'); wrap.innerHTML = '';
+    if(!list.length){
+      wrap.innerHTML = '<div class="empty-state" style="padding:30px 10px;"><p>No candidates yet</p><span>Candidates will appear here once they apply.</span></div>';
+      $('#candDetailName').textContent = '—';
+      appState.activeCandId = null;
+      return;
+    }
+    list.forEach(function(c, idx){
+      var s = hybridScore(c);
+      var item = document.createElement('button');
+      item.className = 'cand-list-item' + (c.id===appState.activeCandId ? ' selected' : '');
+      item.innerHTML =
+        '<div class="cand-row-top">'+
+          '<span style="display:flex; align-items:center; gap:8px;"><span class="rank-badge">#'+(idx+1)+'</span><span class="cand-name">'+c.name+'</span></span>'+
+          '<span class="cand-score '+scoreClass(s)+'">'+s+'</span>'+
+        '</div>'+
+        '<div class="cand-sub">Stage: '+STAGES.filter(function(st){return st.id===c.stage;})[0].label+'</div>';
+      item.addEventListener('click', function(){ selectCandidate(c.id); });
+      wrap.appendChild(item);
+    });
+    if(!appState.activeCandId || !list.some(function(c){return c.id===appState.activeCandId;})) selectCandidate(list[0].id);
+    else selectCandidate(appState.activeCandId);
+  }
+
+  function selectCandidate(id){
+    appState.activeCandId = id;
+    $all('.cand-list-item').forEach(function(item, i){}); // no-op, rebuilt on render
+    var jobId = $('#screeningJobSelect').value;
+    var c = (candidatesByJob[jobId]||[]).filter(function(x){return x.id===id;})[0];
+    if(!c) return;
+    $all('.cand-list-item').forEach(function(item){
+      item.classList.toggle('selected', item.querySelector('.cand-name') && item.querySelector('.cand-name').textContent===c.name);
+    });
+    $('#candDetailName').textContent = c.name;
+    var s = hybridScore(c);
+    $('#ringNum').textContent = s;
+    $('#mainRing').style.setProperty('--pct', s);
+    $('#subResume').textContent = c.resumeScore;
+    $('#subSkill').textContent = c.skillScore;
+    $('#explainCard').innerHTML = '<strong>AI Explanation ·</strong> Hybrid score combines a resume-model match (60% weight) and a structured skill-test result (40% weight). ' +
+      (s>=75 ? 'This candidate ranks in the top band for this role.' : s>=50 ? 'This candidate is a moderate match; consider a closer manual review.' : 'This candidate ranks below the typical bar for this role.');
+    setEvalState('ready');
+  }
+
+  $('#screeningJobSelect').addEventListener('change', function(){ appState.activeCandId=null; renderCandidateList(); });
+
+  function setEvalState(s){
+    $all('[data-eval-state]').forEach(function(b){ b.classList.toggle('active', b.dataset.evalState===s); });
+    $all('[data-eval-block]').forEach(function(b){ b.classList.toggle('active', b.dataset.evalBlock===s); });
+  }
+  $all('[data-eval-state]').forEach(function(btn){
+    btn.addEventListener('click', function(){ setEvalState(btn.dataset.evalState); if(btn.dataset.evalState==='scanning') showToast('Running hybrid screening…'); });
+  });
+  $('#retryScoreBtn').addEventListener('click', function(){
+    setEvalState('scanning');
+    $all('[data-eval-state]').forEach(function(b){ b.classList.toggle('active', b.dataset.evalState==='scanning'); });
+    setTimeout(function(){
+      setEvalState('ready');
+      $all('[data-eval-state]').forEach(function(b){ b.classList.toggle('active', b.dataset.evalState==='ready'); });
+      showToast('Screening complete — score updated', 'success');
+    }, 1600);
+  });
+
+  document.addEventListener('click', function(e){
+    var actBtn = e.target.closest('[data-action]');
+    if(!actBtn || !$('#screen-screening').classList.contains('active')) return;
+    var jobId = $('#screeningJobSelect').value;
+    var c = (candidatesByJob[jobId]||[]).filter(function(x){return x.id===appState.activeCandId;})[0];
+    if(!c) return;
+    var act = actBtn.dataset.action;
+    if(act==='advance'){
+      if(c.stage==='applied') c.stage='screening';
+      else if(c.stage==='screening') c.stage='interview';
+      c.history.push({stage:STAGES.filter(function(s){return s.id===c.stage;})[0].label, at:'Just now', actor: appState.role==='hrm'?'Quốc Thành':'Quốc Tuấn', note:'Advanced from Screening & Ranking review.'});
+      showToast(c.name+' advanced to '+c.stage, 'success');
+      renderCandidateList(); renderKanban();
+    } else if(act==='reject'){
+      c.stage='rejected';
+      c.history.push({stage:'Rejected', at:'Just now', actor: appState.role==='hrm'?'Quốc Thành':'Quốc Tuấn', note:'Rejected after screening review.'});
+      showToast(c.name+' marked as rejected', 'error');
+      renderCandidateList(); renderKanban();
+    } else if(act==='rescan'){
+      setEvalState('scanning');
+      $all('[data-eval-state]').forEach(function(b){ b.classList.toggle('active', b.dataset.evalState==='scanning'); });
+      setTimeout(function(){
+        setEvalState('ready');
+        $all('[data-eval-state]').forEach(function(b){ b.classList.toggle('active', b.dataset.evalState==='ready'); });
+        showToast('Re-screening complete', 'success');
+      }, 1500);
+    }
+  });
+
+  /* ============================ PIPELINE KANBAN (UC-PIPE-01/02/03) ============================ */
+  function renderKanban(){
+    var jobId = $('#pipelineJobSelect').value;
+    var cands = candidatesByJob[jobId] || [];
+    var board = $('#kanbanBoard'); board.innerHTML = '';
+    var canEdit = appState.role !== 'owner';
+
+    STAGES.forEach(function(stage, colIdx){
+      var col = document.createElement('div');
+      col.className = 'kanban-col';
+      col.dataset.stage = stage.id;
+      var inStage = cands.filter(function(c){ return c.stage===stage.id; });
+      col.innerHTML = '<div class="kanban-col-head"><span class="kanban-col-title">'+stage.label+'</span><span class="kanban-col-count">'+inStage.length+'</span></div>';
+      var cardsWrap = document.createElement('div');
+      if(!inStage.length){
+        var empty = document.createElement('div'); empty.className='kanban-empty'; empty.textContent='No candidates';
+        cardsWrap.appendChild(empty);
+      }
+      inStage.forEach(function(c){
+        var card = document.createElement('div');
+        card.className = 'kanban-card';
+        card.draggable = canEdit;
+        card.dataset.candid = c.id;
+        var nextIdx = colIdx+1<STAGES.length-2 ? colIdx+1 : colIdx; // simple forward move within applied..offer/hired
+        card.innerHTML =
+          '<div class="kanban-card-name">'+c.name+'</div>'+
+          '<div class="kanban-card-role">Hybrid score '+hybridScore(c)+'</div>'+
+          '<div class="kanban-card-foot">'+
+            '<button class="kanban-move-btn" data-histbtn="'+c.id+'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>History</button>'+
+            (stage.id!=='hired' && stage.id!=='rejected' ? '<button class="kanban-move-btn" data-movebtn="'+c.id+'" '+(canEdit?'':'disabled')+'>Move →</button>' : '')+
+          '</div>';
+        card.addEventListener('dragstart', function(){ card.classList.add('dragging'); });
+        card.addEventListener('dragend', function(){ card.classList.remove('dragging'); });
+        cardsWrap.appendChild(card);
+      });
+      col.appendChild(cardsWrap);
+
+      col.addEventListener('dragover', function(e){ if(!canEdit) return; e.preventDefault(); col.classList.add('drag-over'); });
+      col.addEventListener('dragleave', function(){ col.classList.remove('drag-over'); });
+      col.addEventListener('drop', function(e){
+        if(!canEdit) return;
+        e.preventDefault(); col.classList.remove('drag-over');
+        var dragging = $('.kanban-card.dragging');
+        if(!dragging) return;
+        moveCandidate(dragging.dataset.candid, stage.id);
+      });
+
+      board.appendChild(col);
+    });
+  }
+
+  function moveCandidate(candId, toStage){
+    var jobId = $('#pipelineJobSelect').value;
+    var c = (candidatesByJob[jobId]||[]).filter(function(x){return x.id===candId;})[0];
+    if(!c || c.stage===toStage) return;
+    c.stage = toStage;
+    var label = STAGES.filter(function(s){return s.id===toStage;})[0].label;
+    c.history.push({stage:label, at:'Just now', actor: appState.role==='hrm'?'Quốc Thành':'Quốc Tuấn', note:'Moved on the pipeline board (UC-PIPE-02).'});
+    showToast(c.name+' moved to '+label, 'success');
+    renderKanban(); renderCandidateList();
+  }
+
+  document.addEventListener('click', function(e){
+    var mv = e.target.closest('[data-movebtn]');
+    if(mv && !mv.disabled){
+      var jobId = $('#pipelineJobSelect').value;
+      var c = (candidatesByJob[jobId]||[]).filter(function(x){return x.id===mv.dataset.movebtn;})[0];
+      if(!c) return;
+      var order = ['applied','screening','interview','offer','hired'];
+      var idx = order.indexOf(c.stage);
+      var next = order[Math.min(idx+1, order.length-1)];
+      moveCandidate(c.id, next);
+      return;
+    }
+    var hb = e.target.closest('[data-histbtn]');
+    if(hb){ openHistoryModal(hb.dataset.histbtn); }
+  });
+
+  $('#pipelineJobSelect').addEventListener('change', renderKanban);
+
+  /* ============================ STAGE HISTORY MODAL (UC-PIPE-03) ============================ */
+  function openHistoryModal(candId){
+    var jobId = $('#pipelineJobSelect').value;
+    var c = (candidatesByJob[jobId]||[]).filter(function(x){return x.id===candId;})[0];
+    if(!c) return;
+    $('#historyModalName').textContent = c.name;
+    var wrap = $('#historyTimeline'); wrap.innerHTML = '';
+    c.history.forEach(function(h){
+      var item = document.createElement('div'); item.className='timeline-item';
+      item.innerHTML = '<div class="timeline-dot"></div><div class="timeline-stage">'+h.stage+'</div><div class="timeline-meta">'+h.at+' · '+h.actor+'</div><div class="timeline-note">'+h.note+'</div>';
+      wrap.appendChild(item);
+    });
+    $('#historyModalBackdrop').classList.add('open');
+  }
+  $('#historyModalClose').addEventListener('click', function(){ $('#historyModalBackdrop').classList.remove('open'); });
+  $('#historyCloseBtn').addEventListener('click', function(){ $('#historyModalBackdrop').classList.remove('open'); });
+  $('#historyModalBackdrop').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('open'); });
+
+  /* ============================ INIT ============================ */
+  populateJobSelects();
+  renderJobs();
+  renderCandidateList();
+  renderKanban();
+  setRole('recruiter');
+})();
+</script>
+</body>
+</html>
