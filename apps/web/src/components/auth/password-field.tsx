@@ -29,7 +29,9 @@ export function PasswordField({
         <button
           type="button"
           className="secondary-action"
-          aria-label={`${visible ? "Hide" : "Show"} ${label.toLowerCase()}`}
+          aria-label={`${visible ? "Hide" : "Show"} password`}
+          title={`${visible ? "Hide" : "Show"} ${label.toLowerCase()}`}
+          aria-controls={id}
           aria-pressed={visible}
           onClick={() => setVisible((value) => !value)}
         >

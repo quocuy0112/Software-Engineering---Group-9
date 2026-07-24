@@ -16,4 +16,24 @@ export class PrismaAuditRepository {
     const created = await this.db.auditEvent.create({ data: event });
     return created.id;
   }
+
+  async appendIdempotent(
+    id: string,
+    input: AuthenticationAuditEvent,
+  ): Promise<string> {
+    const event = authenticationAuditEventSchema.parse(input);
+    try {
+      const created = await this.db.auditEvent.create({
+        data: { id, ...event },
+      });
+      return created.id;
+    } catch (error) {
+      const existing = await this.db.auditEvent.findUnique({
+        where: { id },
+        select: { id: true },
+      });
+      if (existing) return existing.id;
+      throw error;
+    }
+  }
 }

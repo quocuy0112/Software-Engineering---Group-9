@@ -9,7 +9,7 @@ import {
 import { PasswordField } from "./password-field";
 import { FormFeedback } from "./form-feedback";
 
-export function LoginForm({ returnTo = "/" }: { returnTo?: string }) {
+export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
   const [status, setStatus] = useState("");
   const {
     register,

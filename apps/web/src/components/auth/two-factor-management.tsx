@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { AuthStatus } from "./auth-status";
+import { PasswordField } from "./password-field";
 export function TwoFactorManagement({
   onDisabled,
 }: {
@@ -78,15 +79,13 @@ export function TwoFactorManagement({
       <p className="security-panel-copy">
         Regenerating codes invalidates every older backup code.
       </p>
-      <div className="field">
-        <label htmlFor="management-password">Current password</label>
-        <input
-          id="management-password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
+      <PasswordField
+        label="Current password"
+        id="management-password"
+        autoComplete="current-password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
       <div className="field">
         <label htmlFor="management-code">Six-digit TOTP code</label>
         <input

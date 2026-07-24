@@ -223,4 +223,32 @@ describe("PostgreSQL identity invariants", () => {
       /append-only/,
     );
   });
+
+  it("installs the full-recovery one-owner, login-block, and exact-hold constraints", async () => {
+    const indexes = await prisma.$queryRaw<Array<{ indexname: string }>>`
+      SELECT indexname FROM pg_indexes
+      WHERE schemaname = current_schema()
+        AND tablename = 'FullAccountRecoveryOperation'
+    `;
+    expect(indexes.map(({ indexname }) => indexname)).toEqual(
+      expect.arrayContaining([
+        "FullAccountRecoveryOperation_one_active_per_user_idx",
+        "FullAccountRecoveryOperation_login_block_idx",
+        "FullAccountRecoveryOperation_completionProofDigest_key",
+        "FullAccountRecoveryOperation_cancellationProofDigest_key",
+      ]),
+    );
+    const constraints = await prisma.$queryRaw<Array<{ conname: string }>>`
+      SELECT conname FROM pg_constraint
+      WHERE conrelid = '"FullAccountRecoveryOperation"'::regclass
+    `;
+    expect(constraints.map(({ conname }) => conname)).toEqual(
+      expect.arrayContaining([
+        "full_account_recovery_exact_hold",
+        "full_account_recovery_proof_expiry",
+        "full_account_recovery_state",
+        "full_account_recovery_failure",
+      ]),
+    );
+  });
 });

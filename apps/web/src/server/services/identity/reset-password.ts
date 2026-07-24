@@ -1,6 +1,10 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
-import { prisma } from "@/lib/db/prisma";
+import type {
+  PasswordResetFailureCode,
+  PasswordResetOperation,
+  PasswordResetOperationStatus,
+} from "@/generated/prisma/client";
 import { BetterAuthPasswordGateway } from "@/server/auth/identity/better-auth-password-gateway";
 import { PrismaPasswordResetRepository } from "@/server/repositories/identity/prisma-password-reset-repository";
 import { PrismaAuditRepository } from "@/server/repositories/audit/prisma-audit-repository";
@@ -8,6 +12,32 @@ import { PasswordPolicy } from "@/server/auth/password-policy";
 
 export const RESET_PASSWORD_GENERIC_ERROR =
   "This password-reset link is invalid or has expired.";
+export const RESET_PASSWORD_RETRYABLE_ERROR =
+  "Your password reset could not be completed. Please try again.";
+
+type ResetPasswordFailure = {
+  ok: false;
+  message: string;
+  retryable: boolean;
+};
+
+export type ResetPasswordResult =
+  | { ok: true; userId: string; operationId: string }
+  | ResetPasswordFailure;
+
+function withMilestone(
+  operation: PasswordResetOperation,
+  status: PasswordResetOperationStatus,
+  field:
+    | "passwordUpdatedAt"
+    | "sessionsRevokedAt"
+    | "challengesInvalidatedAt"
+    | "notificationEnqueuedAt"
+    | "auditFinalizedAt",
+  now: Date,
+): PasswordResetOperation {
+  return { ...operation, status, [field]: now };
+}
 
 export class ResetPasswordService {
   constructor(
@@ -17,62 +47,187 @@ export class ResetPasswordService {
     private readonly passwordPolicy = new PasswordPolicy(),
   ) {}
 
-  async execute(rawToken: string, newPassword: string, now = new Date()) {
+  async execute(
+    rawToken: string,
+    newPassword: string,
+    now = new Date(),
+  ): Promise<ResetPasswordResult> {
     const policy = await this.passwordPolicy.evaluate(newPassword);
     if (!policy.accepted) {
       await this.recordFailure(now, "password_policy");
-      return { ok: false as const, message: RESET_PASSWORD_GENERIC_ERROR };
+      return {
+        ok: false,
+        message: RESET_PASSWORD_GENERIC_ERROR,
+        retryable: false,
+      };
     }
-    const consumed = await this.repository.consume(rawToken, now);
-    if (consumed.status !== "consumed") {
-      await this.recordFailure(now, `token_${consumed.status}`);
-      return { ok: false as const, message: RESET_PASSWORD_GENERIC_ERROR };
-    }
-    const account = await prisma.userAccount.findUnique({
-      where: { id: consumed.userId },
-      select: { state: true },
-    });
-    if (!account || account.state !== "ACTIVE") {
-      await this.recordFailure(now, "account_state");
-      return { ok: false as const, message: RESET_PASSWORD_GENERIC_ERROR };
-    }
+
+    let claim;
     try {
-      await this.passwordGateway.updatePassword(consumed.userId, newPassword);
-      await this.passwordGateway.revokeAllSessions(consumed.userId);
-      await this.passwordGateway.disableTwoFactorForPasswordReset(consumed.userId);
-      await prisma.authenticationChallenge.deleteMany({ where: { userId: consumed.userId } });
-      await prisma.emailOutbox.upsert({
-        where: { idempotencyKey: `password-changed:${consumed.tokenId}` },
-        update: {},
-        create: {
-          kind: "PASSWORD_CHANGED",
-          userId: consumed.userId,
-          securityTokenId: consumed.tokenId,
-          recipientRef: consumed.userId,
-          templateVersion: "password-changed.v1",
-          payloadRef: {},
-          idempotencyKey: `password-changed:${consumed.tokenId}`,
-        },
-      });
-      await this.appendAudit({
-        occurredAt: now,
-        actorType: "anonymous",
-        action: "password_reset.succeeded",
-        targetType: "password_reset",
-        targetId: consumed.tokenId,
-        result: "SUCCESS",
-        correlationId: randomUUID(),
-        context: { sessionRevocation: "all", twoFactorRevocation: "disabled" },
-      });
+      claim = await this.repository.claimOrResume(rawToken, newPassword, now);
     } catch {
-      await this.recordFailure(now, "provider_or_persistence_failure");
-      return { ok: false as const, message: RESET_PASSWORD_GENERIC_ERROR };
+      await this.recordFailure(now, "claim_or_audit_intent_unavailable");
+      return this.retryableFailure;
     }
-    return { ok: true as const, userId: consumed.userId };
+    if (claim.status === "busy") return this.retryableFailure;
+    if (claim.status !== "acquired") {
+      await this.recordFailure(now, `token_${claim.status}`);
+      return {
+        ok: false,
+        message: RESET_PASSWORD_GENERIC_ERROR,
+        retryable: false,
+      };
+    }
+
+    let operation = claim.operation;
+    const owner = claim.executionOwner;
+
+    if (!operation.passwordUpdatedAt) {
+      try {
+        await this.passwordGateway.updatePassword(
+          operation.userId,
+          newPassword,
+        );
+        await this.repository.markPasswordUpdated(operation.id, owner, now);
+        operation = withMilestone(
+          operation,
+          "PASSWORD_UPDATED",
+          "passwordUpdatedAt",
+          now,
+        );
+      } catch {
+        return this.failClosed(
+          operation.id,
+          owner,
+          "PASSWORD_UPDATE_FAILED",
+          now,
+        );
+      }
+    }
+
+    if (!operation.sessionsRevokedAt) {
+      try {
+        await this.passwordGateway.revokeAllSessions(operation.userId);
+        await this.repository.markSessionsRevoked(operation.id, owner, now);
+        operation = withMilestone(
+          operation,
+          "SESSIONS_REVOKED",
+          "sessionsRevokedAt",
+          now,
+        );
+      } catch {
+        return this.failClosed(
+          operation.id,
+          owner,
+          "SESSION_REVOCATION_FAILED",
+          now,
+        );
+      }
+    }
+
+    if (!operation.challengesInvalidatedAt) {
+      try {
+        await this.repository.invalidateChallengesAndResetProofs(
+          operation,
+          owner,
+          now,
+        );
+        operation = withMilestone(
+          operation,
+          "CHALLENGES_INVALIDATED",
+          "challengesInvalidatedAt",
+          now,
+        );
+      } catch {
+        return this.failClosed(
+          operation.id,
+          owner,
+          "CHALLENGE_INVALIDATION_FAILED",
+          now,
+        );
+      }
+    }
+
+    if (!operation.notificationEnqueuedAt) {
+      try {
+        await this.repository.enqueueNotification(operation, owner, now);
+        operation = withMilestone(
+          operation,
+          "NOTIFICATION_ENQUEUED",
+          "notificationEnqueuedAt",
+          now,
+        );
+      } catch {
+        return this.failClosed(
+          operation.id,
+          owner,
+          "NOTIFICATION_ENQUEUE_FAILED",
+          now,
+        );
+      }
+    }
+
+    if (!operation.auditFinalizedAt) {
+      try {
+        await this.repository.appendFinalAudit(operation, owner, now);
+        operation = withMilestone(
+          operation,
+          "NOTIFICATION_ENQUEUED",
+          "auditFinalizedAt",
+          now,
+        );
+      } catch {
+        return this.failClosed(
+          operation.id,
+          owner,
+          "AUDIT_FINALIZATION_FAILED",
+          now,
+        );
+      }
+    }
+
+    try {
+      await this.repository.finalize(operation.id, owner, now);
+    } catch {
+      return this.failClosed(
+        operation.id,
+        owner,
+        "OPERATION_FINALIZATION_FAILED",
+        now,
+      );
+    }
+
+    return {
+      ok: true,
+      userId: operation.userId,
+      operationId: operation.id,
+    };
+  }
+
+  private get retryableFailure(): ResetPasswordFailure {
+    return {
+      ok: false,
+      message: RESET_PASSWORD_RETRYABLE_ERROR,
+      retryable: true,
+    };
+  }
+
+  private async failClosed(
+    operationId: string,
+    executionOwner: string,
+    failureCode: PasswordResetFailureCode,
+    now: Date,
+  ): Promise<ResetPasswordFailure> {
+    await this.repository
+      .fail(operationId, executionOwner, failureCode, now)
+      .catch(() => false);
+    await this.recordFailure(now, failureCode.toLowerCase());
+    return this.retryableFailure;
   }
 
   private recordFailure(occurredAt: Date, reason: string) {
-    return this.appendAudit({
+    return this.audit
+      .append({
         occurredAt,
         actorType: "anonymous",
         action: "password_reset.failed",
@@ -80,13 +235,7 @@ export class ResetPasswordService {
         result: "FAILURE",
         correlationId: randomUUID(),
         context: { reason },
-      });
-  }
-
-  private appendAudit(entry: Parameters<PrismaAuditRepository["append"]>[0]) {
-    const append = (this.audit as Partial<PrismaAuditRepository>).append;
-    return typeof append === "function"
-      ? append.call(this.audit, entry).catch(() => undefined)
-      : Promise.resolve();
+      })
+      .catch(() => undefined);
   }
 }

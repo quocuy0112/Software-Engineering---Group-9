@@ -9,6 +9,11 @@ export const rateLimitPolicies = {
     windowSeconds: 60 * 60,
   },
   passwordReset: { scope: "password-reset", limit: 3, windowSeconds: 60 * 60 },
+  accountRecovery: {
+    scope: "account-recovery",
+    limit: 3,
+    windowSeconds: 60 * 60,
+  },
   totpChallenge: { scope: "totp-challenge", limit: 5, windowSeconds: 10 * 60 },
   totpEnrollment: {
     scope: "totp-enrollment",

@@ -8,6 +8,7 @@ import {
   registrationSchema,
   type RegistrationInput,
 } from "@/features/identity/schemas/registration";
+import { PasswordField } from "./password-field";
 
 export function RegisterForm() {
   const [complete, setComplete] = useState(false);
@@ -79,23 +80,18 @@ export function RegisterForm() {
           {...register("email")}
         />
       </Field>
-      <Field label="Password" error={errors.password?.message}>
-        <input
-          type="password"
-          autoComplete="new-password"
-          {...register("password")}
-        />
-      </Field>
-      <Field
+      <PasswordField
+        label="Password"
+        error={errors.password?.message}
+        autoComplete="new-password"
+        {...register("password")}
+      />
+      <PasswordField
         label="Confirm password"
         error={errors.passwordConfirmation?.message}
-      >
-        <input
-          type="password"
-          autoComplete="new-password"
-          {...register("passwordConfirmation")}
-        />
-      </Field>
+        autoComplete="new-password"
+        {...register("passwordConfirmation")}
+      />
       <button type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Creating account…" : "Create account"}
       </button>

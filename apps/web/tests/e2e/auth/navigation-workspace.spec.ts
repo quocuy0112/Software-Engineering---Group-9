@@ -93,11 +93,20 @@ test("connects public auth pages and the protected identity workspace", async ({
   );
   await page.getByRole("button", { name: "Sign in" }).click();
   expect((await loginResponse).status()).toBe(200);
-  await expect(page).toHaveURL(/\/$/, { timeout: 15_000 });
-  await expect(page.getByRole("link", { name: "Profile" })).toBeVisible();
-  await page.getByRole("link", { name: "Profile" }).click();
+  await expect(page).toHaveURL(/\/dashboard$/, { timeout: 15_000 });
+  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+  const dashboardMenu = page.getByRole("button", {
+    name: "Open workspace menu",
+  });
+  if (await dashboardMenu.isVisible()) await dashboardMenu.click();
+  await expect(
+    page.getByRole("link", { name: "Profile", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
   await expect(page).toHaveURL(/\/profile$/);
-  await expect(page.getByRole("heading", { name: "Profile" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Profile", exact: true }),
+  ).toBeVisible();
   const profileMenu = page.getByRole("button", {
     name: "Open workspace menu",
   });
@@ -127,6 +136,11 @@ test("connects public auth pages and the protected identity workspace", async ({
   });
   if (await closeMenu.isVisible().catch(() => false)) await closeMenu.click();
 
+  await page.goto("/settings/security?proof=discard-me");
+  await expect(page).toHaveURL(/\/profile\/security$/);
+  await page.goto("/settings/sessions?token=discard-me");
+  await expect(page).toHaveURL(/\/profile\/sessions$/);
+
   await page.setViewportSize({ width: 320, height: 720 });
   expect(
     await page.evaluate(
@@ -153,8 +167,10 @@ test("connects public auth pages and the protected identity workspace", async ({
   ).toBeVisible();
 
   await page.goto("/");
-  await expect(page.getByRole("link", { name: "Sign up" })).toHaveAttribute("href", "/register");
+  await expect(page.getByRole("link", { name: "Create account" })).toHaveAttribute("href", "/register");
   await expect(page.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/login");
+  await page.goto("/home");
+  await expect(page).toHaveURL(/\/$/);
   await page.goto("/dashboard");
-  await expect(page).toHaveURL(/\/login\?returnTo=%2F$/);
+  await expect(page).toHaveURL(/\/login\?returnTo=%2Fdashboard$/);
 });

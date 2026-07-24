@@ -63,6 +63,11 @@ export interface TwoFactorGateway {
     headers: Headers,
     password: string,
   ): Promise<TwoFactorDisablement>;
+  /**
+   * Recovery-only administrative disablement after the verified-email hold.
+   * It creates no session and removes Better Auth's TOTP/backup-code row.
+   */
+  disableForAccountRecovery?(userId: string): Promise<void>;
 }
 
 export class BetterAuthTwoFactorGateway implements TwoFactorGateway {
@@ -162,5 +167,16 @@ export class BetterAuthTwoFactorGateway implements TwoFactorGateway {
       disabled: result.response.status === true,
       sessionCookie: this.sessionCookie(result.headers),
     };
+  }
+
+  async disableForAccountRecovery(userId: string): Promise<void> {
+    const context = await auth.$context;
+    await context.internalAdapter.updateUser(userId, {
+      twoFactorEnabled: false,
+    });
+    await context.adapter.delete({
+      model: "TwoFactor",
+      where: [{ field: "userId", value: userId }],
+    });
   }
 }

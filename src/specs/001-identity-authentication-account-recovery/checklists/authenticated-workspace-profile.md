@@ -7,13 +7,13 @@ does not claim application completion or human usability-study evidence.
 
 - [x] The phase is limited to root authentication, public auth navigation, the authenticated shell, Dashboard, Profile Overview/Security/Sessions, legacy redirects, responsiveness, accessibility, and regression tests.
 - [x] Candidate, Recruiter, Job, Application, Notification, Admin, analytics, and other recruitment-domain functionality remain excluded.
-- [x] FR-069 through FR-074 and SC-019 through SC-022 map to T187 through T196.
+- [x] FR-069 through FR-071 and FR-073 through FR-074 plus SC-019 through SC-022 map to T187 through T196; normal-reset preservation FR-072 is covered by T197-T203.
 - [x] Existing completed task IDs are preserved and T160 remains unchecked.
 
 ## Architecture and security
 
 - [x] Better Auth remains the exclusive opaque browser-session and TOTP/backup-code owner.
-- [x] Root and Profile access are server-authorized with ACTIVE account-state enforcement and no client authentication flash.
+- [x] `/` is the public SmartHire Home (with optional authenticated controls), `/home` server-redirects to `/`, and `/dashboard` plus Profile access are server-authorized with ACTIVE account-state enforcement and no client authentication flash.
 - [x] The workspace client receives only a safe display projection plus the existing ephemeral logout CSRF proof.
 - [x] Provisional pre-auth challenge state cannot authorize Dashboard or Profile.
 - [x] A correct current password is explicitly defined as renewed proof for an old but otherwise valid ACTIVE session.

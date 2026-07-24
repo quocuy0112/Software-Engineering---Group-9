@@ -3,9 +3,11 @@ import { symmetricDecrypt } from "better-auth/crypto";
 import { auth } from "@/server/auth/config";
 import { prisma } from "@/lib/db/prisma";
 import { serverEnvironment } from "@/lib/env/runtime";
+import { BetterAuthPasswordGateway } from "@/server/auth/identity/better-auth-password-gateway";
 import {
   authRequest,
   cleanupFixture,
+  cookie,
   enabledFixture,
   fixturePassword,
   preAuth,
@@ -76,5 +78,34 @@ describe("Better Auth backup-code storage and regeneration", () => {
       Array<{ table_name: string }>
     >`SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name ILIKE '%backup%'`;
     expect(tables).toHaveLength(0);
+  });
+
+  it("keeps an unused backup code valid across a Better Auth password update", async () => {
+    const f = await enabledFixture();
+    users.push(f.userId);
+    const before = await prisma.twoFactor.findUniqueOrThrow({
+      where: { userId: f.userId },
+    });
+    const password = "Backup preserved password 2026!";
+    const gateway = new BetterAuthPasswordGateway();
+    await gateway.updatePassword(f.userId, password);
+    await gateway.revokeAllSessions(f.userId);
+    const preserved = await prisma.twoFactor.findUniqueOrThrow({
+      where: { userId: f.userId },
+    });
+    expect(preserved.backupCodes).toBe(before.backupCodes);
+
+    const login = await authRequest("/sign-in/email", {
+      email: f.email,
+      password,
+    });
+    const proof = cookie(login, "smarthire.pre-auth");
+    expect(proof).not.toBeNull();
+    const completed = await authRequest(
+      "/two-factor/verify-backup-code",
+      { code: f.backupCodes[0], trustDevice: false },
+      proof!,
+    );
+    expect(completed.ok).toBe(true);
   });
 });

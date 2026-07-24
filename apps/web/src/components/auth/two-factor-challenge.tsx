@@ -33,7 +33,7 @@ export function TwoFactorChallenge() {
         return;
       }
       setStatus("Verification complete.");
-      router.replace("/profile#sessions");
+      router.replace("/dashboard");
     } catch {
       setStatus(TWO_FACTOR_GENERIC_ERROR);
     } finally {

@@ -82,7 +82,7 @@ async function registerVerifyAndSignIn(page: Page): Promise<string> {
   await page.getByLabel("Email address").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/dashboard$/);
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
   return email;
 }
@@ -187,7 +187,9 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   );
   await page.getByLabel("Authentication code").fill(totp(manualKey));
   await page.getByLabel("Authentication code").press("Enter");
-  await expect(page).toHaveURL(/\/settings\/sessions/);
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await page.goto("/profile/sessions");
+  await expect(page.getByRole("heading", { name: /^Sessions$/i })).toBeVisible();
 
   // A backup code completes a fresh pre-auth challenge without being rejected
   // by the TOTP replay marker created immediately above.
@@ -214,9 +216,10 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await page.getByRole("button", { name: "Verify" }).click();
   const backupResponse = await backupCompletion;
   expect(backupResponse.status()).toBe(200);
-  await expect(page).toHaveURL(/\/settings\/sessions(?:\?.*)?$/, {
+  await expect(page).toHaveURL(/\/dashboard$/, {
     timeout: 15_000,
   });
+  await page.goto("/profile/sessions");
   await expect(page.getByRole("heading", { name: /^Sessions$/i })).toBeVisible();
   const completedCookies = await page.context().cookies();
   expect(
@@ -226,7 +229,7 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
     completedCookies.filter((cookie) => cookie.name === "smarthire.session"),
   ).toHaveLength(1);
   await page.goto("/profile/security");
-  await expect(page).toHaveURL(/\/settings\/security/);
+  await expect(page).toHaveURL(/\/profile\/security/);
 
   await page.context().clearCookies();
   await page.goto("/login");
@@ -254,9 +257,11 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   );
   await page.getByRole("button", { name: "Verify" }).click();
   expect((await managementLogin).status()).toBe(200);
-  await expect(page).toHaveURL(/\/settings\/sessions(?:\?.*)?$/, {
+  await expect(page).toHaveURL(/\/dashboard$/, {
     timeout: 15_000,
   });
+  await page.goto("/profile/sessions");
+  await expect(page.getByRole("heading", { name: /^Sessions$/i })).toBeVisible();
 
   // Regeneration displays ten replacement codes once and invalidates old ones.
   await page.goto("/profile/security");
@@ -301,7 +306,7 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   );
   await page.getByRole("button", { name: "Verify" }).click();
   expect((await replacementLogin).status()).toBe(200);
-  await expect(page).toHaveURL(/\/settings\/sessions(?:\?.*)?$/, { timeout: 15_000 });
+  await expect(page).toHaveURL(/\/dashboard$/, { timeout: 15_000 });
 
   // Disablement removes the second-factor requirement for the next login.
   await page.goto("/profile/security");
@@ -316,18 +321,23 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   );
   await disablePanel.getByRole("button", { name: "Disable two-factor authentication" }).click();
   expect((await disablement).status()).toBe(200);
-  await expect(disablePanel.getByRole("status")).toContainText("disabled");
-  await page.goto("/settings/sessions");
+  await expect(
+    page.getByRole("heading", { name: "Set up two-factor authentication" }),
+  ).toBeVisible();
+  await page.goto("/profile/sessions");
   // Better Auth may revoke the current session as part of disablement; when it
   // remains active, explicitly exercise logout before the next login.
-  if (await page.getByRole("button", { name: "Sign out" }).isVisible().catch(() => false)) {
-    await page.getByRole("button", { name: "Sign out" }).click();
-  }
+  const sessionsMenu = page.getByRole("button", {
+    name: "Open workspace menu",
+  });
+  if (await sessionsMenu.isVisible()) await sessionsMenu.click();
+  await expect(page.getByRole("button", { name: "Sign out" })).toBeVisible();
+  await page.getByRole("button", { name: "Sign out" }).click();
   await expect(page).toHaveURL(/\/login/);
   await page.getByLabel("Email address").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page).toHaveURL(/\/$/, { timeout: 15_000 });
+  await expect(page).toHaveURL(/\/dashboard$/, { timeout: 15_000 });
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
   await page.context().clearCookies();
   await page.goto("/two-factor");

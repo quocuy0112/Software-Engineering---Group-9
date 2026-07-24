@@ -9,7 +9,13 @@ async function signIn(page: Page, email: string, password = originalPassword) {
   await page.goto("/login");
   await page.getByLabel("Email address").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
+  const response = page.waitForResponse(
+    (result) =>
+      result.url().endsWith("/api/identity/login") &&
+      result.request().method() === "POST",
+  );
   await page.getByRole("button", { name: "Sign in" }).click();
+  return response;
 }
 
 test("forgot-password and reset-password surfaces remain generic and safe", async ({
@@ -96,14 +102,14 @@ test("resets once, revokes all sessions, sends notification, and requires the ne
   await expect(
     page.getByRole("heading", { name: "Email verified" }),
   ).toBeVisible();
-  await signIn(page, email);
-  await expect(page).toHaveURL(/\/$/);
+  expect((await signIn(page, email)).status()).toBe(200);
+  await expect(page).toHaveURL(/\/dashboard$/);
 
   const otherContext = await browser.newContext();
   const otherPage = await otherContext.newPage();
   try {
-    await signIn(otherPage, email);
-    await expect(otherPage).toHaveURL(/\/$/);
+    expect((await signIn(otherPage, email)).status()).toBe(200);
+    await expect(otherPage).toHaveURL(/\/dashboard$/);
 
     const beforeReset = new Set(await readdir(mailDirectory).catch(() => []));
     await page.goto("/forgot-password");
@@ -155,8 +161,8 @@ test("resets once, revokes all sessions, sends notification, and requires the ne
       ),
     ).toBe(false);
 
-    await otherPage.goto("/");
-    await expect(otherPage).toHaveURL(/\/login\?returnTo=%2F$/);
+    await otherPage.goto("/dashboard");
+    await expect(otherPage).toHaveURL(/\/login\?returnTo=%2Fdashboard$/);
 
     await expect
       .poll(async () => {
@@ -198,12 +204,13 @@ test("resets once, revokes all sessions, sends notification, and requires the ne
     ).toBeVisible();
     await reusePage.close();
 
-    await signIn(page, email, originalPassword);
+    expect((await signIn(page, email, originalPassword)).status()).toBe(401);
     await expect(page.getByRole("status")).toContainText(
       /incorrect|could not be completed/i,
     );
-    await signIn(page, email, replacementPassword);
-    await expect(page).toHaveURL(/\/$/);
+    expect((await signIn(page, email, replacementPassword)).status()).toBe(200);
+    await page.goto("/dashboard");
+    await expect(page).toHaveURL(/\/dashboard$/);
     await expect(
       page.getByRole("heading", { name: "Dashboard" }),
     ).toBeVisible();

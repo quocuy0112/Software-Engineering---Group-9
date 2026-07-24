@@ -32,11 +32,11 @@ describe("shared auth primitives", () => {
     fireEvent.change(input, { target: { value: "pasted value" } });
     expect(input.value).toBe("pasted value");
     fireEvent.click(
-      screen.getByRole("button", { name: "Show current password" }),
+      screen.getByRole("button", { name: "Show password" }),
     );
     expect(input.type).toBe("text");
     const hide = screen.getByRole("button", {
-      name: "Hide current password",
+      name: "Hide password",
     });
     expect(hide).toHaveAttribute("aria-pressed", "true");
     expect(hide.querySelector("svg")).toBeTruthy();
@@ -44,7 +44,7 @@ describe("shared auth primitives", () => {
     fireEvent.click(hide);
     expect(input.type).toBe("password");
     expect(
-      screen.getByRole("button", { name: "Show current password" }),
+      screen.getByRole("button", { name: "Show password" }),
     ).toHaveAttribute("aria-pressed", "false");
   });
   it("announces and focuses the error summary", () => {

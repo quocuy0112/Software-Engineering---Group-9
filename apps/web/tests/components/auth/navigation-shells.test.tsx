@@ -76,6 +76,29 @@ describe("identity navigation shells", () => {
     ).toHaveAttribute("aria-expanded", "true");
   });
 
+  it("closes the mobile menu with Escape and returns focus to its toggle", () => {
+    render(
+      <WorkspaceShell
+        csrfProof="proof"
+        profile={{ name: "Thao Nguyen", email: "thao@example.test" }}
+      >
+        <h1>Security</h1>
+      </WorkspaceShell>,
+    );
+
+    const menu = screen.getByRole("button", { name: "Open workspace menu" });
+    fireEvent.click(menu);
+    expect(
+      screen.getByRole("button", { name: "Close workspace menu" }),
+    ).toBeVisible();
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.getByRole("button", { name: "Open workspace menu" })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+    expect(screen.getByRole("button", { name: "Open workspace menu" })).toHaveFocus();
+  });
+
   it("keeps the dashboard limited to identity shortcuts and future placeholders", () => {
     render(<DashboardPage />);
     expect(

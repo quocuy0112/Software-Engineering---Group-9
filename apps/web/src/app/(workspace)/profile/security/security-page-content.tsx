@@ -1,19 +1,12 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { ProfileSecurity } from "@/components/auth/profile-security";
 import { ProfileNavigation } from "@/components/auth/profile-navigation";
-import { prisma } from "@/lib/db/prisma";
-import { requireSession } from "@/server/auth/require-session";
+import { getWorkspaceContext } from "@/server/auth/get-workspace-context";
 
 export default async function ProfileSecurityPageContent() {
-  const current = await requireSession(await headers());
-  if (!current) redirect("/login?returnTo=%2Fprofile%2Fsecurity");
-
-  const account = await prisma.userAccount.findUnique({
-    where: { id: current.userId },
-    select: { twoFactorEnabled: true },
-  });
-  if (!account) redirect("/login?returnTo=%2Fprofile%2Fsecurity");
+  const context = await getWorkspaceContext();
+  if (!context) redirect("/login?returnTo=%2Fprofile%2Fsecurity");
+  const { account } = context;
 
   return (
     <div className="profile-page profile-page--standalone">
@@ -30,7 +23,10 @@ export default async function ProfileSecurityPageContent() {
         </span>
       </header>
       <ProfileNavigation active="security" />
-      <ProfileSecurity initialTwoFactorEnabled={account.twoFactorEnabled} />
+      <ProfileSecurity
+        initialTwoFactorEnabled={account.twoFactorEnabled}
+        recoveryCompleted={context.recoveryCompleted}
+      />
     </div>
   );
 }

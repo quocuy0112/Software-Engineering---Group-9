@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { BetterAuthSessionGateway } from "./identity/better-auth-session-gateway";
 import { SessionService } from "@/server/services/identity/session-service";
 import { PrismaAuditRepository } from "@/server/repositories/audit/prisma-audit-repository";
+import { PrismaAccountRecoveryRepository } from "@/server/repositories/identity/prisma-account-recovery-repository";
 export async function requireSession(headers: Headers, now = new Date()) {
   const gateway = new BetterAuthSessionGateway();
   const current = await gateway.current(headers);
@@ -28,6 +29,14 @@ export async function requireSession(headers: Headers, now = new Date()) {
         context: { reason: "policy_enforcement" },
       })
       .catch(() => undefined);
+    return null;
+  }
+  if (
+    await new PrismaAccountRecoveryRepository()
+      .hasBlockingForUser(current.user.id)
+      .catch(() => true)
+  ) {
+    await gateway.signOut(headers).catch(() => undefined);
     return null;
   }
   return { userId: current.user.id, sessionId: current.session.id };

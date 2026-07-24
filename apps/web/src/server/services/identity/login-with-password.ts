@@ -9,6 +9,8 @@ import { PrismaRateLimitRepository } from "@/server/repositories/rate-limit/pris
 import { PrismaAuditRepository } from "@/server/repositories/audit/prisma-audit-repository";
 import { PrismaSessionPolicyRepository } from "@/server/repositories/identity/prisma-session-policy-repository";
 import { PrismaPreAuthRepository } from "@/server/repositories/identity/prisma-pre-auth-repository";
+import { PrismaPasswordResetRepository } from "@/server/repositories/identity/prisma-password-reset-repository";
+import { PrismaAccountRecoveryRepository } from "@/server/repositories/identity/prisma-account-recovery-repository";
 import { BetterAuthSessionGateway } from "@/server/auth/identity/better-auth-session-gateway";
 import {
   encodePreAuth,
@@ -26,6 +28,8 @@ export class LoginWithPasswordService {
     private limiter = new PrismaRateLimitRepository(),
     private audit = new PrismaAuditRepository(),
     private challenges = new PrismaPreAuthRepository(),
+    private resetOperations = new PrismaPasswordResetRepository(),
+    private recoveryOperations = new PrismaAccountRecoveryRepository(),
   ) {}
   async execute(
     data: LoginData,
@@ -59,6 +63,28 @@ export class LoginWithPasswordService {
       );
     }
     const account = await this.sessions.accountByEmail(data.email);
+    if (
+      account &&
+      ((await this.resetOperations
+        .hasIncompleteForUser(account.id)
+        .catch(() => true)) ||
+        (await this.recoveryOperations
+          .hasBlockingForUser(account.id)
+          .catch(() => true)))
+    ) {
+      await this.record(
+        "login.failed",
+        "FAILURE",
+        cid,
+        now,
+        account.id,
+        "credential_recovery_incomplete",
+      );
+      return Response.json(
+        { message: GENERIC_LOGIN_ERROR },
+        { status: 401, headers: noStoreHeaders },
+      );
+    }
     const upstream = await this.gateway
       .signIn(data.email, data.password, request.headers)
       .catch(() => null);

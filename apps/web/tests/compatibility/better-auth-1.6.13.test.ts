@@ -5,6 +5,7 @@ import { symmetricDecrypt } from "better-auth/crypto";
 import { getActiveSession } from "@/server/auth/get-session";
 import { prisma } from "@/lib/db/prisma";
 import { serverEnvironment } from "@/lib/env/runtime";
+import { markInternalBetterAuthRequest } from "@/server/auth/identity/better-auth-internal-request";
 
 const runId = randomUUID();
 const email = `compat-${runId}@example.test`;
@@ -53,7 +54,21 @@ afterAll(async () => {
   await prisma.$disconnect();
 });
 
-describe.sequential("Better Auth 1.6.11 PostgreSQL compatibility", () => {
+describe.sequential("Better Auth 1.6.13 PostgreSQL compatibility", () => {
+  it("keeps direct Better Auth throttling while the durable SmartHire gateway owns its login limit", async () => {
+    const rule = (await auth.$context).rateLimit.customRules?.[
+      "/sign-in/email"
+    ];
+    expect(typeof rule).toBe("function");
+    if (typeof rule !== "function") throw new Error("RATE_LIMIT_RULE_MISSING");
+    const currentRule = { window: 10, max: 3 };
+    const external = new Request(`${baseURL}/sign-in/email`);
+    expect(await rule(external, currentRule)).toEqual(currentRule);
+    expect(
+      await rule(markInternalBetterAuthRequest(external), currentRule),
+    ).toBe(false);
+  });
+
   it("creates Better Auth credential ownership with a non-plaintext password hash", async () => {
     const response = await request("/sign-up/email", {
       body: { name: "Compatibility User", email, password },

@@ -33,7 +33,38 @@ describe("reset-password route", () => {
     const response = await POST(request({ token: "opaque", newPassword: "correct horse 2026", confirmPassword: "correct horse 2026" }));
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toContain("no-store");
-    expect(response.headers.get("set-cookie")).toMatch(/smarthire\.session=;.*Path=\/.*Max-Age=0/i);
+    expect(response.headers.getSetCookie()).toEqual(
+      expect.arrayContaining([
+        expect.stringMatching(
+          /smarthire\.session=;.*Path=\/.*Max-Age=0/i,
+        ),
+        expect.stringMatching(
+          /smarthire\.pre-auth=;.*Path=\/api\/identity\/two-factor\/complete.*Max-Age=0/i,
+        ),
+      ]),
+    );
     expect(await response.json()).toEqual({ message: "Your password has been reset. Sign in again." });
+  });
+
+  it("returns 503 fail-closed and clears matching auth cookies for retryable cleanup", async () => {
+    execute.mockResolvedValue({
+      ok: false,
+      retryable: true,
+      message: "Your password reset could not be completed. Please try again.",
+    });
+    const response = await POST(
+      request({
+        token: "opaque",
+        newPassword: "correct horse 2026",
+        confirmPassword: "correct horse 2026",
+      }),
+    );
+    expect(response.status).toBe(503);
+    expect(response.headers.get("cache-control")).toContain("no-store");
+    expect(response.headers.getSetCookie()).toHaveLength(2);
+    expect(await response.json()).toEqual({
+      message:
+        "Your password reset could not be completed. Please try again.",
+    });
   });
 });

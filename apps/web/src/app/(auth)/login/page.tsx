@@ -12,7 +12,7 @@ export default async function LoginPage({
       returnTo={trustedInternalRedirect(
         value,
         serverEnvironment.NEXT_PUBLIC_APP_URL,
-        "/",
+        "/dashboard",
       )}
     />
   );

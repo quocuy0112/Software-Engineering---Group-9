@@ -9,7 +9,7 @@ async function signIn(page: Page, email: string) {
   await page.getByLabel("Email address").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/dashboard$/);
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
 }
 
@@ -93,7 +93,10 @@ test("lists, revokes, evicts, and signs out opaque database sessions", async ({
     await expect(sessionRows).toHaveCount(1);
 
     await selectedPage.goto("/");
-    await expect(selectedPage).toHaveURL(/\/login\?returnTo=%2F$/);
+    await expect(selectedPage).toHaveURL(/\/$/);
+    await expect(
+      selectedPage.getByRole("link", { name: "Sign in", exact: true }),
+    ).toBeVisible();
     await selectedContext.close();
     contexts.splice(0, 1);
 
@@ -112,7 +115,7 @@ test("lists, revokes, evicts, and signs out opaque database sessions", async ({
     await expect(newestPage.getByText(/\(current\)/)).toHaveCount(1);
 
     await page.goto("/");
-    await expect(page).toHaveURL(/\/login\?returnTo=%2F$/);
+    await expect(page).toHaveURL(/\/$/);
 
     await openWorkspaceMenu(newestPage);
     await newestPage.getByRole("button", { name: "Sign out" }).click();
@@ -123,7 +126,7 @@ test("lists, revokes, evicts, and signs out opaque database sessions", async ({
       ),
     ).toHaveLength(0);
     await newestPage.goto("/");
-    await expect(newestPage).toHaveURL(/\/login\?returnTo=%2F$/);
+    await expect(newestPage).toHaveURL(/\/$/);
   } finally {
     await Promise.all(contexts.map((context) => context.close()));
   }
