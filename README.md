@@ -1,47 +1,139 @@
 # SmartHire
 
-SmartHire is a modular full-stack Next.js application. The Spec Kit governance and feature artifacts remain under `src/`; application code lives in the single npm workspace `apps/web`.
+SmartHire is a full-stack application for building a secure talent workspace
+for candidates and hiring teams. The current release focuses on Identity and
+Access Management; advanced recruitment modules are still under development.
 
-## Local onboarding
+## Table of Contents
 
-Required tools: Git, Node.js 24.18.0 with npm 11.16.0, and Docker with Docker Compose. PostgreSQL and `psql` do not need to be installed on the host, and Resend is optional for local development.
+- [Current Features](#current-features)
+- [Architecture and Tech Stack](#architecture-and-tech-stack)
+- [Prerequisites](#prerequisites)
+- [Local Setup](#local-setup)
+- [Local Email](#local-email)
+- [Common Commands](#common-commands)
+- [Quality Checks](#quality-checks)
+- [Project Structure](#project-structure)
+- [Documentation](#documentation)
+- [Security](#security)
+
+## Current Features
+
+- Account registration, email verification, and email/password login.
+- TOTP two-factor authentication and backup codes.
+- Session management, session limits, and revocation.
+- Forgot password, password reset, and full account recovery with a 24-hour
+  security hold.
+- Audit logging, rate limiting, and a transactional email outbox.
+- Foundation pages for Home, Dashboard, and Profile.
+
+## Architecture and Tech Stack
+
+The application is a modular monolith located in `apps/web`:
+
+```text
+Next.js Page/Component
+        ↓
+Route Handler
+        ↓
+Service
+        ↓
+Repository / Better Auth Gateway
+        ↓
+PostgreSQL / Email Outbox
+```
+
+| Area                   | Technology                          |
+| ---------------------- | ----------------------------------- |
+| Web                    | Next.js 16, React 19, TypeScript    |
+| Authentication         | Better Auth 1.6                     |
+| Database               | PostgreSQL 16, Prisma 7             |
+| Validation and forms   | Zod, React Hook Form                |
+| UI feedback and motion | Sonner, Motion                      |
+| Email                  | Local capture, SMTP, or Resend      |
+| Testing                | Vitest, Testing Library, Playwright |
+
+## Prerequisites
+
+- Git
+- Node.js `24.18.x`
+- npm `11.16.x`
+- Docker and Docker Compose
+
+PostgreSQL and `psql` do not need to be installed on the host machine.
+
+## Local Setup
 
 ```bash
 git clone <repository-url>
 cd Software-Engineering---Group-9
+
+npm ci
 npm run env:init
 npm run db:up
-npm ci
+npm run db:migrate
 npm run env:check
 npm run dev
 ```
 
-Open the application at http://localhost:3001. PostgreSQL listens only on `localhost:55432`; Docker stores its data in the named `smarthire_postgres_data` volume. Captured local email is written beneath `apps/web/.local/mail`.
+Open the application at:
 
-### Optional Gmail SMTP for local delivery
+```text
+http://localhost:3001
+```
 
-Capture remains the generated default. To send transactional mail through Gmail, edit only the untracked `apps/web/.env.local` and set:
+Local PostgreSQL is available at `localhost:55432`.
 
-    EMAIL_ADAPTER=smtp
-    SMTP_HOST=smtp.gmail.com
-    SMTP_PORT=587
-    SMTP_USERNAME=developer@gmail.com
-    SMTP_PASSWORD=<Google App Password>
-    SMTP_FROM="SmartHire <developer@gmail.com>"
-    SMTP_SECURE=false
-    SMTP_USE_TLS=true
+`npm run env:init` creates `.env`, `apps/web/.env.local`, and secure local
+secrets. Existing files are preserved and never overwritten.
 
-Use the complete Gmail address and a Google App Password, not the normal account password. Port 587 requires STARTTLS with `secure=false`; port 465 is supported with `SMTP_PORT=465`, `SMTP_SECURE=true`, and `SMTP_USE_TLS=false`. Restart `npm run dev` after changing the adapter. SMTP variables are server-only and must never be committed or renamed with a `NEXT_PUBLIC_` prefix.
+`npm run dev` starts both:
 
-`npm run dev` starts both Next.js and the asynchronous EmailOutbox worker. For debugging, run `npm run dev:web` and `npm run email:worker` in separate terminals. Registration and resend return after committing the outbox row; the worker later processes due PENDING/RETRYABLE rows. Capture remains the generated default and uses this same worker path.
+- Next.js on port `3001`.
+- The Email Outbox worker.
 
-For secret-safe worker recovery, inspect only status, attempt count, due time, and lease expiry (never payloads or credentials). `PENDING` and due `RETRYABLE` jobs are picked up automatically. A `PROCESSING` job is reclaimed after its lease expires if a worker is interrupted. Restart `npm run email:worker` to resume due work. `DEAD` means bounded retries are exhausted or the provider rejected the request permanently; resolve the configuration/provider problem and create an explicitly reviewed replacement outbox request rather than editing a terminal row in place.
+Run them separately when debugging:
 
-Use `npm run db:down` to stop local PostgreSQL while retaining its data. Use `npm run db:reset` only when you intentionally want to delete and recreate local database data.
+```bash
+npm run dev:web
+npm run email:worker
+```
 
-Never commit `.env`, `apps/web/.env.local`, anything under `apps/web/.local`, captured email, private keys, logs, coverage, or test output. The checked-in `.env.example` files contain placeholders only.
+## Local Email
 
-## Common checks
+Local development uses the capture adapter by default and does not send email
+over the Internet. Captured messages are stored in:
+
+```text
+apps/web/.local/mail
+```
+
+SMTP and Resend are optional. Configure either provider in
+`apps/web/.env.local` using
+[`apps/web/.env.example`](apps/web/.env.example), then restart the application.
+
+## Common Commands
+
+| Command                | Purpose                                              |
+| ---------------------- | ---------------------------------------------------- |
+| `npm run dev`          | Start the web app and email worker                   |
+| `npm run dev:web`      | Start only Next.js                                   |
+| `npm run email:worker` | Start only the email worker                          |
+| `npm run db:up`        | Start PostgreSQL                                     |
+| `npm run db:down`      | Stop PostgreSQL and retain its data                  |
+| `npm run db:status`    | Show PostgreSQL status                               |
+| `npm run db:logs`      | Follow PostgreSQL logs                               |
+| `npm run db:migrate`   | Apply migrations to the local database               |
+| `npm run db:studio`    | Open Prisma Studio                                   |
+| `npm run db:verify`    | Verify migrations against a temporary clean database |
+| `npm run db:reset`     | Delete the volume and recreate the local database    |
+
+> **Warning:** `npm run db:reset` permanently deletes all data in the current
+> local PostgreSQL volume.
+
+## Quality Checks
+
+Run these commands before opening a pull request:
 
 ```bash
 npm run env:check
@@ -51,11 +143,37 @@ npm test
 npm run build
 ```
 
-Initialize or verify a developer database from committed migrations with:
+Run browser end-to-end tests with:
 
 ```bash
-npm run db:migrate
-npm run db:verify
+npm run test:e2e
 ```
 
-`db:verify` proves that an empty PostgreSQL database can be initialized from committed migrations and that Prisma can connect without host PostgreSQL or host `psql`.
+## Project Structure
+
+```text
+.
+├── apps/web/
+│   ├── prisma/          # Prisma schema and migrations
+│   ├── src/app/         # Next.js pages, layouts, and API routes
+│   ├── src/components/  # React UI
+│   ├── src/features/    # Schemas and feature-level code
+│   ├── src/server/      # Services, repositories, authentication, and email
+│   └── tests/           # Unit, component, contract, integration, and E2E tests
+├── scripts/             # Setup, validation, and local development scripts
+├── src/specs/           # Spec Kit artifacts
+├── compose.yaml         # Local PostgreSQL
+└── summary.md           # Detailed architecture and code-reading guide
+```
+
+## Documentation
+
+- [Implementation plan](src/specs/001-identity-authentication-account-recovery/plan.md)
+- [Feature specification](src/specs/001-identity-authentication-account-recovery/spec.md)
+- [OpenAPI contract](src/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml)
+
+## Security
+
+Never commit `.env`, `apps/web/.env.local`, files under `apps/web/.local`,
+credentials, secrets, captured email, logs, or build artifacts. Committed
+`.env.example` files must contain placeholder values only.
