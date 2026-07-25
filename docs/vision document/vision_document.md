@@ -298,150 +298,95 @@ The platform competes with both job-search websites and Applicant Tracking Syste
 
 # 4. Product Overview
 
-**Author of this Part:** Nguyễn Minh Khôi   
-**Student ID:** 24127066
+**Author of this Part:** Nguyễn Minh Khôi<br>
+**Student ID:** 24127066 <br>
+**Modify based on feedback PA2:** Nguyễn Quốc Thành<br>
+**Student ID:** 24127542
 
----
+<i>**Objective:** Revise the Product Overview by removing implementation-specific details and presenting SmartHire at a high level, focusing on its purpose, target users, core capabilities, product scope, and the advisory role of AI in recruitment decisions.</i>
 
-The SmartHire Platform is a recruitment system designed to automate the hiring lifecycle for Small and Medium Enterprises (SMEs) by integrating job management, candidate tracking, and AI-assisted hiring features into a centralized web-based solution.
+SmartHire is a web-based recruitment platform designed to support Vietnamese small and medium-sized enterprises in managing recruitment activities through a centralized and structured workflow.
 
-The platform utilizes a modern technical stack and a decoupled architecture:
+The platform connects candidates, recruiters, company representatives, and platform administrators throughout the recruitment lifecycle. Candidates can maintain professional profiles, upload CVs, discover suitable job opportunities, submit applications, and monitor their application progress. Recruiters can manage job postings, review applicants, organize candidates through recruitment stages, and use advisory scoring information to support candidate evaluation. Administrators maintain platform trust through company verification, job-post moderation, account management, and security oversight.
 
-### Architecture & Security
-- Follows a **Decoupled Client-Server Architecture**.
-- Uses **JSON Web Tokens (JWT)** for stateless authentication and session management.
-- Implements **Role-Based Access Control (RBAC)** combined with a **Multi-tenant model**, where a base user account acts as a Candidate, but can simultaneously hold Recruiter or HR Manager permissions for one or multiple companies via company membership records.
+SmartHire aims to reduce the fragmented recruitment processes commonly handled through email, spreadsheets, separate job platforms, and manual communication. By combining job discovery, applicant tracking, recruitment coordination, notifications, and AI-assisted candidate evaluation within one platform, the product helps recruitment teams improve efficiency while providing candidates with a clearer and more transparent application experience.
 
-### Frontend Stack
-- Built with:
-  - **Next.js (React)**
-  - **TypeScript**
-  - **Tailwind CSS**
-  - **Shadcn UI**
-- Uses **Zustand** for lightweight state management.
-- Integrates **hello-pangea/dnd** to support drag-and-drop functionality in the Kanban board interface.
-
-### Backend & Database
-- Backend follows a **Layered Architecture** implemented within **Next.js API Routes**.
-- Uses a relational database management system:
-  - **PostgreSQL**, or
-  - **MySQL**
-- Provides transactional integrity and reliable data management.
-
-### Operating Environments
-- Configured as a **responsive web application**.
-- Supports:
-  - **Desktop View**: Optimized for administrative and management tasks with data-dense interfaces.
-  - **Mobile/Tablet View**: Optimized for candidates and users who need access while on the go.
+AI-generated scores and explanations are used only as decision-support information. They do not automatically reject, progress, or hire candidates. Final recruitment decisions remain under the control of authorized recruiters and hiring representatives.
 
 ## 4.1. Product Perspective
 
-SmartHire is a standalone, AI-assisted recruitment management platform that operates as a responsive web application. It serves as a centralized hub connecting job candidates, recruiters, and system administrators throughout the recruitment lifecycle.
+SmartHire operates as a standalone, responsive recruitment platform that serves three primary user groups:
 
-The system uses a client-server architecture in which the frontend communicates with backend services through secure RESTful APIs. SmartHire integrates with an AI service for semantic CV analysis and human-readable score explanations, an email service for notifications, and a relational database for persistent data storage.
+* **Candidates**, who create professional profiles, manage CVs, search for approved job opportunities, submit applications, and track recruitment progress.
+* **Recruiters and company representatives**, who manage company job postings, review applications, evaluate candidates, and coordinate recruitment pipelines.
+* **Platform administrators**, who verify companies and recruiter access, moderate job postings, manage accounts, and oversee platform security and reliability.
 
-SmartHire replaces traditional recruitment methods that rely on spreadsheets, emails, and manual tracking with an automated and structured recruitment workflow. The platform supports the complete hiring process, from job creation and candidate application submission to screening, interviewing, and final hiring decisions.
+The product provides a shared recruitment environment in which candidate information, job postings, applications, evaluation results, and recruitment-stage updates are managed consistently. Access to company recruitment data is restricted to authorized members of the relevant company.
 
-The major system components include:
+SmartHire also relies on external services for email delivery and AI-assisted candidate analysis. Temporary failure of an external service should not prevent users from accessing unaffected core recruitment functions.
 
-### Candidate Portal
-- Profile management
-- CV upload, parsing, and management
-- Job searching and application submission
-- Application tracking and access to disclosed score explanations
+## 4.2. High-Level Product Capabilities
 
-### Recruiter Portal
-- Job posting management
-- Applicant screening and evaluation
-- Kanban-based recruitment pipeline
+SmartHire provides the following high-level capabilities:
 
-### Administration Portal
-- User and recruiter verification
-- Job post moderation
-- Platform monitoring and analytics
-- System audit management
+### Candidate Experience
 
-### AI Services Layer
-- Hybrid candidate scoring (rule-based matching + AI semantic analysis)
-- Human-readable score explanations (shared with both recruiter and candidate)
+Candidates can create and maintain reusable professional profiles, upload supported CV files, search for approved jobs, submit applications, and monitor application statuses from a single account.
 
-### External Systems
-- AI API or custom AI model
-- Email notification service
-- Relational database system (PostgreSQL/MySQL)
+### Recruiter and Company Management
 
-The overall product ecosystem can be represented as:
+Authorized company members can create and manage job postings, review applicants, compare candidate information, and organize applications through a structured recruitment pipeline.
 
-```mermaid
-graph TD
+### Candidate Evaluation Support
 
-    Candidate[Candidates]
-    Recruiter[Recruiters]
-    Admin[System Administrators]
+The platform provides deterministic matching and AI-assisted analysis to generate advisory candidate-job compatibility scores and understandable explanations. These results support recruiter review but do not replace human judgment.
 
-    Candidate --> SmartHire
-    Recruiter --> SmartHire
-    Admin --> SmartHire
+### Communication and Transparency
 
-    subgraph SmartHire Platform
-        CP[Candidate Portal]
-        RP[Recruiter Portal]
-        AP[Admin Portal]
-        AI[AI Services Layer]
-    end
+Email and in-app notifications inform users about important events such as account verification, application submission, recruitment-stage changes, moderation decisions, and system actions.
 
-    SmartHire[SmartHire Recruitment Platform]
+### Administration and Platform Trust
 
-    SmartHire --> CP
-    SmartHire --> RP
-    SmartHire --> AP
-    SmartHire --> AI
+Administrators can verify companies and recruiter access, moderate job postings, manage user accounts, investigate violations, and review important audit records.
 
-    AI --> extAI[AI API / Another AI Model]
-    SmartHire --> DB[(PostgreSQL / MySQL Database)]
-    SmartHire --> Email[Email Notification Service]
-```
+### Reporting and Analytics
 
-## 4.2. Assumptions and Dependencies
+Recruitment analytics and permitted data-export capabilities are planned as secondary capabilities after the core candidate, recruiter, and administrative workflows are stable.
 
-The successful operation of SmartHire depends on several assumptions and external dependencies. 
+## 4.3. Product Boundaries
 
-### Assumptions
+The current SmartHire release focuses on the core recruitment workflow from candidate profile creation and job publication to application review and hiring-stage management.
 
-- Users have access to a stable internet connection to interact with the platform.
-- Candidates possess resumes in supported formats (`.pdf` or `.docx`) for upload and processing.
-- Recruiters provide accurate job information and valid business verification documents.
-- Users access the platform through modern web browsers such as Google Chrome, Microsoft Edge, Mozilla Firefox, or Safari.
-- AI-generated recommendations and scoring results are used as decision-support tools rather than fully automated hiring decisions.
-- System administrators actively review recruiter registrations and job postings to maintain platform quality, security, and compliance.
+The current release does not include:
 
-### Dependencies
+* Fully automated candidate rejection or hiring decisions.
+* AI-generated job descriptions.
+* AI-based CV rewriting or qualification enhancement.
+* Payroll, employee onboarding, or complete human-resource management.
+* External calendar synchronization.
+* Semantic AI job recommendations.
 
-#### AI Service Dependency
-- The platform depends on AI API to provide semantic CV scoring and human-readable score explanations. 
-- AI-powered features may become unavailable or limited if these services experience downtime or API restrictions.
+Job recommendations are based on structured information such as skills, preferences, tags, job type, and location. Recruitment analytics and data export may be deferred if the required core workflow has not reached sufficient stability.
 
-#### Email Service Dependency
-- Password recovery, application status updates, interview invitations, offer letters, and other notifications require a reliable email delivery service.
-- Service interruptions may delay communication between recruiters and candidates.
+## 4.4. Assumptions and Dependencies
 
-#### Authentication Dependency
-- The platform relies on JSON Web Token (JWT) technology to provide secure authentication, session management, and role-based access control.
-- Security mechanisms must remain operational to prevent unauthorized access.
+The product is based on the following high-level assumptions:
 
-#### Database Dependency
-- SmartHire requires a relational database management system such as PostgreSQL or MySQL to store user accounts, job postings, applications, recruiter verification records, and system logs.
-- Database failures may affect system availability and data integrity.
+* Users have access to an internet-connected device and a modern web browser.
+* Candidates provide accurate profile information and upload CVs in supported formats.
+* Recruiters provide legitimate company documents and accurate job-posting information.
+* Administrators perform verification and moderation activities within a reasonable operational period.
+* AI-generated results are treated as advisory information rather than final recruitment decisions.
 
-#### Hosting and Infrastructure Dependency
-- The application requires cloud or server infrastructure capable of hosting the frontend, backend services, database, and AI integrations.
-- Continuous availability depends on server uptime, network connectivity, and infrastructure maintenance.
+The product depends on:
 
-#### Legal and Regulatory Dependency
-- SmartHire must comply with applicable Vietnamese personal-data protection requirements, including Law No. 91/2025/QH15 and supporting requirements under Decree No. 13/2023/ND-CP where applicable.
-- Future regulatory changes may require modifications to data storage, privacy policies, and user consent mechanisms.
+* An email-delivery service for verification, password recovery, and recruitment notifications.
+* An AI service for semantic candidate-job analysis and score explanations.
+* Secure document storage for CVs and company-verification files.
+* Reliable application hosting and persistent data storage.
+* Applicable Vietnamese personal-data protection requirements.
 
-These assumptions and dependencies form the foundation upon which SmartHire's functionality, security, scalability, and user experience are built.
+External-service interruptions may temporarily affect related features. However, failure of email delivery or AI processing should not corrupt recruitment data or block unrelated platform operations.
 
 # 5. Product Features
 
