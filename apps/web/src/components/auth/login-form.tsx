@@ -8,9 +8,73 @@ import {
 } from "@/features/identity/schemas/login";
 import { PasswordField } from "./password-field";
 import { FormFeedback } from "./form-feedback";
+import { useReplayableStatus } from "./use-status";
+
+// Must stay in sync with `rateLimitPolicies.login` in policies.ts (5 minutes).
+const LOGIN_LOCKOUT_WINDOW_MS = 5 * 60 * 1000;
+
+type LoginAttemptState = {
+  count: number;
+  lockedUntil?: number;
+};
+
+function getStorageKey(email: string) {
+  return `${LOGIN_FAILURE_STORAGE_KEY_PREFIX}${email.trim().toLowerCase()}`;
+}
+
+function readAttemptState(email: string) {
+  if (typeof window === "undefined") return { count: 0 } as LoginAttemptState;
+  const stored = window.localStorage.getItem(getStorageKey(email));
+  if (!stored) return { count: 0 } as LoginAttemptState;
+  try {
+    const parsed = JSON.parse(stored) as LoginAttemptState;
+    if (parsed.lockedUntil && parsed.lockedUntil > Date.now()) return parsed;
+    if (parsed.lockedUntil && parsed.lockedUntil <= Date.now()) {
+      window.localStorage.removeItem(getStorageKey(email));
+      return { count: 0 };
+    }
+    return { count: parsed.count ?? 0 };
+  } catch {
+    window.localStorage.removeItem(getStorageKey(email));
+    return { count: 0 } as LoginAttemptState;
+  }
+}
+
+function writeAttemptState(email: string, count: number, lockedUntil?: number) {
+  if (typeof window === "undefined") return;
+  const key = getStorageKey(email);
+  if (count <= 0) {
+    window.localStorage.removeItem(key);
+    return;
+  }
+  window.localStorage.setItem(key, JSON.stringify({ count, lockedUntil }));
+}
+
+function getLoginLockedMessage(lockedUntil: number) {
+  const minutes = Math.max(1, Math.ceil((lockedUntil - Date.now()) / 60000));
+  return `Your account has been temporarily locked after too many failed sign-in attempts. Please try again in ${minutes} minute${minutes === 1 ? "" : "s"}.`;
+}
+
+const MAX_FAILED_LOGIN_ATTEMPTS = 5;
+const LOGIN_FAILURE_STORAGE_KEY_PREFIX = "smarthire-login-failed-attempts:";
+const LOCKED_LOGIN_MESSAGE =
+  "Your account has been temporarily locked after too many failed sign-in attempts. Please try again later.";
+
+function getAccountStorageKey(email: string) {
+  return `${LOGIN_FAILURE_STORAGE_KEY_PREFIX}${email.trim().toLowerCase()}`;
+}
+
+function getStoredFailedLoginAttempts(email: string) {
+  if (typeof window === "undefined") return 0;
+  const stored = window.localStorage.getItem(getAccountStorageKey(email));
+  if (!stored) return 0;
+  const parsed = Number.parseInt(stored, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
 
 export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
-  const [status, setStatus] = useState("");
+  const { status, setStatus } = useReplayableStatus("");
+  const [isLocked, setIsLocked] = useState(false);
   const {
     register,
     handleSubmit,
@@ -21,24 +85,52 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
     defaultValues: { email: "", password: "", returnTo },
   });
   const submit = handleSubmit(async (values) => {
+    const state = readAttemptState(values.email);
+    if (state.lockedUntil && state.lockedUntil > Date.now()) {
+      setIsLocked(true);
+      setStatus(getLoginLockedMessage(state.lockedUntil));
+      return;
+    }
+
     setStatus("");
     const response = await fetch("/api/identity/login", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(values),
     });
-    const body = (await response.json()) as {
-      message: string;
+    const body = (await response.json().catch(() => null)) as {
+      message?: string;
       requiresTwoFactor?: boolean;
       fields?: Record<string, string[]>;
-    };
+    } | null;
+    const message = body?.message ?? "Something went wrong. Please try again.";
     if (!response.ok) {
-      for (const [field, messages] of Object.entries(body.fields ?? {}))
+      for (const [field, messages] of Object.entries(body?.fields ?? {}))
         setError(field as keyof LoginInput, { message: messages[0] });
-      setStatus(body.message);
+
+      const nextFailures = state.count + 1;
+      const remaining = MAX_FAILED_LOGIN_ATTEMPTS - nextFailures;
+      const lockedUntil =
+        nextFailures >= MAX_FAILED_LOGIN_ATTEMPTS
+          ? Date.now() + LOGIN_LOCKOUT_WINDOW_MS
+          : undefined;
+      writeAttemptState(values.email, nextFailures, lockedUntil);
+
+      if (lockedUntil) {
+        setIsLocked(true);
+        setStatus(getLoginLockedMessage(lockedUntil));
+        return;
+      }
+
+      setStatus(
+        `${message} (${remaining} attempt${remaining === 1 ? "" : "s"} remaining)`,
+      );
       return;
     }
-    if (body.requiresTwoFactor) {
+
+    writeAttemptState(values.email, 0);
+    setIsLocked(false);
+    if (body?.requiresTwoFactor) {
       window.location.assign("/two-factor");
       return;
     }

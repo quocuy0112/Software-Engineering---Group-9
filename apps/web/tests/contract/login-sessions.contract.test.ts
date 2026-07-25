@@ -39,6 +39,9 @@ describe("login and session HTTP contract", () => {
     expect(openapi).toContain("name: __Host-smarthire.session");
     expect(openapi).toContain("SessionListOutcome:");
     expect(openapi).toContain("/api/identity/sessions/{sessionReference}:");
+    expect(openapi).toContain("LoginCredentialFailure:");
+    expect(openapi).toContain("No account was found for this email.");
+    expect(openapi).toContain("The password is incorrect.");
     expect(openapi).not.toMatch(/sessionToken:/);
   });
 });

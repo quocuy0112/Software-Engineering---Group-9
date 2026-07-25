@@ -22,6 +22,13 @@ describe("full account recovery contract", () => {
     expect(contract).toContain("proofs arrive only in URL fragments");
     expect(contract).toContain("Proofs are never returned by the API.");
     expect(contract).toContain("RecoveryHoldActive");
-    expect(contract).not.toContain("completionProof, cancellationProof, lowerAssuranceNotice");
+    expect(contract).toContain("AccountRecoveryInstructionsQueued:");
+    expect(contract).toContain("EligibleRecoveryAccountNotFound:");
+    expect(contract).toContain(
+      "'404': {$ref: '#/components/responses/EligibleRecoveryAccountNotFound'}",
+    );
+    expect(contract).not.toContain(
+      "completionProof, cancellationProof, lowerAssuranceNotice",
+    );
   });
 });

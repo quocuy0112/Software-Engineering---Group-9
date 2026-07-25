@@ -2,6 +2,71 @@
 import { useEffect, useState } from "react";
 import { AuthStatus } from "./auth-status";
 import { PasswordField } from "./password-field";
+import { useReplayableStatus } from "./use-status";
+
+const MAX_TWO_FACTOR_MANAGEMENT_ATTEMPTS = 5;
+const TWO_FACTOR_MANAGEMENT_ATTEMPTS_WINDOW_SECONDS = 10 * 60;
+const TWO_FACTOR_MANAGEMENT_STORAGE_KEY_PREFIX =
+  "smarthire-two-factor-management-attempts:";
+
+type AttemptState = {
+  count: number;
+  lockedUntil?: number;
+};
+
+// The attempt counter must be scoped to the signed-in account, otherwise one
+// account's failed attempts lock out every other account that shares the
+// browser. We key on the session's CSRF proof (unique per authenticated
+// session) rather than a single shared constant. Until the proof has loaded
+// we don't have a safe key to read/write yet, so treat state as untracked.
+function getStorageKey(sessionProof: string) {
+  return `${TWO_FACTOR_MANAGEMENT_STORAGE_KEY_PREFIX}${sessionProof}`;
+}
+
+function readAttemptState(sessionProof: string) {
+  if (typeof window === "undefined" || !sessionProof)
+    return { count: 0 } as AttemptState;
+  const storageKey = getStorageKey(sessionProof);
+  const stored = window.localStorage.getItem(storageKey);
+  if (!stored) return { count: 0 } as AttemptState;
+
+  try {
+    const parsed = JSON.parse(stored) as AttemptState;
+    if (parsed.lockedUntil && parsed.lockedUntil > Date.now()) {
+      return parsed;
+    }
+    if (parsed.lockedUntil && parsed.lockedUntil <= Date.now()) {
+      window.localStorage.removeItem(storageKey);
+    }
+    return { count: parsed.count ?? 0 } as AttemptState;
+  } catch {
+    window.localStorage.removeItem(storageKey);
+    return { count: 0 } as AttemptState;
+  }
+}
+
+function writeAttemptState(
+  sessionProof: string,
+  nextCount: number,
+  lockedUntil?: number,
+) {
+  if (typeof window === "undefined" || !sessionProof) return;
+  const storageKey = getStorageKey(sessionProof);
+  if (nextCount <= 0) {
+    window.localStorage.removeItem(storageKey);
+    return;
+  }
+  window.localStorage.setItem(
+    storageKey,
+    JSON.stringify({ count: nextCount, lockedUntil }),
+  );
+}
+
+function getLockedMessage(lockedUntil: number) {
+  const minutes = Math.max(1, Math.ceil((lockedUntil - Date.now()) / 60000));
+  return `Too many failed attempts. This verification flow is temporarily locked. Please try again in ${minutes} minute${minutes === 1 ? "" : "s"}.`;
+}
+
 export function TwoFactorManagement({
   onDisabled,
 }: {
@@ -11,12 +76,23 @@ export function TwoFactorManagement({
     [password, setPassword] = useState(""),
     [code, setCode] = useState(""),
     [codes, setCodes] = useState<string[]>([]),
-    [status, setStatus] = useState(""),
-    [busy, setBusy] = useState(false);
+    { status, setStatus } = useReplayableStatus(""),
+    [tone, setTone] = useState<"error" | "success">("success"),
+    [busy, setBusy] = useState(false),
+    [isLocked, setIsLocked] = useState(false);
   useEffect(() => {
     fetch("/api/identity/sessions", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((v) => setProof(v?.csrfProof ?? ""));
+      .then((v) => {
+        const sessionProof = v?.csrfProof ?? "";
+        setProof(sessionProof);
+        const state = readAttemptState(sessionProof);
+        if (state.lockedUntil && state.lockedUntil > Date.now()) {
+          setIsLocked(true);
+          setTone("error");
+          setStatus(getLockedMessage(state.lockedUntil));
+        }
+      });
     return () => {
       setCodes([]);
       setPassword("");
@@ -31,6 +107,15 @@ export function TwoFactorManagement({
   }, [codes]);
   async function submit(path: string) {
     if (busy) return;
+
+    const state = readAttemptState(proof);
+    if (state.lockedUntil && state.lockedUntil > Date.now()) {
+      setIsLocked(true);
+      setTone("error");
+      setStatus(getLockedMessage(state.lockedUntil));
+      return;
+    }
+
     setBusy(true);
     setStatus("");
     try {
@@ -41,9 +126,29 @@ export function TwoFactorManagement({
       });
       const b = await r.json().catch(() => ({}));
       if (!r.ok) {
-        setStatus("Verification could not be completed.");
+        const nextAttempts = (state.count ?? 0) + 1;
+        const remainingAttempts = MAX_TWO_FACTOR_MANAGEMENT_ATTEMPTS - nextAttempts;
+        const lockedUntil =
+          nextAttempts >= MAX_TWO_FACTOR_MANAGEMENT_ATTEMPTS
+            ? Date.now() + TWO_FACTOR_MANAGEMENT_ATTEMPTS_WINDOW_SECONDS * 1000
+            : undefined;
+
+        writeAttemptState(proof, nextAttempts, lockedUntil);
+        setTone("error");
+        if (lockedUntil) {
+          setIsLocked(true);
+          setStatus(getLockedMessage(lockedUntil));
+        } else {
+          setIsLocked(false);
+          setStatus(
+            `That verification code is invalid. (${remainingAttempts} attempt${remainingAttempts === 1 ? "" : "s"} remaining)`,
+          );
+        }
         return;
       }
+      writeAttemptState(proof, 0);
+      setIsLocked(false);
+      setTone("success");
       if (path.includes("regenerate")) {
         setCodes(b.backupCodes ?? []);
         setStatus("New backup codes generated. Older codes no longer work.");
@@ -140,10 +245,7 @@ export function TwoFactorManagement({
           </button>
         </div>
       ) : null}
-      <AuthStatus
-        status={status}
-        tone={status.includes("could not") ? "error" : "success"}
-      />
+      <AuthStatus status={status} tone={tone} />
     </section>
   );
 }

@@ -47,6 +47,9 @@ npm-debug.log*
 *.p12
 *.pfx
 
+#Config docker
+compose.yaml
+
 # IDE and OS
 .vscode/*
 !.vscode/extensions.json
@@ -55,3 +58,4 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 node_modules
+
