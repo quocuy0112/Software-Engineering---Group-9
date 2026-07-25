@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+import { useReplayableStatus } from "./use-status";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -10,6 +11,67 @@ import {
 } from "@/features/identity/schemas/two-factor";
 import { PasswordField } from "./password-field";
 import { FormFeedback } from "./form-feedback";
+
+// Must stay in sync with `rateLimitPolicies.totpEnrollment` in policies.ts.
+const MAX_TOTP_ATTEMPTS = 5;
+const TOTP_ATTEMPTS_WINDOW_SECONDS = 10 * 60;
+const TOTP_ATTEMPTS_STORAGE_KEY_PREFIX = "smarthire-totp-attempts:";
+
+type AttemptState = {
+  count: number;
+  lockedUntil?: number;
+};
+
+// The counter must be scoped to the signed-in account (via the session's
+// CSRF proof), never to the password/code the person just typed — keying on
+// the typed value meant a fresh wrong guess always reset the counter to a
+// "new account", so lockouts either never triggered for a real attacker or,
+// worse, got attributed to whatever text happened to be typed rather than
+// to the account attempting enrollment.
+function getStorageKey(sessionProof: string) {
+  return `${TOTP_ATTEMPTS_STORAGE_KEY_PREFIX}${sessionProof}`;
+}
+
+function readAttemptState(sessionProof: string) {
+  if (typeof window === "undefined" || !sessionProof)
+    return { count: 0 } as AttemptState;
+  const storageKey = getStorageKey(sessionProof);
+  const stored = window.localStorage.getItem(storageKey);
+  if (!stored) return { count: 0 } as AttemptState;
+  try {
+    const parsed = JSON.parse(stored) as AttemptState;
+    if (parsed.lockedUntil && parsed.lockedUntil > Date.now()) return parsed;
+    if (parsed.lockedUntil && parsed.lockedUntil <= Date.now()) {
+      window.localStorage.removeItem(storageKey);
+    }
+    return { count: parsed.count ?? 0 } as AttemptState;
+  } catch {
+    window.localStorage.removeItem(storageKey);
+    return { count: 0 } as AttemptState;
+  }
+}
+
+function writeAttemptState(
+  sessionProof: string,
+  nextCount: number,
+  lockedUntil?: number,
+) {
+  if (typeof window === "undefined" || !sessionProof) return;
+  const storageKey = getStorageKey(sessionProof);
+  if (nextCount <= 0) {
+    window.localStorage.removeItem(storageKey);
+    return;
+  }
+  window.localStorage.setItem(
+    storageKey,
+    JSON.stringify({ count: nextCount, lockedUntil }),
+  );
+}
+
+function getLockedMessage(lockedUntil: number) {
+  const minutes = Math.max(1, Math.ceil((lockedUntil - Date.now()) / 60000));
+  return `Too many failed attempts. Please wait ${minutes} minute${minutes === 1 ? "" : "s"} before trying again.`;
+}
 
 type Setup = {
   qrCodeDataUrl: string;
@@ -36,7 +98,8 @@ export function TotpEnrollment({
   const [stage, setStage] = useState<Stage>("password");
   const [setup, setSetup] = useState<Setup | null>(null);
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
-  const [status, setStatus] = useState("");
+  const { status, setStatus } = useReplayableStatus("");
+  const [isLocked, setIsLocked] = useState(false);
 
   const clearSensitive = useCallback(() => {
     setSetup(null);
@@ -55,6 +118,11 @@ export function TotpEnrollment({
           if (!response.ok) return;
           const body = (await response.json()) as { csrfProof: string };
           setProof(body.csrfProof);
+          const state = readAttemptState(body.csrfProof);
+          if (state.lockedUntil && state.lockedUntil > Date.now()) {
+            setIsLocked(true);
+            setStatus(getLockedMessage(state.lockedUntil));
+          }
         } catch {
           // Navigation can abort this background request during route changes.
           return;
@@ -91,6 +159,12 @@ export function TotpEnrollment({
   });
 
   const startEnrollment = passwordForm.handleSubmit(async (values) => {
+    const state = readAttemptState(proof);
+    if (state.lockedUntil && state.lockedUntil > Date.now()) {
+      setIsLocked(true);
+      setStatus(getLockedMessage(state.lockedUntil));
+      return;
+    }
     setStatus("");
     const response = await fetch("/api/identity/two-factor/enrollment", {
       method: "POST",
@@ -99,19 +173,38 @@ export function TotpEnrollment({
     });
     passwordForm.reset({ currentPassword: "" });
     if (!response.ok) {
-      setStatus(
-        response.status === 429
-          ? "Too many attempts. Please wait and try again."
-          : "Please confirm your current password to continue.",
-      );
+      const nextAttempts = (state.count ?? 0) + 1;
+      const remaining = MAX_TOTP_ATTEMPTS - nextAttempts;
+      const lockedUntil =
+        nextAttempts >= MAX_TOTP_ATTEMPTS
+          ? Date.now() + TOTP_ATTEMPTS_WINDOW_SECONDS * 1000
+          : undefined;
+      writeAttemptState(proof, nextAttempts, lockedUntil);
+      if (lockedUntil) {
+        setIsLocked(true);
+        setStatus(getLockedMessage(lockedUntil));
+      } else {
+        setIsLocked(false);
+        setStatus(
+          `Please confirm your current password to continue. (${remaining} attempt${remaining === 1 ? "" : "s"} remaining)`,
+        );
+      }
       return;
     }
+    writeAttemptState(proof, 0);
+    setIsLocked(false);
     const body = (await response.json()) as Setup;
     setSetup(body);
     setStage("verify");
   });
 
   const verifyCode = codeForm.handleSubmit(async (values) => {
+    const state = readAttemptState(proof);
+    if (state.lockedUntil && state.lockedUntil > Date.now()) {
+      setIsLocked(true);
+      setStatus(getLockedMessage(state.lockedUntil));
+      return;
+    }
     setStatus("");
     const response = await fetch("/api/identity/two-factor/enrollment/verify", {
       method: "POST",
@@ -120,13 +213,26 @@ export function TotpEnrollment({
     });
     codeForm.reset({ code: "" });
     if (!response.ok) {
-      setStatus(
-        response.status === 429
-          ? "Too many attempts. Please wait and try again."
-          : "That code could not be verified. Try again.",
-      );
+      const nextAttempts = (state.count ?? 0) + 1;
+      const remaining = MAX_TOTP_ATTEMPTS - nextAttempts;
+      const lockedUntil =
+        nextAttempts >= MAX_TOTP_ATTEMPTS
+          ? Date.now() + TOTP_ATTEMPTS_WINDOW_SECONDS * 1000
+          : undefined;
+      writeAttemptState(proof, nextAttempts, lockedUntil);
+      if (lockedUntil) {
+        setIsLocked(true);
+        setStatus(getLockedMessage(lockedUntil));
+      } else {
+        setIsLocked(false);
+        setStatus(
+          `That code could not be verified. Try again. (${remaining} attempt${remaining === 1 ? "" : "s"} remaining)`,
+        );
+      }
       return;
     }
+    writeAttemptState(proof, 0);
+    setIsLocked(false);
     const body = (await response.json()) as { backupCodes: string[] };
     setSetup(null);
     setBackupCodes(body.backupCodes);

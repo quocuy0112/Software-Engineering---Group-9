@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import {
-  ACCOUNT_RECOVERY_GENERIC_RESPONSE,
-} from "@/features/identity/schemas/password-recovery";
+import { ACCOUNT_RECOVERY_REQUEST_FAILED_ERROR } from "@/features/identity/schemas/password-recovery";
 import { AuthStatus } from "./auth-status";
 
 export function AccountRecoveryRequestForm() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
+  const [statusTone, setStatusTone] = useState<"error" | "success">("error");
   const [busy, setBusy] = useState(false);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -26,9 +25,11 @@ export function AccountRecoveryRequestForm() {
       const result = (await response.json().catch(() => null)) as {
         message?: string;
       } | null;
-      setStatus(result?.message ?? ACCOUNT_RECOVERY_GENERIC_RESPONSE);
+      setStatusTone(response.ok ? "success" : "error");
+      setStatus(result?.message ?? ACCOUNT_RECOVERY_REQUEST_FAILED_ERROR);
     } catch {
-      setStatus(ACCOUNT_RECOVERY_GENERIC_RESPONSE);
+      setStatusTone("error");
+      setStatus(ACCOUNT_RECOVERY_REQUEST_FAILED_ERROR);
     } finally {
       setBusy(false);
     }
@@ -57,7 +58,11 @@ export function AccountRecoveryRequestForm() {
         <button type="submit" disabled={busy || !email.trim()}>
           {busy ? "Sending…" : "Send recovery instructions"}
         </button>
-        <AuthStatus status={status} />
+        <AuthStatus
+          id="account-recovery-status"
+          status={status}
+          tone={statusTone}
+        />
         <p>
           Email-only recovery is lower assurance than using your password and
           second factor.

@@ -58,8 +58,10 @@ fail-closed outcomes. No cross-provider database transaction is claimed.
 
 ## FullAccountRecovery
 
-The separate full-recovery boundary accepts an enumeration-safe request and,
-for an eligible account only, sends a verified-email confirmation proof. The
+The separate full-recovery boundary accepts an eligibility-aware request:
+malformed email input returns validation failure, an unknown or ineligible
+account returns a not-eligible failure, and only an eligible account returns
+success and receives a verified-email confirmation proof. The
 proof, completion proof, and one-time cancellation proof are HMAC-digested and
 single-use. Consuming confirmation creates one durable
 `FullAccountRecoveryOperation`, revokes sessions/challenges, begins a

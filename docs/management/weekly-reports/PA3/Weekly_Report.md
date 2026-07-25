@@ -27,7 +27,6 @@
     - Translate the 12 product feature groups into English.
     - Complete constitution.md.
 * **To-do Tasks:** 
-    - Update the Vision Document.
     - Complete Diagram 1 & 2 for full operation.
     - Consolidate final outputs and ensure data consistency.
     - Write the AI Usage Report following the required format.
@@ -36,6 +35,7 @@
 
 ### Nguyễn Quốc Thành
 * **Completed tasks:** 
+    - Update the Vision Document.
     - Review, comment, and provide feedback on the features that the group has chosen.
     - Write the AI Usage Report following the given format.
     - Draw a Mermaid diagram describing an important flow.

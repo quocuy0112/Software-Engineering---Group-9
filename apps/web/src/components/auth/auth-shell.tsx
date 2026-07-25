@@ -1,4 +1,5 @@
 import { AuthMotion } from "./auth-motion";
+import AuthFooter from "./AuthFooter";
 import Link from "next/link";
 
 export function AuthShell({ children }: { children: React.ReactNode }) {
@@ -64,12 +65,12 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
               <Link href="/register">Create account</Link>
               <Link href="/forgot-password">Forgot password</Link>
             </nav>
+
             <AuthMotion>{children}</AuthMotion>
-            <footer className="auth-footer">
-              <span>Need a hand?</span>
-              <Link href="/login">Return to sign in</Link>
-            </footer>
+
+            <AuthFooter />
           </section>
+
           <p className="auth-panel-note">
             SmartHire keeps account access simple, transparent, and secure.
           </p>

@@ -18,6 +18,9 @@ import {
 } from "@/server/auth/identity/pre-auth-cookie";
 import { SessionService } from "./session-service";
 import { noStoreHeaders } from "@/lib/security/response-headers";
+export const ACCOUNT_NOT_FOUND_LOGIN_ERROR =
+  "No account was found for this email.";
+export const INCORRECT_PASSWORD_LOGIN_ERROR = "The password is incorrect.";
 export const GENERIC_LOGIN_ERROR = "Email or password is incorrect.";
 const cookieValue = (line: string) =>
   line.slice(line.indexOf("=") + 1, line.indexOf(";"));
@@ -63,8 +66,35 @@ export class LoginWithPasswordService {
       );
     }
     const account = await this.sessions.accountByEmail(data.email);
+    if (!account) {
+      await this.record(
+        "login.failed",
+        "FAILURE",
+        cid,
+        now,
+        undefined,
+        "account_not_found",
+      );
+      return Response.json(
+        { message: ACCOUNT_NOT_FOUND_LOGIN_ERROR },
+        { status: 401, headers: noStoreHeaders },
+      );
+    }
+    if (account.state !== "ACTIVE") {
+      await this.record(
+        "login.failed",
+        "FAILURE",
+        cid,
+        now,
+        account.id,
+        "account_inactive",
+      );
+      return Response.json(
+        { message: GENERIC_LOGIN_ERROR },
+        { status: 401, headers: noStoreHeaders },
+      );
+    }
     if (
-      account &&
       ((await this.resetOperations
         .hasIncompleteForUser(account.id)
         .catch(() => true)) ||
@@ -88,6 +118,20 @@ export class LoginWithPasswordService {
     const upstream = await this.gateway
       .signIn(data.email, data.password, request.headers)
       .catch(() => null);
+    if (upstream && !upstream.ok) {
+      await this.record(
+        "login.failed",
+        "FAILURE",
+        cid,
+        now,
+        account.id,
+        "incorrect_password",
+      );
+      return Response.json(
+        { message: INCORRECT_PASSWORD_LOGIN_ERROR },
+        { status: 401, headers: noStoreHeaders },
+      );
+    }
     const cookies = upstream?.headers.getSetCookie() ?? [],
       session = cookies.find((v) =>
         /^(smarthire\.session|__Host-smarthire\.session)=/.test(v),
@@ -95,12 +139,8 @@ export class LoginWithPasswordService {
       provisional = cookies.find((v) =>
         /^(smarthire\.pre-auth|__Secure-smarthire\.pre-auth)=/.test(v),
       );
-    if (
-      !upstream?.ok ||
-      account?.state !== "ACTIVE" ||
-      (!session && !provisional)
-    ) {
-      await this.record("login.failed", "FAILURE", cid, now, account?.id);
+    if (!upstream || (!session && !provisional)) {
+      await this.record("login.failed", "FAILURE", cid, now, account.id);
       return Response.json(
         { message: GENERIC_LOGIN_ERROR },
         { status: 401, headers: noStoreHeaders },
