@@ -153,17 +153,55 @@ npm run test:e2e
 
 ```text
 .
-├── apps/web/
-│   ├── prisma/          # Prisma schema and migrations
-│   ├── src/app/         # Next.js pages, layouts, and API routes
-│   ├── src/components/  # React UI
-│   ├── src/features/    # Schemas and feature-level code
-│   ├── src/server/      # Services, repositories, authentication, and email
-│   └── tests/           # Unit, component, contract, integration, and E2E tests
-├── scripts/             # Setup, validation, and local development scripts
-├── src/specs/           # Spec Kit artifacts
-├── compose.yaml         # Local PostgreSQL
-└── summary.md           # Detailed architecture and code-reading guide
+├── apps/
+│   └── web/                               # Main Next.js workspace
+│       ├── prisma/
+│       │   ├── migrations/                 # Ordered PostgreSQL migrations
+│       │   └── schema.prisma               # Application data model
+│       ├── scripts/                        # Build, performance, and worker scripts
+│       ├── src/
+│       │   ├── app/                        # Next.js App Router
+│       │   │   ├── (auth)/                 # Public identity and recovery pages
+│       │   │   ├── (workspace)/            # Session-protected application pages
+│       │   │   ├── api/
+│       │   │   └── *.tsx / *.css          # Root layout, providers, pages, and styles
+│       │   ├── components/
+│       │   │   ├── auth/                  # Auth, profile, and session UI
+│       │   │   └── ui/                    # Reserved reusable UI primitives
+│       │   ├── features/
+│       │   │   ├── authentication/        # Authentication feature scaffolding
+│       │   │   ├── identity/              # Identity client logic and schemas
+│       │   │   └── shared/stores/         # Non-sensitive shared UI state
+│       │   ├── generated/prisma/          # Generated Prisma client; do not edit
+│       │   ├── lib/                       # Database, environment, security, and utilities
+│       │   ├── server/
+│       │   │   ├── auth/                  # Server-side authentication integration
+│       │   │   ├── email/                 # Email templates, previews, and workers
+│       │   │   ├── repositories/          # Data-access implementations
+│       │   │   └── services/              # Application business logic
+│       │   └── types/                     # Shared application type declarations
+│       ├── tests/
+│       │   ├── architecture/              # Dependency and layer boundaries
+│       │   ├── compatibility/             # Better Auth/library compatibility
+│       │   ├── components/                # React UI and accessibility
+│       │   ├── contract/                  # OpenAPI and public contracts
+│       │   ├── e2e/                       # Playwright browser workflows
+│       │   ├── integration/               # PostgreSQL and multi-layer behavior
+│       │   └── unit/                      # Isolated business logic
+│       ├── .env.example                   # Application environment template
+│       └── *.config.*                     # Framework, database, and test configuration
+├── docs/                                  # Requirements, design, planning, testing, and project reports
+├── scripts/
+│   └── .mjs                               # Local setup, validation, and development scripts
+├── src/
+│   └── specs/
+│       └── 001-identity-authentication-account-recovery/
+│           ├── checklists/                # Requirement verification records
+│           ├── contracts/                 # OpenAPI and internal contracts
+│           └── *.md                       # Speckit cycle definitions
+├── .env.example                           # Docker/PostgreSQL environment template
+├── compose.yaml                           # Local PostgreSQL 16.12
+└── README.md                              # Project entry point
 ```
 
 ## Documentation
