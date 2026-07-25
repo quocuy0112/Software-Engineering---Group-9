@@ -13,6 +13,7 @@ I used Vietnamese to prompt in many Use Case so that I may write in Vietnamese i
 ## Table of contents
 
 1. [Task 7 - Functional "Identity - Authentication - Account Recovery"](#task-7---functional-identity---authentication---account-recovery)
+2. [Task 8 - Modify vision document](#task-8---modify-vision-document)
 
 ## Task 7 - Functional "Identity - Authentication - Account Recovery"
 
