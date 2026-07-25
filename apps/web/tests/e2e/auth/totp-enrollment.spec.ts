@@ -172,8 +172,21 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await expect(page.locator(".backup-codes li")).toHaveCount(10);
   await expect(page.locator("[data-warning]")).toContainText("shown only once");
 
+  // Enabling 2FA rotates the Better Auth session. Sign-out must refresh the
+  // session-bound CSRF proof instead of submitting the stale layout proof.
+  await page
+    .getByRole("button", { name: "I've saved my backup codes" })
+    .click();
+  const postEnrollmentLogout = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/api/identity/logout") &&
+      response.request().method() === "POST",
+  );
+  await page.getByRole("button", { name: "Sign out" }).click();
+  expect((await postEnrollmentLogout).status()).toBe(200);
+  await expect(page).toHaveURL(/\/login/);
+
   // A 2FA account receives only a pre-auth challenge after password login.
-  await page.context().clearCookies();
   await page.goto("/login");
   await page.getByLabel("Email address").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);

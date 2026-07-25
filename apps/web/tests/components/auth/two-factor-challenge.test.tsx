@@ -24,6 +24,9 @@ describe("two-factor challenge", () => {
         new Response(JSON.stringify({ message: "ok" }), { status: 200 }),
       );
     render(<TwoFactorChallenge />);
+    expect(
+      screen.getByRole("group", { name: "Verification method" }),
+    ).toHaveClass("factor-mode-switcher");
     const input = screen.getByLabelText(
       "Authentication code",
     ) as HTMLInputElement;

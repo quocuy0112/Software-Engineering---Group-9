@@ -199,7 +199,7 @@ describe("workflow security throttling route wiring", () => {
         ),
       );
     const recoveryResults = await messages(recoveryResponses);
-    expect(recoveryResults.slice(0, 3).every(({ status }) => status === 202)).toBe(
+    expect(recoveryResults.slice(0, 3).every(({ status }) => status === 404)).toBe(
       true,
     );
     expect(recoveryResults[3]?.status).toBe(429);

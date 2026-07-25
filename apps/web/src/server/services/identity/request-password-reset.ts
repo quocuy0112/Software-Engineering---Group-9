@@ -1,12 +1,15 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
+import {
+  PASSWORD_RECOVERY_ACCOUNT_NOT_FOUND_ERROR,
+  PASSWORD_RECOVERY_RATE_LIMIT_ERROR,
+  PASSWORD_RECOVERY_REQUEST_FAILED_ERROR,
+  PASSWORD_RECOVERY_SUCCESS_RESPONSE,
+} from "@/features/identity/schemas/password-recovery";
 import { rateLimitPolicies, safeRetryMetadata } from "@/lib/rate-limit/policies";
 import { TokenProtector } from "@/lib/security/security-tokens";
 import { PrismaRateLimitRepository } from "@/server/repositories/rate-limit/prisma-rate-limit-repository";
 import { PrismaPasswordResetRepository } from "@/server/repositories/identity/prisma-password-reset-repository";
-
-export const PASSWORD_RESET_GENERIC_RESPONSE =
-  "If the account is eligible, password-reset instructions will be sent.";
 
 export class RequestPasswordResetService {
   constructor(
@@ -26,27 +29,38 @@ export class RequestPasswordResetService {
       return {
         accepted: false as const,
         status: 429 as const,
-        message: PASSWORD_RESET_GENERIC_RESPONSE,
+        message: PASSWORD_RECOVERY_RATE_LIMIT_ERROR,
         retryAfterSeconds,
       };
     }
 
     const rawToken = this.protector.generate();
     try {
-      await this.repository.replaceForActiveUser({
+      const resetRequest = await this.repository.replaceForActiveUser({
         normalizedEmail,
         rawToken,
         protectedToken: this.protector.seal(rawToken),
         correlationId: randomUUID(),
         now,
       });
+      if (!resetRequest) {
+        return {
+          accepted: false as const,
+          status: 404 as const,
+          message: PASSWORD_RECOVERY_ACCOUNT_NOT_FOUND_ERROR,
+        };
+      }
     } catch {
-      // Enumeration-safe: persistence and account-state failures have the same response.
+      return {
+        accepted: false as const,
+        status: 503 as const,
+        message: PASSWORD_RECOVERY_REQUEST_FAILED_ERROR,
+      };
     }
     return {
       accepted: true as const,
       status: 202 as const,
-      message: PASSWORD_RESET_GENERIC_RESPONSE,
+      message: PASSWORD_RECOVERY_SUCCESS_RESPONSE,
     };
   }
 }

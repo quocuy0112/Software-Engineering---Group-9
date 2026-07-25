@@ -18,7 +18,7 @@ async function signIn(page: Page, email: string, password = originalPassword) {
   return response;
 }
 
-test("forgot-password and reset-password surfaces remain generic and safe", async ({
+test("forgot-password distinguishes unknown email and keeps reset tokens safe", async ({
   page,
 }) => {
   test.setTimeout(120000);
@@ -33,9 +33,9 @@ test("forgot-password and reset-password surfaces remain generic and safe", asyn
   );
   await page.getByRole("button", { name: /send reset instructions/i }).click();
   const response = await forgotResponse;
-  expect(response.status()).toBe(202);
-  expect((await response.json()).message).toMatch(/eligible|instructions/i);
-  await expect(page.getByRole("status")).toContainText("eligible");
+  expect(response.status()).toBe(404);
+  expect((await response.json()).message).toMatch(/no active account/i);
+  await expect(page.getByRole("status")).toContainText("No active account");
 
   await page.goto("/reset-password#token=opaque-browser-token");
   await page.getByLabel("New password", { exact: true }).fill(originalPassword);
@@ -117,7 +117,9 @@ test("resets once, revokes all sessions, sends notification, and requires the ne
     await page
       .getByRole("button", { name: /send reset instructions/i })
       .click();
-    await expect(page.getByRole("status")).toContainText("eligible");
+    await expect(page.getByRole("status")).toContainText(
+      "instructions will be sent",
+    );
 
     let resetLink = "";
     await expect

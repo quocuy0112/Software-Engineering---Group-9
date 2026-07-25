@@ -1,15 +1,32 @@
 import { describe, expect, it, vi } from "vitest";
+import {
+  PASSWORD_RECOVERY_ACCOUNT_NOT_FOUND_ERROR,
+  PASSWORD_RECOVERY_SUCCESS_RESPONSE,
+} from "@/features/identity/schemas/password-recovery";
 import { RequestPasswordResetService } from "@/server/services/identity/request-password-reset";
 
 describe("request password reset", () => {
-  it("returns the same safe accepted contract for eligible and unknown accounts", async () => {
-    const repository = { replaceForActiveUser: vi.fn().mockResolvedValue(null) };
+  it("returns success only for an eligible account and account-not-found otherwise", async () => {
+    const repository = {
+      replaceForActiveUser: vi
+        .fn()
+        .mockResolvedValueOnce({ userId: "user-id", tokenId: "token-id" })
+        .mockResolvedValueOnce(null),
+    };
     const limiter = { consume: vi.fn().mockResolvedValue({ allowed: true, retryAfterSeconds: 0 }) };
     const service = new RequestPasswordResetService(repository as never, limiter as never);
     const existing = await service.execute("active@example.test", "browser-a", new Date());
     const unknown = await service.execute("unknown@example.test", "browser-b", new Date());
-    expect(existing).toMatchObject({ accepted: true, status: 202, message: expect.any(String) });
-    expect(unknown).toMatchObject({ accepted: true, status: 202, message: existing.message });
+    expect(existing).toMatchObject({
+      accepted: true,
+      status: 202,
+      message: PASSWORD_RECOVERY_SUCCESS_RESPONSE,
+    });
+    expect(unknown).toMatchObject({
+      accepted: false,
+      status: 404,
+      message: PASSWORD_RECOVERY_ACCOUNT_NOT_FOUND_ERROR,
+    });
     expect(repository.replaceForActiveUser).toHaveBeenCalledTimes(2);
     expect(existing).not.toHaveProperty("token");
     expect(existing).not.toHaveProperty("password");

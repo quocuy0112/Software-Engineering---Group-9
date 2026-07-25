@@ -15,6 +15,7 @@ export function AuthStatus({
   const generatedId = useId();
 
   useEffect(() => {
+<<<<<<< HEAD
     if (!status) return;
     const messages = status
       .split(/\r?\n/)
@@ -37,6 +38,18 @@ export function AuthStatus({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, tone]);
 
+=======
+    const toastId = id ?? "auth-status";
+    if (!status) {
+      toast.dismiss(toastId);
+      return;
+    }
+    const toastOptions = { id: toastId };
+    if (tone === "error") toast.error(status, toastOptions);
+    else if (tone === "success") toast.success(status, toastOptions);
+    else toast(status, toastOptions);
+  }, [id, status, tone]);
+>>>>>>> 2cd4ef0d939f8bf7c58d7bfeed2399ef37d7ffc5
   return (
     <p id={id} role="status" aria-live="polite" data-tone={tone} className="sr-only">
       {status}

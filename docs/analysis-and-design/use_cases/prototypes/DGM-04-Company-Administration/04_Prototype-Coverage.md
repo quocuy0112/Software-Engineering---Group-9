@@ -1,3 +1,6 @@
+**Author:** Nguyễn Minh Khôi<br>
+**Student ID:** 24127066<br>
+**Reviewer:** Nguyễn Gia Quốc Uy
 # Prototype Coverage & Traceability – Diagram 4
 ## Company Management and Platform Administration
 

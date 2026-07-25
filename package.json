@@ -37,5 +37,8 @@
     "db:validate": "npm run db:validate --workspace @smarthire/web",
     "db:migrate": "npm run db:migrate --workspace @smarthire/web",
     "db:studio": "npm run db:studio --workspace @smarthire/web"
+  },
+  "dependencies": {
+    "motion": "^12.42.2"
   }
 }

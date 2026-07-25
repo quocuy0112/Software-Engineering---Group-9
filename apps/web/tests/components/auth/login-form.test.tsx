@@ -1,6 +1,16 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LoginForm } from "@/components/auth/login-form";
+
+const { toast } = vi.hoisted(() => ({
+  toast: {
+    error: vi.fn(),
+    success: vi.fn(),
+    info: vi.fn(),
+  },
+}));
+vi.mock("sonner", () => ({ toast }));
+
 describe("login form", () => {
   beforeEach(() => {
     window.localStorage.clear();
@@ -17,7 +27,7 @@ describe("login form", () => {
       await screen.findByText("Enter a valid email address."),
     ).toBeVisible();
   });
-  it("shows the generic server error and prevents duplicate submission", async () => {
+  it("shows one current server error in the fail toast and prevents duplicate submission", async () => {
     let release!: () => void;
     const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(
       () =>
@@ -25,7 +35,7 @@ describe("login form", () => {
           release = () =>
             resolve(
               Response.json(
-                { message: "Email or password is incorrect." },
+                { message: "The password is incorrect." },
                 { status: 401 },
               ),
             );
@@ -44,9 +54,16 @@ describe("login form", () => {
     release();
     await waitFor(() =>
       expect(screen.getByRole("status")).toHaveTextContent(
+<<<<<<< HEAD
         "Email or password is incorrect. (4 attempts remaining)",
+=======
+        "The password is incorrect.",
+>>>>>>> 2cd4ef0d939f8bf7c58d7bfeed2399ef37d7ffc5
       ),
     );
+    expect(toast.error).toHaveBeenCalledWith("The password is incorrect.", {
+      id: "auth-status",
+    });
     fetchMock.mockRestore();
   });
 

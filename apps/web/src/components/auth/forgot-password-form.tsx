@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { PASSWORD_RECOVERY_GENERIC_RESPONSE } from "@/features/identity/schemas/password-recovery";
+import { PASSWORD_RECOVERY_REQUEST_FAILED_ERROR } from "@/features/identity/schemas/password-recovery";
 import { AuthStatus } from "./auth-status";
 import { useReplayableStatus } from "./use-status";
 
@@ -67,7 +67,12 @@ function getStoredAttemptCount(email: string) {
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
+<<<<<<< HEAD
   const { status, setStatus } = useReplayableStatus("");
+=======
+  const [status, setStatus] = useState("");
+  const [statusTone, setStatusTone] = useState<"error" | "success">("error");
+>>>>>>> 2cd4ef0d939f8bf7c58d7bfeed2399ef37d7ffc5
   const [busy, setBusy] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
 
@@ -93,6 +98,7 @@ export function ForgotPasswordForm() {
       const result = (await response.json().catch(() => null)) as {
         message?: string;
       } | null;
+<<<<<<< HEAD
       const nextAttempts = state.count + 1;
       const remaining = MAX_FORGOT_PASSWORD_ATTEMPTS - nextAttempts;
       const lockedUntil =
@@ -108,8 +114,15 @@ export function ForgotPasswordForm() {
           `${result?.message ?? PASSWORD_RECOVERY_GENERIC_RESPONSE} (${remaining} attempt${remaining === 1 ? "" : "s"} remaining)`,
         );
       }
+=======
+      setStatusTone(response.ok ? "success" : "error");
+      setStatus(
+        result?.message ?? PASSWORD_RECOVERY_REQUEST_FAILED_ERROR,
+      );
+>>>>>>> 2cd4ef0d939f8bf7c58d7bfeed2399ef37d7ffc5
     } catch {
-      setStatus(PASSWORD_RECOVERY_GENERIC_RESPONSE);
+      setStatusTone("error");
+      setStatus(PASSWORD_RECOVERY_REQUEST_FAILED_ERROR);
     } finally {
       setBusy(false);
     }
@@ -143,7 +156,11 @@ export function ForgotPasswordForm() {
         <button type="submit" disabled={busy || email.trim().length === 0}>
           {busy ? "Sending…" : "Send reset instructions"}
         </button>
-        <AuthStatus status={status} />
+        <AuthStatus
+          id="forgot-password-status"
+          status={status}
+          tone={statusTone}
+        />
         <Link href="/account-recovery">
           Lost your password and access to two-factor authentication?
         </Link>

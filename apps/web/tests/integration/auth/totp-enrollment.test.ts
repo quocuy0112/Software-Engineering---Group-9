@@ -11,6 +11,8 @@ import { BetterAuthSessionGateway } from "@/server/auth/identity/better-auth-ses
 import { PrismaRegistrationRepository } from "@/server/repositories/identity/prisma-registration-repository";
 import { POST as startEnrollment } from "@/app/api/identity/two-factor/enrollment/route";
 import { POST as verifyEnrollment } from "@/app/api/identity/two-factor/enrollment/verify/route";
+import { GET as listSessions } from "@/app/api/identity/sessions/route";
+import { POST as logout } from "@/app/api/identity/logout/route";
 
 const password = "Enrollment Passphrase 2026!";
 const createdEmails = new Set<string>();
@@ -168,6 +170,49 @@ describe("TOTP enrollment route handlers (real Better Auth + qrcode)", () => {
     const body = (await verified.json()) as { backupCodes: string[] };
     expect(body.backupCodes).toHaveLength(10);
     expect(new Set(body.backupCodes).size).toBe(10);
+
+    const replacementCookie = verified.headers
+      .getSetCookie()
+      .find((value) => value.startsWith("smarthire.session="))
+      ?.split(";", 1)[0];
+    expect(replacementCookie).toBeTruthy();
+    const rotatedSession = await auth.api.getSession({
+      headers: requestHeaders(replacementCookie as string),
+    });
+    expect(rotatedSession?.session.id).toBeTruthy();
+    expect(rotatedSession?.session.id).not.toBe(sessionId);
+
+    const listed = await listSessions(
+      new Request("http://localhost:3001/api/identity/sessions", {
+        headers: requestHeaders(replacementCookie as string),
+      }),
+    );
+    expect(listed.status).toBe(200);
+    const rotatedProof = ((await listed.json()) as { csrfProof: string })
+      .csrfProof;
+    expect(rotatedProof).toBe(csrfProof(rotatedSession?.session.id as string));
+    expect(rotatedProof).not.toBe(proof);
+
+    const staleLogout = await logout(
+      new Request("http://localhost:3001/api/identity/logout", {
+        method: "POST",
+        headers: requestHeaders(replacementCookie as string, {
+          "x-csrf-token": proof,
+        }),
+      }),
+    );
+    expect(staleLogout.status).toBe(403);
+
+    const refreshedLogout = await logout(
+      new Request("http://localhost:3001/api/identity/logout", {
+        method: "POST",
+        headers: requestHeaders(replacementCookie as string, {
+          "x-csrf-token": rotatedProof,
+        }),
+      }),
+    );
+    expect(refreshedLogout.status).toBe(200);
+
     expect(
       (await prisma.userAccount.findUniqueOrThrow({ where: { id: userId } }))
         .twoFactorEnabled,

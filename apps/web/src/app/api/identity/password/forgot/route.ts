@@ -1,6 +1,6 @@
 import {
   forgotPasswordSchema,
-  PASSWORD_RECOVERY_GENERIC_RESPONSE,
+  PASSWORD_RECOVERY_INVALID_EMAIL_ERROR,
 } from "@/features/identity/schemas/password-recovery";
 import { serverEnvironment } from "@/lib/env/runtime";
 import { validateSameOrigin } from "@/lib/security/csrf";
@@ -19,8 +19,8 @@ export async function POST(request: Request) {
   );
   if (!parsed.success) {
     return Response.json(
-      { message: PASSWORD_RECOVERY_GENERIC_RESPONSE },
-      { status: 202, headers: noStoreHeaders },
+      { message: PASSWORD_RECOVERY_INVALID_EMAIL_ERROR },
+      { status: 400, headers: noStoreHeaders },
     );
   }
   const result = await new RequestPasswordResetService().execute(
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     "anonymous",
   );
   const headers = new Headers(noStoreHeaders);
-  if (!result.accepted) {
+  if ("retryAfterSeconds" in result) {
     headers.set("Retry-After", String(result.retryAfterSeconds));
   }
   return Response.json(
