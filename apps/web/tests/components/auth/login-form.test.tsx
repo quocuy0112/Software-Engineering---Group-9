@@ -54,11 +54,7 @@ describe("login form", () => {
     release();
     await waitFor(() =>
       expect(screen.getByRole("status")).toHaveTextContent(
-<<<<<<< HEAD
         "Email or password is incorrect. (4 attempts remaining)",
-=======
-        "The password is incorrect.",
->>>>>>> 2cd4ef0d939f8bf7c58d7bfeed2399ef37d7ffc5
       ),
     );
     expect(toast.error).toHaveBeenCalledWith("The password is incorrect.", {

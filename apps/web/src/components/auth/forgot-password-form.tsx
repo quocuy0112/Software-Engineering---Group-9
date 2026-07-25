@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { PASSWORD_RECOVERY_REQUEST_FAILED_ERROR } from "@/features/identity/schemas/password-recovery";
+import {
+  PASSWORD_RECOVERY_SUCCESS_RESPONSE,
+  PASSWORD_RECOVERY_REQUEST_FAILED_ERROR,
+} from "@/features/identity/schemas/password-recovery";
 import { AuthStatus } from "./auth-status";
 import { useReplayableStatus } from "./use-status";
 
@@ -50,29 +53,19 @@ function getForgotPasswordLockedMessage(lockedUntil: number) {
 
 const MAX_FORGOT_PASSWORD_ATTEMPTS = 3;
 const FORGOT_PASSWORD_STORAGE_KEY_PREFIX = "smarthire-forgot-password-attempts:";
-const FORGOT_PASSWORD_LOCKED_MESSAGE =
-  "Password-reset requests are temporarily limited. Please wait before trying again.";
 
 function getAccountStorageKey(email: string) {
   return `${FORGOT_PASSWORD_STORAGE_KEY_PREFIX}${email.trim().toLowerCase()}`;
 }
 
-function getStoredAttemptCount(email: string) {
-  if (typeof window === "undefined") return 0;
-  const stored = window.localStorage.getItem(getAccountStorageKey(email));
-  if (!stored) return 0;
-  const parsed = Number.parseInt(stored, 10);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
-}
-
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
-<<<<<<< HEAD
   const { status, setStatus } = useReplayableStatus("");
-=======
-  const [status, setStatus] = useState("");
-  const [statusTone, setStatusTone] = useState<"error" | "success">("error");
->>>>>>> 2cd4ef0d939f8bf7c58d7bfeed2399ef37d7ffc5
+  // AuthStatus needs an explicit tone: "error" for lockouts/network failures,
+  // "message" for the normal (intentionally ambiguous) "check your email" reply.
+  const [statusTone, setStatusTone] = useState<"message" | "error" | "success">(
+    "message",
+  );
   const [busy, setBusy] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
 
@@ -83,6 +76,7 @@ export function ForgotPasswordForm() {
     if (busy || (state.lockedUntil && state.lockedUntil > Date.now())) {
       if (state.lockedUntil && state.lockedUntil > Date.now()) {
         setIsLocked(true);
+        setStatusTone("error");
         setStatus(getForgotPasswordLockedMessage(state.lockedUntil));
       }
       return;
@@ -98,7 +92,6 @@ export function ForgotPasswordForm() {
       const result = (await response.json().catch(() => null)) as {
         message?: string;
       } | null;
-<<<<<<< HEAD
       const nextAttempts = state.count + 1;
       const remaining = MAX_FORGOT_PASSWORD_ATTEMPTS - nextAttempts;
       const lockedUntil =
@@ -108,18 +101,15 @@ export function ForgotPasswordForm() {
       writeForgotPasswordAttemptState(normalizedEmail, nextAttempts, lockedUntil);
       if (lockedUntil) {
         setIsLocked(true);
+        setStatusTone("error");
         setStatus(getForgotPasswordLockedMessage(lockedUntil));
       } else {
+        setIsLocked(false);
+        setStatusTone("message");
         setStatus(
-          `${result?.message ?? PASSWORD_RECOVERY_GENERIC_RESPONSE} (${remaining} attempt${remaining === 1 ? "" : "s"} remaining)`,
+          `${result?.message ?? PASSWORD_RECOVERY_SUCCESS_RESPONSE} (${remaining} attempt${remaining === 1 ? "" : "s"} remaining)`,
         );
       }
-=======
-      setStatusTone(response.ok ? "success" : "error");
-      setStatus(
-        result?.message ?? PASSWORD_RECOVERY_REQUEST_FAILED_ERROR,
-      );
->>>>>>> 2cd4ef0d939f8bf7c58d7bfeed2399ef37d7ffc5
     } catch {
       setStatusTone("error");
       setStatus(PASSWORD_RECOVERY_REQUEST_FAILED_ERROR);

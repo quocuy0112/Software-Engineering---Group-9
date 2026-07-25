@@ -15,13 +15,7 @@ afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
-<<<<<<< HEAD
   window.localStorage.clear();
-=======
-  toast.dismiss.mockClear();
-  toast.error.mockClear();
-  toast.success.mockClear();
->>>>>>> 2cd4ef0d939f8bf7c58d7bfeed2399ef37d7ffc5
 });
 
 describe("forgot password form", () => {
@@ -55,7 +49,6 @@ describe("forgot password form", () => {
     expect(input).toHaveValue("user@example.test");
   });
 
-<<<<<<< HEAD
   it("shows how many reset attempts remain before the limit is reached", async () => {
     vi.stubGlobal(
       "fetch",
@@ -78,32 +71,5 @@ describe("forgot password form", () => {
     await waitFor(() =>
       expect(screen.getByRole("status")).toHaveTextContent("2 attempts remaining"),
     );
-=======
-  it("shows one warning toast when no active account matches the email", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue(
-        Response.json(
-          { message: "No active account was found for this email." },
-          { status: 404 },
-        ),
-      ),
-    );
-    render(<ForgotPasswordForm />);
-    fireEvent.change(screen.getByLabelText("Email address"), {
-      target: { value: "missing@example.test" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /send reset/i }));
-    await waitFor(() =>
-      expect(screen.getByRole("status")).toHaveTextContent(
-        "No active account was found for this email.",
-      ),
-    );
-    expect(toast.error).toHaveBeenCalledWith(
-      "No active account was found for this email.",
-      { id: "forgot-password-status" },
-    );
-    expect(toast.success).not.toHaveBeenCalled();
->>>>>>> 2cd4ef0d939f8bf7c58d7bfeed2399ef37d7ffc5
   });
 });
