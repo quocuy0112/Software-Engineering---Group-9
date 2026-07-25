@@ -458,6 +458,10 @@ The table below summarizes the high-level feature groups of the SmartHire system
 
 ## 5.2. Detailed Feature List
 
+**Modify based on feedback PA2:** Nguyễn Quốc Thành<br>
+**Student ID:** 24127542 <br>
+**Reviewer Name:** Nguyễn Gia Quốc Uy
+
 | No. | Group Feature                                      | Short Description                                                                                                                                              | Business Rationale                                                                                                                        | Primary Beneficiaries                                       | Priority    |
 | --: | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ----------- |
 |   1 | **Authentication, Authorization & Access Control** | Allows users to register and log in securely, supports email verification and password recovery, and enforces platform-level and company-scoped authorization. | Protects personal and recruitment data while preventing unauthorized access and cross-company data exposure.                              | All users                                                   | P0 (Must)   |
