@@ -7,7 +7,7 @@
 **Team members present:**
 * Nguyễn Gia Quốc Uy
 * Nguyễn Quốc Thành
-* Nguyễn Quốc Tuấn
+* Ngô Quốc Tuấn
 * Lưu Chí Hải
 * Nguyễn Minh Khôi
 
@@ -30,7 +30,7 @@
 * **To-do Tasks:** Conduct existing app survey (LinkedIn).
 * **Issues/Obstacles:** None
 
-### Nguyễn Quốc Tuấn
+### Ngô Quốc Tuấn
 * **Completed tasks:** None
 * **To-do Tasks:** Conduct existing app survey (TopCV).
 * **Issues/Obstacles:** None

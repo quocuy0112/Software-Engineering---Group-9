@@ -7,7 +7,7 @@
 **Team members present:**
 * Nguyễn Gia Quốc Uy
 * Nguyễn Quốc Thành
-* Nguyễn Quốc Tuấn
+* Ng Quốc Tuấn
 * Lưu Chí Hải
 * Nguyễn Minh Khôi
 
@@ -37,7 +37,7 @@
 * **Issues/Obstacles:** 
     - None
 
-### Nguyễn Quốc Tuấn
+### Ngô Quốc Tuấn
 * **Completed tasks:** 
     - None
 * **To-do Tasks:** 
@@ -92,7 +92,7 @@
 **Team members present:**
 * Nguyễn Gia Quốc Uy
 * Nguyễn Quốc Thành
-* Nguyễn Quốc Tuấn
+* Ngô Quốc Tuấn
 * Lưu Chí Hải
 * Nguyễn Minh Khôi
 
@@ -124,7 +124,7 @@
 * **Issues/Obstacles:** 
     - None
 
-### Nguyễn Quốc Tuấn
+### Ngô Quốc Tuấn
 * **Completed tasks:** 
     - Conduct existing app survey (TopCV).
 * **To-do Tasks:**
@@ -184,7 +184,7 @@
 **Team members present:**
 * Nguyễn Gia Quốc Uy
 * Nguyễn Quốc Thành
-* Nguyễn Quốc Tuấn
+* Ngô Quốc Tuấn
 * Lưu Chí Hải
 * Nguyễn Minh Khôi
 
@@ -220,7 +220,7 @@
 * **Issues/Obstacles:** 
     - None
 
-### Nguyễn Quốc Tuấn
+### Ngô Quốc Tuấn
 * **Completed tasks:** 
     - Vision Doc (Introduction & Positioning)
     - Learn Spec Kit & Save study log.
