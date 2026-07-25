@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { currentCsrfProof } from "@/features/identity/client/current-csrf-proof";
 import { WorkspaceNavigation } from "./workspace-navigation";
 import { AuthStatus } from "./auth-status";
 
@@ -22,9 +23,10 @@ export function WorkspaceShell({
     setBusy(true);
     setStatus("");
     try {
+      const proof = await currentCsrfProof(csrfProof);
       const response = await fetch("/api/identity/logout", {
         method: "POST",
-        headers: { "x-csrf-token": csrfProof },
+        headers: { "x-csrf-token": proof },
       });
       if (!response.ok) {
         setStatus("Unable to sign out. Please try again.");

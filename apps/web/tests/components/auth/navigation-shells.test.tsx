@@ -137,11 +137,16 @@ describe("identity navigation shells", () => {
       "/profile/sessions",
     );
   });
-  it("prevents duplicate sign-out and announces a generic failure", async () => {
+  it("refreshes a rotated CSRF proof, prevents duplicate sign-out, and announces failure", async () => {
     let release!: () => void;
     const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(
-      () =>
-        new Promise<Response>((resolve) => {
+      (input) => {
+        if (String(input).endsWith("/api/identity/sessions")) {
+          return Promise.resolve(
+            Response.json({ sessions: [], csrfProof: "rotated-proof" }),
+          );
+        }
+        return new Promise<Response>((resolve) => {
           release = () =>
             resolve(
               Response.json(
@@ -149,7 +154,8 @@ describe("identity navigation shells", () => {
                 { status: 403 },
               ),
             );
-        }),
+        });
+      },
     );
     render(
       <WorkspaceShell csrfProof="proof">
@@ -160,7 +166,15 @@ describe("identity navigation shells", () => {
     const signOut = screen.getByRole("button", { name: "Sign out" });
     fireEvent.click(signOut);
     fireEvent.click(signOut);
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      "/api/identity/logout",
+      expect.objectContaining({
+        method: "POST",
+        headers: { "x-csrf-token": "rotated-proof" },
+      }),
+    );
     expect(
       screen.getByRole("button", { name: /Signing out/ }),
     ).toBeDisabled();

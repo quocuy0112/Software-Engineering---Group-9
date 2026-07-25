@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { PASSWORD_RECOVERY_GENERIC_RESPONSE } from "@/features/identity/schemas/password-recovery";
+import { PASSWORD_RECOVERY_REQUEST_FAILED_ERROR } from "@/features/identity/schemas/password-recovery";
 import { AuthStatus } from "./auth-status";
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
+  const [statusTone, setStatusTone] = useState<"error" | "success">("error");
   const [busy, setBusy] = useState(false);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -24,9 +25,13 @@ export function ForgotPasswordForm() {
       const result = (await response.json().catch(() => null)) as {
         message?: string;
       } | null;
-      setStatus(result?.message ?? PASSWORD_RECOVERY_GENERIC_RESPONSE);
+      setStatusTone(response.ok ? "success" : "error");
+      setStatus(
+        result?.message ?? PASSWORD_RECOVERY_REQUEST_FAILED_ERROR,
+      );
     } catch {
-      setStatus(PASSWORD_RECOVERY_GENERIC_RESPONSE);
+      setStatusTone("error");
+      setStatus(PASSWORD_RECOVERY_REQUEST_FAILED_ERROR);
     } finally {
       setBusy(false);
     }
@@ -60,7 +65,11 @@ export function ForgotPasswordForm() {
         <button type="submit" disabled={busy || email.trim().length === 0}>
           {busy ? "Sending…" : "Send reset instructions"}
         </button>
-        <AuthStatus status={status} />
+        <AuthStatus
+          id="forgot-password-status"
+          status={status}
+          tone={statusTone}
+        />
         <Link href="/account-recovery">
           Lost your password and access to two-factor authentication?
         </Link>

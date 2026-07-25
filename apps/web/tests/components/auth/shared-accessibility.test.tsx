@@ -5,6 +5,7 @@ import { FormFeedback } from "@/components/auth/form-feedback";
 
 const { toast } = vi.hoisted(() => ({
   toast: {
+    dismiss: vi.fn(),
     error: vi.fn(),
     success: vi.fn(),
     info: vi.fn(),
@@ -16,7 +17,12 @@ describe("shared accessibility and feedback", () => {
   it("keeps inline live feedback while sending the same safe message to Sonner", async () => {
     render(<AuthStatus status="Verification could not be completed." tone="error" />);
     expect(screen.getByRole("status")).toHaveTextContent("could not be completed");
-    await vi.waitFor(() => expect(toast.error).toHaveBeenCalledWith("Verification could not be completed."));
+    await vi.waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Verification could not be completed.",
+        { id: "auth-status" },
+      ),
+    );
   });
 
   it("preserves labelled error summaries and keyboard focus", () => {

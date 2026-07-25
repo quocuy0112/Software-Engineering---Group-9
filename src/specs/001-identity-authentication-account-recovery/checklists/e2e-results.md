@@ -29,7 +29,8 @@ subject isolated.
 | Desktop Chromium | `playwright test tests/e2e/auth/full-account-recovery.spec.ts --project=desktop-chromium` | PASS: 1/1 |
 | Mobile 320 px | `playwright test tests/e2e/auth/full-account-recovery.spec.ts --project=mobile-320` | PASS: 1/1 |
 
-The focused flow proves generic request handling, verified-email confirmation,
+This historical focused flow proved the then-current generic request handling,
+verified-email confirmation,
 fragment-only proofs, the lower-assurance notice, exact-clock hold advancement,
 login/protected-route blocking, one-time cancellation and replay rejection,
 post-hold completion, old TOTP/backup-code failure, new-password login, no
@@ -38,6 +39,9 @@ horizontal overflow at 320 CSS px. The combined same-stack invocation was not
 used as evidence because its second serialized profile can share the local
 rate-limit subject; the isolated profile runs above are the reproducible
 current results.
+
+These runs predate the eligibility-aware request amendment and are not evidence
+for the current success/error differentiation.
 
 ## Final browser validation (2026-07-24)
 

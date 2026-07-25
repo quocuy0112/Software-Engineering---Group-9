@@ -190,7 +190,7 @@ claiming a cross-provider database transaction.
 Full account recovery is separate from normal password reset and is only for
 loss of the password, TOTP access, and backup codes. Its MVP policy is:
 
-- accept an enumeration-safe request for any email address;
+- distinguish malformed, unknown or ineligible, and eligible request outcomes;
 - send a verified-email confirmation proof only for an eligible account;
 - store only HMAC digests of single-use confirmation, completion, and
   cancellation proofs;

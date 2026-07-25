@@ -7,7 +7,12 @@ import {
 import { TokenProtector } from "@/lib/security/security-tokens";
 import { PrismaAccountRecoveryRepository } from "@/server/repositories/identity/prisma-account-recovery-repository";
 import { PrismaRateLimitRepository } from "@/server/repositories/rate-limit/prisma-rate-limit-repository";
-import { ACCOUNT_RECOVERY_GENERIC_RESPONSE } from "@/features/identity/schemas/password-recovery";
+import {
+  ACCOUNT_RECOVERY_NOT_ELIGIBLE_ERROR,
+  ACCOUNT_RECOVERY_RATE_LIMIT_ERROR,
+  ACCOUNT_RECOVERY_REQUEST_FAILED_ERROR,
+  ACCOUNT_RECOVERY_SUCCESS_RESPONSE,
+} from "@/features/identity/schemas/password-recovery";
 
 export class RequestFullAccountRecoveryService {
   constructor(
@@ -31,28 +36,39 @@ export class RequestFullAccountRecoveryService {
       return {
         accepted: false as const,
         status: 429 as const,
-        message: ACCOUNT_RECOVERY_GENERIC_RESPONSE,
+        message: ACCOUNT_RECOVERY_RATE_LIMIT_ERROR,
         retryAfterSeconds: safeRetryMetadata(decision).retryAfterSeconds,
       };
     }
 
     const rawProof = this.protector.generate();
     try {
-      await this.repository.replaceConfirmationForEligibleUser({
-        normalizedEmail,
-        rawProof,
-        protectedProof: this.protector.seal(rawProof),
-        correlationId: randomUUID(),
-        now,
-      });
+      const recoveryRequest =
+        await this.repository.replaceConfirmationForEligibleUser({
+          normalizedEmail,
+          rawProof,
+          protectedProof: this.protector.seal(rawProof),
+          correlationId: randomUUID(),
+          now,
+        });
+      if (!recoveryRequest) {
+        return {
+          accepted: false as const,
+          status: 404 as const,
+          message: ACCOUNT_RECOVERY_NOT_ELIGIBLE_ERROR,
+        };
+      }
     } catch {
-      // Account existence, verification, 2FA, and persistence state all
-      // converge on the same public response.
+      return {
+        accepted: false as const,
+        status: 503 as const,
+        message: ACCOUNT_RECOVERY_REQUEST_FAILED_ERROR,
+      };
     }
     return {
       accepted: true as const,
       status: 202 as const,
-      message: ACCOUNT_RECOVERY_GENERIC_RESPONSE,
+      message: ACCOUNT_RECOVERY_SUCCESS_RESPONSE,
     };
   }
 }

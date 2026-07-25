@@ -49,7 +49,11 @@ export function TwoFactorChallenge() {
       <form onSubmit={submit} noValidate aria-busy={busy} className="auth-card">
         <h1>Two-factor verification</h1>
         <p>Use your authenticator or one backup code.</p>
-        <div role="group" aria-label="Verification method">
+        <div
+          className="factor-mode-switcher"
+          role="group"
+          aria-label="Verification method"
+        >
           <button
             type="button"
             onClick={() => {
@@ -117,6 +121,14 @@ export function TwoFactorChallenge() {
         }
         .auth-card {
           min-width: 0;
+        }
+        .factor-mode-switcher {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+        .factor-mode-switcher button {
+          flex: 1 1 10rem;
         }
         .field input {
           box-sizing: border-box;
