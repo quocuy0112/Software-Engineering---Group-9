@@ -37,6 +37,121 @@ This file records the material changes made to the revised PA3 documents compare
 | PP-22 | No Revision History was provided. | Added a dated Revision History covering changes to the Project Overview, reviewer assignments, schedule, sprint task lists, deliverables, risks, Vision alignment, task traceability, and acceptance criteria. | Preserve a concise audit trail of the PA3 revision. | Section 7 — Revision History |
 | PP-23 | The PA2 version used mixed bullet structures, broad unnumbered outputs, informal date presentation, and limited cross-references. | Standardized the document in English Markdown using numbered sections, structured tables, consistent date formats, unique IDs for constraints, deliverables, risks, and tasks, and explicit references among deliverables, tasks, Vision decisions, and PA2 feedback. | Improve readability, consistency, reviewability, and submission traceability. | Throughout the Project Plan |
 
-## 2. Vision Document Changes
+## 2. Product Overview Changes
+
+**Modify based on feedback PA2:** Nguyễn Quốc Thành<br>
+**Student ID:** 24127542 <br>
+**Reviewer Name:** Nguyễn Gia Quốc Uy
+
+<i>**Objective:** Revise the Product Overview by removing implementation-specific details and presenting SmartHire at a high level, focusing on its purpose, target users, core capabilities, product scope, and the advisory role of AI in recruitment decisions.</i>
+
+SmartHire is a web-based recruitment platform designed to support Vietnamese small and medium-sized enterprises in managing recruitment activities through a centralized and structured workflow.
+
+The platform connects candidates, recruiters, company representatives, and platform administrators throughout the recruitment lifecycle. Candidates can maintain professional profiles, upload CVs, discover suitable job opportunities, submit applications, and monitor their application progress. Recruiters can manage job postings, review applicants, organize candidates through recruitment stages, and use advisory scoring information to support candidate evaluation. Administrators maintain platform trust through company verification, job-post moderation, account management, and security oversight.
+
+SmartHire aims to reduce the fragmented recruitment processes commonly handled through email, spreadsheets, separate job platforms, and manual communication. By combining job discovery, applicant tracking, recruitment coordination, notifications, and AI-assisted candidate evaluation within one platform, the product helps recruitment teams improve efficiency while providing candidates with a clearer and more transparent application experience.
+
+AI-generated scores and explanations are used only as decision-support information. They do not automatically reject, progress, or hire candidates. Final recruitment decisions remain under the control of authorized recruiters and hiring representatives.
+
+### 2.1. Product Perspective
+
+SmartHire operates as a standalone, responsive recruitment platform that serves three primary user groups:
+
+* **Candidates**, who create professional profiles, manage CVs, search for approved job opportunities, submit applications, and track recruitment progress.
+* **Recruiters and company representatives**, who manage company job postings, review applications, evaluate candidates, and coordinate recruitment pipelines.
+* **Platform administrators**, who verify companies and recruiter access, moderate job postings, manage accounts, and oversee platform security and reliability.
+
+The product provides a shared recruitment environment in which candidate information, job postings, applications, evaluation results, and recruitment-stage updates are managed consistently. Access to company recruitment data is restricted to authorized members of the relevant company.
+
+SmartHire also relies on external services for email delivery and AI-assisted candidate analysis. Temporary failure of an external service should not prevent users from accessing unaffected core recruitment functions.
+
+### 2.2. High-Level Product Capabilities
+
+SmartHire provides the following high-level capabilities:
+
+#### Candidate Experience
+
+Candidates can create and maintain reusable professional profiles, upload supported CV files, search for approved jobs, submit applications, and monitor application statuses from a single account.
+
+#### Recruiter and Company Management
+
+Authorized company members can create and manage job postings, review applicants, compare candidate information, and organize applications through a structured recruitment pipeline.
+
+#### Candidate Evaluation Support
+
+The platform provides deterministic matching and AI-assisted analysis to generate advisory candidate-job compatibility scores and understandable explanations. These results support recruiter review but do not replace human judgment.
+
+#### Communication and Transparency
+
+Email and in-app notifications inform users about important events such as account verification, application submission, recruitment-stage changes, moderation decisions, and system actions.
+
+#### Administration and Platform Trust
+
+Administrators can verify companies and recruiter access, moderate job postings, manage user accounts, investigate violations, and review important audit records.
+
+#### Reporting and Analytics
+
+Recruitment analytics and permitted data-export capabilities are planned as secondary capabilities after the core candidate, recruiter, and administrative workflows are stable.
+
+### 2.3. Product Boundaries
+
+The current SmartHire release focuses on the core recruitment workflow from candidate profile creation and job publication to application review and hiring-stage management.
+
+The current release does not include:
+
+* Fully automated candidate rejection or hiring decisions.
+* AI-generated job descriptions.
+* AI-based CV rewriting or qualification enhancement.
+* Payroll, employee onboarding, or complete human-resource management.
+* External calendar synchronization.
+* Semantic AI job recommendations.
+
+Job recommendations are based on structured information such as skills, preferences, tags, job type, and location. Recruitment analytics and data export may be deferred if the required core workflow has not reached sufficient stability.
+
+### 2.4. Assumptions and Dependencies
+
+The product is based on the following high-level assumptions:
+
+* Users have access to an internet-connected device and a modern web browser.
+* Candidates provide accurate profile information and upload CVs in supported formats.
+* Recruiters provide legitimate company documents and accurate job-posting information.
+* Administrators perform verification and moderation activities within a reasonable operational period.
+* AI-generated results are treated as advisory information rather than final recruitment decisions.
+
+The product depends on:
+
+* An email-delivery service for verification, password recovery, and recruitment notifications.
+* An AI service for semantic candidate-job analysis and score explanations.
+* Secure document storage for CVs and company-verification files.
+* Reliable application hosting and persistent data storage.
+* Applicable Vietnamese personal-data protection requirements.
+
+External-service interruptions may temporarily affect related features. However, failure of email delivery or AI processing should not corrupt recruitment data or block unrelated platform operations.
+
+## 3. Product Features Changes
+
+**Modify based on feedback PA2:** Nguyễn Quốc Thành<br>
+**Student ID:** 24127542 <br>
+**Reviewer Name:** Nguyễn Gia Quốc Uy
+
+<i>**Objective:** Enhance the Feature Descriptions by adding a clear business rationale and identifying the primary beneficiaries for each existing feature, while keeping the original short descriptions and priorities unchanged.
+</i>
+### 3.2. Detailed Feature List
+
+| No. | Group Feature                                      | Short Description                                                                                                                                              | Business Rationale                                                                                                                        | Primary Beneficiaries                                       | Priority    |
+| --: | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ----------- |
+|   1 | **Authentication, Authorization & Access Control** | Allows users to register and log in securely, supports email verification and password recovery, and enforces platform-level and company-scoped authorization. | Protects personal and recruitment data while preventing unauthorized access and cross-company data exposure.                              | All users                                                   | P0 (Must)   |
+|   2 | **Account Setup & Management**                     | Allows users to update non-critical account information, profile images, and preferences. Password changes remain part of P0 authentication security.          | Enables users to maintain accurate account information and communication preferences without requiring administrative support.            | Candidates and recruiters                                   | P1 (Should) |
+|   3 | **Candidate Profile Management**                   | Allows candidates to build a professional profile through a form or CV upload, with a CV parser that standardizes data for applications and scoring.           | Reduces repetitive data entry and provides structured candidate information for more consistent application and evaluation processes.     | Candidates and recruiters                                   | P0 (Must)   |
+|   4 | **Job Board & Advanced Search**                    | Allows candidates to search, filter, view, save, share, report, and apply to approved job postings.                                                            | Helps candidates discover more relevant opportunities and allows companies to receive applications from more suitable candidates.         | Candidates and hiring companies                             | P0 (Must)   |
+|   5 | **Job Posting Management**                         | Allows company-authorized recruiters to create, preview, edit, and manage the lifecycle of job postings.                                                       | Centralizes vacancy management and provides structured job information for searching, matching, and candidate screening.                  | Recruiters and hiring companies                             | P0 (Must)   |
+|   6 | **Application Tracking (Candidate Side)**          | Allows candidates to track saved jobs, submitted applications, scoring progress, and recommended jobs.                                                         | Improves application transparency and reduces uncertainty and manual follow-up for candidates.                                            | Candidates                                                  | P0 (Must)   |
+|   7 | **Candidate Screening & Hybrid Scoring System**    | Combines deterministic skills/experience matching with AI-assisted semantic analysis to score and rank applicants for a job posting.                           | Helps recruiters prioritize applications and apply more consistent initial screening criteria while retaining human decision-making.      | Recruiters and hiring managers                              | P0 (Must)   |
+|   8 | **Recruitment Pipeline Kanban Board**              | Provides a drag-and-drop interface for authorized company members to track and update application stages.                                                      | Replaces fragmented spreadsheet tracking and improves recruitment coordination, visibility, and collaboration.                            | Recruiters and hiring managers                              | P0 (Must)   |
+|   9 | **Automated Notifications & In-App Alerts**        | Sends email and in-app notifications when relevant application or moderation events occur.                                                                     | Reduces repetitive communication work and ensures users receive timely information about important events.                                | Candidates, recruiters, and administrators                  | P0 (Must)   |
+|  10 | **Job Posting Moderation & Quality Assurance**     | Allows administrators to approve or reject job postings and handle spam or violation reports.                                                                  | Reduces fraudulent, misleading, and low-quality job content and improves trust in the platform.                                           | Candidates, administrators, and legitimate hiring companies | P0 (Must)   |
+|  11 | **User Management & Employer Verification**        | Allows administrators to find user accounts, verify company documents, approve memberships, and handle violations.                                             | Prevents fake recruiter accounts, company impersonation, unauthorized company access, and recruitment fraud.                              | Candidates, administrators, and hiring companies            | P0 (Must)   |
+|  12 | **Recruitment Analytics & Data Export**            | Provides dashboards, recruitment statistics, and CSV/Excel exports for authorized users.                                                                       | Helps organizations evaluate recruitment performance, identify pipeline bottlenecks, and make decisions using structured historical data. | Recruiters, company owners, and administrators              | P1 (Should) |
+
 
 <!-- Add the Vision Document change log in this section before the final PA3 submission. -->
