@@ -120,6 +120,49 @@ describe("TOTP enrollment UI", () => {
     expect(String(verifyCall?.[0])).not.toContain("123456");
   });
 
+  it("shows the remaining TOTP verification attempts before the limit is reached", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.endsWith("/api/identity/sessions")) {
+        return Response.json({ csrfProof: "proof-token" });
+      }
+      if (url.endsWith("/api/identity/two-factor/enrollment")) {
+        return Response.json({
+          qrCodeDataUrl: QR_DATA_URL,
+          manualKey: "JBSWY3DPEHPK3PXP",
+          issuer: "SmartHire",
+          accountLabel: "demo@example.test",
+        });
+      }
+      if (url.endsWith("/api/identity/two-factor/enrollment/verify")) {
+        return Response.json(
+          { message: "That code could not be verified. Try again." },
+          { status: 401 },
+        );
+      }
+      throw new Error(`unexpected fetch ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<TotpEnrollment />);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByLabelText("Current password"), {
+      target: { value: "correct horse 2026" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    await screen.findByRole("img", { name: /QR code/i });
+
+    fireEvent.change(screen.getByLabelText("Six-digit code"), {
+      target: { value: "000000" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Verify and enable" }));
+
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent("4 attempts remaining"),
+    );
+  });
+
   it("prevents duplicate submission while the request is in flight", async () => {
     let release!: (value: Response) => void;
     const fetchMock = vi.fn((input: RequestInfo | URL) => {
