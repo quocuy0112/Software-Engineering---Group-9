@@ -1,4 +1,4 @@
-# DGM-01 — Specification of Candidate Job Journey
+# DGM-02 — Specification of Candidate Job Journey
 
 ## Use-Case Specifications
 
