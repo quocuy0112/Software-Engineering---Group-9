@@ -9,6 +9,7 @@ export function TwoFactorChallenge() {
     [factor, setFactor] = useState<"totp" | "backup-code">("totp"),
     [code, setCode] = useState(""),
     [status, setStatus] = useState(""),
+    [tone, setTone] = useState<"error" | "success">("error"),
     [busy, setBusy] = useState(false);
   useEffect(() => {
     input.current?.focus();
@@ -28,13 +29,16 @@ export function TwoFactorChallenge() {
         body: JSON.stringify({ factor, code: sent }),
       });
       if (!r.ok) {
+        setTone("error");
         setStatus(TWO_FACTOR_GENERIC_ERROR);
         input.current?.focus();
         return;
       }
+      setTone("success");
       setStatus("Verification complete.");
       router.replace("/dashboard");
     } catch {
+      setTone("error");
       setStatus(TWO_FACTOR_GENERIC_ERROR);
     } finally {
       setBusy(false);
@@ -100,7 +104,7 @@ export function TwoFactorChallenge() {
         >
           {busy ? "Verifying…" : "Verify"}
         </button>
-        <AuthStatus id="two-factor-status" status={status} tone="error" />
+        <AuthStatus id="two-factor-status" status={status} tone={tone} />
         <a href="/login">Back to sign in</a>
       </form>
       <style jsx>{`
