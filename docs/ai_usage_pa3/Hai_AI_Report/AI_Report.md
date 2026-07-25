@@ -3,9 +3,9 @@
 
 
 **Student Name:** Lưu Chí Hải
-**Student ID:** [Điền MSSV của bạn]
+**Student ID:** 24127030
 **Group:** 09
-**Class:** [Điền lớp của bạn]
+**Class:** 24C11
 **Course/Project:** Software Engineering — SmartHire
 **Reporting period:** 12/07/2026–25/07/2026
 
@@ -13,11 +13,11 @@
 
 ## AI Usage Notes
 
-I used Vietnamese for most prompts because it allowed me to ask detailed follow-up questions and verify my understanding quickly. The PA3 deliverables generated from these discussions were written in English.
+- I used Vietnamese for most prompts because it allowed me to ask detailed follow-up questions and verify my understanding quickly. The PA3 deliverables generated from these discussions were written in English.
 
-The AI was used as a planning, explanation, drafting, review, and prototyping assistant. It was used strictly as a support tool, not as a full replacement for human learning and research. I reviewed the responses against the PA3 assignment, the team's approved SmartHire scope, the repository, and feedback from team members.
+- The AI was used as a planning, explanation, drafting, review, and prototyping assistant. It was used strictly as a support tool, not as a full replacement for human learning and research. I reviewed the responses against the PA3 assignment, the team's approved SmartHire scope, the repository, and feedback from team members.
 
-The ChatGPT conversation contains more prompts than those documented in this report because it was originally shared with me by Nguyễn Quốc Thành, who is responsible for revising the Vision Document, after his ChatGPT session suggested that several Vision-related points should also be reflected in the Project Plan; therefore, this report includes only the important prompts directly related to my Project Plan and Project Plan `Changes.md` work.
+- The ChatGPT conversation contains more prompts than those documented in this report because it was originally shared with me by Nguyễn Quốc Thành, who is responsible for revising the Vision Document, after his ChatGPT session suggested that several Vision-related points should also be reflected in the Project Plan; therefore, this report includes only the important prompts directly related to my Project Plan and Project Plan `Changes.md` work.
 
 ---
 
