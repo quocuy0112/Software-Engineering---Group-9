@@ -39,23 +39,23 @@ describe("two-factor challenge", () => {
     expect(fetch.mock.calls[0][1]?.body as string).toContain("123456");
     expect(input.value).toBe("");
   });
-  it("prevents duplicate submission, exposes busy/live state, and gives generic errors", async () => {
-    let done!: (v: Response) => void;
-    vi.spyOn(globalThis, "fetch").mockReturnValue(
-      new Promise((r) => (done = r)),
+  it("shows a specific invalid-code message and locks after repeated failures", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response("{}", { status: 401 }),
     );
     render(<TwoFactorChallenge />);
     const input = screen.getByLabelText("Authentication code");
-    fireEvent.change(input, { target: { value: "123456" } });
     const form = input.closest("form")!;
-    fireEvent.submit(form);
-    fireEvent.submit(form);
-    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
-    expect(form).toHaveAttribute("aria-busy", "true");
-    done(new Response("{}", { status: 401 }));
-    await screen.findByText(/could not be completed/i);
+
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      fireEvent.change(input, { target: { value: "123456" } });
+      fireEvent.submit(form);
+      await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(attempt + 1));
+    }
+
+    await screen.findByText(/Try again in 10 minutes/i);
+    expect(screen.getByRole("button", { name: "Verify" })).toBeDisabled();
     expect(screen.getByRole("status")).toHaveAttribute("aria-live", "polite");
-    expect(localStorage.length + sessionStorage.length).toBe(0);
   });
   it("clears sensitive state on unmount and fits a 320px-safe layout", () => {
     const { unmount, container } = render(<TwoFactorChallenge />);

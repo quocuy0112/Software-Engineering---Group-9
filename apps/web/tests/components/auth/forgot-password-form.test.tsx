@@ -15,9 +15,7 @@ afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
-  toast.dismiss.mockClear();
-  toast.error.mockClear();
-  toast.success.mockClear();
+  window.localStorage.clear();
 });
 
 describe("forgot password form", () => {
@@ -51,30 +49,27 @@ describe("forgot password form", () => {
     expect(input).toHaveValue("user@example.test");
   });
 
-  it("shows one warning toast when no active account matches the email", async () => {
+  it("shows how many reset attempts remain before the limit is reached", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue(
-        Response.json(
-          { message: "No active account was found for this email." },
-          { status: 404 },
+      vi.fn(() =>
+        Promise.resolve(
+          Response.json(
+            { message: "If the account is eligible, password-reset instructions will be sent." },
+            { status: 202 },
+          ),
         ),
       ),
     );
+
     render(<ForgotPasswordForm />);
     fireEvent.change(screen.getByLabelText("Email address"), {
-      target: { value: "missing@example.test" },
+      target: { value: "user@example.test" },
     });
     fireEvent.click(screen.getByRole("button", { name: /send reset/i }));
+
     await waitFor(() =>
-      expect(screen.getByRole("status")).toHaveTextContent(
-        "No active account was found for this email.",
-      ),
+      expect(screen.getByRole("status")).toHaveTextContent("2 attempts remaining"),
     );
-    expect(toast.error).toHaveBeenCalledWith(
-      "No active account was found for this email.",
-      { id: "forgot-password-status" },
-    );
-    expect(toast.success).not.toHaveBeenCalled();
   });
 });
