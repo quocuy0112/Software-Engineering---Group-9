@@ -7,6 +7,7 @@
 - V1.1 (20/7/2026) - First initialization (UC1 --> 3)
 - V1.2 (22/7/2026) - Second initialization (UC3 --> 7)
 - V1.3 (23/7/2026) - Third initialization (UC7 --> 12)
+- V1.4 (25/7/2026) - Reconciled with PA3 implementation; added 2FA, owned-session management, and full account recovery (UC-AUTH-08 --> UC-AUTH-11)
 
 # 1. UC-AUTH-01 — Register Account
 
@@ -192,7 +193,7 @@ If Steps 5–7 cannot be committed atomically, the System rolls back the operati
 | **Trigger** | The Visitor submits the login form.|
 
 ## 3.2. Brief Description
-This use case authenticates a registered account holder and establishes a secure session.
+This use case validates the primary email-and-password factor. It establishes a secure full session immediately only when the account does not require two-factor authentication; otherwise it creates a restricted, short-lived challenge completed by **UC-AUTH-09**.
 
 ## 3.3. Preconditions
 1. The Visitor is not currently authenticated.
@@ -207,9 +208,10 @@ This use case authenticates a registered account holder and establishes a secure
 6. The System finds the account using the normalized email address.
 7. The System verifies the password.
 8. The System verifies that the account is active and permitted to log in.
-9. The System creates a secure authenticated session.
-10. The System records the successful login.
-11. The System redirects the Authenticated User to the requested protected page or default dashboard.
+9. The System determines whether two-factor authentication is enabled for the account.
+10. If two-factor authentication is not enabled, the System creates a secure authenticated session and rotates its identifier.
+11. The System records the successful login without recording credentials.
+12. The System redirects the Authenticated User to the requested protected page or default dashboard.
 
 ## 3.5. Alternative Flows
 
@@ -229,7 +231,7 @@ At Step 8, if the account is temporarily locked, the System displays a neutral t
 At Step 8, the System denies access and provides the permitted support or appeal instruction.
 
 ### 3.5.5. AF-05 — Visitor Selects Forgot Password
-At Step 2, the use case invokes **UC-AUTH-05 — Recover Password**.
+At Step 2, the use case invokes **UC-AUTH-05 — Reset Forgotten Password**.
 
 ### 3.5.6. AF-06 — Valid Session Already Exists
 If a valid session exists, the System redirects the user to the requested page without creating another session.
@@ -240,8 +242,19 @@ If the account or source exceeds the configured limit, the System rejects the at
 ### 3.5.8. EF-01 — Authentication Service Is Unavailable
 The System does not establish a session and displays a temporary-unavailability message.
 
+### 3.5.9. AF-08 — Two-Factor Authentication Is Enabled
+At Step 9, if two-factor authentication is enabled:
+1. The System creates only a restricted, short-lived pre-authentication challenge.
+2. The System does not create a full authenticated session and does not authorize protected resources.
+3. The System redirects the Visitor to **UC-AUTH-09 — Complete Two-Factor Verification**.
+4. Login completes only after the TOTP or backup-code challenge succeeds.
+
+### 3.5.10. AF-09 — Full Account Recovery Is Required
+If the Visitor has lost the password, TOTP access, and every backup code, the Visitor may initiate **UC-AUTH-11 — Recover Account After Loss of All Factors**. The System does not disable 2FA through ordinary login support or ordinary password reset.
+
 ## 3.6. Postconditions 
-- On success, a valid authenticated session exists.
+- On success without 2FA, a valid authenticated session exists.
+- When 2FA is enabled, only a restricted challenge exists until **UC-AUTH-09** succeeds.
 - On failure, no session is created.
 - Login success or failure is recorded without logging the password.
 
@@ -253,6 +266,8 @@ The System does not establish a session and displays a temporary-unavailability 
 
 ## 3.8. Extension Points
 - **Forgot Password**: At the login form, the Visitor may initiate **UC-AUTH-05**.
+- **Two-Factor Challenge**: When 2FA is enabled, login is extended by **UC-AUTH-09**.
+- **Loss of All Factors**: A Visitor who cannot use the password, TOTP, or any backup code may initiate **UC-AUTH-11**.
 - **Protected Page Authentication**: This use case extends **UC-AUTH-07** when no valid session exists.
 
 ---
@@ -263,7 +278,7 @@ The System does not establish a session and displays a temporary-unavailability 
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-AUTH-04 |
-| **Use-Case Name** | Log In |
+| **Use-Case Name** | Log Out and End Session |
 | **Primary Actor** | Authenticated User |
 | **Supporting Actor** | None |
 | **Priority** | High |
@@ -307,13 +322,13 @@ The System clears any remaining local authentication data and redirects the Visi
 
 ---
 
-# 5. UC-AUTH-05 — Recover Password
+# 5. UC-AUTH-05 — Reset Forgotten Password
 
 ## 5.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-AUTH-05 |
-| **Use-Case Name** | Recover Password |
+| **Use-Case Name** | Reset Forgotten Password |
 | **Primary Actor** | Visitor |
 | **Supporting Actor** | Email Delivery Service |
 | **Priority** | High |
@@ -321,7 +336,7 @@ The System clears any remaining local authentication data and redirects the Visi
 
 
 ## 5.2. Brief Description
-This use case allows a Visitor who cannot log in to establish a new password through a time-limited email recovery link.
+This use case allows a Visitor who has forgotten the password to establish a new password through a time-limited email reset link. It is not the lower-assurance full-account-recovery procedure and does not disable an existing TOTP factor or unused backup codes.
 
 ## 5.3. Preconditions
 - The Visitor is not required to be authenticated.
@@ -342,7 +357,9 @@ This use case allows a Visitor who cannot log in to establish a new password thr
 12. The System validates the new password.
 13. The System securely updates the password.
 14. The System invalidates the reset token and existing account sessions.
-15. The System displays a password-reset-success page.
+15. The System invalidates outstanding authentication challenges and queues one password-change security notification.
+16. The System preserves enabled TOTP and every unused backup code.
+17. The System displays a password-reset-success page and requires a normal login; it does not create a session automatically.
 
 ## 5.5. Alternative Flows
 
@@ -369,6 +386,8 @@ The System preserves the old password, keeps the reset operation consistent, and
 
 ## 5.6. Postconditions
 - On success, the password is replaced and previous sessions are invalidated.
+- Existing TOTP configuration and unused backup codes remain enabled.
+- No authenticated session is created automatically.
 - The used reset token cannot be reused.
 - On failure, the existing password remains valid unless the update was committed successfully.
 
@@ -377,6 +396,7 @@ The System preserves the old password, keeps the reset operation consistent, and
 - Reset tokens must be single-use and time-limited.
 - Reset links must use HTTPS.
 - Recovery requests must be rate-limited and audited.
+- A normal password reset must preserve TOTP and unused backup codes; loss of every factor is handled only by **UC-AUTH-11**.
 
 ---
 
@@ -855,3 +875,379 @@ The System keeps the parsing result unconfirmed, preserves the previous profile,
 - Low-confidence fields must be visually distinguishable.
 - Confirmation and profile update must be performed atomically.
 - Only the owning Candidate may review the parsing result.
+
+---
+
+# 13. UC-AUTH-08 — Enable and Manage Two-Factor Authentication
+
+## 13.1. Use-Case Information
+| Field | Value |
+|---|---|
+| **Use-Case ID** | UC-AUTH-08 |
+| **Use-Case Name** | Enable and Manage Two-Factor Authentication |
+| **Primary Actor** | Authenticated User |
+| **Supporting Actor** | RFC 6238-compatible authenticator application |
+| **Priority** | High |
+| **Trigger** | The Authenticated User opens **Profile > Security** to enable or manage two-factor authentication. |
+
+## 13.2. Brief Description
+This use case allows an Authenticated User to enroll a TOTP authenticator, receive one-time backup codes, regenerate the backup-code set, or disable two-factor authentication. Every high-impact action requires renewed proof and is auditable.
+
+## 13.3. Preconditions
+1. The user has an active, verified account and a valid full authenticated session.
+2. The user can provide the current password when recent-authentication proof is required.
+3. TOTP enrollment and management are available through the authoritative authentication service.
+
+## 13.4. Basic Flow — Enable TOTP
+1. The Authenticated User opens **Profile > Security**.
+2. The System validates the full session and authoritative account state before rendering the protected page.
+3. The System shows that 2FA is disabled and offers **Enable two-factor authentication**.
+4. The Authenticated User selects the enable action.
+5. The System requests the current password as renewed proof.
+6. The Authenticated User submits the current password.
+7. The System validates the password and creates a protected pending enrollment with a unique TOTP secret.
+8. The System displays a QR code and manual setup key over the protected interaction.
+9. The Authenticated User adds the secret to a compatible authenticator application.
+10. The Authenticated User submits the current six-digit TOTP code.
+11. The System validates the code within the documented time window.
+12. The System enables 2FA transactionally and generates a finite one-time backup-code set.
+13. The System displays plaintext backup codes once and instructs the user to store them safely.
+14. The System rotates or revalidates the affected session when required by the authentication provider.
+15. The System records the successful enrollment without storing the password, TOTP code, plaintext secret, or plaintext backup codes in the audit event.
+16. The System returns to **Profile > Security** with a clear `2FA enabled` status.
+
+## 13.5. Alternative and Error Flows
+
+### 13.5.1. AF-01 — Two-Factor Authentication Is Already Enabled
+At Step 3, if 2FA is already enabled, the System must not start another enrollment or replace the existing TOTP secret. It displays the actions to regenerate backup codes or disable 2FA.
+
+### 13.5.2. AF-02 — Current Password Is Incorrect
+At Step 7, the System rejects the renewed proof, records a non-sensitive failure, applies the configured attempt limit, and leaves the 2FA state unchanged.
+
+### 13.5.3. AF-03 — Initial TOTP Code Is Invalid, Malformed, or Outside the Accepted Window
+At Step 11, the System displays a generic verification failure, leaves 2FA disabled, does not issue backup codes, and permits another attempt within the configured limit.
+
+### 13.5.4. AF-04 — Regenerate Backup Codes
+1. An Authenticated User with 2FA enabled selects **Regenerate backup codes**.
+2. The System requires the current password and a valid TOTP code as renewed proof.
+3. After successful proof, the System invalidates every previous backup code before activating the replacement set.
+4. The System displays the replacement plaintext codes once and audits the regeneration without recording them.
+
+### 13.5.5. AF-05 — Disable Two-Factor Authentication
+1. An Authenticated User with 2FA enabled selects **Disable two-factor authentication**.
+2. The System requests explicit confirmation, the current password, and a valid TOTP code unless an approved full-recovery procedure authorizes the action.
+3. After successful proof, the System invalidates the TOTP secret and every backup code, rotates or revalidates affected sessions, and audits the disablement.
+
+### 13.5.6. AF-06 — User Cancels a Security Change
+Before a change is committed, the user may cancel. The System discards the pending action and does not change the authoritative 2FA state.
+
+### 13.5.7. AF-07 — Session Is Missing, Expired, or Revoked
+The System does not render or process the security action and redirects safely to Login without exposing factor state.
+
+### 13.5.8. AF-08 — Attempt Limit Is Exceeded
+The System temporarily rejects further password or TOTP attempts, displays a retry-later message, and audits the limited event without recording submitted secrets.
+
+### 13.5.9. EF-01 — Enrollment or Management Update Fails
+The System reports no success, keeps the prior authoritative 2FA state, and either rolls back the single-provider operation or retains a fail-closed retry state. No partial backup-code set becomes valid.
+
+## 13.6. Postconditions
+- On successful enrollment, TOTP is enabled and exactly one current backup-code set is active.
+- On successful regeneration, all older backup codes are unusable and the replacement codes are displayed only once.
+- On successful disablement, the previous TOTP secret and every backup code are unusable.
+- On failure or cancellation, the previously committed 2FA state remains authoritative.
+- Every attempted security-state change produces an audit outcome without secret material.
+
+## 13.7. Special Requirements
+- TOTP must be RFC 6238-compatible, use six-digit codes and a 30-second time step, and apply only the documented limited clock-skew tolerance.
+- TOTP secrets must be unique per account, protected at rest, and never logged or returned after the approved setup interaction.
+- Plaintext backup codes must be shown only during their generation response and stored only as secure representations.
+- Sensitive actions must require renewed proof and server-side CSRF protection.
+- Opening the Security page while 2FA is enabled must never silently start enrollment or replace the stored secret.
+- Password, TOTP, backup-code, and session-replacement values must not appear in audit events, URLs, analytics, or client persistence.
+
+## 13.8. Required Prototype Evidence
+- Disabled 2FA state and enable action.
+- Current-password proof.
+- QR code and manual setup key.
+- Initial TOTP verification and invalid-code state.
+- One-time backup-code display.
+- Enabled management state.
+- Regeneration confirmation and replacement-code result.
+- Disable confirmation, invalid-proof state, and success result.
+
+---
+
+# 14. UC-AUTH-09 — Complete Two-Factor Verification
+
+## 14.1. Use-Case Information
+| Field | Value |
+|---|---|
+| **Use-Case ID** | UC-AUTH-09 |
+| **Use-Case Name** | Complete Two-Factor Verification |
+| **Primary Actor** | Visitor |
+| **Supporting Actor** | RFC 6238-compatible authenticator application |
+| **Priority** | High |
+| **Trigger** | Correct primary credentials are submitted for an active account with 2FA enabled. |
+
+## 14.2. Brief Description
+This use case extends **UC-AUTH-03 — Log In** when 2FA is enabled. The Visitor completes a restricted pre-authentication challenge with a valid TOTP or an unused backup code before the System creates a full authenticated session.
+
+## 14.3. Preconditions
+1. Primary email-and-password validation succeeded.
+2. The account is active, verified, and has 2FA enabled.
+3. A restricted, short-lived, single-account challenge exists and has not expired or been consumed.
+4. No full authenticated session has been created from the primary factor alone.
+
+## 14.4. Basic Flow — TOTP
+1. The System redirects the Visitor from Login to the two-factor verification page.
+2. The System places focus on the authenticator-code control and does not expose account or factor secrets.
+3. The Visitor obtains the current six-digit code from a compatible authenticator application.
+4. The Visitor enters the code and selects **Verify**.
+5. The System validates the restricted challenge and account state.
+6. The System validates the TOTP within the accepted time window and prevents replay for the completed challenge.
+7. The System consumes the restricted challenge.
+8. The System creates the sole full authenticated session and rotates its identifier.
+9. The System audits second-factor success without recording the submitted code.
+10. The System redirects the Authenticated User to the approved protected destination or `/dashboard`.
+
+## 14.5. Alternative and Error Flows
+
+### 14.5.1. AF-01 — Use an Unused Backup Code
+1. At Step 3, the Visitor selects **Backup code**.
+2. The Visitor enters one unused backup code.
+3. The System validates and atomically consumes the code.
+4. The flow resumes at Step 7. The used backup code can never succeed again.
+
+### 14.5.2. AF-02 — TOTP Is Invalid, Malformed, or Outside the Accepted Window
+The System displays a generic failure, creates no full session, keeps only an otherwise valid restricted challenge, and records the failed event without the submitted code.
+
+### 14.5.3. AF-03 — Backup Code Is Invalid or Already Used
+The System displays the same generic factor failure, creates no full session, and does not reveal whether the submitted value was previously valid.
+
+### 14.5.4. AF-04 — Challenge Is Missing, Expired, Consumed, or for Another Account
+The System rejects the attempt, creates no session, clears unusable provisional state, and directs the Visitor to restart Login.
+
+### 14.5.5. AF-05 — Attempt Limit Is Exceeded
+The System rejects further attempts for the configured cooldown, creates no session, and displays a retry-later response.
+
+### 14.5.6. AF-06 — Account State Changes During the Challenge
+If the account becomes Pending Verification, Suspended, Deleted, or subject to pending full recovery, the System invalidates the challenge and denies full authentication.
+
+### 14.5.7. AF-07 — Visitor Lost Every Authentication Factor
+The Visitor may navigate to **UC-AUTH-11 — Recover Account After Loss of All Factors**. The System does not automatically disable 2FA or accept email OTP as a replacement second factor.
+
+### 14.5.8. EF-01 — Authentication Service Is Unavailable
+The System creates no full session, reports a temporary failure, and preserves no client-visible secret or reusable authorization result.
+
+## 14.6. Postconditions
+- On success, the restricted challenge is consumed and exactly one full authenticated session is established.
+- A successfully used backup code is permanently consumed.
+- On failure, protected resources remain inaccessible and no full session exists.
+- Successful and failed factor outcomes are auditable without submitted codes.
+
+## 14.7. Special Requirements
+- Primary password success must never authorize a protected resource while 2FA is required.
+- The challenge must be short-lived, single-account, single-use, and incapable of acting as a browser session.
+- Factor failures must be generic and rate-limited.
+- A backup code must have one atomic winner under concurrent use.
+- The page must support keyboard focus, password-manager-safe field purposes, and approved internal navigation only.
+
+## 14.8. Required Prototype Evidence
+- Authenticator-code mode.
+- Backup-code mode.
+- Invalid or expired code.
+- Expired challenge and restart-login action.
+- Rate-limited state.
+- Successful completion and Dashboard redirect.
+
+---
+
+# 15. UC-AUTH-10 — Review and Revoke Active Sessions
+
+## 15.1. Use-Case Information
+| Field | Value |
+|---|---|
+| **Use-Case ID** | UC-AUTH-10 |
+| **Use-Case Name** | Review and Revoke Active Sessions |
+| **Primary Actor** | Authenticated User |
+| **Supporting Actor** | None |
+| **Priority** | High |
+| **Trigger** | The Authenticated User opens **Profile > Sessions**. |
+
+## 15.2. Brief Description
+This use case allows an Authenticated User to review sanitized metadata for owned active sessions, identify the current session, and revoke another owned session without ending the current one.
+
+## 15.3. Preconditions
+1. The user has a valid full authenticated session.
+2. The account is active.
+3. Session ownership and revocation are enforced by the authoritative server-side session store.
+
+## 15.4. Basic Flow — Revoke Another Session
+1. The Authenticated User opens **Profile > Sessions**.
+2. The System validates the current session and account state before rendering the page.
+3. The System lists only active sessions owned by the account.
+4. For each session, the System displays non-secret device/browser information, creation or last-active time, approximate location when lawfully available, and a clear current-session marker.
+5. The Authenticated User identifies an unrecognized session other than the current session.
+6. The Authenticated User selects **Revoke** for that session.
+7. The System asks for confirmation without exposing the raw session identifier.
+8. The Authenticated User confirms the action.
+9. The System verifies ownership again and atomically revokes the selected session.
+10. The System records the actor, target reference, result, time, and non-sensitive context.
+11. The System refreshes the list, keeps the current session active, and displays a success message.
+12. The revoked session is rejected on its next request.
+
+## 15.5. Alternative and Error Flows
+
+### 15.5.1. AF-01 — Only the Current Session Exists
+The System displays the current session and explains that there are no other devices to revoke. Current-session termination remains available through **UC-AUTH-04 — Log Out and End Session**.
+
+### 15.5.2. AF-02 — User Attempts to Revoke the Current Session
+The System directs the user to the authoritative Logout action or requires explicit confirmation that the current browser will be signed out. It does not present the action as revocation of another device.
+
+### 15.5.3. AF-03 — Target Session Already Expired or Was Revoked Concurrently
+The System treats the result idempotently, refreshes the list, and reports that the session is no longer active.
+
+### 15.5.4. AF-04 — Session Limit Is Reached During New Login
+When creating a sixth session, the System automatically revokes the least recently active older session, excludes the newly created session, and audits the automatic revocation. The refreshed list contains at most five active sessions.
+
+### 15.5.5. AF-05 — Current Session Is Missing, Expired, or Revoked
+The System does not display owned-session data and redirects safely to Login.
+
+### 15.5.6. AF-06 — User Cancels Revocation
+The System closes the confirmation interaction and leaves all sessions unchanged.
+
+### 15.5.7. EF-01 — Revocation Fails
+The System does not claim success, keeps the target session visible until authoritative state confirms revocation, and records or queues the failure where possible.
+
+## 15.6. Postconditions
+- On successful selected revocation, the target session can no longer access protected resources.
+- Revoking another session does not end the current session.
+- No session belonging to another account is disclosed or modified.
+- On cancellation or failure, no unconfirmed revocation is reported as successful.
+
+## 15.7. Special Requirements
+- Raw session tokens, raw database identifiers, full IP addresses, cookies, and authentication credentials must never be displayed.
+- Idle timeout, absolute timeout, ownership, account state, and revocation must be enforced server-side.
+- The account may have at most five active sessions; the sixth login revokes the least recently active older session.
+- Revocation and rejected reuse must be auditable using non-sensitive references.
+- The Sessions page must clearly distinguish the current session and remain keyboard accessible.
+
+## 15.8. Required Prototype Evidence
+- Current-session-only state.
+- Multiple owned sessions with a current-session marker.
+- Revoke action and confirmation dialog.
+- Successful revocation with refreshed list.
+- Already-revoked or expired state.
+- Revocation failure and revoked-session access rejection.
+
+---
+
+# 16. UC-AUTH-11 — Recover Account After Loss of All Factors
+
+## 16.1. Use-Case Information
+| Field | Value |
+|---|---|
+| **Use-Case ID** | UC-AUTH-11 |
+| **Use-Case Name** | Recover Account After Loss of All Factors |
+| **Primary Actor** | Visitor |
+| **Supporting Actor** | Email Delivery Service |
+| **Priority** | High |
+| **Trigger** | The Visitor states that the password, TOTP access, and every backup code are unavailable. |
+
+## 16.2. Brief Description
+This is a separate, lower-assurance account-recovery workflow for an eligible user who has lost every authentication factor. Verified email starts a 24-hour security hold. Existing sessions and challenges are revoked, login remains blocked while recovery is pending, and completion changes the password and disables old 2FA only after the hold. The workflow never creates an automatic session.
+
+## 16.3. Preconditions
+1. The Visitor is not required to have a valid authenticated session.
+2. The Visitor can access the verified email address associated with the account.
+3. The account is active, verified, 2FA-enabled, and eligible for full recovery.
+4. The account is not already Deleted or otherwise ineligible under the approved recovery policy.
+
+## 16.4. Basic Flow
+1. The Visitor opens the full account-recovery page.
+2. The System explains that the workflow is intended only for loss of the password, TOTP access, and every backup code, and that email-only recovery has lower assurance.
+3. The Visitor enters the registered email address and submits the request.
+4. The System validates the email format and evaluates account eligibility.
+5. The System creates HMAC-digested, single-use confirmation and cancellation proof records without storing plaintext proofs.
+6. The Email Delivery Service sends the verified-email confirmation and security notice.
+7. The System displays instructions to check the email account.
+8. The Visitor opens the single-use confirmation link.
+9. The System validates and consumes the confirmation proof.
+10. The System starts exactly one 24-hour security hold and marks full recovery as pending.
+11. The System revokes existing sessions and authentication challenges and blocks password and second-factor login while recovery is pending.
+12. The System sends hold-start and cancellation instructions and records durable audit and notification outcomes.
+13. After the hold ends, the Visitor opens the single-use completion link.
+14. The System validates the completion proof, hold status, account state, and recovery ownership.
+15. The Visitor enters and confirms a new password satisfying policy.
+16. The System claims the recovery completion exactly once and securely updates the password.
+17. The System invalidates the old TOTP secret and every old backup code only at this completion step.
+18. The System confirms that sessions and challenges remain revoked, consumes remaining recovery proofs, and finalizes the operation.
+19. The System queues a completion notification and records the final audit result without secrets.
+20. The System displays recovery success and directs the Visitor to normal Login. It does not create a full session or provisional challenge automatically.
+
+## 16.5. Alternative and Error Flows
+
+### 16.5.1. AF-01 — Email Format Is Invalid
+At Step 4, the System displays a format-validation message and does not create recovery proofs.
+
+### 16.5.2. AF-02 — Account Is Unknown or Ineligible
+The System returns the documented account-not-found or ineligible outcome, queues no recovery email, and records only the non-sensitive request result allowed by policy.
+
+### 16.5.3. AF-03 — Confirmation Proof Is Invalid, Expired, or Already Used
+At Step 9, the System rejects the link, starts no new hold, changes no factor, and offers a safe route to restart the request when permitted.
+
+### 16.5.4. AF-04 — Confirmation Is Submitted Concurrently
+Exactly one request starts the hold. Every concurrent or replayed confirmation receives a non-success outcome and creates no duplicate hold, notification, or audit completion.
+
+### 16.5.5. AF-05 — Login Attempt During the Security Hold
+The System returns the approved blocked outcome and creates neither a full session nor a provisional challenge.
+
+### 16.5.6. AF-06 — Visitor Cancels Pending Recovery
+1. Before completion, the Visitor opens the single-use cancellation link.
+2. The System validates and atomically consumes the cancellation proof.
+3. The System marks recovery cancelled, invalidates remaining recovery proofs, queues a notification, and audits the result.
+4. A reused or concurrent cancellation proof fails without changing state again.
+
+### 16.5.7. AF-07 — Completion Is Attempted Before the Hold Ends
+The System rejects the attempt, preserves the pending hold and credentials, and displays the remaining wait policy without exposing secret proof data.
+
+### 16.5.8. AF-08 — Completion Proof Is Invalid, Expired, Used, or Superseded
+The System rejects completion, does not change the password or 2FA state, and does not create a session.
+
+### 16.5.9. AF-09 — New Password Violates Policy or Confirmation Does Not Match
+The System displays the applicable validation message and allows correction while the valid completion operation remains safely controlled.
+
+### 16.5.10. AF-10 — Recovery Was Cancelled or Already Completed
+The System reports the terminal status, performs no repeated credential or factor change, and directs the Visitor to the appropriate safe next action.
+
+### 16.5.11. EF-01 — Email Delivery Fails Before an Eligible Request Is Issued
+The System does not claim that instructions were delivered, retains only policy-approved retry state, and records the provider failure without credentials or plaintext proofs.
+
+### 16.5.12. EF-02 — Mandatory Recovery Step Fails
+The System does not report success. It retains a durable fail-closed operation that can resume idempotently, keeps login blocked when cleanup is incomplete, and finalizes only after password update, factor disablement, session/challenge revocation, notification enqueue, and final audit completion are confirmed.
+
+## 16.6. Postconditions
+- On confirmed request, one 24-hour hold exists, prior sessions and challenges are revoked, and login is blocked.
+- On cancellation, recovery proofs are invalidated and credentials remain unchanged.
+- On successful completion, the password is replaced and old TOTP and backup codes are disabled exactly once.
+- No recovery path creates an authenticated session automatically.
+- On incomplete mandatory cleanup, access remains fail closed until the durable operation converges.
+
+## 16.7. Special Requirements
+- Full account recovery must remain separate from ordinary forgotten-password reset.
+- Every confirmation, cancellation, and completion proof must be HMAC-digested, time-limited, single-use, and absent from logs and persistent plaintext storage.
+- The 24-hour hold must be server-enforced and must not depend on browser time.
+- Support personnel must not bypass the hold or disable TOTP without the approved workflow.
+- Audit records and notifications must be durable and idempotent and must exclude passwords, TOTP values, backup codes, cookies, raw session identifiers, and plaintext proofs.
+- The interface must clearly state that verified-email-only recovery is lower assurance.
+
+## 16.8. Required Prototype Evidence
+- Recovery request and eligibility feedback.
+- Check-email state.
+- Invalid, expired, and reused confirmation link.
+- Security-hold status and login-blocked state.
+- Cancellation confirmation and terminal cancelled state.
+- Too-early completion state.
+- New-password completion form and validation.
+- Successful completion with required normal-login action.
+- Provider or mandatory-step failure without false success.
