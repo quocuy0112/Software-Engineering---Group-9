@@ -7,7 +7,7 @@
 **Team members present:**
 * Nguyễn Gia Quốc Uy
 * Nguyễn Quốc Thành
-* Nguyễn Quốc Tuấn
+* Ngô Quốc Tuấn
 * Lưu Chí Hải
 * Nguyễn Minh Khôi
 
@@ -45,7 +45,7 @@
 * **Issues/Obstacles:** 
     - None
 
-### Nguyễn Quốc Tuấn
+### Ngô Quốc Tuấn
 * **Completed tasks:** 
     - Review, comment, and provide feedback on the features that the group has chosen.
     - Write the AI Usage Report following the given format.
