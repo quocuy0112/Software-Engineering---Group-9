@@ -35,7 +35,7 @@ Any later plan proposing a different backend mechanism, browser-storage authenti
 
 - Q: What is the canonical public and protected routing? → A: `/` is the public SmartHire Home; `/home` redirects server-side to `/`; `/dashboard`, `/profile`, `/profile/security`, and `/profile/sessions` are protected; `/settings/security` redirects to `/profile/security`; `/settings/sessions` redirects to `/profile/sessions`; authenticated users may see Dashboard/Profile controls on `/`; successful full Login redirects to `/dashboard`; a provisional two-factor challenge cannot access protected routes. A Visitor opening `/` is not required to redirect to `/login`.
 - Q: What does normal password reset do to two-factor authentication? → A: It updates the password through Better Auth, preserves TOTP and unused backup codes, revokes all sessions, invalidates authentication challenges, consumes the reset token exactly once, queues one idempotent notification, requires a new login, and leaves the existing TOTP or backup-code requirement enabled. It MUST NOT disable 2FA.
-- Q: How does a user recover an account after losing the password, TOTP access, and backup codes? → A: A separate full account-recovery workflow uses verified-email confirmation, an enumeration-safe request, HMAC-digested single-use proofs, a 24-hour security hold, session/challenge revocation, login blocking while pending, one-time cancellation proof, password change after the hold, and 2FA/backup-code disablement only at completion. It never automatically logs the user in, emits notification and durable audit records, and documents email-only recovery as lower assurance.
+- Q: How does a user recover an account after losing the password, TOTP access, and backup codes? → A: A separate full account-recovery workflow uses verified-email confirmation, an eligibility-aware request with distinct success and account-not-found outcomes, HMAC-digested single-use proofs, a 24-hour security hold, session/challenge revocation, login blocking while pending, one-time cancellation proof, password change after the hold, and 2FA/backup-code disablement only at completion. It never automatically logs the user in, emits notification and durable audit records, and documents email-only recovery as lower assurance.
 - Q: What happens when password-reset steps cross Better Auth and SmartHire persistence boundaries? → A: The reset is an idempotent fail-closed saga with a token claim, durable audit intent, Better Auth password update, session revocation, challenge invalidation, notification enqueue, and finalization. Retries resume the claimed operation; concurrent submissions have one winner; partial mandatory cleanup leaves login blocked until cleanup completes. No single cross-provider database transaction is claimed.
 
 ## User Scenarios & Testing *(mandatory)*
@@ -85,7 +85,7 @@ As a verified Registered User, I want to log in with my email and password so th
 
 1. **Successful login without 2FA** â€” **Given** a verified, active account without 2FA, **When** the user supplies the correct normalized email and password within rate limits, **Then** a new authenticated session is created only after credential validation, its identifier is rotated, success is audited, and the user is redirected to an authorized destination.
 2. **Login with an unverified email** â€” **Given** an account in Pending Verification, **When** correct credentials are submitted, **Then** no authenticated session is created, the attempt is audited, and the response directs the user toward verification without exposing additional account data.
-3. **Invalid credentials** â€” **Given** an unknown email or a known email with the wrong password, **When** login is attempted, **Then** both cases receive the same generic invalid-email-or-password message, no authenticated session is created, and the failed event contains no credential secrets.
+3. **Invalid credentials** â€” **Given** an unknown email or a known, active account with the wrong password, **When** login is attempted, **Then** an unknown email receives an account-not-found message while a known account receives an incorrect-password message, no authenticated session is created, and the failed event contains no credential secrets.
 4. **Login throttling** â€” **Given** failed attempts exceed the configured account/IP/time-window allowance, **When** another attempt occurs, **Then** authentication is delayed or rejected for the configured interval, the response remains generic, and the throttling event is auditable without permanently locking the account solely because of these attempts.
 
 ---
@@ -139,16 +139,17 @@ As an Authenticated User, I want to disable 2FA or regenerate backup codes so th
 
 ### User Story 7 â€” Request a Password-Reset Link (Priority: P1)
 
-As a user who forgot a password, I want to request a reset link through email so that I can regain access without disclosing whether an account exists.
+As a user who forgot a password, I want to request a reset link through email and receive clear feedback when the email has no active account so that I can correct the address or create an account.
 
 **Why this priority**: Account recovery is essential to continued access and reduces unsafe support workarounds.
 
-**Independent Test**: Submit known and unknown emails, cross rate-limit boundaries, and simulate email-delivery failure while verifying identical public outcomes and unchanged account access state.
+**Independent Test**: Submit valid active-account, unknown, and malformed emails; cross rate-limit boundaries; and simulate persistence failure while verifying the correct success/error outcome and unchanged account access state.
 
 **Acceptance Scenarios**:
 
-1. **Successful password-reset request** â€” **Given** an active account matches the normalized email and request limits allow it, **When** a reset is requested, **Then** one secure single-use reset request valid for 30 minutes is issued, a URL based only on the trusted configured application address is queued for email delivery, the account remains otherwise unchanged, and a generic response is shown.
-2. **Password-reset request for a nonexistent email** â€” **Given** no account matches the normalized email, **When** a reset is requested, **Then** no account or usable reset token is created and the timing and content of the response are materially indistinguishable from the response for an existing account.
+1. **Successful password-reset request** â€” **Given** an active account matches the normalized email and request limits allow it, **When** a reset is requested, **Then** one secure single-use reset request valid for 30 minutes is issued, a URL based only on the trusted configured application address is queued for email delivery, the account remains otherwise unchanged, and a success toast confirms that instructions will be sent.
+2. **Password-reset request for a nonexistent email** â€” **Given** no active account matches the normalized email, **When** a reset is requested, **Then** no account, usable reset token, or email outbox item is created and an error toast states that no active account was found.
+3. **Malformed password-reset email** â€” **Given** the submitted value is not a valid email address, **When** a reset is requested, **Then** the request is rejected before account lookup and an error toast asks for a valid email address.
 
 ---
 
@@ -251,10 +252,11 @@ audit records, and required new login.
 
 **Acceptance Scenarios**:
 
-1. **Enumeration-safe request** - **Given** any email address, **When** a full
-   recovery request is submitted, **Then** the response and timing are
-   materially indistinguishable, and only an eligible account receives a
-   confirmation message with no proof value logged.
+1. **Eligibility-aware request** - **Given** an email address, **When** a full
+   recovery request is submitted, **Then** malformed input receives a
+   validation error, an unknown or ineligible account receives an
+   account-not-found error, and an eligible account receives a success response
+   and confirmation message with no proof value logged or returned.
 2. **Verified-email confirmation and hold** - **Given** a valid unexpired
    HMAC-digested single-use confirmation proof, **When** it is consumed,
    **Then** one durable recovery operation enters a 24-hour security hold,
@@ -339,7 +341,7 @@ audit records, and required new login.
 
 #### Password Authentication
 
-- **FR-012**: `/login` MUST authenticate verified, active accounts using normalized email and password and MUST use the same generic invalid-email-or-password response for unknown email and wrong password.
+- **FR-012**: `/login` MUST authenticate verified, active accounts using normalized email and password; it MUST return an account-not-found response for an unknown normalized email and an incorrect-password response for a known, active account whose submitted password is invalid.
 - **FR-013**: Login MUST reject unverified and suspended accounts without creating a full session; user guidance MUST not disclose data beyond what the requestor already supplied or proved.
 - **FR-014**: Registration and login attempts MUST be rate-limited using documented account/email, IP, and time-window controls that resist distributed abuse while allowing legitimate recovery.
 - **FR-015**: The system MUST record successful and failed password-authentication events without logging emails unnecessarily, passwords, submitted codes, session credentials, or complete tokens.
@@ -372,7 +374,7 @@ audit records, and required new login.
 - **FR-031A**: Registration and password reset MUST reject passwords found on the approved common-password or known-compromised-password list. The check MUST use a locally available/cacheable list or a privacy-preserving query that never discloses the complete password or reusable password hash; loss of an external checking service MUST NOT bypass the approved local/cacheable check or expose the password.
 - **FR-032**: Password input interfaces MUST allow paste, use appropriate password-manager/browser autocomplete attributes, and provide a show/hide control with an accessible label.
 - **FR-033**: Passwords MUST be securely hashed, never stored or logged in plaintext, and MUST NOT be subject to arbitrary periodic rotation.
-- **FR-034**: `/forgot-password` MUST return materially indistinguishable responses for existing and nonexistent emails and MUST NOT change, suspend, or lock an account merely because reset was requested.
+- **FR-034**: `/forgot-password` MUST return success only when an active account matches the normalized email, MUST return a distinct account-not-found error for an unknown or ineligible email, MUST reject malformed email input, and MUST NOT change, suspend, or lock an account merely because reset was requested.
 - **FR-035**: Reset requests MUST be rate-limited by account/email, IP address, and time window.
 - **FR-036**: Reset tokens MUST be cryptographically unpredictable, stored only as secure non-reversible representations, single-use, and expired 30 minutes after issuance.
 - **FR-037**: Reset URLs MUST be formed only from a trusted configured application URL and MUST NOT trust a request-supplied host or redirect destination.
@@ -381,7 +383,7 @@ audit records, and required new login.
 - **FR-040**: Successful normal reset MUST update the Better Auth credential, consume the reset token exactly once, revoke every existing Better Auth session, invalidate outstanding authentication challenges, queue one idempotent password-change security notification, audit the reset without secrets, preserve TOTP and unused backup codes, and send the user to normal login without automatic authentication. Normal reset MUST NOT disable 2FA.
 - **FR-040A**: Normal reset MUST execute as an idempotent fail-closed saga across SmartHire persistence and Better Auth. The ordered milestones are: (1) atomically claim the HMAC-digested token for one durable reset operation and record the audit intent; (2) update the Better Auth password without modifying Better Auth-owned TOTP or backup-code state; (3) revoke all Better Auth sessions; (4) invalidate every outstanding authentication challenge and superseded reset proof; (5) enqueue the password-change notification under a stable idempotency key; and (6) atomically finalize the operation and token lifecycle. Each milestone MUST be durably observable without storing the plaintext token or password.
 - **FR-040C**: A retry MUST reacquire and resume the same claimed reset operation from its first incomplete milestone. Completed SmartHire effects MUST be idempotent; an ambiguous Better Auth result MAY be safely re-invoked only to converge on the same submitted password and MUST NOT create a session or alter 2FA. Concurrent submissions MUST have one claim owner, and the token MUST have one terminal consumption. Any partial failure MUST return a non-success result, retain a retryable durable state, and keep password login, second-factor completion, and protected access blocked until all mandatory cleanup, notification enqueue, final audit emission, and finalization complete.
-- **FR-040B**: Full account recovery MUST be a separate workflow for a user who has lost the password, TOTP access, and backup codes. It MUST provide an enumeration-safe request, verified-email confirmation, HMAC-digested single-use proofs, a 24-hour security hold, session and challenge revocation, login blocking while pending, one-time cancellation proof, password change only after the hold, durable audit and notification records, and no automatic login. Old TOTP and backup codes MUST be disabled only at full-recovery completion, and the product MUST document email-only recovery as lower assurance.
+- **FR-040B**: Full account recovery MUST be a separate workflow for a user who has lost the password, TOTP access, and backup codes. Its request MUST reject malformed email input, return a distinct account-not-found error for an unknown or ineligible account, and return success only after an eligible active, verified, 2FA-enabled account has queued a verified-email confirmation. It MUST use HMAC-digested single-use proofs, a 24-hour security hold, session and challenge revocation, login blocking while pending, one-time cancellation proof, password change only after the hold, durable audit and notification records, and no automatic login. Old TOTP and backup codes MUST be disabled only at full-recovery completion, and the product MUST document email-only recovery as lower assurance.
 
 #### Sessions, Authorization, Cookies, and CSRF
 
@@ -493,7 +495,7 @@ audit records, and required new login.
 - **SC-022**: Automated component and browser accessibility checks find every password visibility toggle by a descriptive accessible name, confirm eye/eye-off state changes, and complete keyboard operation without replacing visible labels or autocomplete metadata.
 - **SC-023**: In 100% of normal password-reset tests, Better Auth records the new password while the pre-reset TOTP state and every unused backup code remain valid; all sessions and authentication challenges are revoked, the reset notification is enqueued once, and the next successful login still requires the existing second factor.
 - **SC-024**: In 100% of injected normal-reset failures and concurrent submissions, exactly one durable operation owns the token claim; retries resume its first incomplete milestone, any ambiguous Better Auth retry converges on the same submitted password without altering 2FA, no mandatory cleanup or idempotent audit/notification effect is skipped or duplicated, and login remains blocked until finalization.
-- **SC-025**: In 100% of full-recovery tests, the request is enumeration-safe, one verified-email proof starts exactly one 24-hour hold, sessions/challenges are revoked, pending login is blocked, cancellation proof is single-use, completion after the hold changes the password and disables old 2FA only then, notification/audit records exist, and no automatic login occurs.
+- **SC-025**: In 100% of full-recovery tests, malformed, unknown or ineligible, and eligible request outcomes are differentiated correctly; one verified-email proof starts exactly one 24-hour hold, sessions/challenges are revoked, pending login is blocked, cancellation proof is single-use, completion after the hold changes the password and disables old 2FA only then, notification/audit records exist, and no automatic login occurs.
 
 ## Assumptions
 

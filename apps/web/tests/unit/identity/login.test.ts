@@ -5,8 +5,10 @@ import { TokenProtector } from "@/lib/security/security-tokens";
 import { BetterAuthGateway } from "@/server/auth/identity/better-auth-gateway";
 import { PrismaRegistrationRepository } from "@/server/repositories/identity/prisma-registration-repository";
 import {
+  ACCOUNT_NOT_FOUND_LOGIN_ERROR,
   LoginWithPasswordService,
   GENERIC_LOGIN_ERROR,
+  INCORRECT_PASSWORD_LOGIN_ERROR,
 } from "@/server/services/identity/login-with-password";
 async function account(
   state: "ACTIVE" | "PENDING_VERIFICATION" | "SUSPENDED" | "DELETED",
@@ -71,7 +73,7 @@ describe("password login state enforcement", () => {
       expect((await response.json()).message).toBe(GENERIC_LOGIN_ERROR);
     },
   );
-  it("maps unknown email and wrong password to the same response", async () => {
+  it("returns separate messages for an unknown email and an incorrect password", async () => {
     const fixture = await account("ACTIVE");
     const service = new LoginWithPasswordService();
     const wrong = await service.execute(
@@ -85,9 +87,11 @@ describe("password login state enforcement", () => {
       },
       { headers: headers(), subject: randomUUID() },
     );
-    expect([wrong.status, (await wrong.json()).message]).toEqual([
-      unknown.status,
-      (await unknown.json()).message,
-    ]);
+    const wrongMessage = (await wrong.json()).message;
+    const unknownMessage = (await unknown.json()).message;
+    expect(wrong.status).toBe(401);
+    expect(unknown.status).toBe(401);
+    expect(wrongMessage).toBe(INCORRECT_PASSWORD_LOGIN_ERROR);
+    expect(unknownMessage).toBe(ACCOUNT_NOT_FOUND_LOGIN_ERROR);
   });
 });

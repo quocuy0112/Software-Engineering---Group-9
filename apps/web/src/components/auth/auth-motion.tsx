@@ -1,3 +1,13 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+
 export function AuthMotion({ children }: { children: React.ReactNode }) {
-  return <div className="auth-motion">{children}</div>;
+  const pathname = usePathname();
+
+  return (
+    <div key={pathname} className="auth-motion" data-route={pathname}>
+      {children}
+    </div>
+  );
 }

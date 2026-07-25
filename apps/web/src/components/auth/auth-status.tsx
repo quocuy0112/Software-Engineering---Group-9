@@ -13,11 +13,16 @@ export function AuthStatus({
   id?: string;
 }) {
   useEffect(() => {
-    if (!status) return;
-    if (tone === "error") toast.error(status);
-    else if (tone === "success") toast.success(status);
-    else toast(status);
-  }, [status, tone]);
+    const toastId = id ?? "auth-status";
+    if (!status) {
+      toast.dismiss(toastId);
+      return;
+    }
+    const toastOptions = { id: toastId };
+    if (tone === "error") toast.error(status, toastOptions);
+    else if (tone === "success") toast.success(status, toastOptions);
+    else toast(status, toastOptions);
+  }, [id, status, tone]);
   return (
     <p id={id} role="status" aria-live="polite">
       {status}

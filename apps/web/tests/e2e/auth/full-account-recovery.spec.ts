@@ -53,17 +53,20 @@ async function waitForMailLink(
 ) {
   let link = "";
   await expect
-    .poll(async () => {
-      for (const name of (await readdir(mailDirectory)).filter(
-        (candidate) => !before.has(candidate),
-      )) {
-        const body = await readFile(resolve(mailDirectory, name), "utf8");
-        if (body.includes(`To: ${email}`)) {
-          link = body.match(pattern)?.[0] ?? link;
+    .poll(
+      async () => {
+        for (const name of (await readdir(mailDirectory)).filter(
+          (candidate) => !before.has(candidate),
+        )) {
+          const body = await readFile(resolve(mailDirectory, name), "utf8");
+          if (body.includes(`To: ${email}`)) {
+            link = body.match(pattern)?.[0] ?? link;
+          }
         }
-      }
-      return Boolean(link);
-    }, { timeout: 20_000 })
+        return Boolean(link);
+      },
+      { timeout: 20_000 },
+    )
     .toBe(true);
   return link;
 }
@@ -83,7 +86,9 @@ async function registerVerifyAndEnroll(page: Page) {
     /http:\/\/localhost:3001\/verify-email\?token=[A-Za-z0-9._~-]+/,
   );
   await page.goto(verificationLink);
-  await expect(page.getByRole("heading", { name: "Email verified" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Email verified" }),
+  ).toBeVisible();
   await page.goto("/login");
   await page.getByLabel("Email address").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
@@ -102,7 +107,9 @@ async function registerVerifyAndEnroll(page: Page) {
   const enrollment = page.getByRole("region", {
     name: "Set up two-factor authentication",
   });
-  await enrollment.getByLabel("Current password", { exact: true }).fill(password);
+  await enrollment
+    .getByLabel("Current password", { exact: true })
+    .fill(password);
   await enrollment.getByRole("button", { name: "Continue" }).click();
   const secret = (await page.locator(".totp-manual code").innerText()).trim();
   await page.getByLabel("Six-digit code").fill(totp(secret));
@@ -112,9 +119,11 @@ async function registerVerifyAndEnroll(page: Page) {
       response.request().method() === "POST",
   );
   await page.getByRole("button", { name: "Verify and enable" }).click();
-  const backupCodes = ((await (await verification).json()) as {
-    backupCodes: string[];
-  }).backupCodes;
+  const backupCodes = (
+    (await (await verification).json()) as {
+      backupCodes: string[];
+    }
+  ).backupCodes;
   expect(backupCodes).toHaveLength(10);
   return { email, secret, backupCode: backupCodes[0] };
 }
@@ -128,9 +137,13 @@ async function requestRecovery(page: Page, email: string) {
       result.url().endsWith("/api/identity/account-recovery/request") &&
       result.request().method() === "POST",
   );
-  await page.getByRole("button", { name: "Send recovery instructions" }).click();
+  await page
+    .getByRole("button", { name: "Send recovery instructions" })
+    .click();
   expect((await response).status()).toBe(202);
-  await expect(page.getByRole("status")).toContainText("eligible");
+  await expect(page.getByRole("status")).toContainText(
+    "instructions will be sent",
+  );
   return {
     before,
     confirmationLink: await waitForMailLink(
@@ -191,7 +204,7 @@ test.afterAll(async () => {
   await pool.end();
 });
 
-test("full recovery is generic, cancellable once, held for 24 hours, and completes without a session", async ({
+test("full recovery differentiates request eligibility, is cancellable once, held for 24 hours, and completes without a session", async ({
   page,
 }) => {
   test.setTimeout(420_000);
@@ -202,12 +215,15 @@ test("full recovery is generic, cancellable once, held for 24 hours, and complet
   await page
     .getByLabel("Email address")
     .fill(`unknown-${Date.now()}@example.test`);
-  await page.getByRole("button", { name: "Send recovery instructions" }).click();
-  await expect(page.getByRole("status")).toContainText("eligible");
-  const unknownMessage = await page.getByRole("status").innerText();
+  await page
+    .getByRole("button", { name: "Send recovery instructions" })
+    .click();
+  await expect(page.getByRole("status")).toContainText("No eligible account");
 
   const first = await requestRecovery(page, email);
-  expect(await page.getByRole("status").innerText()).toBe(unknownMessage);
+  await expect(page.getByRole("status")).toContainText(
+    "instructions will be sent",
+  );
   const firstLinks = await confirmAndReadPendingLinks(
     page,
     email,
@@ -231,7 +247,9 @@ test("full recovery is generic, cancellable once, held for 24 hours, and complet
   await expect(page.getByRole("status")).toContainText("cancelled");
   const replay = await page.context().newPage();
   await replay.goto(firstLinks.cancellationLink);
-  await expect(replay.getByRole("status")).toContainText(/invalid|used|expired/);
+  await expect(replay.getByRole("status")).toContainText(
+    /invalid|used|expired/,
+  );
   await replay.close();
 
   const second = await requestRecovery(page, email);
@@ -268,10 +286,7 @@ test("full recovery is generic, cancellable once, held for 24 hours, and complet
   await page.getByRole("button", { name: "Complete recovery" }).click();
   const completionResponse = await completion;
   const completionBody = await completionResponse.json().catch(() => ({}));
-  expect(
-    completionResponse.status(),
-    JSON.stringify(completionBody),
-  ).toBe(200);
+  expect(completionResponse.status(), JSON.stringify(completionBody)).toBe(200);
   await expect(page.getByRole("status")).toContainText("complete");
   await expect(
     page.getByText(
@@ -309,11 +324,15 @@ test("full recovery is generic, cancellable once, held for 24 hours, and complet
   await page.getByRole("button", { name: "Backup code" }).click();
   await page.getByLabel("Backup code").fill(backupCode);
   await page.getByRole("button", { name: "Verify" }).click();
-  await expect(page.getByRole("status")).toContainText("could not be completed");
+  await expect(page.getByRole("status")).toContainText(
+    "could not be completed",
+  );
   await page.getByRole("button", { name: "Authenticator code" }).click();
   await page.getByLabel("Authentication code").fill(totp(secret));
   await page.getByRole("button", { name: "Verify" }).click();
-  await expect(page.getByRole("status")).toContainText("could not be completed");
+  await expect(page.getByRole("status")).toContainText(
+    "could not be completed",
+  );
 
   await page.goto("/login");
   await page.getByLabel("Email address").fill(email);

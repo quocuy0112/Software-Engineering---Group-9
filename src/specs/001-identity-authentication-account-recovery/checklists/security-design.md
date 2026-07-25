@@ -19,7 +19,7 @@
 - [x] Security, accessibility, contract, integration, E2E, and measured performance tests are planned
 - [x] Transactional email uses one server-only adapter selector, leased PostgreSQL `SKIP LOCKED` claims, bounded retry/DEAD transitions, unique terminal audit, secret-safe errors, and a supervised worker with verified no-orphan teardown
 - [x] Normal password reset is an idempotent fail-closed saga with one token claimant, durable audit intent/finalization, Better Auth password update, session/challenge cleanup, idempotent notification enqueue, 2FA preservation, retry/concurrency policy, and a login block while mandatory cleanup is incomplete
-- [x] Full account recovery is explicitly separate, enumeration-safe, verified-email based, HMAC-proof protected, held for 24 hours, cancellable once, login-blocking while pending, and the only path that disables old 2FA/backup codes after the hold; email-only recovery is documented as lower assurance
+- [x] Full account recovery is explicitly separate, eligibility-aware with distinct not-found and queued-success outcomes, verified-email based, HMAC-proof protected, held for 24 hours, cancellable once, login-blocking while pending, and the only path that disables old 2FA/backup codes after the hold; email-only recovery is documented as lower assurance
 
 ## Implementation gate
 

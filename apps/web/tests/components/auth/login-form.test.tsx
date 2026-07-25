@@ -1,6 +1,16 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { LoginForm } from "@/components/auth/login-form";
+
+const { toast } = vi.hoisted(() => ({
+  toast: {
+    error: vi.fn(),
+    success: vi.fn(),
+    info: vi.fn(),
+  },
+}));
+vi.mock("sonner", () => ({ toast }));
+
 describe("login form", () => {
   it("shows inline validation with password autocomplete", async () => {
     render(<LoginForm />);
@@ -13,7 +23,7 @@ describe("login form", () => {
       await screen.findByText("Enter a valid email address."),
     ).toBeVisible();
   });
-  it("shows the generic server error and prevents duplicate submission", async () => {
+  it("shows one current server error in the fail toast and prevents duplicate submission", async () => {
     let release!: () => void;
     const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(
       () =>
@@ -21,7 +31,7 @@ describe("login form", () => {
           release = () =>
             resolve(
               Response.json(
-                { message: "Email or password is incorrect." },
+                { message: "The password is incorrect." },
                 { status: 401 },
               ),
             );
@@ -40,9 +50,12 @@ describe("login form", () => {
     release();
     await waitFor(() =>
       expect(screen.getByRole("status")).toHaveTextContent(
-        "Email or password is incorrect.",
+        "The password is incorrect.",
       ),
     );
+    expect(toast.error).toHaveBeenCalledWith("The password is incorrect.", {
+      id: "auth-status",
+    });
     fetchMock.mockRestore();
   });
 });
