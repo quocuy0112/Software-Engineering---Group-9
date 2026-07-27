@@ -3,6 +3,7 @@ import { auth } from "@/server/auth/config";
 import { prisma } from "@/lib/db/prisma";
 import { symmetricDecrypt } from "better-auth/crypto";
 import { serverEnvironment } from "@/lib/env/runtime";
+import { createCredentialFixture } from "../../helpers/credential-fixture";
 
 export const fixturePassword = "Backup Code Fixture 2026!";
 const origin = "http://localhost:3001";
@@ -39,15 +40,10 @@ export async function authRequest(
 export async function enabledFixture() {
   const id = randomUUID(),
     email = `backup-${id}@example.test`;
-  const signup = await authRequest("/sign-up/email", {
+  const user = await createCredentialFixture({
     name: "Backup User",
     email,
     password: fixturePassword,
-  });
-  if (!signup.ok) throw new Error("fixture signup failed");
-  const user = await prisma.userAccount.update({
-    where: { normalizedEmail: email },
-    data: { state: "ACTIVE", emailVerified: true },
   });
   const login = await authRequest("/sign-in/email", {
     email,

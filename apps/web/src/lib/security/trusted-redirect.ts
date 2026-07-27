@@ -1,18 +1,28 @@
-const unsafe = /[\\\u0000-\u001f\u007f-\u009f]/;
+function hasUnsafeCharacter(value: string) {
+  return Array.from(value).some((character) => {
+    const code = character.codePointAt(0) ?? 0;
+    return (
+      character === "\\" ||
+      code <= 0x1f ||
+      (code >= 0x7f && code <= 0x9f)
+    );
+  });
+}
 
 export function trustedInternalRedirect(
   value: string | null | undefined,
   applicationUrl: string,
   fallback = "/",
 ) {
-  if (!value || unsafe.test(value) || value.startsWith("//")) return fallback;
+  if (!value || hasUnsafeCharacter(value) || value.startsWith("//"))
+    return fallback;
   let decoded: string;
   try {
     decoded = decodeURIComponent(value);
   } catch {
     return fallback;
   }
-  if (unsafe.test(decoded) || decoded.startsWith("//")) return fallback;
+  if (hasUnsafeCharacter(decoded) || decoded.startsWith("//")) return fallback;
   try {
     const base = new URL(applicationUrl);
     const target = new URL(decoded, base);

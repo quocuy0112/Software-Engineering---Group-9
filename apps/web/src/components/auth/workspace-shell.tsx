@@ -54,15 +54,7 @@ export function WorkspaceShell({
             <span className="workspace-product-label">Talent workspace</span>
           </div>
           <WorkspaceNavigation busy={busy} onSignOut={() => void signOut()} />
-          <div className="workspace-sidebar-footer">
-            <span className="sidebar-footer-mark" aria-hidden="true">
-              ✦
-            </span>
-            <span>
-              <strong>Private by default</strong>
-              <small>Your identity is protected.</small>
-            </span>
-          </div>
+          <div className="workspace-sidebar-footer"></div>
         </aside>
         <div className="workspace-main">
           <header className="workspace-header">

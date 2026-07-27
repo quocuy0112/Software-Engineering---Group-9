@@ -17,7 +17,7 @@ Deliver the approved P0 identity scope in one Next.js App Router application. Ne
 
 
 **TOTP QR dependency decision**: Exact `qrcode` 1.5.4 and `@types/qrcode` 1.5.6 are approved for the T061–T069 enrollment increment, including gate T180, and resolve through the sole root lockfile. The replaceable server-only boundary is `apps/web/src/server/auth/identity/totp-qr-code.ts`. T180 directly blocks T065 and proves only pre-implementation compatibility; the QR ADR defines detailed boundary and security rules.
-**Primary dependencies**: Next.js `16.2.11`; Better Auth and `@better-auth/prisma-adapter` `1.6.13`; Prisma and `@prisma/client` `7.9.0`; Resend `6.17.2`; exact React Email package versions are a blocking T002 compatibility outcome and must be recorded in `apps/web/package.json`, the root lockfile, and dependency-compatibility evidence before email work begins; Tailwind CSS; shadcn/ui; React Hook Form; Zod; Sonner; `@tanstack/react-query` `5.101.4` for sanitized session/resend mutations only; optional Zustand and Motion under the restrictions below
+**Primary dependencies**: Next.js `16.2.11`; Better Auth and `@better-auth/prisma-adapter` `1.6.25`; Prisma and `@prisma/client` `7.9.0`; ESLint `10.8.0` with direct flat-config plugins; Resend `6.17.2`; exact React Email package versions are a blocking T002 compatibility outcome and must be recorded in `apps/web/package.json`, the root lockfile, and dependency-compatibility evidence before email work begins; Tailwind CSS; shadcn/ui; React Hook Form; Zod; Sonner; `@tanstack/react-query` `5.101.4` for sanitized session/resend mutations only; optional Zustand and Motion under the restrictions below
 **Storage**: PostgreSQL 16.12 through root Docker Compose locally (host port `55432`, health check, persistent named volume); PostgreSQL remains the only production database; Prisma ORM and Prisma Migrate run from `apps/web/`
 
 **Testing**: unit, OpenAPI contract, PostgreSQL integration, component/accessibility, and browser E2E tests with controlled clock and concurrency cases  
@@ -113,9 +113,9 @@ Local infrastructure requires only Docker Desktop or another compatible Docker C
 
 ## Better Auth Ownership and Capability Matrix
 
-Pin Better Auth `1.6.13` and regenerate its Prisma schema with that exact CLI version. Use the same version for the package and schema generation; review generated SQL and apply only through Prisma Migrate.
+Pin Better Auth `1.6.25` and regenerate its Prisma schema with that exact CLI version. Use the same version for the package and schema generation; review generated SQL and apply only through Prisma Migrate. The provider-native sign-up option is disabled, and the generic `/api/auth/**` Route Handler returns a no-store 404; all public operations must cross the typed `/api/identity/**` SmartHire boundary.
 
-| Requirement | Better Auth 1.6.13 verified behavior | SmartHire work |
+| Requirement | Better Auth 1.6.25 verified behavior | SmartHire work |
 |---|---|---|
 | One opaque PostgreSQL session | Database mode stores opaque `Session.token`; the cookie carries that token; server `getSession` validates it. Cookie cache/stateless mode remain disabled. | Configure PostgreSQL Prisma adapter; require Better Auth server APIs at every protected entry point. |
 | Current-session logout | Native sign-out revokes the current session and clears its cookie. | Wrap with origin/CSRF policy and audit. |
@@ -126,7 +126,7 @@ Pin Better Auth `1.6.13` and regenerate its Prisma schema with that exact CLI ve
 | Maximum five active sessions | No verified native cap. | Serialize creation per user; revoke least-recent non-current sessions until count ≤5; audit. |
 | Suspended/Deleted rejection | Better Auth does not know SmartHire domain states. | `UserAccount.state` hook/service denies sign-in and protected access and revokes remaining sessions; scheduled cleanup is defense in depth. |
 | Authentication audit events | No complete SmartHire append-only audit contract. | Hooks/services append allowlisted events without secrets. |
-| TOTP and backup codes | Two-factor plugin owns TOTP configuration, persistence, and serialized backup codes; used codes are removed and regeneration replaces the old set. | Disable email OTP/trusted devices; verify encryption-at-rest and atomic concurrent single-use against 1.6.13. A SmartHire TOTP persistence-encryption extension is permitted only when the spike proves it necessary, Better Auth integration supports it safely, and an approved ADR documents it; it must not create duplicate ownership. |
+| TOTP and backup codes | Two-factor plugin owns TOTP configuration, encrypted persistence, serialized backup codes, failed-verification count, lock timestamp, atomic used-code removal, and set replacement. | Disable email OTP/trusted devices; preserve the 1.6.25 `failedVerificationCount` and `lockedUntil` schema fields; retain SmartHire request/challenge rate limits as an independent outer control without duplicate TOTP ownership. |
 
 The Better Auth JWT plugin is not configured for browser authentication. A future service-to-service JWT is only an architectural note and is not implemented by this feature.
 
@@ -207,7 +207,7 @@ No browser-session JWT issuer, audience, or signing variables exist.
 - PostgreSQL integration tests cover normalized-email races, one-time tokens, outbox idempotency, concurrent backup-code use, session cap, idle/absolute expiry, reset revocation, and Suspended/Deleted denial.
 - Reset/recovery integration tests must cover token claim and operation idempotency, Better Auth factor preservation, durable audit intent/finalization, failure injection at every saga milestone, concurrent reset submission, recovery-operation persistence, verified-email confirmation, 24-hour hold enforcement, one-time cancellation, login blocking, post-hold completion, and disabling old 2FA only during full recovery.
 - Environment checks verify Node `24.18.x`, npm workspace/one-lockfile invariants, Docker Compose availability, container health, port `55432`, required local files, and capture-directory writability without printing secrets.
-- Version-compatibility tests exercise Better Auth 1.6.13 schema, Prisma adapter, TOTP storage, backup-code regeneration/single-use, list/revoke/logout, and cookie issuance against the Compose PostgreSQL service before implementation is accepted.
+- Version-compatibility tests exercise Better Auth 1.6.25 schema, Prisma adapter, TOTP storage and lockout fields, backup-code regeneration/single-use, list/revoke/logout, and cookie issuance against the Compose PostgreSQL service before implementation is accepted.
 - Accessibility tests require keyboard access, focus management, labels, readable inline errors/summaries, reduced motion, responsive layouts, and no color-only status.
 - Navigation component tests cover semantic landmarks, labelled/expanded mobile controls, active-page state, internal Link destinations, sign-out busy/error behavior, reduced motion, and 320px overflow. Serial Playwright flows prove Visitor cross-links and Authenticated User Dashboard -> Security -> Sessions -> Sign out transitions using response, URL, and destination landmarks.
 - Browser E2E tests must prove public `/` and `/home` compatibility, protected Dashboard/Profile routes, normal-reset 2FA preservation and re-login, and the full-recovery request/confirmation/hold/cancellation/completion policy using isolated fixtures and controlled time. A current PASS may be recorded only from a reproducible validation run.
@@ -215,12 +215,15 @@ No browser-session JWT issuer, audience, or signing variables exist.
 
 ## Dependency Security Assessment
 
-`npm audit --json` was rerun on 2026-07-24 without `--force`: 0 critical,
-0 high, 0 moderate, 0 low. The dependency repair pins Better Auth and its
-adapter to 1.6.13, Next.js to 16.2.11, Prisma packages to 7.9.0, PostCSS to
-8.5.22, and sharp to 0.35.3. Real PostgreSQL compatibility, Prisma migration,
-Vitest, Playwright, lint, typecheck, and production-build gates all passed
-after the repair.
+`npm audit --json` was rerun on 2026-07-27 without `--force`: 0 critical,
+0 high, 0 moderate, 0 low. The repair pins Better Auth and its adapter to
+1.6.25, keeps Next.js 16.2.11 and Prisma 7.9.0, overrides Prisma development
+transitives to `find-my-way` 9.7.0 and `valibot` 1.4.2, and replaces the legacy
+Next ESLint preset chain with ESLint 10.8.0 plus direct flat-config plugins so
+only `brace-expansion` 5.0.8 resolves. The forced npm proposal was rejected
+because it attempted incompatible Prisma/ESLint/Next-config changes and still
+left findings. Real PostgreSQL compatibility, migration, Vitest, lint,
+typecheck, production-build, and audit gates are required after the repair.
 
 ## Post-Design Constitution Re-check
 

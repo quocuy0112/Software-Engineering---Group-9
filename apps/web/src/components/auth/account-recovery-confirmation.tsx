@@ -1,43 +1,41 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useAccountRecoveryCapability } from "@/features/identity/client/use-account-recovery-capability";
 import { AuthStatus } from "./auth-status";
 
 export function AccountRecoveryConfirmation() {
-  const [status, setStatus] = useState("Confirming your recovery request…");
+  const capability = useAccountRecoveryCapability("confirmation");
+  const [status, setStatus] = useState("");
   const [holdEndsAt, setHoldEndsAt] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    const value = new URLSearchParams(window.location.hash.slice(1)).get(
-      "proof",
-    );
-    window.history.replaceState(null, "", window.location.pathname);
-    void (async () => {
-      if (!value) {
-        setStatus(
-          "This account-recovery link is invalid, expired, or already used.",
-        );
-        return;
-      }
-      try {
-        const response = await fetch("/api/identity/account-recovery/confirm", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ proof: value }),
-        });
-        const result = (await response.json().catch(() => null)) as {
-          message?: string;
-          holdEndsAt?: string;
-        } | null;
-        setStatus(result?.message ?? "The recovery request could not be confirmed.");
-        if (response.ok && result?.holdEndsAt) setHoldEndsAt(result.holdEndsAt);
-      } catch {
-        setStatus("The recovery request could not be confirmed.");
-      } finally {
-      }
-    })();
-  }, []);
+  async function confirm() {
+    if (busy || capability !== "authorized") return;
+    setBusy(true);
+    setStatus("");
+    try {
+      const response = await fetch("/api/identity/account-recovery/confirm", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      });
+      const result = (await response.json().catch(() => null)) as {
+        message?: string;
+        holdEndsAt?: string;
+      } | null;
+      setStatus(
+        result?.message ?? "The recovery request could not be confirmed.",
+      );
+      if (response.ok && result?.holdEndsAt) setHoldEndsAt(result.holdEndsAt);
+    } catch {
+      setStatus("The recovery request could not be confirmed.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <section className="auth-form-content">
@@ -50,6 +48,14 @@ export function AccountRecoveryConfirmation() {
             password or factor change.
           </p>
         </div>
+        {capability === "authorizing" ? (
+          <AuthStatus status="Verifying this secure recovery link…" />
+        ) : null}
+        {capability === "authorized" && !holdEndsAt ? (
+          <button type="button" onClick={confirm} disabled={busy}>
+            {busy ? "Starting security hold…" : "Start 24-hour security hold"}
+          </button>
+        ) : null}
         <AuthStatus status={status} />
         {holdEndsAt ? (
           <p>

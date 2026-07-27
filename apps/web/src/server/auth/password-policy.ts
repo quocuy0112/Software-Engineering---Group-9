@@ -17,6 +17,13 @@ const compromisedPasswords = new Set([
   "smarthire1234",
 ]);
 
+function hasControlCharacter(value: string) {
+  return Array.from(value).some((character) => {
+    const code = character.codePointAt(0) ?? 0;
+    return code <= 0x1f || code === 0x7f;
+  });
+}
+
 export type PasswordPolicyResult =
   | { accepted: true }
   | {
@@ -53,11 +60,7 @@ export class PasswordPolicy {
       }
     }
     const length = [...password].length;
-    if (
-      length < 12 ||
-      length > 128 ||
-      /[\u0000-\u001f\u007f]/u.test(password)
-    ) {
+    if (length < 12 || length > 128 || hasControlCharacter(password)) {
       if (context)
         await this.appendAudit("password.policy_rejected", "DENIED", context);
       return {

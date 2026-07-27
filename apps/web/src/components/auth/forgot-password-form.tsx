@@ -9,107 +9,34 @@ import {
 import { AuthStatus } from "./auth-status";
 import { useReplayableStatus } from "./use-status";
 
-// Must stay in sync with `rateLimitPolicies.passwordReset` in policies.ts (10 minutes).
-const FORGOT_PASSWORD_LOCKOUT_WINDOW_MS = 10 * 60 * 1000;
-
-type ForgotPasswordAttemptState = {
-  count: number;
-  lockedUntil?: number;
-};
-
-function readForgotPasswordAttemptState(email: string) {
-  if (typeof window === "undefined") return { count: 0 } as ForgotPasswordAttemptState;
-  const key = getAccountStorageKey(email);
-  const stored = window.localStorage.getItem(key);
-  if (!stored) return { count: 0 } as ForgotPasswordAttemptState;
-  try {
-    const parsed = JSON.parse(stored) as ForgotPasswordAttemptState;
-    if (parsed.lockedUntil && parsed.lockedUntil > Date.now()) return parsed;
-    if (parsed.lockedUntil && parsed.lockedUntil <= Date.now()) {
-      window.localStorage.removeItem(key);
-      return { count: 0 };
-    }
-    return { count: parsed.count ?? 0 };
-  } catch {
-    window.localStorage.removeItem(key);
-    return { count: 0 } as ForgotPasswordAttemptState;
-  }
-}
-
-function writeForgotPasswordAttemptState(email: string, count: number, lockedUntil?: number) {
-  if (typeof window === "undefined") return;
-  const key = getAccountStorageKey(email);
-  if (count <= 0) {
-    window.localStorage.removeItem(key);
-    return;
-  }
-  window.localStorage.setItem(key, JSON.stringify({ count, lockedUntil }));
-}
-
-function getForgotPasswordLockedMessage(lockedUntil: number) {
-  const minutes = Math.max(1, Math.ceil((lockedUntil - Date.now()) / 60000));
-  return `Password-reset requests are temporarily limited. Please wait ${minutes} minute${minutes === 1 ? "" : "s"} before trying again.`;
-}
-
-const MAX_FORGOT_PASSWORD_ATTEMPTS = 3;
-const FORGOT_PASSWORD_STORAGE_KEY_PREFIX = "smarthire-forgot-password-attempts:";
-
-function getAccountStorageKey(email: string) {
-  return `${FORGOT_PASSWORD_STORAGE_KEY_PREFIX}${email.trim().toLowerCase()}`;
-}
-
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
   const { status, setStatus } = useReplayableStatus("");
-  // AuthStatus needs an explicit tone: "error" for lockouts/network failures,
-  // "message" for the normal (intentionally ambiguous) "check your email" reply.
-  const [statusTone, setStatusTone] = useState<"message" | "error" | "success">(
-    "message",
-  );
+  const [statusTone, setStatusTone] = useState<"error" | "success">("error");
   const [busy, setBusy] = useState(false);
-  const [isLocked, setIsLocked] = useState(false);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const normalizedEmail = email.trim().toLowerCase();
-    const state = readForgotPasswordAttemptState(normalizedEmail);
-    if (busy || (state.lockedUntil && state.lockedUntil > Date.now())) {
-      if (state.lockedUntil && state.lockedUntil > Date.now()) {
-        setIsLocked(true);
-        setStatusTone("error");
-        setStatus(getForgotPasswordLockedMessage(state.lockedUntil));
-      }
-      return;
-    }
+    if (busy) return;
+
     setBusy(true);
     setStatus("");
     try {
       const response = await fetch("/api/identity/password/forgot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
       });
       const result = (await response.json().catch(() => null)) as {
         message?: string;
       } | null;
-      const nextAttempts = state.count + 1;
-      const remaining = MAX_FORGOT_PASSWORD_ATTEMPTS - nextAttempts;
-      const lockedUntil =
-        nextAttempts >= MAX_FORGOT_PASSWORD_ATTEMPTS
-          ? Date.now() + FORGOT_PASSWORD_LOCKOUT_WINDOW_MS
-          : undefined;
-      writeForgotPasswordAttemptState(normalizedEmail, nextAttempts, lockedUntil);
-      if (lockedUntil) {
-        setIsLocked(true);
-        setStatusTone("error");
-        setStatus(getForgotPasswordLockedMessage(lockedUntil));
-      } else {
-        setIsLocked(false);
-        setStatusTone("message");
-        setStatus(
-          `${result?.message ?? PASSWORD_RECOVERY_SUCCESS_RESPONSE} (${remaining} attempt${remaining === 1 ? "" : "s"} remaining)`,
-        );
-      }
+      setStatusTone(response.ok ? "success" : "error");
+      setStatus(
+        result?.message ??
+          (response.ok
+            ? PASSWORD_RECOVERY_SUCCESS_RESPONSE
+            : PASSWORD_RECOVERY_REQUEST_FAILED_ERROR),
+      );
     } catch {
       setStatusTone("error");
       setStatus(PASSWORD_RECOVERY_REQUEST_FAILED_ERROR);

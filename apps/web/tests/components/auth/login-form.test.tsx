@@ -57,9 +57,12 @@ describe("login form", () => {
         "Email or password is incorrect. (4 attempts remaining)",
       ),
     );
-    expect(toast.error).toHaveBeenCalledWith("The password is incorrect.", {
+    expect(toast.error).toHaveBeenCalledWith(
+      "Email or password is incorrect. (4 attempts remaining)",
+      {
       id: "auth-status",
-    });
+      },
+    );
     fetchMock.mockRestore();
   });
 
@@ -114,7 +117,7 @@ describe("login form", () => {
         /Your account has been temporarily locked after too many failed sign-in attempts\. Please try again in \d+ minute(s)?\./,
       ),
     );
-    expect(screen.getByRole("button", { name: "Sign in" })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: "Sign in" })).toBeDisabled();
 
     fetchMock.mockRestore();
   });

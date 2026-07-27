@@ -11,17 +11,24 @@ const optionalBooleanString = z.preprocess(
   (value) => (value === "" || value === undefined ? undefined : value),
   booleanString.optional(),
 );
-const mailbox =
-  /^[^<>\s@\u0000-\u001f\u007f-\u009f]+@[^<>\s@\u0000-\u001f\u007f-\u009f]+\.[^<>\s@\u0000-\u001f\u007f-\u009f]+$/;
+const mailbox = /^[^<>\s@]+@[^<>\s@]+\.[^<>\s@]+$/;
+const hasControlCharacter = (value: string) =>
+  Array.from(value).some((character) => {
+    const code = character.codePointAt(0) ?? 0;
+    return code <= 0x1f || (code >= 0x7f && code <= 0x9f);
+  });
 const safeMailbox = z
   .string()
   .trim()
-  .refine((value) => mailbox.test(value), "must be a complete email address");
+  .refine(
+    (value) => !hasControlCharacter(value) && mailbox.test(value),
+    "must be a complete email address",
+  );
 const smtpFrom = z
   .string()
   .trim()
   .refine((value) => {
-    if (/[\u0000-\u001f\u007f-\u009f]/.test(value)) return false;
+    if (hasControlCharacter(value)) return false;
     const display = value.match(/^(?:[^<>]+\s)?<([^<>]+)>$/);
     return mailbox.test(display?.[1] ?? value);
   }, "must contain a safe complete email address")

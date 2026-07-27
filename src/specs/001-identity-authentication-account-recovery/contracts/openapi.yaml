@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: SmartHire Identity API
   version: 0.1.0
-  description: Browser-facing contracts implemented only by apps/web/src/app/api/**/route.ts in the modular full-stack Next.js application. Better Auth owns the single opaque PostgreSQL-backed browser session and its only authentication cookie. All errors/logs omit secrets; state-changing browser writes require same-origin validation, and recovery proofs arrive only in URL fragments before being POSTed.
+  description: Browser-facing contracts implemented only by apps/web/src/app/api/**/route.ts in the modular full-stack Next.js application. Better Auth owns the single opaque PostgreSQL-backed browser session and its only authentication cookie. All errors/logs omit secrets; state-changing browser writes require same-origin validation. Recovery proofs arrive only in URL fragments and may be POSTed only to the read-only capability exchange; mutation endpoints require the resulting encrypted HttpOnly capability cookie.
 servers:
   - url: https://{configured-origin}
 paths:
@@ -119,33 +119,46 @@ paths:
         '404': {$ref: '#/components/responses/EligibleRecoveryAccountNotFound'}
         '429': {$ref: '#/components/responses/RateLimited'}
         '503': {$ref: '#/components/responses/RequestUnavailable'}
+  /api/identity/account-recovery/capability:
+    post:
+      operationId: authorizeAccountRecoveryRoute
+      security: []
+      description: Exchanges a valid fragment-carried one-time proof for a five-minute encrypted HttpOnly, SameSite=Strict, route-scoped capability cookie. This read-only gate never mutates account state and never returns the proof.
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/RecoveryCapabilityRequest'}}}}
+      responses:
+        '200': {description: A short-lived route capability was issued}
+        '400': {$ref: '#/components/responses/GenericFailure'}
+        '403': {$ref: '#/components/responses/GenericFailure'}
   /api/identity/account-recovery/confirm:
     post:
       operationId: confirmFullAccountRecovery
-      security: []
-      description: Consuming one verified-email proof starts one 24-hour hold, revokes sessions/challenges, and queues one-time completion and cancellation links. Proofs are never returned by the API.
-      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/RecoveryProofRequest'}}}}
+      security: [{recoveryCapabilityCookie: []}]
+      description: Consuming the server-validated proof held in the short-lived capability cookie starts one 24-hour hold, revokes sessions/challenges, and queues one-time completion and cancellation links. Link navigation alone never changes account state.
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/EmptyActionRequest'}}}}
       responses:
         '202': {description: Confirmation accepted; the 24-hour hold is active and login is blocked, content: {application/json: {schema: {$ref: '#/components/schemas/RecoveryHoldOutcome'}}}}
         '400': {$ref: '#/components/responses/GenericFailure'}
+        '403': {$ref: '#/components/responses/GenericFailure'}
   /api/identity/account-recovery/cancel:
     post:
       operationId: cancelFullAccountRecovery
-      security: []
-      description: A valid cancellation proof is single-use and may cancel an incomplete recovery operation before the hold ends.
-      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/RecoveryProofRequest'}}}}
+      security: [{recoveryCapabilityCookie: []}]
+      description: The cancellation proof in a valid capability cookie is single-use and may cancel an incomplete recovery operation before the hold ends. An explicit user action is required.
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/EmptyActionRequest'}}}}
       responses:
         '200': {description: Cancellation processed without disclosing account state, content: {application/json: {schema: {$ref: '#/components/schemas/Outcome'}}}}
         '400': {$ref: '#/components/responses/GenericFailure'}
+        '403': {$ref: '#/components/responses/GenericFailure'}
   /api/identity/account-recovery/complete:
     post:
       operationId: completeFullAccountRecovery
-      security: []
+      security: [{recoveryCapabilityCookie: []}]
       description: Deferred MVP contract. Completion is allowed only after the 24-hour hold; it changes the Better Auth password and disables old TOTP and backup codes only in this full-recovery completion step, then requires a new login.
       requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/CompleteRecoveryRequest'}}}}
       responses:
         '200': {description: Full recovery completed; old 2FA disabled, sessions/challenges revoked, notification/audit durable, and no automatic login}
         '400': {$ref: '#/components/responses/GenericFailure'}
+        '403': {$ref: '#/components/responses/GenericFailure'}
         '409': {$ref: '#/components/responses/RecoveryHoldActive'}
   /api/identity/logout:
     post:
@@ -172,6 +185,7 @@ components:
   securitySchemes:
     sessionCookie: {type: apiKey, in: cookie, name: __Host-smarthire.session, description: 'Production Better Auth opaque session cookie: Secure=true; HttpOnly=true; SameSite=Lax; Path=/; no Domain. Development without HTTPS uses unprefixed smarthire.session with Secure=false; it never uses the __Host- prefix.'}
     preAuthCookie: {type: apiKey, in: cookie, name: __Secure-smarthire.pre-auth, description: 'Production non-authenticating challenge handle: Secure=true; HttpOnly=true; SameSite=Lax; Path=/api/identity/two-factor/complete. Development without HTTPS uses unprefixed smarthire.pre-auth with Secure=false; it never uses the __Secure- prefix.'}
+    recoveryCapabilityCookie: {type: apiKey, in: cookie, name: __Secure-smarthire.recovery-capability, description: 'Five-minute encrypted non-session capability: Secure=true; HttpOnly=true; SameSite=Strict; Path=/api/identity/account-recovery; no Domain. Development HTTP uses the unprefixed smarthire.recovery-capability cookie.'}
     csrfToken: {type: apiKey, in: header, name: X-CSRF-Token}
   schemas:
     RegisterRequest:
@@ -207,13 +221,13 @@ components:
         currentPassword: {type: string, writeOnly: true}
         code: {type: string, pattern: '^[0-9]{6}$', writeOnly: true}
     ResetPasswordRequest: {type: object, additionalProperties: false, required: [token, newPassword, confirmPassword], properties: {token: {type: string, writeOnly: true}, newPassword: {type: string, minLength: 12, maxLength: 128, writeOnly: true}, confirmPassword: {type: string, minLength: 12, maxLength: 128, writeOnly: true}}}
-    RecoveryProofRequest: {type: object, additionalProperties: false, required: [proof], properties: {proof: {type: string, minLength: 32, maxLength: 1024, writeOnly: true}}}
+    RecoveryCapabilityRequest: {type: object, additionalProperties: false, required: [kind, proof], properties: {kind: {type: string, enum: [confirmation, cancellation, completion]}, proof: {type: string, minLength: 32, maxLength: 512, writeOnly: true}}}
+    EmptyActionRequest: {type: object, additionalProperties: false}
     CompleteRecoveryRequest:
       type: object
       additionalProperties: false
-      required: [completionProof, newPassword, confirmPassword]
+      required: [newPassword, confirmPassword]
       properties:
-        completionProof: {type: string, minLength: 32, maxLength: 1024, writeOnly: true}
         newPassword: {type: string, minLength: 12, maxLength: 128, writeOnly: true}
         confirmPassword: {type: string, minLength: 12, maxLength: 128, writeOnly: true}
     LoginOutcome:
@@ -262,7 +276,7 @@ components:
     RequestUnavailable: {description: The request could not be completed because persistence was unavailable; no success is claimed}
     ValidationError: {description: Field-safe validation errors; no account-existence information}
     GenericFailure: {description: Generic invalid/expired/used failure without secret echo}
-    LoginCredentialFailure: {description: Login failure differentiated as account not found or incorrect password according to FR-012, content: {application/json: {schema: {type: object, additionalProperties: false, required: [message], properties: {message: {type: string, enum: [No account was found for this email., The password is incorrect., Email or password is incorrect.]}}}}}}
+    LoginCredentialFailure: {description: Generic credential failure that does not disclose whether the normalized email exists, content: {application/json: {schema: {type: object, additionalProperties: false, required: [message], properties: {message: {type: string, const: Email or password is incorrect.}}}}}}
     GenericAuthFailure: {description: Generic authentication failure}
     RecentAuthRequired: {description: Recent authentication/current proof required}
     RateLimited: {description: Generic retry-later response, headers: {Retry-After: {schema: {type: integer, minimum: 1}}}}

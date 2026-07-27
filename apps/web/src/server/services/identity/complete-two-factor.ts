@@ -116,25 +116,22 @@ export class CompleteTwoFactorService {
     }
     const forwarded = new Headers(headers);
     forwarded.set("cookie", providerCookieHeader(state.binding));
-    let session: string | null = null;
-    let response: Response | null = null;
-    if (factor === "backup-code") {
-      session = (
-        await this.backupGateway
-          .consumeBackupCode(forwarded, code)
-          .catch(() => ({ sessionCookie: null }))
-      ).sessionCookie;
-    } else {
-      response = await this.gateway
-        .verifyTotp(code, forwarded)
-        .catch(() => null);
-      session =
-        response?.headers
-          .getSetCookie()
-          .find((v) =>
-            /^(smarthire\.session|__Host-smarthire\.session)=/.test(v),
-          ) ?? null;
-    }
+    const session =
+      factor === "backup-code"
+        ? (
+            await this.backupGateway
+              .consumeBackupCode(forwarded, code)
+              .catch(() => ({ sessionCookie: null }))
+          ).sessionCookie
+        : (
+            await this.gateway
+              .verifyTotp(code, forwarded)
+              .catch(() => null)
+          )?.headers
+            .getSetCookie()
+            .find((value) =>
+              /^(smarthire\.session|__Host-smarthire\.session)=/.test(value),
+            ) ?? null;
     if (!session) {
       await this.challenges.releaseFailed(claim.id, claim.claimTime);
       await this.record("FAILURE", claim.userId, now, factor, "factor_rejected", correlationId);

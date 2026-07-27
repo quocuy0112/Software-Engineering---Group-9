@@ -1,8 +1,12 @@
 import {
-  accountRecoveryProofSchema,
+  accountRecoveryActionSchema,
   ACCOUNT_RECOVERY_GENERIC_ERROR,
 } from "@/features/identity/schemas/password-recovery";
 import { serverEnvironment } from "@/lib/env/runtime";
+import {
+  clearAccountRecoveryCapability,
+  readAccountRecoveryCapability,
+} from "@/lib/security/account-recovery-capability";
 import { clearSessionCookie } from "@/lib/security/cookies";
 import { validateSameOrigin } from "@/lib/security/csrf";
 import { noStoreHeaders } from "@/lib/security/response-headers";
@@ -13,6 +17,7 @@ function clearedAuthenticationHeaders() {
   const headers = new Headers(noStoreHeaders);
   headers.append("Set-Cookie", clearSessionCookie());
   headers.append("Set-Cookie", clearPreAuthCookie());
+  headers.append("Set-Cookie", clearAccountRecoveryCapability());
   return headers;
 }
 
@@ -23,17 +28,31 @@ export async function POST(request: Request) {
       { status: 403, headers: noStoreHeaders },
     );
   }
-  const parsed = accountRecoveryProofSchema.safeParse(
+  const capability = readAccountRecoveryCapability(
+    request.headers,
+    "cancellation",
+  );
+  if (!capability) {
+    const headers = new Headers(noStoreHeaders);
+    headers.append("Set-Cookie", clearAccountRecoveryCapability());
+    return Response.json(
+      { message: ACCOUNT_RECOVERY_GENERIC_ERROR },
+      { status: 403, headers },
+    );
+  }
+  const parsed = accountRecoveryActionSchema.safeParse(
     await request.json().catch(() => null),
   );
   if (!parsed.success) {
+    const headers = new Headers(noStoreHeaders);
+    headers.append("Set-Cookie", clearAccountRecoveryCapability());
     return Response.json(
       { message: ACCOUNT_RECOVERY_GENERIC_ERROR },
-      { status: 400, headers: noStoreHeaders },
+      { status: 400, headers },
     );
   }
   const result = await new CancelFullAccountRecoveryService().execute(
-    parsed.data.proof,
+    capability.proof,
   );
   return result.ok
     ? Response.json(
@@ -46,6 +65,6 @@ export async function POST(request: Request) {
       )
     : Response.json(
         { message: ACCOUNT_RECOVERY_GENERIC_ERROR },
-        { status: 400, headers: noStoreHeaders },
+        { status: 400, headers: clearedAuthenticationHeaders() },
       );
 }

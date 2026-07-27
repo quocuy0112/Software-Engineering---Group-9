@@ -162,6 +162,9 @@ async function confirmAndReadPendingLinks(
 ) {
   await page.goto(confirmationLink);
   await expect.poll(() => page.url()).not.toContain("#proof=");
+  await page
+    .getByRole("button", { name: "Start 24-hour security hold" })
+    .click();
   await expect(page.getByRole("status")).toContainText("24-hour");
   await expect(page.getByText(/lower assurance/i)).toBeVisible();
   return {
@@ -244,6 +247,7 @@ test("full recovery differentiates request eligibility, is cancellable once, hel
 
   await page.goto(firstLinks.cancellationLink);
   await expect.poll(() => page.url()).not.toContain("#proof=");
+  await page.getByRole("button", { name: "Cancel account recovery" }).click();
   await expect(page.getByRole("status")).toContainText("cancelled");
   const replay = await page.context().newPage();
   await replay.goto(firstLinks.cancellationLink);

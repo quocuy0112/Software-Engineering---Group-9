@@ -98,7 +98,7 @@ export function TwoFactorManagement({
       setPassword("");
       setCode("");
     };
-  }, []);
+  }, [setStatus]);
   useEffect(() => {
     if (codes.length === 0) return;
     const warn = (event: BeforeUnloadEvent) => event.preventDefault();
@@ -206,7 +206,9 @@ export function TwoFactorManagement({
       <div className="security-actions">
         <button
           type="button"
-          disabled={busy || !proof || !password || code.length !== 6}
+          disabled={
+            busy || isLocked || !proof || !password || code.length !== 6
+          }
           onClick={() => {
             if (
               window.confirm(
@@ -221,7 +223,9 @@ export function TwoFactorManagement({
         <button
           className="danger-action"
           type="button"
-          disabled={busy || !proof || !password || code.length !== 6}
+          disabled={
+            busy || isLocked || !proof || !password || code.length !== 6
+          }
           onClick={() => {
             if (window.confirm("Disable two-factor authentication?"))
               void submit("/api/identity/two-factor/disable");

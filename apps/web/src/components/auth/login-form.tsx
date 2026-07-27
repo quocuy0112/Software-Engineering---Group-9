@@ -57,19 +57,10 @@ function getLoginLockedMessage(lockedUntil: number) {
 
 const MAX_FAILED_LOGIN_ATTEMPTS = 5;
 const LOGIN_FAILURE_STORAGE_KEY_PREFIX = "smarthire-login-failed-attempts:";
-const LOCKED_LOGIN_MESSAGE =
-  "Your account has been temporarily locked after too many failed sign-in attempts. Please try again later.";
+const GENERIC_LOGIN_ERROR = "Email or password is incorrect.";
 
-function getAccountStorageKey(email: string) {
-  return `${LOGIN_FAILURE_STORAGE_KEY_PREFIX}${email.trim().toLowerCase()}`;
-}
-
-function getStoredFailedLoginAttempts(email: string) {
-  if (typeof window === "undefined") return 0;
-  const stored = window.localStorage.getItem(getAccountStorageKey(email));
-  if (!stored) return 0;
-  const parsed = Number.parseInt(stored, 10);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+function currentTimestamp() {
+  return Date.now();
 }
 
 export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
@@ -86,7 +77,7 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
   });
   const submit = handleSubmit(async (values) => {
     const state = readAttemptState(values.email);
-    if (state.lockedUntil && state.lockedUntil > Date.now()) {
+    if (state.lockedUntil && state.lockedUntil > currentTimestamp()) {
       setIsLocked(true);
       setStatus(getLoginLockedMessage(state.lockedUntil));
       return;
@@ -103,7 +94,10 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
       requiresTwoFactor?: boolean;
       fields?: Record<string, string[]>;
     } | null;
-    const message = body?.message ?? "Something went wrong. Please try again.";
+    const message =
+      response.status === 401
+        ? GENERIC_LOGIN_ERROR
+        : (body?.message ?? "Something went wrong. Please try again.");
     if (!response.ok) {
       for (const [field, messages] of Object.entries(body?.fields ?? {}))
         setError(field as keyof LoginInput, { message: messages[0] });
@@ -112,7 +106,7 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
       const remaining = MAX_FAILED_LOGIN_ATTEMPTS - nextFailures;
       const lockedUntil =
         nextFailures >= MAX_FAILED_LOGIN_ATTEMPTS
-          ? Date.now() + LOGIN_LOCKOUT_WINDOW_MS
+          ? currentTimestamp() + LOGIN_LOCKOUT_WINDOW_MS
           : undefined;
       writeAttemptState(values.email, nextFailures, lockedUntil);
 
@@ -165,7 +159,7 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
         error={errors.password?.message}
         {...register("password")}
       />
-      <button type="submit" disabled={isSubmitting}>
+      <button type="submit" disabled={isSubmitting || isLocked}>
         {isSubmitting ? "Signing in…" : "Sign in"}
       </button>
       <FormFeedback status={status} />

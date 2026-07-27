@@ -85,7 +85,7 @@ As a verified Registered User, I want to log in with my email and password so th
 
 1. **Successful login without 2FA** â€” **Given** a verified, active account without 2FA, **When** the user supplies the correct normalized email and password within rate limits, **Then** a new authenticated session is created only after credential validation, its identifier is rotated, success is audited, and the user is redirected to an authorized destination.
 2. **Login with an unverified email** â€” **Given** an account in Pending Verification, **When** correct credentials are submitted, **Then** no authenticated session is created, the attempt is audited, and the response directs the user toward verification without exposing additional account data.
-3. **Invalid credentials** â€” **Given** an unknown email or a known, active account with the wrong password, **When** login is attempted, **Then** an unknown email receives an account-not-found message while a known account receives an incorrect-password message, no authenticated session is created, and the failed event contains no credential secrets.
+3. **Invalid credentials** â€” **Given** an unknown email or a known, active account with the wrong password, **When** login is attempted, **Then** both cases receive the same generic credential-failure message, no authenticated session is created, and the failed event contains no credential secrets.
 4. **Login throttling** â€” **Given** failed attempts exceed the configured account/IP/time-window allowance, **When** another attempt occurs, **Then** authentication is delayed or rejected for the configured interval, the response remains generic, and the throttling event is auditable without permanently locking the account solely because of these attempts.
 
 ---
@@ -341,7 +341,7 @@ audit records, and required new login.
 
 #### Password Authentication
 
-- **FR-012**: `/login` MUST authenticate verified, active accounts using normalized email and password; it MUST return an account-not-found response for an unknown normalized email and an incorrect-password response for a known, active account whose submitted password is invalid.
+- **FR-012**: `/login` MUST authenticate verified, active accounts using normalized email and password; unknown normalized emails and invalid passwords for known accounts MUST return the same generic credential-failure response so the endpoint cannot be used for account enumeration.
 - **FR-013**: Login MUST reject unverified and suspended accounts without creating a full session; user guidance MUST not disclose data beyond what the requestor already supplied or proved.
 - **FR-014**: Registration and login attempts MUST be rate-limited using documented account/email, IP, and time-window controls that resist distributed abuse while allowing legitimate recovery.
 - **FR-015**: The system MUST record successful and failed password-authentication events without logging emails unnecessarily, passwords, submitted codes, session credentials, or complete tokens.

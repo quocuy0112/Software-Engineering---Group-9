@@ -1,19 +1,43 @@
 # Research: Identity, Authentication, and Account Recovery
 
-**Reviewed**: 2026-07-20. Findings below are tied to the planning pins, not unbounded `latest` installs. Primary sources must be rechecked when a pin changes.
+**Reviewed**: 2026-07-27. Findings below are tied to the planning pins, not unbounded `latest` installs. Primary sources must be rechecked when a pin changes.
 
 ## Version Baseline
 
 | Component                  |                                                            Planning pin | Primary source                                                                                                                               |
 | -------------------------- | ----------------------------------------------------------------------: | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Better Auth                |                                                    `better-auth@1.6.13` | [Better Auth releases](https://github.com/better-auth/better-auth/releases)                                                                  |
-| Better Auth Prisma adapter |                                    `@better-auth/prisma-adapter@1.6.13` | [Prisma adapter](https://www.better-auth.com/docs/adapters/prisma)                                                                           |
+| Better Auth                |                                                    `better-auth@1.6.25` | [Better Auth releases](https://github.com/better-auth/better-auth/releases)                                                                  |
+| Better Auth Prisma adapter |                                    `@better-auth/prisma-adapter@1.6.25` | [Prisma adapter](https://www.better-auth.com/docs/adapters/prisma)                                                                           |
 | Next.js                    |                                                           `next@16.2.11` | [Next.js releases](https://github.com/vercel/next.js/releases), [Route Handlers](https://nextjs.org/docs/app/getting-started/route-handlers) |
 | Prisma CLI/client          |                                  `prisma@7.9.0`, `@prisma/client@7.9.0` | [Prisma releases](https://github.com/prisma/prisma/releases), [release policy](https://www.prisma.io/docs/orm/more/releases)                 |
 | Resend Node SDK            |                                                         `resend@6.17.2` | [resend-node releases](https://github.com/resend/resend-node/releases), [send API](https://resend.com/docs/api-reference/emails/send-email)  |
 | React Email                | Exact stable package versions are a blocking T002 compatibility outcome | [React Email releases](https://github.com/resend/react-email/releases)                                                                       |
 
 The application manifest belongs at `apps/web/package.json`, registered by the root npm workspace. There must be one root `package-lock.json` and no nested lockfile. T002 must compatibility-test and select exact React Email package versions, then record them in the workspace manifest, root lockfile, and `checklists/dependency-compatibility.md` before any template, adapter, preview, or email integration task proceeds. No unbounded `latest` range is allowed.
+
+## Decision: 2026-07-27 npm Advisory Remediation
+
+**Verified findings**: Better Auth versions before 1.6.22 are affected by
+[GHSA-qq9h-g4jm-xgf3](https://github.com/advisories/GHSA-qq9h-g4jm-xgf3);
+`brace-expansion` through 5.0.7 is affected by
+[GHSA-mh99-v99m-4gvg](https://github.com/advisories/GHSA-mh99-v99m-4gvg);
+`find-my-way` through 9.6.0 is affected by
+[GHSA-c96f-x56v-gq3h](https://github.com/advisories/GHSA-c96f-x56v-gq3h);
+and `valibot` through 1.4.1 is affected by
+[GHSA-5qjj-4xww-7phc](https://github.com/advisories/GHSA-5qjj-4xww-7phc).
+
+**Decision**: Pin Better Auth/core/adapter 1.6.25, `better-call` 1.3.7 and
+Better Auth utils 0.4.2; retain Prisma 7.9.0 while root-overriding only its
+development transitives to `find-my-way` 9.7.0 and `valibot` 1.4.2; migrate
+from the legacy `eslint-config-next` dependency chain to ESLint 10.8.0,
+`@eslint/js`, `typescript-eslint`, `@next/eslint-plugin-next`, and
+`eslint-plugin-react-hooks` flat configs. The resulting tree resolves only
+`minimatch` 10.2.5 and `brace-expansion` 5.0.8.
+
+**Rejected**: `npm audit fix --force` attempted to downgrade Prisma, install an
+obsolete 0.x Next ESLint preset, and still reported vulnerabilities. Forcing
+`brace-expansion` 5 into consumers designed for its legacy CommonJS callable
+API was also rejected; the vulnerable consumers were removed instead.
 
 ## Decision: Local-First Repository and Runtime
 
@@ -29,7 +53,7 @@ The application manifest belongs at `apps/web/package.json`, registered by the r
 
 **Verified behavior**: Next.js defines Route Handlers in `route.ts` under `app`; they are the App Router equivalent of Pages Router API Routes, so both mechanisms are unnecessary for this feature.
 
-**Decision**: All identity HTTP endpoints use `apps/web/src/app/api/**/route.ts`, including `apps/web/src/app/api/auth/[...all]/route.ts`. The call chain is Route Handler → Service → Repository/Data Access → PostgreSQL.
+**Decision**: All SmartHire identity HTTP endpoints use `apps/web/src/app/api/**/route.ts`. `apps/web/src/app/api/auth/[...all]/route.ts` is retained only as a no-store 404 boundary: Better Auth's generic provider routes are not public. The call chain is SmartHire Route Handler → Service → provider gateway or Repository/Data Access → PostgreSQL.
 
 **Alternative rejected**: Pages Router API Routes and FastAPI would create an unapproved second backend mechanism.
 
@@ -67,7 +91,7 @@ The application manifest belongs at `apps/web/package.json`, registered by the r
 
 **Decision**: Better Auth is authoritative for TOTP enrollment/login/disablement and backup-code generation, storage, regeneration, and consumption. SmartHire does not create normalized `BackupCodeSet`/`BackupCode` ownership or a second TOTP implementation. Email OTP and trusted-device options are disabled.
 
-**Unverified/blocking details**: Documentation establishes ownership and nominal single-use behavior, but it does not prove that `1.6.13` encrypts TOTP/backup values at rest to SmartHire’s required standard or that concurrent submission is atomic through the Prisma adapter. Version-locked PostgreSQL tests and source/schema inspection are required. A SmartHire TOTP persistence-encryption extension may be introduced only if the spike proves it necessary, Better Auth integration supports it safely, and an approved ADR documents it. The extension must preserve Better Auth ownership and must not create parallel TOTP or backup-code storage.
+**Verified compatibility details**: Better Auth 1.6.25 encrypts TOTP and backup-code values with the configured encrypted-storage option, consumes a backup code through optimistic compare-and-swap, and adds provider-owned `failedVerificationCount` plus `lockedUntil` fields. Version-locked PostgreSQL tests prove one concurrent backup-code winner, replacement invalidation, and successful account-lockout persistence without a parallel SmartHire TOTP store.
 
 ### Local QR decision
 
@@ -138,7 +162,7 @@ account control, but raw Better Auth session identifiers/tokens, TOTP material,
 backup codes, passwords, and CSRF values other than the existing ephemeral
 logout proof never enter the projection or persistent client state.
 
-**Verified behavior**: Better Auth 1.6.13 can rotate its authoritative session
+**Verified behavior**: Better Auth 1.6.25 can rotate its authoritative session
 during initial TOTP verification and TOTP disablement. Server API calls support
 returnHeaders so a provider gateway can capture the new Set-Cookie value. The
 custom SmartHire handlers must forward that cookie; otherwise the browser keeps
@@ -215,8 +239,8 @@ no proof values.
 
 ## Remaining Research Risks
 
-1. Confirm Better Auth 1.6.13 TOTP-secret and backup-code at-rest format and the exact extension hook for application-managed encryption if required.
-2. Prove atomic backup-code single use under concurrent PostgreSQL requests.
+1. Reconfirm Better Auth 1.6.25 TOTP-secret, backup-code, failed-attempt, and lockout persistence whenever the pin changes; the current PostgreSQL gate passes without application-managed encryption.
+2. Re-run atomic backup-code single-use tests under concurrent PostgreSQL requests whenever the Better Auth or Prisma pin changes; the current 1.6.25/7.9.0 gate passes.
 3. Prove session hooks can enforce idle/absolute limits and five-session cap without issuing an unvalidated session or racing concurrent logins.
 4. Confirm all-session revocation behavior when invoked from the reset saga
    and define compensation/retry when SmartHire persistence and Better Auth

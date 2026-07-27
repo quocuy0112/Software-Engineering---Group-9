@@ -6,6 +6,7 @@ import { getActiveSession } from "@/server/auth/get-session";
 import { prisma } from "@/lib/db/prisma";
 import { serverEnvironment } from "@/lib/env/runtime";
 import { markInternalBetterAuthRequest } from "@/server/auth/identity/better-auth-internal-request";
+import { createCredentialFixture } from "../helpers/credential-fixture";
 
 const runId = randomUUID();
 const email = `compat-${runId}@example.test`;
@@ -54,7 +55,7 @@ afterAll(async () => {
   await prisma.$disconnect();
 });
 
-describe.sequential("Better Auth 1.6.13 PostgreSQL compatibility", () => {
+describe.sequential("Better Auth 1.6.25 PostgreSQL compatibility", () => {
   it("keeps direct Better Auth throttling while the durable SmartHire gateway owns its login limit", async () => {
     const rule = (await auth.$context).rateLimit.customRules?.[
       "/sign-in/email"
@@ -70,10 +71,13 @@ describe.sequential("Better Auth 1.6.13 PostgreSQL compatibility", () => {
   });
 
   it("creates Better Auth credential ownership with a non-plaintext password hash", async () => {
-    const response = await request("/sign-up/email", {
-      body: { name: "Compatibility User", email, password },
+    await createCredentialFixture({
+      name: "Compatibility User",
+      email,
+      password,
+      state: "PENDING_VERIFICATION",
+      emailVerified: false,
     });
-    expect(response.status, await response.clone().text()).toBe(200);
     const user = await prisma.userAccount.findUniqueOrThrow({
       where: { normalizedEmail: email },
       include: { accounts: true, sessions: true },

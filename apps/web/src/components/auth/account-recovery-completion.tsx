@@ -1,44 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useAccountRecoveryCapability } from "@/features/identity/client/use-account-recovery-capability";
 import { AuthStatus } from "./auth-status";
 import { PasswordField } from "./password-field";
 
 export function AccountRecoveryCompletion() {
-  const [proof, setProof] = useState("");
+  const capability = useAccountRecoveryCapability("completion");
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
   const [completed, setCompleted] = useState(false);
 
-  useEffect(() => {
-    const value = new URLSearchParams(window.location.hash.slice(1)).get(
-      "proof",
-    );
-    window.history.replaceState(null, "", window.location.pathname);
-    void Promise.resolve().then(() => {
-      setProof(value ?? "");
-      if (!value) {
-        setStatus(
-          "This account-recovery link is invalid, expired, or already used.",
-        );
-      }
-    });
-  }, []);
-
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (busy || !proof) return;
+    if (busy || capability !== "authorized") return;
     setBusy(true);
     setStatus("");
     try {
       const response = await fetch("/api/identity/account-recovery/complete", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          completionProof: proof,
           newPassword: password,
           confirmPassword: confirmation,
         }),
@@ -47,10 +33,7 @@ export function AccountRecoveryCompletion() {
         message?: string;
       } | null;
       setStatus(result?.message ?? "Recovery could not be completed.");
-      if (response.ok) {
-        setCompleted(true);
-        setProof("");
-      }
+      if (response.ok) setCompleted(true);
     } catch {
       setStatus("Recovery could not be completed.");
     } finally {
@@ -71,6 +54,21 @@ export function AccountRecoveryCompletion() {
           <AuthStatus status={status} />
           <p>Re-enroll two-factor authentication after your next login.</p>
           <Link href="/login">Go to sign in</Link>
+        </div>
+      </section>
+    );
+  }
+
+  if (capability !== "authorized") {
+    return (
+      <section className="auth-form-content">
+        <div className="auth-form">
+          <div className="auth-form-heading">
+            <p className="form-kicker">COMPLETE RECOVERY</p>
+            <h1>Verifying secure link</h1>
+          </div>
+          <AuthStatus status="Verifying this secure recovery link…" />
+          <Link href="/account-recovery">Request a new recovery link</Link>
         </div>
       </section>
     );
@@ -105,13 +103,14 @@ export function AccountRecoveryCompletion() {
         />
         <button
           type="submit"
-          disabled={
-            busy || !proof || password.length < 12 || password !== confirmation
-          }
+          disabled={busy || password.length < 12 || password !== confirmation}
         >
           {busy ? "Completing…" : "Complete recovery"}
         </button>
-        <AuthStatus status={status} tone={status.includes("could not") ? "error" : "success"} />
+        <AuthStatus
+          status={status}
+          tone={status.includes("could not") ? "error" : "success"}
+        />
         <Link href="/login">Back to sign in</Link>
       </form>
     </section>

@@ -5,9 +5,13 @@ import { useState } from "react";
 import { ACCOUNT_RECOVERY_REQUEST_FAILED_ERROR } from "@/features/identity/schemas/password-recovery";
 import { AuthStatus } from "./auth-status";
 
-export function AccountRecoveryRequestForm() {
+export function AccountRecoveryRequestForm({
+  initialStatus = "",
+}: {
+  initialStatus?: string;
+}) {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState(initialStatus);
   const [statusTone, setStatusTone] = useState<"error" | "success">("error");
   const [busy, setBusy] = useState(false);
 
