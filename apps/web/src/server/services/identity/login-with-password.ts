@@ -18,9 +18,6 @@ import {
 } from "@/server/auth/identity/pre-auth-cookie";
 import { SessionService } from "./session-service";
 import { noStoreHeaders } from "@/lib/security/response-headers";
-export const ACCOUNT_NOT_FOUND_LOGIN_ERROR =
-  "No account was found for this email.";
-export const INCORRECT_PASSWORD_LOGIN_ERROR = "The password is incorrect.";
 export const GENERIC_LOGIN_ERROR = "Email or password is incorrect.";
 const cookieValue = (line: string) =>
   line.slice(line.indexOf("=") + 1, line.indexOf(";"));
@@ -76,7 +73,7 @@ export class LoginWithPasswordService {
         "account_not_found",
       );
       return Response.json(
-        { message: ACCOUNT_NOT_FOUND_LOGIN_ERROR },
+        { message: GENERIC_LOGIN_ERROR },
         { status: 401, headers: noStoreHeaders },
       );
     }
@@ -128,7 +125,7 @@ export class LoginWithPasswordService {
         "incorrect_password",
       );
       return Response.json(
-        { message: INCORRECT_PASSWORD_LOGIN_ERROR },
+        { message: GENERIC_LOGIN_ERROR },
         { status: 401, headers: noStoreHeaders },
       );
     }

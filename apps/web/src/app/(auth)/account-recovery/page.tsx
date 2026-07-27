@@ -1,5 +1,18 @@
 import { AccountRecoveryRequestForm } from "@/components/auth/account-recovery-request-form";
 
-export default function AccountRecoveryPage() {
-  return <AccountRecoveryRequestForm />;
+export default async function AccountRecoveryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ invalidLink?: string }>;
+}) {
+  const { invalidLink } = await searchParams;
+  return (
+    <AccountRecoveryRequestForm
+      initialStatus={
+        invalidLink === "1"
+          ? "This account-recovery link is invalid, expired, or already used."
+          : undefined
+      }
+    />
+  );
 }

@@ -13,10 +13,25 @@ const nextConfig: NextConfig = {
       { key: "Referrer-Policy", value: "no-referrer" },
       { key: "X-Content-Type-Options", value: "nosniff" },
       { key: "X-Frame-Options", value: "DENY" },
+      { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+      { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
+      {
+        key: "Permissions-Policy",
+        value: "camera=(), microphone=(), geolocation=()",
+      },
+      ...(process.env.NODE_ENV === "production"
+        ? [
+            {
+              key: "Strict-Transport-Security",
+              value: "max-age=31536000; includeSubDomains",
+            },
+          ]
+        : []),
     ];
     const noStore = [
       { key: "Cache-Control", value: "no-store, max-age=0" },
       { key: "Pragma", value: "no-cache" },
+      { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
     ];
     return [
       { source: "/:path*", headers: globalHeaders },
@@ -25,6 +40,7 @@ const nextConfig: NextConfig = {
         "/settings/:path*",
         "/two-factor/:path*",
         "/reset-password/:path*",
+        "/account-recovery/:path*",
       ].map((source) => ({ source, headers: noStore })),
     ];
   },

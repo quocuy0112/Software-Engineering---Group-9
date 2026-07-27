@@ -172,7 +172,7 @@ describe("workflow security throttling route wiring", () => {
     const loginSubject = `anonymous:${email}`;
     subjects.push({ scope: "login", subject: loginSubject });
     const loginResponses: Response[] = [];
-    for (let i = 0; i < 11; i += 1)
+    for (let i = 0; i < 6; i += 1)
       loginResponses.push(
         await login(
           request("/api/identity/login", {
@@ -182,11 +182,11 @@ describe("workflow security throttling route wiring", () => {
         ),
       );
     const loginResults = await messages(loginResponses);
-    expect(loginResults.slice(0, 10).every(({ status }) => status === 401)).toBe(
+    expect(loginResults.slice(0, 5).every(({ status }) => status === 401)).toBe(
       true,
     );
-    expect(loginResults[10]?.status).toBe(429);
-    expect(JSON.stringify(loginResults[10]?.body)).not.toContain(email);
+    expect(loginResults[5]?.status).toBe(429);
+    expect(JSON.stringify(loginResults[5]?.body)).not.toContain(email);
 
     const recoveryEmail = `recovery-${randomUUID()}@example.test`;
     const recoverySubject = `anonymous:${recoveryEmail}`;

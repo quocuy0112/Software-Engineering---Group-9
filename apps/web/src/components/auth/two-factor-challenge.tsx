@@ -82,18 +82,20 @@ export function TwoFactorChallenge() {
     [isLocked, setIsLocked] = useState(false);
 
   useEffect(() => {
-    const state = readAttemptState(factor);
-    if (state.lockedUntil && state.lockedUntil > Date.now()) {
-      setIsLocked(true);
-      setTone("error");
-      setStatus(getLockedMessage(state.lockedUntil));
-    } else {
-      setIsLocked(false);
-      setStatus("");
-    }
     input.current?.focus();
-    return () => setCode("");
-  }, [factor]);
+    const timer = window.setTimeout(() => {
+      const state = readAttemptState(factor);
+      if (state.lockedUntil && state.lockedUntil > Date.now()) {
+        setIsLocked(true);
+        setTone("error");
+        setStatus(getLockedMessage(state.lockedUntil));
+      } else {
+        setIsLocked(false);
+        setStatus("");
+      }
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [factor, setStatus]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -213,6 +215,7 @@ export function TwoFactorChallenge() {
           type="submit"
           disabled={
             busy ||
+            isLocked ||
             (factor === "totp" ? code.length !== 6 : code.trim().length < 8)
           }
         >

@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 
 const { toast } = vi.hoisted(() => ({
@@ -15,13 +21,19 @@ afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+  toast.dismiss.mockClear();
+  toast.error.mockClear();
+  toast.success.mockClear();
   window.localStorage.clear();
 });
 
 describe("forgot password form", () => {
   it("preserves the email, shows one success toast, and prevents duplicate submits", async () => {
     let resolve!: (value: Response) => void;
-    vi.stubGlobal("fetch", vi.fn(() => new Promise<Response>((r) => (resolve = r))));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => new Promise<Response>((r) => (resolve = r))),
+    );
     render(<ForgotPasswordForm />);
     const input = screen.getByLabelText("Email address");
     fireEvent.change(input, { target: { value: "user@example.test" } });
@@ -49,14 +61,14 @@ describe("forgot password form", () => {
     expect(input).toHaveValue("user@example.test");
   });
 
-  it("shows how many reset attempts remain before the limit is reached", async () => {
+  it("shows an error toast when the email does not match an active account", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn(() =>
         Promise.resolve(
           Response.json(
-            { message: "If the account is eligible, password-reset instructions will be sent." },
-            { status: 202 },
+            { message: "No active account was found for this email." },
+            { status: 404 },
           ),
         ),
       ),
@@ -69,7 +81,11 @@ describe("forgot password form", () => {
     fireEvent.click(screen.getByRole("button", { name: /send reset/i }));
 
     await waitFor(() =>
-      expect(screen.getByRole("status")).toHaveTextContent("2 attempts remaining"),
+      expect(toast.error).toHaveBeenCalledWith(
+        "No active account was found for this email.",
+        { id: "forgot-password-status" },
+      ),
     );
+    expect(toast.success).not.toHaveBeenCalled();
   });
 });

@@ -329,6 +329,20 @@ work in the current artifact-reconciliation increment.
 - [x] T210 [P] [US12] Add full-recovery browser workflows in `apps/web/tests/e2e/auth/full-account-recovery.spec.ts`, `apps/web/tests/e2e/auth/password-recovery.spec.ts`, and `apps/web/tests/e2e/fixtures/failures.ts` | Deps: T209 | Parallel: Yes | Story: US12 | Done when: desktop and mobile-320 prove malformed, ineligible, and eligible request differentiation, verified-email confirmation, visible lower-assurance notice, 24-hour hold, blocked login, one-time cancellation, post-hold completion that disables old 2FA only then, notification/audit evidence, no automatic login, and keyboard/responsive behavior without arbitrary sleeps.
 - [x] T211 [US12] Record final reset and recovery evidence without promoting historical results in `src/specs/001-identity-authentication-account-recovery/checklists/password-reset-account-recovery.md`, `src/specs/001-identity-authentication-account-recovery/checklists/integration-results.md`, `src/specs/001-identity-authentication-account-recovery/checklists/e2e-results.md`, `src/specs/001-identity-authentication-account-recovery/checklists/performance-results.md`, and `src/specs/001-identity-authentication-account-recovery/checklists/security-design.md` | Deps: T203, T210 | Parallel: No | Story: US8, US12 | Done when: only newly executed controlled reset/recovery integration and E2E results are recorded, old Vitest/Playwright results remain labelled historical or superseded, saga/recovery evidence is linked to requirements, and no current PASS is claimed without a reproducible run.
 
+## Phase 21: Dependency Advisory Remediation and Provider Boundary Hardening
+
+**Scope**: Remove the 2026-07-27 npm audit findings without accepting unsafe
+forced downgrades, preserve Next.js 16.2.11 and Prisma 7.9.0, validate the
+Better Auth 1.6.25 schema/runtime against PostgreSQL, and keep Better Auth an
+internal provider behind SmartHire-owned identity endpoints.
+
+- [x] T212 Assess GHSA-qq9h-g4jm-xgf3, GHSA-mh99-v99m-4gvg, GHSA-c96f-x56v-gq3h, and GHSA-5qjj-4xww-7phc against the exact lockfile; record the compatible remediation in `src/specs/001-identity-authentication-account-recovery/research.md` and reject the unsafe `npm audit fix --force` proposal | Deps: T211 | Parallel: No | Story: Cross-cutting | Done when: affected/fixed ranges, exploit preconditions, production-versus-development reachability, and selected exact versions are documented from primary advisories without downgrading Prisma, Next.js, or lint configuration to obsolete releases.
+- [x] T213 Upgrade Better Auth/core/Prisma adapter to 1.6.25, `better-call` to 1.3.7, Better Auth utils to 0.4.2, and override Prisma development transitives to `find-my-way` 9.7.0 plus `valibot` 1.4.2 in `package.json`, `apps/web/package.json`, and the sole root `package-lock.json` | Deps: T212 | Parallel: No | Story: Cross-cutting | Done when: `npm ls` resolves one compatible Better Auth family, retains Prisma/client 7.9.0, contains no invalid/peer-conflicted node, and no unbounded range is introduced.
+- [x] T214 Replace the vulnerable legacy ESLint preset chain with ESLint 10.8.0 direct flat-config plugins in `apps/web/package.json` and `apps/web/eslint.config.mjs`; resolve newly enforced correctness findings without weakening route/presentation import boundaries | Deps: T212 | Parallel: Yes | Story: Cross-cutting | Done when: only minimatch 10.2.5/brace-expansion 5.0.8 resolve, architecture restrictions remain errors, React hook checks remain active, and root lint passes.
+- [x] T215 Harden the Better Auth provider boundary and 1.6.25 data model in `apps/web/src/server/auth/config.ts`, `apps/web/src/app/api/auth/[...all]/route.ts`, `apps/web/prisma/schema.prisma`, `apps/web/prisma/migrations/20260727082000_better_auth_1_6_25_two_factor_lockout/migration.sql`, and focused compatibility/security tests | Deps: T213 | Parallel: No | Story: US2, US3, US4 | Done when: provider-native signup is disabled, public `/api/auth/**` calls return no-store 404, public clients must use `/api/identity/**`, login failures cannot enumerate accounts, provider-owned TOTP failed-count/lock timestamps persist, and the PostgreSQL compatibility suite passes 16/16.
+- [x] T216 Repair the duplicated index-rename migration and update test fixtures/evidence for the provider boundary in `apps/web/prisma/migrations/20260725081637_npm_run_db_verify/migration.sql`, `apps/web/tests/helpers/credential-fixture.ts`, compatibility/integration/component/contract tests, and current Spec Kit artifacts | Deps: T214, T215 | Parallel: No | Story: Cross-cutting | Done when: a fresh ordered migration deploy no longer fails on a second index rename, fixtures do not reopen provider signup, and the full Vitest suite passes.
+- [x] T217 Run final `npm audit`, exact dependency-tree, Prisma validate/generate/status, lint, typecheck, full Vitest, production build, diff-check, and secret-boundary evidence; update only truthful current results | Deps: T216 | Parallel: No | Story: Cross-cutting | Done when: audit reports 0 vulnerabilities, all static/runtime/build gates pass from the documented environment, no provider route or secret is exposed, and this task is checked only after every command completes.
+
 ## Dependencies and execution order
 
 1. Project/environment: T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013, T014.
@@ -339,6 +353,7 @@ work in the current artifact-reconciliation increment.
 6. Optional SMTP/asynchronous outbox synchronization follows T161 -> T162 -> T163 -> T164 -> T165 -> T166 -> T167; T168 -> T169 and T170 validate adapters; T171 -> T172 -> T173 -> T174 implement claim/retry/DEAD; T175 -> T176 add operations; T177 and T178 prove non-blocking/restart/concurrency behavior; T179 is the only completion gate.
 7. Authenticated Workspace and Profile Integration follows T187 -> T188; T189 and T191 then establish the shell and security-session correctness; T190 follows T189; T192 follows T190 and T191; T193 may proceed after T188; T194 follows the merged UI; T195 proves browser behavior; T196 is the only automated completion gate. T160 remains separate human-participant evidence.
 8. Password Reset Hardening and Account Recovery follows T197 -> T198 -> T199; T200, T201, and T202 may run in parallel after T199; T203 closes normal-reset contracts and evidence; T204 -> T205, with T206 parallel after T205; T207 gates login blocking before T208 completion; T209 and T210 provide integration/E2E coverage; T211 is the only final evidence gate. T160 remains separate human-participant evidence.
+9. Dependency Advisory Remediation follows T212 -> T213; T214 may proceed after T212; T215 follows T213; T216 joins T214 and T215; T217 is the only final audit/build/evidence gate.
 
 **TOTP enrollment increment**: T061 and T063 may begin after their dependencies; T061 -> T180 establishes the QR dependency gate; T063 -> T064 and T180 -> T065 -> T066 prepare the protected flow; T067 follows T066; T068 follows T067; T069 follows T065. T070 and later login-challenge work remain outside this increment.
 
@@ -365,6 +380,11 @@ Foundation
 **Incremental delivery**: (1) register/verify, (2) login/sessions, (3) TOTP/backup/management, (4) recovery/revocation, (5) full evidence/demo.
 
 **SMTP/outbox synchronization**: Complete T161-T179 as a cross-cutting corrective increment. Do not claim SMTP completion at T167 or worker completion at T174; only T179 closes the increment after exact-pin/ADR, transport, regression, concurrency, non-blocking-request, restart, retry, DEAD, audit, and security evidence pass.
+
+**Dependency advisory synchronization**: Complete T212-T217 without
+`npm audit fix --force`. Preserve the approved Next.js and Prisma baselines,
+keep provider-native HTTP routes closed, and require real PostgreSQL
+compatibility plus a production build before closing T217.
 
 **Password reset/recovery synchronization**: Complete T197-T211 only in a
 future implementation increment. Normal reset must remain a Better Auth

@@ -34,17 +34,17 @@ describe("authentication route motion", () => {
     expect(wrapper).not.toBe(loginWrapper);
   });
 
-  it("defines slide, fade, blur, and reduced-motion safeguards", async () => {
+  it("defines page slide, fade, blur, and reduced-motion safeguards", async () => {
     const css = await readFile(
       resolve(process.cwd(), "src/app/globals.css"),
       "utf8",
     );
-    expect(css).toContain("@keyframes auth-route-enter-forward");
+    expect(css).toContain("@keyframes page-slide-to-center");
     expect(css).toMatch(/opacity:\s*0/);
-    expect(css).toMatch(/filter:\s*blur\(4px\)/);
-    expect(css).toMatch(/translate3d\((?:-|)18px,\s*8px,\s*0\)/);
+    expect(css).toMatch(/filter:\s*blur\(3px\)/);
+    expect(css).toMatch(/translate3d\(-3rem,\s*0,\s*0\)/);
     expect(css).toMatch(
-      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.auth-motion[\s\S]*?animation:\s*none/,
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.page-transition[\s\S]*?animation:\s*none/,
     );
   });
 });

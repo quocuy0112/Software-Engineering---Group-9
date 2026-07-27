@@ -1,18 +1,25 @@
 import {
-  completeAccountRecoverySchema,
+  completeAccountRecoveryActionSchema,
   ACCOUNT_RECOVERY_GENERIC_ERROR,
 } from "@/features/identity/schemas/password-recovery";
 import { serverEnvironment } from "@/lib/env/runtime";
+import {
+  clearAccountRecoveryCapability,
+  readAccountRecoveryCapability,
+} from "@/lib/security/account-recovery-capability";
 import { clearSessionCookie } from "@/lib/security/cookies";
 import { validateSameOrigin } from "@/lib/security/csrf";
 import { noStoreHeaders } from "@/lib/security/response-headers";
 import { clearPreAuthCookie } from "@/server/auth/identity/pre-auth-cookie";
 import { CompleteFullAccountRecoveryService } from "@/server/services/identity/complete-full-account-recovery";
 
-function clearedAuthenticationHeaders() {
+function clearedAuthenticationHeaders(clearCapability = false) {
   const headers = new Headers(noStoreHeaders);
   headers.append("Set-Cookie", clearSessionCookie());
   headers.append("Set-Cookie", clearPreAuthCookie());
+  if (clearCapability) {
+    headers.append("Set-Cookie", clearAccountRecoveryCapability());
+  }
   return headers;
 }
 
@@ -23,7 +30,19 @@ export async function POST(request: Request) {
       { status: 403, headers: noStoreHeaders },
     );
   }
-  const parsed = completeAccountRecoverySchema.safeParse(
+  const capability = readAccountRecoveryCapability(
+    request.headers,
+    "completion",
+  );
+  if (!capability) {
+    const headers = new Headers(noStoreHeaders);
+    headers.append("Set-Cookie", clearAccountRecoveryCapability());
+    return Response.json(
+      { message: ACCOUNT_RECOVERY_GENERIC_ERROR },
+      { status: 403, headers },
+    );
+  }
+  const parsed = completeAccountRecoveryActionSchema.safeParse(
     await request.json().catch(() => null),
   );
   if (!parsed.success) {
@@ -33,11 +52,18 @@ export async function POST(request: Request) {
     );
   }
   const result = await new CompleteFullAccountRecoveryService().execute(
-    parsed.data.completionProof,
+    capability.proof,
     parsed.data.newPassword,
   );
   if (!result.ok) {
     const status = result.holdEndsAt ? 409 : result.retryable ? 503 : 400;
+    const headers =
+      result.retryable || result.holdEndsAt
+        ? clearedAuthenticationHeaders()
+        : new Headers(noStoreHeaders);
+    if (!result.retryable && !result.holdEndsAt) {
+      headers.append("Set-Cookie", clearAccountRecoveryCapability());
+    }
     return Response.json(
       {
         message: result.holdEndsAt
@@ -51,9 +77,7 @@ export async function POST(request: Request) {
       },
       {
         status,
-        headers: result.retryable
-          ? clearedAuthenticationHeaders()
-          : noStoreHeaders,
+        headers,
       },
     );
   }
@@ -66,6 +90,6 @@ export async function POST(request: Request) {
       twoFactorRecommendation:
         "Re-enroll two-factor authentication after your next login.",
     },
-    { headers: clearedAuthenticationHeaders() },
+    { headers: clearedAuthenticationHeaders(true) },
   );
 }

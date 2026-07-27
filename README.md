@@ -46,7 +46,7 @@ PostgreSQL / Email Outbox
 | Area                   | Technology                          |
 | ---------------------- | ----------------------------------- |
 | Web                    | Next.js 16, React 19, TypeScript    |
-| Authentication         | Better Auth 1.6                     |
+| Authentication         | Better Auth 1.6.25                  |
 | Database               | PostgreSQL 16, Prisma 7             |
 | Validation and forms   | Zod, React Hook Form                |
 | UI feedback and motion | Sonner, Motion                      |

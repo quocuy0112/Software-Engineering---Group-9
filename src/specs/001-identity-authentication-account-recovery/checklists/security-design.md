@@ -23,7 +23,7 @@
 
 ## Implementation gate
 
-Any unchecked item blocks `/speckit-implement`. Failure of Better Auth 1.6.13 TOTP/backup-code protection, atomic-use, session-hook ordering, or reset-revocation tests blocks implementation pending an approved extension/ADR. It must never produce duplicate authentication ownership.
+Any unchecked item blocks `/speckit-implement`. Failure of Better Auth 1.6.25 TOTP/backup-code protection, lockout persistence, atomic-use, session-hook ordering, or reset-revocation tests blocks implementation pending an approved extension/ADR. It must never produce duplicate authentication ownership.
 
 ## Final automated review (2026-07-24)
 

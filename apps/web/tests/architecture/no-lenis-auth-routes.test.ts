@@ -17,7 +17,7 @@ describe("auth route motion policy", () => {
   it("imports no Lenis in auth or security shells", async () => {
     for (const directory of [
       "src/app/(auth)",
-      "src/app/settings",
+      "src/app/(workspace)/profile",
       "src/components/auth",
     ]) {
       for (const file of await walk(resolve(process.cwd(), directory))) {

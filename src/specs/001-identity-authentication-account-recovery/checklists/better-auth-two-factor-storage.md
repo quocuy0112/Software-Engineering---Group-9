@@ -1,6 +1,6 @@
 # Better Auth two-factor storage checklist (T061)
 
-Scope: verify how pinned Better Auth 1.6.13 persists TOTP secrets and backup codes, confirm
+Scope: verify how pinned Better Auth 1.6.25 persists TOTP secrets and backup codes, confirm
 exclusive ownership, and decide whether an encryption extension or ADR stop is required.
 
 ## Ownership
@@ -43,7 +43,7 @@ data: secret })` before persisting (`index.mjs`, enable flow). The stored `secre
 
 ## Verification status
 
-- [x] Storage model confirmed by source inspection of pinned Better Auth 1.6.13.
+- [x] Storage model confirmed by source inspection of pinned Better Auth 1.6.25, including provider-owned failed-verification and lockout fields.
 - [x] Executable proof is provided by the T062 PostgreSQL integration test
       (`apps/web/tests/integration/auth/better-auth-totp-storage.test.ts`); this checklist is not
       marked complete on documentation inspection alone.

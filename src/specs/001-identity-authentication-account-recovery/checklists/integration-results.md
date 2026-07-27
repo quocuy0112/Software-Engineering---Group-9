@@ -55,6 +55,26 @@ session-revocation adapter repair, against PostgreSQL 16.12.
 | Dependency audit | PASS | npm audit: Critical 0, High 0, Moderate 0, Low 0 |
 | Secret/generated-file review | PASS | no configured secret value or secret file is tracked; three generic-pattern findings were reviewed test-only invalid literals; no unapproved validation artifact remains |
 
-The validated compatibility baseline is Better Auth 1.6.13, Next.js 16.2.11,
+The historical compatibility baseline was Better Auth 1.6.13, Next.js 16.2.11,
 Prisma 7.9.0, and PostCSS 8.5.22. No migration was added or modified during
 validation.
+
+## Dependency advisory validation evidence (2026-07-27)
+
+This validation supersedes the 2026-07-24 dependency and static-validation
+claims for the current working tree.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Better Auth compatibility | PASS | `npm run test:compatibility --workspace @smarthire/web`: 4 files, 16 tests |
+| Full Vitest | PASS | `npm test`: 83 files, 305 tests |
+| Prisma schema/generation/status | PASS | Prisma 7.9.0 schema valid, client generated, 8 migrations applied, database up to date |
+| Static validation | PASS | ESLint 10.8.0 lint, TypeScript typecheck, Next.js 16.2.11 production build, and `git diff --check` passed |
+| Dependency tree | PASS | Better Auth family 1.6.25; `find-my-way` 9.7.0; `valibot` 1.4.2; ESLint 10.8.0; minimatch 10.2.5; brace-expansion 5.0.8; no `eslint-config-next` |
+| Dependency audit | PASS | `npm audit --json`: Critical 0, High 0, Moderate 0, Low 0, total 0 |
+| Provider boundary | PASS | provider-native signup disabled; four representative public `/api/auth/**` requests return 404/no-store; SmartHire `/api/identity/**` remains the public boundary |
+
+The current compatibility baseline is Better Auth 1.6.25, Next.js 16.2.11,
+Prisma 7.9.0, and PostgreSQL 16.12. The 1.6.25 two-factor lockout fields are
+applied by a forward migration. The duplicate rename migration is idempotent;
+no database reset or force dependency fix was used.

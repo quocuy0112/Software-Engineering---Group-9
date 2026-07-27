@@ -17,7 +17,12 @@ export default function RootLayout({
     <html lang="en" data-app-environment={serverEnvironment.APP_ENV}>
       <body suppressHydrationWarning>
         <Providers>{children}</Providers>
-        <Toaster richColors />
+        <Toaster
+          className="app-toaster"
+          position="top-right"
+          richColors
+          toastOptions={{ className: "app-toast" }}
+        />
       </body>
     </html>
   );

@@ -28,16 +28,34 @@ export type AccountRecoveryRequest = z.infer<
 >;
 
 const recoveryProof = z.string().trim().min(32).max(512);
+export const accountRecoveryCapabilityKindSchema = z.enum([
+  "confirmation",
+  "cancellation",
+  "completion",
+]);
+export type AccountRecoveryCapabilityKind = z.infer<
+  typeof accountRecoveryCapabilityKindSchema
+>;
 
-/** A fragment-carried proof is copied into a POST body and is never returned. */
-export const accountRecoveryProofSchema = z
-  .object({ proof: recoveryProof })
-  .strict();
-export type AccountRecoveryProof = z.infer<typeof accountRecoveryProofSchema>;
-
-export const completeAccountRecoverySchema = z
+/**
+ * A fragment-carried proof may only be presented to the capability exchange.
+ * Mutation endpoints accept the resulting HttpOnly cookie instead of a raw
+ * proof supplied by browser JavaScript.
+ */
+export const accountRecoveryCapabilitySchema = z
   .object({
-    completionProof: recoveryProof,
+    kind: accountRecoveryCapabilityKindSchema,
+    proof: recoveryProof,
+  })
+  .strict();
+export type AccountRecoveryCapability = z.infer<
+  typeof accountRecoveryCapabilitySchema
+>;
+
+export const accountRecoveryActionSchema = z.object({}).strict();
+
+export const completeAccountRecoveryActionSchema = z
+  .object({
     newPassword: password,
     confirmPassword: password,
   })
@@ -47,7 +65,7 @@ export const completeAccountRecoverySchema = z
     message: "Passwords do not match.",
   });
 export type CompleteAccountRecovery = z.infer<
-  typeof completeAccountRecoverySchema
+  typeof completeAccountRecoveryActionSchema
 >;
 
 export const PASSWORD_RECOVERY_SUCCESS_RESPONSE =

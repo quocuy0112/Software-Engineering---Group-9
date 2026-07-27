@@ -5,6 +5,7 @@ import type {
   FullAccountRecoveryOperation,
   Prisma,
 } from "@/generated/prisma/client";
+import type { AccountRecoveryCapabilityKind } from "@/features/identity/schemas/password-recovery";
 import { prisma } from "@/lib/db/prisma";
 import { TokenProtector } from "@/lib/security/security-tokens";
 import { PrismaAuditRepository } from "@/server/repositories/audit/prisma-audit-repository";
@@ -58,6 +59,95 @@ export class PrismaAccountRecoveryRepository {
     private readonly outboxFactory: OutboxFactory = (db) =>
       new PrismaOutboxRepository(db),
   ) {}
+
+  /**
+   * Performs a read-only capability check before a sensitive recovery page is
+   * unlocked. Mutation methods repeat all checks atomically, so this method is
+   * only a route gate and can never authorize a database write by itself.
+   */
+  async isRouteProofValid(
+    kind: AccountRecoveryCapabilityKind,
+    rawProof: string,
+    now = new Date(),
+  ): Promise<boolean> {
+    const digest = this.protector.digest(rawProof);
+    if (kind === "confirmation") {
+      const existing = await prisma.fullAccountRecoveryOperation.findUnique({
+        where: { confirmationProofDigest: digest },
+        select: {
+          status: true,
+          confirmationFinalizedAt: true,
+        },
+      });
+      if (existing) {
+        return (
+          existing.status === "CONFIRMED_HOLD" &&
+          !existing.confirmationFinalizedAt
+        );
+      }
+      const token = await prisma.securityToken.findUnique({
+        where: { tokenDigest: digest },
+        select: {
+          purpose: true,
+          status: true,
+          expiresAt: true,
+          user: {
+            select: {
+              state: true,
+              emailVerified: true,
+              twoFactorEnabled: true,
+            },
+          },
+        },
+      });
+      return Boolean(
+        token &&
+        token.purpose === "ACCOUNT_RECOVERY_CONFIRMATION" &&
+        token.status === "ACTIVE" &&
+        token.expiresAt > now &&
+        token.user.state === "ACTIVE" &&
+        token.user.emailVerified &&
+        token.user.twoFactorEnabled,
+      );
+    }
+
+    if (kind === "cancellation") {
+      const operation = await prisma.fullAccountRecoveryOperation.findUnique({
+        where: { cancellationProofDigest: digest },
+        select: {
+          status: true,
+          confirmationFinalizedAt: true,
+          cancellationConsumedAt: true,
+          cancellationProofExpiresAt: true,
+        },
+      });
+      return Boolean(
+        operation &&
+        operation.status === "CONFIRMED_HOLD" &&
+        operation.confirmationFinalizedAt &&
+        !operation.cancellationConsumedAt &&
+        operation.cancellationProofExpiresAt > now,
+      );
+    }
+
+    const operation = await prisma.fullAccountRecoveryOperation.findUnique({
+      where: { completionProofDigest: digest },
+      select: {
+        status: true,
+        confirmationFinalizedAt: true,
+        completedAt: true,
+        completionProofExpiresAt: true,
+      },
+    });
+    return Boolean(
+      operation &&
+      (operation.status === "CONFIRMED_HOLD" ||
+        operation.status === "COMPLETING") &&
+      operation.confirmationFinalizedAt &&
+      !operation.completedAt &&
+      operation.completionProofExpiresAt > now,
+    );
+  }
 
   async replaceConfirmationForEligibleUser(input: {
     normalizedEmail: string;
@@ -250,19 +340,16 @@ export class PrismaAccountRecoveryRepository {
       const id = randomUUID();
       const holdEndsAt = new Date(now.getTime() + ACCOUNT_RECOVERY_HOLD_MS);
       const confirmationAuditIntentKey = `account-recovery-confirm-intent:${id}`;
-      await this.auditFactory(tx).appendIdempotent(
-        confirmationAuditIntentKey,
-        {
-          occurredAt: now,
-          actorType: "anonymous",
-          action: "account_recovery.confirmation_intent_recorded",
-          targetType: "account_recovery",
-          targetId: id,
-          result: "SUCCESS",
-          correlationId: id,
-          context: { stage: "hold_claimed" },
-        },
-      );
+      await this.auditFactory(tx).appendIdempotent(confirmationAuditIntentKey, {
+        occurredAt: now,
+        actorType: "anonymous",
+        action: "account_recovery.confirmation_intent_recorded",
+        targetType: "account_recovery",
+        targetId: id,
+        result: "SUCCESS",
+        correlationId: id,
+        context: { stage: "hold_claimed" },
+      });
       const operation = await tx.fullAccountRecoveryOperation.create({
         data: {
           id,
@@ -273,9 +360,7 @@ export class PrismaAccountRecoveryRepository {
           confirmationExpiresAt: token.expiresAt,
           confirmationConsumedAt: now,
           completionProofDigest: this.protector.digest(input.completionProof),
-          completionProofCiphertext: this.protector.seal(
-            input.completionProof,
-          ),
+          completionProofCiphertext: this.protector.seal(input.completionProof),
           completionProofExpiresAt: new Date(
             holdEndsAt.getTime() + ACCOUNT_RECOVERY_COMPLETION_WINDOW_MS,
           ),
@@ -490,9 +575,7 @@ export class PrismaAccountRecoveryRepository {
   ): Promise<CompletionClaimResult> {
     const completionProofDigest = this.protector.digest(rawProof);
     const completionKey = this.protector.digest(
-      ["full-account-recovery-completion-v1", rawProof, newPassword].join(
-        "\0",
-      ),
+      ["full-account-recovery-completion-v1", rawProof, newPassword].join("\0"),
     );
     const executionOwner = randomUUID();
     const leaseExpiresAt = new Date(
@@ -506,7 +589,10 @@ export class PrismaAccountRecoveryRepository {
       if (!operation || !operation.confirmationFinalizedAt) {
         return { status: "invalid" };
       }
-      if (operation.status === "CANCELLED" || operation.status === "COMPLETED") {
+      if (
+        operation.status === "CANCELLED" ||
+        operation.status === "COMPLETED"
+      ) {
         return { status: "used" };
       }
       if (operation.completionProofExpiresAt <= now) {
@@ -516,7 +602,10 @@ export class PrismaAccountRecoveryRepository {
         return { status: "hold", holdEndsAt: operation.holdEndsAt };
       }
       if (operation.status === "COMPLETING") {
-        if (!operation.completionKey || !equalDigest(operation.completionKey, completionKey)) {
+        if (
+          !operation.completionKey ||
+          !equalDigest(operation.completionKey, completionKey)
+        ) {
           return { status: "used" };
         }
         if (

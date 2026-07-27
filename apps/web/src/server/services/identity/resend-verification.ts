@@ -45,7 +45,9 @@ export class ResendVerificationService {
         correlationId: randomUUID(),
         now,
       });
-    } catch {}
+    } catch {
+      // Preserve the generic response so account existence is not disclosed.
+    }
     return {
       accepted: true as const,
       status: 202 as const,

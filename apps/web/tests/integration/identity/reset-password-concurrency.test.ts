@@ -10,6 +10,7 @@ import {
   cleanupFixture,
   cookie,
 } from "../auth/backup-code-fixture";
+import { createCredentialFixture } from "../../helpers/credential-fixture";
 
 const protector = new TokenProtector();
 const originalPassword = "Concurrent fixture password 2026!";
@@ -26,15 +27,10 @@ describe("concurrent password reset saga on PostgreSQL", () => {
   it("has one claim winner and one terminal credential/notification/audit outcome", async () => {
     const id = randomUUID();
     const email = `reset-race-${id}@example.test`;
-    const signup = await authRequest("/sign-up/email", {
+    const user = await createCredentialFixture({
       name: "Concurrent Reset User",
       email,
       password: originalPassword,
-    });
-    expect(signup.ok).toBe(true);
-    const user = await prisma.userAccount.update({
-      where: { normalizedEmail: email },
-      data: { state: "ACTIVE", emailVerified: true },
     });
     users.push(user.id);
     const initialLogin = await authRequest("/sign-in/email", {

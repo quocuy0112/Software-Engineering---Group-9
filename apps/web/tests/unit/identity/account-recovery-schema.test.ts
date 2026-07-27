@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
-  accountRecoveryProofSchema,
+  accountRecoveryActionSchema,
+  accountRecoveryCapabilitySchema,
   accountRecoveryRequestSchema,
-  completeAccountRecoverySchema,
+  completeAccountRecoveryActionSchema,
 } from "@/features/identity/schemas/password-recovery";
 
 describe("full account recovery schemas", () => {
@@ -20,20 +21,30 @@ describe("full account recovery schemas", () => {
 
   it("accepts only bounded write-only proofs and matching compliant passwords", () => {
     const proof = "a".repeat(32);
-    expect(accountRecoveryProofSchema.safeParse({ proof }).success).toBe(true);
-    expect(accountRecoveryProofSchema.safeParse({ proof: "short" }).success).toBe(
+    expect(
+      accountRecoveryCapabilitySchema.safeParse({
+        kind: "confirmation",
+        proof,
+      }).success,
+    ).toBe(true);
+    expect(
+      accountRecoveryCapabilitySchema.safeParse({
+        kind: "confirmation",
+        proof: "short",
+      }).success,
+    ).toBe(false);
+    expect(accountRecoveryActionSchema.safeParse({}).success).toBe(true);
+    expect(accountRecoveryActionSchema.safeParse({ proof }).success).toBe(
       false,
     );
     expect(
-      completeAccountRecoverySchema.safeParse({
-        completionProof: proof,
+      completeAccountRecoveryActionSchema.safeParse({
         newPassword: "new recovery password 2026!",
         confirmPassword: "new recovery password 2026!",
       }).success,
     ).toBe(true);
     expect(
-      completeAccountRecoverySchema.safeParse({
-        completionProof: proof,
+      completeAccountRecoveryActionSchema.safeParse({
         newPassword: "new recovery password 2026!",
         confirmPassword: "different recovery password 2026!",
       }).success,

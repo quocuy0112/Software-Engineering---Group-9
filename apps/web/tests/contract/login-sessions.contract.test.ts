@@ -40,8 +40,9 @@ describe("login and session HTTP contract", () => {
     expect(openapi).toContain("SessionListOutcome:");
     expect(openapi).toContain("/api/identity/sessions/{sessionReference}:");
     expect(openapi).toContain("LoginCredentialFailure:");
-    expect(openapi).toContain("No account was found for this email.");
-    expect(openapi).toContain("The password is incorrect.");
+    expect(openapi).toContain("const: Email or password is incorrect.");
+    expect(openapi).not.toContain("No account was found for this email.");
+    expect(openapi).not.toContain("The password is incorrect.");
     expect(openapi).not.toMatch(/sessionToken:/);
   });
 });

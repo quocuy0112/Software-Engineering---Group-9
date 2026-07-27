@@ -47,13 +47,6 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
               <span className="visual-signal-label">Secure by design</span>
             </div>
           </div>
-
-          <div className="auth-visual-footer">
-            <span>For candidates and hiring teams</span>
-            <span>
-              <span className="footer-pulse" /> Private by default
-            </span>
-          </div>
         </div>
       </aside>
 

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export function useReplayableStatus(initial = "") {
   const [status, setStatus] = useState(initial);
@@ -9,7 +9,7 @@ export function useReplayableStatus(initial = "") {
     latestStatus.current = status;
   }, [status]);
 
-  function setReplayableStatus(nextStatus: string) {
+  const setReplayableStatus = useCallback((nextStatus: string) => {
     if (nextStatus === latestStatus.current) {
       setStatus("");
       Promise.resolve().then(() => setStatus(nextStatus));
@@ -17,7 +17,7 @@ export function useReplayableStatus(initial = "") {
     }
 
     setStatus(nextStatus);
-  }
+  }, []);
 
   return { status, setStatus: setReplayableStatus };
 }

@@ -4,6 +4,7 @@ import { auth } from "@/server/auth/config";
 import { symmetricDecrypt, symmetricEncrypt } from "better-auth/crypto";
 import { prisma } from "@/lib/db/prisma";
 import { serverEnvironment } from "@/lib/env/runtime";
+import { createCredentialFixture } from "../../helpers/credential-fixture";
 
 const runId = randomUUID();
 const email = `totp-store-${runId}@example.test`;
@@ -68,16 +69,13 @@ afterAll(async () => {
 });
 
 describe.sequential(
-  "Better Auth 1.6.13 TOTP storage protection (PostgreSQL)",
+  "Better Auth 1.6.25 TOTP storage protection (PostgreSQL)",
   () => {
     it("bootstraps an ACTIVE account", async () => {
-      const response = await request("/sign-up/email", {
-        body: { name: "Storage User", email, password },
-      });
-      expect(response.status, await response.clone().text()).toBe(200);
-      await prisma.userAccount.update({
-        where: { normalizedEmail: email },
-        data: { state: "ACTIVE" },
+      await createCredentialFixture({
+        name: "Storage User",
+        email,
+        password,
       });
     });
 

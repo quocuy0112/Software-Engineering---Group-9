@@ -73,6 +73,10 @@ function getLockedMessage(lockedUntil: number) {
   return `Too many failed attempts. Please wait ${minutes} minute${minutes === 1 ? "" : "s"} before trying again.`;
 }
 
+function currentTimestamp() {
+  return Date.now();
+}
+
 type Setup = {
   qrCodeDataUrl: string;
   manualKey: string;
@@ -133,7 +137,7 @@ export function TotpEnrollment({
       clearTimeout(timer);
       controller.abort();
     };
-  }, []);
+  }, [setStatus]);
 
   // Warn before navigating away while backup codes are still on screen.
   useEffect(() => {
@@ -160,7 +164,7 @@ export function TotpEnrollment({
 
   const startEnrollment = passwordForm.handleSubmit(async (values) => {
     const state = readAttemptState(proof);
-    if (state.lockedUntil && state.lockedUntil > Date.now()) {
+    if (state.lockedUntil && state.lockedUntil > currentTimestamp()) {
       setIsLocked(true);
       setStatus(getLockedMessage(state.lockedUntil));
       return;
@@ -177,7 +181,7 @@ export function TotpEnrollment({
       const remaining = MAX_TOTP_ATTEMPTS - nextAttempts;
       const lockedUntil =
         nextAttempts >= MAX_TOTP_ATTEMPTS
-          ? Date.now() + TOTP_ATTEMPTS_WINDOW_SECONDS * 1000
+          ? currentTimestamp() + TOTP_ATTEMPTS_WINDOW_SECONDS * 1000
           : undefined;
       writeAttemptState(proof, nextAttempts, lockedUntil);
       if (lockedUntil) {
@@ -200,7 +204,7 @@ export function TotpEnrollment({
 
   const verifyCode = codeForm.handleSubmit(async (values) => {
     const state = readAttemptState(proof);
-    if (state.lockedUntil && state.lockedUntil > Date.now()) {
+    if (state.lockedUntil && state.lockedUntil > currentTimestamp()) {
       setIsLocked(true);
       setStatus(getLockedMessage(state.lockedUntil));
       return;
@@ -217,7 +221,7 @@ export function TotpEnrollment({
       const remaining = MAX_TOTP_ATTEMPTS - nextAttempts;
       const lockedUntil =
         nextAttempts >= MAX_TOTP_ATTEMPTS
-          ? Date.now() + TOTP_ATTEMPTS_WINDOW_SECONDS * 1000
+          ? currentTimestamp() + TOTP_ATTEMPTS_WINDOW_SECONDS * 1000
           : undefined;
       writeAttemptState(proof, nextAttempts, lockedUntil);
       if (lockedUntil) {
@@ -281,7 +285,7 @@ export function TotpEnrollment({
           />
           <button
             type="submit"
-            disabled={passwordForm.formState.isSubmitting || !proof}
+            disabled={passwordForm.formState.isSubmitting || !proof || isLocked}
           >
             {passwordForm.formState.isSubmitting ? "Starting…" : "Continue"}
           </button>
@@ -327,7 +331,10 @@ export function TotpEnrollment({
               <p role="alert">{codeForm.formState.errors.code.message}</p>
             ) : null}
           </div>
-          <button type="submit" disabled={codeForm.formState.isSubmitting}>
+          <button
+            type="submit"
+            disabled={codeForm.formState.isSubmitting || isLocked}
+          >
             {codeForm.formState.isSubmitting
               ? "Verifying…"
               : "Verify and enable"}

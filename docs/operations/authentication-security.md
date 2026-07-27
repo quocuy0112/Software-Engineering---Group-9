@@ -23,7 +23,7 @@ During routine rotation, expire current verification/reset tokens, install the r
 
 ## TOTP and backup codes
 
-Better Auth 1.6.11 exclusively owns TOTP secrets and serialized backup codes. SmartHire must not add a second TOTP store, export secrets for operations, or regenerate codes on behalf of a user without the existing proof gate. Recovery uses supported user flows; database editing is prohibited.
+Better Auth 1.6.25 exclusively owns encrypted TOTP secrets, serialized backup codes, failed-verification counts, and lock timestamps. SmartHire must not add a second TOTP store, export secrets for operations, or regenerate codes on behalf of a user without the existing proof gate. Recovery uses supported user flows; database editing is prohibited.
 
 If TOTP storage protection is suspected compromised, suspend affected authentication access through the authorized account-management process, revoke sessions and pre-authentication challenges, preserve secret-safe evidence, and require password proof plus fresh TOTP enrollment. Regeneration replaces the entire backup-code set; old codes must fail.
 

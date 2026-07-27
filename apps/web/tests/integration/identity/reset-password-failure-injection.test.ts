@@ -11,6 +11,7 @@ import {
   cleanupFixture,
   cookie,
 } from "../auth/backup-code-fixture";
+import { createCredentialFixture } from "../../helpers/credential-fixture";
 
 const protector = new TokenProtector();
 const oldPassword = "Failure fixture password 2026!";
@@ -30,15 +31,10 @@ afterEach(async () => {
 async function fixture() {
   const id = randomUUID();
   const email = `reset-failure-${id}@example.test`;
-  const signup = await authRequest("/sign-up/email", {
+  const user = await createCredentialFixture({
     name: "Reset Failure User",
     email,
     password: oldPassword,
-  });
-  if (!signup.ok) throw new Error("fixture signup failed");
-  const user = await prisma.userAccount.update({
-    where: { normalizedEmail: email },
-    data: { state: "ACTIVE", emailVerified: true },
   });
   users.push(user.id);
   const login = await authRequest("/sign-in/email", {
