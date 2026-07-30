@@ -1,0 +1,74 @@
+import { passwordProofSchema } from "@/shared/contracts/identity/two-factor";
+import { noStoreHeaders } from "@/backend/security/response-headers";
+import { validateSameOrigin } from "@/backend/security/csrf/csrf";
+import { validCsrfProof } from "@/backend/security/csrf/csrf-proof";
+import { serverEnvironment } from "@/backend/env/runtime";
+import { requireSession } from "@/backend/auth/session/require-session";
+import { EnrollTotpService } from "@/backend/services/profile/enroll-totp";
+
+/**
+ * Starts TOTP enrollment. Requires an authenticated ACTIVE session, same-origin
+ * request, CSRF proof, and recent current-password re-proof (enforced by the
+ * service). Returns a one-time setup response that must never be cached; the
+ * password, otpauth URI, secret, and QR payload never appear in the URL or logs.
+ */
+export async function POST(request: Request) {
+  const current = await requireSession(request.headers);
+  if (!current)
+    return Response.json(
+      { message: "Authentication required." },
+      { status: 401, headers: noStoreHeaders },
+    );
+  if (
+    !validateSameOrigin(request, serverEnvironment.NEXT_PUBLIC_APP_URL) ||
+    !validCsrfProof(current.sessionId, request.headers.get("x-csrf-token"))
+  ) {
+    return Response.json(
+      { message: "Request rejected." },
+      { status: 403, headers: noStoreHeaders },
+    );
+  }
+
+  const parsed = passwordProofSchema.safeParse(
+    await request.json().catch(() => null),
+  );
+  if (!parsed.success) {
+    return Response.json(
+      {
+        message: "Review the highlighted fields.",
+        fields: parsed.error.flatten().fieldErrors,
+      },
+      { status: 400, headers: noStoreHeaders },
+    );
+  }
+
+  // The authenticated account is a stable server-derived limiter subject.
+  // Never trust a browser-supplied forwarding header for production policy.
+  const subject = `user:${current.userId}`;
+  const result = await new EnrollTotpService().start(
+    parsed.data.currentPassword,
+    { headers: request.headers, subject },
+  );
+  if (!result.ok) {
+    const headers = new Headers(noStoreHeaders);
+    if (result.status === 429 && result.retryAfterSeconds)
+      headers.set("Retry-After", String(result.retryAfterSeconds));
+    const message =
+      result.status === 502
+        ? "Two-factor setup is temporarily unavailable. Please try again."
+        : result.status === 429
+          ? "Too many attempts. Please wait before trying again."
+          : "Please confirm your current password to continue.";
+    return Response.json({ message }, { status: result.status, headers });
+  }
+
+  return Response.json(
+    {
+      qrCodeDataUrl: result.qrCodeDataUrl,
+      manualKey: result.manualKey,
+      issuer: result.issuer,
+      accountLabel: result.accountLabel,
+    },
+    { headers: noStoreHeaders },
+  );
+}

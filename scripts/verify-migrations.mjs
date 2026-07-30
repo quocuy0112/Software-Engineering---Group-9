@@ -4,7 +4,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const app = resolve(root, "apps/web");
+const app = resolve(root, "web");
 const prismaCli = resolve(root, "node_modules/prisma/build/index.js");
 const composeEnv = Object.fromEntries(
   (await readFile(resolve(root, ".env"), "utf8"))

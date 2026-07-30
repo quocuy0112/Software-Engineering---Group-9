@@ -13,4 +13,4 @@ node_modules/
 logs/
 .env
 .env.*
-apps/web/.env.local
+web/.env.local

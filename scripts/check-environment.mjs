@@ -42,9 +42,9 @@ check(
   "Compose PostgreSQL health",
 );
 check(await canAccess(".env"), "root .env exists");
-check(await canAccess("apps/web/.env.local"), "apps/web/.env.local exists");
+check(await canAccess("web/.env.local"), "web/.env.local exists");
 check(
-  await canAccess("apps/web/.local/mail", constants.W_OK),
+  await canAccess("web/.local/mail", constants.W_OK),
   "email capture directory is writable",
 );
 const lockfiles = (await readdir(root, { recursive: true })).filter(
@@ -60,9 +60,9 @@ check(
   workspaces.status === 0 && workspaces.stdout.includes("@smarthire/web"),
   "@smarthire/web workspace discovery",
 );
-if (await canAccess("apps/web/.env.local")) {
+if (await canAccess("web/.env.local")) {
   const appEnvironment = Object.fromEntries(
-    (await readFile(resolve(root, "apps/web/.env.local"), "utf8"))
+    (await readFile(resolve(root, "web/.env.local"), "utf8"))
       .split(/\r?\n/)
       .filter(Boolean)
       .map((line) => line.split(/=(.*)/s).slice(0, 2)),
@@ -101,7 +101,7 @@ if (await canAccess("apps/web/.env.local")) {
     process.execPath,
     [prismaCli, "db", "execute", "--stdin"],
     {
-      cwd: resolve(root, "apps/web"),
+      cwd: resolve(root, "web"),
       env: { ...process.env, ...appEnvironment },
       input: "SELECT 1;",
       encoding: "utf8",

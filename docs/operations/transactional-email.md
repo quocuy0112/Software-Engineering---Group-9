@@ -6,7 +6,7 @@ SmartHire sends every transactional message through `EmailOutbox -> due-outbox p
 
 `EMAIL_ADAPTER=capture` is the generated default. Run `npm run dev` to supervise Next.js and the worker together, or run `npm run dev:web` and `npm run email:worker` in separate terminals for diagnosis. Captures are written beneath the configured, gitignored `EMAIL_CAPTURE_DIR`. Never commit captures because their message bodies may contain verification or recovery links.
 
-SMTP is an explicit local/team demonstration option only. Store its credentials in untracked `apps/web/.env.local`; never print them or persist them in outbox/audit records. Gmail port 587 uses STARTTLS with `SMTP_SECURE=false` and `SMTP_USE_TLS=true`; port 465 uses implicit TLS with `SMTP_SECURE=true`.
+SMTP is an explicit local/team demonstration option only. Store its credentials in untracked `web/.env.local`; never print them or persist them in outbox/audit records. Gmail port 587 uses STARTTLS with `SMTP_SECURE=false` and `SMTP_USE_TLS=true`; port 465 uses implicit TLS with `SMTP_SECURE=true`.
 
 ## Resend production readiness
 

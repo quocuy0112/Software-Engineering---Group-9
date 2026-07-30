@@ -1,7 +1,7 @@
 ---
 name: speckit-git-initialize
 description: Initialize a Git repository with an initial commit
-compatibility: Requires spec-kit project structure with .specify/ directory
+compatibility: Requires spec-kit project structure with spec-kit/.specify/ directory
 metadata:
   author: github-spec-kit
   source: git:commands/speckit.git.initialize.md
@@ -15,8 +15,8 @@ Initialize a Git repository in the current project directory if one does not alr
 
 Run the appropriate script from the project root:
 
-- **Bash**: `.specify/extensions/git/scripts/bash/initialize-repo.sh`
-- **PowerShell**: `.specify/extensions/git/scripts/powershell/initialize-repo.ps1`
+- **Bash**: `spec-kit/.specify/extensions/git/scripts/bash/initialize-repo.sh`
+- **PowerShell**: `spec-kit/.specify/extensions/git/scripts/powershell/initialize-repo.ps1`
 
 If the extension scripts are not found, fall back to:
 - **Bash**: `git init && git add . && git commit -m "Initial commit from Specify template"`

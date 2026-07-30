@@ -1,0 +1,158 @@
+/* Base styles. */
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.app-toaster[data-sonner-toaster] {
+  --width: min(33.375rem, calc(100vw - 2rem)) !important;
+}
+
+.app-toaster [data-sonner-toast].app-toast[data-styled="true"] {
+  min-height: 4.875rem;
+}
+.smart-hire-brand {
+  color: #0f172a;
+  font-size: 1.2rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+.smart-hire-brand:focus-visible {
+  outline: 3px solid #f59e0b;
+  outline-offset: 2px;
+  border-radius: 0.2rem;
+}
+
+/* SmartHire visual system */
+
+html {
+  min-height: 100%;
+  background: var(--canvas);
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family:
+    "Segoe UI",
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: wait;
+}
+
+.smart-hire-brand {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 0.65rem;
+  color: inherit;
+  font-size: 1.05rem;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: inline-grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 0.7rem;
+  color: var(--forest);
+  background: #d7e8cd;
+  font-size: 0.95rem;
+  font-weight: 850;
+}
+
+.form-kicker,
+.panel-kicker {
+  margin: 0;
+  color: var(--violet);
+  font-size: 0.69rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.sidebar-footer-mark {
+  display: inline-grid;
+  width: 1.4rem;
+  height: 1.4rem;
+  place-items: center;
+  border-radius: 0.45rem;
+  color: #d8e9ac;
+  background: rgb(216 233 172 / 0.14);
+  font-size: 0.8rem;
+}
+
+.account-checklist {
+  display: grid;
+  gap: 0.9rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.account-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+}
+
+.account-checklist strong,
+.account-checklist small {
+  display: block;
+}
+
+.account-checklist strong {
+  color: #465044;
+  font-size: 0.77rem;
+}
+
+.account-checklist small {
+  margin-top: 0.2rem;
+  color: #899187;
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+.settings-page {
+  width: 100%;
+}
+
+/* Reset properties inherited from the original foundation layout. */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+  }
+}

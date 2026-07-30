@@ -1,0 +1,22 @@
+import { noStoreHeaders } from "@/backend/security/response-headers";
+import { csrfProof } from "@/backend/security/csrf/csrf-proof";
+import { requireSession } from "@/backend/auth/session/require-session";
+import { ListSessionsService } from "@/backend/services/session/list-sessions";
+export async function GET(request: Request) {
+  const current = await requireSession(request.headers);
+  if (!current)
+    return Response.json(
+      { message: "Authentication required." },
+      { status: 401, headers: noStoreHeaders },
+    );
+  return Response.json(
+    {
+      sessions: await new ListSessionsService().execute(
+        current.userId,
+        current.sessionId,
+      ),
+      csrfProof: csrfProof(current.sessionId),
+    },
+    { headers: noStoreHeaders },
+  );
+}

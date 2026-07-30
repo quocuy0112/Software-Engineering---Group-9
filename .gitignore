@@ -6,7 +6,7 @@ node_modules/
 .env
 .env.*
 !**/.env.example
-apps/web/.env.local
+web/.env.local
 
 # Next.js
 **/.next/
@@ -19,7 +19,7 @@ apps/web/.env.local
 
 # Local application data
 **/.local/
-apps/web/.local/mail/
+web/.local/mail/
 mail-output/
 email-preview/
 

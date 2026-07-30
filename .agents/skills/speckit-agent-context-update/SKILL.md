@@ -1,7 +1,7 @@
 ---
 name: speckit-agent-context-update
 description: Refresh the managed Spec Kit section in the coding agent context file
-compatibility: Requires spec-kit project structure with .specify/ directory
+compatibility: Requires spec-kit project structure with spec-kit/.specify/ directory
 metadata:
   author: github-spec-kit
   source: agent-context:commands/speckit.agent-context.update.md
@@ -14,7 +14,7 @@ Refresh the managed Spec Kit section inside the active coding agent's context/in
 ## Behavior
 
 The script reads the agent-context extension config at
-`.specify/extensions/agent-context/agent-context-config.yml` to discover:
+`spec-kit/.specify/extensions/agent-context/agent-context-config.yml` to discover:
 
 - `context_file` — the path of the coding agent context file to manage.
 - `context_markers.start` / `.end` — the delimiters surrounding the managed section. Defaults to `<!-- SPECKIT START -->` and `<!-- SPECKIT END -->` when the field is missing.
@@ -25,7 +25,7 @@ If `context_file` is empty or the file cannot be located, the command reports no
 
 ## Execution
 
-- **Bash**: `.specify/extensions/agent-context/scripts/bash/update-agent-context.sh [plan_path]`
-- **PowerShell**: `.specify/extensions/agent-context/scripts/powershell/update-agent-context.ps1 [plan_path]`
+- **Bash**: `spec-kit/.specify/extensions/agent-context/scripts/bash/update-agent-context.sh [plan_path]`
+- **PowerShell**: `spec-kit/.specify/extensions/agent-context/scripts/powershell/update-agent-context.ps1 [plan_path]`
 
 When `plan_path` is omitted, the script auto-detects the most recently modified `specs/*/plan.md`.
