@@ -827,7 +827,10 @@
 }
 
 .workspace-page {
+  height: 100dvh;
+  min-height: 100dvh;
   padding: 0;
+  overflow: hidden;
 }
 
 .workspace-header {
@@ -841,6 +844,151 @@
   flex: 1;
   align-items: stretch;
   margin: 2.8rem 0 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.workspace-layout {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  transition: grid-template-columns 180ms ease;
+}
+
+.workspace-layout[data-sidebar-collapsed="true"] {
+  grid-template-columns: 4.75rem minmax(0, 1fr);
+}
+
+.workspace-sidebar {
+  position: relative;
+  top: auto;
+  align-self: stretch;
+  height: 100%;
+  max-height: none;
+  overflow: hidden;
+}
+
+.workspace-main {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+
+.workspace-sidebar-header {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.workspace-sidebar-brand {
+  min-width: 0;
+  flex: 1;
+}
+
+.workspace-sidebar-toggle {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  border: 1px solid rgb(222 235 195 / 0.22);
+  border-radius: 0.65rem;
+  color: #dce7d8;
+  background: rgb(222 235 195 / 0.08);
+  cursor: pointer;
+}
+
+.workspace-sidebar-toggle:hover {
+  color: #fff;
+  background: rgb(222 235 195 / 0.16);
+}
+
+.workspace-sidebar-toggle svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.workspace-navigation-scroll {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.3rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.25rem;
+  scrollbar-color: rgb(222 235 195 / 0.32) transparent;
+  scrollbar-width: thin;
+}
+
+.workspace-navigation-scroll::-webkit-scrollbar {
+  width: 0.38rem;
+}
+
+.workspace-navigation-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgb(222 235 195 / 0.32);
+}
+
+.workspace-navigation-footer {
+  flex: 0 0 auto;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgb(222 235 195 / 0.13);
+}
+
+.workspace-navigation-footer button {
+  margin-top: 0;
+}
+
+.workspace-sidebar[data-collapsed="true"] {
+  padding-inline: 0.65rem;
+}
+
+.workspace-sidebar[data-collapsed="true"] .workspace-sidebar-header {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.workspace-sidebar[data-collapsed="true"] .workspace-sidebar-brand {
+  flex: 0 0 auto;
+}
+
+.workspace-sidebar[data-collapsed="true"] .smart-hire-brand {
+  justify-content: center;
+}
+
+.workspace-sidebar[data-collapsed="true"] .workspace-brand-name,
+.workspace-sidebar[data-collapsed="true"] .workspace-product-label,
+.workspace-sidebar[data-collapsed="true"] .workspace-navigation-label {
+  display: none;
+}
+
+.workspace-sidebar[data-collapsed="true"] .workspace-sidebar-toggle {
+  margin: 0;
+}
+
+.workspace-sidebar[data-collapsed="true"] .workspace-navigation {
+  margin-top: 1.6rem;
+}
+
+.workspace-sidebar[data-collapsed="true"] .workspace-navigation-scroll {
+  padding-right: 0;
+}
+
+.workspace-sidebar[data-collapsed="true"] .workspace-navigation a,
+.workspace-sidebar[data-collapsed="true"] .workspace-navigation button {
+  justify-content: center;
+  gap: 0;
+  padding-inline: 0.5rem;
 }
 
 .dashboard-links {
@@ -865,24 +1013,73 @@
 }
 
 @media (max-width: 760px) {
+  .workspace-page {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
   .workspace-layout {
     display: block;
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
   }
 
   .workspace-sidebar {
+    position: relative;
+    top: auto;
+    height: auto;
+    max-height: none;
     min-height: 0;
+    padding: 1rem;
+    overflow: visible;
+  }
+
+  .workspace-main {
+    height: auto;
+    overflow: visible;
+  }
+
+  .workspace-sidebar[data-collapsed="true"] {
     padding: 1rem;
   }
 
-  .workspace-sidebar-brand {
+  .workspace-sidebar-header,
+  .workspace-sidebar[data-collapsed="true"] .workspace-sidebar-header {
+    display: block;
+  }
+
+  .workspace-sidebar-brand,
+  .workspace-sidebar[data-collapsed="true"] .workspace-sidebar-brand {
     display: flex;
+    min-width: 0;
     align-items: center;
+    flex: 1;
     justify-content: space-between;
     gap: 1rem;
   }
 
-  .workspace-product-label {
+  .workspace-sidebar[data-collapsed="true"] .workspace-brand-name,
+  .workspace-sidebar[data-collapsed="true"] .workspace-navigation-label {
+    display: inline;
+  }
+
+  .workspace-sidebar[data-collapsed="true"] .workspace-product-label {
+    display: block;
+  }
+
+  .workspace-sidebar[data-collapsed="true"] .smart-hire-brand {
+    justify-content: flex-start;
+  }
+
+  .workspace-product-label,
+  .workspace-sidebar[data-collapsed="true"] .workspace-product-label {
     margin: 0;
+  }
+
+  .workspace-sidebar-toggle {
+    display: none;
   }
 
   .workspace-menu-toggle {
@@ -890,8 +1087,18 @@
   }
 
   .workspace-navigation {
+    max-height: min(32rem, calc(100dvh - 8rem));
+    flex: none;
     display: none;
     margin-top: 0.65rem;
+  }
+
+  .workspace-sidebar[data-collapsed="true"] .workspace-navigation {
+    margin-top: 0.65rem;
+  }
+
+  .workspace-sidebar[data-collapsed="true"] .workspace-navigation-scroll {
+    padding-right: 0.25rem;
   }
 
   .workspace-navigation[data-open="true"] {
@@ -899,8 +1106,11 @@
   }
 
   .workspace-navigation a,
-  .workspace-navigation button {
+  .workspace-navigation button,
+  .workspace-sidebar[data-collapsed="true"] .workspace-navigation a,
+  .workspace-sidebar[data-collapsed="true"] .workspace-navigation button {
     justify-content: flex-start;
+    gap: 0.72rem;
   }
 
   .workspace-sidebar-footer {

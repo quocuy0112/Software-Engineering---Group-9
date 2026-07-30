@@ -236,12 +236,30 @@ export function TwoFactorChallenge() {
           min-width: 0;
         }
         .factor-mode-switcher {
-          display: flex;
-          flex-wrap: wrap;
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 0.5rem;
         }
         .factor-mode-switcher button {
-          flex: 1 1 10rem;
+          width: 100%;
+          min-width: 0;
+          border: 2px solid transparent;
+          padding-inline: 0.65rem;
+          color: #384438;
+          background: #edf0e9;
+          box-shadow: none;
+        }
+        .factor-mode-switcher button:hover:not(:disabled) {
+          color: var(--forest);
+          background: #e4eadf;
+          box-shadow: none;
+          transform: none;
+        }
+        .factor-mode-switcher button[aria-pressed="true"] {
+          border-color: #c49b45;
+          color: var(--forest);
+          background: #fffaf0;
+          box-shadow: 0 0 0 1px rgb(196 155 69 / 0.16);
         }
         .field input {
           box-sizing: border-box;

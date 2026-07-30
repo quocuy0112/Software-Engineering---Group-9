@@ -11,9 +11,11 @@ const destinations = [
 
 export function WorkspaceNavigation({
   busy,
+  collapsed,
   onSignOut,
 }: {
   busy: boolean;
+  collapsed: boolean;
   onSignOut: () => void;
 }) {
   const pathname = usePathname() ?? "/";
@@ -52,37 +54,58 @@ export function WorkspaceNavigation({
         aria-label="Workspace"
         data-open={menuOpen}
       >
-        {destinations.map((destination) => {
-          const active =
-            pathname === destination.href ||
-            (destination.href !== "/dashboard" &&
-              pathname.startsWith(destination.href));
-          return (
-            <Link
-              key={destination.href}
-              href={destination.href}
-              aria-current={active ? "page" : undefined}
-              onClick={() => setMenuOpen(false)}
-            >
-              <NavIcon name={destination.icon} />
-              {destination.label}
-            </Link>
-          );
-        })}
-        <button
-          type="button"
-          onClick={onSignOut}
-          disabled={busy}
-          aria-busy={busy}
-        >
-          {busy ? "Signing out…" : "Sign out"}
-        </button>
+        <div className="workspace-navigation-scroll">
+          {destinations.map((destination) => {
+            const active =
+              pathname === destination.href ||
+              (destination.href !== "/dashboard" &&
+                pathname.startsWith(destination.href));
+            return (
+              <Link
+                key={destination.href}
+                href={destination.href}
+                aria-current={active ? "page" : undefined}
+                aria-label={destination.label}
+                title={collapsed ? destination.label : undefined}
+                onClick={() => setMenuOpen(false)}
+              >
+                <NavIcon name={destination.icon} />
+                <span className="workspace-navigation-label">
+                  {destination.label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+        <div className="workspace-navigation-footer">
+          <button
+            type="button"
+            onClick={onSignOut}
+            disabled={busy}
+            aria-busy={busy}
+            aria-label={busy ? "Signing out" : "Sign out"}
+            title={collapsed ? (busy ? "Signing out" : "Sign out") : undefined}
+          >
+            <NavIcon name="signout" />
+            <span className="workspace-navigation-label">
+              {busy ? "Signing out…" : "Sign out"}
+            </span>
+          </button>
+        </div>
       </nav>
     </>
   );
 }
 
 function NavIcon({ name }: { name: string }) {
+  if (name === "signout") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
+        <path d="M8 4H4.5A1.5 1.5 0 0 0 3 5.5v9A1.5 1.5 0 0 0 4.5 16H8" />
+        <path d="M11 6.5 14.5 10 11 13.5M7 10h7.5" />
+      </svg>
+    );
+  }
   if (name === "profile") {
     return (
       <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">

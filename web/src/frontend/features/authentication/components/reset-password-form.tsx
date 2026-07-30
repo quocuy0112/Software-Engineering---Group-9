@@ -1,12 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { PASSWORD_RESET_GENERIC_ERROR } from "@/shared/contracts/identity/password-recovery";
+import {
+  PASSWORD_CONFIRMATION_MISMATCH_ERROR,
+  PASSWORD_RESET_GENERIC_ERROR,
+  PASSWORD_RESET_SUCCESS_RESPONSE,
+} from "@/shared/contracts/identity/password-recovery";
 import { AuthStatus } from "./auth-status";
 import { PasswordField } from "./password-field";
+import { useReplayableStatus } from "./use-status";
 
 export function ResetPasswordForm() {
+  const router = useRouter();
   const [token, setToken] = useState(() => {
     if (typeof window === "undefined") return "";
     const hash = window.location.hash.replace(/^#/, "");
@@ -14,8 +21,10 @@ export function ResetPasswordForm() {
   });
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
-  const [status, setStatus] = useState("");
+  const { status, setStatus } = useReplayableStatus("");
+  const [statusTone, setStatusTone] = useState<"error" | "success">("error");
   const [busy, setBusy] = useState(false);
+  const [completed, setCompleted] = useState(false);
 
   useEffect(() => {
     window.history.replaceState(null, "", window.location.pathname);
@@ -26,9 +35,23 @@ export function ResetPasswordForm() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!completed) return;
+    const redirectTimer = window.setTimeout(() => {
+      router.replace("/login");
+    }, 750);
+    return () => window.clearTimeout(redirectTimer);
+  }, [completed, router]);
+
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (busy) return;
+    if (busy || completed) return;
+    if (password !== confirmation) {
+      setStatusTone("error");
+      setStatus(PASSWORD_CONFIRMATION_MISMATCH_ERROR);
+      return;
+    }
+
     setBusy(true);
     setStatus("");
     const sentToken = token;
@@ -45,14 +68,23 @@ export function ResetPasswordForm() {
       const result = (await response.json().catch(() => null)) as {
         message?: string;
       } | null;
-      setStatus(result?.message ?? PASSWORD_RESET_GENERIC_ERROR);
-      if (response.ok) setToken("");
+      if (!response.ok) {
+        setStatusTone("error");
+        setStatus(result?.message ?? PASSWORD_RESET_GENERIC_ERROR);
+        return;
+      }
+
+      setStatusTone("success");
+      setStatus(result?.message ?? PASSWORD_RESET_SUCCESS_RESPONSE);
+      setToken("");
+      setPassword("");
+      setConfirmation("");
+      setCompleted(true);
     } catch {
+      setStatusTone("error");
       setStatus(PASSWORD_RESET_GENERIC_ERROR);
     } finally {
       setBusy(false);
-      setPassword("");
-      setConfirmation("");
     }
   }
 
@@ -82,15 +114,18 @@ export function ResetPasswordForm() {
         />
         <button
           type="submit"
-          disabled={
-            busy || !token || password.length < 12 || password !== confirmation
-          }
+          disabled={busy || completed || !token || password.length < 12}
         >
-          {busy ? "Resetting…" : "Reset password"}
+          {completed
+            ? "Redirecting to sign in…"
+            : busy
+              ? "Resetting…"
+              : "Reset password"}
         </button>
         <AuthStatus
+          id="reset-password-status"
           status={status}
-          tone={status === PASSWORD_RESET_GENERIC_ERROR ? "error" : "success"}
+          tone={statusTone}
         />
         <Link href="/login">Back to sign in</Link>
       </form>

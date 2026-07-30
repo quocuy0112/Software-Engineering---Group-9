@@ -20,6 +20,7 @@ export function WorkspaceShell({
   const [busy, setBusy] = useState(false);
   const [navigating, startNavigation] = useTransition();
   const [status, setStatus] = useState("");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   async function signOut() {
     if (busy || navigating) return;
@@ -44,22 +45,56 @@ export function WorkspaceShell({
 
   return (
     <main className="workspace-page">
-      <div className="workspace-layout">
-        <aside className="workspace-sidebar">
-          <div className="workspace-sidebar-brand">
-            <Link className="smart-hire-brand" href="/">
-              <span className="brand-mark" aria-hidden="true">
-                S
-              </span>
-              <span>SmartHire</span>
-            </Link>
-            <span className="workspace-product-label">Talent workspace</span>
+      <div
+        className="workspace-layout"
+        data-sidebar-collapsed={sidebarCollapsed}
+      >
+        <aside
+          className="workspace-sidebar"
+          aria-label="Workspace sidebar"
+          data-collapsed={sidebarCollapsed}
+        >
+          <div className="workspace-sidebar-header">
+            <div className="workspace-sidebar-brand">
+              <Link
+                className="smart-hire-brand"
+                href="/"
+                aria-label="SmartHire home"
+              >
+                <span className="brand-mark" aria-hidden="true">
+                  S
+                </span>
+                <span className="workspace-brand-name">SmartHire</span>
+              </Link>
+              <span className="workspace-product-label">Talent workspace</span>
+            </div>
+            <button
+              className="workspace-sidebar-toggle"
+              type="button"
+              aria-controls="workspace-navigation"
+              aria-expanded={!sidebarCollapsed}
+              aria-label={
+                sidebarCollapsed
+                  ? "Expand workspace sidebar"
+                  : "Collapse workspace sidebar"
+              }
+              title={
+                sidebarCollapsed
+                  ? "Expand workspace sidebar"
+                  : "Collapse workspace sidebar"
+              }
+              onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
+            >
+              <svg aria-hidden="true" viewBox="0 0 20 20">
+                <path d={sidebarCollapsed ? "m7 4 6 6-6 6" : "m13 4-6 6 6 6"} />
+              </svg>
+            </button>
           </div>
           <WorkspaceNavigation
             busy={busy || navigating}
+            collapsed={sidebarCollapsed}
             onSignOut={() => void signOut()}
           />
-          <div className="workspace-sidebar-footer"></div>
         </aside>
         <div className="workspace-main">
           <header className="workspace-header">
