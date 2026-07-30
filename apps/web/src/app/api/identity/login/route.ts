@@ -1,8 +1,8 @@
-import { loginSchema } from "@/features/identity/schemas/login";
-import { validateSameOrigin } from "@/lib/security/csrf";
-import { serverEnvironment } from "@/lib/env/runtime";
-import { noStoreHeaders } from "@/lib/security/response-headers";
-import { LoginWithPasswordService } from "@/server/services/identity/login-with-password";
+import { loginSchema } from "@/shared/contracts/identity/login";
+import { validateSameOrigin } from "@/backend/security/csrf/csrf";
+import { serverEnvironment } from "@/backend/env/runtime";
+import { noStoreHeaders } from "@/backend/security/response-headers";
+import { LoginWithPasswordService } from "@/backend/services/identity/login-with-password";
 export async function POST(request: Request) {
   if (!validateSameOrigin(request, serverEnvironment.NEXT_PUBLIC_APP_URL))
     return Response.json(

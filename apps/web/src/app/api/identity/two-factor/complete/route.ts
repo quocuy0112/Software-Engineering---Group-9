@@ -1,15 +1,15 @@
 import {
   completeTwoFactorSchema,
   TWO_FACTOR_GENERIC_ERROR,
-} from "@/features/identity/schemas/two-factor";
-import { validateSameOrigin } from "@/lib/security/csrf";
-import { noStoreHeaders } from "@/lib/security/response-headers";
-import { serverEnvironment } from "@/lib/env/runtime";
+} from "@/shared/contracts/identity/two-factor";
+import { validateSameOrigin } from "@/backend/security/csrf/csrf";
+import { noStoreHeaders } from "@/backend/security/response-headers";
+import { serverEnvironment } from "@/backend/env/runtime";
 import {
   clearPreAuthCookie,
   readPreAuthCookie,
-} from "@/server/auth/identity/pre-auth-cookie";
-import { CompleteTwoFactorService } from "@/server/services/identity/complete-two-factor";
+} from "@/backend/auth/cookies/pre-auth-cookie";
+import { CompleteTwoFactorService } from "@/backend/services/two-factor/complete-two-factor";
 export async function POST(request: Request) {
   const safe = (status = 401, retryAfterSeconds?: number) => {
     const headers = new Headers(noStoreHeaders);

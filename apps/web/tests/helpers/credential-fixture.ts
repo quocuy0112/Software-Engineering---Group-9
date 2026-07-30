@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { hashPassword } from "better-auth/crypto";
-import { prisma } from "@/lib/db/prisma";
+import { prisma } from "@/backend/database/prisma";
 
 type CredentialFixtureInput = {
   email: string;

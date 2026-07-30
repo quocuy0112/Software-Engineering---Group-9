@@ -1,10 +1,10 @@
-import { passwordProofSchema } from "@/features/identity/schemas/two-factor";
-import { noStoreHeaders } from "@/lib/security/response-headers";
-import { validateSameOrigin } from "@/lib/security/csrf";
-import { validCsrfProof } from "@/lib/security/csrf-proof";
-import { serverEnvironment } from "@/lib/env/runtime";
-import { requireSession } from "@/server/auth/require-session";
-import { EnrollTotpService } from "@/server/services/identity/enroll-totp";
+import { passwordProofSchema } from "@/shared/contracts/identity/two-factor";
+import { noStoreHeaders } from "@/backend/security/response-headers";
+import { validateSameOrigin } from "@/backend/security/csrf/csrf";
+import { validCsrfProof } from "@/backend/security/csrf/csrf-proof";
+import { serverEnvironment } from "@/backend/env/runtime";
+import { requireSession } from "@/backend/auth/session/require-session";
+import { EnrollTotpService } from "@/backend/services/profile/enroll-totp";
 
 /**
  * Starts TOTP enrollment. Requires an authenticated ACTIVE session, same-origin
@@ -53,8 +53,14 @@ export async function POST(request: Request) {
     const headers = new Headers(noStoreHeaders);
     if (result.status === 429 && result.retryAfterSeconds)
       headers.set("Retry-After", String(result.retryAfterSeconds));
+    const message =
+      result.status === 502
+        ? "Two-factor setup is temporarily unavailable. Please try again."
+        : result.status === 429
+          ? "Too many attempts. Please wait before trying again."
+          : "Please confirm your current password to continue.";
     return Response.json(
-      { message: "Please confirm your current password to continue." },
+      { message },
       { status: result.status, headers },
     );
   }

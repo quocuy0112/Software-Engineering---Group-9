@@ -1,8 +1,8 @@
-import { registrationSchema } from "@/features/identity/schemas/registration";
-import { serverEnvironment } from "@/lib/env/runtime";
-import { validateSameOrigin } from "@/lib/security/csrf";
-import { noStoreHeaders } from "@/lib/security/response-headers";
-import { RegisterAccountService } from "@/server/services/identity/register-account";
+import { registrationSchema } from "@/shared/contracts/identity/registration";
+import { serverEnvironment } from "@/backend/env/runtime";
+import { validateSameOrigin } from "@/backend/security/csrf/csrf";
+import { noStoreHeaders } from "@/backend/security/response-headers";
+import { RegisterAccountService } from "@/backend/services/identity/register-account";
 
 export async function POST(request: Request) {
   if (!validateSameOrigin(request, serverEnvironment.NEXT_PUBLIC_APP_URL))

@@ -1,4 +1,4 @@
-import { TwoFactorChallenge } from "@/components/auth/two-factor-challenge";
+import { TwoFactorChallenge } from "@/frontend/features/authentication/components/auth/two-factor-challenge";
 export default function TwoFactorPage() {
   return <TwoFactorChallenge />;
 }

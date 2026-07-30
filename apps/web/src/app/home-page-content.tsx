@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { headers } from "next/headers";
-import { requireSession } from "@/server/auth/require-session";
-import { prisma } from "@/lib/db/prisma";
-import { csrfProof } from "@/lib/security/csrf-proof";
-import { HomeAuthenticatedActions } from "@/components/auth/home-authenticated-actions";
+import { requireSession } from "@/backend/auth/session/require-session";
+import { prisma } from "@/backend/database/prisma";
+import { csrfProof } from "@/backend/security/csrf/csrf-proof";
+import { HomeAuthenticatedActions } from "@/frontend/features/authentication/components/auth/home-authenticated-actions";
 
 export default async function HomePageContent() {
   const current = await requireSession(await headers());

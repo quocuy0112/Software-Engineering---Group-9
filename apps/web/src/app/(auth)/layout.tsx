@@ -1,4 +1,4 @@
-import { AuthShell } from "@/components/auth/auth-shell";
+import { AuthShell } from "@/frontend/features/authentication/components/auth/auth-shell";
 export default function AuthLayout({
   children,
 }: {

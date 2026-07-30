@@ -1,6 +1,6 @@
-import { LoginForm } from "@/components/auth/login-form";
-import { trustedInternalRedirect } from "@/lib/security/trusted-redirect";
-import { serverEnvironment } from "@/lib/env/runtime";
+import { LoginForm } from "@/frontend/features/authentication/components/auth/login-form";
+import { trustedInternalRedirect } from "@/backend/security/trusted-redirect";
+import { serverEnvironment } from "@/backend/env/runtime";
 export default async function LoginPage({
   searchParams,
 }: {

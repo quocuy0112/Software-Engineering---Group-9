@@ -1,5 +1,5 @@
-import { SessionList } from "@/components/auth/session-list";
-import { ProfileNavigation } from "@/components/auth/profile-navigation";
+import { SessionList } from "@/frontend/features/authentication/components/auth/session-list";
+import { ProfileNavigation } from "@/frontend/features/authentication/components/auth/profile-navigation";
 
 export default function ProfileSessionsPage() {
   return (

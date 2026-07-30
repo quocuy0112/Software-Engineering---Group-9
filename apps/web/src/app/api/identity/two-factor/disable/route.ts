@@ -1,10 +1,10 @@
-import { twoFactorManagementSchema } from "@/features/identity/schemas/two-factor";
-import { validateSameOrigin } from "@/lib/security/csrf";
-import { validCsrfProof } from "@/lib/security/csrf-proof";
-import { serverEnvironment } from "@/lib/env/runtime";
-import { noStoreHeaders } from "@/lib/security/response-headers";
-import { requireSession } from "@/server/auth/require-session";
-import { DisableTwoFactorService } from "@/server/services/identity/disable-two-factor";
+import { twoFactorManagementSchema } from "@/shared/contracts/identity/two-factor";
+import { validateSameOrigin } from "@/backend/security/csrf/csrf";
+import { validCsrfProof } from "@/backend/security/csrf/csrf-proof";
+import { serverEnvironment } from "@/backend/env/runtime";
+import { noStoreHeaders } from "@/backend/security/response-headers";
+import { requireSession } from "@/backend/auth/session/require-session";
+import { DisableTwoFactorService } from "@/backend/services/two-factor/disable-two-factor";
 export async function POST(request: Request) {
   const current = await requireSession(request.headers);
   if (!current)

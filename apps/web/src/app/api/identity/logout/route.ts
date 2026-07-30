@@ -1,10 +1,10 @@
-import { validateSameOrigin } from "@/lib/security/csrf";
-import { validCsrfProof } from "@/lib/security/csrf-proof";
-import { serverEnvironment } from "@/lib/env/runtime";
-import { requireSession } from "@/server/auth/require-session";
-import { BetterAuthSessionGateway } from "@/server/auth/identity/better-auth-session-gateway";
-import { SessionService } from "@/server/services/identity/session-service";
-import { noStoreHeaders } from "@/lib/security/response-headers";
+import { validateSameOrigin } from "@/backend/security/csrf/csrf";
+import { validCsrfProof } from "@/backend/security/csrf/csrf-proof";
+import { serverEnvironment } from "@/backend/env/runtime";
+import { requireSession } from "@/backend/auth/session/require-session";
+import { BetterAuthSessionGateway } from "@/backend/auth/better-auth/better-auth-session-gateway";
+import { SessionService } from "@/backend/services/session/session-service";
+import { noStoreHeaders } from "@/backend/security/response-headers";
 export async function POST(request: Request) {
   const current = await requireSession(request.headers);
   if (!current)

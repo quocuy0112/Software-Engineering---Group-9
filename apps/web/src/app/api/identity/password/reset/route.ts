@@ -1,13 +1,13 @@
 import {
   resetPasswordSchema,
   PASSWORD_RESET_GENERIC_ERROR,
-} from "@/features/identity/schemas/password-recovery";
-import { serverEnvironment } from "@/lib/env/runtime";
-import { validateSameOrigin } from "@/lib/security/csrf";
-import { noStoreHeaders } from "@/lib/security/response-headers";
-import { clearSessionCookie } from "@/lib/security/cookies";
-import { clearPreAuthCookie } from "@/server/auth/identity/pre-auth-cookie";
-import { ResetPasswordService } from "@/server/services/identity/reset-password";
+} from "@/shared/contracts/identity/password-recovery";
+import { serverEnvironment } from "@/backend/env/runtime";
+import { validateSameOrigin } from "@/backend/security/csrf/csrf";
+import { noStoreHeaders } from "@/backend/security/response-headers";
+import { clearSessionCookie } from "@/backend/security/cookies";
+import { clearPreAuthCookie } from "@/backend/auth/cookies/pre-auth-cookie";
+import { ResetPasswordService } from "@/backend/services/recovery/reset-password";
 
 function resetResponseHeaders() {
   const headers = new Headers(noStoreHeaders);

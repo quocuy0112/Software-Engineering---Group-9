@@ -1,11 +1,11 @@
-import { emailSchema } from "@/features/identity/schemas/registration";
-import { validateSameOrigin } from "@/lib/security/csrf";
-import { serverEnvironment } from "@/lib/env/runtime";
-import { noStoreHeaders } from "@/lib/security/response-headers";
+import { emailSchema } from "@/shared/contracts/identity/registration";
+import { validateSameOrigin } from "@/backend/security/csrf/csrf";
+import { serverEnvironment } from "@/backend/env/runtime";
+import { noStoreHeaders } from "@/backend/security/response-headers";
 import {
   ResendVerificationService,
   GENERIC_RESEND_MESSAGE,
-} from "@/server/services/identity/resend-verification";
+} from "@/backend/services/identity/resend-verification";
 
 export async function POST(request: Request) {
   if (!validateSameOrigin(request, serverEnvironment.NEXT_PUBLIC_APP_URL))

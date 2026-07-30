@@ -1,7 +1,7 @@
-import { verificationTokenSchema } from "@/features/identity/schemas/registration";
-import { serverEnvironment } from "@/lib/env/runtime";
-import { noStoreHeaders } from "@/lib/security/response-headers";
-import { VerifyEmailService } from "@/server/services/identity/verify-email";
+import { verificationTokenSchema } from "@/shared/contracts/identity/registration";
+import { serverEnvironment } from "@/backend/env/runtime";
+import { noStoreHeaders } from "@/backend/security/response-headers";
+import { VerifyEmailService } from "@/backend/services/identity/verify-email";
 
 export async function POST(request: Request) {
   const origin = request.headers.get("origin");

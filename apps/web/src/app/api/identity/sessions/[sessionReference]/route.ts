@@ -1,10 +1,10 @@
-import { sessionReferenceSchema } from "@/features/identity/schemas/session";
-import { validateSameOrigin } from "@/lib/security/csrf";
-import { validCsrfProof } from "@/lib/security/csrf-proof";
-import { serverEnvironment } from "@/lib/env/runtime";
-import { requireSession } from "@/server/auth/require-session";
-import { RevokeSessionService } from "@/server/services/identity/revoke-session";
-import { noStoreHeaders } from "@/lib/security/response-headers";
+import { sessionReferenceSchema } from "@/shared/contracts/identity/session";
+import { validateSameOrigin } from "@/backend/security/csrf/csrf";
+import { validCsrfProof } from "@/backend/security/csrf/csrf-proof";
+import { serverEnvironment } from "@/backend/env/runtime";
+import { requireSession } from "@/backend/auth/session/require-session";
+import { RevokeSessionService } from "@/backend/services/session/revoke-session";
+import { noStoreHeaders } from "@/backend/security/response-headers";
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ sessionReference: string }> },

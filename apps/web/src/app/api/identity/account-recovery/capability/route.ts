@@ -1,15 +1,15 @@
 import {
   accountRecoveryCapabilitySchema,
   ACCOUNT_RECOVERY_GENERIC_ERROR,
-} from "@/features/identity/schemas/password-recovery";
-import { serverEnvironment } from "@/lib/env/runtime";
+} from "@/shared/contracts/identity/password-recovery";
+import { serverEnvironment } from "@/backend/env/runtime";
 import {
   clearAccountRecoveryCapability,
   issueAccountRecoveryCapability,
-} from "@/lib/security/account-recovery-capability";
-import { validateSameOrigin } from "@/lib/security/csrf";
-import { noStoreHeaders } from "@/lib/security/response-headers";
-import { AuthorizeAccountRecoveryRouteService } from "@/server/services/identity/authorize-account-recovery-route";
+} from "@/backend/security/account-recovery-capability";
+import { validateSameOrigin } from "@/backend/security/csrf/csrf";
+import { noStoreHeaders } from "@/backend/security/response-headers";
+import { AuthorizeAccountRecoveryRouteService } from "@/backend/services/profile/authorize-account-recovery-route";
 
 function rejected(status: 400 | 403) {
   const headers = new Headers(noStoreHeaders);
