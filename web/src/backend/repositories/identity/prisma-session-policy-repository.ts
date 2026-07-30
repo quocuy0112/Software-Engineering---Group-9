@@ -1,6 +1,8 @@
 import "server-only";
 import { prisma } from "@/backend/database/prisma";
 const IDLE_MS = 30 * 60 * 1000;
+const TOUCH_INTERVAL_MS = 60 * 1000;
+
 export class PrismaSessionPolicyRepository {
   async accountByEmail(email: string) {
     return prisma.userAccount.findUnique({
@@ -73,7 +75,17 @@ export class PrismaSessionPolicyRepository {
         await tx.session.deleteMany({ where: { id, userId } });
         return null;
       }
-      await tx.session.update({ where: { id }, data: { lastActivityAt: now } });
+      if (row.lastActivityAt.getTime() + TOUCH_INTERVAL_MS <= now.getTime()) {
+        await tx.session.updateMany({
+          where: {
+            id,
+            userId,
+            revokedAt: null,
+            lastActivityAt: row.lastActivityAt,
+          },
+          data: { lastActivityAt: now },
+        });
+      }
       return row;
     });
   }

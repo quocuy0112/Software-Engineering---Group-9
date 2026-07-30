@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3001",
     "dev:web": "next dev -p 3001",
+    "start": "next start -p 3001",
     "email:worker": "tsx scripts/run-email-worker.mjs",
     "email:preview": "tsx src/backend/email/preview/index.ts",
     "perf:pages": "node scripts/measure-page-performance.mjs",

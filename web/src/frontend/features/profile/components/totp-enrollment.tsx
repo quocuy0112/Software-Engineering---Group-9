@@ -392,7 +392,7 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
           >
             I&apos;ve saved my backup codes
           </button>
-          <FormFeedback status={status} />
+          <FormFeedback status={status} tone="success" />
         </div>
       ) : null}
     </section>

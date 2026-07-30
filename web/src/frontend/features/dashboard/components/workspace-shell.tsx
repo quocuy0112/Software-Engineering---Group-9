@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { currentCsrfProof } from "@/frontend/features/authentication/client/current-csrf-proof";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { postWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
 import { WorkspaceNavigation } from "./workspace-navigation";
 
@@ -15,24 +16,25 @@ export function WorkspaceShell({
   csrfProof: string;
   profile?: { name: string; email: string };
 }) {
+  const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [navigating, startNavigation] = useTransition();
   const [status, setStatus] = useState("");
 
   async function signOut() {
-    if (busy) return;
+    if (busy || navigating) return;
     setBusy(true);
     setStatus("");
     try {
-      const proof = await currentCsrfProof(csrfProof);
-      const response = await fetch("/api/identity/logout", {
-        method: "POST",
-        headers: { "x-csrf-token": proof },
-      });
+      const response = await postWithCurrentCsrf(
+        "/api/identity/logout",
+        csrfProof,
+      );
       if (!response.ok) {
         setStatus("Unable to sign out. Please try again.");
         return;
       }
-      window.location.assign("/login");
+      startNavigation(() => router.replace("/login"));
     } catch {
       setStatus("Unable to sign out. Please try again.");
     } finally {
@@ -53,7 +55,10 @@ export function WorkspaceShell({
             </Link>
             <span className="workspace-product-label">Talent workspace</span>
           </div>
-          <WorkspaceNavigation busy={busy} onSignOut={() => void signOut()} />
+          <WorkspaceNavigation
+            busy={busy || navigating}
+            onSignOut={() => void signOut()}
+          />
           <div className="workspace-sidebar-footer"></div>
         </aside>
         <div className="workspace-main">

@@ -7,8 +7,17 @@ import {
   sessionListQueryOptions,
 } from "@/frontend/features/authentication/client/query-options";
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
+import { AppProviders } from "@/frontend/providers/app-providers";
 
 export function SessionList({ embedded = false }: { embedded?: boolean }) {
+  return (
+    <AppProviders>
+      <SessionListContent embedded={embedded} />
+    </AppProviders>
+  );
+}
+
+function SessionListContent({ embedded = false }: { embedded?: boolean }) {
   const [proof, setProof] = useState("");
   const queryClient = useQueryClient();
   const sessionsQuery = useQuery(sessionListQueryOptions(setProof));

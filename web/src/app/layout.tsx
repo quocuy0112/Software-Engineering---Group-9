@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { serverEnvironment } from "@/backend/env/runtime";
-import { AppProviders } from "@/frontend/providers/app-providers";
 import "./globals.css";
 import { Toaster } from "sonner";
 
@@ -16,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-app-environment={serverEnvironment.APP_ENV}>
       <body suppressHydrationWarning>
-        <AppProviders>{children}</AppProviders>
+        {children}
         <Toaster
           className="app-toaster"
           position="top-right"

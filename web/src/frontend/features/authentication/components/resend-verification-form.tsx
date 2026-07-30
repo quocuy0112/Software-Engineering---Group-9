@@ -2,10 +2,19 @@
 
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { AppProviders } from "@/frontend/providers/app-providers";
 import { AuthStatus } from "./auth-status";
 import { resendVerificationMutationOptions } from "@/frontend/features/authentication/client/query-options";
 
 export function ResendVerificationForm() {
+  return (
+    <AppProviders>
+      <ResendVerificationFields />
+    </AppProviders>
+  );
+}
+
+function ResendVerificationFields() {
   const [status, setStatus] = useState("");
   const [email, setEmail] = useState("");
   const resend = useMutation(

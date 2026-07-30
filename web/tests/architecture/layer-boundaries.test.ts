@@ -55,10 +55,30 @@ describe("application layers", () => {
       '@import "tailwindcss";',
       '@import "../frontend/styles/tokens.css";',
       '@import "../frontend/styles/base.css";',
-      '@import "../frontend/styles/auth.css";',
-      '@import "../frontend/styles/home.css";',
-      '@import "../frontend/styles/workspace.css";',
-      '@import "../frontend/styles/profile.css";',
     ]);
+
+    const routeStyles = [
+      ["src/app/(auth)/layout.tsx", "frontend/styles/auth.css"],
+      ["src/app/page.tsx", "frontend/styles/home.css"],
+      ["src/app/(workspace)/layout.tsx", "frontend/styles/workspace.css"],
+      ["src/app/(workspace)/profile/layout.tsx", "frontend/styles/profile.css"],
+    ] as const;
+    for (const [path, expectedImport] of routeStyles) {
+      expect(await readFile(path, "utf8")).toContain(expectedImport);
+    }
+  });
+
+  it("keeps route transitions and data providers scoped to consumers", async () => {
+    await expect(readFile("src/app/template.tsx", "utf8")).rejects.toThrow();
+
+    const rootLayout = await readFile("src/app/layout.tsx", "utf8");
+    expect(rootLayout).not.toContain("AppProviders");
+
+    for (const path of [
+      "src/frontend/features/authentication/components/resend-verification-form.tsx",
+      "src/frontend/features/profile/components/session-list.tsx",
+    ]) {
+      expect(await readFile(path, "utf8")).toContain("AppProviders");
+    }
   });
 });

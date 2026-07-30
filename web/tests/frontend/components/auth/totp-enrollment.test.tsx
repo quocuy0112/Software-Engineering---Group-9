@@ -9,6 +9,14 @@ import {
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { TotpEnrollment } from "@/frontend/features/profile/components/totp-enrollment";
 
+const { toast } = vi.hoisted(() => ({
+  toast: {
+    error: vi.fn(),
+    success: vi.fn(),
+  },
+}));
+vi.mock("sonner", () => ({ toast }));
+
 // A 1x1 PNG data URL stands in for the server-rendered QR image.
 const QR_DATA_URL =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
@@ -47,6 +55,8 @@ describe("TOTP enrollment UI", () => {
     cleanup();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
+    toast.error.mockClear();
+    toast.success.mockClear();
   });
 
   it("labels the password field for keyboard and screen-reader use", async () => {
@@ -143,6 +153,17 @@ describe("TOTP enrollment UI", () => {
     const items = within(list).getAllByRole("listitem");
     expect(items).toHaveLength(10);
     expect(screen.getByRole("alert")).toHaveTextContent(/only once/i);
+    expect(screen.getByRole("status")).toHaveAttribute("data-tone", "success");
+    await waitFor(() =>
+      expect(toast.success).toHaveBeenCalledWith(
+        "Two-factor authentication is now enabled.",
+        { id: "auth-status" },
+      ),
+    );
+    expect(toast.error).not.toHaveBeenCalledWith(
+      "Two-factor authentication is now enabled.",
+      expect.anything(),
+    );
 
     // The verify request must carry the CSRF proof and never appear in the URL.
     const verifyCall = fetchMock.mock.calls.find(([url]) =>

@@ -8,7 +8,6 @@ import {
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { RegisterForm } from "@/frontend/features/authentication/components/register-form";
 import { ResendVerificationForm } from "@/frontend/features/authentication/components/resend-verification-form";
-import { AppProviders } from "@/frontend/providers/app-providers";
 
 describe("registration and verification UI", () => {
   afterEach(() => {
@@ -87,11 +86,7 @@ describe("registration and verification UI", () => {
         ),
       ),
     );
-    render(
-      <AppProviders>
-        <ResendVerificationForm />
-      </AppProviders>,
-    );
+    render(<ResendVerificationForm />);
     fireEvent.change(screen.getByLabelText("Email address"), {
       target: { value: "nobody@example.test" },
     });

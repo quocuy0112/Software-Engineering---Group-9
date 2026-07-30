@@ -2,17 +2,20 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ResendVerificationForm } from "./resend-verification-form";
 
 export function VerifyEmailResult() {
   const token = useSearchParams().get("token");
+  const attemptedToken = useRef<string | null>(null);
   const [state, setState] = useState<"checking" | "success" | "failure">(() =>
     token && token.length >= 32 ? "checking" : "failure",
   );
 
   useEffect(() => {
     if (!token || token.length < 32) return;
+    if (attemptedToken.current === token) return;
+    attemptedToken.current = token;
 
     void fetch("/api/identity/verification/consume", {
       method: "POST",

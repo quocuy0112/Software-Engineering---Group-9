@@ -5,8 +5,10 @@ import { WorkspaceShell } from "@/frontend/features/dashboard/components/workspa
 import { ProfileNavigation } from "@/frontend/features/profile/components/profile-navigation";
 import DashboardPage from "@/app/(workspace)/dashboard/page";
 
+const navigation = vi.hoisted(() => ({ replace: vi.fn() }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/profile/security",
+  useRouter: () => navigation,
 }));
 
 describe("identity navigation shells", () => {
@@ -134,14 +136,48 @@ describe("identity navigation shells", () => {
       "/profile/sessions",
     );
   });
+  it("uses the rendered CSRF proof and client navigation on normal sign-out", async () => {
+    navigation.replace.mockClear();
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(Response.json({ message: "Signed out." }));
+
+    render(
+      <WorkspaceShell csrfProof="proof">
+        <h1>Security</h1>
+      </WorkspaceShell>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Sign out" }));
+
+    await waitFor(() =>
+      expect(navigation.replace).toHaveBeenCalledWith("/login"),
+    );
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/identity/logout",
+      expect.objectContaining({
+        method: "POST",
+        headers: { "x-csrf-token": "proof" },
+      }),
+    );
+    fetchMock.mockRestore();
+  });
+
   it("refreshes a rotated CSRF proof, prevents duplicate sign-out, and announces failure", async () => {
     let release!: () => void;
+    let logoutRequests = 0;
     const fetchMock = vi
       .spyOn(globalThis, "fetch")
       .mockImplementation((input) => {
         if (String(input).endsWith("/api/identity/sessions")) {
           return Promise.resolve(
             Response.json({ sessions: [], csrfProof: "rotated-proof" }),
+          );
+        }
+        logoutRequests += 1;
+        if (logoutRequests > 1) {
+          return Promise.resolve(
+            Response.json({ message: "Request rejected." }, { status: 403 }),
           );
         }
         return new Promise<Response>((resolve) => {
@@ -160,17 +196,29 @@ describe("identity navigation shells", () => {
     const signOut = screen.getByRole("button", { name: "Sign out" });
     fireEvent.click(signOut);
     fireEvent.click(signOut);
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     expect(fetchMock).toHaveBeenNthCalledWith(
-      2,
+      1,
+      "/api/identity/logout",
+      expect.objectContaining({
+        method: "POST",
+        headers: { "x-csrf-token": "proof" },
+      }),
+    );
+    expect(screen.getByRole("button", { name: /Signing out/ })).toBeDisabled();
+    release();
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
+    expect(fetchMock).toHaveBeenNthCalledWith(2, "/api/identity/sessions", {
+      cache: "no-store",
+    });
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      3,
       "/api/identity/logout",
       expect.objectContaining({
         method: "POST",
         headers: { "x-csrf-token": "rotated-proof" },
       }),
     );
-    expect(screen.getByRole("button", { name: /Signing out/ })).toBeDisabled();
-    release();
     await waitFor(() =>
       expect(screen.getByRole("status")).toHaveTextContent(
         "Unable to sign out. Please try again.",

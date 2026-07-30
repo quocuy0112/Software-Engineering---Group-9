@@ -47,6 +47,24 @@ describe("session policy", () => {
     expect(
       await service.validate(active.id, u.id, new Date(now.getTime() + 1000)),
     ).not.toBeNull();
+    expect(
+      (
+        await prisma.session.findUniqueOrThrow({
+          where: { id: active.id },
+          select: { lastActivityAt: true },
+        })
+      ).lastActivityAt,
+    ).toEqual(active.lastActivityAt);
+    const touchAt = new Date(now.getTime() + 61 * 1000);
+    expect(await service.validate(active.id, u.id, touchAt)).not.toBeNull();
+    expect(
+      (
+        await prisma.session.findUniqueOrThrow({
+          where: { id: active.id },
+          select: { lastActivityAt: true },
+        })
+      ).lastActivityAt,
+    ).toEqual(touchAt);
     expect(await service.validate(active.id, other.id, now)).toBeNull();
     const idle = await session(u.id, 0, now);
     await prisma.session.update({

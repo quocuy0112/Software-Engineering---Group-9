@@ -1,3 +1,4 @@
+import "../../frontend/styles/workspace.css";
 import { redirect } from "next/navigation";
 import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
 import { WorkspaceShell } from "@/frontend/features/dashboard/components/workspace-shell";

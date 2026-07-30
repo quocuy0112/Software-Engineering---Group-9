@@ -91,14 +91,11 @@ export class LoginWithPasswordService {
         { status: 401, headers: noStoreHeaders },
       );
     }
-    if (
-      ((await this.resetOperations
-        .hasIncompleteForUser(account.id)
-        .catch(() => true)) ||
-        (await this.recoveryOperations
-          .hasBlockingForUser(account.id)
-          .catch(() => true)))
-    ) {
+    const [hasIncompleteReset, hasBlockingRecovery] = await Promise.all([
+      this.resetOperations.hasIncompleteForUser(account.id).catch(() => true),
+      this.recoveryOperations.hasBlockingForUser(account.id).catch(() => true),
+    ]);
+    if (hasIncompleteReset || hasBlockingRecovery) {
       await this.record(
         "login.failed",
         "FAILURE",

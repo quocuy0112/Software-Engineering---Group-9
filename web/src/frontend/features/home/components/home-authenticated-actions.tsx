@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { currentCsrfProof } from "@/frontend/features/authentication/client/current-csrf-proof";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { postWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
 
 export function HomeAuthenticatedActions({
@@ -12,24 +13,25 @@ export function HomeAuthenticatedActions({
   profile: { name: string; email: string };
   csrfProof: string;
 }) {
+  const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [navigating, startNavigation] = useTransition();
   const [status, setStatus] = useState("");
 
   async function signOut() {
-    if (busy) return;
+    if (busy || navigating) return;
     setBusy(true);
     setStatus("");
     try {
-      const proof = await currentCsrfProof(csrfProof);
-      const response = await fetch("/api/identity/logout", {
-        method: "POST",
-        headers: { "x-csrf-token": proof },
-      });
+      const response = await postWithCurrentCsrf(
+        "/api/identity/logout",
+        csrfProof,
+      );
       if (!response.ok) {
         setStatus("Unable to sign out. Please try again.");
         return;
       }
-      window.location.assign("/login");
+      startNavigation(() => router.replace("/login"));
     } catch {
       setStatus("Unable to sign out. Please try again.");
     } finally {
@@ -63,8 +65,12 @@ export function HomeAuthenticatedActions({
               <small>{profile.email}</small>
             </span>
           </Link>
-          <button type="button" onClick={() => void signOut()} disabled={busy}>
-            {busy ? "Signing out…" : "Sign out"}
+          <button
+            type="button"
+            onClick={() => void signOut()}
+            disabled={busy || navigating}
+          >
+            {busy || navigating ? "Signing out…" : "Sign out"}
           </button>
         </div>
       </header>

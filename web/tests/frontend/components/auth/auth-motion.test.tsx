@@ -34,17 +34,21 @@ describe("authentication route motion", () => {
     expect(wrapper).not.toBe(loginWrapper);
   });
 
-  it("defines page slide, fade, blur, and reduced-motion safeguards", async () => {
+  it("uses a short transform-only transition with reduced-motion safeguards", async () => {
     const css = await readFile(
       resolve(process.cwd(), "src/frontend/styles/auth.css"),
       "utf8",
     );
-    expect(css).toContain("@keyframes page-slide-to-center");
-    expect(css).toMatch(/opacity:\s*0/);
-    expect(css).toMatch(/filter:\s*blur\(3px\)/);
-    expect(css).toMatch(/translate3d\(-3rem,\s*0,\s*0\)/);
+    expect(css).toContain("@keyframes auth-content-enter");
+    expect(css).toMatch(/animation:\s*auth-content-enter 140ms/);
+    expect(css).toMatch(/translate3d\(0,\s*0\.25rem,\s*0\)/);
+    const keyframes = css.slice(
+      css.indexOf("@keyframes auth-content-enter"),
+      css.indexOf("@media (max-width: 320px)"),
+    );
+    expect(keyframes).not.toContain("filter:");
     expect(css).toMatch(
-      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.page-transition[\s\S]*?animation:\s*none/,
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.auth-motion[\s\S]*?animation:\s*none/,
     );
   });
 });

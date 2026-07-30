@@ -4,10 +4,12 @@ export function FormFeedback({
   title = "Please review the form",
   errors = [],
   status,
+  tone = "error",
 }: {
   title?: string;
   errors?: string[];
   status?: string;
+  tone?: "message" | "error" | "success";
 }) {
   return (
     <>
@@ -21,7 +23,7 @@ export function FormFeedback({
           </ul>
         </div>
       ) : null}
-      {status ? <AuthStatus status={status} tone="error" /> : null}
+      {status ? <AuthStatus status={status} tone={tone} /> : null}
     </>
   );
 }

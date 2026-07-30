@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -64,8 +65,10 @@ function currentTimestamp() {
 }
 
 export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
+  const router = useRouter();
   const { status, setStatus } = useReplayableStatus("");
   const [isLocked, setIsLocked] = useState(false);
+  const [isNavigating, startNavigation] = useTransition();
   const {
     register,
     handleSubmit,
@@ -125,17 +128,17 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
     writeAttemptState(values.email, 0);
     setIsLocked(false);
     if (body?.requiresTwoFactor) {
-      window.location.assign("/two-factor");
+      startNavigation(() => router.replace("/two-factor"));
       return;
     }
-    window.location.assign(returnTo);
+    startNavigation(() => router.replace(returnTo));
   });
   return (
     <form
       className="auth-form"
       onSubmit={submit}
       noValidate
-      aria-busy={isSubmitting}
+      aria-busy={isSubmitting || isNavigating}
     >
       <div className="auth-form-heading">
         <p className="form-kicker">WELCOME BACK</p>
@@ -159,8 +162,8 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
         error={errors.password?.message}
         {...register("password")}
       />
-      <button type="submit" disabled={isSubmitting || isLocked}>
-        {isSubmitting ? "Signing in…" : "Sign in"}
+      <button type="submit" disabled={isSubmitting || isNavigating || isLocked}>
+        {isSubmitting || isNavigating ? "Signing in…" : "Sign in"}
       </button>
       <FormFeedback status={status} />
     </form>

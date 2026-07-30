@@ -125,6 +125,18 @@ npm run dev:web
 npm run email:worker
 ```
 
+Development mode compiles a route the first time it is opened, so its first
+request is intentionally slower. To evaluate production-like navigation, stop
+the development server and run:
+
+```bash
+npm run build
+npm start
+```
+
+Run `npm run email:worker` in another terminal when testing email flows against
+the production server.
+
 ## Local Email
 
 Local development uses the capture adapter by default and does not send email
@@ -144,6 +156,7 @@ SMTP and Resend are optional. Configure either provider in
 | ---------------------- | ---------------------------------------------------- |
 | `npm run dev`          | Start the web app and email worker                   |
 | `npm run dev:web`      | Start only Next.js                                   |
+| `npm start`            | Start an already-built production server             |
 | `npm run email:worker` | Start only the email worker                          |
 | `npm run db:up`        | Start PostgreSQL                                     |
 | `npm run db:down`      | Stop PostgreSQL and retain its data                  |

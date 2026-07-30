@@ -10,11 +10,16 @@ const { toast } = vi.hoisted(() => ({
   },
 }));
 vi.mock("sonner", () => ({ toast }));
+const navigation = vi.hoisted(() => ({ replace: vi.fn() }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => navigation,
+}));
 
 describe("login form", () => {
   beforeEach(() => {
     window.localStorage.clear();
     vi.restoreAllMocks();
+    navigation.replace.mockClear();
   });
   it("shows inline validation with password autocomplete", async () => {
     render(<LoginForm />);
@@ -60,16 +65,16 @@ describe("login form", () => {
     expect(toast.error).toHaveBeenCalledWith(
       "Email or password is incorrect. (4 attempts remaining)",
       {
-      id: "auth-status",
+        id: "auth-status",
       },
     );
     fetchMock.mockRestore();
   });
 
   it("falls back to a generic message when the server returns an empty body", async () => {
-    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
-      new Response("", { status: 500 }),
-    );
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(new Response("", { status: 500 }));
 
     render(<LoginForm />);
     fireEvent.change(screen.getByLabelText("Email address"), {
@@ -89,15 +94,44 @@ describe("login form", () => {
     fetchMock.mockRestore();
   });
 
-  it("locks the form after five failed attempts", async () => {
-    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(() =>
-      Promise.resolve(
+  it("uses client navigation after a successful sign-in", async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(
         Response.json(
-          { message: "Email or password is incorrect." },
-          { status: 401 },
+          { message: "Signed in.", requiresTwoFactor: false },
+          { status: 200 },
         ),
-      ),
+      );
+
+    render(<LoginForm />);
+    fireEvent.change(screen.getByLabelText("Email address"), {
+      target: { value: "user@example.test" },
+    });
+    fireEvent.change(screen.getByLabelText("Password"), {
+      target: { value: "correct horse 2026" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+
+    await waitFor(() =>
+      expect(navigation.replace).toHaveBeenCalledWith("/dashboard"),
     );
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    fetchMock.mockRestore();
+  });
+
+  it("locks the form after five failed attempts", async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(() =>
+        Promise.resolve(
+          Response.json(
+            { message: "Email or password is incorrect." },
+            { status: 401 },
+          ),
+        ),
+      );
 
     render(<LoginForm />);
     fireEvent.change(screen.getByLabelText("Email address"), {

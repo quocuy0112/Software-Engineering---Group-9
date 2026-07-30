@@ -53,9 +53,11 @@ describe("forgot password form", () => {
         "Password-reset instructions will be sent to this email.",
       ),
     );
-    expect(toast.success).toHaveBeenCalledWith(
-      "Password-reset instructions will be sent to this email.",
-      { id: "forgot-password-status" },
+    await waitFor(() =>
+      expect(toast.success).toHaveBeenCalledWith(
+        "Password-reset instructions will be sent to this email.",
+        { id: "forgot-password-status" },
+      ),
     );
     expect(toast.error).not.toHaveBeenCalled();
     expect(input).toHaveValue("user@example.test");
