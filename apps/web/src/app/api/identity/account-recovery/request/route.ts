@@ -1,11 +1,11 @@
 import {
   accountRecoveryRequestSchema,
   ACCOUNT_RECOVERY_INVALID_EMAIL_ERROR,
-} from "@/features/identity/schemas/password-recovery";
-import { serverEnvironment } from "@/lib/env/runtime";
-import { validateSameOrigin } from "@/lib/security/csrf";
-import { noStoreHeaders } from "@/lib/security/response-headers";
-import { RequestFullAccountRecoveryService } from "@/server/services/identity/request-full-account-recovery";
+} from "@/shared/contracts/identity/password-recovery";
+import { serverEnvironment } from "@/backend/env/runtime";
+import { validateSameOrigin } from "@/backend/security/csrf/csrf";
+import { noStoreHeaders } from "@/backend/security/response-headers";
+import { RequestFullAccountRecoveryService } from "@/backend/services/recovery/request-full-account-recovery";
 
 export async function POST(request: Request) {
   if (!validateSameOrigin(request, serverEnvironment.NEXT_PUBLIC_APP_URL)) {

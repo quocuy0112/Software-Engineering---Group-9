@@ -14,4 +14,4 @@ registerHooks({
   },
 });
 
-await import("../src/server/email/workers/email-worker-entry.ts");
+await import("../src/backend/email/workers/email-worker-entry.ts");

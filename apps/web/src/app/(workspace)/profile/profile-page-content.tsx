@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ProfileNavigation } from "@/components/auth/profile-navigation";
-import { getWorkspaceContext } from "@/server/auth/get-workspace-context";
+import { ProfileNavigation } from "@/frontend/features/authentication/components/auth/profile-navigation";
+import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
 
 export default async function ProfilePage() {
   const context = await getWorkspaceContext();

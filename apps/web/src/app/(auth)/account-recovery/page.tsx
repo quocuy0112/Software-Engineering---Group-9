@@ -1,4 +1,4 @@
-import { AccountRecoveryRequestForm } from "@/components/auth/account-recovery-request-form";
+import { AccountRecoveryRequestForm } from "@/frontend/features/authentication/components/auth/account-recovery-request-form";
 
 export default async function AccountRecoveryPage({
   searchParams,

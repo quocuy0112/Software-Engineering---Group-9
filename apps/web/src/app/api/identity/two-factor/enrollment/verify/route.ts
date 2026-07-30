@@ -1,10 +1,10 @@
-import { totpCodeSchema } from "@/features/identity/schemas/two-factor";
-import { noStoreHeaders } from "@/lib/security/response-headers";
-import { validateSameOrigin } from "@/lib/security/csrf";
-import { validCsrfProof } from "@/lib/security/csrf-proof";
-import { serverEnvironment } from "@/lib/env/runtime";
-import { requireSession } from "@/server/auth/require-session";
-import { EnrollTotpService } from "@/server/services/identity/enroll-totp";
+import { totpCodeSchema } from "@/shared/contracts/identity/two-factor";
+import { noStoreHeaders } from "@/backend/security/response-headers";
+import { validateSameOrigin } from "@/backend/security/csrf/csrf";
+import { validCsrfProof } from "@/backend/security/csrf/csrf-proof";
+import { serverEnvironment } from "@/backend/env/runtime";
+import { requireSession } from "@/backend/auth/session/require-session";
+import { EnrollTotpService } from "@/backend/services/profile/enroll-totp";
 
 /**
  * Verifies the initial six-digit TOTP code, enables 2FA, and returns the ten

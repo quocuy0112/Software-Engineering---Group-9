@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../src/shared/generated/prisma"
 }
 
 datasource db {
@@ -177,12 +177,14 @@ model Verification {
 }
 
 model TwoFactor {
-  id          String      @id
-  secret      String
-  backupCodes String
-  userId      String      @unique
-  verified    Boolean     @default(true)
-  user        UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                      String      @id
+  secret                  String
+  backupCodes             String
+  userId                  String      @unique
+  verified                Boolean     @default(true)
+  failedVerificationCount Int         @default(0)
+  lockedUntil             DateTime?
+  user                    UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([secret])
   @@map("twoFactor")

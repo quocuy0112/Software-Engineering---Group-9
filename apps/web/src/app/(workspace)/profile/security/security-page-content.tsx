@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
-import { ProfileSecurity } from "@/components/auth/profile-security";
-import { ProfileNavigation } from "@/components/auth/profile-navigation";
-import { getWorkspaceContext } from "@/server/auth/get-workspace-context";
+import { ProfileSecurity } from "@/frontend/features/authentication/components/auth/profile-security";
+import { ProfileNavigation } from "@/frontend/features/authentication/components/auth/profile-navigation";
+import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
 
 export default async function ProfileSecurityPageContent() {
   const context = await getWorkspaceContext();

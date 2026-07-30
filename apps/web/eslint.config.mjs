@@ -34,7 +34,12 @@ export default defineConfig([
         {
           patterns: [
             {
-              group: ["@prisma/client", "@/server/repositories/**"],
+              group: [
+                "@prisma/client",
+                "@/backend/database/**",
+                "@/backend/repositories/**",
+                "@/shared/generated/prisma/**",
+              ],
               message:
                 "Route Handlers must call services, not data access directly.",
             },
@@ -44,18 +49,19 @@ export default defineConfig([
     },
   },
   {
-    files: [
-      "src/components/**/*.{ts,tsx}",
-      "src/features/**/*.{ts,tsx}",
-      "src/app/**/page.{ts,tsx}",
-    ],
+    files: ["src/frontend/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
         {
           patterns: [
             {
-              group: ["@prisma/client", "resend", "@/server/**"],
+              group: [
+                "@prisma/client",
+                "resend",
+                "@/backend/**",
+                "@/shared/generated/prisma/client",
+              ],
               message:
                 "Presentation code cannot import server providers or data access.",
             },

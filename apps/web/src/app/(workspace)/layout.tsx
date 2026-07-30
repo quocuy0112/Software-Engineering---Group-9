@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { WorkspaceShell } from "@/components/auth/workspace-shell";
-import { getWorkspaceContext } from "@/server/auth/get-workspace-context";
+import { WorkspaceShell } from "@/frontend/features/authentication/components/auth/workspace-shell";
+import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
 
 export default async function WorkspaceLayout({
   children,

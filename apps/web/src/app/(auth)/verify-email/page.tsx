@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { ResendVerificationForm } from "@/components/auth/resend-verification-form";
+import { ResendVerificationForm } from "@/frontend/features/authentication/components/auth/resend-verification-form";
 
 function VerificationResult() {
   const token = useSearchParams().get("token");

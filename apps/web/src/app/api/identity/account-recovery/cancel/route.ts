@@ -1,17 +1,17 @@
 import {
   accountRecoveryActionSchema,
   ACCOUNT_RECOVERY_GENERIC_ERROR,
-} from "@/features/identity/schemas/password-recovery";
-import { serverEnvironment } from "@/lib/env/runtime";
+} from "@/shared/contracts/identity/password-recovery";
+import { serverEnvironment } from "@/backend/env/runtime";
 import {
   clearAccountRecoveryCapability,
   readAccountRecoveryCapability,
-} from "@/lib/security/account-recovery-capability";
-import { clearSessionCookie } from "@/lib/security/cookies";
-import { validateSameOrigin } from "@/lib/security/csrf";
-import { noStoreHeaders } from "@/lib/security/response-headers";
-import { clearPreAuthCookie } from "@/server/auth/identity/pre-auth-cookie";
-import { CancelFullAccountRecoveryService } from "@/server/services/identity/cancel-full-account-recovery";
+} from "@/backend/security/account-recovery-capability";
+import { clearSessionCookie } from "@/backend/security/cookies";
+import { validateSameOrigin } from "@/backend/security/csrf/csrf";
+import { noStoreHeaders } from "@/backend/security/response-headers";
+import { clearPreAuthCookie } from "@/backend/auth/cookies/pre-auth-cookie";
+import { CancelFullAccountRecoveryService } from "@/backend/services/recovery/cancel-full-account-recovery";
 
 function clearedAuthenticationHeaders() {
   const headers = new Headers(noStoreHeaders);

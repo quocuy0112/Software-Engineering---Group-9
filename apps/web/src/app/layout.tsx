@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { serverEnvironment } from "@/lib/env/runtime";
+import { serverEnvironment } from "@/backend/env/runtime";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { Providers } from "./providers";
