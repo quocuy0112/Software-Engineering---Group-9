@@ -1,0 +1,143 @@
+import "server-only";
+import { randomUUID } from "node:crypto";
+import { verifyPassword } from "better-auth/crypto";
+import { prisma } from "@/backend/database/prisma";
+import {
+  rateLimitPolicies,
+  safeRetryMetadata,
+} from "@/backend/security/rate-limit/policies";
+import { PrismaRateLimitRepository } from "@/backend/repositories/rate-limit/prisma-rate-limit-repository";
+import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
+import { requireSession } from "@/backend/auth/session/require-session";
+
+/** Sensitive actions require fresh proof. A valid current password renews it. */
+export const RECENT_AUTH_WINDOW_MS = 10 * 60 * 1000;
+export const RECENT_AUTH_ERROR =
+  "Please confirm your current password to continue.";
+
+export type RecentAuthDenied = {
+  ok: false;
+  status: 401 | 429;
+  retryAfterSeconds?: number;
+};
+export type RecentAuthGranted = { ok: true; userId: string; sessionId: string };
+export type RecentAuthResult = RecentAuthDenied | RecentAuthGranted;
+
+type Dependencies = {
+  limiter?: PrismaRateLimitRepository;
+  audit?: PrismaAuditRepository;
+};
+
+/**
+ * Confirms the caller recently authenticated before a sensitive action:
+ *  - valid Better Auth session (policy-enforced, ACTIVE-only),
+ *  - the owning UserAccount is ACTIVE,
+ *  - the supplied current password verifies through Better Auth only.
+ *
+ * A password supplied for this request is the renewed proof required when the
+ * session itself is older than the recent-auth window. Rejecting an otherwise
+ * valid session before checking that password made every sensitive action
+ * permanently fail after ten minutes.
+ * Failures are generic and never leak which check failed. No password value is logged.
+ */
+export class RequireRecentAuthService {
+  private readonly limiter: PrismaRateLimitRepository;
+  private readonly audit: PrismaAuditRepository;
+
+  constructor(dependencies: Dependencies = {}) {
+    this.limiter = dependencies.limiter ?? new PrismaRateLimitRepository();
+    this.audit = dependencies.audit ?? new PrismaAuditRepository();
+  }
+
+  async execute(
+    currentPassword: string,
+    request: { headers: Headers; subject: string; now?: Date },
+  ): Promise<RecentAuthResult> {
+    const now = request.now ?? new Date();
+    const correlationId = randomUUID();
+
+    const decision = await this.limiter.consume({
+      ...rateLimitPolicies.totpEnrollment,
+      subject: `recent-auth:${request.subject}`,
+      now,
+    });
+    if (!decision.allowed) {
+      await this.record("DENIED", correlationId, now, "throttled");
+      return {
+        ok: false,
+        status: 429,
+        retryAfterSeconds: safeRetryMetadata(decision).retryAfterSeconds,
+      };
+    }
+
+    const session = await requireSession(request.headers, now);
+    if (!session) {
+      await this.record("FAILURE", correlationId, now, "no_session");
+      return { ok: false, status: 401 };
+    }
+
+    const account = await prisma.userAccount.findUnique({
+      where: { id: session.userId },
+      select: { state: true },
+    });
+    if (account?.state !== "ACTIVE") {
+      await this.record(
+        "FAILURE",
+        correlationId,
+        now,
+        "inactive",
+        session.userId,
+        session.sessionId,
+      );
+      return { ok: false, status: 401 };
+    }
+
+    const credential = await prisma.authProviderAccount.findFirst({
+      where: { userId: session.userId, providerId: "credential" },
+      select: { password: true },
+    });
+    const verified = credential?.password
+      ? await verifyPassword({
+          hash: credential.password,
+          password: currentPassword,
+        }).catch(() => false)
+      : false;
+    if (!verified) {
+      await this.record(
+        "FAILURE",
+        correlationId,
+        now,
+        "wrong_password",
+        session.userId,
+        session.sessionId,
+      );
+      return { ok: false, status: 401 };
+    }
+
+    return { ok: true, userId: session.userId, sessionId: session.sessionId };
+  }
+
+  private record(
+    result: "SUCCESS" | "FAILURE" | "DENIED",
+    correlationId: string,
+    occurredAt: Date,
+    reason: string,
+    actorUserId?: string,
+    actorSessionId?: string,
+  ) {
+    return this.audit
+      .append({
+        occurredAt,
+        actorType: actorUserId ? "user" : "anonymous",
+        actorUserId: actorUserId ?? null,
+        actorSessionId: actorSessionId ?? null,
+        action: "login.failed",
+        targetType: "user_account",
+        targetId: actorUserId ?? null,
+        result,
+        correlationId,
+        context: { stage: "recent_auth", reason },
+      })
+      .catch(() => undefined);
+  }
+}
