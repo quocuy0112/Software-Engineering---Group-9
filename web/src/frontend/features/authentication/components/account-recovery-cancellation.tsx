@@ -8,6 +8,8 @@ import { AuthStatus } from "./auth-status";
 export function AccountRecoveryCancellation() {
   const capability = useAccountRecoveryCapability("cancellation");
   const [status, setStatus] = useState("");
+  const [statusTone, setStatusTone] = useState<"error" | "success">("error");
+  const [cancelled, setCancelled] = useState(false);
   const [busy, setBusy] = useState(false);
 
   async function cancel() {
@@ -24,11 +26,16 @@ export function AccountRecoveryCancellation() {
       const result = (await response.json().catch(() => null)) as {
         message?: string;
       } | null;
+      setStatusTone(response.ok ? "success" : "error");
       setStatus(
         result?.message ??
-          "Recovery was cancelled. Sign in with your existing password and second factor.",
+          (response.ok
+            ? "Recovery was cancelled. Sign in with your existing password and second factor."
+            : "The account-recovery link is invalid, expired, or already used."),
       );
+      if (response.ok) setCancelled(true);
     } catch {
+      setStatusTone("error");
       setStatus(
         "The account-recovery link is invalid, expired, or already used.",
       );
@@ -49,14 +56,21 @@ export function AccountRecoveryCancellation() {
           </p>
         </div>
         {capability === "authorizing" ? (
-          <AuthStatus status="Verifying this secure recovery link…" />
+          <AuthStatus
+            id="account-recovery-cancellation-status"
+            status="Verifying this secure recovery link…"
+          />
         ) : null}
-        {capability === "authorized" && !status ? (
+        {capability === "authorized" && !cancelled ? (
           <button type="button" onClick={cancel} disabled={busy}>
             {busy ? "Cancelling recovery…" : "Cancel account recovery"}
           </button>
         ) : null}
-        <AuthStatus status={status} />
+        <AuthStatus
+          id="account-recovery-cancellation-status"
+          status={status}
+          tone={statusTone}
+        />
         <Link href="/login">Return to sign in</Link>
       </div>
     </section>

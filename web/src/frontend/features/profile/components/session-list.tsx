@@ -38,7 +38,13 @@ function SessionListContent({ embedded = false }: { embedded?: boolean }) {
         ? "Session revoked."
         : revokeMutation.isError
           ? "Unable to revoke session."
-          : "";
+          : "Sessions loaded successfully.";
+  const statusTone =
+    sessionsQuery.isError || revokeMutation.isError
+      ? "error"
+      : sessionsQuery.isSuccess || revokeMutation.isSuccess
+        ? "success"
+        : "message";
 
   return (
     <section
@@ -59,10 +65,7 @@ function SessionListContent({ embedded = false }: { embedded?: boolean }) {
           <span className="page-heading-badge">{sessions.length} active</span>
         </header>
       ) : null}
-      <AuthStatus
-        status={status}
-        tone={status.startsWith("Unable") ? "error" : "message"}
-      />
+      <AuthStatus id="session-list-status" status={status} tone={statusTone} />
       <div className="sessions-panel-heading">
         <div>
           <p className="panel-kicker">SIGNED-IN DEVICES</p>

@@ -100,6 +100,42 @@ describe("identity navigation shells", () => {
     ).toHaveFocus();
   });
 
+  it("collapses the desktop sidebar while keeping navigation and sign-out accessible", () => {
+    render(
+      <WorkspaceShell csrfProof="proof">
+        <h1>Dashboard</h1>
+      </WorkspaceShell>,
+    );
+
+    const sidebar = screen.getByRole("complementary", {
+      name: "Workspace sidebar",
+    });
+    const toggle = screen.getByRole("button", {
+      name: "Collapse workspace sidebar",
+    });
+    const navigation = screen.getByRole("navigation", { name: "Workspace" });
+    const signOut = screen.getByRole("button", { name: "Sign out" });
+
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(
+      navigation.querySelector(".workspace-navigation-scroll"),
+    ).not.toBeNull();
+    expect(signOut.parentElement).toHaveClass("workspace-navigation-footer");
+
+    fireEvent.click(toggle);
+
+    expect(sidebar).toHaveAttribute("data-collapsed", "true");
+    expect(sidebar.parentElement).toHaveAttribute(
+      "data-sidebar-collapsed",
+      "true",
+    );
+    expect(
+      screen.getByRole("button", { name: "Expand workspace sidebar" }),
+    ).toHaveAttribute("aria-expanded", "false");
+    expect(screen.getByRole("link", { name: "Dashboard" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Sign out" })).toBeVisible();
+  });
+
   it("keeps the dashboard limited to identity shortcuts and future placeholders", () => {
     render(<DashboardPage />);
     expect(screen.getByRole("heading", { name: "Dashboard" })).toBeVisible();

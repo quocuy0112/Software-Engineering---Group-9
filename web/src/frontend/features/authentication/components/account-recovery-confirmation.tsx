@@ -8,6 +8,7 @@ import { AuthStatus } from "./auth-status";
 export function AccountRecoveryConfirmation() {
   const capability = useAccountRecoveryCapability("confirmation");
   const [status, setStatus] = useState("");
+  const [statusTone, setStatusTone] = useState<"error" | "success">("error");
   const [holdEndsAt, setHoldEndsAt] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -26,11 +27,13 @@ export function AccountRecoveryConfirmation() {
         message?: string;
         holdEndsAt?: string;
       } | null;
+      setStatusTone(response.ok ? "success" : "error");
       setStatus(
         result?.message ?? "The recovery request could not be confirmed.",
       );
       if (response.ok && result?.holdEndsAt) setHoldEndsAt(result.holdEndsAt);
     } catch {
+      setStatusTone("error");
       setStatus("The recovery request could not be confirmed.");
     } finally {
       setBusy(false);
@@ -49,14 +52,21 @@ export function AccountRecoveryConfirmation() {
           </p>
         </div>
         {capability === "authorizing" ? (
-          <AuthStatus status="Verifying this secure recovery link…" />
+          <AuthStatus
+            id="account-recovery-confirmation-status"
+            status="Verifying this secure recovery link…"
+          />
         ) : null}
         {capability === "authorized" && !holdEndsAt ? (
           <button type="button" onClick={confirm} disabled={busy}>
             {busy ? "Starting security hold…" : "Start 24-hour security hold"}
           </button>
         ) : null}
-        <AuthStatus status={status} />
+        <AuthStatus
+          id="account-recovery-confirmation-status"
+          status={status}
+          tone={statusTone}
+        />
         {holdEndsAt ? (
           <p>
             Hold ends at <time dateTime={holdEndsAt}>{holdEndsAt}</time>. Check

@@ -1,6 +1,7 @@
 import {
   resetPasswordSchema,
   PASSWORD_RESET_GENERIC_ERROR,
+  PASSWORD_RESET_SUCCESS_RESPONSE,
 } from "@/shared/contracts/identity/password-recovery";
 import { serverEnvironment } from "@/backend/env/runtime";
 import { validateSameOrigin } from "@/backend/security/csrf/csrf";
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
     );
   }
   return Response.json(
-    { message: "Your password has been reset. Sign in again." },
+    { message: PASSWORD_RESET_SUCCESS_RESPONSE },
     { headers: resetResponseHeaders() },
   );
 }

@@ -5,6 +5,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
 import { TwoFactorChallenge } from "@/frontend/features/authentication/components/two-factor-challenge";
 const replace = vi.fn(),
@@ -17,6 +18,27 @@ afterEach(() => {
   localStorage.clear();
 });
 describe("two-factor challenge", () => {
+  it("keeps both verification methods in one switcher and marks the selection", () => {
+    render(<TwoFactorChallenge />);
+    const switcher = screen.getByRole("group", {
+      name: "Verification method",
+    });
+    const authenticator = within(switcher).getByRole("button", {
+      name: "Authenticator code",
+    });
+    const backupCode = within(switcher).getByRole("button", {
+      name: "Backup code",
+    });
+
+    expect(authenticator).toHaveAttribute("aria-pressed", "true");
+    expect(backupCode).toHaveAttribute("aria-pressed", "false");
+
+    fireEvent.click(backupCode);
+
+    expect(authenticator).toHaveAttribute("aria-pressed", "false");
+    expect(backupCode).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("focuses, labels, pastes numeric input and submits with Enter", async () => {
     const fetch = vi
       .spyOn(globalThis, "fetch")
@@ -50,7 +72,9 @@ describe("two-factor challenge", () => {
     for (let attempt = 0; attempt < 5; attempt += 1) {
       fireEvent.change(input, { target: { value: "123456" } });
       fireEvent.submit(form);
-      await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(attempt + 1));
+      await waitFor(() =>
+        expect(globalThis.fetch).toHaveBeenCalledTimes(attempt + 1),
+      );
     }
 
     await screen.findByText(/Try again in 10 minutes/i);

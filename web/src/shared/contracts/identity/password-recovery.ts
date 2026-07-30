@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const email = z.string().trim().toLowerCase().email().max(320);
 const password = z.string().min(12).max(128);
+export const PASSWORD_CONFIRMATION_MISMATCH_ERROR = "Passwords do not match.";
 
 /** Forgot-password input. The email is normalized before account lookup. */
 export const forgotPasswordSchema = z.object({ email }).strict();
@@ -17,7 +18,7 @@ export const resetPasswordSchema = z
   .strict()
   .refine((value) => value.newPassword === value.confirmPassword, {
     path: ["confirmPassword"],
-    message: "Passwords do not match.",
+    message: PASSWORD_CONFIRMATION_MISMATCH_ERROR,
   });
 export type ResetPassword = z.infer<typeof resetPasswordSchema>;
 
@@ -62,7 +63,7 @@ export const completeAccountRecoveryActionSchema = z
   .strict()
   .refine((value) => value.newPassword === value.confirmPassword, {
     path: ["confirmPassword"],
-    message: "Passwords do not match.",
+    message: PASSWORD_CONFIRMATION_MISMATCH_ERROR,
   });
 export type CompleteAccountRecovery = z.infer<
   typeof completeAccountRecoveryActionSchema
@@ -80,6 +81,8 @@ export const PASSWORD_RECOVERY_REQUEST_FAILED_ERROR =
   "The password-reset request could not be completed. Please try again.";
 export const PASSWORD_RESET_GENERIC_ERROR =
   "This password-reset link is invalid or has expired.";
+export const PASSWORD_RESET_SUCCESS_RESPONSE =
+  "Your password has been reset. Sign in again.";
 export const ACCOUNT_RECOVERY_SUCCESS_RESPONSE =
   "Account-recovery instructions will be sent to this email.";
 export const ACCOUNT_RECOVERY_NOT_ELIGIBLE_ERROR =
