@@ -20,8 +20,8 @@
 
 ## TOTP QR dependency approval
 
-- [x] qrcode is pinned exactly to 1.5.4 and @types/qrcode to 1.5.6 in apps/web/package.json and the sole root package-lock.json.
+- [x] qrcode is pinned exactly to 1.5.4 and @types/qrcode to 1.5.6 in web/package.json and the sole root package-lock.json.
 - [x] Lockfile compatibility retains Node.js 24.18.0, npm 11.16.0, TypeScript 5.9, Next.js 16.2.11, and Better Auth 1.6.25.
 - [x] Approval covers the T061–T069 TOTP enrollment increment, including cross-cutting gate T180, behind `totp-qr-code.ts`.
 - [x] Audit after dependency repair: 0 critical, 0 high, 0 moderate, 0 low; no QR-package finding; no force fix was run.
-- [x] T180 revalidated on 2026-07-24: `apps/web/tests/compatibility/qrcode-1.5.4.test.ts` passes 7/7 under Node.js 24.18.0. It asserts exact pins (qrcode 1.5.4, @types/qrcode 1.5.6), server-side import, deterministic local QR generation from a safe test otpauth URI, segment-reconstruction proof that encoded content matches the supplied URI, zero network requests (global fetch/http/https/dns stubbed to throw), a single root package-lock.json, and Next.js 16.2.11 + TypeScript 5.9 coexistence. No client import of qrcode exists.
+- [x] T180 revalidated on 2026-07-24: `web/tests/backend/compatibility/qrcode-1.5.4.test.ts` passes 7/7 under Node.js 24.18.0. It asserts exact pins (qrcode 1.5.4, @types/qrcode 1.5.6), server-side import, deterministic local QR generation from a safe test otpauth URI, segment-reconstruction proof that encoded content matches the supplied URI, zero network requests (global fetch/http/https/dns stubbed to throw), a single root package-lock.json, and Next.js 16.2.11 + TypeScript 5.9 coexistence. No client import of qrcode exists.

@@ -16,9 +16,9 @@ Deliver the approved P0 identity scope in one Next.js App Router application. Ne
 **SMTP dependency decision**: Nodemailer `9.0.3` and `@types/nodemailer` `8.0.1` are exact root-lockfile pins used only by server email integration. Installed-tree evidence confirms Node.js `24.18.0` and Next.js `16.2.11` compatibility. They MUST NOT be imported by client modules, Route Handlers, registration/verification services, or repositories; only the SMTP implementation behind `EmailService` may import Nodemailer. ADR `docs/architecture/adr/transactional-email-adapters-and-worker.md` records the decision.
 
 
-**TOTP QR dependency decision**: Exact `qrcode` 1.5.4 and `@types/qrcode` 1.5.6 are approved for the T061–T069 enrollment increment, including gate T180, and resolve through the sole root lockfile. The replaceable server-only boundary is `apps/web/src/server/auth/identity/totp-qr-code.ts`. T180 directly blocks T065 and proves only pre-implementation compatibility; the QR ADR defines detailed boundary and security rules.
-**Primary dependencies**: Next.js `16.2.11`; Better Auth and `@better-auth/prisma-adapter` `1.6.25`; Prisma and `@prisma/client` `7.9.0`; ESLint `10.8.0` with direct flat-config plugins; Resend `6.17.2`; exact React Email package versions are a blocking T002 compatibility outcome and must be recorded in `apps/web/package.json`, the root lockfile, and dependency-compatibility evidence before email work begins; Tailwind CSS; shadcn/ui; React Hook Form; Zod; Sonner; `@tanstack/react-query` `5.101.4` for sanitized session/resend mutations only; optional Zustand and Motion under the restrictions below
-**Storage**: PostgreSQL 16.12 through root Docker Compose locally (host port `55432`, health check, persistent named volume); PostgreSQL remains the only production database; Prisma ORM and Prisma Migrate run from `apps/web/`
+**TOTP QR dependency decision**: Exact `qrcode` 1.5.4 and `@types/qrcode` 1.5.6 are approved for the T061–T069 enrollment increment, including gate T180, and resolve through the sole root lockfile. The replaceable server-only boundary is `web/src/backend/auth/two-factor/totp-qr-code.ts`. T180 directly blocks T065 and proves only pre-implementation compatibility; the QR ADR defines detailed boundary and security rules.
+**Primary dependencies**: Next.js `16.2.11`; Better Auth and `@better-auth/prisma-adapter` `1.6.25`; Prisma and `@prisma/client` `7.9.0`; ESLint `10.8.0` with direct flat-config plugins; Resend `6.17.2`; exact React Email package versions are a blocking T002 compatibility outcome and must be recorded in `web/package.json`, the root lockfile, and dependency-compatibility evidence before email work begins; Tailwind CSS; shadcn/ui; React Hook Form; Zod; Sonner; `@tanstack/react-query` `5.101.4` for sanitized session/resend mutations only; optional Zustand and Motion under the restrictions below
+**Storage**: PostgreSQL 16.12 through root Docker Compose locally (host port `55432`, health check, persistent named volume); PostgreSQL remains the only production database; Prisma ORM and Prisma Migrate run from `web/`
 
 **Testing**: unit, OpenAPI contract, PostgreSQL integration, component/accessibility, and browser E2E tests with controlled clock and concurrency cases  
 **Performance target**: authentication page load ≤3 seconds and identity interactions ≤2 seconds under the environment and dataset defined in `quickstart.md`  
@@ -45,7 +45,7 @@ Browser / Server Components
         |
         App Router route-group layouts: (auth) public auth shell | public Home | (workspace) server-authenticated shell
         |
-apps/web/src/app/api/**/route.ts (Route Handlers and Better Auth catch-all)
+web/src/app/api/**/route.ts (Route Handlers and Better Auth catch-all)
         |
 Identity services and policy hooks
         |
@@ -75,39 +75,50 @@ PostgreSQL            EmailOutbox worker -> EmailService -> capture | SMTP | Res
 
 ```text
 ./
-├── package.json                 # npm workspace root; includes apps/web
+├── package.json                 # npm workspace root; includes web
 ├── package-lock.json            # the only lockfile
 ├── .nvmrc
 ├── .node-version
 ├── compose.yaml                 # PostgreSQL 16.12, host 55432, health check, volume
 ├── .env.example
 ├── scripts/{setup-local.mjs,check-environment.mjs}
-├── apps/web/
+├── web/
 │   ├── .env.example
 │   ├── prisma/{schema.prisma,migrations/}
 │   ├── src/
-│   │   ├── app/{(auth),api/{auth/[...all],identity/**}/route.ts}
-│   │   ├── features/identity/
-│   │   ├── server/{auth,services,repositories,email}/
-│   │   └── components/ui/
-│   └── tests/{unit,contract,integration,components,e2e}/
+│   │   ├── app/{(auth),(workspace),api}/
+│   │   ├── frontend/
+│   │   │   ├── features/{authentication,home,dashboard,profile}/
+│   │   │   ├── providers/
+│   │   │   ├── styles/
+│   │   │   └── stores/
+│   │   ├── backend/
+│   │   │   ├── auth/
+│   │   │   ├── services/
+│   │   │   ├── repositories/
+│   │   │   ├── database/
+│   │   │   ├── email/
+│   │   │   └── generated/prisma/
+│   │   └── shared/{contracts,types}/
+│   └── tests/{architecture,backend,frontend,shared,system}/
 └── spec-kit/
     ├── .specify/{feature.json,memory/constitution.md}
     └── specs/001-identity-authentication-account-recovery/
 ```
 
-- The repository remains one modular full-stack Next.js application under `apps/web/`; no separate frontend or backend application is permitted.
-- Route Handlers live only in `apps/web/src/app/api/**/route.ts`. Feature UI modules live in `apps/web/src/features/`; server authentication integration in `apps/web/src/server/auth/`; business services in `apps/web/src/server/services/`; repositories in `apps/web/src/server/repositories/`; email adapters in `apps/web/src/server/email/`; shared UI in `apps/web/src/components/ui/`.
-- Prisma commands and migrations execute with `apps/web/` as their working directory. Tests live under `apps/web/tests/`.
+- The repository remains one modular full-stack Next.js application under `web/`; no separate frontend or backend application is permitted.
+- `web/src/app/` is the thin Next.js App Router boundary: route files, layouts, metadata, redirects, and the global stylesheet import manifest only. Stateful UI and presentation live under `web/src/frontend/`; server authentication, services, repositories, database access, email, and generated Prisma code live under `web/src/backend/`; transport-neutral contracts live under `web/src/shared/`.
+- Route Handlers live only in `web/src/app/api/**/route.ts`. Feature UI modules live in `web/src/frontend/features/`; providers and split styles live in `web/src/frontend/providers/` and `web/src/frontend/styles/`.
+- Prisma commands and migrations execute with `web/` as their working directory. Tests live under `web/tests/`.
 - Spec Kit stays nested under `spec-kit/`; neither `spec-kit/.specify/` nor `spec-kit/specs/` is moved.
 
 ## Local-First Setup and Compatibility Chain
 
-Planning must create, without implementing identity features, the shared setup baseline at the repository root: npm workspace configuration, the single root `package-lock.json`, `.nvmrc`, `.node-version`, `compose.yaml`, `.env.example`, `apps/web/.env.example`, `scripts/setup-local.mjs`, `scripts/check-environment.mjs`, root `.gitignore` rules, and matching onboarding in `README.md` and this feature's `quickstart.md`.
+Planning must create, without implementing identity features, the shared setup baseline at the repository root: npm workspace configuration, the single root `package-lock.json`, `.nvmrc`, `.node-version`, `compose.yaml`, `.env.example`, `web/.env.example`, `scripts/setup-local.mjs`, `scripts/check-environment.mjs`, root `.gitignore` rules, and matching onboarding in `README.md` and this feature's `quickstart.md`.
 
-`scripts/setup-local.mjs` must be cross-platform, generate strong local PostgreSQL and Better Auth secrets without printing them, never overwrite an existing environment file, create both root `.env` and `apps/web/.env.local`, and create the gitignored local email-capture directory. Root `.env` configures Compose; `apps/web/.env.local` configures Next.js. Example files contain placeholders only.
+`scripts/setup-local.mjs` must be cross-platform, generate strong local PostgreSQL and Better Auth secrets without printing them, never overwrite an existing environment file, create both root `.env` and `web/.env.local`, and create the gitignored local email-capture directory. Root `.env` configures Compose; `web/.env.local` configures Next.js. Example files contain placeholders only.
 
-T002 must run through the root npm workspace and lock exact compatible versions in the single root lockfile. Its PostgreSQL/Prisma/Better Auth compatibility chain uses `docker compose up -d`, waits for the container health check, and then uses Prisma validation, migration, and connectivity commands from `apps/web/`. Host `psql`, a host PostgreSQL installation, and Resend are not prerequisites. PostgreSQL inspection, when needed, runs inside the Compose container; routine connectivity proof comes from Prisma.
+T002 must run through the root npm workspace and lock exact compatible versions in the single root lockfile. Its PostgreSQL/Prisma/Better Auth compatibility chain uses `docker compose up -d`, waits for the container health check, and then uses Prisma validation, migration, and connectivity commands from `web/`. Host `psql`, a host PostgreSQL installation, and Resend are not prerequisites. PostgreSQL inspection, when needed, runs inside the Compose container; routine connectivity proof comes from Prisma.
 
 Local infrastructure requires only Docker Desktop or another compatible Docker Compose runtime. PostgreSQL is pinned to 16.12, published only to host port 55432, and persisted in a named Docker volume. Local email defaults to file capture; SMTP is opt-in for local/team demonstrations; Resend remains optional and is not required for setup, startup, or routine validation. Generated environment files set only `EMAIL_ADAPTER=capture`; the obsolete duplicate `EMAIL_DRIVER` selector is removed from implementation, setup, validation, and examples.
 

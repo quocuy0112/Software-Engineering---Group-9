@@ -29,7 +29,7 @@ Access Management; advanced recruitment modules are still under development.
 
 ## Architecture and Tech Stack
 
-The application is a modular monolith located in `apps/web`:
+The application is a modular monolith located in `web`:
 
 ```text
 Next.js Page/Component
@@ -42,6 +42,32 @@ Repository / Better Auth Gateway
         ↓
 PostgreSQL / Email Outbox
 ```
+
+The application directory is organized by responsibility:
+
+```text
+web/src/
+├── app/                         # thin Next.js routes, layouts, and API handlers
+├── frontend/
+│   ├── features/               # authentication, home, dashboard, profile
+│   ├── providers/
+│   ├── styles/
+│   └── stores/
+├── backend/
+│   ├── auth/
+│   ├── services/
+│   ├── repositories/
+│   ├── database/
+│   ├── email/
+│   └── generated/prisma/
+└── shared/
+    ├── contracts/
+    └── types/
+```
+
+`src/app` remains at this location because Next.js discovers App Router
+conventions there. Route files should compose backend data with frontend
+features rather than contain database access, client state, or large UI trees.
 
 | Area                   | Technology                          |
 | ---------------------- | ----------------------------------- |
@@ -84,7 +110,7 @@ http://localhost:3001
 
 Local PostgreSQL is available at `localhost:55432`.
 
-`npm run env:init` creates `.env`, `apps/web/.env.local`, and secure local
+`npm run env:init` creates `.env`, `web/.env.local`, and secure local
 secrets. Existing files are preserved and never overwritten.
 
 `npm run dev` starts both:
@@ -105,12 +131,12 @@ Local development uses the capture adapter by default and does not send email
 over the Internet. Captured messages are stored in:
 
 ```text
-apps/web/.local/mail
+web/.local/mail
 ```
 
 SMTP and Resend are optional. Configure either provider in
-`apps/web/.env.local` using
-[`apps/web/.env.example`](apps/web/.env.example), then restart the application.
+`web/.env.local` using
+[`web/.env.example`](web/.env.example), then restart the application.
 
 ## Common Commands
 
@@ -153,43 +179,37 @@ npm run test:e2e
 
 ```text
 .
-├── apps/
-│   └── web/                               # Main Next.js workspace
-│       ├── prisma/
-│       │   ├── migrations/                 # Ordered PostgreSQL migrations
-│       │   └── schema.prisma               # Application data model
-│       ├── scripts/                        # Build, performance, and worker scripts
-│       ├── src/
-│       │   ├── app/                        # Next.js App Router
-│       │   │   ├── (auth)/                 # Public identity and recovery pages
-│       │   │   ├── (workspace)/            # Session-protected application pages
-│       │   │   ├── api/
-│       │   │   └── *.tsx / *.css          # Root layout, providers, pages, and styles
-│       │   ├── components/
-│       │   │   ├── auth/                  # Auth, profile, and session UI
-│       │   │   └── ui/                    # Reserved reusable UI primitives
-│       │   ├── features/
-│       │   │   ├── authentication/        # Authentication feature scaffolding
-│       │   │   ├── identity/              # Identity client logic and schemas
-│       │   │   └── shared/stores/         # Non-sensitive shared UI state
-│       │   ├── generated/prisma/          # Generated Prisma client; do not edit
-│       │   ├── lib/                       # Database, environment, security, and utilities
-│       │   ├── server/
-│       │   │   ├── auth/                  # Server-side authentication integration
-│       │   │   ├── email/                 # Email templates, previews, and workers
-│       │   │   ├── repositories/          # Data-access implementations
-│       │   │   └── services/              # Application business logic
-│       │   └── types/                     # Shared application type declarations
-│       ├── tests/
-│       │   ├── architecture/              # Dependency and layer boundaries
-│       │   ├── compatibility/             # Better Auth/library compatibility
-│       │   ├── components/                # React UI and accessibility
-│       │   ├── contract/                  # OpenAPI and public contracts
-│       │   ├── e2e/                       # Playwright browser workflows
-│       │   ├── integration/               # PostgreSQL and multi-layer behavior
-│       │   └── unit/                      # Isolated business logic
-│       ├── .env.example                   # Application environment template
-│       └── *.config.*                     # Framework, database, and test configuration
+├── web/                                  # Main Next.js workspace
+│   ├── prisma/
+│   │   ├── migrations/                   # Ordered PostgreSQL migrations
+│   │   └── schema.prisma                 # Application data model
+│   ├── scripts/                          # Build, performance, and worker scripts
+│   ├── src/
+│   │   ├── app/                          # Thin Next.js App Router boundary
+│   │   │   ├── (auth)/                   # Public identity and recovery routes
+│   │   │   ├── (workspace)/              # Session-protected routes
+│   │   │   └── api/                      # Browser-facing Route Handlers
+│   │   ├── frontend/
+│   │   │   ├── features/                 # Authentication, Home, Dashboard, Profile
+│   │   │   ├── providers/                # Application-level client providers
+│   │   │   ├── styles/                   # Tokens and feature stylesheets
+│   │   │   └── stores/                   # Non-sensitive UI state
+│   │   ├── backend/
+│   │   │   ├── auth/                     # Better Auth integration and policy
+│   │   │   ├── services/                 # Application orchestration
+│   │   │   ├── repositories/             # Data-access implementations
+│   │   │   ├── database/                 # Prisma client boundary
+│   │   │   ├── email/                    # Templates, adapters, and workers
+│   │   │   └── generated/prisma/         # Generated Prisma client; do not edit
+│   │   └── shared/                       # Transport-neutral contracts and types
+│   ├── tests/
+│   │   ├── architecture/                 # Cross-layer boundaries
+│   │   ├── backend/                      # Unit, integration, contract, compatibility
+│   │   ├── frontend/                     # Components and browser-safe architecture
+│   │   ├── shared/                       # Shared contract tests
+│   │   └── system/e2e/                   # Playwright browser workflows
+│   ├── .env.example                      # Application environment template
+│   └── *.config.*                        # Framework, database, and test configuration
 ├── docs/                                  # Requirements, design, planning, testing, and project reports
 ├── scripts/
 │   └── .mjs                               # Local setup, validation, and development scripts
@@ -212,6 +232,6 @@ npm run test:e2e
 
 ## Security
 
-Never commit `.env`, `apps/web/.env.local`, files under `apps/web/.local`,
+Never commit `.env`, `web/.env.local`, files under `web/.local`,
 credentials, secrets, captured email, logs, or build artifacts. Committed
 `.env.example` files must contain placeholder values only.

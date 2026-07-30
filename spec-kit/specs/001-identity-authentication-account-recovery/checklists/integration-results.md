@@ -29,7 +29,7 @@ increment.
 | Reset regression | PASS | 10 focused files, 37 tests; normal reset still preserves Better Auth TOTP and unused backup codes |
 | Better Auth compatibility | PASS | 4 files, 16 tests |
 | Prisma schema/status | PASS | schema valid; 5 migrations applied; database up to date |
-| Fresh migration/drift/connectivity | PASS | `npm run db:verify --workspace apps/web` passed against fresh PostgreSQL |
+| Fresh migration/drift/connectivity | PASS | `npm run db:verify --workspace web` passed against fresh PostgreSQL |
 | Secret output/storage gate | PASS | raw proofs, passwords, cookies, TOTP values, and backup codes absent from persisted recovery evidence and captured output |
 
 The controlled-clock tests advance the hold with explicit timestamps; no test
@@ -45,12 +45,12 @@ session-revocation adapter repair, against PostgreSQL 16.12.
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
-| Better Auth compatibility | PASS | `npm run test:compatibility --workspace apps/web`: 4 files, 16 tests |
-| Unit suite | PASS | `npm run test:unit --workspace apps/web`: 25 files, 113 tests |
-| PostgreSQL integration suite | PASS | `npm run test:integration --workspace apps/web`: 28 files, 99 tests |
-| Full Vitest | PASS | `npm run test --workspace apps/web -- --run`: 77 files, 280 tests |
+| Better Auth compatibility | PASS | `npm run test:compatibility --workspace web`: 4 files, 16 tests |
+| Unit suite | PASS | `npm run test:unit --workspace web`: 25 files, 113 tests |
+| PostgreSQL integration suite | PASS | `npm run test:integration --workspace web`: 28 files, 99 tests |
+| Full Vitest | PASS | `npm run test --workspace web -- --run`: 77 files, 280 tests |
 | Prisma schema/status | PASS | schema valid; 5 migrations applied; database up to date |
-| Fresh migration/drift/connectivity | PASS | `npm run db:verify --workspace apps/web` passed against fresh PostgreSQL |
+| Fresh migration/drift/connectivity | PASS | `npm run db:verify --workspace web` passed against fresh PostgreSQL |
 | Static validation | PASS | lint, typecheck, production build, and `git diff --check` passed |
 | Dependency audit | PASS | npm audit: Critical 0, High 0, Moderate 0, Low 0 |
 | Secret/generated-file review | PASS | no configured secret value or secret file is tracked; three generic-pattern findings were reviewed test-only invalid literals; no unapproved validation artifact remains |

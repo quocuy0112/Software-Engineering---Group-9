@@ -1,6 +1,6 @@
-﻿# Internal Integration Contracts
+# Internal Integration Contracts
 
-Implementation boundaries map to `apps/web/src/server/email/`, `apps/web/src/server/auth/`, `apps/web/src/server/services/`, and `apps/web/src/server/repositories/`. Browser-facing handlers remain in `apps/web/src/app/api/**/route.ts`; these paths are modules of the same Next.js application, not separate services.
+Implementation boundaries map to `web/src/backend/email/`, `web/src/backend/auth/`, `web/src/backend/services/`, and `web/src/backend/repositories/`. Browser-facing handlers remain in `web/src/app/api/**/route.ts`; these paths are modules of the same Next.js application, not separate services.
 
 ## EmailService
 

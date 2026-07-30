@@ -5,7 +5,7 @@ exclusive ownership, and decide whether an encryption extension or ADR stop is r
 
 ## Ownership
 
-- [x] The `twoFactor` plugin is configured in `apps/web/src/server/auth/config.ts` with
+- [x] The `twoFactor` plugin is configured in `web/src/backend/auth/cookies/config.ts` with
       `twoFactorTable: "TwoFactor"`, `backupCodeOptions.storeBackupCodes: "encrypted"`, and
       `backupCodeOptions.amount: 10`.
 - [x] The Prisma `TwoFactor` model (`prisma/schema.prisma`) holds `secret`, `backupCodes`,
@@ -45,5 +45,5 @@ data: secret })` before persisting (`index.mjs`, enable flow). The stored `secre
 
 - [x] Storage model confirmed by source inspection of pinned Better Auth 1.6.25, including provider-owned failed-verification and lockout fields.
 - [x] Executable proof is provided by the T062 PostgreSQL integration test
-      (`apps/web/tests/integration/auth/better-auth-totp-storage.test.ts`); this checklist is not
+      (`web/tests/backend/integration/auth/better-auth-totp-storage.test.ts`); this checklist is not
       marked complete on documentation inspection alone.

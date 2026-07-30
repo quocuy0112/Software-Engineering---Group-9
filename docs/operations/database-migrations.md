@@ -1,6 +1,6 @@
 # Database migration operations
 
-SmartHire uses Prisma Migrate 7.7.0 against PostgreSQL 16.12. Run all commands from the repository root; workspace scripts execute Prisma from `apps/web` and load the existing `.env.local` without overwriting it.
+SmartHire uses Prisma Migrate 7.7.0 against PostgreSQL 16.12. Run all commands from the repository root; workspace scripts execute Prisma from `web` and load the existing `.env.local` without overwriting it.
 
 ## Routine local workflow
 

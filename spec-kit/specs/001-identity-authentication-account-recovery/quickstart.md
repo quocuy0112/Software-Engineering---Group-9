@@ -28,9 +28,9 @@ npm run dev
 
 The planned `npm run dev` command starts both the Next.js application and due-outbox worker through a cross-platform supervisor. Use `npm run dev:web` and `npm run email:worker` separately only for debugging. The worker must be running before expecting capture, SMTP, or Resend delivery; registration and resend responses intentionally return after the outbox commit and do not wait for mail.
 
-Open http://localhost:3001. PostgreSQL is published only at `localhost:55432`, and captured email is stored in `apps/web/.local/mail`. Use `npm run db:down` to stop PostgreSQL without deleting data; use `npm run db:reset` only to delete the local named volume and start clean.
+Open http://localhost:3001. PostgreSQL is published only at `localhost:55432`, and captured email is stored in `web/.local/mail`. Use `npm run db:down` to stop PostgreSQL without deleting data; use `npm run db:reset` only to delete the local named volume and start clean.
 
-`env:init` invokes `scripts/setup-local.mjs`; it generates PostgreSQL and Better Auth secrets without printing them, does not overwrite existing files, creates root `.env` and `apps/web/.env.local`, and creates the gitignored file-email capture directory. If either environment file already exists, preserve it and report only the skipped path, never its contents.
+`env:init` invokes `scripts/setup-local.mjs`; it generates PostgreSQL and Better Auth secrets without printing them, does not overwrite existing files, creates root `.env` and `web/.env.local`, and creates the gitignored file-email capture directory. If either environment file already exists, preserve it and report only the skipped path, never its contents.
 
 `env:check` invokes `scripts/check-environment.mjs`; it checks Node `24.18.x`, npm `11.16.x`, the root npm workspace and sole root lockfile, Docker Compose availability, required environment files, Compose configuration, and capture-directory writability without exposing secrets.
 
@@ -43,7 +43,7 @@ npm run db:verify
 
 The verifier initializes an empty temporary PostgreSQL database from committed migrations, checks status and drift, proves Prisma connectivity, and removes its temporary databases without requiring host PostgreSQL or host `psql`.
 
-Do not commit `.env`, `apps/web/.env.local`, captured email, private keys, logs, coverage, or test output. Host PostgreSQL and host `psql` are not required, and Resend remains optional for local startup.
+Do not commit `.env`, `web/.env.local`, captured email, private keys, logs, coverage, or test output. Host PostgreSQL and host `psql` are not required, and Resend remains optional for local startup.
 
 If direct database inspection is needed, run the PostgreSQL client inside the container with `docker compose exec`; host `psql` is never a prerequisite. Do not use `docker compose down -v` during routine work because the named volume is the local persistence mechanism.
 
@@ -51,13 +51,13 @@ If direct database inspection is needed, run the PostgreSQL client inside the co
 
 1. Install only from the root lockfile; fail if the resolved Better Auth/schema CLI, Prisma/client, Next.js, Resend, or T002-approved React Email versions differ from their pins.
 2. Wait for the Compose PostgreSQL health check, then prove application connectivity using the Prisma-backed `db:check` workspace script.
-3. From `apps/web/`, generate the Better Auth 1.6.25 Prisma schema and diff it against `apps/web/prisma/schema.prisma`. Confirm there is one each of user/account/session/verification/two-factor ownership, the two-factor row includes `failedVerificationCount` and `lockedUntil`, and no custom browser JWT/session table exists.
-4. Create and apply reviewed Prisma Migrate SQL under `apps/web/prisma/migrations/`; never edit/reset an applied production migration.
-5. Validate `spec-kit/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml` as OpenAPI 3.1 and lint all `apps/web/src/app/api/**/route.ts` handlers against the no-direct-Prisma layering rule.
+3. From `web/`, generate the Better Auth 1.6.25 Prisma schema and diff it against `web/prisma/schema.prisma`. Confirm there is one each of user/account/session/verification/two-factor ownership, the two-factor row includes `failedVerificationCount` and `lockedUntil`, and no custom browser JWT/session table exists.
+4. Create and apply reviewed Prisma Migrate SQL under `web/prisma/migrations/`; never edit/reset an applied production migration.
+5. Validate `spec-kit/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml` as OpenAPI 3.1 and lint all `web/src/app/api/**/route.ts` handlers against the no-direct-Prisma layering rule.
 
 ## Automated Validation
 
-Run root npm workspace scripts for type checking, linting, unit tests, OpenAPI contract tests, Compose PostgreSQL integration tests, component/accessibility tests, production build, and browser E2E tests. All application commands target `apps/web/`, Prisma commands execute from that workspace, and the only lockfile remains at the repository root. Expected results:
+Run root npm workspace scripts for type checking, linting, unit tests, OpenAPI contract tests, Compose PostgreSQL integration tests, component/accessibility tests, production build, and browser E2E tests. All application commands target `web/`, Prisma commands execute from that workspace, and the only lockfile remains at the repository root. Expected results:
 
 From the repository root, the reproducible release sequence is:
 
@@ -109,7 +109,7 @@ Captured local messages are files beneath the configured `EMAIL_CAPTURE_DIR`; in
 
 ### Optional Gmail SMTP smoke test
 
-Keep capture as the normal acceptance-test adapter. For an explicit Gmail delivery test, place the following only in the untracked `apps/web/.env.local`, run `npm run env:check`, and restart `npm run dev`:
+Keep capture as the normal acceptance-test adapter. For an explicit Gmail delivery test, place the following only in the untracked `web/.env.local`, run `npm run env:check`, and restart `npm run dev`:
 
     EMAIL_ADAPTER=smtp
     SMTP_HOST=smtp.gmail.com

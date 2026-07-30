@@ -1,0 +1,21 @@
+/* Tokens styles. */
+:root {
+  color-scheme: light;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+}
+:root {
+  --ink: #18201a;
+  --muted: #70786f;
+  --line: #e6e6df;
+  --canvas: #f7f7f3;
+  --surface: #ffffff;
+  --forest: #243a25;
+  --forest-soft: #eaf0e6;
+  --lavender: #e9e5f4;
+  --mint: #dceee4;
+  --sand: #f3ead9;
+  --violet: #7364a9;
+  --danger: #a64040;
+  --shadow: 0 24px 70px rgb(23 32 24 / 0.08);
+}

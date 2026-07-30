@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: SmartHire Identity API
   version: 0.1.0
-  description: Browser-facing contracts implemented only by apps/web/src/app/api/**/route.ts in the modular full-stack Next.js application. Better Auth owns the single opaque PostgreSQL-backed browser session and its only authentication cookie. All errors/logs omit secrets; state-changing browser writes require same-origin validation. Recovery proofs arrive only in URL fragments and may be POSTed only to the read-only capability exchange; mutation endpoints require the resulting encrypted HttpOnly capability cookie.
+  description: Browser-facing contracts implemented only by web/src/app/api/**/route.ts in the modular full-stack Next.js application. Better Auth owns the single opaque PostgreSQL-backed browser session and its only authentication cookie. All errors/logs omit secrets; state-changing browser writes require same-origin validation. Recovery proofs arrive only in URL fragments and may be POSTed only to the read-only capability exchange; mutation endpoints require the resulting encrypted HttpOnly capability cookie.
 servers:
   - url: https://{configured-origin}
 paths:

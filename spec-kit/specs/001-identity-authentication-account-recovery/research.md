@@ -13,7 +13,7 @@
 | Resend Node SDK            |                                                         `resend@6.17.2` | [resend-node releases](https://github.com/resend/resend-node/releases), [send API](https://resend.com/docs/api-reference/emails/send-email)  |
 | React Email                | Exact stable package versions are a blocking T002 compatibility outcome | [React Email releases](https://github.com/resend/react-email/releases)                                                                       |
 
-The application manifest belongs at `apps/web/package.json`, registered by the root npm workspace. There must be one root `package-lock.json` and no nested lockfile. T002 must compatibility-test and select exact React Email package versions, then record them in the workspace manifest, root lockfile, and `checklists/dependency-compatibility.md` before any template, adapter, preview, or email integration task proceeds. No unbounded `latest` range is allowed.
+The application manifest belongs at `web/package.json`, registered by the root npm workspace. There must be one root `package-lock.json` and no nested lockfile. T002 must compatibility-test and select exact React Email package versions, then record them in the workspace manifest, root lockfile, and `checklists/dependency-compatibility.md` before any template, adapter, preview, or email integration task proceeds. No unbounded `latest` range is allowed.
 
 ## Decision: 2026-07-27 npm Advisory Remediation
 
@@ -41,11 +41,11 @@ API was also rejected; the vulnerable consumers were removed instead.
 
 ## Decision: Local-First Repository and Runtime
 
-**Decision**: Keep Spec Kit under `spec-kit/.specify/` and `spec-kit/specs/`, while the only modular full-stack application lives under `apps/web/`. Use Node.js `24.18.x` through root `.nvmrc` and `.node-version`, npm workspaces from the repository root, and one root lockfile. Route Handlers, feature UI, server authentication, services, repositories, email adapters, shared UI, Prisma, and tests use the approved `apps/web/` paths from `plan.md`.
+**Decision**: Keep Spec Kit under `spec-kit/.specify/` and `spec-kit/specs/`, while the only modular full-stack application lives under `web/`. Use Node.js `24.18.x` through root `.nvmrc` and `.node-version`, npm workspaces from the repository root, and one root lockfile. Route Handlers, feature UI, server authentication, services, repositories, email adapters, shared UI, Prisma, and tests use the approved `web/` paths from `plan.md`.
 
-**Decision**: Run PostgreSQL 16.12 with root `compose.yaml`, a health check, named-volume persistence, and host port `55432`. Docker Compose is the only required local infrastructure. Host PostgreSQL and `psql` are unnecessary; Prisma commands run from `apps/web/` and provide the application-level connectivity check.
+**Decision**: Run PostgreSQL 16.12 with root `compose.yaml`, a health check, named-volume persistence, and host port `55432`. Docker Compose is the only required local infrastructure. Host PostgreSQL and `psql` are unnecessary; Prisma commands run from `web/` and provide the application-level connectivity check.
 
-**Decision**: A cross-platform root setup script creates root `.env`, `apps/web/.env.local`, and the local email-capture directory without overwriting files or printing generated PostgreSQL/Better Auth secrets. File capture is the default email driver. Resend is optional and cannot block local setup or startup.
+**Decision**: A cross-platform root setup script creates root `.env`, `web/.env.local`, and the local email-capture directory without overwriting files or printing generated PostgreSQL/Better Auth secrets. File capture is the default email driver. Resend is optional and cannot block local setup or startup.
 
 **Alternatives rejected**: a separate frontend/backend pair, moving Spec Kit to the repository root, per-workspace lockfiles, host-installed PostgreSQL/`psql`, and requiring Resend locally all add unsupported structure or machine prerequisites without improving the academic local demonstration.
 
@@ -53,7 +53,7 @@ API was also rejected; the vulnerable consumers were removed instead.
 
 **Verified behavior**: Next.js defines Route Handlers in `route.ts` under `app`; they are the App Router equivalent of Pages Router API Routes, so both mechanisms are unnecessary for this feature.
 
-**Decision**: All SmartHire identity HTTP endpoints use `apps/web/src/app/api/**/route.ts`. `apps/web/src/app/api/auth/[...all]/route.ts` is retained only as a no-store 404 boundary: Better Auth's generic provider routes are not public. The call chain is SmartHire Route Handler → Service → provider gateway or Repository/Data Access → PostgreSQL.
+**Decision**: All SmartHire identity HTTP endpoints use `web/src/app/api/**/route.ts`. `web/src/app/api/auth/[...all]/route.ts` is retained only as a no-store 404 boundary: Better Auth's generic provider routes are not public. The call chain is SmartHire Route Handler → Service → provider gateway or Repository/Data Access → PostgreSQL.
 
 **Alternative rejected**: Pages Router API Routes and FastAPI would create an unapproved second backend mechanism.
 
@@ -61,7 +61,7 @@ API was also rejected; the vulnerable consumers were removed instead.
 
 **Verified behavior**: Better Auth documents `prismaAdapter(prisma, { provider: postgresql })`. Its CLI supports Prisma schema generation but not Prisma migrations; Prisma 7 requires an explicit generated-client output path.
 
-**Decision**: PostgreSQL is the only production database. Generate the Better Auth schema using the pinned Better Auth CLI, review it, and migrate only through pinned Prisma Migrate from `apps/web/`, with schema and migrations under `apps/web/prisma/`. Local compatibility work targets the healthy Compose PostgreSQL service; it does not depend on host `psql`. Do not duplicate Better Auth tables.
+**Decision**: PostgreSQL is the only production database. Generate the Better Auth schema using the pinned Better Auth CLI, review it, and migrate only through pinned Prisma Migrate from `web/`, with schema and migrations under `web/prisma/`. Local compatibility work targets the healthy Compose PostgreSQL service; it does not depend on host `psql`. Do not duplicate Better Auth tables.
 
 **SmartHire extension**: Domain constraints, partial indexes/check constraints that Prisma schema cannot fully express, outbox/audit tables, account-state fields, session policy fields, and safe migration/rollback procedures.
 

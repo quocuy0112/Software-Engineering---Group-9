@@ -1,0 +1,7 @@
+@import "tailwindcss";
+@import "../frontend/styles/tokens.css";
+@import "../frontend/styles/base.css";
+@import "../frontend/styles/auth.css";
+@import "../frontend/styles/home.css";
+@import "../frontend/styles/workspace.css";
+@import "../frontend/styles/profile.css";

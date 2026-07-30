@@ -1,4 +1,4 @@
-﻿# Planning Readiness Checklist
+# Planning Readiness Checklist
 
 - [x] `plan.md` completes Technical Context and Constitution Check
 - [x] PostgreSQL is the only production database
@@ -11,9 +11,9 @@
 - [x] Browser and internal contracts exist
 - [x] Cookie prefixes and paths are contractually valid
 - [x] Email provider and local development strategy are selected
-- [x] Root npm workspace, one root lockfile, Node `24.18.x` version files, and `apps/web/` application paths are planned
+- [x] Root npm workspace, one root lockfile, Node `24.18.x` version files, and `web/` application paths are planned
 - [x] PostgreSQL 16.12 Compose health check, host port `55432`, named volume, and Prisma connectivity gate are planned without host `psql`
-- [x] Cross-platform non-overwriting secret-safe setup plans root `.env`, `apps/web/.env.local`, and the local email-capture directory
+- [x] Cross-platform non-overwriting secret-safe setup plans root `.env`, `web/.env.local`, and the local email-capture directory
 - [x] Docker Compose is the only local infrastructure prerequisite; file capture is default and Resend is optional
 - [x] Environment variables are defined and classified
 - [x] Accessibility and no-Lenis constraints are planned
