@@ -55,8 +55,19 @@ function Test-ConfigObject {
 $ErrorActionPreference = 'Stop'
 $DefaultStart = '<!-- SPECKIT START -->'
 $DefaultEnd   = '<!-- SPECKIT END -->'
-$ProjectRoot  = (Get-Location).Path
-$ExtConfig    = Join-Path $ProjectRoot '.specify/extensions/agent-context/agent-context-config.yml'
+$SpecKitRoot  = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../../../..')).Path
+$ProjectRoot  = $SpecKitRoot
+if (Get-Command git -ErrorAction SilentlyContinue) {
+    try {
+        $gitRoot = git -C $SpecKitRoot rev-parse --show-toplevel 2>$null
+        if ($LASTEXITCODE -eq 0 -and $gitRoot) {
+            $ProjectRoot = (Resolve-Path -LiteralPath $gitRoot.Trim()).Path
+        }
+    } catch {
+        # A standalone Spec Kit directory may not be inside a Git worktree.
+    }
+}
+$ExtConfig    = Join-Path $SpecKitRoot '.specify/extensions/agent-context/agent-context-config.yml'
 
 if (-not (Test-Path -LiteralPath $ExtConfig)) {
     Write-Warning "agent-context: $ExtConfig not found; nothing to do."
@@ -170,7 +181,7 @@ if (-not $PlanPath) {
     # matching the bash glob specs/*/plan.md. Wrap in try/catch so access errors under
     # $ErrorActionPreference = 'Stop' don't abort the script.
     try {
-        $specsDir = Join-Path $ProjectRoot 'specs'
+        $specsDir = Join-Path $SpecKitRoot 'specs'
         $candidate = Get-ChildItem -Path $specsDir -Directory -ErrorAction SilentlyContinue |
             ForEach-Object { Get-Item -LiteralPath (Join-Path $_.FullName 'plan.md') -ErrorAction SilentlyContinue } |
             Where-Object { $_ } |

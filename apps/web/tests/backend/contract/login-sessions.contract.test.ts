@@ -35,7 +35,7 @@ describe("login and session HTTP contract", () => {
   });
 
   it("documents the sole cookie session and sanitized list/revoke boundaries", async () => {
-    const openapi = await readFile(resolve(process.cwd(), "../../src/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml"), "utf8");
+    const openapi = await readFile(resolve(process.cwd(), "../../spec-kit/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml"), "utf8");
     expect(openapi).toContain("name: __Host-smarthire.session");
     expect(openapi).toContain("SessionListOutcome:");
     expect(openapi).toContain("/api/identity/sessions/{sessionReference}:");

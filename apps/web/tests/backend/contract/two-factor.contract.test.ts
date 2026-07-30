@@ -38,7 +38,7 @@ describe("two-factor and cookie contract", () => {
   });
 
   it("documents one Better Auth session mechanism and correct cookie scopes", async () => {
-    const contract = await readFile(resolve(process.cwd(), "../../src/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml"), "utf8");
+    const contract = await readFile(resolve(process.cwd(), "../../spec-kit/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml"), "utf8");
     expect(contract).toContain("required: [factor, code]");
     expect(contract).toContain("const: backup-code");
     expect(contract).toContain("required: [currentPassword, code]");

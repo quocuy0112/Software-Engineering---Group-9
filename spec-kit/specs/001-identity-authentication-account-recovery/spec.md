@@ -499,7 +499,7 @@ audit records, and required new login.
 
 ## Assumptions
 
-- The active Spec Kit project root is `src`, so the requested relative path resolves to `src/specs/001-identity-authentication-account-recovery/spec.md` in this repository.
+- The active Spec Kit project root is `spec-kit`, so the requested relative path resolves to `spec-kit/specs/001-identity-authentication-account-recovery/spec.md` in this repository.
 - Next.js App Router Route Handlers and the exclusive Better Auth opaque PostgreSQL-backed session are the confirmed architecture. Pages Router API Routes, Python/FastAPI, custom browser JWTs, and any second browser-session mechanism are excluded.
 - Email/password is the only primary authentication method in this group. Google OAuth/social login, SMS OTP, phone authentication, passkeys/WebAuthn, and trusted-device behavior are excluded.
 - Email OTP MUST NOT be offered as a login factor, alternative second factor, or account-recovery factor in this functional group.

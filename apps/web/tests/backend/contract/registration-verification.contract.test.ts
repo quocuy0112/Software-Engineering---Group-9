@@ -27,7 +27,7 @@ describe("registration and verification HTTP contract", () => {
     expect(verificationTokenSchema.safeParse({ token: "short" }).success).toBe(false);
 
     const openapi = await readFile(
-      resolve(process.cwd(), "../../src/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml"),
+      resolve(process.cwd(), "../../spec-kit/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml"),
       "utf8",
     );
     expect(openapi).toContain("/api/identity/register:");

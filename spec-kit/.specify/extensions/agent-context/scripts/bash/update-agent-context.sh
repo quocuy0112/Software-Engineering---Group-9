@@ -16,8 +16,10 @@
 
 set -euo pipefail
 
-PROJECT_ROOT="$(pwd)"
-EXT_CONFIG="$PROJECT_ROOT/.specify/extensions/agent-context/agent-context-config.yml"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SPEC_KIT_ROOT="$(cd "$SCRIPT_DIR/../../../../.." && pwd)"
+PROJECT_ROOT="$(git -C "$SPEC_KIT_ROOT" rev-parse --show-toplevel 2>/dev/null || printf '%s' "$SPEC_KIT_ROOT")"
+EXT_CONFIG="$SPEC_KIT_ROOT/.specify/extensions/agent-context/agent-context-config.yml"
 DEFAULT_START="<!-- SPECKIT START -->"
 DEFAULT_END="<!-- SPECKIT END -->"
 
@@ -125,7 +127,7 @@ if [[ -z "$PLAN_PATH" ]]; then
   # Pick the most recently modified plan.md one level deep (specs/<feature>/plan.md).
   # Use find + sort by modification time to avoid ls/head fragility with
   # spaces in paths or SIGPIPE from pipefail.
-  _plan_abs="$("$_python" - "$PROJECT_ROOT" <<'PY'
+  _plan_abs="$("$_python" - "$SPEC_KIT_ROOT" <<'PY'
 import sys, os
 from pathlib import Path
 specs = Path(sys.argv[1]) / "specs"

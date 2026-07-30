@@ -36,7 +36,7 @@ describe("password recovery HTTP contract", () => {
   });
 
   it("documents the fail-closed saga, 2FA preservation, and never models returned credentials", async () => {
-    const openapi = await readFile(resolve(process.cwd(), "../../src/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml"), "utf8");
+    const openapi = await readFile(resolve(process.cwd(), "../../spec-kit/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml"), "utf8");
     expect(openapi).toContain("required: [token, newPassword, confirmPassword]");
     expect(openapi).toContain("idempotent reset saga");
     expect(openapi).toContain("TOTP and unused backup codes preserved");

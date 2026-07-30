@@ -193,7 +193,7 @@ npm run test:e2e
 ├── docs/                                  # Requirements, design, planning, testing, and project reports
 ├── scripts/
 │   └── .mjs                               # Local setup, validation, and development scripts
-├── src/
+├── spec-kit/
 │   └── specs/
 │       └── 001-identity-authentication-account-recovery/
 │           ├── checklists/                # Requirement verification records
@@ -206,9 +206,9 @@ npm run test:e2e
 
 ## Documentation
 
-- [Implementation plan](src/specs/001-identity-authentication-account-recovery/plan.md)
-- [Feature specification](src/specs/001-identity-authentication-account-recovery/spec.md)
-- [OpenAPI contract](src/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml)
+- [Implementation plan](spec-kit/specs/001-identity-authentication-account-recovery/plan.md)
+- [Feature specification](spec-kit/specs/001-identity-authentication-account-recovery/spec.md)
+- [OpenAPI contract](spec-kit/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml)
 
 ## Security
 

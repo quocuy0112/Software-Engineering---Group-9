@@ -7,7 +7,7 @@ describe("full account recovery contract", () => {
     const contract = await readFile(
       resolve(
         process.cwd(),
-        "../../src/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml",
+        "../../spec-kit/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml",
       ),
       "utf8",
     );

@@ -1,7 +1,7 @@
 # Implementation Plan: Identity, Authentication, and Account Recovery
 
 **Branch**: `001-identity-authentication-account-recovery` | **Date**: 2026-07-20  
-**Spec**: `src/specs/001-identity-authentication-account-recovery/spec.md`
+**Spec**: `spec-kit/specs/001-identity-authentication-account-recovery/spec.md`
 
 ## Summary
 
@@ -36,7 +36,7 @@ Deliver the approved P0 identity scope in one Next.js App Router application. Ne
 
 The SMTP decision preserves Principle VII: business services depend on EmailOutbox and `EmailService`, not Nodemailer or provider APIs. Exact library pins and the asynchronous worker are documented here and in the approved ADR; provider failures cannot roll back committed identity state.
 
-The active Constitution is `src/.specify/memory/constitution.md`. It permits the selected opaque database-backed session and technology-specific plan decisions. No waiver or complexity exception is required.
+The active Constitution is `spec-kit/.specify/memory/constitution.md`. It permits the selected opaque database-backed session and technology-specific plan decisions. No waiver or complexity exception is required.
 
 ## Architecture and Layer Boundaries
 
@@ -91,7 +91,7 @@ PostgreSQL            EmailOutbox worker -> EmailService -> capture | SMTP | Res
 │   │   ├── server/{auth,services,repositories,email}/
 │   │   └── components/ui/
 │   └── tests/{unit,contract,integration,components,e2e}/
-└── src/
+└── spec-kit/
     ├── .specify/{feature.json,memory/constitution.md}
     └── specs/001-identity-authentication-account-recovery/
 ```
@@ -99,7 +99,7 @@ PostgreSQL            EmailOutbox worker -> EmailService -> capture | SMTP | Res
 - The repository remains one modular full-stack Next.js application under `apps/web/`; no separate frontend or backend application is permitted.
 - Route Handlers live only in `apps/web/src/app/api/**/route.ts`. Feature UI modules live in `apps/web/src/features/`; server authentication integration in `apps/web/src/server/auth/`; business services in `apps/web/src/server/services/`; repositories in `apps/web/src/server/repositories/`; email adapters in `apps/web/src/server/email/`; shared UI in `apps/web/src/components/ui/`.
 - Prisma commands and migrations execute with `apps/web/` as their working directory. Tests live under `apps/web/tests/`.
-- Spec Kit stays nested under `src/`; neither `src/.specify/` nor `src/specs/` is moved.
+- Spec Kit stays nested under `spec-kit/`; neither `spec-kit/.specify/` nor `spec-kit/specs/` is moved.
 
 ## Local-First Setup and Compatibility Chain
 

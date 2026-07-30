@@ -24,7 +24,7 @@ function Find-SpecifyRoot {
     }
 }
 
-# Return the actual Git repository root; Spec Kit may be nested under src/.
+# Return the actual Git repository root; Spec Kit may be nested under spec-kit/.
 function Get-RepoRoot {
     try {
         $result = git -C (Get-Location).Path rev-parse --show-toplevel 2>$null
@@ -359,7 +359,7 @@ function Get-InvokeSeparator {
     }
 
     $separator = '.'
-    $integrationJson = Join-Path $RepoRoot '.specify/integration.json'
+    $integrationJson = Join-Path (Get-SpecifyDirectory) 'integration.json'
     if (Test-Path -LiteralPath $integrationJson -PathType Leaf) {
         try {
             $state = Get-Content -LiteralPath $integrationJson -Raw | ConvertFrom-Json

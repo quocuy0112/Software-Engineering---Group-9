@@ -1,7 +1,7 @@
 ---
 name: speckit-git-validate
 description: Validate current branch follows feature branch naming conventions
-compatibility: Requires spec-kit project structure with .specify/ directory
+compatibility: Requires spec-kit project structure with spec-kit/.specify/ directory
 metadata:
   author: github-spec-kit
   source: git:commands/speckit.git.validate.md

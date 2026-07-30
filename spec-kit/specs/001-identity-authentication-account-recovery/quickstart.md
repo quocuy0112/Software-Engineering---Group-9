@@ -53,7 +53,7 @@ If direct database inspection is needed, run the PostgreSQL client inside the co
 2. Wait for the Compose PostgreSQL health check, then prove application connectivity using the Prisma-backed `db:check` workspace script.
 3. From `apps/web/`, generate the Better Auth 1.6.25 Prisma schema and diff it against `apps/web/prisma/schema.prisma`. Confirm there is one each of user/account/session/verification/two-factor ownership, the two-factor row includes `failedVerificationCount` and `lockedUntil`, and no custom browser JWT/session table exists.
 4. Create and apply reviewed Prisma Migrate SQL under `apps/web/prisma/migrations/`; never edit/reset an applied production migration.
-5. Validate `src/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml` as OpenAPI 3.1 and lint all `apps/web/src/app/api/**/route.ts` handlers against the no-direct-Prisma layering rule.
+5. Validate `spec-kit/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml` as OpenAPI 3.1 and lint all `apps/web/src/app/api/**/route.ts` handlers against the no-direct-Prisma layering rule.
 
 ## Automated Validation
 

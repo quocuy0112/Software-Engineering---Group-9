@@ -41,7 +41,7 @@ API was also rejected; the vulnerable consumers were removed instead.
 
 ## Decision: Local-First Repository and Runtime
 
-**Decision**: Keep Spec Kit under `src/.specify/` and `src/specs/`, while the only modular full-stack application lives under `apps/web/`. Use Node.js `24.18.x` through root `.nvmrc` and `.node-version`, npm workspaces from the repository root, and one root lockfile. Route Handlers, feature UI, server authentication, services, repositories, email adapters, shared UI, Prisma, and tests use the approved `apps/web/` paths from `plan.md`.
+**Decision**: Keep Spec Kit under `spec-kit/.specify/` and `spec-kit/specs/`, while the only modular full-stack application lives under `apps/web/`. Use Node.js `24.18.x` through root `.nvmrc` and `.node-version`, npm workspaces from the repository root, and one root lockfile. Route Handlers, feature UI, server authentication, services, repositories, email adapters, shared UI, Prisma, and tests use the approved `apps/web/` paths from `plan.md`.
 
 **Decision**: Run PostgreSQL 16.12 with root `compose.yaml`, a health check, named-volume persistence, and host port `55432`. Docker Compose is the only required local infrastructure. Host PostgreSQL and `psql` are unnecessary; Prisma commands run from `apps/web/` and provide the application-level connectivity check.
 
