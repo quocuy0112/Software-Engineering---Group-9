@@ -22,10 +22,21 @@ const emptyProfile = {
   socialLinks: [],
 };
 
+const account = {
+  name: "Candidate Example",
+  email: "candidate@example.com",
+  memberSince: "July 31, 2026",
+  twoFactorEnabled: true,
+};
+
 describe("professional profile accessibility", () => {
   it("provides labelled keyboard-operable collection controls", () => {
     render(
-      <ProfileOverview initialProfile={emptyProfile} csrfProof="csrf-proof" />,
+      <ProfileOverview
+        account={account}
+        initialProfile={emptyProfile}
+        csrfProof="csrf-proof"
+      />,
     );
     fireEvent.click(screen.getByRole("button", { name: "Add skill" }));
     fireEvent.click(screen.getByRole("button", { name: "Add skill" }));
@@ -71,7 +82,11 @@ describe("professional profile accessibility", () => {
 
   it("uses explicit text and ARIA semantics instead of color-only state", () => {
     render(
-      <ProfileOverview initialProfile={emptyProfile} csrfProof="csrf-proof" />,
+      <ProfileOverview
+        account={account}
+        initialProfile={emptyProfile}
+        csrfProof="csrf-proof"
+      />,
     );
     expect(screen.getByText(/not filled yet/i)).toBeVisible();
     expect(screen.getByText(/no skills added/i)).toBeVisible();

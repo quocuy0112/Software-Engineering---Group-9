@@ -12,6 +12,15 @@ export default async function ProfilePage() {
   );
 
   return (
-    <ProfileOverview initialProfile={profile} csrfProof={context.csrfProof} />
+    <ProfileOverview
+      account={{
+        name: context.account.name,
+        email: context.account.email,
+        memberSince: context.account.createdAt.toLocaleDateString(),
+        twoFactorEnabled: context.account.twoFactorEnabled,
+      }}
+      initialProfile={profile}
+      csrfProof={context.csrfProof}
+    />
   );
 }

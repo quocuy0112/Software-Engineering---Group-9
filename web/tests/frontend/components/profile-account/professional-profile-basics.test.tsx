@@ -21,6 +21,13 @@ const emptyProfile = {
   socialLinks: [],
 };
 
+const account = {
+  name: "Candidate Example",
+  email: "candidate@example.com",
+  memberSince: "July 31, 2026",
+  twoFactorEnabled: true,
+};
+
 afterEach(() => {
   vi.restoreAllMocks();
   toast.mockClear();
@@ -38,7 +45,9 @@ describe("professional profile basics", () => {
           resolve = done;
         }),
     );
-    const { unmount } = render(<ProfileOverview csrfProof="csrf-proof" />);
+    const { unmount } = render(
+      <ProfileOverview account={account} csrfProof="csrf-proof" />,
+    );
     expect(
       screen.getByRole("status", { name: /loading professional profile/i }),
     ).toBeVisible();
@@ -55,7 +64,11 @@ describe("professional profile basics", () => {
     unmount();
 
     render(
-      <ProfileOverview initialProfile={emptyProfile} csrfProof="csrf-proof" />,
+      <ProfileOverview
+        account={account}
+        initialProfile={emptyProfile}
+        csrfProof="csrf-proof"
+      />,
     );
     expect(screen.getByText(/not filled yet/i)).toBeVisible();
     expect(
@@ -87,7 +100,11 @@ describe("professional profile basics", () => {
       )
       .mockResolvedValueOnce(Response.json(saved));
     render(
-      <ProfileOverview initialProfile={emptyProfile} csrfProof="csrf-proof" />,
+      <ProfileOverview
+        account={account}
+        initialProfile={emptyProfile}
+        csrfProof="csrf-proof"
+      />,
     );
     fireEvent.change(screen.getByLabelText("Headline"), {
       target: { value: "Platform Engineer" },
@@ -140,7 +157,11 @@ describe("professional profile basics", () => {
         }),
     );
     render(
-      <ProfileOverview initialProfile={emptyProfile} csrfProof="csrf-proof" />,
+      <ProfileOverview
+        account={account}
+        initialProfile={emptyProfile}
+        csrfProof="csrf-proof"
+      />,
     );
     const phone = screen.getByLabelText("Phone");
     fireEvent.change(phone, { target: { value: "not-a-phone" } });
