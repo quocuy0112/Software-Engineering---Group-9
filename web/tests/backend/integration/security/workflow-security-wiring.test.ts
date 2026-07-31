@@ -18,7 +18,11 @@ const repository = new PrismaRateLimitRepository();
 const subjects: Array<{ scope: string; subject: string }> = [];
 const origin = serverEnvironment.NEXT_PUBLIC_APP_URL;
 
-function request(path: string, body: unknown, extra: Record<string, string> = {}) {
+function request(
+  path: string,
+  body: unknown,
+  extra: Record<string, string> = {},
+) {
   return new Request(`${origin}${path}`, {
     method: "POST",
     headers: {
@@ -91,8 +95,12 @@ describe("workflow security throttling route wiring", () => {
       }),
     );
     expect(crossOrigin.status).toBe(403);
-    expect(trustedInternalRedirect("https://attacker.example/path", origin)).toBe("/");
-    expect(trustedInternalRedirect("//attacker.example/path", origin)).toBe("/");
+    expect(
+      trustedInternalRedirect("https://attacker.example/path", origin),
+    ).toBe("/");
+    expect(trustedInternalRedirect("//attacker.example/path", origin)).toBe(
+      "/",
+    );
 
     const email = `forwarded-${randomUUID()}@example.test`;
     subjects.push({ scope: "registration", subject: `anonymous:${email}` });
@@ -115,11 +123,15 @@ describe("workflow security throttling route wiring", () => {
     }
     expect(responses.at(-1)?.status).toBe(429);
 
-    const managementSources = await Promise.all([
-      "two-factor/enrollment/route.ts",
-      "two-factor/backup-codes/regenerate/route.ts",
-      "two-factor/disable/route.ts",
-    ].map((file) => readFile(resolve(process.cwd(), "src/app/api/identity", file), "utf8")));
+    const managementSources = await Promise.all(
+      [
+        "two-factor/enrollment/route.ts",
+        "two-factor/backup-codes/regenerate/route.ts",
+        "two-factor/disable/route.ts",
+      ].map((file) =>
+        readFile(resolve(process.cwd(), "src/app/api/identity", file), "utf8"),
+      ),
+    );
     expect(managementSources.join("\n")).not.toContain("x-forwarded-for");
   });
   it("throttles registration and resend without account enumeration", async () => {
@@ -160,9 +172,9 @@ describe("workflow security throttling route wiring", () => {
         ),
       );
     const resendResults = await messages(resendResponses);
-    expect(resendResults.slice(0, 3).every(({ status }) => status === 202)).toBe(
-      true,
-    );
+    expect(
+      resendResults.slice(0, 3).every(({ status }) => status === 202),
+    ).toBe(true);
     expect(resendResults[3]?.status).toBe(429);
     expect(JSON.stringify(resendResults[3]?.body)).not.toContain(resendEmail);
   });
@@ -199,11 +211,13 @@ describe("workflow security throttling route wiring", () => {
         ),
       );
     const recoveryResults = await messages(recoveryResponses);
-    expect(recoveryResults.slice(0, 3).every(({ status }) => status === 404)).toBe(
-      true,
-    );
+    expect(
+      recoveryResults.slice(0, 3).every(({ status }) => status === 404),
+    ).toBe(true);
     expect(recoveryResults[3]?.status).toBe(429);
-    expect(JSON.stringify(recoveryResults[3]?.body)).not.toContain(recoveryEmail);
+    expect(JSON.stringify(recoveryResults[3]?.body)).not.toContain(
+      recoveryEmail,
+    );
 
     const handle = randomUUID();
     const binding = randomUUID();
@@ -223,9 +237,9 @@ describe("workflow security throttling route wiring", () => {
         ),
       );
     const challengeResults = await messages(challengeResponses);
-    expect(challengeResults.slice(0, 5).every(({ status }) => status === 401)).toBe(
-      true,
-    );
+    expect(
+      challengeResults.slice(0, 5).every(({ status }) => status === 401),
+    ).toBe(true);
     expect(challengeResults[5]?.status).toBe(429);
     expect(JSON.stringify(challengeResults[5]?.body)).not.toContain(handle);
   });

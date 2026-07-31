@@ -13,8 +13,8 @@ export class BetterAuthSessionGateway {
     return auth.handler(
       markInternalBetterAuthRequest(
         new Request(
-        new URL(`/api/auth${path}`, serverEnvironment.BETTER_AUTH_URL),
-        { method: "POST", headers: forwarded, body: JSON.stringify(body) },
+          new URL(`/api/auth${path}`, serverEnvironment.BETTER_AUTH_URL),
+          { method: "POST", headers: forwarded, body: JSON.stringify(body) },
         ),
       ),
     );

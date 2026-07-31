@@ -110,17 +110,12 @@ describe("concurrent password reset saga on PostgreSQL", () => {
       await prisma.auditEvent.count({
         where: {
           id: {
-            in: [
-              operations[0]!.auditIntentKey,
-              operations[0]!.finalAuditId!,
-            ],
+            in: [operations[0]!.auditIntentKey, operations[0]!.finalAuditId!],
           },
         },
       }),
     ).toBe(2);
-    expect(
-      await prisma.session.count({ where: { userId: user.id } }),
-    ).toBe(0);
+    expect(await prisma.session.count({ where: { userId: user.id } })).toBe(0);
     await expect(
       new ResetPasswordService().execute(
         rawToken,

@@ -29,22 +29,25 @@ describe("account recovery login and protected-route gate", () => {
     users.push(fixture.userId);
     const now = new Date("2026-07-23T08:00:00.000Z");
     const confirmation = protector.generate();
-    await new PrismaAccountRecoveryRepository().replaceConfirmationForEligibleUser({
-      normalizedEmail: fixture.email,
-      rawProof: confirmation,
-      protectedProof: protector.seal(confirmation),
-      correlationId: randomUUID(),
-      now,
-    });
+    await new PrismaAccountRecoveryRepository().replaceConfirmationForEligibleUser(
+      {
+        normalizedEmail: fixture.email,
+        rawProof: confirmation,
+        protectedProof: protector.seal(confirmation),
+        correlationId: randomUUID(),
+        now,
+      },
+    );
     const confirmed = await new ConfirmFullAccountRecoveryService().execute(
       confirmation,
       new Date(now.getTime() + 1),
     );
     expect(confirmed.ok).toBe(true);
     if (!confirmed.ok) throw new Error("hold did not start");
-    const operation = await prisma.fullAccountRecoveryOperation.findUniqueOrThrow({
-      where: { id: confirmed.operationId },
-    });
+    const operation =
+      await prisma.fullAccountRecoveryOperation.findUniqueOrThrow({
+        where: { id: confirmed.operationId },
+      });
 
     const blockedLogin = await new LoginWithPasswordService().execute(
       { email: fixture.email, password: fixturePassword },

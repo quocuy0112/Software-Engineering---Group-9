@@ -39,11 +39,19 @@ describe("authentication audit integration", () => {
       undefined,
       audit as never,
     ).execute(
-      { name: "Test", email: "audit@example.test", password: "safe", passwordConfirmation: "safe" },
+      {
+        name: "Test",
+        email: "audit@example.test",
+        password: "safe",
+        passwordConfirmation: "safe",
+      },
       { subject: "audit-test" },
     );
     expect(audit.append).toHaveBeenCalledWith(
-      expect.objectContaining({ action: "registration.rejected", result: "DENIED" }),
+      expect.objectContaining({
+        action: "registration.rejected",
+        result: "DENIED",
+      }),
     );
 
     const verificationAudit = auditSpy();
@@ -54,7 +62,10 @@ describe("authentication audit integration", () => {
     );
     await verifier.execute("opaque-test-value");
     expect(verificationAudit.append).toHaveBeenCalledWith(
-      expect.objectContaining({ action: "verification.failed", result: "FAILURE" }),
+      expect.objectContaining({
+        action: "verification.failed",
+        result: "FAILURE",
+      }),
     );
 
     const loginAudit = auditSpy();
@@ -70,7 +81,10 @@ describe("authentication audit integration", () => {
       { headers: new Headers(), subject: "audit-login" },
     );
     expect(loginAudit.append).toHaveBeenCalledWith(
-      expect.objectContaining({ action: "rate_limit.denied", result: "DENIED" }),
+      expect.objectContaining({
+        action: "rate_limit.denied",
+        result: "DENIED",
+      }),
     );
   });
 
@@ -81,36 +95,66 @@ describe("authentication audit integration", () => {
       undefined,
       undefined,
       challengeAudit as never,
-    ).execute("invalid-cookie", "not-used", new Headers(), new Date(), "backup-code");
+    ).execute(
+      "invalid-cookie",
+      "not-used",
+      new Headers(),
+      new Date(),
+      "backup-code",
+    );
     expect(challengeAudit.append).toHaveBeenCalledWith(
-      expect.objectContaining({ action: "backup_code.consumed", result: "FAILURE" }),
+      expect.objectContaining({
+        action: "backup_code.consumed",
+        result: "FAILURE",
+      }),
     );
 
     const enrollmentAudit = auditSpy();
     await new EnrollTotpService({
-      recentAuth: { execute: vi.fn().mockResolvedValue({ ok: false, status: 401 }) } as never,
+      recentAuth: {
+        execute: vi.fn().mockResolvedValue({ ok: false, status: 401 }),
+      } as never,
       audit: enrollmentAudit as never,
-    }).start("not-used", { headers: new Headers(), subject: "enrollment-audit" });
+    }).start("not-used", {
+      headers: new Headers(),
+      subject: "enrollment-audit",
+    });
     expect(enrollmentAudit.append).toHaveBeenCalledWith(
-      expect.objectContaining({ action: "totp.enrollment_started", result: "FAILURE" }),
+      expect.objectContaining({
+        action: "totp.enrollment_started",
+        result: "FAILURE",
+      }),
     );
 
     const regenerationAudit = auditSpy();
     await new RegenerateBackupCodesService(
       undefined,
-      { execute: vi.fn().mockResolvedValue({ ok: false, status: 401 }) } as never,
+      {
+        execute: vi.fn().mockResolvedValue({ ok: false, status: 401 }),
+      } as never,
       regenerationAudit as never,
-    ).execute("not-used", "not-used", { headers: new Headers(), subject: "regeneration-audit" });
+    ).execute("not-used", "not-used", {
+      headers: new Headers(),
+      subject: "regeneration-audit",
+    });
     expect(regenerationAudit.append).toHaveBeenCalledWith(
-      expect.objectContaining({ action: "backup_codes.regenerated", result: "FAILURE" }),
+      expect.objectContaining({
+        action: "backup_codes.regenerated",
+        result: "FAILURE",
+      }),
     );
 
     const disableAudit = auditSpy();
     await new DisableTwoFactorService(
       undefined,
-      { execute: vi.fn().mockResolvedValue({ ok: false, status: 401 }) } as never,
+      {
+        execute: vi.fn().mockResolvedValue({ ok: false, status: 401 }),
+      } as never,
       disableAudit as never,
-    ).execute("not-used", "not-used", { headers: new Headers(), subject: "disable-audit" });
+    ).execute("not-used", "not-used", {
+      headers: new Headers(),
+      subject: "disable-audit",
+    });
     expect(disableAudit.append).toHaveBeenCalledWith(
       expect.objectContaining({ action: "totp.disabled", result: "FAILURE" }),
     );
@@ -125,12 +169,18 @@ describe("authentication audit integration", () => {
       { evaluate: vi.fn().mockResolvedValue({ accepted: false }) } as never,
     ).execute("opaque-reset-value", "not-used");
     expect(resetAudit.append).toHaveBeenCalledWith(
-      expect.objectContaining({ action: "password_reset.failed", result: "FAILURE" }),
+      expect.objectContaining({
+        action: "password_reset.failed",
+        result: "FAILURE",
+      }),
     );
 
     const sessionAudit = auditSpy();
     const sessionService = new SessionService(
-      { newest: vi.fn().mockResolvedValue({ id: "new" }), enforceCap: vi.fn().mockResolvedValue(["victim"]) } as never,
+      {
+        newest: vi.fn().mockResolvedValue({ id: "new" }),
+        enforceCap: vi.fn().mockResolvedValue(["victim"]),
+      } as never,
       sessionAudit as never,
     );
     await sessionService.enforceCreated("user-id");
@@ -149,7 +199,11 @@ describe("authentication audit integration", () => {
       revokeAudit as never,
     ).execute("session-reference", "user-id", new Headers());
     expect(revokeAudit.append).toHaveBeenCalledWith(
-      expect.objectContaining({ action: "session.revoked", result: "FAILURE", targetId: null }),
+      expect.objectContaining({
+        action: "session.revoked",
+        result: "FAILURE",
+        targetId: null,
+      }),
     );
   });
 });

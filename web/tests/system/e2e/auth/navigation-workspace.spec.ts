@@ -107,7 +107,7 @@ test("connects public auth pages and the protected identity workspace", async ({
   await page.getByRole("link", { name: "Profile", exact: true }).click();
   await expect(page).toHaveURL(/\/profile$/);
   await expect(
-    page.getByRole("heading", { name: "Profile", exact: true }),
+    page.getByRole("heading", { name: "Professional profile", exact: true }),
   ).toBeVisible();
   const profileMenu = page.getByRole("button", {
     name: "Open workspace menu",

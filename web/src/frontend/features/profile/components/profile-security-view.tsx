@@ -5,11 +5,13 @@ import { Badge } from "@/frontend/components/ui/badge";
 type ProfileSecurityViewProps = {
   twoFactorEnabled: boolean;
   recoveryCompleted: boolean;
+  csrfProof: string;
 };
 
 export function ProfileSecurityView({
   twoFactorEnabled,
   recoveryCompleted,
+  csrfProof,
 }: ProfileSecurityViewProps) {
   return (
     <div className="profile-page profile-page--standalone">
@@ -29,6 +31,7 @@ export function ProfileSecurityView({
       <ProfileSecurity
         initialTwoFactorEnabled={twoFactorEnabled}
         recoveryCompleted={recoveryCompleted}
+        csrfProof={csrfProof}
       />
     </div>
   );

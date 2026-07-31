@@ -13,10 +13,25 @@ describe("request password reset", () => {
         .mockResolvedValueOnce({ userId: "user-id", tokenId: "token-id" })
         .mockResolvedValueOnce(null),
     };
-    const limiter = { consume: vi.fn().mockResolvedValue({ allowed: true, retryAfterSeconds: 0 }) };
-    const service = new RequestPasswordResetService(repository as never, limiter as never);
-    const existing = await service.execute("active@example.test", "browser-a", new Date());
-    const unknown = await service.execute("unknown@example.test", "browser-b", new Date());
+    const limiter = {
+      consume: vi
+        .fn()
+        .mockResolvedValue({ allowed: true, retryAfterSeconds: 0 }),
+    };
+    const service = new RequestPasswordResetService(
+      repository as never,
+      limiter as never,
+    );
+    const existing = await service.execute(
+      "active@example.test",
+      "browser-a",
+      new Date(),
+    );
+    const unknown = await service.execute(
+      "unknown@example.test",
+      "browser-b",
+      new Date(),
+    );
     expect(existing).toMatchObject({
       accepted: true,
       status: 202,
@@ -34,9 +49,18 @@ describe("request password reset", () => {
 
   it("returns generic throttling metadata without invoking persistence", async () => {
     const repository = { replaceForActiveUser: vi.fn() };
-    const limiter = { consume: vi.fn().mockResolvedValue({ allowed: false, retryAfterSeconds: 12 }) };
-    const service = new RequestPasswordResetService(repository as never, limiter as never);
-    await expect(service.execute("user@example.test", "browser", new Date())).resolves.toMatchObject({
+    const limiter = {
+      consume: vi
+        .fn()
+        .mockResolvedValue({ allowed: false, retryAfterSeconds: 12 }),
+    };
+    const service = new RequestPasswordResetService(
+      repository as never,
+      limiter as never,
+    );
+    await expect(
+      service.execute("user@example.test", "browser", new Date()),
+    ).resolves.toMatchObject({
       accepted: false,
       status: 429,
       retryAfterSeconds: 12,

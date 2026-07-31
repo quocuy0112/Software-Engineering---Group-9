@@ -77,13 +77,11 @@ describe("SMTP adapter", () => {
     ],
     ["terminal response", { responseCode: 550 }, "SMTP_REJECTED", false],
   ])("maps %s failures safely", async (_name, failure, code, retryable) => {
-    const factory = vi
-      .fn()
-      .mockReturnValue({
-        sendMail: vi
-          .fn()
-          .mockRejectedValue({ ...failure, message: "secret app-password" }),
-      } as unknown as Transporter);
+    const factory = vi.fn().mockReturnValue({
+      sendMail: vi
+        .fn()
+        .mockRejectedValue({ ...failure, message: "secret app-password" }),
+    } as unknown as Transporter);
     await expect(
       new SmtpEmailAdapter(gmail587, factory).send(message),
     ).rejects.toMatchObject({
@@ -94,16 +92,12 @@ describe("SMTP adapter", () => {
   });
   it("does not log SMTP secrets", async () => {
     const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
-    const factory = vi
-      .fn()
-      .mockReturnValue({
-        sendMail: vi
-          .fn()
-          .mockRejectedValue({
-            code: "EAUTH",
-            message: gmail587.SMTP_PASSWORD,
-          }),
-      } as unknown as Transporter);
+    const factory = vi.fn().mockReturnValue({
+      sendMail: vi.fn().mockRejectedValue({
+        code: "EAUTH",
+        message: gmail587.SMTP_PASSWORD,
+      }),
+    } as unknown as Transporter);
     await new SmtpEmailAdapter(gmail587, factory)
       .send(message)
       .catch(() => undefined);

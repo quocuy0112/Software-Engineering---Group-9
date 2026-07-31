@@ -37,6 +37,7 @@ const nextConfig: NextConfig = {
       { source: "/:path*", headers: globalHeaders },
       ...[
         "/verify-email",
+        "/verify-email-change",
         "/settings/:path*",
         "/two-factor/:path*",
         "/reset-password/:path*",

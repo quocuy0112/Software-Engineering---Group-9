@@ -1,0 +1,1025 @@
+openapi: 3.1.0
+info:
+  title: SmartHire Candidate Profile and Account API
+  version: 0.1.0
+  description: >-
+    Browser-facing Feature 002 contracts implemented only by Next.js App
+    Router Route Handlers under web/src/app/api/**/route.ts. Better Auth
+    remains the exclusive opaque PostgreSQL-backed browser-session and
+    credential owner. Protected operations derive ownership only from that
+    session and reject client-supplied account/profile ownership.
+servers:
+  - url: https://{configured-origin}
+tags:
+  - name: Profile
+  - name: Account Identity
+  - name: Preferences
+  - name: Account Security
+paths:
+  /api/account/profile:
+    get:
+      tags: [Profile]
+      operationId: getOwnCandidateProfile
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Complete owned Profile aggregate, including a valid empty profile.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateProfile"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+    patch:
+      tags: [Profile]
+      operationId: saveOwnCandidateProfileSection
+      description: >-
+        Saves exactly one Profile aggregate section. A stale revision is still
+        applied under last-write-wins and returns conflictApplied=true.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileSectionMutation"
+      responses:
+        "200":
+          description: Section committed; response explicitly reports whether a stale write was applied.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileMutationOutcome"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "413":
+          description: Profile section payload exceeds the configured bounded size.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+  /api/account/profile/skills/suggestions:
+    get:
+      tags: [Profile]
+      operationId: suggestSkills
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 80
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+            default: 10
+      responses:
+        "200":
+          description: Catalog-only suggestions; no account/profile usage data.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [skills]
+                properties:
+                  skills:
+                    type: array
+                    maxItems: 20
+                    items:
+                      $ref: "#/components/schemas/Skill"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+  /api/account/identity:
+    get:
+      tags: [Account Identity]
+      operationId: getOwnAccountIdentity
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Own account identity, safe read-only metadata, and pending email-change status.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountIdentity"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+    patch:
+      tags: [Account Identity]
+      operationId: updateOwnAccountName
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountNameMutation"
+      responses:
+        "200":
+          description: Account name updated.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountIdentityMutationOutcome"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /api/account/preferences:
+    get:
+      tags: [Preferences]
+      operationId: getOwnAccountPreferences
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Stored preferences or the exact defaults when no row exists.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountPreferences"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+    put:
+      tags: [Preferences]
+      operationId: replaceOwnAccountPreferences
+      description: Replaces one complete validated preference set atomically.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountPreferencesMutation"
+      responses:
+        "200":
+          description: Complete preference set committed.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountPreferencesMutationOutcome"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /api/account/email-change/request:
+    post:
+      tags: [Account Security]
+      operationId: requestOwnEmailChange
+      description: >-
+        Requires the existing current-password recent-auth policy. Atomically
+        reserves the new email and queues verification to the new address plus
+        a security notice to the old address; provider delivery is asynchronous.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailChangeRequest"
+      responses:
+        "202":
+          description: Reservation and both logical emails were queued.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailChangeQueued"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/RecentAuthRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/EmailUnavailable"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "503":
+          $ref: "#/components/responses/MutationUnavailable"
+  /api/account/email-change/verify:
+    post:
+      tags: [Account Security]
+      operationId: verifyEmailChange
+      description: >-
+        Public one-time proof consumption. The proof arrives in a URL fragment
+        and is POSTed only by the same-origin verification page. A current
+        session never selects or redirects the bound account.
+      security:
+        - sameOrigin: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailChangeProof"
+      responses:
+        "200":
+          description: Proposed email became the effective verified login email exactly once.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Outcome"
+        "400":
+          $ref: "#/components/responses/InvalidEmailChangeProof"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/EmailUnavailable"
+        "503":
+          $ref: "#/components/responses/MutationUnavailable"
+  /api/account/password/change:
+    post:
+      tags: [Account Security]
+      operationId: changeOwnPassword
+      description: >-
+        Changes the Better Auth credential, preserves the initiating
+        authoritative session, proves every other session unusable, and
+        finalizes one confirmation email and audit event before returning
+        completed.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordChangeRequest"
+      responses:
+        "200":
+          description: Password change fully finalized; the current session remains authoritative.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Outcome"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/CurrentPasswordInvalid"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/IdempotencyConflict"
+        "429":
+          $ref: "#/components/responses/PasswordChangeLocked"
+        "503":
+          $ref: "#/components/responses/PasswordChangeIncomplete"
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: __Host-smarthire.session
+      description: >-
+        Production Better Auth opaque session cookie. Local HTTP uses the
+        existing unprefixed smarthire.session cookie. No Feature 002 endpoint
+        issues another browser credential.
+    csrfToken:
+      type: apiKey
+      in: header
+      name: X-CSRF-Token
+      description: Ephemeral proof derived from the current server-validated session.
+    sameOrigin:
+      type: apiKey
+      in: header
+      name: Origin
+      description: >-
+        Must exactly match the configured application origin and be accompanied
+        by valid same-origin Fetch Metadata; absence or mismatch is rejected.
+  headers:
+    NoStoreHeader:
+      description: Prevents storage of personal identity, profile, preference, or security-action responses.
+      schema:
+        type: string
+        const: "no-store, max-age=0"
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 20
+        maxLength: 128
+        pattern: "^[A-Za-z0-9_-]+$"
+      description: Opaque browser-generated request identity; never derived from a password or email.
+  schemas:
+    NullableShortText:
+      type: [string, "null"]
+      maxLength: 200
+    ProfileBasics:
+      type: object
+      additionalProperties: false
+      required: [headline, summary, phone, location]
+      properties:
+        headline:
+          type: [string, "null"]
+          maxLength: 200
+        summary:
+          type: [string, "null"]
+          maxLength: 5000
+        phone:
+          type: [string, "null"]
+          maxLength: 32
+          pattern: '^(?=(?:[^0-9]*[0-9]){7,15}[^0-9]*$)\+?(?:[0-9]{1,4}|\([0-9]{1,4}\))(?:[ .-]?(?:[0-9]{1,4}|\([0-9]{1,4}\)))*$'
+          description: >-
+            Optional validated display number. The anchored lookahead enforces
+            7-15 total ASCII digits; only the specified grouping and presentation
+            characters are allowed, and extensions are forbidden.
+        location:
+          type: [string, "null"]
+          maxLength: 160
+    Skill:
+      type: object
+      additionalProperties: false
+      required: [id, label]
+      properties:
+        id:
+          type: string
+          minLength: 1
+          maxLength: 128
+          readOnly: true
+        label:
+          type: string
+          minLength: 1
+          maxLength: 80
+    Experience:
+      type: object
+      additionalProperties: false
+      required: [id, title, company, description, startDate, endDate, current]
+      properties:
+        id:
+          type: string
+          minLength: 1
+          maxLength: 128
+          readOnly: true
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        company:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: [string, "null"]
+          maxLength: 3000
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: [string, "null"]
+          format: date
+        current:
+          type: boolean
+    Education:
+      type: object
+      additionalProperties: false
+      required: [id, institution, degree, field, startDate, endDate, current]
+      properties:
+        id:
+          type: string
+          minLength: 1
+          maxLength: 128
+          readOnly: true
+        institution:
+          type: string
+          minLength: 1
+          maxLength: 200
+        degree:
+          type: string
+          minLength: 1
+          maxLength: 200
+        field:
+          type: [string, "null"]
+          maxLength: 200
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: [string, "null"]
+          format: date
+        current:
+          type: boolean
+    SocialLink:
+      type: object
+      additionalProperties: false
+      required: [id, url]
+      properties:
+        id:
+          type: string
+          minLength: 1
+          maxLength: 128
+          readOnly: true
+        url:
+          type: string
+          format: uri
+          maxLength: 2048
+    CandidateProfile:
+      type: object
+      additionalProperties: false
+      required:
+        [revision, empty, basics, skills, experience, education, socialLinks]
+      properties:
+        revision:
+          type: integer
+          minimum: 0
+        empty:
+          type: boolean
+        basics:
+          $ref: "#/components/schemas/ProfileBasics"
+        skills:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/Skill"
+        experience:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/Experience"
+        education:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/Education"
+        socialLinks:
+          type: array
+          maxItems: 10
+          items:
+            $ref: "#/components/schemas/SocialLink"
+    BasicsSectionMutation:
+      type: object
+      additionalProperties: false
+      required: [section, baseRevision, basics]
+      properties:
+        section:
+          const: basics
+        baseRevision:
+          type: integer
+          minimum: 0
+        basics:
+          $ref: "#/components/schemas/ProfileBasics"
+    SkillMutation:
+      type: object
+      additionalProperties: false
+      required: [label]
+      properties:
+        id:
+          type: string
+          minLength: 1
+          maxLength: 128
+        label:
+          type: string
+          minLength: 1
+          maxLength: 80
+    SkillsSectionMutation:
+      type: object
+      additionalProperties: false
+      required: [section, baseRevision, skills]
+      properties:
+        section:
+          const: skills
+        baseRevision:
+          type: integer
+          minimum: 0
+        skills:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/SkillMutation"
+    ExperienceMutation:
+      type: object
+      additionalProperties: false
+      required: [title, company, description, startDate, endDate, current]
+      properties:
+        id:
+          type: string
+          minLength: 1
+          maxLength: 128
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        company:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: [string, "null"]
+          maxLength: 3000
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: [string, "null"]
+          format: date
+        current:
+          type: boolean
+    ExperienceSectionMutation:
+      type: object
+      additionalProperties: false
+      required: [section, baseRevision, experience]
+      properties:
+        section:
+          const: experience
+        baseRevision:
+          type: integer
+          minimum: 0
+        experience:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/ExperienceMutation"
+    EducationMutation:
+      type: object
+      additionalProperties: false
+      required: [institution, degree, field, startDate, endDate, current]
+      properties:
+        id:
+          type: string
+          minLength: 1
+          maxLength: 128
+        institution:
+          type: string
+          minLength: 1
+          maxLength: 200
+        degree:
+          type: string
+          minLength: 1
+          maxLength: 200
+        field:
+          type: [string, "null"]
+          maxLength: 200
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: [string, "null"]
+          format: date
+        current:
+          type: boolean
+    EducationSectionMutation:
+      type: object
+      additionalProperties: false
+      required: [section, baseRevision, education]
+      properties:
+        section:
+          const: education
+        baseRevision:
+          type: integer
+          minimum: 0
+        education:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/EducationMutation"
+    SocialLinkMutation:
+      type: object
+      additionalProperties: false
+      required: [url]
+      properties:
+        id:
+          type: string
+          minLength: 1
+          maxLength: 128
+        url:
+          type: string
+          format: uri
+          maxLength: 2048
+    SocialLinksSectionMutation:
+      type: object
+      additionalProperties: false
+      required: [section, baseRevision, socialLinks]
+      properties:
+        section:
+          const: socialLinks
+        baseRevision:
+          type: integer
+          minimum: 0
+        socialLinks:
+          type: array
+          maxItems: 10
+          items:
+            $ref: "#/components/schemas/SocialLinkMutation"
+    ProfileSectionMutation:
+      oneOf:
+        - $ref: "#/components/schemas/BasicsSectionMutation"
+        - $ref: "#/components/schemas/SkillsSectionMutation"
+        - $ref: "#/components/schemas/ExperienceSectionMutation"
+        - $ref: "#/components/schemas/EducationSectionMutation"
+        - $ref: "#/components/schemas/SocialLinksSectionMutation"
+      discriminator:
+        propertyName: section
+    NormalizationWarning:
+      type: object
+      additionalProperties: false
+      required: [field, message]
+      properties:
+        field:
+          type: string
+          maxLength: 160
+        message:
+          type: string
+          maxLength: 240
+    ProfileMutationOutcome:
+      type: object
+      additionalProperties: false
+      required: [profile, conflictApplied, warnings, message]
+      properties:
+        profile:
+          $ref: "#/components/schemas/CandidateProfile"
+        conflictApplied:
+          type: boolean
+        warnings:
+          type: array
+          maxItems: 100
+          items:
+            $ref: "#/components/schemas/NormalizationWarning"
+        message:
+          type: string
+          maxLength: 240
+    PendingEmailChange:
+      type: object
+      additionalProperties: false
+      required: [proposedEmail, expiresAt]
+      properties:
+        proposedEmail:
+          type: string
+          format: email
+          maxLength: 320
+        expiresAt:
+          type: string
+          format: date-time
+    AccountIdentity:
+      type: object
+      additionalProperties: false
+      required:
+        [name, email, emailVerified, accountState, createdAt, pendingEmailChange]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 320
+        emailVerified:
+          type: boolean
+        accountState:
+          type: string
+          enum: [ACTIVE]
+          readOnly: true
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        pendingEmailChange:
+          oneOf:
+            - $ref: "#/components/schemas/PendingEmailChange"
+            - type: "null"
+    AccountNameMutation:
+      type: object
+      additionalProperties: false
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+    AccountIdentityMutationOutcome:
+      type: object
+      additionalProperties: false
+      required: [identity, warnings, message]
+      properties:
+        identity:
+          $ref: "#/components/schemas/AccountIdentity"
+        warnings:
+          type: array
+          maxItems: 5
+          items:
+            $ref: "#/components/schemas/NormalizationWarning"
+        message:
+          type: string
+          maxLength: 240
+    NotificationPreferences:
+      type: object
+      additionalProperties: false
+      required: [application_updates, job_recommendations, account_security]
+      properties:
+        application_updates:
+          type: boolean
+        job_recommendations:
+          type: boolean
+        account_security:
+          type: boolean
+          const: true
+    AccountPreferences:
+      type: object
+      additionalProperties: false
+      required: [language, timezone, timezoneSupported, emailNotifications]
+      properties:
+        language:
+          type: string
+          enum: [vi, en]
+        timezone:
+          type: string
+          minLength: 1
+          maxLength: 100
+        timezoneSupported:
+          type: boolean
+          readOnly: true
+        emailNotifications:
+          $ref: "#/components/schemas/NotificationPreferences"
+    AccountPreferencesMutation:
+      type: object
+      additionalProperties: false
+      required: [language, timezone, emailNotifications]
+      properties:
+        language:
+          type: string
+          enum: [vi, en]
+        timezone:
+          type: string
+          minLength: 1
+          maxLength: 100
+        emailNotifications:
+          $ref: "#/components/schemas/NotificationPreferences"
+    AccountPreferencesMutationOutcome:
+      type: object
+      additionalProperties: false
+      required: [preferences, message]
+      properties:
+        preferences:
+          $ref: "#/components/schemas/AccountPreferences"
+        message:
+          type: string
+          maxLength: 240
+    EmailChangeRequest:
+      type: object
+      additionalProperties: false
+      required: [newEmail, currentPassword]
+      properties:
+        newEmail:
+          type: string
+          format: email
+          maxLength: 320
+        currentPassword:
+          type: string
+          minLength: 1
+          maxLength: 128
+          writeOnly: true
+    EmailChangeQueued:
+      type: object
+      additionalProperties: false
+      required: [status, expiresAt, message]
+      properties:
+        status:
+          const: verification-queued
+        expiresAt:
+          type: string
+          format: date-time
+        message:
+          type: string
+          maxLength: 240
+    EmailChangeProof:
+      type: object
+      additionalProperties: false
+      required: [proof]
+      properties:
+        proof:
+          type: string
+          minLength: 32
+          maxLength: 512
+          writeOnly: true
+    PasswordChangeRequest:
+      type: object
+      additionalProperties: false
+      required: [currentPassword, newPassword, newPasswordConfirmation]
+      properties:
+        currentPassword:
+          type: string
+          minLength: 1
+          maxLength: 128
+          writeOnly: true
+        newPassword:
+          type: string
+          minLength: 12
+          maxLength: 128
+          writeOnly: true
+        newPasswordConfirmation:
+          type: string
+          minLength: 12
+          maxLength: 128
+          writeOnly: true
+    Outcome:
+      type: object
+      additionalProperties: false
+      required: [status, message]
+      properties:
+        status:
+          const: success
+        message:
+          type: string
+          maxLength: 240
+    Error:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          pattern: "^[A-Z0-9_]+$"
+          maxLength: 80
+        message:
+          type: string
+          maxLength: 240
+        fieldErrors:
+          type: object
+          additionalProperties:
+            type: array
+            maxItems: 5
+            items:
+              type: string
+              maxLength: 240
+        retryAfterSeconds:
+          type: integer
+          minimum: 1
+  responses:
+    ValidationError:
+      description: Strict field-safe validation failure; prior valid state is preserved.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    AuthenticationRequired:
+      description: Better Auth session or Feature 001 account/session policy is not valid.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    RecentAuthRequired:
+      description: Current-password recent-auth proof was invalid or missing.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Forbidden:
+      description: Same-origin, CSRF, account-state, or ownership policy denied the request.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    EmailUnavailable:
+      description: Requested email cannot be claimed; no other account/request details are disclosed.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    InvalidEmailChangeProof:
+      description: Proof is malformed, expired, superseded, consumed, or otherwise unusable.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    CurrentPasswordInvalid:
+      description: Current password could not authorize this password change.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    IdempotencyConflict:
+      description: Idempotency key was already bound to a different submission.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    RateLimited:
+      description: Sensitive action is temporarily rate limited.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    PasswordChangeLocked:
+      description: Five incorrect current-password checks activated the 15-minute account-level lock.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    MutationUnavailable:
+      description: Required persistence/audit/outbox work did not commit; success is not claimed.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    PasswordChangeIncomplete:
+      description: >-
+        A durable password-change operation remains retryable; success is not
+        claimed until all other sessions are unusable and notification/audit
+        finalization is durable.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"

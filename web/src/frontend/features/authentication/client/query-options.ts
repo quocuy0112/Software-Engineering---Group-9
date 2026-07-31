@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  mutationOptions,
-  queryOptions,
-} from "@tanstack/react-query";
+import { mutationOptions, queryOptions } from "@tanstack/react-query";
 import type { PublicSession } from "@/shared/contracts/identity/session";
 
 type SessionPayload = { sessions: PublicSession[]; csrfProof: string };
@@ -13,9 +10,7 @@ type SessionPayload = { sessions: PublicSession[]; csrfProof: string };
  * CSRF proof is handed to an ephemeral React state callback and is never
  * returned from the query function, so it cannot enter the Query cache.
  */
-export function sessionListQueryOptions(
-  onCsrfProof: (proof: string) => void,
-) {
+export function sessionListQueryOptions(onCsrfProof: (proof: string) => void) {
   return queryOptions({
     queryKey: ["identity", "sessions"],
     queryFn: async (): Promise<PublicSession[]> => {

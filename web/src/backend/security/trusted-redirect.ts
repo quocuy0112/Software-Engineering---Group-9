@@ -1,11 +1,7 @@
 function hasUnsafeCharacter(value: string) {
   return Array.from(value).some((character) => {
     const code = character.codePointAt(0) ?? 0;
-    return (
-      character === "\\" ||
-      code <= 0x1f ||
-      (code >= 0x7f && code <= 0x9f)
-    );
+    return character === "\\" || code <= 0x1f || (code >= 0x7f && code <= 0x9f);
   });
 }
 

@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  GET,
-  POST,
-} from "@/app/api/auth/[...all]/route";
+import { GET, POST } from "@/app/api/auth/[...all]/route";
 import { auth } from "@/backend/auth/cookies/config";
 
 describe("Better Auth provider route boundary", () => {

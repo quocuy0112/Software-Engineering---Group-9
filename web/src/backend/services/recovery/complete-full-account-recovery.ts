@@ -186,11 +186,7 @@ export class CompleteFullAccountRecoveryService {
     if (!operation.completionAuditFinalizedAt) {
       try {
         await this.repository.appendCompletionAudit(operation, owner, now);
-        operation = withMilestone(
-          operation,
-          "completionAuditFinalizedAt",
-          now,
-        );
+        operation = withMilestone(operation, "completionAuditFinalizedAt", now);
       } catch {
         return this.failClosed(
           operation.id,
@@ -231,7 +227,9 @@ export class CompleteFullAccountRecoveryService {
     code: FullAccountRecoveryFailureCode,
     now: Date,
   ): Promise<CompletionFailure> {
-    await this.repository.fail(operationId, owner, code, now).catch(() => false);
+    await this.repository
+      .fail(operationId, owner, code, now)
+      .catch(() => false);
     await this.recordFailure(now, code.toLowerCase());
     return this.retryableFailure;
   }

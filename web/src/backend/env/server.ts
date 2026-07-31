@@ -11,6 +11,11 @@ const optionalBooleanString = z.preprocess(
   (value) => (value === "" || value === undefined ? undefined : value),
   booleanString.optional(),
 );
+const trustedProxyHops = z
+  .string()
+  .regex(/^(?:0|[1-9]|10)$/u)
+  .default("0")
+  .transform((value) => Number.parseInt(value, 10));
 const mailbox = /^[^<>\s@]+@[^<>\s@]+\.[^<>\s@]+$/;
 const hasControlCharacter = (value: string) =>
   Array.from(value).some((character) => {
@@ -60,6 +65,7 @@ const schema = z
     PRE_AUTH_COOKIE_NAME: z.string().min(1),
     COOKIE_SECURE: booleanString,
     COOKIE_SAME_SITE: z.literal("lax"),
+    AUDIT_TRUSTED_PROXY_HOPS: trustedProxyHops,
   })
   .superRefine((env, ctx) => {
     const production = env.APP_ENV === "production";
@@ -99,6 +105,11 @@ const schema = z
         "must exactly match the public application origin",
       );
     if (production) {
+      if (env.AUDIT_TRUSTED_PROXY_HOPS < 1)
+        fail(
+          "AUDIT_TRUSTED_PROXY_HOPS",
+          "production requires at least one trusted proxy hop",
+        );
       if (appUrl.protocol !== "https:")
         fail("NEXT_PUBLIC_APP_URL", "production requires HTTPS");
       if (

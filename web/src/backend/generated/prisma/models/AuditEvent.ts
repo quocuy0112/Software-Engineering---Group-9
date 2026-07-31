@@ -242,6 +242,7 @@ export type AuditEventWhereInput = {
   ipPrefixDigest?: Prisma.StringNullableFilter<"AuditEvent"> | string | null
   userAgentFamily?: Prisma.StringNullableFilter<"AuditEvent"> | string | null
   context?: Prisma.JsonFilter<"AuditEvent">
+  passwordChangeOperation?: Prisma.XOR<Prisma.PasswordChangeOperationNullableScalarRelationFilter, Prisma.PasswordChangeOperationWhereInput> | null
 }
 
 export type AuditEventOrderByWithRelationInput = {
@@ -258,6 +259,7 @@ export type AuditEventOrderByWithRelationInput = {
   ipPrefixDigest?: Prisma.SortOrderInput | Prisma.SortOrder
   userAgentFamily?: Prisma.SortOrderInput | Prisma.SortOrder
   context?: Prisma.SortOrder
+  passwordChangeOperation?: Prisma.PasswordChangeOperationOrderByWithRelationInput
 }
 
 export type AuditEventWhereUniqueInput = Prisma.AtLeast<{
@@ -277,6 +279,7 @@ export type AuditEventWhereUniqueInput = Prisma.AtLeast<{
   ipPrefixDigest?: Prisma.StringNullableFilter<"AuditEvent"> | string | null
   userAgentFamily?: Prisma.StringNullableFilter<"AuditEvent"> | string | null
   context?: Prisma.JsonFilter<"AuditEvent">
+  passwordChangeOperation?: Prisma.XOR<Prisma.PasswordChangeOperationNullableScalarRelationFilter, Prisma.PasswordChangeOperationWhereInput> | null
 }, "id">
 
 export type AuditEventOrderByWithAggregationInput = {
@@ -331,6 +334,7 @@ export type AuditEventCreateInput = {
   ipPrefixDigest?: string | null
   userAgentFamily?: string | null
   context: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  passwordChangeOperation?: Prisma.PasswordChangeOperationCreateNestedOneWithoutFinalAuditInput
 }
 
 export type AuditEventUncheckedCreateInput = {
@@ -347,6 +351,7 @@ export type AuditEventUncheckedCreateInput = {
   ipPrefixDigest?: string | null
   userAgentFamily?: string | null
   context: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  passwordChangeOperation?: Prisma.PasswordChangeOperationUncheckedCreateNestedOneWithoutFinalAuditInput
 }
 
 export type AuditEventUpdateInput = {
@@ -363,6 +368,7 @@ export type AuditEventUpdateInput = {
   ipPrefixDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userAgentFamily?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   context?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  passwordChangeOperation?: Prisma.PasswordChangeOperationUpdateOneWithoutFinalAuditNestedInput
 }
 
 export type AuditEventUncheckedUpdateInput = {
@@ -379,6 +385,7 @@ export type AuditEventUncheckedUpdateInput = {
   ipPrefixDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userAgentFamily?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   context?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  passwordChangeOperation?: Prisma.PasswordChangeOperationUncheckedUpdateOneWithoutFinalAuditNestedInput
 }
 
 export type AuditEventCreateManyInput = {
@@ -429,6 +436,11 @@ export type AuditEventUncheckedUpdateManyInput = {
   context?: Prisma.JsonNullValueInput | runtime.InputJsonValue
 }
 
+export type AuditEventNullableScalarRelationFilter = {
+  is?: Prisma.AuditEventWhereInput | null
+  isNot?: Prisma.AuditEventWhereInput | null
+}
+
 export type AuditEventCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   occurredAt?: Prisma.SortOrder
@@ -475,8 +487,104 @@ export type AuditEventMinOrderByAggregateInput = {
   userAgentFamily?: Prisma.SortOrder
 }
 
+export type AuditEventCreateNestedOneWithoutPasswordChangeOperationInput = {
+  create?: Prisma.XOR<Prisma.AuditEventCreateWithoutPasswordChangeOperationInput, Prisma.AuditEventUncheckedCreateWithoutPasswordChangeOperationInput>
+  connectOrCreate?: Prisma.AuditEventCreateOrConnectWithoutPasswordChangeOperationInput
+  connect?: Prisma.AuditEventWhereUniqueInput
+}
+
+export type AuditEventUpdateOneWithoutPasswordChangeOperationNestedInput = {
+  create?: Prisma.XOR<Prisma.AuditEventCreateWithoutPasswordChangeOperationInput, Prisma.AuditEventUncheckedCreateWithoutPasswordChangeOperationInput>
+  connectOrCreate?: Prisma.AuditEventCreateOrConnectWithoutPasswordChangeOperationInput
+  upsert?: Prisma.AuditEventUpsertWithoutPasswordChangeOperationInput
+  disconnect?: Prisma.AuditEventWhereInput | boolean
+  delete?: Prisma.AuditEventWhereInput | boolean
+  connect?: Prisma.AuditEventWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AuditEventUpdateToOneWithWhereWithoutPasswordChangeOperationInput, Prisma.AuditEventUpdateWithoutPasswordChangeOperationInput>, Prisma.AuditEventUncheckedUpdateWithoutPasswordChangeOperationInput>
+}
+
 export type EnumAuditResultFieldUpdateOperationsInput = {
   set?: $Enums.AuditResult
+}
+
+export type AuditEventCreateWithoutPasswordChangeOperationInput = {
+  id?: string
+  occurredAt?: Date | string
+  actorType: string
+  actorUserId?: string | null
+  actorSessionId?: string | null
+  action: string
+  targetType: string
+  targetId?: string | null
+  result: $Enums.AuditResult
+  correlationId: string
+  ipPrefixDigest?: string | null
+  userAgentFamily?: string | null
+  context: Prisma.JsonNullValueInput | runtime.InputJsonValue
+}
+
+export type AuditEventUncheckedCreateWithoutPasswordChangeOperationInput = {
+  id?: string
+  occurredAt?: Date | string
+  actorType: string
+  actorUserId?: string | null
+  actorSessionId?: string | null
+  action: string
+  targetType: string
+  targetId?: string | null
+  result: $Enums.AuditResult
+  correlationId: string
+  ipPrefixDigest?: string | null
+  userAgentFamily?: string | null
+  context: Prisma.JsonNullValueInput | runtime.InputJsonValue
+}
+
+export type AuditEventCreateOrConnectWithoutPasswordChangeOperationInput = {
+  where: Prisma.AuditEventWhereUniqueInput
+  create: Prisma.XOR<Prisma.AuditEventCreateWithoutPasswordChangeOperationInput, Prisma.AuditEventUncheckedCreateWithoutPasswordChangeOperationInput>
+}
+
+export type AuditEventUpsertWithoutPasswordChangeOperationInput = {
+  update: Prisma.XOR<Prisma.AuditEventUpdateWithoutPasswordChangeOperationInput, Prisma.AuditEventUncheckedUpdateWithoutPasswordChangeOperationInput>
+  create: Prisma.XOR<Prisma.AuditEventCreateWithoutPasswordChangeOperationInput, Prisma.AuditEventUncheckedCreateWithoutPasswordChangeOperationInput>
+  where?: Prisma.AuditEventWhereInput
+}
+
+export type AuditEventUpdateToOneWithWhereWithoutPasswordChangeOperationInput = {
+  where?: Prisma.AuditEventWhereInput
+  data: Prisma.XOR<Prisma.AuditEventUpdateWithoutPasswordChangeOperationInput, Prisma.AuditEventUncheckedUpdateWithoutPasswordChangeOperationInput>
+}
+
+export type AuditEventUpdateWithoutPasswordChangeOperationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  actorType?: Prisma.StringFieldUpdateOperationsInput | string
+  actorUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  actorSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  action?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.StringFieldUpdateOperationsInput | string
+  targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  result?: Prisma.EnumAuditResultFieldUpdateOperationsInput | $Enums.AuditResult
+  correlationId?: Prisma.StringFieldUpdateOperationsInput | string
+  ipPrefixDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgentFamily?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  context?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+}
+
+export type AuditEventUncheckedUpdateWithoutPasswordChangeOperationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  actorType?: Prisma.StringFieldUpdateOperationsInput | string
+  actorUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  actorSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  action?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.StringFieldUpdateOperationsInput | string
+  targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  result?: Prisma.EnumAuditResultFieldUpdateOperationsInput | $Enums.AuditResult
+  correlationId?: Prisma.StringFieldUpdateOperationsInput | string
+  ipPrefixDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgentFamily?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  context?: Prisma.JsonNullValueInput | runtime.InputJsonValue
 }
 
 
@@ -495,6 +603,7 @@ export type AuditEventSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   ipPrefixDigest?: boolean
   userAgentFamily?: boolean
   context?: boolean
+  passwordChangeOperation?: boolean | Prisma.AuditEvent$passwordChangeOperationArgs<ExtArgs>
 }, ExtArgs["result"]["auditEvent"]>
 
 export type AuditEventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -546,10 +655,17 @@ export type AuditEventSelectScalar = {
 }
 
 export type AuditEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "occurredAt" | "actorType" | "actorUserId" | "actorSessionId" | "action" | "targetType" | "targetId" | "result" | "correlationId" | "ipPrefixDigest" | "userAgentFamily" | "context", ExtArgs["result"]["auditEvent"]>
+export type AuditEventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  passwordChangeOperation?: boolean | Prisma.AuditEvent$passwordChangeOperationArgs<ExtArgs>
+}
+export type AuditEventIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type AuditEventIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $AuditEventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AuditEvent"
-  objects: {}
+  objects: {
+    passwordChangeOperation: Prisma.$PasswordChangeOperationPayload<ExtArgs> | null
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     occurredAt: Date
@@ -958,6 +1074,7 @@ readonly fields: AuditEventFieldRefs;
  */
 export interface Prisma__AuditEventClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  passwordChangeOperation<T extends Prisma.AuditEvent$passwordChangeOperationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AuditEvent$passwordChangeOperationArgs<ExtArgs>>): Prisma.Prisma__PasswordChangeOperationClient<runtime.Types.Result.GetResult<Prisma.$PasswordChangeOperationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1017,6 +1134,10 @@ export type AuditEventFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   omit?: Prisma.AuditEventOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditEventInclude<ExtArgs> | null
+  /**
    * Filter, which AuditEvent to fetch.
    */
   where: Prisma.AuditEventWhereUniqueInput
@@ -1035,6 +1156,10 @@ export type AuditEventFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extens
    */
   omit?: Prisma.AuditEventOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditEventInclude<ExtArgs> | null
+  /**
    * Filter, which AuditEvent to fetch.
    */
   where: Prisma.AuditEventWhereUniqueInput
@@ -1052,6 +1177,10 @@ export type AuditEventFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the AuditEvent
    */
   omit?: Prisma.AuditEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditEventInclude<ExtArgs> | null
   /**
    * Filter, which AuditEvent to fetch.
    */
@@ -1101,6 +1230,10 @@ export type AuditEventFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    */
   omit?: Prisma.AuditEventOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditEventInclude<ExtArgs> | null
+  /**
    * Filter, which AuditEvent to fetch.
    */
   where?: Prisma.AuditEventWhereInput
@@ -1148,6 +1281,10 @@ export type AuditEventFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Omit specific fields from the AuditEvent
    */
   omit?: Prisma.AuditEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditEventInclude<ExtArgs> | null
   /**
    * Filter, which AuditEvents to fetch.
    */
@@ -1197,6 +1334,10 @@ export type AuditEventCreateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    */
   omit?: Prisma.AuditEventOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditEventInclude<ExtArgs> | null
+  /**
    * The data needed to create a AuditEvent.
    */
   data: Prisma.XOR<Prisma.AuditEventCreateInput, Prisma.AuditEventUncheckedCreateInput>
@@ -1244,6 +1385,10 @@ export type AuditEventUpdateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Omit specific fields from the AuditEvent
    */
   omit?: Prisma.AuditEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditEventInclude<ExtArgs> | null
   /**
    * The data needed to update a AuditEvent.
    */
@@ -1311,6 +1456,10 @@ export type AuditEventUpsertArgs<ExtArgs extends runtime.Types.Extensions.Intern
    */
   omit?: Prisma.AuditEventOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditEventInclude<ExtArgs> | null
+  /**
    * The filter to search for the AuditEvent to update in case it exists.
    */
   where: Prisma.AuditEventWhereUniqueInput
@@ -1337,6 +1486,10 @@ export type AuditEventDeleteArgs<ExtArgs extends runtime.Types.Extensions.Intern
    */
   omit?: Prisma.AuditEventOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditEventInclude<ExtArgs> | null
+  /**
    * Filter which AuditEvent to delete.
    */
   where: Prisma.AuditEventWhereUniqueInput
@@ -1357,6 +1510,25 @@ export type AuditEventDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.In
 }
 
 /**
+ * AuditEvent.passwordChangeOperation
+ */
+export type AuditEvent$passwordChangeOperationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PasswordChangeOperation
+   */
+  select?: Prisma.PasswordChangeOperationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PasswordChangeOperation
+   */
+  omit?: Prisma.PasswordChangeOperationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PasswordChangeOperationInclude<ExtArgs> | null
+  where?: Prisma.PasswordChangeOperationWhereInput
+}
+
+/**
  * AuditEvent without action
  */
 export type AuditEventDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1368,4 +1540,8 @@ export type AuditEventDefaultArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Omit specific fields from the AuditEvent
    */
   omit?: Prisma.AuditEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditEventInclude<ExtArgs> | null
 }

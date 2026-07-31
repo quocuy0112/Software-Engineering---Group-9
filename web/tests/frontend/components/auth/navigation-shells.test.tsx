@@ -169,7 +169,7 @@ describe("identity navigation shells", () => {
     render(<ProfileNavigation active="security" />);
 
     expect(screen.getByRole("navigation", { name: "Profile" })).toBeVisible();
-    expect(screen.getByRole("link", { name: "Overview" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Professional" })).toHaveAttribute(
       "href",
       "/profile",
     );

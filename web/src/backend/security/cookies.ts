@@ -61,5 +61,7 @@ export function clearSessionCookie() {
     attributes.secure && "Secure",
     "Max-Age=0",
     `Expires=${attributes.expires.toUTCString()}`,
-  ].filter(Boolean).join("; ");
+  ]
+    .filter(Boolean)
+    .join("; ");
 }

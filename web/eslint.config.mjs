@@ -21,6 +21,7 @@ export default defineConfig([
   },
   globalIgnores([
     "node_modules/**",
+    ".local/**",
     ".next/**",
     "dist/**",
     "build/**",

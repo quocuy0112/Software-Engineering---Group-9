@@ -21,6 +21,8 @@ export class DueOutboxProcessor {
       now,
       this.batchSize,
     );
+    // Claimed recipient snapshots remain opaque here. The delivery boundary
+    // unseals each value immediately before its provider adapter call.
     await Promise.all(
       rows.map((row) =>
         deliverClaimedOutbox(

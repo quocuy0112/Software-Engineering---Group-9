@@ -3,13 +3,16 @@
 import { useState } from "react";
 import { TotpEnrollment } from "./totp-enrollment";
 import { TwoFactorManagement } from "./two-factor-management";
+import { PasswordChangeForm } from "./password-change-form";
 
 export function ProfileSecurity({
   initialTwoFactorEnabled,
   recoveryCompleted = false,
+  csrfProof,
 }: {
   initialTwoFactorEnabled: boolean;
   recoveryCompleted?: boolean;
+  csrfProof: string;
 }) {
   const [enabled, setEnabled] = useState(initialTwoFactorEnabled);
 
@@ -26,6 +29,7 @@ export function ProfileSecurity({
       ) : (
         <TotpEnrollment onEnabled={() => setEnabled(true)} />
       )}
+      <PasswordChangeForm csrfProof={csrfProof} />
     </div>
   );
 }

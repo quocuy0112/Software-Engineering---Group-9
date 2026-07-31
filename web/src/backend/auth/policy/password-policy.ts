@@ -33,6 +33,20 @@ export type PasswordPolicyResult =
       retryAfterSeconds?: number;
     };
 
+export type PasswordChangePolicyResult =
+  | { accepted: true }
+  | {
+      accepted: false;
+      code:
+        | "PASSWORD_POLICY"
+        | "PASSWORD_COMPROMISED"
+        | "PASSWORD_CONFIRMATION_MISMATCH"
+        | "PASSWORD_REUSE"
+        | "RATE_LIMITED";
+      message: string;
+      retryAfterSeconds?: number;
+    };
+
 export class PasswordPolicy {
   constructor(
     private readonly limiter?: PrismaRateLimitRepository,
@@ -88,6 +102,32 @@ export class PasswordPolicy {
       };
     }
     return { accepted: true };
+  }
+
+  async evaluateChange(input: {
+    currentPassword: string;
+    newPassword: string;
+    newPasswordConfirmation: string;
+    newPasswordMatchesCurrent?: boolean;
+  }): Promise<PasswordChangePolicyResult> {
+    if (input.newPassword !== input.newPasswordConfirmation) {
+      return {
+        accepted: false,
+        code: "PASSWORD_CONFIRMATION_MISMATCH",
+        message: "The new-password confirmation must match.",
+      };
+    }
+    if (
+      input.newPassword === input.currentPassword ||
+      input.newPasswordMatchesCurrent
+    ) {
+      return {
+        accepted: false,
+        code: "PASSWORD_REUSE",
+        message: "Choose a password different from the current password.",
+      };
+    }
+    return this.evaluate(input.newPassword);
   }
 
   mapCredentialError(): {
