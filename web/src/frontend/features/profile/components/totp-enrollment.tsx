@@ -99,6 +99,9 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
   const [setup, setSetup] = useState<Setup | null>(null);
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const { status, setStatus } = useReplayableStatus("");
+  const [statusTone, setStatusTone] = useState<"message" | "error" | "success">(
+    "message",
+  );
   const [isLocked, setIsLocked] = useState(false);
 
   const clearSensitive = useCallback(() => {
@@ -121,6 +124,7 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
           const state = readAttemptState(body.csrfProof);
           if (state.lockedUntil && state.lockedUntil > Date.now()) {
             setIsLocked(true);
+            setStatusTone("error");
             setStatus(getLockedMessage(state.lockedUntil));
           }
         } catch {
@@ -162,6 +166,7 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
     const state = readAttemptState(proof);
     if (state.lockedUntil && state.lockedUntil > currentTimestamp()) {
       setIsLocked(true);
+      setStatusTone("error");
       setStatus(getLockedMessage(state.lockedUntil));
       return;
     }
@@ -176,6 +181,7 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
     } | null;
     passwordForm.reset({ currentPassword: "" });
     if (!response.ok) {
+      setStatusTone("error");
       const passwordRejected =
         response.status === 401 &&
         responseBody?.message ===
@@ -226,6 +232,7 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
     const state = readAttemptState(proof);
     if (state.lockedUntil && state.lockedUntil > currentTimestamp()) {
       setIsLocked(true);
+      setStatusTone("error");
       setStatus(getLockedMessage(state.lockedUntil));
       return;
     }
@@ -237,6 +244,7 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
     });
     codeForm.reset({ code: "" });
     if (!response.ok) {
+      setStatusTone("error");
       const nextAttempts = (state.count ?? 0) + 1;
       const remaining = MAX_TOTP_ATTEMPTS - nextAttempts;
       const lockedUntil =
@@ -261,6 +269,7 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
     setSetup(null);
     setBackupCodes(body.backupCodes);
     setStage("complete");
+    setStatusTone("success");
     setStatus("Two-factor authentication is now enabled.");
   });
 
@@ -269,6 +278,7 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
     passwordForm.reset({ currentPassword: "" });
     codeForm.reset({ code: "" });
     setStage("password");
+    setStatusTone("message");
     setStatus("Enrollment cancelled.");
   }
 
@@ -309,7 +319,7 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
           >
             {passwordForm.formState.isSubmitting ? "Starting…" : "Continue"}
           </button>
-          <FormFeedback status={status} />
+          <FormFeedback status={status} tone={statusTone} />
         </form>
       ) : null}
 
@@ -362,7 +372,7 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
           <button type="button" className="secondary-action" onClick={cancel}>
             Cancel
           </button>
-          <FormFeedback status={status} />
+          <FormFeedback status={status} tone={statusTone} />
         </form>
       ) : null}
 
@@ -386,13 +396,14 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
             onClick={() => {
               clearSensitive();
               setStage("password");
+              setStatusTone("success");
               setStatus("Backup codes dismissed.");
               onEnabled?.();
             }}
           >
             I&apos;ve saved my backup codes
           </button>
-          <FormFeedback status={status} tone="success" />
+          <FormFeedback status={status} tone={statusTone} />
         </div>
       ) : null}
     </section>

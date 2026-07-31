@@ -142,6 +142,17 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   const qr = page.getByRole("img", { name: /QR code/i });
   await expect(qr).toBeVisible();
   expect(await qr.getAttribute("src")).toMatch(/^data:image\/png;base64,/);
+  await expect
+    .poll(() =>
+      qr.evaluate(
+        (image) =>
+          image instanceof HTMLImageElement &&
+          image.complete &&
+          image.naturalWidth > 0 &&
+          image.naturalHeight > 0,
+      ),
+    )
+    .toBe(true);
   await expect(page.getByText("Can't scan?")).toBeVisible();
 
   const manualKey = (
@@ -202,7 +213,9 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await page.getByLabel("Authentication code").press("Enter");
   await expect(page).toHaveURL(/\/dashboard$/);
   await page.goto("/profile/sessions");
-  await expect(page.getByRole("heading", { name: /^Sessions$/i })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /^Sessions$/i }),
+  ).toBeVisible();
 
   // A backup code completes a fresh pre-auth challenge without being rejected
   // by the TOTP replay marker created immediately above.
@@ -233,7 +246,9 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
     timeout: 15_000,
   });
   await page.goto("/profile/sessions");
-  await expect(page.getByRole("heading", { name: /^Sessions$/i })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /^Sessions$/i }),
+  ).toBeVisible();
   const completedCookies = await page.context().cookies();
   expect(
     completedCookies.some((cookie) => cookie.name === "smarthire.pre-auth"),
@@ -274,7 +289,9 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
     timeout: 15_000,
   });
   await page.goto("/profile/sessions");
-  await expect(page.getByRole("heading", { name: /^Sessions$/i })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /^Sessions$/i }),
+  ).toBeVisible();
 
   // Regeneration displays ten replacement codes once and invalidates old ones.
   await page.goto("/profile/security");
@@ -283,22 +300,40 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   });
   await management.getByLabel("Current password").fill(password);
   await management.getByLabel("Six-digit TOTP code").fill(totp(manualKey));
-  page.once("dialog", (dialog) => dialog.accept());
   const regeneration = page.waitForResponse(
     (response) =>
-      response.url().endsWith("/api/identity/two-factor/backup-codes/regenerate") &&
+      response
+        .url()
+        .endsWith("/api/identity/two-factor/backup-codes/regenerate") &&
       response.request().method() === "POST",
   );
-  await management.getByRole("button", { name: "Regenerate backup codes" }).click();
+  await management
+    .getByRole("button", { name: "Regenerate backup codes" })
+    .click();
+  const regenerateDialog = page.getByRole("dialog", {
+    name: "Replace backup codes?",
+  });
+  await expect(regenerateDialog).toBeVisible();
+  await regenerateDialog
+    .getByRole("button", { name: "Regenerate codes" })
+    .click();
   expect((await regeneration).status()).toBe(200);
-  await expect(management.getByRole("heading", { name: "Save your ten new backup codes" })).toBeVisible();
+  await expect(
+    management.getByRole("heading", {
+      name: "Save your ten new backup codes",
+    }),
+  ).toBeVisible();
   await expect(management.locator("li code")).toHaveCount(10);
-  const replacementCode = (await management.locator("li code").first().innerText()).trim();
-  expect(await page.evaluate(() => {
-    const event = new Event("beforeunload", { cancelable: true });
-    window.dispatchEvent(event);
-    return event.defaultPrevented;
-  })).toBe(true);
+  const replacementCode = (
+    await management.locator("li code").first().innerText()
+  ).trim();
+  expect(
+    await page.evaluate(() => {
+      const event = new Event("beforeunload", { cancelable: true });
+      window.dispatchEvent(event);
+      return event.defaultPrevented;
+    }),
+  ).toBe(true);
   await management.getByRole("button", { name: "I saved these codes" }).click();
   await expect(management.locator("li code")).toHaveCount(0);
 
@@ -310,7 +345,9 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await selectBackupCode(page);
   await page.getByLabel("Backup code").fill(oldCode);
   await page.getByRole("button", { name: "Verify" }).click();
-  await expect(page.getByRole("status")).toContainText("could not be completed");
+  await expect(page.getByRole("status")).toContainText(
+    "could not be completed",
+  );
   await page.getByLabel("Backup code").fill(replacementCode);
   const replacementLogin = page.waitForResponse(
     (response) =>
@@ -323,16 +360,24 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
 
   // Disablement removes the second-factor requirement for the next login.
   await page.goto("/profile/security");
-  const disablePanel = page.getByRole("region", { name: "Two-factor management" });
+  const disablePanel = page.getByRole("region", {
+    name: "Two-factor management",
+  });
   await disablePanel.getByLabel("Current password").fill(password);
   await disablePanel.getByLabel("Six-digit TOTP code").fill(totp(manualKey));
-  page.once("dialog", (dialog) => dialog.accept());
   const disablement = page.waitForResponse(
     (response) =>
       response.url().endsWith("/api/identity/two-factor/disable") &&
       response.request().method() === "POST",
   );
-  await disablePanel.getByRole("button", { name: "Disable two-factor authentication" }).click();
+  await disablePanel
+    .getByRole("button", { name: "Disable two-factor authentication" })
+    .click();
+  const disableDialog = page.getByRole("dialog", {
+    name: "Disable two-factor authentication?",
+  });
+  await expect(disableDialog).toBeVisible();
+  await disableDialog.getByRole("button", { name: "Disable 2FA" }).click();
   expect((await disablement).status()).toBe(200);
   await expect(
     page.getByRole("heading", { name: "Set up two-factor authentication" }),
@@ -357,7 +402,9 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await selectBackupCode(page);
   await page.getByLabel("Backup code").fill(replacementCode);
   await page.getByRole("button", { name: "Verify" }).click();
-  await expect(page.getByRole("status")).toContainText("could not be completed");
+  await expect(page.getByRole("status")).toContainText(
+    "could not be completed",
+  );
 });
 
 test("enrollment UI is keyboard-operable and has no 320px overflow", async ({

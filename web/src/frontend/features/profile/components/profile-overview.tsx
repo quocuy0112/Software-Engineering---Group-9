@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ProfileNavigation } from "./profile-navigation";
+import { Badge } from "@/frontend/components/ui/badge";
 
 type ProfileOverviewProps = {
   account: {
@@ -22,9 +23,12 @@ export function ProfileOverview({ account }: ProfileOverviewProps) {
             place.
           </p>
         </div>
-        <span className="page-heading-badge page-heading-badge--secure">
-          {account.twoFactorEnabled ? "2FA enabled" : "2FA not enabled"}
-        </span>
+        <Badge
+          className="page-heading-badge"
+          tone={account.twoFactorEnabled ? "success" : "warning"}
+        >
+          {account.twoFactorEnabled ? "2FA enabled" : "2FA recommended"}
+        </Badge>
       </header>
       <ProfileNavigation active="overview" />
 
@@ -47,9 +51,12 @@ export function ProfileOverview({ account }: ProfileOverviewProps) {
             </div>
           </dl>
           <div className="profile-account-actions">
-            <span className="profile-status-pill">
+            <Badge
+              className="profile-status-pill"
+              tone={account.twoFactorEnabled ? "success" : "warning"}
+            >
               {account.twoFactorEnabled ? "2FA enabled" : "2FA recommended"}
-            </span>
+            </Badge>
             <Link href="/profile/security">Review security</Link>
           </div>
         </article>

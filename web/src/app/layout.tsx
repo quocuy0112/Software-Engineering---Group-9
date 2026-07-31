@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "@fontsource-variable/inter/wght.css";
 import { serverEnvironment } from "@/backend/env/runtime";
 import "./globals.css";
 import { Toaster } from "sonner";
