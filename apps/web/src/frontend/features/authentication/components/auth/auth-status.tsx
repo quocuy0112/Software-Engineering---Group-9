@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { Alert, type AlertTone } from "@/components/ui/alert";
 
 export function AuthStatus({
   status,
@@ -31,15 +32,17 @@ export function AuthStatus({
     });
   }, [id, status, tone]);
 
-  return (
-    <p
+  const alertTone: AlertTone = tone === "message" ? "info" : tone;
+
+  return status ? (
+    <Alert
       id={id}
       role="status"
       aria-live="polite"
-      data-tone={tone}
-      className="sr-only"
+      tone={alertTone}
+      className="auth-status"
     >
       {status}
-    </p>
-  );
+    </Alert>
+  ) : null;
 }

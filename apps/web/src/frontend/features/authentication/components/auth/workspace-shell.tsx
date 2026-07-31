@@ -5,6 +5,7 @@ import { useState } from "react";
 import { currentCsrfProof } from "@/frontend/features/identity/client/current-csrf-proof";
 import { WorkspaceNavigation } from "./workspace-navigation";
 import { AuthStatus } from "./auth-status";
+import { SmartHireBrand } from "@/components/ui/smarthire-brand";
 
 export function WorkspaceShell({
   children,
@@ -45,22 +46,23 @@ export function WorkspaceShell({
       <div className="workspace-layout">
         <aside className="workspace-sidebar">
           <div className="workspace-sidebar-brand">
-            <Link className="smart-hire-brand" href="/">
-              <span className="brand-mark" aria-hidden="true">
-                S
-              </span>
-              <span>SmartHire</span>
-            </Link>
-            <span className="workspace-product-label">Talent workspace</span>
+            <SmartHireBrand />
+            <span className="workspace-product-label">Candidate portal</span>
           </div>
           <WorkspaceNavigation busy={busy} onSignOut={() => void signOut()} />
-          <div className="workspace-sidebar-footer"></div>
+          <div className="workspace-sidebar-footer">
+            <span aria-hidden="true">✓</span>
+            <span>
+              <strong>Secure workspace</strong>
+              <small>Your account access is protected</small>
+            </span>
+          </div>
         </aside>
         <div className="workspace-main">
           <header className="workspace-header">
             <div>
-              <p className="workspace-topbar-kicker">Candidate workspace</p>
-              <p className="workspace-topbar-title">Good to see you</p>
+              <p className="workspace-topbar-kicker">Candidate portal</p>
+              <p className="workspace-topbar-title">SmartHire workspace</p>
             </div>
             <Link
               className="workspace-account-chip"

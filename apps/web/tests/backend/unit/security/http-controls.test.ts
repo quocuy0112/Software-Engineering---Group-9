@@ -24,5 +24,5 @@ describe("identity HTTP controls", () => {
     expect(trustedInternalRedirect(value,"https://app.example.test","/home")).toBe("/home");
   });
   it("accepts an exact-origin relative redirect",()=>expect(trustedInternalRedirect("/settings?tab=sessions","https://app.example.test")).toBe("/settings?tab=sessions"));
-  it("applies no-store, framing, referrer, and script policy to sensitive responses",()=>{expect(noStoreHeaders["Cache-Control"]).toContain("no-store");expect(noStoreHeaders["Content-Security-Policy"]).toContain("frame-ancestors 'none'");expect(noStoreHeaders["Referrer-Policy"]).toBe("no-referrer");});
+  it("applies no-store, framing, referrer, and asset policies to sensitive responses",()=>{expect(noStoreHeaders["Cache-Control"]).toContain("no-store");expect(noStoreHeaders["Content-Security-Policy"]).toContain("frame-ancestors 'none'");expect(noStoreHeaders["Content-Security-Policy"]).toContain("img-src 'self' data:");expect(noStoreHeaders["Referrer-Policy"]).toBe("no-referrer");});
 });

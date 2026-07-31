@@ -56,10 +56,6 @@ export function ForgotPasswordForm() {
             eligible.
           </p>
         </div>
-        <p>
-          Enter your email and we’ll send reset instructions if the account is
-          eligible.
-        </p>
         <label htmlFor="forgot-email">Email address</label>
         <input
           id="forgot-email"

@@ -6,6 +6,8 @@ import {
   revokeSessionMutationOptions,
   sessionListQueryOptions,
 } from "@/frontend/features/identity/client/query-options";
+import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import { AuthStatus } from "./auth-status";
 
 export function SessionList({ embedded = false }: { embedded?: boolean }) {
@@ -30,6 +32,12 @@ export function SessionList({ embedded = false }: { embedded?: boolean }) {
         : revokeMutation.isError
           ? "Unable to revoke session."
           : "";
+  const statusTone =
+    sessionsQuery.isError || revokeMutation.isError
+      ? "error"
+      : revokeMutation.isSuccess
+        ? "success"
+        : "message";
 
   return (
     <section className={embedded ? "sessions-page sessions-page--embedded" : "sessions-page"}>
@@ -42,12 +50,14 @@ export function SessionList({ embedded = false }: { embedded?: boolean }) {
               Review the devices that can currently access your SmartHire account.
             </p>
           </div>
-          <span className="page-heading-badge">{sessions.length} active</span>
+          <Badge className="page-heading-badge" tone="info">
+            {sessions.length} active
+          </Badge>
         </header>
       ) : null}
       <AuthStatus
         status={status}
-        tone={status.startsWith("Unable") ? "error" : "message"}
+        tone={statusTone}
       />
       <div className="sessions-panel-heading">
         <div>
@@ -86,10 +96,12 @@ export function SessionList({ embedded = false }: { embedded?: boolean }) {
         ))}
       </ul>
       {!sessionsQuery.isPending && sessions.length === 0 ? (
-        <div className="session-empty">
-          <span aria-hidden="true">□</span>
-          <p>No active sessions are available to display.</p>
-        </div>
+        <EmptyState
+          className="session-empty"
+          icon="□"
+          title="No active sessions"
+          description="No signed-in devices are available to display."
+        />
       ) : null}
     </section>
   );

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
 import { ProfileSecurity } from "@/frontend/features/authentication/components/auth/profile-security";
 import { ProfileNavigation } from "@/frontend/features/authentication/components/auth/profile-navigation";
 import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
@@ -18,9 +19,12 @@ export default async function ProfileSecurityPageContent() {
             Confirm your password before changing high-impact settings.
           </p>
         </div>
-        <span className="page-heading-badge page-heading-badge--secure">
-          {account.twoFactorEnabled ? "2FA enabled" : "2FA not enabled"}
-        </span>
+        <Badge
+          className="page-heading-badge"
+          tone={account.twoFactorEnabled ? "success" : "warning"}
+        >
+          {account.twoFactorEnabled ? "2FA enabled" : "2FA recommended"}
+        </Badge>
       </header>
       <ProfileNavigation active="security" />
       <ProfileSecurity

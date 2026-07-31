@@ -19,5 +19,9 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./tests/setup.ts"],
     exclude: ["tests/system/e2e/**", "node_modules/**"],
+    // Integration files share one local PostgreSQL service. Bounding file-level
+    // concurrency prevents DB contention from exhausting the default 5s budget.
+    maxWorkers: 4,
+    testTimeout: 15_000,
   },
 });

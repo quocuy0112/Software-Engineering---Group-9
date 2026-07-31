@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { TWO_FACTOR_GENERIC_ERROR } from "@/shared/contracts/identity/two-factor";
 import { AuthStatus } from "./auth-status";
 import { useReplayableStatus } from "./use-status";
@@ -157,10 +158,13 @@ export function TwoFactorChallenge() {
     }
   }
   return (
-    <main className="auth-shell">
-      <form onSubmit={submit} noValidate aria-busy={busy} className="auth-card">
-        <h1>Two-factor verification</h1>
-        <p>Use your authenticator or one backup code.</p>
+    <section className="auth-form-content">
+      <form onSubmit={submit} noValidate aria-busy={busy} className="auth-form">
+        <div className="auth-form-heading">
+          <p className="form-kicker">VERIFY YOUR IDENTITY</p>
+          <h1>Two-factor verification</h1>
+          <p>Use your authenticator or one backup code.</p>
+        </div>
         <div
           className="factor-mode-switcher"
           role="group"
@@ -222,39 +226,8 @@ export function TwoFactorChallenge() {
           {busy ? "Verifying…" : "Verify"}
         </button>
         <AuthStatus id="two-factor-status" status={status} tone={tone} />
-        <a href="/login">Back to sign in</a>
+        <Link href="/login">Back to sign in</Link>
       </form>
-      <style jsx>{`
-        .auth-shell {
-          width: 100%;
-          max-width: 28rem;
-          margin: auto;
-          padding: 1rem;
-          overflow-x: hidden;
-        }
-        .auth-card {
-          min-width: 0;
-        }
-        .factor-mode-switcher {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.5rem;
-        }
-        .factor-mode-switcher button {
-          flex: 1 1 10rem;
-        }
-        .field input {
-          box-sizing: border-box;
-          width: 100%;
-          font-size: 1rem;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          * {
-            scroll-behavior: auto !important;
-            transition: none !important;
-          }
-        }
-      `}</style>
-    </main>
+    </section>
   );
 }

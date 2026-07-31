@@ -1,50 +1,45 @@
 import { AuthMotion } from "./auth-motion";
 import AuthFooter from "./AuthFooter";
 import Link from "next/link";
+import { SmartHireBrand } from "@/components/ui/smarthire-brand";
 
 export function AuthShell({ children }: { children: React.ReactNode }) {
   return (
     <main className="auth-page">
       <aside className="auth-visual" aria-label="About SmartHire">
         <div className="auth-visual-inner">
-          <Link className="smart-hire-brand" href="/">
-            <span className="brand-mark" aria-hidden="true">
-              S
-            </span>
-            <span>SmartHire</span>
-          </Link>
+          <SmartHireBrand />
 
           <div className="auth-visual-copy">
-            <p className="auth-eyebrow">THE TALENT CONNECTION</p>
+            <p className="auth-eyebrow">SECURE TALENT WORKSPACE</p>
             <h2>
-              Make your next
-              <br />
-              <em>great move.</em>
+              Your next opportunity,
+              <br /> thoughtfully connected.
             </h2>
             <p>
-              One calm, secure place to shape your career story and stay ready
-              for what comes next.
+              Build a trusted professional identity and keep every important
+              account action protected.
             </p>
           </div>
 
           <div className="auth-visual-board" aria-hidden="true">
             <div className="visual-board-header">
               <span className="visual-board-dot" />
-              <span>SmartHire profile</span>
-              <span className="visual-board-status">Ready</span>
+              <span>Account protection</span>
+              <span className="visual-board-status">Secure</span>
             </div>
             <div className="visual-profile-row">
               <span className="visual-avatar">AM</span>
               <span>
-                <strong>Your professional story</strong>
-                <small>Built for meaningful connections</small>
+                <strong>Your identity stays yours</strong>
+                <small>Private, transparent, and secure</small>
               </span>
             </div>
             <div className="visual-signal-row">
-              <span className="visual-signal visual-signal--violet" />
-              <span className="visual-signal visual-signal--mint" />
-              <span className="visual-signal visual-signal--gold" />
-              <span className="visual-signal-label">Secure by design</span>
+              <span className="visual-signal" />
+              <span className="visual-signal" />
+              <span className="visual-signal" />
+              <span className="visual-signal-label">Protected by design</span>
             </div>
           </div>
         </div>

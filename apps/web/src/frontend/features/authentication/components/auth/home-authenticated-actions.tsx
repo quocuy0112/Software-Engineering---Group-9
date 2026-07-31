@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { currentCsrfProof } from "@/frontend/features/identity/client/current-csrf-proof";
 import { AuthStatus } from "./auth-status";
+import { SmartHireBrand } from "@/components/ui/smarthire-brand";
 
 export function HomeAuthenticatedActions({
   profile,
@@ -40,12 +41,7 @@ export function HomeAuthenticatedActions({
   return (
     <div className="home-authenticated">
       <header className="home-header">
-        <Link className="smart-hire-brand home-brand" href="/">
-          <span className="brand-mark" aria-hidden="true">
-            S
-          </span>
-          <span>SmartHire</span>
-        </Link>
+        <SmartHireBrand className="home-brand" />
         <div className="home-account">
           <Link
             className="home-profile-link"

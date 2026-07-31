@@ -52,6 +52,7 @@ export function WorkspaceNavigation({
         aria-label="Workspace"
         data-open={menuOpen}
       >
+        <span className="workspace-nav-label">Workspace</span>
         {destinations.map((destination) => {
           const active =
             pathname === destination.href ||
@@ -75,6 +76,7 @@ export function WorkspaceNavigation({
           disabled={busy}
           aria-busy={busy}
         >
+          <NavIcon name="logout" />
           {busy ? "Signing out…" : "Sign out"}
         </button>
       </nav>
@@ -83,6 +85,14 @@ export function WorkspaceNavigation({
 }
 
 function NavIcon({ name }: { name: string }) {
+  if (name === "logout") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
+        <path d="M8 4H4.5A1.5 1.5 0 0 0 3 5.5v9A1.5 1.5 0 0 0 4.5 16H8" />
+        <path d="M12 6l4 4-4 4M7 10h9" />
+      </svg>
+    );
+  }
   if (name === "profile") {
     return (
       <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">

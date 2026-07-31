@@ -9,9 +9,11 @@ async function openWorkspaceLink(page: Page, name: "Security" | "Sessions") {
   if (await menu.isVisible()) await menu.click();
   const responsePromise = page.waitForResponse(
     (response) =>
-      response.url().includes(
-        name === "Security" ? "/profile/security" : "/profile/sessions",
-      ) && response.status() === 200,
+      response
+        .url()
+        .includes(
+          name === "Security" ? "/profile/security" : "/profile/sessions",
+        ) && response.status() === 200,
   );
   const startedAt = Date.now();
   await page.getByRole("link", { name, exact: true }).click();
@@ -123,6 +125,48 @@ test("connects public auth pages and the protected identity workspace", async ({
   await expect(
     page.getByRole("link", { name: "Security", exact: true }),
   ).toHaveAttribute("aria-current", "page");
+
+  // The desktop rail must remain blue and cover the viewport after the long
+  // security page scrolls. A transformed ancestor previously made the fixed
+  // rail end early and exposed the white page background underneath it.
+  await page.setViewportSize({ width: 1440, height: 420 });
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  expect(
+    await page.evaluate(() => {
+      const sidebar = document.querySelector<HTMLElement>(".workspace-sidebar");
+      const point = document.elementFromPoint(110, window.innerHeight - 1);
+      const rect = sidebar?.getBoundingClientRect();
+      return {
+        coversBottom: Boolean(
+          sidebar && point && sidebar.contains(point) && rect,
+        ),
+        top: rect?.top,
+        bottom: rect?.bottom,
+        background: sidebar
+          ? getComputedStyle(sidebar).backgroundColor
+          : "transparent",
+      };
+    }),
+  ).toMatchObject({
+    coversBottom: true,
+    top: 0,
+    bottom: 420,
+    background: "rgb(15, 42, 74)",
+  });
+
+  await page.setViewportSize({ width: 768, height: 900 });
+  await expect(
+    page.getByRole("button", { name: "Open workspace menu" }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth <=
+        document.documentElement.clientWidth,
+    ),
+  ).toBe(true);
+
   await openWorkspaceLink(page, "Sessions");
   const sessionsMenu = page.getByRole("button", {
     name: "Open workspace menu",
@@ -167,8 +211,13 @@ test("connects public auth pages and the protected identity workspace", async ({
   ).toBeVisible();
 
   await page.goto("/");
-  await expect(page.getByRole("link", { name: "Create account" })).toHaveAttribute("href", "/register");
-  await expect(page.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/login");
+  await expect(
+    page.getByRole("link", { name: "Create account" }),
+  ).toHaveAttribute("href", "/register");
+  await expect(page.getByRole("link", { name: "Sign in" })).toHaveAttribute(
+    "href",
+    "/login",
+  );
   await page.goto("/home");
   await expect(page).toHaveURL(/\/$/);
   await page.goto("/dashboard");
