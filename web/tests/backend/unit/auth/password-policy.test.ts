@@ -29,14 +29,12 @@ describe("SmartHire password operation boundary", () => {
     );
   });
   it("integrates rate limiting and audit without exposing the subject", async () => {
-    const consume = vi
-      .fn()
-      .mockResolvedValue({
-        allowed: false,
-        limit: 5,
-        remaining: 0,
-        retryAfterSeconds: 60,
-      });
+    const consume = vi.fn().mockResolvedValue({
+      allowed: false,
+      limit: 5,
+      remaining: 0,
+      retryAfterSeconds: 60,
+    });
     const append = vi.fn().mockResolvedValue("audit");
     const policy = new PasswordPolicy(
       { consume } as unknown as PrismaRateLimitRepository,
@@ -67,7 +65,10 @@ describe("SmartHire password operation boundary", () => {
       /scrypt|argon|bcrypt|pbkdf|createHash|verifyPassword|hashPassword/,
     );
     const gateway = await readFile(
-      resolve(process.cwd(), "src/backend/auth/better-auth/better-auth-gateway.ts"),
+      resolve(
+        process.cwd(),
+        "src/backend/auth/better-auth/better-auth-gateway.ts",
+      ),
       "utf8",
     );
     expect(gateway).toContain('from "better-auth/crypto"');

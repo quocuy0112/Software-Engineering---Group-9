@@ -16,14 +16,12 @@ function tenCodes(): string[] {
 // Minimal in-memory limiter/audit doubles so the unit test needs no database.
 function fakeLimiter(allowed = true) {
   return {
-    consume: vi
-      .fn()
-      .mockResolvedValue({
-        allowed,
-        limit: 5,
-        remaining: allowed ? 4 : 0,
-        retryAfterSeconds: allowed ? 0 : 42,
-      }),
+    consume: vi.fn().mockResolvedValue({
+      allowed,
+      limit: 5,
+      remaining: allowed ? 4 : 0,
+      retryAfterSeconds: allowed ? 0 : 42,
+    }),
     subjectDigest: vi.fn((subject: string) => subject),
   } as never;
 }

@@ -1,6 +1,6 @@
 .git/
-.dockerignore
 Dockerfile*
+.dockerignore
 node_modules/
 **/node_modules/
 **/.next/

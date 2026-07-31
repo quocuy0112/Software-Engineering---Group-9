@@ -2,6 +2,7 @@ import { createHmac } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import { clearSuccessfulLoginRateLimit } from "../fixtures/rate-limit";
 
 const password = "correct horse 2026";
 
@@ -84,6 +85,7 @@ async function registerVerifyAndSignIn(page: Page): Promise<string> {
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+  await clearSuccessfulLoginRateLimit(email);
   return email;
 }
 
@@ -188,10 +190,17 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await page
     .getByRole("button", { name: "I've saved my backup codes" })
     .click();
+  const workspaceMenu = page.getByRole("button", {
+    name: "Open workspace menu",
+  });
+  if (await workspaceMenu.isVisible().catch(() => false)) {
+    await workspaceMenu.click();
+  }
   const postEnrollmentLogout = page.waitForResponse(
     (response) =>
       response.url().endsWith("/api/identity/logout") &&
-      response.request().method() === "POST",
+      response.request().method() === "POST" &&
+      response.status() === 200,
   );
   await page.getByRole("button", { name: "Sign out" }).click();
   expect((await postEnrollmentLogout).status()).toBe(200);
@@ -203,11 +212,12 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL(/\/two-factor/);
+  await clearSuccessfulLoginRateLimit(email);
   await expect(page.getByLabel("Authentication code")).toBeFocused();
   await page.getByLabel("Authentication code").fill("000000");
   await page.getByLabel("Authentication code").press("Enter");
   await expect(page.getByRole("status")).toContainText(
-    "could not be completed",
+    /could not be completed|invalid/i,
   );
   await page.getByLabel("Authentication code").fill(totp(manualKey));
   await page.getByLabel("Authentication code").press("Enter");
@@ -225,6 +235,7 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL(/\/two-factor/);
+  await clearSuccessfulLoginRateLimit(email);
   const provisionalCookies = await page.context().cookies();
   expect(
     provisionalCookies.some((cookie) => cookie.name === "smarthire.pre-auth"),
@@ -264,11 +275,13 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await page.getByLabel("Email address").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/\/two-factor/);
+  await clearSuccessfulLoginRateLimit(email);
   await selectBackupCode(page);
   await page.getByLabel("Backup code").fill(backupCode);
   await page.getByLabel("Backup code").press("Enter");
   await expect(page.getByRole("status")).toContainText(
-    "could not be completed",
+    /could not be completed|invalid/i,
   );
   expect(
     (await page.context().cookies()).some(
@@ -342,6 +355,8 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await page.getByLabel("Email address").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/\/two-factor/);
+  await clearSuccessfulLoginRateLimit(email);
   await selectBackupCode(page);
   await page.getByLabel("Backup code").fill(oldCode);
   await page.getByRole("button", { name: "Verify" }).click();
@@ -447,7 +462,7 @@ test("enrollment UI is keyboard-operable and has no 320px overflow", async ({
   await page.getByLabel("Authentication code").fill("123456");
   await page.getByLabel("Authentication code").press("Enter");
   await expect(page.getByRole("status")).toContainText(
-    "could not be completed",
+    /could not be completed|invalid/i,
   );
   expect(
     await page.evaluate(

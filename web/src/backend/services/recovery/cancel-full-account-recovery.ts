@@ -15,7 +15,9 @@ export class CancelFullAccountRecoveryService {
     rawProof: string,
     now = new Date(),
   ): Promise<CancelFullAccountRecoveryResult> {
-    const result = await this.repository.cancel(rawProof, now).catch(() => null);
+    const result = await this.repository
+      .cancel(rawProof, now)
+      .catch(() => null);
     return result
       ? { ok: true, operationId: result.operationId }
       : { ok: false, message: ACCOUNT_RECOVERY_GENERIC_ERROR };

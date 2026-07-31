@@ -10,6 +10,7 @@ export default async function ProfileSecurityPage() {
     <ProfileSecurityView
       twoFactorEnabled={context.account.twoFactorEnabled}
       recoveryCompleted={context.recoveryCompleted}
+      csrfProof={context.csrfProof}
     />
   );
 }

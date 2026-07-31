@@ -68,6 +68,25 @@ if (await canAccess("web/.env.local")) {
       .map((line) => line.split(/=(.*)/s).slice(0, 2)),
   );
   const adapter = appEnvironment.EMAIL_ADAPTER;
+  const trustedProxyHops = Number(
+    appEnvironment.AUDIT_TRUSTED_PROXY_HOPS,
+  );
+  const trustedProxyHopsValid =
+    /^\d+$/.test(appEnvironment.AUDIT_TRUSTED_PROXY_HOPS ?? "") &&
+    Number.isSafeInteger(trustedProxyHops) &&
+    trustedProxyHops >= 0 &&
+    trustedProxyHops <= 10 &&
+    (appEnvironment.APP_ENV !== "production" || trustedProxyHops >= 1);
+  check(
+    trustedProxyHopsValid,
+    "non-public AUDIT_TRUSTED_PROXY_HOPS is an integer from 0 to 10 and production uses at least 1",
+  );
+  check(
+    !Object.keys(appEnvironment).some((key) =>
+      key.startsWith("NEXT_PUBLIC_AUDIT_"),
+    ),
+    "audit proxy configuration is not browser-public",
+  );
   let emailValid = ["capture", "resend", "smtp"].includes(adapter);
   if (adapter === "smtp") {
     const port = Number(appEnvironment.SMTP_PORT);

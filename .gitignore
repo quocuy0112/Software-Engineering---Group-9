@@ -57,6 +57,8 @@ compose.yaml
 .idea/
 .DS_Store
 Thumbs.db
+*.tmp
+*.swp
 node_modules
 
 # Prisma ignore

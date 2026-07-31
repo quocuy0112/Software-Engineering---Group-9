@@ -136,11 +136,7 @@ describe("password reset fail-closed failure injection", () => {
       acceptedPolicy as never,
     );
     await expect(
-      service.execute(
-        f.rawToken,
-        newPassword,
-        new Date(f.now.getTime() + 1),
-      ),
+      service.execute(f.rawToken, newPassword, new Date(f.now.getTime() + 1)),
     ).resolves.toMatchObject({ ok: false, retryable: true });
     expect(await operation(f.userId)).toMatchObject({
       status: "FAILED_RETRYABLE",
@@ -154,11 +150,7 @@ describe("password reset fail-closed failure injection", () => {
     ).password;
 
     await expect(
-      service.execute(
-        f.rawToken,
-        newPassword,
-        new Date(f.now.getTime() + 2),
-      ),
+      service.execute(f.rawToken, newPassword, new Date(f.now.getTime() + 2)),
     ).resolves.toMatchObject({ ok: true });
     const hashAfterRetry = (
       await prisma.authProviderAccount.findFirstOrThrow({
@@ -189,11 +181,7 @@ describe("password reset fail-closed failure injection", () => {
       acceptedPolicy as never,
     );
     await expect(
-      service.execute(
-        f.rawToken,
-        newPassword,
-        new Date(f.now.getTime() + 1),
-      ),
+      service.execute(f.rawToken, newPassword, new Date(f.now.getTime() + 1)),
     ).resolves.toMatchObject({ ok: false, retryable: true });
     expect(await operation(f.userId)).toMatchObject({
       status: "FAILED_RETRYABLE",
@@ -218,15 +206,9 @@ describe("password reset fail-closed failure injection", () => {
     expect(cookie(blockedLogin, "smarthire.session")).toBeNull();
 
     await expect(
-      service.execute(
-        f.rawToken,
-        newPassword,
-        new Date(f.now.getTime() + 3),
-      ),
+      service.execute(f.rawToken, newPassword, new Date(f.now.getTime() + 3)),
     ).resolves.toMatchObject({ ok: true });
-    expect(
-      await prisma.session.count({ where: { userId: f.userId } }),
-    ).toBe(0);
+    expect(await prisma.session.count({ where: { userId: f.userId } })).toBe(0);
   });
 
   it("persists challenge invalidation failure and resumes cleanup", async () => {
@@ -240,8 +222,10 @@ describe("password reset fail-closed failure injection", () => {
       },
     });
     const repository = new PrismaPasswordResetRepository();
-    vi.spyOn(repository, "invalidateChallengesAndResetProofs")
-      .mockRejectedValueOnce(new Error("injected challenge cleanup"));
+    vi.spyOn(
+      repository,
+      "invalidateChallengesAndResetProofs",
+    ).mockRejectedValueOnce(new Error("injected challenge cleanup"));
     const service = new ResetPasswordService(
       repository,
       new BetterAuthPasswordGateway(),
@@ -249,11 +233,7 @@ describe("password reset fail-closed failure injection", () => {
       acceptedPolicy as never,
     );
     await expect(
-      service.execute(
-        f.rawToken,
-        newPassword,
-        new Date(f.now.getTime() + 1),
-      ),
+      service.execute(f.rawToken, newPassword, new Date(f.now.getTime() + 1)),
     ).resolves.toMatchObject({ ok: false, retryable: true });
     expect(await operation(f.userId)).toMatchObject({
       failureCode: "CHALLENGE_INVALIDATION_FAILED",
@@ -265,11 +245,7 @@ describe("password reset fail-closed failure injection", () => {
       }),
     ).toBe(1);
     await expect(
-      service.execute(
-        f.rawToken,
-        newPassword,
-        new Date(f.now.getTime() + 2),
-      ),
+      service.execute(f.rawToken, newPassword, new Date(f.now.getTime() + 2)),
     ).resolves.toMatchObject({ ok: true });
     expect(
       await prisma.authenticationChallenge.count({
@@ -291,22 +267,14 @@ describe("password reset fail-closed failure injection", () => {
       acceptedPolicy as never,
     );
     await expect(
-      service.execute(
-        f.rawToken,
-        newPassword,
-        new Date(f.now.getTime() + 1),
-      ),
+      service.execute(f.rawToken, newPassword, new Date(f.now.getTime() + 1)),
     ).resolves.toMatchObject({ ok: false, retryable: true });
     expect(await operation(f.userId)).toMatchObject({
       failureCode: "NOTIFICATION_ENQUEUE_FAILED",
       notificationEnqueuedAt: null,
     });
     await expect(
-      service.execute(
-        f.rawToken,
-        newPassword,
-        new Date(f.now.getTime() + 2),
-      ),
+      service.execute(f.rawToken, newPassword, new Date(f.now.getTime() + 2)),
     ).resolves.toMatchObject({ ok: true });
     expect(
       await prisma.emailOutbox.count({
@@ -328,22 +296,14 @@ describe("password reset fail-closed failure injection", () => {
       acceptedPolicy as never,
     );
     await expect(
-      service.execute(
-        f.rawToken,
-        newPassword,
-        new Date(f.now.getTime() + 1),
-      ),
+      service.execute(f.rawToken, newPassword, new Date(f.now.getTime() + 1)),
     ).resolves.toMatchObject({ ok: false, retryable: true });
     expect(await operation(f.userId)).toMatchObject({
       failureCode: "AUDIT_FINALIZATION_FAILED",
       auditFinalizedAt: null,
     });
     await expect(
-      service.execute(
-        f.rawToken,
-        newPassword,
-        new Date(f.now.getTime() + 2),
-      ),
+      service.execute(f.rawToken, newPassword, new Date(f.now.getTime() + 2)),
     ).resolves.toMatchObject({ ok: true });
     const completed = await operation(f.userId);
     expect(
@@ -366,11 +326,7 @@ describe("password reset fail-closed failure injection", () => {
       acceptedPolicy as never,
     );
     await expect(
-      service.execute(
-        f.rawToken,
-        newPassword,
-        new Date(f.now.getTime() + 1),
-      ),
+      service.execute(f.rawToken, newPassword, new Date(f.now.getTime() + 1)),
     ).resolves.toMatchObject({ ok: false, retryable: true });
     expect(await operation(f.userId)).toMatchObject({
       failureCode: "OPERATION_FINALIZATION_FAILED",
@@ -378,11 +334,7 @@ describe("password reset fail-closed failure injection", () => {
       finalizedAt: null,
     });
     await expect(
-      service.execute(
-        f.rawToken,
-        newPassword,
-        new Date(f.now.getTime() + 2),
-      ),
+      service.execute(f.rawToken, newPassword, new Date(f.now.getTime() + 2)),
     ).resolves.toMatchObject({ ok: true });
     const completed = await operation(f.userId);
     expect(completed.status).toBe("FINALIZED");
@@ -421,7 +373,10 @@ describe("password reset fail-closed failure injection", () => {
       acceptedPolicy as never,
     ).execute(secrets[0], secrets[1]);
     expect(result).toMatchObject({ ok: false, retryable: true });
-    const output = consoleSpies.flatMap((spy) => spy.mock.calls).flat().join(" ");
+    const output = consoleSpies
+      .flatMap((spy) => spy.mock.calls)
+      .flat()
+      .join(" ");
     for (const secret of secrets) expect(output).not.toContain(secret);
     for (const call of quietAudit.append.mock.calls) {
       const serialized = JSON.stringify(call);

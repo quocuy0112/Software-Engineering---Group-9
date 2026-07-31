@@ -192,6 +192,74 @@ export type IntWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedIntFilter<$PrismaModel>
 }
 
+export type EnumPreferenceLanguageFilter<$PrismaModel = never> = {
+  equals?: $Enums.PreferenceLanguage | Prisma.EnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  in?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel> | $Enums.PreferenceLanguage
+}
+
+export type EnumPreferenceLanguageWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PreferenceLanguage | Prisma.EnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  in?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPreferenceLanguageWithAggregatesFilter<$PrismaModel> | $Enums.PreferenceLanguage
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel>
+}
+
+export type EnumEmailChangeStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.EmailChangeStatus | Prisma.EnumEmailChangeStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.EmailChangeStatus[] | Prisma.ListEnumEmailChangeStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EmailChangeStatus[] | Prisma.ListEnumEmailChangeStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEmailChangeStatusFilter<$PrismaModel> | $Enums.EmailChangeStatus
+}
+
+export type EnumEmailChangeStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.EmailChangeStatus | Prisma.EnumEmailChangeStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.EmailChangeStatus[] | Prisma.ListEnumEmailChangeStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EmailChangeStatus[] | Prisma.ListEnumEmailChangeStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEmailChangeStatusWithAggregatesFilter<$PrismaModel> | $Enums.EmailChangeStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumEmailChangeStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumEmailChangeStatusFilter<$PrismaModel>
+}
+
+export type EnumPasswordChangeOperationStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PasswordChangeOperationStatus | Prisma.EnumPasswordChangeOperationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PasswordChangeOperationStatus[] | Prisma.ListEnumPasswordChangeOperationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PasswordChangeOperationStatus[] | Prisma.ListEnumPasswordChangeOperationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPasswordChangeOperationStatusFilter<$PrismaModel> | $Enums.PasswordChangeOperationStatus
+}
+
+export type EnumPasswordChangeFailureCodeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.PasswordChangeFailureCode | Prisma.EnumPasswordChangeFailureCodeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PasswordChangeFailureCode[] | Prisma.ListEnumPasswordChangeFailureCodeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PasswordChangeFailureCode[] | Prisma.ListEnumPasswordChangeFailureCodeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPasswordChangeFailureCodeNullableFilter<$PrismaModel> | $Enums.PasswordChangeFailureCode | null
+}
+
+export type EnumPasswordChangeOperationStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PasswordChangeOperationStatus | Prisma.EnumPasswordChangeOperationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PasswordChangeOperationStatus[] | Prisma.ListEnumPasswordChangeOperationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PasswordChangeOperationStatus[] | Prisma.ListEnumPasswordChangeOperationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPasswordChangeOperationStatusWithAggregatesFilter<$PrismaModel> | $Enums.PasswordChangeOperationStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPasswordChangeOperationStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPasswordChangeOperationStatusFilter<$PrismaModel>
+}
+
+export type EnumPasswordChangeFailureCodeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PasswordChangeFailureCode | Prisma.EnumPasswordChangeFailureCodeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PasswordChangeFailureCode[] | Prisma.ListEnumPasswordChangeFailureCodeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PasswordChangeFailureCode[] | Prisma.ListEnumPasswordChangeFailureCodeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPasswordChangeFailureCodeNullableWithAggregatesFilter<$PrismaModel> | $Enums.PasswordChangeFailureCode | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPasswordChangeFailureCodeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPasswordChangeFailureCodeNullableFilter<$PrismaModel>
+}
+
 export type EnumTokenPurposeFilter<$PrismaModel = never> = {
   equals?: $Enums.TokenPurpose | Prisma.EnumTokenPurposeFieldRefInput<$PrismaModel>
   in?: $Enums.TokenPurpose[] | Prisma.ListEnumTokenPurposeFieldRefInput<$PrismaModel>
@@ -629,6 +697,74 @@ export type NestedFloatFilter<$PrismaModel = never> = {
   gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   not?: Prisma.NestedFloatFilter<$PrismaModel> | number
+}
+
+export type NestedEnumPreferenceLanguageFilter<$PrismaModel = never> = {
+  equals?: $Enums.PreferenceLanguage | Prisma.EnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  in?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel> | $Enums.PreferenceLanguage
+}
+
+export type NestedEnumPreferenceLanguageWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PreferenceLanguage | Prisma.EnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  in?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PreferenceLanguage[] | Prisma.ListEnumPreferenceLanguageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPreferenceLanguageWithAggregatesFilter<$PrismaModel> | $Enums.PreferenceLanguage
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPreferenceLanguageFilter<$PrismaModel>
+}
+
+export type NestedEnumEmailChangeStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.EmailChangeStatus | Prisma.EnumEmailChangeStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.EmailChangeStatus[] | Prisma.ListEnumEmailChangeStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EmailChangeStatus[] | Prisma.ListEnumEmailChangeStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEmailChangeStatusFilter<$PrismaModel> | $Enums.EmailChangeStatus
+}
+
+export type NestedEnumEmailChangeStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.EmailChangeStatus | Prisma.EnumEmailChangeStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.EmailChangeStatus[] | Prisma.ListEnumEmailChangeStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EmailChangeStatus[] | Prisma.ListEnumEmailChangeStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEmailChangeStatusWithAggregatesFilter<$PrismaModel> | $Enums.EmailChangeStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumEmailChangeStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumEmailChangeStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumPasswordChangeOperationStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PasswordChangeOperationStatus | Prisma.EnumPasswordChangeOperationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PasswordChangeOperationStatus[] | Prisma.ListEnumPasswordChangeOperationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PasswordChangeOperationStatus[] | Prisma.ListEnumPasswordChangeOperationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPasswordChangeOperationStatusFilter<$PrismaModel> | $Enums.PasswordChangeOperationStatus
+}
+
+export type NestedEnumPasswordChangeFailureCodeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.PasswordChangeFailureCode | Prisma.EnumPasswordChangeFailureCodeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PasswordChangeFailureCode[] | Prisma.ListEnumPasswordChangeFailureCodeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PasswordChangeFailureCode[] | Prisma.ListEnumPasswordChangeFailureCodeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPasswordChangeFailureCodeNullableFilter<$PrismaModel> | $Enums.PasswordChangeFailureCode | null
+}
+
+export type NestedEnumPasswordChangeOperationStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PasswordChangeOperationStatus | Prisma.EnumPasswordChangeOperationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PasswordChangeOperationStatus[] | Prisma.ListEnumPasswordChangeOperationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PasswordChangeOperationStatus[] | Prisma.ListEnumPasswordChangeOperationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPasswordChangeOperationStatusWithAggregatesFilter<$PrismaModel> | $Enums.PasswordChangeOperationStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPasswordChangeOperationStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPasswordChangeOperationStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumPasswordChangeFailureCodeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PasswordChangeFailureCode | Prisma.EnumPasswordChangeFailureCodeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PasswordChangeFailureCode[] | Prisma.ListEnumPasswordChangeFailureCodeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PasswordChangeFailureCode[] | Prisma.ListEnumPasswordChangeFailureCodeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPasswordChangeFailureCodeNullableWithAggregatesFilter<$PrismaModel> | $Enums.PasswordChangeFailureCode | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPasswordChangeFailureCodeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPasswordChangeFailureCodeNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumTokenPurposeFilter<$PrismaModel = never> = {

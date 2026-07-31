@@ -2,6 +2,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { Prisma } from "@/backend/generated/prisma/client";
 import { prisma } from "@/backend/database/prisma";
+import { EmailAddressClaimCoordinator } from "@/backend/repositories/account/email-address-claim-coordinator";
 
 export type RegistrationPersistenceInput = {
   name: string;
@@ -12,17 +13,26 @@ export type RegistrationPersistenceInput = {
   protectedToken: string;
   expiresAt: Date;
   correlationId: string;
+  now?: Date;
 };
 
 export class DuplicateRegistrationError extends Error {}
 
 export class PrismaRegistrationRepository {
+  constructor(
+    private readonly emailClaims = new EmailAddressClaimCoordinator(),
+  ) {}
+
   async create(
     input: RegistrationPersistenceInput,
   ): Promise<{ userId: string; outboxId: string }> {
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
         return await prisma.$transaction(async (tx) => {
+          await this.emailClaims.assertAvailable(tx, {
+            normalizedEmail: input.normalizedEmail,
+            now: input.now ?? new Date(),
+          });
           const userId = randomUUID();
           await tx.userAccount.create({
             data: {
@@ -43,7 +53,12 @@ export class PrismaRegistrationRepository {
               password: input.credentialPassword,
             },
           });
-          await tx.candidateIdentity.create({ data: { userId } });
+          await tx.candidateIdentity.create({
+            data: {
+              userId,
+              profile: { create: {} },
+            },
+          });
           const token = await tx.securityToken.create({
             data: {
               userId,

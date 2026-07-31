@@ -79,9 +79,40 @@ enum AuditResult {
 
 enum EmailKind {
   VERIFY_EMAIL
+  EMAIL_CHANGE_VERIFY
   RESET_PASSWORD
   PASSWORD_CHANGED
   SECURITY_ALERT
+}
+
+enum PreferenceLanguage {
+  VI
+  EN
+}
+
+enum EmailChangeStatus {
+  PENDING
+  SUPERSEDED
+  CONSUMED
+  EXPIRED
+  CONFLICTED
+}
+
+enum PasswordChangeOperationStatus {
+  INTENT_RECORDED
+  PASSWORD_UPDATED
+  OTHER_SESSIONS_REVOKED
+  FAILED_RETRYABLE
+  FINALIZED
+}
+
+enum PasswordChangeFailureCode {
+  PASSWORD_UPDATE_FAILED
+  SESSION_REVOCATION_FAILED
+  SESSION_VERIFICATION_FAILED
+  NOTIFICATION_ENQUEUE_FAILED
+  AUDIT_FINALIZATION_FAILED
+  OPERATION_FINALIZATION_FAILED
 }
 
 enum OutboxStatus {
@@ -115,6 +146,10 @@ model UserAccount {
   fullAccountRecoveryOperations FullAccountRecoveryOperation[]
   challenges        AuthenticationChallenge[]
   outbox            EmailOutbox[]
+  preferences       AccountPreferences?
+  emailChangeRequests EmailChangeRequest[]
+  passwordChangeAttemptWindow PasswordChangeAttemptWindow?
+  passwordChangeOperations PasswordChangeOperation[]
 
   @@index([state, id])
   @@map("user")
@@ -195,6 +230,174 @@ model CandidateIdentity {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
   user      UserAccount @relation(fields: [userId], references: [id], onDelete: Restrict)
+  profile   CandidateProfile?
+}
+
+model CandidateProfile {
+  id              String                  @id @default(cuid())
+  candidateUserId String                  @unique
+  headline        String?
+  summary         String?
+  phone           String?
+  location        String?
+  revision        Int                     @default(0)
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+  candidate       CandidateIdentity       @relation(fields: [candidateUserId], references: [userId], onDelete: Cascade)
+  experiences     ProfileExperience[]
+  education       ProfileEducation[]
+  skills          CandidateProfileSkill[]
+  socialLinks     SocialLink[]
+
+  @@index([candidateUserId])
+}
+
+model ProfileExperience {
+  id          String           @id @default(cuid())
+  profileId   String
+  title       String
+  company     String
+  description String?
+  startDate   DateTime         @db.Date
+  endDate     DateTime?        @db.Date
+  isCurrent   Boolean
+  position    Int
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  profile     CandidateProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, position])
+  @@index([profileId])
+}
+
+model ProfileEducation {
+  id          String           @id @default(cuid())
+  profileId   String
+  institution String
+  degree      String
+  field       String?
+  startDate   DateTime         @db.Date
+  endDate     DateTime?        @db.Date
+  isCurrent   Boolean
+  position    Int
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  profile     CandidateProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, position])
+  @@index([profileId])
+}
+
+model Skill {
+  id             String                  @id @default(cuid())
+  name           String
+  normalizedName String                  @unique
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+  profiles       CandidateProfileSkill[]
+}
+
+model CandidateProfileSkill {
+  profileId  String
+  skillId    String
+  displayName String
+  position   Int
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  profile    CandidateProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  skill      Skill            @relation(fields: [skillId], references: [id], onDelete: Restrict)
+
+  @@id([profileId, skillId])
+  @@unique([profileId, position])
+  @@index([skillId])
+}
+
+model SocialLink {
+  id            String           @id @default(cuid())
+  profileId     String
+  url           String
+  normalizedUrl String
+  position      Int
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  profile       CandidateProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, normalizedUrl])
+  @@unique([profileId, position])
+  @@index([profileId])
+}
+
+model AccountPreferences {
+  userId                    String             @id
+  language                  PreferenceLanguage @default(VI)
+  timezone                  String             @default("Asia/Ho_Chi_Minh")
+  applicationUpdatesEmail   Boolean            @default(true)
+  jobRecommendationsEmail   Boolean            @default(true)
+  accountSecurityEmail      Boolean            @default(true)
+  createdAt                 DateTime           @default(now())
+  updatedAt                 DateTime           @updatedAt
+  user                      UserAccount        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EmailChangeRequest {
+  id                       String            @id @default(cuid())
+  userId                   String
+  proposedEmail            String
+  normalizedProposedEmail  String
+  tokenDigest              String            @unique
+  status                   EmailChangeStatus @default(PENDING)
+  expiresAt                DateTime
+  consumedAt               DateTime?
+  supersededAt             DateTime?
+  resolvedAt               DateTime?
+  idempotencyKey           String
+  correlationId            String
+  verificationOutboxId     String?           @unique
+  oldEmailNoticeOutboxId   String?           @unique
+  createdBySessionId       String
+  createdAt                DateTime          @default(now())
+  updatedAt                DateTime          @updatedAt
+  user                     UserAccount       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verificationOutbox       EmailOutbox?      @relation("EmailChangeVerificationOutbox", fields: [verificationOutboxId], references: [id], onDelete: SetNull)
+  oldEmailNoticeOutbox     EmailOutbox?      @relation("EmailChangeOldAddressOutbox", fields: [oldEmailNoticeOutboxId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, idempotencyKey])
+  @@index([status, expiresAt])
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model PasswordChangeAttemptWindow {
+  userId            String      @id
+  failureTimestamps DateTime[]  @default([])
+  lockedUntil       DateTime?
+  updatedAt         DateTime    @updatedAt
+  user              UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordChangeOperation {
+  id                         String                        @id
+  userId                     String
+  idempotencyKey             String
+  submissionBindingDigest    String
+  initiatingSessionId        String
+  status                     PasswordChangeOperationStatus @default(INTENT_RECORDED)
+  passwordUpdatedAt          DateTime?
+  otherSessionsRevokedAt     DateTime?
+  notificationIdempotencyKey String                        @unique
+  notificationOutboxId       String?                       @unique
+  finalAuditId               String?                       @unique
+  failureCode                PasswordChangeFailureCode?
+  retryAt                    DateTime?
+  finalizedAt                DateTime?
+  createdAt                  DateTime                      @default(now())
+  updatedAt                  DateTime                      @updatedAt
+  user                       UserAccount                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notificationOutbox         EmailOutbox?                  @relation("PasswordChangeNotificationOutbox", fields: [notificationOutboxId], references: [id], onDelete: SetNull)
+  finalAudit                 AuditEvent?                   @relation("PasswordChangeFinalAudit", fields: [finalAuditId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, idempotencyKey])
+  @@index([userId, status])
+  @@index([status, retryAt])
 }
 
 model SecurityToken {
@@ -342,6 +545,8 @@ model EmailOutbox {
   userId            String?
   securityTokenId   String?
   recipientRef      String
+  recipientCiphertext String?
+  recipientPurpose  String?
   templateVersion   String
   payloadRef        Json
   idempotencyKey    String         @unique
@@ -356,6 +561,9 @@ model EmailOutbox {
   updatedAt         DateTime       @updatedAt
   user              UserAccount?   @relation(fields: [userId], references: [id], onDelete: SetNull)
   securityToken     SecurityToken? @relation(fields: [securityTokenId], references: [id], onDelete: SetNull)
+  emailChangeVerificationFor EmailChangeRequest? @relation("EmailChangeVerificationOutbox")
+  emailChangeOldAddressFor EmailChangeRequest? @relation("EmailChangeOldAddressOutbox")
+  passwordChangeNotificationFor PasswordChangeOperation? @relation("PasswordChangeNotificationOutbox")
 
   @@index([status, nextAttemptAt])
   @@index([leaseExpiresAt])
@@ -375,6 +583,7 @@ model AuditEvent {
   ipPrefixDigest  String?
   userAgentFamily String?
   context         Json
+  passwordChangeOperation PasswordChangeOperation? @relation("PasswordChangeFinalAudit")
 
   @@index([actorUserId, occurredAt])
   @@index([targetType, targetId, occurredAt])

@@ -11,8 +11,14 @@ type AuditClient = Pick<typeof prisma, "auditEvent"> | Prisma.TransactionClient;
 export class PrismaAuditRepository {
   constructor(private readonly db: AuditClient = prisma) {}
 
+  private validated(input: AuthenticationAuditEvent) {
+    // The strict event/context schemas are the persistence allowlist. Never
+    // pass caller-owned request/provider objects directly to Prisma.
+    return authenticationAuditEventSchema.parse(input);
+  }
+
   async append(input: AuthenticationAuditEvent): Promise<string> {
-    const event = authenticationAuditEventSchema.parse(input);
+    const event = this.validated(input);
     const created = await this.db.auditEvent.create({ data: event });
     return created.id;
   }
@@ -21,7 +27,7 @@ export class PrismaAuditRepository {
     id: string,
     input: AuthenticationAuditEvent,
   ): Promise<string> {
-    const event = authenticationAuditEventSchema.parse(input);
+    const event = this.validated(input);
     try {
       const created = await this.db.auditEvent.create({
         data: { id, ...event },

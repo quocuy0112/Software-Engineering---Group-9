@@ -9,8 +9,8 @@ const activeEmail = `forgot-active-${randomUUID()}@example.test`;
 const unknownEmail = `forgot-unknown-${randomUUID()}@example.test`;
 const throttledEmail = `forgot-throttled-${randomUUID()}@example.test`;
 const limiter = new PrismaRateLimitRepository();
-const subjectDigests = [activeEmail, unknownEmail, throttledEmail].map((email) =>
-  limiter.subjectDigest(`anonymous:${email}`),
+const subjectDigests = [activeEmail, unknownEmail, throttledEmail].map(
+  (email) => limiter.subjectDigest(`anonymous:${email}`),
 );
 
 function request(body: unknown) {

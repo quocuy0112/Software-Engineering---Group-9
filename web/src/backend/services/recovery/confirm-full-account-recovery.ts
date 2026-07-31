@@ -64,11 +64,7 @@ export class ConfirmFullAccountRecoveryService {
     if (!operation.holdSessionsRevokedAt) {
       try {
         await this.sessions.revokeAllSessions(operation.userId);
-        await this.repository.markHoldSessionsRevoked(
-          operation.id,
-          owner,
-          now,
-        );
+        await this.repository.markHoldSessionsRevoked(operation.id, owner, now);
         operation = withMilestone(operation, "holdSessionsRevokedAt", now);
       } catch {
         return this.failClosed(

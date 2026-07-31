@@ -43,6 +43,9 @@ button:disabled {
   cursor: not-allowed;
 }
 
+.smart-hire-brand:focus-visible {
+  outline: 3px solid var(--focus-ring);
+
 a,
 button,
 input,

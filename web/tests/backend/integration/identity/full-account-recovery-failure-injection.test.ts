@@ -20,13 +20,15 @@ afterEach(async () => {
 
 async function issue(email: string, now: Date) {
   const proof = protector.generate();
-  await new PrismaAccountRecoveryRepository().replaceConfirmationForEligibleUser({
-    normalizedEmail: email,
-    rawProof: proof,
-    protectedProof: protector.seal(proof),
-    correlationId: randomUUID(),
-    now,
-  });
+  await new PrismaAccountRecoveryRepository().replaceConfirmationForEligibleUser(
+    {
+      normalizedEmail: email,
+      rawProof: proof,
+      protectedProof: protector.seal(proof),
+      correlationId: randomUUID(),
+      now,
+    },
+  );
   return proof;
 }
 
@@ -66,16 +68,13 @@ describe("full account recovery failure injection", () => {
       failingRepository,
       { updatePassword } as unknown as BetterAuthPasswordGateway,
       {} as BetterAuthTwoFactorGateway,
-    ).execute(
-      proof,
-      password,
-      new Date(operation.holdEndsAt.getTime() + 1),
-    );
+    ).execute(proof, password, new Date(operation.holdEndsAt.getTime() + 1));
     expect(result).toMatchObject({ ok: false, retryable: true });
     expect(updatePassword).not.toHaveBeenCalled();
-    const unchanged = await prisma.fullAccountRecoveryOperation.findUniqueOrThrow({
-      where: { id: operation.id },
-    });
+    const unchanged =
+      await prisma.fullAccountRecoveryOperation.findUniqueOrThrow({
+        where: { id: operation.id },
+      });
     expect(unchanged.status).toBe("CONFIRMED_HOLD");
     expect(unchanged.completionConsumedAt).toBeNull();
   });
@@ -95,9 +94,10 @@ describe("full account recovery failure injection", () => {
       failingSessions as unknown as BetterAuthPasswordGateway,
     ).execute(confirmation, new Date(now.getTime() + 1));
     expect(failed).toMatchObject({ ok: false, retryable: true });
-    const operation = await prisma.fullAccountRecoveryOperation.findFirstOrThrow({
-      where: { userId: fixture.userId },
-    });
+    const operation =
+      await prisma.fullAccountRecoveryOperation.findFirstOrThrow({
+        where: { userId: fixture.userId },
+      });
     expect(operation.failureCode).toBe("HOLD_SESSION_REVOCATION_FAILED");
     expect(operation.status).toBe("CONFIRMED_HOLD");
     const retried = await new ConfirmFullAccountRecoveryService().execute(
@@ -134,15 +134,13 @@ describe("full account recovery failure injection", () => {
       new PrismaAccountRecoveryRepository(),
       failingPasswords as unknown as BetterAuthPasswordGateway,
       {} as BetterAuthTwoFactorGateway,
-    ).execute(
-      proof,
-      password,
-      new Date(operation.holdEndsAt.getTime() + 1),
-    );
+    ).execute(proof, password, new Date(operation.holdEndsAt.getTime() + 1));
     expect(failed).toMatchObject({ ok: false, retryable: true });
-    const partial = await prisma.fullAccountRecoveryOperation.findUniqueOrThrow({
-      where: { id: operation.id },
-    });
+    const partial = await prisma.fullAccountRecoveryOperation.findUniqueOrThrow(
+      {
+        where: { id: operation.id },
+      },
+    );
     expect(partial.status).toBe("COMPLETING");
     expect(partial.passwordUpdatedAt).toBeNull();
 
