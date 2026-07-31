@@ -14,6 +14,7 @@ paths:
       responses:
         '202': {$ref: '#/components/responses/GenericAccepted'}
         '400': {$ref: '#/components/responses/ValidationError'}
+        '409': {description: The normalized email is already registered, content: {application/json: {schema: {type: object, additionalProperties: false, required: [message, fields], properties: {message: {type: string, const: An account with this email already exists.}, fields: {type: object, required: [email], properties: {email: {type: array, items: {type: string}}}}}}}}}
         '429': {$ref: '#/components/responses/RateLimited'}
   /api/identity/verification/consume:
     post:
@@ -111,7 +112,7 @@ paths:
     post:
       operationId: requestFullAccountRecovery
       security: []
-      description: Eligibility-aware request; malformed email input and unknown or ineligible accounts return distinct errors, while only eligible verified 2FA accounts receive a confirmation message.
+      description: Eligibility-aware request; verified 2FA accounts receive full-recovery confirmation, while active accounts without 2FA receive the normal password-reset email. Unknown or inactive accounts return a distinct error.
       requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/EmailRequest'}}}}
       responses:
         '202': {$ref: '#/components/responses/AccountRecoveryInstructionsQueued'}
@@ -268,11 +269,11 @@ components:
         lowerAssuranceNotice: {type: string}
         message: {type: string}
   responses:
-    GenericAccepted: {description: Same response regardless of account existence, content: {application/json: {schema: {type: object, required: [message], properties: {message: {type: string}}}}}}
+    GenericAccepted: {description: Accepted request response containing a safe user-facing message, content: {application/json: {schema: {type: object, required: [message], properties: {message: {type: string}}}}}}
     PasswordResetQueued: {description: An active account matched and one password-reset instruction email was queued, content: {application/json: {schema: {type: object, additionalProperties: false, required: [message], properties: {message: {type: string, const: Password-reset instructions will be sent to this email.}}}}}}
     ActiveAccountNotFound: {description: No active account matched the normalized email, content: {application/json: {schema: {type: object, additionalProperties: false, required: [message], properties: {message: {type: string, const: No active account was found for this email.}}}}}}
-    AccountRecoveryInstructionsQueued: {description: An eligible active, verified, 2FA-enabled account matched and one account-recovery confirmation email was queued, content: {application/json: {schema: {type: object, additionalProperties: false, required: [message], properties: {message: {type: string, const: Account-recovery instructions will be sent to this email.}}}}}}
-    EligibleRecoveryAccountNotFound: {description: No account eligible for full account recovery matched the normalized email, content: {application/json: {schema: {type: object, additionalProperties: false, required: [message], properties: {message: {type: string, const: No eligible account was found for this email.}}}}}}
+    AccountRecoveryInstructionsQueued: {description: A recovery email was queued; active 2FA accounts receive full recovery and active accounts without 2FA receive normal password reset, content: {application/json: {schema: {type: object, additionalProperties: false, required: [message], properties: {message: {type: string, enum: [Account-recovery instructions will be sent to this email., Password-reset instructions will be sent to this email.]}}}}}}
+    EligibleRecoveryAccountNotFound: {description: No active account matched the normalized email, content: {application/json: {schema: {type: object, additionalProperties: false, required: [message], properties: {message: {type: string, const: No active account was found for this email.}}}}}}
     RequestUnavailable: {description: The request could not be completed because persistence was unavailable; no success is claimed}
     ValidationError: {description: Field-safe validation errors; no account-existence information}
     GenericFailure: {description: Generic invalid/expired/used failure without secret echo}

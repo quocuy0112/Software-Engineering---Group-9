@@ -63,14 +63,14 @@ describe("account recovery request surface", () => {
     expect(toast.error).not.toHaveBeenCalled();
   });
 
-  it("shows one error toast when no eligible account matches", async () => {
+  it("shows one error toast when no active account matches", async () => {
     vi.stubGlobal(
       "fetch",
       vi
         .fn()
         .mockResolvedValue(
           Response.json(
-            { message: "No eligible account was found for this email." },
+            { message: "No active account was found for this email." },
             { status: 404 },
           ),
         ),
@@ -84,7 +84,7 @@ describe("account recovery request surface", () => {
     );
     await waitFor(() =>
       expect(toast.error).toHaveBeenCalledWith(
-        "No eligible account was found for this email.",
+        "No active account was found for this email.",
         { id: "account-recovery-status" },
       ),
     );

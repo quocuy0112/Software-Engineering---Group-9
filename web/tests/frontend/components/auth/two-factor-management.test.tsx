@@ -1,4 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import {
   cleanup,
   fireEvent,
@@ -13,6 +15,27 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 describe("two-factor management UI", () => {
+  it("groups password and TOTP controls with enough vertical spacing for focus borders", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(Response.json({ csrfProof: "p" })),
+    );
+    render(<TwoFactorManagement />);
+    const fields = screen
+      .getByLabelText("Current password")
+      .closest(".security-management-fields");
+    expect(fields).not.toBeNull();
+    expect(fields).toContainElement(
+      screen.getByLabelText("Six-digit TOTP code"),
+    );
+    const css = await readFile(
+      resolve(process.cwd(), "src/frontend/styles/profile.css"),
+      "utf8",
+    );
+    expect(css).toMatch(
+      /\.security-management-fields\s*\{[^}]*display:\s*grid;[^}]*gap:\s*var\(--sh-space-4\);/,
+    );
+  });
   it("requires proof, shows exactly ten codes once, and clears them", async () => {
     const fetch = vi.fn((url: string) =>
       url.includes("sessions")

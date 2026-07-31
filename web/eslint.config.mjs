@@ -20,10 +20,14 @@ export default defineConfig([
     },
   },
   globalIgnores([
+    "node_modules/**",
     ".next/**",
+    "dist/**",
+    "build/**",
     "coverage/**",
     "playwright-report/**",
     "test-results/**",
+    "**/*.min.js",
     "next-env.d.ts",
   ]),
   {

@@ -6,6 +6,7 @@ import { BetterAuthGateway } from "@/backend/auth/better-auth/better-auth-gatewa
 import { PrismaRegistrationRepository } from "@/backend/repositories/identity/prisma-registration-repository";
 import {
   RegisterAccountService,
+  EMAIL_ALREADY_REGISTERED_MESSAGE,
   GENERIC_REGISTRATION_MESSAGE,
 } from "@/backend/services/identity/register-account";
 import { registrationSchema } from "@/shared/contracts/identity/registration";
@@ -37,7 +38,10 @@ describe("registration persistence", () => {
         { subject: randomUUID() },
       ),
     ]);
-    expect(first.message).toBe(second.message);
+    expect([first.accepted, second.accepted].sort()).toEqual([false, true]);
+    expect([first.message, second.message]).toContain(
+      EMAIL_ALREADY_REGISTERED_MESSAGE,
+    );
     const users = await prisma.userAccount.findMany({
       where: { normalizedEmail: email.toLocaleLowerCase("en-US") },
       include: { candidateIdentity: true, securityTokens: true, outbox: true },
@@ -90,7 +94,7 @@ describe("registration persistence", () => {
     expect(user?.outbox).toHaveLength(1);
     expect(user?.sessions).toHaveLength(0);
   });
-  it("returns the same response for normalized duplicate emails", async () => {
+  it("returns a conflict for normalized duplicate emails", async () => {
     const suffix = randomUUID();
     const service = new RegisterAccountService(
       undefined,
@@ -117,7 +121,15 @@ describe("registration persistence", () => {
       },
       { subject: randomUUID() },
     );
-    expect(first).toEqual(second);
+    expect(first).toEqual({
+      accepted: true,
+      message: GENERIC_REGISTRATION_MESSAGE,
+    });
+    expect(second).toEqual({
+      accepted: false,
+      status: 409,
+      message: EMAIL_ALREADY_REGISTERED_MESSAGE,
+    });
     expect(
       await prisma.userAccount.count({
         where: { normalizedEmail: `duplicate-${suffix}@example.test` },
