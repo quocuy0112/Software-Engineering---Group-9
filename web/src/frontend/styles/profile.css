@@ -221,6 +221,11 @@
   margin-top: var(--sh-space-4);
 }
 
+.security-management-fields {
+  display: grid;
+  gap: var(--sh-space-4);
+}
+
 .totp-qr {
   display: block;
   width: min(100%, 240px);

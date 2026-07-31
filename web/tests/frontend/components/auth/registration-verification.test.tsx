@@ -73,6 +73,47 @@ describe("registration and verification UI", () => {
       "Registration is temporarily unavailable. Please try again.",
     );
   });
+  it("keeps the form open and marks email when it is already registered", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        Response.json(
+          {
+            message: "An account with this email already exists.",
+            fields: {
+              email: ["An account with this email already exists."],
+            },
+          },
+          { status: 409 },
+        ),
+      ),
+    );
+    render(<RegisterForm />);
+    fireEvent.change(screen.getByLabelText("Full name"), {
+      target: { value: "Ada Example" },
+    });
+    fireEvent.change(screen.getByLabelText("Email address"), {
+      target: { value: "ada@example.test" },
+    });
+    fireEvent.change(screen.getByLabelText("Password"), {
+      target: { value: "correct horse 2026" },
+    });
+    fireEvent.change(screen.getByLabelText("Confirm password"), {
+      target: { value: "correct horse 2026" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Create account" }));
+
+    expect(
+      await screen.findByText("An account with this email already exists."),
+    ).toBeVisible();
+    expect(screen.getByLabelText("Email address")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+    expect(
+      screen.queryByRole("heading", { name: "Check your email" }),
+    ).toBeNull();
+  });
   it("keeps resend feedback inline and enumeration resistant", async () => {
     vi.stubGlobal(
       "fetch",

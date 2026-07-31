@@ -27,6 +27,9 @@ describe("full account recovery contract", () => {
     expect(contract).toContain("recoveryCapabilityCookie:");
     expect(contract).toContain("RecoveryHoldActive");
     expect(contract).toContain("AccountRecoveryInstructionsQueued:");
+    expect(contract).toContain(
+      "Password-reset instructions will be sent to this email.",
+    );
     expect(contract).toContain("EligibleRecoveryAccountNotFound:");
     expect(contract).toContain(
       "'404': {$ref: '#/components/responses/EligibleRecoveryAccountNotFound'}",

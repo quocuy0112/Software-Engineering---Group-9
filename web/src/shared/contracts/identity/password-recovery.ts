@@ -85,8 +85,6 @@ export const PASSWORD_RESET_SUCCESS_RESPONSE =
   "Your password has been reset. Sign in again.";
 export const ACCOUNT_RECOVERY_SUCCESS_RESPONSE =
   "Account-recovery instructions will be sent to this email.";
-export const ACCOUNT_RECOVERY_NOT_ELIGIBLE_ERROR =
-  "No eligible account was found for this email.";
 export const ACCOUNT_RECOVERY_INVALID_EMAIL_ERROR =
   "Enter a valid email address.";
 export const ACCOUNT_RECOVERY_RATE_LIMIT_ERROR =
