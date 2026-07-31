@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { HomeAuthenticatedActions } from "./home-authenticated-actions";
+import { SmartHireBrand } from "@/frontend/components/ui/smarthire-brand";
 
 type HomePageViewProps = {
   context: {
@@ -23,12 +24,7 @@ export function HomePageView({ context }: HomePageViewProps) {
   return (
     <main className="home-page">
       <section className="home-visitor" aria-labelledby="home-title">
-        <Link className="smart-hire-brand home-brand" href="/">
-          <span className="brand-mark" aria-hidden="true">
-            S
-          </span>
-          <span>SmartHire</span>
-        </Link>
+        <SmartHireBrand className="home-brand" />
         <p className="home-eyebrow">THE TALENT CONNECTION</p>
         <h1 id="home-title">Make your next great move.</h1>
         <p>
