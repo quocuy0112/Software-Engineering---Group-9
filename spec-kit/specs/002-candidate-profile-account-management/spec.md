@@ -306,16 +306,18 @@ account-security notifications remain enabled.
 - **FR-017**: A provided phone value MUST be NFKC-normalized, trimmed, contain
   7 to 15 ASCII digits after presentation characters are removed, and be at
   most 32 characters. It MUST match
-  `^\+?(?:[0-9]{1,4}|\([0-9]{1,4}\))(?:[ .-]?(?:[0-9]{1,4}|\([0-9]{1,4}\)))*$`:
-  one optional leading `+`; digit groups of one to four digits; and only a
-  single space, hyphen, period, or balanced parentheses as presentation
-  characters. Extensions, letters, slashes, repeated separators, unbalanced
-  parentheses, and a `+` anywhere except the start MUST be rejected. Accepted
-  examples are `0912345678`, `0912 345 678`, `+84 912 345 678`,
-  `(028) 3822-1234`, and `+1 (415) 555-2671`. Rejected examples are `+84`,
-  `0912--345-678`, `+84 912 345 678 ext 9`, `0912/345/678`, and
-  `+84 (912 345-678`. The validated display value is profile contact data
-  only; Feature 002 MUST NOT use it for SMS, verification, or authentication.
+  `^(?=(?:[^0-9]*[0-9]){7,15}[^0-9]*$)\+?(?:[0-9]{1,4}|\([0-9]{1,4}\))(?:[ .-]?(?:[0-9]{1,4}|\([0-9]{1,4}\)))*$`:
+  the leading lookahead enforces the total ASCII-digit count, followed by one
+  optional leading `+`; digit groups of one to four digits; and only a single
+  space, hyphen, period, or balanced parentheses as presentation characters.
+  Extensions, letters, slashes, repeated separators, unbalanced parentheses,
+  a `+` anywhere except the start, fewer than 7 digits, and more than 15 digits
+  MUST be rejected. Accepted examples are `0912345678`, `0912 345 678`,
+  `+84 912 345 678`, `(028) 3822-1234`, and `+1 (415) 555-2671`. Rejected
+  examples are `+84`, `0912--345-678`, `+84 912 345 678 ext 9`,
+  `0912/345/678`, and `+84 (912 345-678`. The validated display value is
+  profile contact data only; Feature 002 MUST NOT use it for SMS,
+  verification, or authentication.
 - **FR-018**: Each social link MUST be a complete `http` or `https` URL of at
   most 2,048 characters, MUST NOT contain embedded credentials, and MUST reject
   executable or non-web schemes.

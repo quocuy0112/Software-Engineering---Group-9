@@ -375,10 +375,11 @@ components:
         phone:
           type: [string, "null"]
           maxLength: 32
-          pattern: '^\+?(?:[0-9]{1,4}|\([0-9]{1,4}\))(?:[ .-]?(?:[0-9]{1,4}|\([0-9]{1,4}\)))*$'
+          pattern: '^(?=(?:[^0-9]*[0-9]){7,15}[^0-9]*$)\+?(?:[0-9]{1,4}|\([0-9]{1,4}\))(?:[ .-]?(?:[0-9]{1,4}|\([0-9]{1,4}\)))*$'
           description: >-
-            Optional validated display number with 7-15 ASCII digits after
-            allowed presentation characters are removed; extensions are forbidden.
+            Optional validated display number. The anchored lookahead enforces
+            7-15 total ASCII digits; only the specified grouping and presentation
+            characters are allowed, and extensions are forbidden.
         location:
           type: [string, "null"]
           maxLength: 160
