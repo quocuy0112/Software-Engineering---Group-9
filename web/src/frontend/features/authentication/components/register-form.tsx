@@ -43,9 +43,14 @@ export function RegisterForm() {
         fields?: Record<string, string[]>;
       } | null;
       if (!response.ok) {
-        for (const [field, messages] of Object.entries(body?.fields ?? {}))
+        const fieldEntries = Object.entries(body?.fields ?? {});
+        for (const [field, messages] of fieldEntries)
           setError(field as keyof RegistrationInput, { message: messages[0] });
-        setServerStatus(body?.message ?? GENERIC_REGISTRATION_ERROR);
+        setServerStatus(
+          fieldEntries.length === 0
+            ? (body?.message ?? GENERIC_REGISTRATION_ERROR)
+            : "",
+        );
         toast.error("Registration needs attention.");
         return;
       }

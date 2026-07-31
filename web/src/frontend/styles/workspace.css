@@ -6,9 +6,11 @@
 }
 
 .workspace-layout {
+  --sh-sidebar-current-width: var(--sh-sidebar-width);
+
   display: grid;
   min-height: 100dvh;
-  grid-template-columns: var(--sh-sidebar-width) minmax(0, 1fr);
+  grid-template-columns: var(--sh-sidebar-current-width) minmax(0, 1fr);
 }
 
 .workspace-sidebar {
@@ -18,7 +20,7 @@
   left: 0;
   z-index: 30;
   display: flex;
-  width: var(--sh-sidebar-width);
+  width: var(--sh-sidebar-current-width);
   height: 100dvh;
   min-width: 0;
   flex-direction: column;
@@ -593,7 +595,7 @@
 }
 
 .workspace-layout[data-sidebar-collapsed="true"] {
-  grid-template-columns: 4.75rem minmax(0, 1fr);
+  --sh-sidebar-current-width: 4.75rem;
 }
 
 .workspace-sidebar {
@@ -603,6 +605,9 @@
   height: 100%;
   max-height: none;
   overflow: hidden;
+  transition:
+    width 180ms ease,
+    padding 180ms ease;
 }
 
 .workspace-main {
@@ -748,6 +753,7 @@
     height: auto;
     max-height: none;
     min-height: 0;
+    width: 100%;
     padding: 1rem;
     overflow: visible;
   }

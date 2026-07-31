@@ -221,7 +221,7 @@ test("full recovery differentiates request eligibility, is cancellable once, hel
   await page
     .getByRole("button", { name: "Send recovery instructions" })
     .click();
-  await expect(page.getByRole("status")).toContainText("No eligible account");
+  await expect(page.getByRole("status")).toContainText("No active account");
 
   const first = await requestRecovery(page, email);
   await expect(page.getByRole("status")).toContainText(

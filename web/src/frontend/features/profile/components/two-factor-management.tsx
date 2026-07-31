@@ -190,24 +190,26 @@ export function TwoFactorManagement({
       <p className="security-panel-copy">
         Regenerating codes invalidates every older backup code.
       </p>
-      <PasswordField
-        label="Current password"
-        id="management-password"
-        autoComplete="current-password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <div className="field">
-        <label htmlFor="management-code">Six-digit TOTP code</label>
-        <input
-          id="management-code"
-          inputMode="numeric"
-          maxLength={6}
-          value={code}
-          onChange={(e) =>
-            setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
-          }
+      <div className="security-management-fields">
+        <PasswordField
+          label="Current password"
+          id="management-password"
+          autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
+        <div className="field">
+          <label htmlFor="management-code">Six-digit TOTP code</label>
+          <input
+            id="management-code"
+            inputMode="numeric"
+            maxLength={6}
+            value={code}
+            onChange={(e) =>
+              setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+            }
+          />
+        </div>
       </div>
       <div className="security-actions">
         <button
