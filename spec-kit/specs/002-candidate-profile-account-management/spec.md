@@ -303,10 +303,19 @@ account-security notifications remain enabled.
   a current education entry MAY omit its end date or provide a future expected
   completion date. Any provided end date MUST NOT precede its start date.
   Institution, degree, and field MUST each be at most 200 characters.
-- **FR-017**: A provided phone value MUST use a plausible national or
-  international phone format and contain 7 to 15 digits after presentation
-  separators are ignored. Phone is optional profile contact/display data only;
-  Feature 002 MUST NOT use it for SMS, verification, or authentication.
+- **FR-017**: A provided phone value MUST be NFKC-normalized, trimmed, contain
+  7 to 15 ASCII digits after presentation characters are removed, and be at
+  most 32 characters. It MUST match
+  `^\+?(?:[0-9]{1,4}|\([0-9]{1,4}\))(?:[ .-]?(?:[0-9]{1,4}|\([0-9]{1,4}\)))*$`:
+  one optional leading `+`; digit groups of one to four digits; and only a
+  single space, hyphen, period, or balanced parentheses as presentation
+  characters. Extensions, letters, slashes, repeated separators, unbalanced
+  parentheses, and a `+` anywhere except the start MUST be rejected. Accepted
+  examples are `0912345678`, `0912 345 678`, `+84 912 345 678`,
+  `(028) 3822-1234`, and `+1 (415) 555-2671`. Rejected examples are `+84`,
+  `0912--345-678`, `+84 912 345 678 ext 9`, `0912/345/678`, and
+  `+84 (912 345-678`. The validated display value is profile contact data
+  only; Feature 002 MUST NOT use it for SMS, verification, or authentication.
 - **FR-018**: Each social link MUST be a complete `http` or `https` URL of at
   most 2,048 characters, MUST NOT contain embedded credentials, and MUST reject
   executable or non-web schemes.
@@ -451,6 +460,10 @@ account-security notifications remain enabled.
   `account_security` flag.
 - **Password Change Attempt Window**: Shared account-level state that tracks
   incorrect current-password checks and a temporary password-change lock.
+- **Password Change Operation**: An internal durable, idempotent orchestration
+  record that tracks password-update, other-session-revocation, notification,
+  audit, and finalization milestones. It stores no password, credential hash,
+  session token, raw request body, or email address.
 - **Security Audit Event**: An allowlisted record of a sensitive account action
   and its outcome, actor, target, timestamp, and privacy-protected network
   source; it contains no authentication secrets.
@@ -517,12 +530,16 @@ account-security notifications remain enabled.
 
 ### Measurable Outcomes
 
-- **SC-001**: Under the documented normal test environment, 95% of authenticated
-  users can load profile or account-management views within 3 seconds and see a
-  visible loading, empty, or completed state rather than a blank page.
-- **SC-002**: Under the documented normal test environment, 95% of valid
-  profile, identity, and preference updates produce a visible result within 2
-  seconds, excluding asynchronous email delivery.
+- **SC-001**: Under the documented normal test environment and maximum supported
+  Profile dataset, the p95 elapsed time from authenticated navigation start
+  until a visible loading, empty, or completed profile/account-management state
+  MUST be at most 3 seconds over at least 100 warm samples per measured view
+  class.
+- **SC-002**: Under the documented normal test environment, the p95 elapsed time
+  from a valid profile, identity, or preference submission until authoritative
+  data and an accessible visible result are shown MUST be at most 2 seconds over
+  at least 100 warm samples per measured mutation class, excluding asynchronous
+  provider delivery.
 - **SC-003**: At least 90% of representative users can complete each primary
   profile, identity, preference, and password task on their first attempt
   without assistance in usability testing.
