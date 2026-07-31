@@ -27,8 +27,12 @@ export async function POST(request: Request) {
   const headers = new Headers(noStoreHeaders);
   if (!outcome.accepted && outcome.retryAfterSeconds)
     headers.set("Retry-After", String(outcome.retryAfterSeconds));
-  return Response.json(
-    { message: outcome.message },
-    { status: outcome.accepted ? 202 : outcome.status, headers },
-  );
+  const body =
+    !outcome.accepted && outcome.status === 409
+      ? { message: outcome.message, fields: { email: [outcome.message] } }
+      : { message: outcome.message };
+  return Response.json(body, {
+    status: outcome.accepted ? 202 : outcome.status,
+    headers,
+  });
 }

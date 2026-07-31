@@ -1,4 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { AuthShell } from "@/frontend/features/authentication/components/auth-shell";
 import { WorkspaceShell } from "@/frontend/features/dashboard/components/workspace-shell";
@@ -134,6 +136,18 @@ describe("identity navigation shells", () => {
     ).toHaveAttribute("aria-expanded", "false");
     expect(screen.getByRole("link", { name: "Dashboard" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Sign out" })).toBeVisible();
+  });
+
+  it("keeps the sidebar frame width synchronized with the collapsed grid track", async () => {
+    const css = await readFile(
+      resolve(process.cwd(), "src/frontend/styles/workspace.css"),
+      "utf8",
+    );
+    expect(css).toContain(
+      "--sh-sidebar-current-width: var(--sh-sidebar-width);",
+    );
+    expect(css).toContain("--sh-sidebar-current-width: 4.75rem;");
+    expect(css).toContain("width: var(--sh-sidebar-current-width);");
   });
 
   it("keeps the dashboard limited to identity shortcuts and future placeholders", () => {

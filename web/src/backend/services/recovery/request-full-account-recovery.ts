@@ -7,8 +7,8 @@ import {
 import { TokenProtector } from "@/backend/security/security-token/security-tokens";
 import { PrismaAccountRecoveryRepository } from "@/backend/repositories/identity/prisma-account-recovery-repository";
 import { PrismaRateLimitRepository } from "@/backend/repositories/rate-limit/prisma-rate-limit-repository";
+import { RequestPasswordResetService } from "@/backend/services/recovery/request-password-reset";
 import {
-  ACCOUNT_RECOVERY_NOT_ELIGIBLE_ERROR,
   ACCOUNT_RECOVERY_RATE_LIMIT_ERROR,
   ACCOUNT_RECOVERY_REQUEST_FAILED_ERROR,
   ACCOUNT_RECOVERY_SUCCESS_RESPONSE,
@@ -19,6 +19,7 @@ export class RequestFullAccountRecoveryService {
     private readonly repository = new PrismaAccountRecoveryRepository(),
     private readonly limiter = new PrismaRateLimitRepository(),
     private readonly protector = new TokenProtector(),
+    private readonly passwordReset = new RequestPasswordResetService(),
   ) {}
 
   async execute(normalizedEmail: string, now = new Date()) {
@@ -52,11 +53,15 @@ export class RequestFullAccountRecoveryService {
           now,
         });
       if (!recoveryRequest) {
-        return {
-          accepted: false as const,
-          status: 404 as const,
-          message: ACCOUNT_RECOVERY_NOT_ELIGIBLE_ERROR,
-        };
+        // An ACTIVE account without 2FA does not need the lower-assurance
+        // 24-hour full-recovery saga. Route it through the normal reset path
+        // so the user still receives a useful recovery email. Unknown,
+        // inactive, or otherwise ineligible accounts remain a 404 there.
+        return this.passwordReset.execute(
+          normalizedEmail,
+          "account-recovery-fallback",
+          now,
+        );
       }
     } catch {
       return {

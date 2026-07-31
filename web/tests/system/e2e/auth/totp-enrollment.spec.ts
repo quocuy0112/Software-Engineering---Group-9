@@ -144,6 +144,17 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   const qr = page.getByRole("img", { name: /QR code/i });
   await expect(qr).toBeVisible();
   expect(await qr.getAttribute("src")).toMatch(/^data:image\/png;base64,/);
+  await expect
+    .poll(() =>
+      qr.evaluate(
+        (image) =>
+          image instanceof HTMLImageElement &&
+          image.complete &&
+          image.naturalWidth > 0 &&
+          image.naturalHeight > 0,
+      ),
+    )
+    .toBe(true);
   await expect(page.getByText("Can't scan?")).toBeVisible();
 
   const manualKey = (
@@ -302,7 +313,6 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   });
   await management.getByLabel("Current password").fill(password);
   await management.getByLabel("Six-digit TOTP code").fill(totp(manualKey));
-  page.once("dialog", (dialog) => dialog.accept());
   const regeneration = page.waitForResponse(
     (response) =>
       response
@@ -313,9 +323,18 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await management
     .getByRole("button", { name: "Regenerate backup codes" })
     .click();
+  const regenerateDialog = page.getByRole("dialog", {
+    name: "Replace backup codes?",
+  });
+  await expect(regenerateDialog).toBeVisible();
+  await regenerateDialog
+    .getByRole("button", { name: "Regenerate codes" })
+    .click();
   expect((await regeneration).status()).toBe(200);
   await expect(
-    management.getByRole("heading", { name: "Save your ten new backup codes" }),
+    management.getByRole("heading", {
+      name: "Save your ten new backup codes",
+    }),
   ).toBeVisible();
   await expect(management.locator("li code")).toHaveCount(10);
   const replacementCode = (
@@ -342,7 +361,7 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await page.getByLabel("Backup code").fill(oldCode);
   await page.getByRole("button", { name: "Verify" }).click();
   await expect(page.getByRole("status")).toContainText(
-    /could not be completed|invalid/i,
+    "could not be completed",
   );
   await page.getByLabel("Backup code").fill(replacementCode);
   const replacementLogin = page.waitForResponse(
@@ -361,7 +380,6 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   });
   await disablePanel.getByLabel("Current password").fill(password);
   await disablePanel.getByLabel("Six-digit TOTP code").fill(totp(manualKey));
-  page.once("dialog", (dialog) => dialog.accept());
   const disablement = page.waitForResponse(
     (response) =>
       response.url().endsWith("/api/identity/two-factor/disable") &&
@@ -370,6 +388,11 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await disablePanel
     .getByRole("button", { name: "Disable two-factor authentication" })
     .click();
+  const disableDialog = page.getByRole("dialog", {
+    name: "Disable two-factor authentication?",
+  });
+  await expect(disableDialog).toBeVisible();
+  await disableDialog.getByRole("button", { name: "Disable 2FA" }).click();
   expect((await disablement).status()).toBe(200);
   await expect(
     page.getByRole("heading", { name: "Set up two-factor authentication" }),
@@ -395,7 +418,7 @@ test("enrolls TOTP and completes backup-code login end-to-end", async ({
   await page.getByLabel("Backup code").fill(replacementCode);
   await page.getByRole("button", { name: "Verify" }).click();
   await expect(page.getByRole("status")).toContainText(
-    /could not be completed|invalid/i,
+    "could not be completed",
   );
 });
 

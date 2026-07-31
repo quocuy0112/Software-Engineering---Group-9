@@ -8,6 +8,8 @@ import {
 } from "@/frontend/features/authentication/client/query-options";
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
 import { AppProviders } from "@/frontend/providers/app-providers";
+import { Badge } from "@/frontend/components/ui/badge";
+import { EmptyState } from "@/frontend/components/ui/empty-state";
 
 export function SessionList({ embedded = false }: { embedded?: boolean }) {
   return (
@@ -62,7 +64,9 @@ function SessionListContent({ embedded = false }: { embedded?: boolean }) {
               account.
             </p>
           </div>
-          <span className="page-heading-badge">{sessions.length} active</span>
+          <Badge className="page-heading-badge" tone="info">
+            {sessions.length} active
+          </Badge>
         </header>
       ) : null}
       <AuthStatus id="session-list-status" status={status} tone={statusTone} />
@@ -103,10 +107,12 @@ function SessionListContent({ embedded = false }: { embedded?: boolean }) {
         ))}
       </ul>
       {!sessionsQuery.isPending && sessions.length === 0 ? (
-        <div className="session-empty">
-          <span aria-hidden="true">□</span>
-          <p>No active sessions are available to display.</p>
-        </div>
+        <EmptyState
+          className="session-empty"
+          icon="□"
+          title="No active sessions"
+          description="No active sessions are available to display."
+        />
       ) : null}
     </section>
   );

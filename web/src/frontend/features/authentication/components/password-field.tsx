@@ -1,5 +1,7 @@
 "use client";
 import { useId, useState, type InputHTMLAttributes } from "react";
+import { Button } from "@/frontend/components/ui/button";
+import { Input } from "@/frontend/components/ui/input";
 
 type Props = Omit<InputHTMLAttributes<HTMLInputElement>, "type"> & {
   label: string;
@@ -19,16 +21,17 @@ export function PasswordField({
     <div className="field">
       <label htmlFor={id}>{label}</label>
       <div className="password-control">
-        <input
+        <Input
           {...props}
           id={id}
           type={visible ? "text" : "password"}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? errorId : props["aria-describedby"]}
         />
-        <button
-          type="button"
+        <Button
           className="secondary-action"
+          variant="secondary"
+          size="icon"
           aria-label={`${visible ? "Hide" : "Show"} password`}
           title={`${visible ? "Hide" : "Show"} ${label.toLowerCase()}`}
           aria-controls={id}
@@ -50,7 +53,7 @@ export function PasswordField({
               }
             />
           </svg>
-        </button>
+        </Button>
       </div>
       {error ? (
         <p id={errorId} role="alert">

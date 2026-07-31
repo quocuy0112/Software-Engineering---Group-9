@@ -13,12 +13,16 @@ import { PrismaRateLimitRepository } from "@/backend/repositories/rate-limit/pri
 
 export const GENERIC_REGISTRATION_MESSAGE =
   "If the address can be registered, check your email for the next step.";
+export const EMAIL_ALREADY_REGISTERED_MESSAGE =
+  "An account with this email already exists.";
+export const REGISTRATION_FAILED_MESSAGE =
+  "Registration is temporarily unavailable. Please try again.";
 
 export type RegistrationOutcome =
   | { accepted: true; message: string }
   | {
       accepted: false;
-      status: 400 | 429;
+      status: 400 | 409 | 429 | 503;
       message: string;
       retryAfterSeconds?: number;
     };
@@ -111,6 +115,18 @@ export class RegisterAccountService {
           },
         })
         .catch(() => undefined);
+      if (error instanceof DuplicateRegistrationError) {
+        return {
+          accepted: false,
+          status: 409,
+          message: EMAIL_ALREADY_REGISTERED_MESSAGE,
+        };
+      }
+      return {
+        accepted: false,
+        status: 503,
+        message: REGISTRATION_FAILED_MESSAGE,
+      };
     }
     return { accepted: true, message: GENERIC_REGISTRATION_MESSAGE };
   }

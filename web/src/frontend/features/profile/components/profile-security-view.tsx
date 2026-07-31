@@ -1,5 +1,6 @@
 import { ProfileNavigation } from "./profile-navigation";
 import { ProfileSecurity } from "./profile-security";
+import { Badge } from "@/frontend/components/ui/badge";
 
 type ProfileSecurityViewProps = {
   twoFactorEnabled: boolean;
@@ -22,9 +23,9 @@ export function ProfileSecurityView({
             Confirm your password before changing high-impact settings.
           </p>
         </div>
-        <span className="page-heading-badge page-heading-badge--secure">
-          {twoFactorEnabled ? "2FA enabled" : "2FA not enabled"}
-        </span>
+        <Badge tone={twoFactorEnabled ? "success" : "warning"}>
+          {twoFactorEnabled ? "2FA enabled" : "2FA recommended"}
+        </Badge>
       </header>
       <ProfileNavigation active="security" />
       <ProfileSecurity

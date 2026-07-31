@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
 import { PasswordField } from "@/frontend/features/authentication/components/password-field";
 import { useReplayableStatus } from "@/frontend/features/authentication/components/use-status";
+import { Button } from "@/frontend/components/ui/button";
+import { Modal } from "@/frontend/components/ui/modal";
 
 const MAX_TWO_FACTOR_MANAGEMENT_ATTEMPTS = 5;
 const TWO_FACTOR_MANAGEMENT_ATTEMPTS_WINDOW_SECONDS = 10 * 60;
@@ -79,7 +81,10 @@ export function TwoFactorManagement({
     { status, setStatus } = useReplayableStatus(""),
     [tone, setTone] = useState<"error" | "success">("success"),
     [busy, setBusy] = useState(false),
-    [isLocked, setIsLocked] = useState(false);
+    [isLocked, setIsLocked] = useState(false),
+    [confirmAction, setConfirmAction] = useState<
+      "regenerate" | "disable" | null
+    >(null);
   useEffect(() => {
     fetch("/api/identity/sessions", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
@@ -172,7 +177,7 @@ export function TwoFactorManagement({
     >
       <div className="security-panel-heading">
         <span
-          className="security-panel-icon security-panel-icon--mint"
+          className="security-panel-icon security-panel-icon--success"
           aria-hidden="true"
         >
           ◎
@@ -185,24 +190,26 @@ export function TwoFactorManagement({
       <p className="security-panel-copy">
         Regenerating codes invalidates every older backup code.
       </p>
-      <PasswordField
-        label="Current password"
-        id="management-password"
-        autoComplete="current-password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <div className="field">
-        <label htmlFor="management-code">Six-digit TOTP code</label>
-        <input
-          id="management-code"
-          inputMode="numeric"
-          maxLength={6}
-          value={code}
-          onChange={(e) =>
-            setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
-          }
+      <div className="security-management-fields">
+        <PasswordField
+          label="Current password"
+          id="management-password"
+          autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
+        <div className="field">
+          <label htmlFor="management-code">Six-digit TOTP code</label>
+          <input
+            id="management-code"
+            inputMode="numeric"
+            maxLength={6}
+            value={code}
+            onChange={(e) =>
+              setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+            }
+          />
+        </div>
       </div>
       <div className="security-actions">
         <button
@@ -210,14 +217,7 @@ export function TwoFactorManagement({
           disabled={
             busy || isLocked || !proof || !password || code.length !== 6
           }
-          onClick={() => {
-            if (
-              window.confirm(
-                "Regenerate backup codes? All older codes will stop working.",
-              )
-            )
-              void submit("/api/identity/two-factor/backup-codes/regenerate");
-          }}
+          onClick={() => setConfirmAction("regenerate")}
         >
           Regenerate backup codes
         </button>
@@ -227,10 +227,7 @@ export function TwoFactorManagement({
           disabled={
             busy || isLocked || !proof || !password || code.length !== 6
           }
-          onClick={() => {
-            if (window.confirm("Disable two-factor authentication?"))
-              void submit("/api/identity/two-factor/disable");
-          }}
+          onClick={() => setConfirmAction("disable")}
         >
           Disable two-factor authentication
         </button>
@@ -251,6 +248,50 @@ export function TwoFactorManagement({
         </div>
       ) : null}
       <AuthStatus status={status} tone={tone} />
+      <Modal
+        open={confirmAction !== null}
+        title={
+          confirmAction === "disable"
+            ? "Disable two-factor authentication?"
+            : "Replace backup codes?"
+        }
+        description={
+          confirmAction === "disable"
+            ? "Your account will no longer require an authenticator code when signing in."
+            : "All existing backup codes will stop working immediately."
+        }
+        tone={confirmAction === "disable" ? "destructive" : "standard"}
+        busy={busy}
+        onClose={() => setConfirmAction(null)}
+      >
+        <div className="sh-modal-actions">
+          <Button
+            variant="secondary"
+            disabled={busy}
+            onClick={() => setConfirmAction(null)}
+          >
+            Cancel
+          </Button>
+          <Button
+            data-autofocus
+            variant={confirmAction === "disable" ? "danger" : "primary"}
+            disabled={busy}
+            onClick={() => {
+              const path =
+                confirmAction === "disable"
+                  ? "/api/identity/two-factor/disable"
+                  : "/api/identity/two-factor/backup-codes/regenerate";
+              void submit(path).then(() => setConfirmAction(null));
+            }}
+          >
+            {busy
+              ? "Working…"
+              : confirmAction === "disable"
+                ? "Disable 2FA"
+                : "Regenerate codes"}
+          </Button>
+        </div>
+      </Modal>
     </section>
   );
 }

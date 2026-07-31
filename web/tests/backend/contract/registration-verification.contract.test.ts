@@ -45,6 +45,9 @@ describe("registration and verification HTTP contract", () => {
       "utf8",
     );
     expect(openapi).toContain("/api/identity/register:");
+    expect(openapi).toContain(
+      "'409': {description: The normalized email is already registered",
+    );
     expect(openapi).toContain("/api/identity/verification/consume:");
     expect(openapi).toMatch(/password: \{[^\n]*writeOnly: true/);
     expect(openapi).toMatch(/TokenRequest:[^\n]*writeOnly: true/);

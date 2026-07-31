@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("rejects invalid input and keeps an existing registration generic", async ({
+test("rejects invalid input and reports an existing registration", async ({
   page,
 }) => {
   const email = `duplicate-${Date.now()}-${Math.random().toString(16).slice(2)}@example.test`;
@@ -36,9 +36,12 @@ test("rejects invalid input and keeps an existing registration generic", async (
       response.request().method() === "POST",
   );
   await page.getByRole("button", { name: "Create account" }).click();
-  expect((await duplicate).status()).toBe(202);
+  expect((await duplicate).status()).toBe(409);
+  await expect(
+    page.getByText("An account with this email already exists."),
+  ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Check your email" }),
-  ).toBeVisible();
+  ).toHaveCount(0);
   expect(await page.locator("body").innerText()).not.toContain(email);
 });

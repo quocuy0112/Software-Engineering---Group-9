@@ -1,4 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import {
   cleanup,
   fireEvent,
@@ -13,8 +15,28 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 describe("two-factor management UI", () => {
+  it("groups password and TOTP controls with enough vertical spacing for focus borders", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(Response.json({ csrfProof: "p" })),
+    );
+    render(<TwoFactorManagement />);
+    const fields = screen
+      .getByLabelText("Current password")
+      .closest(".security-management-fields");
+    expect(fields).not.toBeNull();
+    expect(fields).toContainElement(
+      screen.getByLabelText("Six-digit TOTP code"),
+    );
+    const css = await readFile(
+      resolve(process.cwd(), "src/frontend/styles/profile.css"),
+      "utf8",
+    );
+    expect(css).toMatch(
+      /\.security-management-fields\s*\{[^}]*display:\s*grid;[^}]*gap:\s*var\(--sh-space-4\);/,
+    );
+  });
   it("requires proof, shows exactly ten codes once, and clears them", async () => {
-    vi.spyOn(window, "confirm").mockReturnValue(true);
     const fetch = vi.fn((url: string) =>
       url.includes("sessions")
         ? Promise.resolve(Response.json({ csrfProof: "p" }))
@@ -40,6 +62,10 @@ describe("two-factor management UI", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: /Regenerate/ }));
     expect(
+      await screen.findByRole("dialog", { name: "Replace backup codes?" }),
+    ).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Regenerate codes" }));
+    expect(
       await screen.findByText("Save your ten new backup codes"),
     ).toBeVisible();
     expect(screen.getAllByRole("listitem")).toHaveLength(10);
@@ -54,7 +80,6 @@ describe("two-factor management UI", () => {
         : new Promise<Response>((r) => (resolve = r)),
     );
     vi.stubGlobal("fetch", fetch);
-    vi.spyOn(window, "confirm").mockReturnValue(true);
     render(<TwoFactorManagement />);
     await waitFor(() =>
       expect(fetch).toHaveBeenCalledWith(
@@ -72,7 +97,14 @@ describe("two-factor management UI", () => {
       expect(screen.getByRole("button", { name: /Disable/ })).toBeEnabled(),
     );
     fireEvent.click(screen.getByRole("button", { name: /Disable/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Disable/ }));
+    expect(
+      await screen.findByRole("dialog", {
+        name: "Disable two-factor authentication?",
+      }),
+    ).toBeVisible();
+    const confirmButton = screen.getByRole("button", { name: "Disable 2FA" });
+    fireEvent.click(confirmButton);
+    fireEvent.click(confirmButton);
     expect(fetch).toHaveBeenCalledTimes(2);
     resolve(Response.json({ message: "ok" }));
   });

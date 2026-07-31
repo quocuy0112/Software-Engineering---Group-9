@@ -101,10 +101,13 @@ describe("identity HTTP controls", () => {
         "https://app.example.test",
       ),
     ).toBe("/settings?tab=sessions"));
-  it("applies no-store, framing, referrer, and script policy to sensitive responses", () => {
+  it("applies no-store, framing, referrer, and asset policies to sensitive responses", () => {
     expect(noStoreHeaders["Cache-Control"]).toContain("no-store");
     expect(noStoreHeaders["Content-Security-Policy"]).toContain(
       "frame-ancestors 'none'",
+    );
+    expect(noStoreHeaders["Content-Security-Policy"]).toContain(
+      "img-src 'self' data:",
     );
     expect(noStoreHeaders["Referrer-Policy"]).toBe("no-referrer");
   });
