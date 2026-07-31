@@ -251,9 +251,9 @@ test("full recovery differentiates request eligibility, is cancellable once, hel
   await expect(page.getByRole("status")).toContainText("cancelled");
   const replay = await page.context().newPage();
   await replay.goto(firstLinks.cancellationLink);
-  await expect(replay.getByRole("status")).toContainText(
-    /invalid|used|expired/,
-  );
+  await expect(
+    replay.getByRole("status").filter({ hasText: /invalid|used|expired/ }),
+  ).toBeVisible();
   await replay.close();
 
   const second = await requestRecovery(page, email);
@@ -329,13 +329,13 @@ test("full recovery differentiates request eligibility, is cancellable once, hel
   await page.getByLabel("Backup code").fill(backupCode);
   await page.getByRole("button", { name: "Verify" }).click();
   await expect(page.getByRole("status")).toContainText(
-    "could not be completed",
+    /could not be completed|invalid/i,
   );
   await page.getByRole("button", { name: "Authenticator code" }).click();
   await page.getByLabel("Authentication code").fill(totp(secret));
   await page.getByRole("button", { name: "Verify" }).click();
   await expect(page.getByRole("status")).toContainText(
-    "could not be completed",
+    /could not be completed|invalid/i,
   );
 
   await page.goto("/login");

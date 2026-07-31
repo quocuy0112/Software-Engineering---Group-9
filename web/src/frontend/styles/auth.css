@@ -27,7 +27,7 @@
 }
 .auth-navigation a:focus-visible,
 .auth-footer a:focus-visible {
-  outline: 3px solid #f59e0b;
+  outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
   border-radius: 0.2rem;
 }
@@ -117,7 +117,7 @@
   cursor: wait;
 }
 .auth-card :focus-visible {
-  outline: 3px solid #f59e0b;
+  outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
 }
 .password-control {
@@ -535,7 +535,7 @@
 .auth-form input {
   width: 100%;
   min-height: 3.05rem;
-  border: 1px solid #d9dcd4;
+  border: 1px solid var(--control-border);
   border-radius: 0.75rem;
   padding: 0.75rem 0.85rem;
   color: var(--ink);
@@ -652,7 +652,7 @@
 
 .auth-card :focus-visible,
 .auth-page a:focus-visible {
-  outline: 3px solid #c49b45;
+  outline: 3px solid var(--focus-ring);
   outline-offset: 3px;
 }
 

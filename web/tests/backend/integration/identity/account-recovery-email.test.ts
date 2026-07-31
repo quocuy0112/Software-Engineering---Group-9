@@ -35,9 +35,7 @@ describe("full account recovery email proof delivery", () => {
       delivered.push(message);
       return { providerMessageId: "capture:test" };
     });
-    await expect(
-      deliverOutboxMessage(outbox.id, { send }),
-    ).resolves.toBe(true);
+    await expect(deliverOutboxMessage(outbox.id, { send })).resolves.toBe(true);
     const message = delivered[0];
     expect(message?.text).toContain(
       `/account-recovery/confirm#proof=${rawProof}`,

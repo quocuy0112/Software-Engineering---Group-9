@@ -21,7 +21,15 @@ describe("AuthStatus", () => {
     render(<AuthStatus status={"First issue\nSecond issue"} tone="error" />);
 
     expect(toast.error).toHaveBeenCalledTimes(2);
-    expect(toast.error).toHaveBeenNthCalledWith(1, "First issue", expect.anything());
-    expect(toast.error).toHaveBeenNthCalledWith(2, "Second issue", expect.anything());
+    expect(toast.error).toHaveBeenNthCalledWith(
+      1,
+      "First issue",
+      expect.anything(),
+    );
+    expect(toast.error).toHaveBeenNthCalledWith(
+      2,
+      "Second issue",
+      expect.anything(),
+    );
   });
 });

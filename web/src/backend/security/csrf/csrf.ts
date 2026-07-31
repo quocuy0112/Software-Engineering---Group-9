@@ -1,3 +1,4 @@
+import "server-only";
 import { timingSafeEqual } from "node:crypto";
 
 function equal(left: string, right: string) {

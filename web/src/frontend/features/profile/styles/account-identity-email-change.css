@@ -1,0 +1,189 @@
+.account-identity-page,
+.verify-email-change {
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.account-identity-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.account-identity-panel {
+  min-width: 0;
+  max-width: 100%;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.88);
+}
+
+.account-panel-heading h2 {
+  margin: 0.35rem 0 1rem;
+  color: var(--ink);
+  font-size: 1.2rem;
+}
+
+.account-identity-panel form {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.account-identity-panel label {
+  color: #394137;
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.account-identity-panel input {
+  width: 100%;
+  max-width: 100%;
+  min-height: 2.9rem;
+  border: 1px solid var(--control-border);
+  border-radius: 0.7rem;
+  padding: 0.7rem 0.8rem;
+  background: #fbfbf9;
+  font: inherit;
+}
+
+.account-identity-panel button,
+.verify-email-change button {
+  min-height: 2.8rem;
+  border: 0;
+  border-radius: 0.7rem;
+  padding: 0.7rem 0.9rem;
+  color: #fff;
+  background: var(--forest);
+  font: inherit;
+  font-weight: 750;
+}
+
+.account-identity-panel button:disabled,
+.verify-email-change button:disabled {
+  opacity: 0.55;
+}
+
+.account-identity-page :focus-visible,
+.verify-email-change :focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.account-identity-metadata {
+  display: grid;
+  gap: 0.65rem;
+  margin: 1.2rem 0 0;
+}
+
+.account-identity-metadata > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.55rem;
+}
+
+.account-identity-metadata dt {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.account-identity-metadata dd {
+  max-width: 65%;
+  margin: 0;
+  text-align: right;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.email-change-pending {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  border: 1px solid #decf99;
+  border-radius: 0.75rem;
+  padding: 0.8rem;
+  color: #695525;
+  background: #fff9e8;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.account-panel-copy,
+.account-panel-guidance {
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
+.account-identity-feedback {
+  min-height: 0.4rem;
+  margin-bottom: 0.7rem;
+}
+
+.account-identity-feedback p,
+.verify-email-change-success,
+.verify-email-change-error {
+  margin: 0;
+  border: 1px solid #bad6c2;
+  border-radius: 0.75rem;
+  padding: 0.8rem;
+  color: #315e3f;
+  background: #edf8f0;
+}
+
+.account-identity-feedback [data-feedback-kind="error"],
+.verify-email-change-error {
+  border-color: #e5b5b5;
+  color: var(--danger);
+  background: #fff1f1;
+}
+
+.verify-email-change {
+  display: grid;
+  gap: 1rem;
+}
+
+.verify-email-change a {
+  color: #5e4e99;
+  font-weight: 750;
+}
+
+@media (max-width: 760px) {
+  .account-identity-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 320px) {
+  .account-identity-panel {
+    padding: 0.8rem;
+  }
+
+  .account-identity-metadata > div {
+    display: block;
+  }
+
+  .account-identity-metadata dd {
+    max-width: 100%;
+    margin-top: 0.2rem;
+    text-align: left;
+  }
+
+  .account-identity-panel button,
+  .verify-email-change button {
+    width: 100%;
+    max-width: 100%;
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-identity-page *,
+  .verify-email-change * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

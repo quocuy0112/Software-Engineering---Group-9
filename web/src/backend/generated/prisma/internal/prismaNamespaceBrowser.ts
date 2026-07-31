@@ -57,6 +57,16 @@ export const ModelName = {
   Verification: 'Verification',
   TwoFactor: 'TwoFactor',
   CandidateIdentity: 'CandidateIdentity',
+  CandidateProfile: 'CandidateProfile',
+  ProfileExperience: 'ProfileExperience',
+  ProfileEducation: 'ProfileEducation',
+  Skill: 'Skill',
+  CandidateProfileSkill: 'CandidateProfileSkill',
+  SocialLink: 'SocialLink',
+  AccountPreferences: 'AccountPreferences',
+  EmailChangeRequest: 'EmailChangeRequest',
+  PasswordChangeAttemptWindow: 'PasswordChangeAttemptWindow',
+  PasswordChangeOperation: 'PasswordChangeOperation',
   SecurityToken: 'SecurityToken',
   PasswordResetOperation: 'PasswordResetOperation',
   FullAccountRecoveryOperation: 'FullAccountRecoveryOperation',
@@ -170,6 +180,160 @@ export const CandidateIdentityScalarFieldEnum = {
 } as const
 
 export type CandidateIdentityScalarFieldEnum = (typeof CandidateIdentityScalarFieldEnum)[keyof typeof CandidateIdentityScalarFieldEnum]
+
+
+export const CandidateProfileScalarFieldEnum = {
+  id: 'id',
+  candidateUserId: 'candidateUserId',
+  headline: 'headline',
+  summary: 'summary',
+  phone: 'phone',
+  location: 'location',
+  revision: 'revision',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CandidateProfileScalarFieldEnum = (typeof CandidateProfileScalarFieldEnum)[keyof typeof CandidateProfileScalarFieldEnum]
+
+
+export const ProfileExperienceScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  title: 'title',
+  company: 'company',
+  description: 'description',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  isCurrent: 'isCurrent',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProfileExperienceScalarFieldEnum = (typeof ProfileExperienceScalarFieldEnum)[keyof typeof ProfileExperienceScalarFieldEnum]
+
+
+export const ProfileEducationScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  institution: 'institution',
+  degree: 'degree',
+  field: 'field',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  isCurrent: 'isCurrent',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProfileEducationScalarFieldEnum = (typeof ProfileEducationScalarFieldEnum)[keyof typeof ProfileEducationScalarFieldEnum]
+
+
+export const SkillScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  normalizedName: 'normalizedName',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SkillScalarFieldEnum = (typeof SkillScalarFieldEnum)[keyof typeof SkillScalarFieldEnum]
+
+
+export const CandidateProfileSkillScalarFieldEnum = {
+  profileId: 'profileId',
+  skillId: 'skillId',
+  displayName: 'displayName',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CandidateProfileSkillScalarFieldEnum = (typeof CandidateProfileSkillScalarFieldEnum)[keyof typeof CandidateProfileSkillScalarFieldEnum]
+
+
+export const SocialLinkScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  url: 'url',
+  normalizedUrl: 'normalizedUrl',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SocialLinkScalarFieldEnum = (typeof SocialLinkScalarFieldEnum)[keyof typeof SocialLinkScalarFieldEnum]
+
+
+export const AccountPreferencesScalarFieldEnum = {
+  userId: 'userId',
+  language: 'language',
+  timezone: 'timezone',
+  applicationUpdatesEmail: 'applicationUpdatesEmail',
+  jobRecommendationsEmail: 'jobRecommendationsEmail',
+  accountSecurityEmail: 'accountSecurityEmail',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AccountPreferencesScalarFieldEnum = (typeof AccountPreferencesScalarFieldEnum)[keyof typeof AccountPreferencesScalarFieldEnum]
+
+
+export const EmailChangeRequestScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  proposedEmail: 'proposedEmail',
+  normalizedProposedEmail: 'normalizedProposedEmail',
+  tokenDigest: 'tokenDigest',
+  status: 'status',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  supersededAt: 'supersededAt',
+  resolvedAt: 'resolvedAt',
+  idempotencyKey: 'idempotencyKey',
+  correlationId: 'correlationId',
+  verificationOutboxId: 'verificationOutboxId',
+  oldEmailNoticeOutboxId: 'oldEmailNoticeOutboxId',
+  createdBySessionId: 'createdBySessionId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EmailChangeRequestScalarFieldEnum = (typeof EmailChangeRequestScalarFieldEnum)[keyof typeof EmailChangeRequestScalarFieldEnum]
+
+
+export const PasswordChangeAttemptWindowScalarFieldEnum = {
+  userId: 'userId',
+  failureTimestamps: 'failureTimestamps',
+  lockedUntil: 'lockedUntil',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PasswordChangeAttemptWindowScalarFieldEnum = (typeof PasswordChangeAttemptWindowScalarFieldEnum)[keyof typeof PasswordChangeAttemptWindowScalarFieldEnum]
+
+
+export const PasswordChangeOperationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  idempotencyKey: 'idempotencyKey',
+  submissionBindingDigest: 'submissionBindingDigest',
+  initiatingSessionId: 'initiatingSessionId',
+  status: 'status',
+  passwordUpdatedAt: 'passwordUpdatedAt',
+  otherSessionsRevokedAt: 'otherSessionsRevokedAt',
+  notificationIdempotencyKey: 'notificationIdempotencyKey',
+  notificationOutboxId: 'notificationOutboxId',
+  finalAuditId: 'finalAuditId',
+  failureCode: 'failureCode',
+  retryAt: 'retryAt',
+  finalizedAt: 'finalizedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PasswordChangeOperationScalarFieldEnum = (typeof PasswordChangeOperationScalarFieldEnum)[keyof typeof PasswordChangeOperationScalarFieldEnum]
 
 
 export const SecurityTokenScalarFieldEnum = {
@@ -304,6 +468,8 @@ export const EmailOutboxScalarFieldEnum = {
   userId: 'userId',
   securityTokenId: 'securityTokenId',
   recipientRef: 'recipientRef',
+  recipientCiphertext: 'recipientCiphertext',
+  recipientPurpose: 'recipientPurpose',
   templateVersion: 'templateVersion',
   payloadRef: 'payloadRef',
   idempotencyKey: 'idempotencyKey',

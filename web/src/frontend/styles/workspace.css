@@ -42,7 +42,7 @@
 .workspace-navigation a:focus-visible,
 .workspace-navigation button:focus-visible,
 .workspace-menu-toggle:focus-visible {
-  outline: 3px solid #f59e0b;
+  outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
 }
 .workspace-navigation button:disabled {
@@ -109,7 +109,7 @@
 }
 .dashboard-links a:focus-visible,
 .dashboard-coming-later:focus-within {
-  outline: 3px solid #f59e0b;
+  outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
 }
 .dashboard-links span {
@@ -181,7 +181,7 @@
 
 .workspace-page a:focus-visible,
 .workspace-page button:focus-visible {
-  outline: 3px solid #c49b45;
+  outline: 3px solid var(--focus-ring);
   outline-offset: 3px;
 }
 

@@ -1,0 +1,161 @@
+.account-preferences-page {
+  width: 100%;
+  min-width: 0;
+}
+
+.account-preferences-panel {
+  max-width: 48rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  overflow-wrap: anywhere;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--surface);
+}
+
+.account-preferences-panel h2 {
+  margin: 0.35rem 0 0;
+  color: var(--ink);
+  font-size: 1.1rem;
+}
+
+.account-preferences-feedback {
+  max-width: 100%;
+  margin: 0.8rem 0;
+  border-radius: 0.7rem;
+  line-height: 1.5;
+}
+
+.account-preferences-feedback:not(:empty) {
+  padding: 0.75rem;
+  border: 1px solid #bdd4c2;
+  color: #315a3d;
+  background: #eff8f1;
+}
+
+.account-preferences-feedback[data-feedback-kind="error"] {
+  border-color: #e1b8b8;
+  color: var(--danger);
+  background: #fff2f2;
+}
+
+.account-preferences-feedback:focus-visible,
+.account-preferences-form :focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.account-preferences-form,
+.account-preferences-fields {
+  display: grid;
+  min-width: 0;
+  gap: 0.8rem;
+}
+
+.account-preferences-form label,
+.notification-preferences legend {
+  color: #394137;
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+.account-preferences-form select,
+.account-preferences-form input[type="text"],
+.account-preferences-form input[list] {
+  width: 100%;
+  max-width: 100%;
+  min-height: 3rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--control-border);
+  border-radius: 0.75rem;
+  background: #fbfbf9;
+  font: inherit;
+}
+
+.preference-guidance {
+  margin: -0.3rem 0 0.4rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.preference-guidance--warning {
+  padding: 0.65rem;
+  border-left: 4px solid #b7791f;
+  color: #7c571e;
+  background: #fff8e8;
+}
+
+.notification-preferences {
+  display: grid;
+  gap: 0.65rem;
+  min-width: 0;
+  margin: 0.5rem 0;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+}
+
+.notification-preferences label {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.7rem;
+  align-items: start;
+  padding: 0.65rem;
+  border-radius: 0.65rem;
+  background: #f7f9f5;
+}
+
+.notification-preferences input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.15rem;
+}
+
+.notification-preferences span {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.notification-preferences small {
+  color: var(--muted);
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.notification-preferences__mandatory {
+  border: 1px solid #bdd4c2;
+}
+
+.account-preferences-form > button {
+  min-height: 3rem;
+  border: 0;
+  border-radius: 0.75rem;
+  color: white;
+  background: var(--forest);
+  font: inherit;
+  font-weight: 750;
+}
+
+.account-preferences-form > button:disabled {
+  opacity: 0.6;
+}
+
+@media (max-width: 320px) {
+  .account-preferences-panel,
+  .notification-preferences {
+    padding: 0.85rem;
+  }
+
+  .account-preferences-form > button {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-preferences-form *,
+  .account-preferences-feedback {
+    transition: none !important;
+    animation: none !important;
+  }
+}

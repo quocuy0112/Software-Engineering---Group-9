@@ -64,7 +64,11 @@ describe("PostgreSQL password-reset operation repository", () => {
     const second = protector.generate();
     await issue(second, new Date(now.getTime() + 1), `second-${runId}`);
     await expect(
-      repository.claimOrResume(first, replacementPassword, new Date(now.getTime() + 2)),
+      repository.claimOrResume(
+        first,
+        replacementPassword,
+        new Date(now.getTime() + 2),
+      ),
     ).resolves.toEqual({ status: "used" });
     await expect(
       repository.claimOrResume(
@@ -96,10 +100,13 @@ describe("PostgreSQL password-reset operation repository", () => {
       (result) => result.status === "acquired" && result.claimed,
     );
     expect(winners).toHaveLength(1);
-    expect(results.filter((result) => result.status === "busy")).toHaveLength(1);
+    expect(results.filter((result) => result.status === "busy")).toHaveLength(
+      1,
+    );
 
     const winner = winners[0];
-    if (!winner || winner.status !== "acquired") throw new Error("missing winner");
+    if (!winner || winner.status !== "acquired")
+      throw new Error("missing winner");
     await repository.fail(
       winner.operation.id,
       winner.executionOwner,

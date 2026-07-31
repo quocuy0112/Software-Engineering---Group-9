@@ -1,39 +1,103 @@
 import "server-only";
+import { isDeepStrictEqual } from "node:util";
 import type { EmailKind, Prisma } from "@/backend/generated/prisma/client";
 import { prisma } from "@/backend/database/prisma";
+import {
+  protectedRecipientPurposes,
+  type ProtectedRecipientPurpose,
+} from "@/backend/security/protected-recipient/protected-outbox-recipient";
 type OutboxClient =
   | Pick<typeof prisma, "emailOutbox">
   | Prisma.TransactionClient;
 export type ClaimedOutbox = Prisma.EmailOutboxGetPayload<{
   include: { user: true };
 }>;
+
+export type OutboxIntent = {
+  kind: EmailKind;
+  userId?: string;
+  securityTokenId?: string;
+  recipientRef: string;
+  recipientCiphertext?: string;
+  recipientPurpose?: ProtectedRecipientPurpose;
+  templateVersion: string;
+  payloadRef: Prisma.InputJsonValue;
+  idempotencyKey: string;
+};
+
+function validateIntent(input: OutboxIntent): OutboxIntent {
+  if (
+    !input.recipientRef ||
+    !input.templateVersion ||
+    !input.idempotencyKey ||
+    input.idempotencyKey.length > 200
+  ) {
+    throw new Error("OUTBOX_INTENT_INVALID");
+  }
+  if (Boolean(input.recipientCiphertext) !== Boolean(input.recipientPurpose)) {
+    throw new Error("OUTBOX_RECIPIENT_SNAPSHOT_INCOMPLETE");
+  }
+  if (
+    input.recipientPurpose &&
+    !(protectedRecipientPurposes as readonly string[]).includes(
+      input.recipientPurpose,
+    )
+  ) {
+    throw new Error("OUTBOX_RECIPIENT_PURPOSE_INVALID");
+  }
+  return input;
+}
+
+function sameIntent(
+  existing: {
+    kind: EmailKind;
+    recipientRef: string;
+    recipientCiphertext: string | null;
+    recipientPurpose: string | null;
+    templateVersion: string;
+    payloadRef: Prisma.JsonValue;
+  },
+  intent: OutboxIntent,
+): boolean {
+  return (
+    existing.kind === intent.kind &&
+    existing.recipientRef === intent.recipientRef &&
+    existing.recipientCiphertext === (intent.recipientCiphertext ?? null) &&
+    existing.recipientPurpose === (intent.recipientPurpose ?? null) &&
+    existing.templateVersion === intent.templateVersion &&
+    isDeepStrictEqual(existing.payloadRef, intent.payloadRef)
+  );
+}
+
 export class PrismaOutboxRepository {
   constructor(private readonly db: OutboxClient = prisma) {}
-  async enqueue(input: {
-    kind: EmailKind;
-    userId: string;
-    securityTokenId: string;
-    recipientRef: string;
-    templateVersion: string;
-    payloadRef: Prisma.InputJsonValue;
-    idempotencyKey: string;
-  }) {
-    return this.db.emailOutbox.create({ data: input });
+  async enqueue(input: OutboxIntent) {
+    return this.db.emailOutbox.create({ data: validateIntent(input) });
   }
-  async enqueueIdempotent(input: {
-    kind: EmailKind;
-    userId: string;
-    securityTokenId: string;
-    recipientRef: string;
-    templateVersion: string;
-    payloadRef: Prisma.InputJsonValue;
-    idempotencyKey: string;
-  }) {
-    return this.db.emailOutbox.upsert({
-      where: { idempotencyKey: input.idempotencyKey },
-      update: {},
-      create: input,
+  async enqueueIdempotent(input: OutboxIntent) {
+    const intent = validateIntent(input);
+    let originalError: unknown;
+    try {
+      const result = await this.db.emailOutbox.upsert({
+        where: { idempotencyKey: intent.idempotencyKey },
+        update: {},
+        create: intent,
+      });
+      if (!sameIntent(result, intent)) {
+        throw new Error("OUTBOX_IDEMPOTENCY_CONFLICT");
+      }
+      return result;
+    } catch (error) {
+      originalError = error;
+    }
+    const existing = await this.db.emailOutbox.findUnique({
+      where: { idempotencyKey: intent.idempotencyKey },
     });
+    if (!existing) throw originalError;
+    if (!sameIntent(existing, intent)) {
+      throw new Error("OUTBOX_IDEMPOTENCY_CONFLICT");
+    }
+    return existing;
   }
   async claimDue(
     owner: string,

@@ -9,9 +9,11 @@ async function openWorkspaceLink(page: Page, name: "Security" | "Sessions") {
   if (await menu.isVisible()) await menu.click();
   const responsePromise = page.waitForResponse(
     (response) =>
-      response.url().includes(
-        name === "Security" ? "/profile/security" : "/profile/sessions",
-      ) && response.status() === 200,
+      response
+        .url()
+        .includes(
+          name === "Security" ? "/profile/security" : "/profile/sessions",
+        ) && response.status() === 200,
   );
   const startedAt = Date.now();
   await page.getByRole("link", { name, exact: true }).click();
@@ -105,7 +107,7 @@ test("connects public auth pages and the protected identity workspace", async ({
   await page.getByRole("link", { name: "Profile", exact: true }).click();
   await expect(page).toHaveURL(/\/profile$/);
   await expect(
-    page.getByRole("heading", { name: "Profile", exact: true }),
+    page.getByRole("heading", { name: "Professional profile", exact: true }),
   ).toBeVisible();
   const profileMenu = page.getByRole("button", {
     name: "Open workspace menu",
@@ -167,8 +169,13 @@ test("connects public auth pages and the protected identity workspace", async ({
   ).toBeVisible();
 
   await page.goto("/");
-  await expect(page.getByRole("link", { name: "Create account" })).toHaveAttribute("href", "/register");
-  await expect(page.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/login");
+  await expect(
+    page.getByRole("link", { name: "Create account" }),
+  ).toHaveAttribute("href", "/register");
+  await expect(page.getByRole("link", { name: "Sign in" })).toHaveAttribute(
+    "href",
+    "/login",
+  );
   await page.goto("/home");
   await expect(page).toHaveURL(/\/$/);
   await page.goto("/dashboard");

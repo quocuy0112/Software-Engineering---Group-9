@@ -24,7 +24,7 @@ Better Auth 1.6.25 remains the only browser-session and credential owner.
 - Local `EMAIL_ADAPTER=capture` and the email worker; SMTP/Resend are not
   required for routine validation.
 - Exact existing package pins from `web/package.json`.
-- Planned server-only additions `sanitize-html` 2.17.6 and
+- Exact server-only additions `sanitize-html` 2.17.6 and
   `@types/sanitize-html` 2.16.1 resolved through the sole root lockfile.
 - Generated local `AUDIT_TRUSTED_PROXY_HOPS=0`; this mode permits only the
   direct loopback marker or controlled test fixtures and is forbidden in
@@ -54,6 +54,32 @@ Do not commit `.env`, `web/.env.local`, captured email, proofs, logs, coverage,
 or test output. Do not use `npm run db:reset` during routine validation because
 it deletes the local PostgreSQL volume.
 
+### Capture-email proof extraction
+
+Use only a disposable local account with `EMAIL_ADAPTER=capture`. Wait for the
+worker to create the email-change verification capture, then open its fragment
+link without printing the proof:
+
+```powershell
+$capture = Get-ChildItem -LiteralPath "web/.local/mail" -Filter "*.eml" |
+  Sort-Object LastWriteTime |
+  Select-Object -Last 1
+$message = Get-Content -LiteralPath $capture.FullName -Raw
+$link = [regex]::Match(
+  $message,
+  "http://localhost:3001/verify-email-change#proof=[A-Za-z0-9._~%=-]+"
+)
+if (-not $link.Success) { throw "Email-change proof link not found" }
+Start-Process $link.Value
+Remove-Variable message, link
+```
+
+The capture includes personal and one-time credential material. Do not echo the
+matched value, paste it into a ticket/chat, commit the `.eml`, or use this
+procedure against production. Confirm the page immediately removes `#proof=`
+from the address bar. The old-address security-alert capture must contain no
+proof, token, or full verification URL.
+
 ## Migration Gate
 
 Before functional tests:
@@ -75,6 +101,9 @@ Before functional tests:
    Feature 001 migration.
 6. Confirm registration and email-change code share the normalized-email
    advisory-lock helper.
+7. Confirm the timestamped
+   `20260731191000_preserve_outbox_on_fk_cleanup` forward fix allows only
+   non-null-to-null outbox FK cleanup and does not permit envelope retargeting.
 
 ## Static and Contract Gates
 
@@ -105,23 +134,33 @@ Expected static evidence:
 
 ## Automated Validation
 
-Run the full reproducible sequence:
+Run focused Feature 002 checks while iterating:
+
+```bash
+npm run test:profile-account --workspace @smarthire/web
+npm run test:e2e --workspace @smarthire/web -- tests/system/e2e/profile-account
+```
+
+Run the full reproducible release sequence:
 
 ```bash
 npm run env:check
+npm run db:validate
 npm run db:verify
+npm run format --workspace @smarthire/web
 npm run typecheck
 npm run lint
 npm test
 npm run test:e2e --workspace @smarthire/web -- --project=desktop-chromium
 npm run test:e2e --workspace @smarthire/web -- --project=mobile-320
 npm run build
-npm run perf:pages --workspace @smarthire/web
+npm run perf:profile-account
 ```
 
 PostgreSQL integration tests, not mocks or SQLite, are required for row locks,
 advisory locks, partial unique indexes, concurrent proof consumption, and
-session revocation.
+session revocation. The two Playwright projects must run serially against
+capture email and controlled accounts; the configuration enforces one worker.
 
 ## Critical Walkthrough 1: Professional Profile
 
@@ -180,8 +219,8 @@ session revocation.
 9. Request two changes for A. Confirm only the newest remains usable and the
    earlier request is `SUPERSEDED`.
 10. Race A and B for the same free email at request time and at verification
-   time. Confirm at most one effective/pending claim exists and the loser keeps
-   its prior email.
+    time. Confirm at most one effective/pending claim exists and the loser keeps
+    its prior email.
 11. Race registration against an active pending reservation. Confirm the shared
     claim lock prevents the same normalized email from crossing the two tables.
 12. Test malformed, expired, consumed, superseded, and newly conflicted proofs.
@@ -271,7 +310,8 @@ pixels:
 
 ## Performance Evidence
 
-Run against PostgreSQL 16.12 with:
+Build first, then run `npm run perf:profile-account` against PostgreSQL 16.12.
+The harness creates and removes a disposable account and records:
 
 - one account holding the maximum 50 skills, 50 experience entries, 50
   education entries, and 10 social links;
@@ -294,6 +334,13 @@ Record at least 100 warm samples for each measured view or mutation class:
 External email delivery time is excluded because success means a durable
 outbox enqueue, not provider delivery.
 
+The command fails if any view p95 exceeds 3 seconds, any profile/identity/
+preference mutation p95 exceeds 2 seconds, any of four other sessions remains
+usable two seconds after the completed password-change response, the initiating
+session becomes unusable, or the final active-session count is not exactly one.
+Preserve the aggregate environment and percentile output, never the seeded
+account credentials or captured message.
+
 ## Usability Evidence
 
 Run a documented representative-user study for the four primary tasks:
@@ -307,3 +354,32 @@ Record participant/task counts, device/viewport, first-attempt completion,
 assistance requested, time, accessibility accommodations, and observed
 blockers. At least 90% of representative users must complete each task on the
 first attempt without assistance before SC-003 is marked passed.
+
+## Troubleshooting
+
+- **Environment check rejects the proxy setting:** local/test uses
+  `AUDIT_TRUSTED_PROXY_HOPS=0`; production must use the exact nonzero trusted
+  ingress count. Do not weaken production validation to make the check pass.
+- **Migration verification fails:** run `npm run db:status`, confirm Compose
+  PostgreSQL is healthy with `npm run db:status`, and preserve the reported
+  migration name. Do not edit an applied migration or use `db:reset` as a
+  repair. Follow the forward-fix procedure in
+  `docs/operations/profile-account-data-lifecycle.md`.
+- **No capture appears:** confirm `EMAIL_ADAPTER=capture`, the configured
+  capture directory, and that `npm run email:worker` is running. Inspect only
+  aggregate outbox status, attempts, timestamps, and `safeErrorCode`; do not
+  print payloads or recipients.
+- **The latest capture has no email-change proof:** select the message whose
+  kind is `EMAIL_CHANGE_VERIFY`; the old-address `SECURITY_ALERT` intentionally
+  has no proof. Confirm the request returned `202` and let the worker process
+  its due row.
+- **Password change returns a safe `503`:** keep the same authoritative
+  browser session, idempotency key, and unchanged submission and retry. Do not
+  create a second operation or edit credential/session/operation rows.
+- **Playwright cannot start the server:** stop an unrelated process already
+  using port 3001, leave `PLAYWRIGHT_REUSE_SERVER` unset for isolated evidence,
+  and rerun with PostgreSQL healthy. Stateful identity tests must remain
+  serial.
+- **A test leaves disposable state after interruption:** rerun the same focused
+  suite so its setup/teardown can reconcile known fixtures. Do not delete broad
+  database or capture paths by hand.

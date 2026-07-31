@@ -37,7 +37,41 @@ export const authenticationAuditAction = z.enum([
   "account.activated",
   "account.suspended",
   "account.deleted",
+  "email_change.requested",
+  "email_change.rejected",
+  "email_change.superseded",
+  "email_change.verified",
+  "email_change.verification_failed",
+  "password_change.intent_recorded",
+  "password_change.succeeded",
+  "password_change.failed",
+  "password_change.locked",
 ]);
+
+const auditContextSchema = z
+  .object({
+    reason: z.string().max(160).optional(),
+    stage: z.string().max(160).optional(),
+    state: z.string().max(160).optional(),
+    status: z.string().max(160).optional(),
+    kind: z.string().max(160).optional(),
+    failureCode: z.string().max(160).optional(),
+    count: z.number().finite().optional(),
+    attemptCount: z.number().finite().optional(),
+    holdHours: z.number().finite().optional(),
+    eligible: z.boolean().optional(),
+    passwordOwner: z.string().max(160).optional(),
+    sessionRevocation: z.string().max(160).optional(),
+    twoFactorPreserved: z.boolean().optional(),
+    sessionsRevoked: z.boolean().optional(),
+    otherSessionsRevoked: z.boolean().optional(),
+    challengesInvalidated: z.boolean().optional(),
+    previousSessionsRemainRevoked: z.boolean().optional(),
+    twoFactorDisabled: z.boolean().optional(),
+    backupCodesInvalidated: z.boolean().optional(),
+    automaticSessionCreated: z.boolean().optional(),
+  })
+  .strict();
 
 export const authenticationAuditEventSchema = z
   .object({
@@ -55,16 +89,15 @@ export const authenticationAuditEventSchema = z
       "two_factor",
       "password_reset",
       "account_recovery",
+      "email_change",
+      "password_change",
     ]),
     targetId: z.string().min(1).nullable().optional(),
     result: z.enum(["SUCCESS", "FAILURE", "DENIED"]),
     correlationId: z.string().min(8).max(128),
     ipPrefixDigest: z.string().max(128).nullable().optional(),
     userAgentFamily: z.string().max(80).nullable().optional(),
-    context: z.record(
-      z.string(),
-      z.union([z.string().max(160), z.number(), z.boolean(), z.null()]),
-    ),
+    context: auditContextSchema,
   })
   .strict();
 

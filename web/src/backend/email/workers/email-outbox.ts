@@ -5,6 +5,12 @@ import { createElement } from "react";
 import { serverEnvironment } from "@/backend/env/runtime";
 import { safeErrorCode } from "@/backend/security/redaction";
 import { TokenProtector } from "@/backend/security/security-token/security-tokens";
+import { EmailChangeProofProtector } from "@/backend/security/email-change-proof";
+import {
+  ProtectedOutboxRecipient,
+  protectedRecipientPurposes,
+  type ProtectedRecipientPurpose,
+} from "@/backend/security/protected-recipient/protected-outbox-recipient";
 import {
   PrismaOutboxRepository,
   type ClaimedOutbox,
@@ -16,10 +22,46 @@ import {
   VerifyEmailTemplate,
   verificationEmailText,
 } from "../templates/verify-email";
-import { ResetPasswordTemplate, resetPasswordEmailText } from "../templates/reset-password";
-import { PasswordChangedTemplate, passwordChangedEmailText } from "../templates/password-changed";
+import {
+  ResetPasswordTemplate,
+  resetPasswordEmailText,
+} from "../templates/reset-password";
+import {
+  PasswordChangedTemplate,
+  passwordChangedEmailText,
+} from "../templates/password-changed";
+import {
+  EmailChangeVerificationTemplate,
+  emailChangeVerificationText,
+} from "../templates/email-change-verification";
+import {
+  EmailChangeAlertTemplate,
+  emailChangeAlertText,
+} from "../templates/email-change-alert";
 import { EmailDeliveryError, type EmailService } from "../email-service";
 const protector = new TokenProtector();
+const emailChangeProofs = new EmailChangeProofProtector();
+const recipientProtector = new ProtectedOutboxRecipient();
+
+function deliveryRecipient(row: ClaimedOutbox): string {
+  if (row.recipientCiphertext || row.recipientPurpose) {
+    if (
+      !row.recipientCiphertext ||
+      !row.recipientPurpose ||
+      !(protectedRecipientPurposes as readonly string[]).includes(
+        row.recipientPurpose,
+      )
+    ) {
+      throw new Error("PROTECTED_RECIPIENT_INVALID");
+    }
+    return recipientProtector.unseal(
+      row.recipientCiphertext,
+      row.recipientPurpose as ProtectedRecipientPurpose,
+    );
+  }
+  if (!row.user) throw new Error("MISSING_RECIPIENT");
+  return row.user.email;
+}
 export function selectedEmailAdapter(): EmailService {
   if (serverEnvironment.EMAIL_ADAPTER === "capture")
     return new CaptureEmailAdapter();
@@ -41,7 +83,6 @@ export async function deliverClaimedOutbox(
   random = Math.random,
 ): Promise<boolean> {
   try {
-    if (!row.user) throw new Error("MISSING_RECIPIENT");
     const payload = row.payloadRef as { protectedToken?: string };
     let subject: string;
     let html: string;
@@ -53,7 +94,25 @@ export async function deliverClaimedOutbox(
       protectedCancellationProof?: string;
       holdEndsAt?: string;
     };
-    if (row.templateVersion === "account-recovery-confirmation.v1") {
+    if (row.templateVersion === "email-change-verification.v1") {
+      const emailChangePayload = row.payloadRef as {
+        protectedProof?: string;
+      };
+      if (!emailChangePayload.protectedProof) {
+        throw new Error("MISSING_PROTECTED_TOKEN");
+      }
+      const proof = emailChangeProofs.unseal(emailChangePayload.protectedProof);
+      const verificationUrl = emailChangeProofs.fragmentUrl(proof);
+      subject = "Verify your new SmartHire email";
+      html = await render(
+        createElement(EmailChangeVerificationTemplate, { verificationUrl }),
+      );
+      text = emailChangeVerificationText(verificationUrl);
+    } else if (row.templateVersion === "email-change-alert.v1") {
+      subject = "A SmartHire email change was requested";
+      html = await render(createElement(EmailChangeAlertTemplate));
+      text = emailChangeAlertText();
+    } else if (row.templateVersion === "account-recovery-confirmation.v1") {
       if (!recoveryPayload.protectedProof)
         throw new Error("MISSING_PROTECTED_TOKEN");
       const proof = protector.unseal(recoveryPayload.protectedProof);
@@ -92,12 +151,14 @@ export async function deliverClaimedOutbox(
       text = `Your SmartHire account recovery has a 24-hour security hold.\nCancel recovery: ${cancellationUrl.toString()}\nComplete recovery after the hold: ${completionUrl.toString()}\n\nEmail-only recovery is lower assurance than using your password and second factor.`;
     } else if (row.templateVersion === "account-recovery-cancelled.v1") {
       subject = "Your SmartHire account recovery was cancelled";
-      html = "<p>Your SmartHire account recovery was cancelled. Your existing password and second factor remain authoritative.</p>";
+      html =
+        "<p>Your SmartHire account recovery was cancelled. Your existing password and second factor remain authoritative.</p>";
       text =
         "Your SmartHire account recovery was cancelled. Your existing password and second factor remain authoritative.";
     } else if (row.templateVersion === "account-recovery-completed.v1") {
       subject = "Your SmartHire account recovery is complete";
-      html = "<p>Your SmartHire account recovery is complete. Sign in with your new password, then re-enroll two-factor authentication.</p>";
+      html =
+        "<p>Your SmartHire account recovery is complete. Sign in with your new password, then re-enroll two-factor authentication.</p>";
       text =
         "Your SmartHire account recovery is complete. Sign in with your new password, then re-enroll two-factor authentication.";
     } else if (row.kind === "PASSWORD_CHANGED") {
@@ -108,22 +169,38 @@ export async function deliverClaimedOutbox(
       if (!payload.protectedToken) throw new Error("MISSING_PROTECTED_TOKEN");
       const token = protector.unseal(payload.protectedToken);
       if (row.kind === "RESET_PASSWORD") {
-        const url = new URL("/reset-password", serverEnvironment.NEXT_PUBLIC_APP_URL);
+        const url = new URL(
+          "/reset-password",
+          serverEnvironment.NEXT_PUBLIC_APP_URL,
+        );
         url.hash = `token=${encodeURIComponent(token)}`;
         subject = "Reset your SmartHire password";
-        html = await render(createElement(ResetPasswordTemplate, { resetUrl: url.toString() }));
+        html = await render(
+          createElement(ResetPasswordTemplate, { resetUrl: url.toString() }),
+        );
         text = resetPasswordEmailText(url.toString());
       } else {
-        const url = new URL("/verify-email", serverEnvironment.NEXT_PUBLIC_APP_URL);
+        const url = new URL(
+          "/verify-email",
+          serverEnvironment.NEXT_PUBLIC_APP_URL,
+        );
         url.searchParams.set("token", token);
         subject = "Verify your SmartHire email";
-        html = await render(createElement(VerifyEmailTemplate, { verificationUrl: url.toString() }));
+        html = await render(
+          createElement(VerifyEmailTemplate, {
+            verificationUrl: url.toString(),
+          }),
+        );
         text = verificationEmailText(url.toString());
       }
     }
+    // Keep plaintext recipient material in process memory for the shortest
+    // possible interval: unseal only after rendering and immediately before
+    // invoking the selected provider adapter.
+    const recipient = deliveryRecipient(row);
     const delivery = await adapter.send({
       kind: row.kind,
-      recipient: row.user.email,
+      recipient,
       subject,
       html,
       text,

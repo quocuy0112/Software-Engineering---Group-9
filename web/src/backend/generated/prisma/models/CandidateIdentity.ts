@@ -167,6 +167,7 @@ export type CandidateIdentityWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"CandidateIdentity"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CandidateIdentity"> | Date | string
   user?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
+  profile?: Prisma.XOR<Prisma.CandidateProfileNullableScalarRelationFilter, Prisma.CandidateProfileWhereInput> | null
 }
 
 export type CandidateIdentityOrderByWithRelationInput = {
@@ -174,6 +175,7 @@ export type CandidateIdentityOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserAccountOrderByWithRelationInput
+  profile?: Prisma.CandidateProfileOrderByWithRelationInput
 }
 
 export type CandidateIdentityWhereUniqueInput = Prisma.AtLeast<{
@@ -184,6 +186,7 @@ export type CandidateIdentityWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"CandidateIdentity"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CandidateIdentity"> | Date | string
   user?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
+  profile?: Prisma.XOR<Prisma.CandidateProfileNullableScalarRelationFilter, Prisma.CandidateProfileWhereInput> | null
 }, "userId">
 
 export type CandidateIdentityOrderByWithAggregationInput = {
@@ -208,24 +211,28 @@ export type CandidateIdentityCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserAccountCreateNestedOneWithoutCandidateIdentityInput
+  profile?: Prisma.CandidateProfileCreateNestedOneWithoutCandidateInput
 }
 
 export type CandidateIdentityUncheckedCreateInput = {
   userId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  profile?: Prisma.CandidateProfileUncheckedCreateNestedOneWithoutCandidateInput
 }
 
 export type CandidateIdentityUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserAccountUpdateOneRequiredWithoutCandidateIdentityNestedInput
+  profile?: Prisma.CandidateProfileUpdateOneWithoutCandidateNestedInput
 }
 
 export type CandidateIdentityUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.CandidateProfileUncheckedUpdateOneWithoutCandidateNestedInput
 }
 
 export type CandidateIdentityCreateManyInput = {
@@ -268,6 +275,11 @@ export type CandidateIdentityMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type CandidateIdentityScalarRelationFilter = {
+  is?: Prisma.CandidateIdentityWhereInput
+  isNot?: Prisma.CandidateIdentityWhereInput
+}
+
 export type CandidateIdentityCreateNestedOneWithoutUserInput = {
   create?: Prisma.XOR<Prisma.CandidateIdentityCreateWithoutUserInput, Prisma.CandidateIdentityUncheckedCreateWithoutUserInput>
   connectOrCreate?: Prisma.CandidateIdentityCreateOrConnectWithoutUserInput
@@ -300,14 +312,30 @@ export type CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CandidateIdentityUpdateToOneWithWhereWithoutUserInput, Prisma.CandidateIdentityUpdateWithoutUserInput>, Prisma.CandidateIdentityUncheckedUpdateWithoutUserInput>
 }
 
+export type CandidateIdentityCreateNestedOneWithoutProfileInput = {
+  create?: Prisma.XOR<Prisma.CandidateIdentityCreateWithoutProfileInput, Prisma.CandidateIdentityUncheckedCreateWithoutProfileInput>
+  connectOrCreate?: Prisma.CandidateIdentityCreateOrConnectWithoutProfileInput
+  connect?: Prisma.CandidateIdentityWhereUniqueInput
+}
+
+export type CandidateIdentityUpdateOneRequiredWithoutProfileNestedInput = {
+  create?: Prisma.XOR<Prisma.CandidateIdentityCreateWithoutProfileInput, Prisma.CandidateIdentityUncheckedCreateWithoutProfileInput>
+  connectOrCreate?: Prisma.CandidateIdentityCreateOrConnectWithoutProfileInput
+  upsert?: Prisma.CandidateIdentityUpsertWithoutProfileInput
+  connect?: Prisma.CandidateIdentityWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CandidateIdentityUpdateToOneWithWhereWithoutProfileInput, Prisma.CandidateIdentityUpdateWithoutProfileInput>, Prisma.CandidateIdentityUncheckedUpdateWithoutProfileInput>
+}
+
 export type CandidateIdentityCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
+  profile?: Prisma.CandidateProfileCreateNestedOneWithoutCandidateInput
 }
 
 export type CandidateIdentityUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
+  profile?: Prisma.CandidateProfileUncheckedCreateNestedOneWithoutCandidateInput
 }
 
 export type CandidateIdentityCreateOrConnectWithoutUserInput = {
@@ -329,9 +357,51 @@ export type CandidateIdentityUpdateToOneWithWhereWithoutUserInput = {
 export type CandidateIdentityUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.CandidateProfileUpdateOneWithoutCandidateNestedInput
 }
 
 export type CandidateIdentityUncheckedUpdateWithoutUserInput = {
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.CandidateProfileUncheckedUpdateOneWithoutCandidateNestedInput
+}
+
+export type CandidateIdentityCreateWithoutProfileInput = {
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserAccountCreateNestedOneWithoutCandidateIdentityInput
+}
+
+export type CandidateIdentityUncheckedCreateWithoutProfileInput = {
+  userId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type CandidateIdentityCreateOrConnectWithoutProfileInput = {
+  where: Prisma.CandidateIdentityWhereUniqueInput
+  create: Prisma.XOR<Prisma.CandidateIdentityCreateWithoutProfileInput, Prisma.CandidateIdentityUncheckedCreateWithoutProfileInput>
+}
+
+export type CandidateIdentityUpsertWithoutProfileInput = {
+  update: Prisma.XOR<Prisma.CandidateIdentityUpdateWithoutProfileInput, Prisma.CandidateIdentityUncheckedUpdateWithoutProfileInput>
+  create: Prisma.XOR<Prisma.CandidateIdentityCreateWithoutProfileInput, Prisma.CandidateIdentityUncheckedCreateWithoutProfileInput>
+  where?: Prisma.CandidateIdentityWhereInput
+}
+
+export type CandidateIdentityUpdateToOneWithWhereWithoutProfileInput = {
+  where?: Prisma.CandidateIdentityWhereInput
+  data: Prisma.XOR<Prisma.CandidateIdentityUpdateWithoutProfileInput, Prisma.CandidateIdentityUncheckedUpdateWithoutProfileInput>
+}
+
+export type CandidateIdentityUpdateWithoutProfileInput = {
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserAccountUpdateOneRequiredWithoutCandidateIdentityNestedInput
+}
+
+export type CandidateIdentityUncheckedUpdateWithoutProfileInput = {
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -343,6 +413,7 @@ export type CandidateIdentitySelect<ExtArgs extends runtime.Types.Extensions.Int
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
+  profile?: boolean | Prisma.CandidateIdentity$profileArgs<ExtArgs>
 }, ExtArgs["result"]["candidateIdentity"]>
 
 export type CandidateIdentitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -368,6 +439,7 @@ export type CandidateIdentitySelectScalar = {
 export type CandidateIdentityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"userId" | "createdAt" | "updatedAt", ExtArgs["result"]["candidateIdentity"]>
 export type CandidateIdentityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
+  profile?: boolean | Prisma.CandidateIdentity$profileArgs<ExtArgs>
 }
 export type CandidateIdentityIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
@@ -380,6 +452,7 @@ export type $CandidateIdentityPayload<ExtArgs extends runtime.Types.Extensions.I
   name: "CandidateIdentity"
   objects: {
     user: Prisma.$UserAccountPayload<ExtArgs>
+    profile: Prisma.$CandidateProfilePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     userId: string
@@ -780,6 +853,7 @@ readonly fields: CandidateIdentityFieldRefs;
 export interface Prisma__CandidateIdentityClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserAccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccountDefaultArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  profile<T extends Prisma.CandidateIdentity$profileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CandidateIdentity$profileArgs<ExtArgs>>): Prisma.Prisma__CandidateProfileClient<runtime.Types.Result.GetResult<Prisma.$CandidateProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1210,6 +1284,25 @@ export type CandidateIdentityDeleteManyArgs<ExtArgs extends runtime.Types.Extens
    * Limit how many CandidateIdentities to delete.
    */
   limit?: number
+}
+
+/**
+ * CandidateIdentity.profile
+ */
+export type CandidateIdentity$profileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CandidateProfile
+   */
+  select?: Prisma.CandidateProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CandidateProfile
+   */
+  omit?: Prisma.CandidateProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CandidateProfileInclude<ExtArgs> | null
+  where?: Prisma.CandidateProfileWhereInput
 }
 
 /**

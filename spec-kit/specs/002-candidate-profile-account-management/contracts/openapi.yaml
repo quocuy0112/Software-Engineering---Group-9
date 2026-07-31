@@ -67,6 +67,9 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "413":
           description: Profile section payload exceeds the configured bounded size.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
   /api/account/profile/skills/suggestions:
     get:
       tags: [Profile]
@@ -903,48 +906,72 @@ components:
   responses:
     ValidationError:
       description: Strict field-safe validation failure; prior valid state is preserved.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
     AuthenticationRequired:
       description: Better Auth session or Feature 001 account/session policy is not valid.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
     RecentAuthRequired:
       description: Current-password recent-auth proof was invalid or missing.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
     Forbidden:
       description: Same-origin, CSRF, account-state, or ownership policy denied the request.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
     EmailUnavailable:
       description: Requested email cannot be claimed; no other account/request details are disclosed.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
     InvalidEmailChangeProof:
       description: Proof is malformed, expired, superseded, consumed, or otherwise unusable.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
     CurrentPasswordInvalid:
       description: Current password could not authorize this password change.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
     IdempotencyConflict:
       description: Idempotency key was already bound to a different submission.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
       content:
         application/json:
           schema:
@@ -952,6 +979,8 @@ components:
     RateLimited:
       description: Sensitive action is temporarily rate limited.
       headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
         Retry-After:
           schema:
             type: integer
@@ -963,6 +992,8 @@ components:
     PasswordChangeLocked:
       description: Five incorrect current-password checks activated the 15-minute account-level lock.
       headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
         Retry-After:
           schema:
             type: integer
@@ -973,6 +1004,9 @@ components:
             $ref: "#/components/schemas/Error"
     MutationUnavailable:
       description: Required persistence/audit/outbox work did not commit; success is not claimed.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
       content:
         application/json:
           schema:
@@ -982,6 +1016,9 @@ components:
         A durable password-change operation remains retryable; success is not
         claimed until all other sessions are unusable and notification/audit
         finalization is durable.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
       content:
         application/json:
           schema:

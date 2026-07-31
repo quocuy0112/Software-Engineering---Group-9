@@ -31,9 +31,7 @@ describe("shared auth primitives", () => {
     expect(input.autocomplete).toBe("current-password");
     fireEvent.change(input, { target: { value: "pasted value" } });
     expect(input.value).toBe("pasted value");
-    fireEvent.click(
-      screen.getByRole("button", { name: "Show password" }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "Show password" }));
     expect(input.type).toBe("text");
     const hide = screen.getByRole("button", {
       name: "Hide password",

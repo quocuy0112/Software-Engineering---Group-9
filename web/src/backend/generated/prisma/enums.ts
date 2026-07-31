@@ -108,12 +108,55 @@ export type AuditResult = (typeof AuditResult)[keyof typeof AuditResult]
 
 export const EmailKind = {
   VERIFY_EMAIL: 'VERIFY_EMAIL',
+  EMAIL_CHANGE_VERIFY: 'EMAIL_CHANGE_VERIFY',
   RESET_PASSWORD: 'RESET_PASSWORD',
   PASSWORD_CHANGED: 'PASSWORD_CHANGED',
   SECURITY_ALERT: 'SECURITY_ALERT'
 } as const
 
 export type EmailKind = (typeof EmailKind)[keyof typeof EmailKind]
+
+
+export const PreferenceLanguage = {
+  VI: 'VI',
+  EN: 'EN'
+} as const
+
+export type PreferenceLanguage = (typeof PreferenceLanguage)[keyof typeof PreferenceLanguage]
+
+
+export const EmailChangeStatus = {
+  PENDING: 'PENDING',
+  SUPERSEDED: 'SUPERSEDED',
+  CONSUMED: 'CONSUMED',
+  EXPIRED: 'EXPIRED',
+  CONFLICTED: 'CONFLICTED'
+} as const
+
+export type EmailChangeStatus = (typeof EmailChangeStatus)[keyof typeof EmailChangeStatus]
+
+
+export const PasswordChangeOperationStatus = {
+  INTENT_RECORDED: 'INTENT_RECORDED',
+  PASSWORD_UPDATED: 'PASSWORD_UPDATED',
+  OTHER_SESSIONS_REVOKED: 'OTHER_SESSIONS_REVOKED',
+  FAILED_RETRYABLE: 'FAILED_RETRYABLE',
+  FINALIZED: 'FINALIZED'
+} as const
+
+export type PasswordChangeOperationStatus = (typeof PasswordChangeOperationStatus)[keyof typeof PasswordChangeOperationStatus]
+
+
+export const PasswordChangeFailureCode = {
+  PASSWORD_UPDATE_FAILED: 'PASSWORD_UPDATE_FAILED',
+  SESSION_REVOCATION_FAILED: 'SESSION_REVOCATION_FAILED',
+  SESSION_VERIFICATION_FAILED: 'SESSION_VERIFICATION_FAILED',
+  NOTIFICATION_ENQUEUE_FAILED: 'NOTIFICATION_ENQUEUE_FAILED',
+  AUDIT_FINALIZATION_FAILED: 'AUDIT_FINALIZATION_FAILED',
+  OPERATION_FINALIZATION_FAILED: 'OPERATION_FINALIZATION_FAILED'
+} as const
+
+export type PasswordChangeFailureCode = (typeof PasswordChangeFailureCode)[keyof typeof PasswordChangeFailureCode]
 
 
 export const OutboxStatus = {

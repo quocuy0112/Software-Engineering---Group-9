@@ -5,7 +5,10 @@ import { twoFactor } from "better-auth/plugins";
 import { prisma } from "@/backend/database/prisma";
 import { serverEnvironment } from "@/backend/env/runtime";
 import { preserveExternalBetterAuthSignInRateLimit } from "../better-auth/better-auth-internal-request";
-import { authCookiePolicy, betterAuthCookieOptions } from "../policy/cookie-policy";
+import {
+  authCookiePolicy,
+  betterAuthCookieOptions,
+} from "../policy/cookie-policy";
 
 const cookiePolicy = authCookiePolicy(serverEnvironment);
 

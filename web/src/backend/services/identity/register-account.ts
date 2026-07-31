@@ -81,6 +81,7 @@ export class RegisterAccountService {
         protectedToken: this.protector.seal(token),
         expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
         correlationId,
+        now,
       });
       await this.audit
         .append({

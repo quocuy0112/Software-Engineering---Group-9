@@ -1,97 +1,109 @@
-import Link from "next/link";
+"use client";
+
+import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
+import { useProfileEditor } from "../client/use-profile-editor";
 import { ProfileNavigation } from "./profile-navigation";
+import { ProfileBasicsForm } from "./profile-basics-form";
+import { ProfileSkillsForm } from "./profile-skills-form";
+import { ProfileExperienceForm } from "./profile-experience-form";
+import { ProfileEducationForm } from "./profile-education-form";
+import { ProfileSocialLinksForm } from "./profile-social-links-form";
+import { ProfileSaveFeedback } from "./profile-save-feedback";
 
-type ProfileOverviewProps = {
-  account: {
-    name: string;
-    email: string;
-    memberSince: string;
-    twoFactorEnabled: boolean;
-  };
-};
+export function ProfileOverview({
+  initialProfile,
+  csrfProof = "",
+}: {
+  initialProfile?: CandidateProfileContract;
+  csrfProof?: string;
+}) {
+  const editor = useProfileEditor(initialProfile, csrfProof);
 
-export function ProfileOverview({ account }: ProfileOverviewProps) {
+  if (editor.loading) {
+    return (
+      <div className="profile-page professional-profile-page">
+        <p role="status" aria-label="Loading professional profile">
+          Loading professional profile…
+        </p>
+      </div>
+    );
+  }
+  if (editor.loadError || !editor.profile) {
+    return (
+      <div className="profile-page professional-profile-page">
+        <p role="alert">Unable to load your professional profile.</p>
+        <button type="button" onClick={editor.reload}>
+          Try again
+        </button>
+      </div>
+    );
+  }
+
+  const profile = editor.profile;
   return (
-    <div className="profile-page">
+    <div className="profile-page professional-profile-page">
       <header className="page-heading profile-heading">
         <div>
-          <p className="workspace-kicker">YOUR SMART HIRE ACCOUNT</p>
-          <h1 id="workspace-page-title">Profile</h1>
+          <p className="workspace-kicker">YOUR PROFESSIONAL STORY</p>
+          <h1 id="workspace-page-title">Professional profile</h1>
           <p className="page-heading-copy">
-            Manage your identity, sign-in protection, and active sessions in one
-            place.
+            Keep your structured skills, experience, education, contact details,
+            and professional links current.
           </p>
         </div>
-        <span className="page-heading-badge page-heading-badge--secure">
-          {account.twoFactorEnabled ? "2FA enabled" : "2FA not enabled"}
-        </span>
+        <span className="page-heading-badge">Revision {profile.revision}</span>
       </header>
       <ProfileNavigation active="overview" />
 
-      <section className="profile-overview-grid" aria-label="Profile overview">
-        <article className="profile-account-card profile-card">
-          <p className="panel-kicker">ACCOUNT DETAILS</p>
-          <h2>{account.name}</h2>
-          <dl className="profile-account-details">
-            <div>
-              <dt>Email address</dt>
-              <dd>{account.email}</dd>
-            </div>
-            <div>
-              <dt>Account status</dt>
-              <dd>Active</dd>
-            </div>
-            <div>
-              <dt>Member since</dt>
-              <dd>{account.memberSince}</dd>
-            </div>
-          </dl>
-          <div className="profile-account-actions">
-            <span className="profile-status-pill">
-              {account.twoFactorEnabled ? "2FA enabled" : "2FA recommended"}
-            </span>
-            <Link href="/profile/security">Review security</Link>
-          </div>
-        </article>
-
-        <article className="profile-card profile-security-card">
-          <p className="panel-kicker">SECURITY</p>
-          <h2>Keep your account protected</h2>
+      {profile.empty ? (
+        <section
+          className="professional-profile-empty"
+          aria-labelledby="empty-title"
+        >
+          <p className="panel-kicker">READY WHEN YOU ARE</p>
+          <h2 id="empty-title">Your professional profile is not filled yet</h2>
           <p>
-            Manage your password, authenticator, backup codes, and trusted
-            sessions from one secure place.
+            Start with a headline, then add only the structured information you
+            want to keep for later candidate workflows.
           </p>
-          <Link className="profile-card-link" href="/profile/security">
-            Open security settings
-          </Link>
-        </article>
-      </section>
+          <button
+            type="button"
+            onClick={() => document.getElementById("profile-headline")?.focus()}
+          >
+            Start editing
+          </button>
+        </section>
+      ) : null}
 
-      <section
-        className="profile-future-section"
-        aria-labelledby="profile-future-title"
-      >
-        <div className="profile-section-heading">
-          <div>
-            <p className="workspace-kicker">YOUR PROFESSIONAL STORY</p>
-            <h2 id="profile-future-title">Build your profile over time</h2>
-          </div>
-          <p>These areas will be available in future SmartHire increments.</p>
-        </div>
-        <div className="profile-placeholder-grid">
-          {["CV", "Education", "Certificates", "Skills", "Experience"].map(
-            (label) => (
-              <article className="profile-placeholder-card" key={label}>
-                <span className="profile-placeholder-icon" aria-hidden="true">
-                  +
-                </span>
-                <h3>{label}</h3>
-                <p>Coming later</p>
-              </article>
-            ),
-          )}
-        </div>
-      </section>
+      <ProfileSaveFeedback feedback={editor.feedback} />
+      <div className="professional-profile-sections">
+        <ProfileBasicsForm
+          profile={profile}
+          saving={editor.savingSection === "basics"}
+          feedback={editor.feedback}
+          onSave={editor.save}
+        />
+        <ProfileSkillsForm
+          profile={profile}
+          saving={editor.savingSection === "skills"}
+          onSave={editor.save}
+        />
+        <ProfileExperienceForm
+          profile={profile}
+          saving={editor.savingSection === "experience"}
+          onSave={editor.save}
+        />
+        <ProfileEducationForm
+          profile={profile}
+          saving={editor.savingSection === "education"}
+          onSave={editor.save}
+        />
+        <ProfileSocialLinksForm
+          profile={profile}
+          saving={editor.savingSection === "socialLinks"}
+          onSave={editor.save}
+        />
+      </div>
     </div>
   );
 }

@@ -41,7 +41,14 @@ export class CompleteTwoFactorService {
     const correlationId = randomUUID();
     const state = decodePreAuth(cookie);
     if (!state) {
-      await this.record("FAILURE", undefined, now, factor, "invalid_cookie", correlationId);
+      await this.record(
+        "FAILURE",
+        undefined,
+        now,
+        factor,
+        "invalid_cookie",
+        correlationId,
+      );
       return null;
     }
     const challengeUserId = await this.challenges
@@ -69,7 +76,14 @@ export class CompleteTwoFactorService {
       now,
     });
     if (!decision.allowed) {
-      await this.record("DENIED", undefined, now, factor, "throttled", correlationId);
+      await this.record(
+        "DENIED",
+        undefined,
+        now,
+        factor,
+        "throttled",
+        correlationId,
+      );
       return {
         rateLimited: true,
         retryAfterSeconds: safeRetryMetadata(decision).retryAfterSeconds,
@@ -81,7 +95,14 @@ export class CompleteTwoFactorService {
       now,
     );
     if (!claim) {
-      await this.record("FAILURE", undefined, now, factor, "invalid_or_bound_challenge", correlationId);
+      await this.record(
+        "FAILURE",
+        undefined,
+        now,
+        factor,
+        "invalid_or_bound_challenge",
+        correlationId,
+      );
       return null;
     }
     if (
@@ -123,18 +144,23 @@ export class CompleteTwoFactorService {
               .consumeBackupCode(forwarded, code)
               .catch(() => ({ sessionCookie: null }))
           ).sessionCookie
-        : (
-            await this.gateway
-              .verifyTotp(code, forwarded)
-              .catch(() => null)
+        : ((
+            await this.gateway.verifyTotp(code, forwarded).catch(() => null)
           )?.headers
             .getSetCookie()
             .find((value) =>
               /^(smarthire\.session|__Host-smarthire\.session)=/.test(value),
-            ) ?? null;
+            ) ?? null);
     if (!session) {
       await this.challenges.releaseFailed(claim.id, claim.claimTime);
-      await this.record("FAILURE", claim.userId, now, factor, "factor_rejected", correlationId);
+      await this.record(
+        "FAILURE",
+        claim.userId,
+        now,
+        factor,
+        "factor_rejected",
+        correlationId,
+      );
       return null;
     }
     const step =
@@ -149,11 +175,25 @@ export class CompleteTwoFactorService {
     ) {
       const h = new Headers({ cookie: session.split(";", 1)[0] });
       await this.gateway.signOut(h).catch(() => null);
-      await this.record("FAILURE", claim.userId, now, factor, "challenge_finalize_failed", correlationId);
+      await this.record(
+        "FAILURE",
+        claim.userId,
+        now,
+        factor,
+        "challenge_finalize_failed",
+        correlationId,
+      );
       return null;
     }
     await new SessionService(this.sessions).enforceCreated(claim.userId);
-    await this.record("SUCCESS", claim.userId, now, factor, "verified", correlationId);
+    await this.record(
+      "SUCCESS",
+      claim.userId,
+      now,
+      factor,
+      "verified",
+      correlationId,
+    );
     return { sessionCookie: session };
   }
   private record(

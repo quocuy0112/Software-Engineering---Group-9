@@ -48,6 +48,56 @@ export type TwoFactor = Prisma.TwoFactorModel
  */
 export type CandidateIdentity = Prisma.CandidateIdentityModel
 /**
+ * Model CandidateProfile
+ * 
+ */
+export type CandidateProfile = Prisma.CandidateProfileModel
+/**
+ * Model ProfileExperience
+ * 
+ */
+export type ProfileExperience = Prisma.ProfileExperienceModel
+/**
+ * Model ProfileEducation
+ * 
+ */
+export type ProfileEducation = Prisma.ProfileEducationModel
+/**
+ * Model Skill
+ * 
+ */
+export type Skill = Prisma.SkillModel
+/**
+ * Model CandidateProfileSkill
+ * 
+ */
+export type CandidateProfileSkill = Prisma.CandidateProfileSkillModel
+/**
+ * Model SocialLink
+ * 
+ */
+export type SocialLink = Prisma.SocialLinkModel
+/**
+ * Model AccountPreferences
+ * 
+ */
+export type AccountPreferences = Prisma.AccountPreferencesModel
+/**
+ * Model EmailChangeRequest
+ * 
+ */
+export type EmailChangeRequest = Prisma.EmailChangeRequestModel
+/**
+ * Model PasswordChangeAttemptWindow
+ * 
+ */
+export type PasswordChangeAttemptWindow = Prisma.PasswordChangeAttemptWindowModel
+/**
+ * Model PasswordChangeOperation
+ * 
+ */
+export type PasswordChangeOperation = Prisma.PasswordChangeOperationModel
+/**
  * Model SecurityToken
  * 
  */

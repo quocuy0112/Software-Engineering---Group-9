@@ -55,7 +55,7 @@
   color: #0f172a;
 }
 .totp-enrollment :focus-visible {
-  outline: 3px solid #f59e0b;
+  outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
 }
 .totp-qr {
@@ -121,7 +121,7 @@
 .security-panel input {
   width: 100%;
   min-height: 3.05rem;
-  border: 1px solid #d9dcd4;
+  border: 1px solid var(--control-border);
   border-radius: 0.75rem;
   padding: 0.75rem 0.85rem;
   color: var(--ink);
@@ -281,6 +281,61 @@
 .totp-enrollment form {
   display: grid;
   gap: 1rem;
+}
+
+.password-change-panel {
+  overflow-wrap: anywhere;
+}
+
+.password-change-form {
+  min-width: 0;
+}
+
+.password-change-form input {
+  max-width: 100%;
+}
+
+.password-visibility-control {
+  display: inline-flex;
+  gap: 0.55rem;
+  align-items: center;
+  width: fit-content;
+}
+
+.security-panel .password-visibility-control input {
+  width: 1.1rem;
+  min-height: 1.1rem;
+  margin: 0;
+}
+
+.password-change-feedback {
+  margin-bottom: 0.9rem;
+  border-radius: 0.7rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.password-change-feedback:not(:empty) {
+  padding: 0.8rem;
+  border: 1px solid #bdd4c2;
+  color: #315a3d;
+  background: #eff8f1;
+}
+
+.password-change-feedback[data-feedback-kind="error"] {
+  border-color: #e1b8b8;
+  color: var(--danger);
+  background: #fff2f2;
+}
+
+.password-change-feedback ul {
+  margin: 0.45rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.password-change-feedback:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .security-actions {
@@ -523,6 +578,18 @@
 
   .security-panel {
     padding: 1rem;
+  }
+
+  .password-change-form button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .password-change-form *,
+  .password-change-feedback {
+    transition: none !important;
+    animation: none !important;
   }
 }
 .profile-navigation {

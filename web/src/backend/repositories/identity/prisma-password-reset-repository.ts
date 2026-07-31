@@ -387,11 +387,7 @@ export class PrismaPasswordResetRepository {
     });
   }
 
-  async finalize(
-    id: string,
-    executionOwner: string,
-    now = new Date(),
-  ) {
+  async finalize(id: string, executionOwner: string, now = new Date()) {
     const changed = await prisma.passwordResetOperation.updateMany({
       where: {
         id,

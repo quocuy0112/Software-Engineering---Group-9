@@ -1,6 +1,7 @@
 import { readdir, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import { clearSuccessfulLoginRateLimit } from "../fixtures/rate-limit";
 
 const password = "correct horse 2026";
 
@@ -11,6 +12,7 @@ async function signIn(page: Page, email: string) {
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+  await clearSuccessfulLoginRateLimit(email);
 }
 
 async function openWorkspaceMenu(page: Page) {

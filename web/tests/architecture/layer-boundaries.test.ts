@@ -81,4 +81,86 @@ describe("application layers", () => {
       expect(await readFile(path, "utf8")).toContain("AppProviders");
     }
   });
+
+  it("marks sanitizer, cryptography, database, and mail-provider modules as server-only", async () => {
+    for (const path of await files("src/backend")) {
+      if (![".ts", ".tsx"].includes(extname(path))) continue;
+      const source = await readFile(path, "utf8");
+      if (
+        /sanitize-html|node:crypto|@\/backend\/database\/prisma|from ["'](?:nodemailer|resend)["']/u.test(
+          source,
+        )
+      ) {
+        expect(source, path).toMatch(/^import ["']server-only["'];/u);
+      }
+    }
+  });
+
+  it("enforces account transport-service-repository direction", async () => {
+    for (const path of await files("src/app/api/account")) {
+      if (extname(path) !== ".ts") continue;
+      const source = await readFile(path, "utf8");
+      expect(source, path).not.toMatch(
+        /@\/backend\/(?:database|generated|repositories)\//u,
+      );
+      expect(source, path).not.toMatch(
+        /@\/backend\/auth\/better-auth\/better-auth-(?:password|session)-gateway/u,
+      );
+    }
+    for (const path of await files("src/backend/services")) {
+      if (extname(path) !== ".ts") continue;
+      expect(await readFile(path, "utf8"), path).not.toMatch(/@\/app\/api\//u);
+    }
+    for (const path of await files("src/backend/repositories")) {
+      if (extname(path) !== ".ts") continue;
+      expect(await readFile(path, "utf8"), path).not.toMatch(
+        /@\/(?:app|backend\/services)\//u,
+      );
+    }
+  });
+
+  it("loads Feature 002 Server Component data through services, never internal HTTP", async () => {
+    const pages = [
+      [
+        "src/app/(workspace)/profile/page.tsx",
+        "@/backend/services/profile/get-profile-aggregate",
+      ],
+      [
+        "src/app/(workspace)/profile/account/page.tsx",
+        "@/backend/services/account/account-identity-service",
+      ],
+      [
+        "src/app/(workspace)/profile/preferences/page.tsx",
+        "@/backend/services/account/account-preferences-service",
+      ],
+    ] as const;
+    for (const [path, service] of pages) {
+      const source = await readFile(path, "utf8");
+      expect(source, path).toContain(service);
+      expect(source, path).not.toMatch(/fetch\s*\(|\/api\/account\//u);
+      expect(source, path).not.toMatch(
+        /@\/backend\/(?:database|generated|repositories)\//u,
+      );
+    }
+  });
+
+  it("retains one Better Auth-backed browser-session owner", async () => {
+    const schema = await readFile("prisma/schema.prisma", "utf8");
+    expect(schema.match(/^model Session \{/gmu)).toHaveLength(1);
+    expect(schema).not.toMatch(
+      /^model (?:AccountSession|CandidateSession|ProfileSession) \{/gmu,
+    );
+
+    const passwordGateway = await readFile(
+      "src/backend/auth/better-auth/better-auth-password-gateway.ts",
+      "utf8",
+    );
+    expect(passwordGateway).toContain("auth.api.revokeOtherSessions");
+    for (const path of await files("src/frontend")) {
+      if (![".ts", ".tsx"].includes(extname(path))) continue;
+      expect(await readFile(path, "utf8"), path).not.toMatch(
+        /better-auth\/(?:api|crypto)|@\/backend\/auth\/better-auth/u,
+      );
+    }
+  });
 });

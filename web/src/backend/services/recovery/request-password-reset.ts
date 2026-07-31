@@ -6,7 +6,10 @@ import {
   PASSWORD_RECOVERY_REQUEST_FAILED_ERROR,
   PASSWORD_RECOVERY_SUCCESS_RESPONSE,
 } from "@/shared/contracts/identity/password-recovery";
-import { rateLimitPolicies, safeRetryMetadata } from "@/backend/security/rate-limit/policies";
+import {
+  rateLimitPolicies,
+  safeRetryMetadata,
+} from "@/backend/security/rate-limit/policies";
 import { TokenProtector } from "@/backend/security/security-token/security-tokens";
 import { PrismaRateLimitRepository } from "@/backend/repositories/rate-limit/prisma-rate-limit-repository";
 import { PrismaPasswordResetRepository } from "@/backend/repositories/identity/prisma-password-reset-repository";

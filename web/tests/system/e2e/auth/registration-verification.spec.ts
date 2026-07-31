@@ -65,11 +65,17 @@ test("keeps keyboard-accessible validation visible at 320px", async ({
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: "SmartHire" })).toBeFocused();
   await page.keyboard.press("Tab");
-  await expect(page.getByRole("link", { name: "Sign in", exact: true })).toBeFocused();
+  await expect(
+    page.getByRole("link", { name: "Sign in", exact: true }),
+  ).toBeFocused();
   await page.keyboard.press("Tab");
-  await expect(page.getByRole("link", { name: "Create account", exact: true })).toBeFocused();
+  await expect(
+    page.getByRole("link", { name: "Create account", exact: true }),
+  ).toBeFocused();
   await page.keyboard.press("Tab");
-  await expect(page.getByRole("link", { name: "Forgot password", exact: true })).toBeFocused();
+  await expect(
+    page.getByRole("link", { name: "Forgot password", exact: true }),
+  ).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(page.getByLabel("Full name")).toBeFocused();
   await page.getByRole("button", { name: "Create account" }).click();

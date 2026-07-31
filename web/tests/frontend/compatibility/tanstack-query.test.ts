@@ -21,7 +21,10 @@ describe("TanStack Query 5.101.4 compatibility boundary", () => {
 
   it("keeps secret-bearing names out of the query boundary source", async () => {
     const source = await readFile(
-      resolve(process.cwd(), "src/frontend/features/authentication/client/query-options.ts"),
+      resolve(
+        process.cwd(),
+        "src/frontend/features/authentication/client/query-options.ts",
+      ),
       "utf8",
     );
     expect(source).not.toMatch(/password|totp|backup.?code|session.?token/i);

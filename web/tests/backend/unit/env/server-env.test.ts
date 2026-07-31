@@ -33,6 +33,7 @@ describe("server environment", () => {
         EMAIL_ADAPTER: "resend",
         RESEND_API_KEY: "re_example",
         EMAIL_FROM: "no-reply@smarthire.example",
+        AUDIT_TRUSTED_PROXY_HOPS: "1",
       }).APP_ENV,
     ).toBe("production");
   });

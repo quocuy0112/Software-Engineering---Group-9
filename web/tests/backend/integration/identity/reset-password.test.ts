@@ -121,7 +121,9 @@ describe("password reset preservation saga", () => {
     expect(operation.finalizedAt).not.toBeNull();
     expect(
       await prisma.auditEvent.count({
-        where: { id: { in: [operation.auditIntentKey, operation.finalAuditId!] } },
+        where: {
+          id: { in: [operation.auditIntentKey, operation.finalAuditId!] },
+        },
       }),
     ).toBe(2);
     const persistedEvidence = JSON.stringify({
