@@ -63,3 +63,4 @@ node_modules
 
 # Prisma ignore
 .prisma/migrations/
+./web/prisma/migrations/
