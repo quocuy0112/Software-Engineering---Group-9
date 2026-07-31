@@ -375,3 +375,74 @@
   margin-inline: auto;
   overflow-wrap: anywhere;
 }
+
+/* Feature 002: password-change controls that do not exist in main. */
+.password-change-panel {
+  overflow-wrap: anywhere;
+}
+
+.password-change-form {
+  min-width: 0;
+}
+
+.password-change-form input {
+  max-width: 100%;
+}
+
+.password-visibility-control {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: var(--sh-space-2);
+}
+
+.security-panel .password-visibility-control input {
+  width: 1.1rem;
+  min-height: 1.1rem;
+  margin: 0;
+}
+
+.password-change-feedback {
+  margin-bottom: var(--sh-space-4);
+  border-radius: var(--sh-radius-sm);
+  font-size: var(--sh-font-size-body-sm);
+  line-height: var(--sh-line-height-body-sm);
+}
+
+.password-change-feedback:not(:empty) {
+  padding: var(--sh-space-3) var(--sh-space-4);
+  border: 1px solid var(--sh-color-success);
+  color: var(--sh-color-success);
+  background: var(--sh-color-success-bg);
+}
+
+.password-change-feedback[data-feedback-kind="error"] {
+  border-color: var(--sh-color-error);
+  color: var(--sh-color-error);
+  background: var(--sh-color-error-bg);
+}
+
+.password-change-feedback ul {
+  margin: var(--sh-space-2) 0 0;
+  padding-left: var(--sh-space-5);
+}
+
+.password-change-feedback:focus-visible {
+  outline: 2px solid var(--sh-color-border-focus);
+  outline-offset: 2px;
+}
+
+@media (max-width: 320px) {
+  .password-change-form button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .password-change-form *,
+  .password-change-feedback {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

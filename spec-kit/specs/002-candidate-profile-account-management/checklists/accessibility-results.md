@@ -34,23 +34,25 @@ journey at desktop and 320 px (8/8 Feature 002 variants; 40/40 overall).
 
 ## Contrast correction and measured ratios
 
-The audit found and corrected two prior non-text contrast gaps. All
-profile/account focus rings now use `--focus-ring: #a87900`; all relevant input
-boundaries use `--control-border: #858d82`.
+The current design-token migration preserves the corrected non-text contrast
+gaps. Profile/account focus treatment uses
+`--sh-color-border-focus: #2563eb` plus
+`--sh-color-focus-ring-bg: #dbeafe`; relevant input boundaries use
+`--sh-color-border-default: #64748b`. The executable contrast test also rejects
+the superseded legacy focus, boundary, and color tokens in Feature 002 styles.
 
-| Pair                                    |   Ratio | Requirement | Result |
-| --------------------------------------- | ------: | ----------: | ------ |
-| Focus ring / white surface              |  3.89:1 |         3:1 | PASS   |
-| Focus ring / forest primary control     |  3.16:1 |         3:1 | PASS   |
-| Control boundary / white surface        |  3.43:1 |         3:1 | PASS   |
-| Control boundary / `#fbfbf9` input fill |  3.31:1 |         3:1 | PASS   |
-| Primary text / surface                  | 16.66:1 |       4.5:1 | PASS   |
-| Muted text / surface                    |  4.56:1 |       4.5:1 | PASS   |
-| White button text / forest              | 12.30:1 |       4.5:1 | PASS   |
-| Section kicker / surface                |  5.09:1 |       4.5:1 | PASS   |
-| Success feedback text / fill            |  6.88:1 |       4.5:1 | PASS   |
-| Warning feedback text / fill            |  6.56:1 |       4.5:1 | PASS   |
-| Error feedback text / fill              |  5.57:1 |       4.5:1 | PASS   |
+| Pair                              |   Ratio | Requirement | Result |
+| --------------------------------- | ------: | ----------: | ------ |
+| Focus border / white card         |  5.17:1 |         3:1 | PASS   |
+| Focus halo / blue primary control |  5.49:1 |         3:1 | PASS   |
+| Control boundary / white card     |  4.76:1 |         3:1 | PASS   |
+| Primary text / white card         | 17.85:1 |       4.5:1 | PASS   |
+| Secondary text / white card       |  7.58:1 |       4.5:1 | PASS   |
+| White button text / blue primary  |  6.70:1 |       4.5:1 | PASS   |
+| Section kicker / white card       |  6.70:1 |       4.5:1 | PASS   |
+| Success feedback text / fill      |  4.79:1 |       4.5:1 | PASS   |
+| Warning feedback text / fill      |  4.76:1 |       4.5:1 | PASS   |
+| Error feedback text / fill        |  5.91:1 |       4.5:1 | PASS   |
 
 ## Source and semantics review
 

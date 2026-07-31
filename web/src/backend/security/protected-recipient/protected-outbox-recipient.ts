@@ -37,6 +37,17 @@ function assertRecipient(value: string): void {
   }
 }
 
+function decodeCanonicalBase64Url(value: string): Buffer {
+  if (!/^[A-Za-z0-9_-]+$/u.test(value)) {
+    throw new Error("PROTECTED_RECIPIENT_INVALID");
+  }
+  const decoded = Buffer.from(value, "base64url");
+  if (decoded.toString("base64url") !== value) {
+    throw new Error("PROTECTED_RECIPIENT_INVALID");
+  }
+  return decoded;
+}
+
 export class ProtectedOutboxRecipient {
   constructor(private readonly secret = serverEnvironment.TOKEN_SECRET) {
     if (Buffer.byteLength(secret, "utf8") < 32) {
@@ -88,15 +99,17 @@ export class ProtectedOutboxRecipient {
       throw new Error("PROTECTED_RECIPIENT_INVALID");
     }
     try {
-      const decipher = createDecipheriv(
-        "aes-256-gcm",
-        this.key(purpose),
-        Buffer.from(ivValue, "base64url"),
-      );
+      const iv = decodeCanonicalBase64Url(ivValue);
+      const encrypted = decodeCanonicalBase64Url(encryptedValue);
+      const tag = decodeCanonicalBase64Url(tagValue);
+      if (iv.length !== 12 || encrypted.length === 0 || tag.length !== 16) {
+        throw new Error("PROTECTED_RECIPIENT_INVALID");
+      }
+      const decipher = createDecipheriv("aes-256-gcm", this.key(purpose), iv);
       decipher.setAAD(Buffer.from(`${version}:${purpose}`, "utf8"));
-      decipher.setAuthTag(Buffer.from(tagValue, "base64url"));
+      decipher.setAuthTag(tag);
       const recipient = Buffer.concat([
-        decipher.update(Buffer.from(encryptedValue, "base64url")),
+        decipher.update(encrypted),
         decipher.final(),
       ]).toString("utf8");
       assertRecipient(recipient);

@@ -43,9 +43,6 @@ button:disabled {
   cursor: not-allowed;
 }
 
-.smart-hire-brand:focus-visible {
-  outline: 3px solid var(--focus-ring);
-
 a,
 button,
 input,
@@ -61,6 +58,7 @@ textarea {
 :focus-visible {
   outline: 2px solid var(--sh-color-border-focus);
   outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--sh-color-focus-ring-bg);
 }
 
 ::selection {

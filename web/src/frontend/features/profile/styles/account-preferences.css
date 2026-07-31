@@ -5,42 +5,45 @@
 
 .account-preferences-panel {
   max-width: 48rem;
-  padding: clamp(1rem, 3vw, 1.5rem);
+  padding: var(--sh-card-padding);
   overflow-wrap: anywhere;
-  border: 1px solid var(--line);
-  border-radius: 1rem;
-  background: var(--surface);
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-md);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-card);
 }
 
 .account-preferences-panel h2 {
-  margin: 0.35rem 0 0;
-  color: var(--ink);
-  font-size: 1.1rem;
+  margin: var(--sh-space-1) 0 0;
+  color: var(--sh-color-text-primary);
+  font-size: var(--sh-font-size-h3);
+  line-height: var(--sh-line-height-h3);
 }
 
 .account-preferences-feedback {
   max-width: 100%;
-  margin: 0.8rem 0;
-  border-radius: 0.7rem;
-  line-height: 1.5;
+  margin: var(--sh-space-3) 0;
+  border-radius: var(--sh-radius-sm);
+  font-size: var(--sh-font-size-body-sm);
+  line-height: var(--sh-line-height-body-sm);
 }
 
 .account-preferences-feedback:not(:empty) {
-  padding: 0.75rem;
-  border: 1px solid #bdd4c2;
-  color: #315a3d;
-  background: #eff8f1;
+  padding: var(--sh-space-3) var(--sh-space-4);
+  border: 1px solid var(--sh-color-success);
+  color: var(--sh-color-success);
+  background: var(--sh-color-success-bg);
 }
 
 .account-preferences-feedback[data-feedback-kind="error"] {
-  border-color: #e1b8b8;
-  color: var(--danger);
-  background: #fff2f2;
+  border-color: var(--sh-color-error);
+  color: var(--sh-color-error);
+  background: var(--sh-color-error-bg);
 }
 
 .account-preferences-feedback:focus-visible,
 .account-preferences-form :focus-visible {
-  outline: 3px solid var(--focus-ring);
+  outline: 2px solid var(--sh-color-border-focus);
   outline-offset: 2px;
 }
 
@@ -48,14 +51,15 @@
 .account-preferences-fields {
   display: grid;
   min-width: 0;
-  gap: 0.8rem;
+  gap: var(--sh-space-3);
 }
 
 .account-preferences-form label,
 .notification-preferences legend {
-  color: #394137;
-  font-size: 0.8rem;
-  font-weight: 750;
+  color: var(--sh-color-text-primary);
+  font-size: var(--sh-font-size-label);
+  font-weight: var(--sh-font-weight-medium);
+  line-height: 18px;
 }
 
 .account-preferences-form select,
@@ -63,87 +67,116 @@
 .account-preferences-form input[list] {
   width: 100%;
   max-width: 100%;
-  min-height: 3rem;
-  padding: 0.7rem 0.8rem;
-  border: 1px solid var(--control-border);
-  border-radius: 0.75rem;
-  background: #fbfbf9;
+  min-height: var(--sh-control-height);
+  padding: 11px var(--sh-space-3);
+  border: 1px solid var(--sh-color-border-default);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
   font: inherit;
 }
 
+.account-preferences-form select:hover:not(:disabled),
+.account-preferences-form input:hover:not(:disabled) {
+  border-color: var(--sh-color-text-muted);
+}
+
+.account-preferences-form select:focus,
+.account-preferences-form input:focus {
+  border-color: var(--sh-color-border-focus);
+  outline: 2px solid var(--sh-color-border-focus);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
 .preference-guidance {
-  margin: -0.3rem 0 0.4rem;
-  color: var(--muted);
-  font-size: 0.75rem;
+  margin: calc(-1 * var(--sh-space-2)) 0 var(--sh-space-2);
+  color: var(--sh-color-text-muted);
+  font-size: var(--sh-font-size-caption);
+  line-height: var(--sh-line-height-caption);
 }
 
 .preference-guidance--warning {
-  padding: 0.65rem;
-  border-left: 4px solid #b7791f;
-  color: #7c571e;
-  background: #fff8e8;
+  padding: var(--sh-space-3);
+  border-left: 4px solid var(--sh-color-warning);
+  color: var(--sh-color-warning);
+  background: var(--sh-color-warning-bg);
 }
 
 .notification-preferences {
   display: grid;
-  gap: 0.65rem;
   min-width: 0;
-  margin: 0.5rem 0;
-  padding: 1rem;
-  border: 1px solid var(--line);
-  border-radius: 0.8rem;
+  gap: var(--sh-space-3);
+  margin: var(--sh-space-2) 0;
+  padding: var(--sh-space-4);
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-sm);
 }
 
 .notification-preferences label {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.7rem;
+  gap: var(--sh-space-3);
   align-items: start;
-  padding: 0.65rem;
-  border-radius: 0.65rem;
-  background: #f7f9f5;
+  padding: var(--sh-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-color-surface-subtle);
 }
 
 .notification-preferences input {
   width: 1.1rem;
   height: 1.1rem;
-  margin-top: 0.15rem;
+  margin-top: var(--sh-space-1);
 }
 
 .notification-preferences span {
   display: grid;
-  gap: 0.2rem;
   min-width: 0;
+  gap: var(--sh-space-1);
 }
 
 .notification-preferences small {
-  color: var(--muted);
-  font-weight: 500;
-  line-height: 1.45;
+  color: var(--sh-color-text-secondary);
+  font-weight: var(--sh-font-weight-regular);
+  line-height: var(--sh-line-height-body-sm);
 }
 
 .notification-preferences__mandatory {
-  border: 1px solid #bdd4c2;
+  border-color: var(--sh-color-success) !important;
+  background: var(--sh-color-success-bg) !important;
 }
 
 .account-preferences-form > button {
-  min-height: 3rem;
-  border: 0;
-  border-radius: 0.75rem;
-  color: white;
-  background: var(--forest);
+  display: inline-flex;
+  min-height: var(--sh-control-height);
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--sh-space-4);
+  border: 1px solid var(--sh-color-brand-primary);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-text-inverse);
+  background: var(--sh-color-brand-primary);
   font: inherit;
-  font-weight: 750;
+  font-size: var(--sh-font-size-button);
+  font-weight: var(--sh-font-weight-semibold);
+}
+
+.account-preferences-form > button:hover:not(:disabled) {
+  background: var(--sh-color-brand-primary-hover);
+  border-color: var(--sh-color-brand-primary-hover);
 }
 
 .account-preferences-form > button:disabled {
-  opacity: 0.6;
+  color: var(--sh-color-disabled-text);
+  background: var(--sh-color-disabled-bg);
+  border-color: var(--sh-color-border-subtle);
 }
 
 @media (max-width: 320px) {
   .account-preferences-panel,
   .notification-preferences {
-    padding: 0.85rem;
+    padding: var(--sh-space-4);
   }
 
   .account-preferences-form > button {
@@ -155,7 +188,8 @@
 @media (prefers-reduced-motion: reduce) {
   .account-preferences-form *,
   .account-preferences-feedback {
-    transition: none !important;
-    animation: none !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

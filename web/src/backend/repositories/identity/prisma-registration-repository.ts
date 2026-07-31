@@ -2,7 +2,10 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { Prisma } from "@/backend/generated/prisma/client";
 import { prisma } from "@/backend/database/prisma";
-import { EmailAddressClaimCoordinator } from "@/backend/repositories/account/email-address-claim-coordinator";
+import {
+  EmailAddressClaimCoordinator,
+  EmailAddressUnavailableError,
+} from "@/backend/repositories/account/email-address-claim-coordinator";
 
 export type RegistrationPersistenceInput = {
   name: string;
@@ -94,6 +97,8 @@ export class PrismaRegistrationRepository {
           return { userId, outboxId: outbox.id };
         });
       } catch (error) {
+        if (error instanceof EmailAddressUnavailableError)
+          throw new DuplicateRegistrationError();
         if (
           error instanceof Prisma.PrismaClientKnownRequestError &&
           error.code === "P2002"

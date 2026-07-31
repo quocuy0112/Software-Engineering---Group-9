@@ -11,146 +11,152 @@
 }
 
 .professional-profile-page button {
-  min-height: 2.75rem;
-  border: 0;
-  border-radius: 0.75rem;
-  padding: 0.65rem 0.9rem;
-  color: #fff;
-  background: var(--forest);
-  font-size: 0.78rem;
-  font-weight: 750;
+  display: inline-flex;
+  min-height: var(--sh-control-height);
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--sh-space-4);
+  border: 1px solid var(--sh-color-brand-primary);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-text-inverse);
+  background: var(--sh-color-brand-primary);
+  font-size: var(--sh-font-size-button);
+  font-weight: var(--sh-font-weight-semibold);
   cursor: pointer;
 }
 
 .professional-profile-page button:hover:not(:disabled) {
-  background: #345636;
+  background: var(--sh-color-brand-primary-hover);
+  border-color: var(--sh-color-brand-primary-hover);
 }
 
 .professional-profile-page button:disabled {
+  color: var(--sh-color-disabled-text);
+  background: var(--sh-color-disabled-bg);
+  border-color: var(--sh-color-border-subtle);
   cursor: not-allowed;
-  opacity: 0.55;
 }
 
 .professional-profile-page :focus-visible {
-  outline: 3px solid var(--focus-ring);
-  outline-offset: 3px;
+  outline: 2px solid var(--sh-color-border-focus);
+  outline-offset: 2px;
 }
 
 .professional-profile-empty,
 .professional-profile-section,
 .professional-profile-feedback {
   max-width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 1rem;
-  background: rgb(255 255 255 / 0.86);
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-md);
+  background: var(--sh-color-surface-card);
 }
 
 .professional-profile-empty {
-  margin-bottom: 1rem;
-  padding: clamp(1rem, 3vw, 1.5rem);
-  background: linear-gradient(
-    135deg,
-    rgb(230 242 231 / 0.9),
-    rgb(255 255 255 / 0.92)
-  );
+  margin-bottom: var(--sh-space-4);
+  padding: var(--sh-card-padding);
+  background: var(--sh-color-info-bg);
 }
 
 .professional-profile-empty h2 {
-  margin: 0.45rem 0 0.65rem;
-  color: var(--ink);
-  font-size: clamp(1.15rem, 4vw, 1.55rem);
+  margin: var(--sh-space-2) 0 var(--sh-space-3);
+  color: var(--sh-color-text-primary);
+  font-size: var(--sh-font-size-h2);
+  line-height: var(--sh-line-height-h2);
 }
 
 .professional-profile-empty p:not(.panel-kicker) {
   max-width: 42rem;
-  color: var(--muted);
-  line-height: 1.6;
+  color: var(--sh-color-text-secondary);
+  font-size: var(--sh-font-size-body-sm);
+  line-height: var(--sh-line-height-body-sm);
 }
 
 .professional-profile-feedback {
-  min-height: 0.25rem;
-  margin-bottom: 1rem;
+  min-height: var(--sh-space-2);
+  margin-bottom: var(--sh-space-4);
   border-color: transparent;
   background: transparent;
 }
 
 .professional-profile-feedback p {
   margin: 0;
-  padding: 0.85rem 1rem;
-  border: 1px solid #bad6c2;
-  border-radius: 0.8rem;
-  color: #315e3f;
-  background: #edf8f0;
-  line-height: 1.5;
+  padding: var(--sh-space-3) var(--sh-space-4);
+  border: 1px solid var(--sh-color-success);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-success);
+  background: var(--sh-color-success-bg);
+  font-size: var(--sh-font-size-body-sm);
+  line-height: var(--sh-line-height-body-sm);
 }
 
 .professional-profile-feedback [data-feedback-kind="warning"] {
-  border-color: #dfca8b;
-  color: #6d5724;
-  background: #fff9e5;
+  border-color: var(--sh-color-warning);
+  color: var(--sh-color-warning);
+  background: var(--sh-color-warning-bg);
 }
 
 .professional-profile-feedback [data-feedback-kind="error"] {
-  border-color: #e5b5b5;
-  color: var(--danger);
-  background: #fff1f1;
+  border-color: var(--sh-color-error);
+  color: var(--sh-color-error);
+  background: var(--sh-color-error-bg);
 }
 
 .professional-profile-sections {
   display: grid;
-  gap: 1rem;
+  gap: var(--sh-space-4);
 }
 
 .professional-profile-section {
   min-width: 0;
-  padding: clamp(1rem, 3vw, 1.5rem);
-  box-shadow: 0 12px 34px rgb(23 32 24 / 0.04);
+  padding: var(--sh-card-padding);
+  box-shadow: var(--sh-shadow-card);
 }
 
 .professional-profile-section-heading {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.15rem;
+  gap: var(--sh-space-4);
+  margin-bottom: var(--sh-space-5);
 }
 
 .professional-profile-section-heading h2 {
-  margin: 0.35rem 0 0;
-  color: var(--ink);
-  font-size: clamp(1.05rem, 3vw, 1.35rem);
-  letter-spacing: -0.035em;
+  margin: var(--sh-space-1) 0 0;
+  color: var(--sh-color-text-primary);
+  font-size: var(--sh-font-size-h3);
+  line-height: var(--sh-line-height-h3);
 }
 
 .professional-profile-fields {
   display: grid;
   grid-template-columns: minmax(7rem, 0.3fr) minmax(0, 1fr);
-  gap: 0.45rem 1rem;
+  gap: var(--sh-space-2) var(--sh-space-4);
   align-items: start;
 }
 
 .professional-profile-fields label,
 .professional-profile-section fieldset label,
 .professional-profile-list-row > label {
-  color: #394137;
-  font-size: 0.78rem;
-  font-weight: 750;
+  color: var(--sh-color-text-primary);
+  font-size: var(--sh-font-size-label);
+  font-weight: var(--sh-font-weight-medium);
+  line-height: 18px;
 }
 
 .professional-profile-fields label {
-  padding-top: 0.8rem;
+  padding-top: var(--sh-space-3);
 }
 
 .professional-profile-section input,
 .professional-profile-section textarea {
   width: 100%;
   max-width: 100%;
-  min-height: 2.8rem;
-  border: 1px solid var(--control-border);
-  border-radius: 0.7rem;
-  padding: 0.7rem 0.8rem;
-  color: var(--ink);
-  background: #fbfbf9;
+  min-height: var(--sh-control-height);
+  padding: 11px var(--sh-space-3);
+  border: 1px solid var(--sh-color-border-default);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
 }
 
 .professional-profile-section textarea {
@@ -158,32 +164,38 @@
   resize: vertical;
 }
 
+.professional-profile-section input:hover:not(:disabled),
+.professional-profile-section textarea:hover:not(:disabled) {
+  border-color: var(--sh-color-text-muted);
+}
+
 .professional-profile-section input:focus,
 .professional-profile-section textarea:focus {
-  border-color: #78936d;
-  background: #fff;
-  box-shadow: 0 0 0 4px rgb(120 147 109 / 0.13);
+  border-color: var(--sh-color-border-focus);
+  outline: 2px solid var(--sh-color-border-focus);
+  outline-offset: 2px;
+  box-shadow: none;
 }
 
 .profile-field-error,
 .profile-field-hint {
   grid-column: 2;
-  margin: 0.1rem 0 0.65rem;
-  color: var(--muted);
-  font-size: 0.72rem;
-  line-height: 1.5;
+  margin: 0 0 var(--sh-space-2);
+  color: var(--sh-color-text-muted);
+  font-size: var(--sh-font-size-caption);
+  line-height: var(--sh-line-height-caption);
 }
 
 .profile-field-error {
-  color: var(--danger);
-  font-weight: 700;
+  color: var(--sh-color-error);
+  font-weight: var(--sh-font-weight-semibold);
 }
 
 .professional-profile-list,
 .profile-suggestions {
   display: grid;
-  gap: 0.8rem;
-  margin: 0 0 1rem;
+  gap: var(--sh-space-3);
+  margin: 0 0 var(--sh-space-4);
   padding: 0;
   list-style: none;
 }
@@ -191,43 +203,43 @@
 .professional-profile-list-row,
 .professional-profile-section fieldset {
   min-width: 0;
-  border: 1px solid var(--line);
-  border-radius: 0.85rem;
-  padding: 0.9rem;
-  background: #fafbf8;
+  padding: var(--sh-space-4);
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-color-surface-subtle);
 }
 
 .professional-profile-list-row {
   display: grid;
   grid-template-columns: minmax(6rem, 0.25fr) minmax(0, 1fr) auto;
-  gap: 0.65rem;
+  gap: var(--sh-space-3);
   align-items: center;
 }
 
 .professional-profile-section fieldset {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem 1rem;
+  gap: var(--sh-space-3) var(--sh-space-4);
 }
 
 .professional-profile-section fieldset legend {
-  padding: 0 0.4rem;
-  color: var(--ink);
-  font-weight: 800;
+  padding: 0 var(--sh-space-2);
+  color: var(--sh-color-text-primary);
+  font-weight: var(--sh-font-weight-semibold);
 }
 
 .professional-profile-section fieldset label {
   display: grid;
-  gap: 0.4rem;
+  gap: var(--sh-space-2);
 }
 
 .professional-profile-checkbox {
   display: flex !important;
+  min-height: var(--sh-control-height);
   flex-direction: row;
   align-items: center;
   align-self: end;
-  gap: 0.55rem !important;
-  min-height: 2.8rem;
+  gap: var(--sh-space-2) !important;
 }
 
 .professional-profile-checkbox input {
@@ -239,25 +251,34 @@
   display: flex;
   flex-wrap: wrap;
   grid-column: 1 / -1;
-  gap: 0.45rem;
+  gap: var(--sh-space-2);
 }
 
 .professional-profile-row-actions button,
 .profile-suggestions button {
-  min-height: 2.25rem;
-  padding: 0.45rem 0.65rem;
-  color: #4f5c4e;
-  background: #edf0e9;
+  min-height: var(--sh-control-height-sm);
+  padding-inline: var(--sh-space-3);
+  border-color: var(--sh-color-border-default);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+  font-size: var(--sh-font-size-body-sm);
+}
+
+.professional-profile-row-actions button:hover:not(:disabled),
+.profile-suggestions button:hover:not(:disabled) {
+  border-color: var(--sh-color-brand-primary);
+  color: var(--sh-color-brand-primary-hover);
+  background: var(--sh-color-info-bg);
 }
 
 .profile-suggestions {
-  padding: 0.65rem;
-  border: 1px solid var(--line);
-  border-radius: 0.75rem;
-  background: #f7f8f4;
+  padding: var(--sh-space-3);
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-color-surface-subtle);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .professional-profile-section-heading,
   .professional-profile-list-row {
     display: grid;
@@ -274,7 +295,7 @@
   }
 
   .professional-profile-fields label {
-    padding-top: 0.35rem;
+    padding-top: var(--sh-space-1);
   }
 
   .profile-field-error,
@@ -286,7 +307,7 @@
 @media (max-width: 320px) {
   .professional-profile-section,
   .professional-profile-empty {
-    padding: 0.8rem;
+    padding: var(--sh-space-4);
   }
 
   .professional-profile-page button {

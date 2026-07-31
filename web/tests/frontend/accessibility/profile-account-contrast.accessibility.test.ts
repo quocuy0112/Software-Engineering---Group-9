@@ -41,36 +41,50 @@ describe("profile and account contrast", () => {
     resolve(process.cwd(), "src/frontend/styles/tokens.css"),
     "utf8",
   );
-  const surface = variable(tokens, "surface");
-  const forest = variable(tokens, "forest");
-  const focusRing = variable(tokens, "focus-ring");
-  const controlBorder = variable(tokens, "control-border");
+  const surface = variable(tokens, "sh-color-surface-card");
+  const primary = variable(tokens, "sh-color-brand-primary");
+  const focusBorder = variable(tokens, "sh-color-border-focus");
+  const focusHalo = variable(tokens, "sh-color-focus-ring-bg");
+  const controlBorder = variable(tokens, "sh-color-border-default");
 
   it.each([
-    ["primary text", variable(tokens, "ink"), surface],
-    ["secondary text", variable(tokens, "muted"), surface],
-    ["primary button", "#ffffff", forest],
-    ["section kicker", variable(tokens, "violet"), surface],
-    ["field label", "#394137", "#fbfbf9"],
-    ["success feedback", "#315e3f", "#edf8f0"],
-    ["warning feedback", "#6d5724", "#fff9e5"],
-    ["error feedback", variable(tokens, "danger"), "#fff1f1"],
-    ["account link", "#5e4e99", surface],
+    ["primary text", variable(tokens, "sh-color-text-primary"), surface],
+    ["secondary text", variable(tokens, "sh-color-text-secondary"), surface],
+    ["primary button", variable(tokens, "sh-color-text-inverse"), primary],
+    ["section kicker", primary, surface],
+    ["field label", variable(tokens, "sh-color-text-primary"), surface],
+    [
+      "success feedback",
+      variable(tokens, "sh-color-success"),
+      variable(tokens, "sh-color-success-bg"),
+    ],
+    [
+      "warning feedback",
+      variable(tokens, "sh-color-warning"),
+      variable(tokens, "sh-color-warning-bg"),
+    ],
+    [
+      "error feedback",
+      variable(tokens, "sh-color-error"),
+      variable(tokens, "sh-color-error-bg"),
+    ],
+    ["account link", primary, surface],
   ])("%s text meets 4.5:1", (_name, foreground, background) => {
     expect(contrast(foreground, background)).toBeGreaterThanOrEqual(4.5);
   });
 
   it.each([
-    ["focus ring on light surface", focusRing, surface],
-    ["focus ring on primary control", focusRing, forest],
+    ["focus border on light surface", focusBorder, surface],
+    ["focus halo on primary control", focusHalo, primary],
     ["control boundary on surface", controlBorder, surface],
-    ["control boundary on input fill", controlBorder, "#fbfbf9"],
+    ["control boundary on input fill", controlBorder, surface],
   ])("%s meets 3:1", (_name, foreground, background) => {
     expect(contrast(foreground, background)).toBeGreaterThanOrEqual(3);
   });
 
   it("routes every profile/account focus and control boundary through the reviewed tokens", () => {
     const sources = [
+      "src/frontend/styles/base.css",
       "src/frontend/styles/profile.css",
       "src/frontend/styles/workspace.css",
       "src/frontend/features/profile/styles/professional-profile.css",
@@ -81,7 +95,10 @@ describe("profile and account contrast", () => {
     expect(sources.join("\n")).not.toMatch(
       /#f59e0b|#c49b45|#cfd4ca|#d9dcd4|#8b6ab8/u,
     );
-    expect(sources.join("\n")).toContain("var(--focus-ring)");
-    expect(sources.join("\n")).toContain("var(--control-border)");
+    expect(sources.join("\n")).not.toMatch(
+      /var\(--(?:focus-ring|control-border|forest|ink|muted|danger)\)/u,
+    );
+    expect(sources.join("\n")).toContain("var(--sh-color-border-focus)");
+    expect(sources.join("\n")).toContain("var(--sh-color-border-default)");
   });
 });
