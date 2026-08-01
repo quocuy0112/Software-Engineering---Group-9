@@ -46,6 +46,11 @@ export const authenticationAuditAction = z.enum([
   "password_change.succeeded",
   "password_change.failed",
   "password_change.locked",
+  "job.report.submitted",
+  "job.report.denied",
+  "job.application.submitted",
+  "job.application.denied",
+  "job.application.failed",
 ]);
 
 const auditContextSchema = z
@@ -70,6 +75,8 @@ const auditContextSchema = z
     twoFactorDisabled: z.boolean().optional(),
     backupCodesInvalidated: z.boolean().optional(),
     automaticSessionCreated: z.boolean().optional(),
+    duplicate: z.boolean().optional(),
+    notificationWorkCount: z.number().int().nonnegative().optional(),
   })
   .strict();
 
@@ -91,6 +98,9 @@ export const authenticationAuditEventSchema = z
       "account_recovery",
       "email_change",
       "password_change",
+      "job_posting",
+      "job_report",
+      "job_application",
     ]),
     targetId: z.string().min(1).nullable().optional(),
     result: z.enum(["SUCCESS", "FAILURE", "DENIED"]),

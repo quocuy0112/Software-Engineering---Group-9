@@ -168,3 +168,118 @@ export const OutboxStatus = {
 } as const
 
 export type OutboxStatus = (typeof OutboxStatus)[keyof typeof OutboxStatus]
+
+
+export const JobPostingStatus = {
+  DRAFT: 'DRAFT',
+  PENDING_REVIEW: 'PENDING_REVIEW',
+  ACTIVE: 'ACTIVE',
+  CLOSED: 'CLOSED',
+  EXPIRED: 'EXPIRED',
+  REJECTED: 'REJECTED',
+  REMOVED: 'REMOVED'
+} as const
+
+export type JobPostingStatus = (typeof JobPostingStatus)[keyof typeof JobPostingStatus]
+
+
+export const EmploymentType = {
+  FULL_TIME: 'FULL_TIME',
+  PART_TIME: 'PART_TIME',
+  CONTRACT: 'CONTRACT',
+  INTERNSHIP: 'INTERNSHIP',
+  TEMPORARY: 'TEMPORARY'
+} as const
+
+export type EmploymentType = (typeof EmploymentType)[keyof typeof EmploymentType]
+
+
+export const ExperienceLevel = {
+  ENTRY: 'ENTRY',
+  JUNIOR: 'JUNIOR',
+  MID: 'MID',
+  SENIOR: 'SENIOR',
+  LEAD: 'LEAD',
+  MANAGER: 'MANAGER'
+} as const
+
+export type ExperienceLevel = (typeof ExperienceLevel)[keyof typeof ExperienceLevel]
+
+
+export const WorkArrangement = {
+  ONSITE: 'ONSITE',
+  HYBRID: 'HYBRID',
+  REMOTE: 'REMOTE'
+} as const
+
+export type WorkArrangement = (typeof WorkArrangement)[keyof typeof WorkArrangement]
+
+
+export const SalaryPeriod = {
+  HOUR: 'HOUR',
+  MONTH: 'MONTH',
+  YEAR: 'YEAR'
+} as const
+
+export type SalaryPeriod = (typeof SalaryPeriod)[keyof typeof SalaryPeriod]
+
+
+export const ApplicationQuestionKind = {
+  TEXT: 'TEXT',
+  BOOLEAN: 'BOOLEAN',
+  SINGLE_CHOICE: 'SINGLE_CHOICE'
+} as const
+
+export type ApplicationQuestionKind = (typeof ApplicationQuestionKind)[keyof typeof ApplicationQuestionKind]
+
+
+export const JobReportReason = {
+  FRAUD: 'FRAUD',
+  MISLEADING: 'MISLEADING',
+  DUPLICATE: 'DUPLICATE',
+  DISCRIMINATORY: 'DISCRIMINATORY',
+  INAPPROPRIATE: 'INAPPROPRIATE',
+  OTHER: 'OTHER'
+} as const
+
+export type JobReportReason = (typeof JobReportReason)[keyof typeof JobReportReason]
+
+
+export const JobReportStatus = {
+  PENDING_REVIEW: 'PENDING_REVIEW',
+  RESOLVED: 'RESOLVED',
+  DISMISSED: 'DISMISSED'
+} as const
+
+export type JobReportStatus = (typeof JobReportStatus)[keyof typeof JobReportStatus]
+
+
+export const ApplicationStage = {
+  APPLIED: 'APPLIED',
+  VIEWED: 'VIEWED',
+  SHORTLISTED: 'SHORTLISTED',
+  INTERVIEWING: 'INTERVIEWING',
+  OFFERED: 'OFFERED',
+  HIRED: 'HIRED',
+  OFFER_DECLINED: 'OFFER_DECLINED',
+  REJECTED: 'REJECTED',
+  WAITLISTED: 'WAITLISTED'
+} as const
+
+export type ApplicationStage = (typeof ApplicationStage)[keyof typeof ApplicationStage]
+
+
+export const RecruitmentNotificationAudience = {
+  CANDIDATE: 'CANDIDATE',
+  COMPANY: 'COMPANY'
+} as const
+
+export type RecruitmentNotificationAudience = (typeof RecruitmentNotificationAudience)[keyof typeof RecruitmentNotificationAudience]
+
+
+export const RecruitmentNotificationKind = {
+  APPLICATION_SUBMITTED: 'APPLICATION_SUBMITTED',
+  APPLICATION_RECEIVED: 'APPLICATION_RECEIVED'
+} as const
+
+export type RecruitmentNotificationKind = (typeof RecruitmentNotificationKind)[keyof typeof RecruitmentNotificationKind]

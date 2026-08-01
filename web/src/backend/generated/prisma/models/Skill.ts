@@ -183,6 +183,7 @@ export type SkillWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
   profiles?: Prisma.CandidateProfileSkillListRelationFilter
+  jobPostings?: Prisma.JobPostingSkillListRelationFilter
 }
 
 export type SkillOrderByWithRelationInput = {
@@ -192,6 +193,7 @@ export type SkillOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   profiles?: Prisma.CandidateProfileSkillOrderByRelationAggregateInput
+  jobPostings?: Prisma.JobPostingSkillOrderByRelationAggregateInput
 }
 
 export type SkillWhereUniqueInput = Prisma.AtLeast<{
@@ -204,6 +206,7 @@ export type SkillWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
   profiles?: Prisma.CandidateProfileSkillListRelationFilter
+  jobPostings?: Prisma.JobPostingSkillListRelationFilter
 }, "id" | "normalizedName">
 
 export type SkillOrderByWithAggregationInput = {
@@ -235,6 +238,7 @@ export type SkillCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   profiles?: Prisma.CandidateProfileSkillCreateNestedManyWithoutSkillInput
+  jobPostings?: Prisma.JobPostingSkillCreateNestedManyWithoutSkillInput
 }
 
 export type SkillUncheckedCreateInput = {
@@ -244,6 +248,7 @@ export type SkillUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   profiles?: Prisma.CandidateProfileSkillUncheckedCreateNestedManyWithoutSkillInput
+  jobPostings?: Prisma.JobPostingSkillUncheckedCreateNestedManyWithoutSkillInput
 }
 
 export type SkillUpdateInput = {
@@ -253,6 +258,7 @@ export type SkillUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profiles?: Prisma.CandidateProfileSkillUpdateManyWithoutSkillNestedInput
+  jobPostings?: Prisma.JobPostingSkillUpdateManyWithoutSkillNestedInput
 }
 
 export type SkillUncheckedUpdateInput = {
@@ -262,6 +268,7 @@ export type SkillUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profiles?: Prisma.CandidateProfileSkillUncheckedUpdateManyWithoutSkillNestedInput
+  jobPostings?: Prisma.JobPostingSkillUncheckedUpdateManyWithoutSkillNestedInput
 }
 
 export type SkillCreateManyInput = {
@@ -331,12 +338,27 @@ export type SkillUpdateOneRequiredWithoutProfilesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SkillUpdateToOneWithWhereWithoutProfilesInput, Prisma.SkillUpdateWithoutProfilesInput>, Prisma.SkillUncheckedUpdateWithoutProfilesInput>
 }
 
+export type SkillCreateNestedOneWithoutJobPostingsInput = {
+  create?: Prisma.XOR<Prisma.SkillCreateWithoutJobPostingsInput, Prisma.SkillUncheckedCreateWithoutJobPostingsInput>
+  connectOrCreate?: Prisma.SkillCreateOrConnectWithoutJobPostingsInput
+  connect?: Prisma.SkillWhereUniqueInput
+}
+
+export type SkillUpdateOneRequiredWithoutJobPostingsNestedInput = {
+  create?: Prisma.XOR<Prisma.SkillCreateWithoutJobPostingsInput, Prisma.SkillUncheckedCreateWithoutJobPostingsInput>
+  connectOrCreate?: Prisma.SkillCreateOrConnectWithoutJobPostingsInput
+  upsert?: Prisma.SkillUpsertWithoutJobPostingsInput
+  connect?: Prisma.SkillWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SkillUpdateToOneWithWhereWithoutJobPostingsInput, Prisma.SkillUpdateWithoutJobPostingsInput>, Prisma.SkillUncheckedUpdateWithoutJobPostingsInput>
+}
+
 export type SkillCreateWithoutProfilesInput = {
   id?: string
   name: string
   normalizedName: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  jobPostings?: Prisma.JobPostingSkillCreateNestedManyWithoutSkillInput
 }
 
 export type SkillUncheckedCreateWithoutProfilesInput = {
@@ -345,6 +367,7 @@ export type SkillUncheckedCreateWithoutProfilesInput = {
   normalizedName: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  jobPostings?: Prisma.JobPostingSkillUncheckedCreateNestedManyWithoutSkillInput
 }
 
 export type SkillCreateOrConnectWithoutProfilesInput = {
@@ -369,6 +392,7 @@ export type SkillUpdateWithoutProfilesInput = {
   normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  jobPostings?: Prisma.JobPostingSkillUpdateManyWithoutSkillNestedInput
 }
 
 export type SkillUncheckedUpdateWithoutProfilesInput = {
@@ -377,6 +401,59 @@ export type SkillUncheckedUpdateWithoutProfilesInput = {
   normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  jobPostings?: Prisma.JobPostingSkillUncheckedUpdateManyWithoutSkillNestedInput
+}
+
+export type SkillCreateWithoutJobPostingsInput = {
+  id?: string
+  name: string
+  normalizedName: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profiles?: Prisma.CandidateProfileSkillCreateNestedManyWithoutSkillInput
+}
+
+export type SkillUncheckedCreateWithoutJobPostingsInput = {
+  id?: string
+  name: string
+  normalizedName: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profiles?: Prisma.CandidateProfileSkillUncheckedCreateNestedManyWithoutSkillInput
+}
+
+export type SkillCreateOrConnectWithoutJobPostingsInput = {
+  where: Prisma.SkillWhereUniqueInput
+  create: Prisma.XOR<Prisma.SkillCreateWithoutJobPostingsInput, Prisma.SkillUncheckedCreateWithoutJobPostingsInput>
+}
+
+export type SkillUpsertWithoutJobPostingsInput = {
+  update: Prisma.XOR<Prisma.SkillUpdateWithoutJobPostingsInput, Prisma.SkillUncheckedUpdateWithoutJobPostingsInput>
+  create: Prisma.XOR<Prisma.SkillCreateWithoutJobPostingsInput, Prisma.SkillUncheckedCreateWithoutJobPostingsInput>
+  where?: Prisma.SkillWhereInput
+}
+
+export type SkillUpdateToOneWithWhereWithoutJobPostingsInput = {
+  where?: Prisma.SkillWhereInput
+  data: Prisma.XOR<Prisma.SkillUpdateWithoutJobPostingsInput, Prisma.SkillUncheckedUpdateWithoutJobPostingsInput>
+}
+
+export type SkillUpdateWithoutJobPostingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profiles?: Prisma.CandidateProfileSkillUpdateManyWithoutSkillNestedInput
+}
+
+export type SkillUncheckedUpdateWithoutJobPostingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profiles?: Prisma.CandidateProfileSkillUncheckedUpdateManyWithoutSkillNestedInput
 }
 
 
@@ -386,10 +463,12 @@ export type SkillUncheckedUpdateWithoutProfilesInput = {
 
 export type SkillCountOutputType = {
   profiles: number
+  jobPostings: number
 }
 
 export type SkillCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   profiles?: boolean | SkillCountOutputTypeCountProfilesArgs
+  jobPostings?: boolean | SkillCountOutputTypeCountJobPostingsArgs
 }
 
 /**
@@ -409,6 +488,13 @@ export type SkillCountOutputTypeCountProfilesArgs<ExtArgs extends runtime.Types.
   where?: Prisma.CandidateProfileSkillWhereInput
 }
 
+/**
+ * SkillCountOutputType without action
+ */
+export type SkillCountOutputTypeCountJobPostingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.JobPostingSkillWhereInput
+}
+
 
 export type SkillSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -417,6 +503,7 @@ export type SkillSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   createdAt?: boolean
   updatedAt?: boolean
   profiles?: boolean | Prisma.Skill$profilesArgs<ExtArgs>
+  jobPostings?: boolean | Prisma.Skill$jobPostingsArgs<ExtArgs>
   _count?: boolean | Prisma.SkillCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["skill"]>
 
@@ -447,6 +534,7 @@ export type SkillSelectScalar = {
 export type SkillOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "normalizedName" | "createdAt" | "updatedAt", ExtArgs["result"]["skill"]>
 export type SkillInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   profiles?: boolean | Prisma.Skill$profilesArgs<ExtArgs>
+  jobPostings?: boolean | Prisma.Skill$jobPostingsArgs<ExtArgs>
   _count?: boolean | Prisma.SkillCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SkillIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -456,6 +544,7 @@ export type $SkillPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   name: "Skill"
   objects: {
     profiles: Prisma.$CandidateProfileSkillPayload<ExtArgs>[]
+    jobPostings: Prisma.$JobPostingSkillPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -858,6 +947,7 @@ readonly fields: SkillFieldRefs;
 export interface Prisma__SkillClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   profiles<T extends Prisma.Skill$profilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Skill$profilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CandidateProfileSkillPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  jobPostings<T extends Prisma.Skill$jobPostingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Skill$jobPostingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPostingSkillPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1306,6 +1396,30 @@ export type Skill$profilesArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.CandidateProfileSkillScalarFieldEnum | Prisma.CandidateProfileSkillScalarFieldEnum[]
+}
+
+/**
+ * Skill.jobPostings
+ */
+export type Skill$jobPostingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the JobPostingSkill
+   */
+  select?: Prisma.JobPostingSkillSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the JobPostingSkill
+   */
+  omit?: Prisma.JobPostingSkillOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JobPostingSkillInclude<ExtArgs> | null
+  where?: Prisma.JobPostingSkillWhereInput
+  orderBy?: Prisma.JobPostingSkillOrderByWithRelationInput | Prisma.JobPostingSkillOrderByWithRelationInput[]
+  cursor?: Prisma.JobPostingSkillWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.JobPostingSkillScalarFieldEnum | Prisma.JobPostingSkillScalarFieldEnum[]
 }
 
 /**

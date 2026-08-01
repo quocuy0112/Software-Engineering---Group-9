@@ -252,6 +252,8 @@ export type UserAccountWhereInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestListRelationFilter
   passwordChangeAttemptWindow?: Prisma.XOR<Prisma.PasswordChangeAttemptWindowNullableScalarRelationFilter, Prisma.PasswordChangeAttemptWindowWhereInput> | null
   passwordChangeOperations?: Prisma.PasswordChangeOperationListRelationFilter
+  savedJobs?: Prisma.SavedJobListRelationFilter
+  jobReports?: Prisma.JobReportListRelationFilter
 }
 
 export type UserAccountOrderByWithRelationInput = {
@@ -281,6 +283,8 @@ export type UserAccountOrderByWithRelationInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestOrderByRelationAggregateInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowOrderByWithRelationInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationOrderByRelationAggregateInput
+  savedJobs?: Prisma.SavedJobOrderByRelationAggregateInput
+  jobReports?: Prisma.JobReportOrderByRelationAggregateInput
 }
 
 export type UserAccountWhereUniqueInput = Prisma.AtLeast<{
@@ -313,6 +317,8 @@ export type UserAccountWhereUniqueInput = Prisma.AtLeast<{
   emailChangeRequests?: Prisma.EmailChangeRequestListRelationFilter
   passwordChangeAttemptWindow?: Prisma.XOR<Prisma.PasswordChangeAttemptWindowNullableScalarRelationFilter, Prisma.PasswordChangeAttemptWindowWhereInput> | null
   passwordChangeOperations?: Prisma.PasswordChangeOperationListRelationFilter
+  savedJobs?: Prisma.SavedJobListRelationFilter
+  jobReports?: Prisma.JobReportListRelationFilter
 }, "id" | "email" | "normalizedEmail">
 
 export type UserAccountOrderByWithAggregationInput = {
@@ -378,6 +384,8 @@ export type UserAccountCreateInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateInput = {
@@ -407,6 +415,8 @@ export type UserAccountUncheckedCreateInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUpdateInput = {
@@ -436,6 +446,8 @@ export type UserAccountUpdateInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateInput = {
@@ -465,6 +477,8 @@ export type UserAccountUncheckedUpdateInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateManyInput = {
@@ -791,6 +805,34 @@ export type UserAccountUpdateOneWithoutOutboxNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutOutboxInput, Prisma.UserAccountUpdateWithoutOutboxInput>, Prisma.UserAccountUncheckedUpdateWithoutOutboxInput>
 }
 
+export type UserAccountCreateNestedOneWithoutSavedJobsInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSavedJobsInput, Prisma.UserAccountUncheckedCreateWithoutSavedJobsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSavedJobsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutSavedJobsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSavedJobsInput, Prisma.UserAccountUncheckedCreateWithoutSavedJobsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSavedJobsInput
+  upsert?: Prisma.UserAccountUpsertWithoutSavedJobsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutSavedJobsInput, Prisma.UserAccountUpdateWithoutSavedJobsInput>, Prisma.UserAccountUncheckedUpdateWithoutSavedJobsInput>
+}
+
+export type UserAccountCreateNestedOneWithoutJobReportsInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutJobReportsInput, Prisma.UserAccountUncheckedCreateWithoutJobReportsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutJobReportsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutJobReportsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutJobReportsInput, Prisma.UserAccountUncheckedCreateWithoutJobReportsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutJobReportsInput
+  upsert?: Prisma.UserAccountUpsertWithoutJobReportsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutJobReportsInput, Prisma.UserAccountUpdateWithoutJobReportsInput>, Prisma.UserAccountUncheckedUpdateWithoutJobReportsInput>
+}
+
 export type UserAccountCreateWithoutAccountsInput = {
   id: string
   name: string
@@ -817,6 +859,8 @@ export type UserAccountCreateWithoutAccountsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutAccountsInput = {
@@ -845,6 +889,8 @@ export type UserAccountUncheckedCreateWithoutAccountsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutAccountsInput = {
@@ -889,6 +935,8 @@ export type UserAccountUpdateWithoutAccountsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutAccountsInput = {
@@ -917,6 +965,8 @@ export type UserAccountUncheckedUpdateWithoutAccountsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutSessionsInput = {
@@ -945,6 +995,8 @@ export type UserAccountCreateWithoutSessionsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutSessionsInput = {
@@ -973,6 +1025,8 @@ export type UserAccountUncheckedCreateWithoutSessionsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutSessionsInput = {
@@ -1017,6 +1071,8 @@ export type UserAccountUpdateWithoutSessionsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSessionsInput = {
@@ -1045,6 +1101,8 @@ export type UserAccountUncheckedUpdateWithoutSessionsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutVerificationsInput = {
@@ -1073,6 +1131,8 @@ export type UserAccountCreateWithoutVerificationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutVerificationsInput = {
@@ -1101,6 +1161,8 @@ export type UserAccountUncheckedCreateWithoutVerificationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutVerificationsInput = {
@@ -1145,6 +1207,8 @@ export type UserAccountUpdateWithoutVerificationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutVerificationsInput = {
@@ -1173,6 +1237,8 @@ export type UserAccountUncheckedUpdateWithoutVerificationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutTwoFactorInput = {
@@ -1201,6 +1267,8 @@ export type UserAccountCreateWithoutTwoFactorInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutTwoFactorInput = {
@@ -1229,6 +1297,8 @@ export type UserAccountUncheckedCreateWithoutTwoFactorInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutTwoFactorInput = {
@@ -1273,6 +1343,8 @@ export type UserAccountUpdateWithoutTwoFactorInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutTwoFactorInput = {
@@ -1301,6 +1373,8 @@ export type UserAccountUncheckedUpdateWithoutTwoFactorInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutCandidateIdentityInput = {
@@ -1329,6 +1403,8 @@ export type UserAccountCreateWithoutCandidateIdentityInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutCandidateIdentityInput = {
@@ -1357,6 +1433,8 @@ export type UserAccountUncheckedCreateWithoutCandidateIdentityInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutCandidateIdentityInput = {
@@ -1401,6 +1479,8 @@ export type UserAccountUpdateWithoutCandidateIdentityInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCandidateIdentityInput = {
@@ -1429,6 +1509,8 @@ export type UserAccountUncheckedUpdateWithoutCandidateIdentityInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutPreferencesInput = {
@@ -1457,6 +1539,8 @@ export type UserAccountCreateWithoutPreferencesInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutPreferencesInput = {
@@ -1485,6 +1569,8 @@ export type UserAccountUncheckedCreateWithoutPreferencesInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutPreferencesInput = {
@@ -1529,6 +1615,8 @@ export type UserAccountUpdateWithoutPreferencesInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPreferencesInput = {
@@ -1557,6 +1645,8 @@ export type UserAccountUncheckedUpdateWithoutPreferencesInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutEmailChangeRequestsInput = {
@@ -1585,6 +1675,8 @@ export type UserAccountCreateWithoutEmailChangeRequestsInput = {
   preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutEmailChangeRequestsInput = {
@@ -1613,6 +1705,8 @@ export type UserAccountUncheckedCreateWithoutEmailChangeRequestsInput = {
   preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutEmailChangeRequestsInput = {
@@ -1657,6 +1751,8 @@ export type UserAccountUpdateWithoutEmailChangeRequestsInput = {
   preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutEmailChangeRequestsInput = {
@@ -1685,6 +1781,8 @@ export type UserAccountUncheckedUpdateWithoutEmailChangeRequestsInput = {
   preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordChangeAttemptWindowInput = {
@@ -1713,6 +1811,8 @@ export type UserAccountCreateWithoutPasswordChangeAttemptWindowInput = {
   preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordChangeAttemptWindowInput = {
@@ -1741,6 +1841,8 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeAttemptWindowInput = 
   preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordChangeAttemptWindowInput = {
@@ -1785,6 +1887,8 @@ export type UserAccountUpdateWithoutPasswordChangeAttemptWindowInput = {
   preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordChangeAttemptWindowInput = {
@@ -1813,6 +1917,8 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeAttemptWindowInput = 
   preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordChangeOperationsInput = {
@@ -1841,6 +1947,8 @@ export type UserAccountCreateWithoutPasswordChangeOperationsInput = {
   preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordChangeOperationsInput = {
@@ -1869,6 +1977,8 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeOperationsInput = {
   preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordChangeOperationsInput = {
@@ -1913,6 +2023,8 @@ export type UserAccountUpdateWithoutPasswordChangeOperationsInput = {
   preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordChangeOperationsInput = {
@@ -1941,6 +2053,8 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeOperationsInput = {
   preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutSecurityTokensInput = {
@@ -1969,6 +2083,8 @@ export type UserAccountCreateWithoutSecurityTokensInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutSecurityTokensInput = {
@@ -1997,6 +2113,8 @@ export type UserAccountUncheckedCreateWithoutSecurityTokensInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutSecurityTokensInput = {
@@ -2041,6 +2159,8 @@ export type UserAccountUpdateWithoutSecurityTokensInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSecurityTokensInput = {
@@ -2069,6 +2189,8 @@ export type UserAccountUncheckedUpdateWithoutSecurityTokensInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordResetOperationsInput = {
@@ -2097,6 +2219,8 @@ export type UserAccountCreateWithoutPasswordResetOperationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordResetOperationsInput = {
@@ -2125,6 +2249,8 @@ export type UserAccountUncheckedCreateWithoutPasswordResetOperationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordResetOperationsInput = {
@@ -2169,6 +2295,8 @@ export type UserAccountUpdateWithoutPasswordResetOperationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordResetOperationsInput = {
@@ -2197,6 +2325,8 @@ export type UserAccountUncheckedUpdateWithoutPasswordResetOperationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutFullAccountRecoveryOperationsInput = {
@@ -2225,6 +2355,8 @@ export type UserAccountCreateWithoutFullAccountRecoveryOperationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutFullAccountRecoveryOperationsInput = {
@@ -2253,6 +2385,8 @@ export type UserAccountUncheckedCreateWithoutFullAccountRecoveryOperationsInput 
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutFullAccountRecoveryOperationsInput = {
@@ -2297,6 +2431,8 @@ export type UserAccountUpdateWithoutFullAccountRecoveryOperationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutFullAccountRecoveryOperationsInput = {
@@ -2325,6 +2461,8 @@ export type UserAccountUncheckedUpdateWithoutFullAccountRecoveryOperationsInput 
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutChallengesInput = {
@@ -2353,6 +2491,8 @@ export type UserAccountCreateWithoutChallengesInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutChallengesInput = {
@@ -2381,6 +2521,8 @@ export type UserAccountUncheckedCreateWithoutChallengesInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutChallengesInput = {
@@ -2425,6 +2567,8 @@ export type UserAccountUpdateWithoutChallengesInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutChallengesInput = {
@@ -2453,6 +2597,8 @@ export type UserAccountUncheckedUpdateWithoutChallengesInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutOutboxInput = {
@@ -2481,6 +2627,8 @@ export type UserAccountCreateWithoutOutboxInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutOutboxInput = {
@@ -2509,6 +2657,8 @@ export type UserAccountUncheckedCreateWithoutOutboxInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutOutboxInput = {
@@ -2553,6 +2703,8 @@ export type UserAccountUpdateWithoutOutboxInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutOutboxInput = {
@@ -2581,6 +2733,280 @@ export type UserAccountUncheckedUpdateWithoutOutboxInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+}
+
+export type UserAccountCreateWithoutSavedJobsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+}
+
+export type UserAccountUncheckedCreateWithoutSavedJobsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+}
+
+export type UserAccountCreateOrConnectWithoutSavedJobsInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSavedJobsInput, Prisma.UserAccountUncheckedCreateWithoutSavedJobsInput>
+}
+
+export type UserAccountUpsertWithoutSavedJobsInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutSavedJobsInput, Prisma.UserAccountUncheckedUpdateWithoutSavedJobsInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSavedJobsInput, Prisma.UserAccountUncheckedCreateWithoutSavedJobsInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutSavedJobsInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutSavedJobsInput, Prisma.UserAccountUncheckedUpdateWithoutSavedJobsInput>
+}
+
+export type UserAccountUpdateWithoutSavedJobsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutSavedJobsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+}
+
+export type UserAccountCreateWithoutJobReportsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+}
+
+export type UserAccountUncheckedCreateWithoutJobReportsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserAccountCreateOrConnectWithoutJobReportsInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutJobReportsInput, Prisma.UserAccountUncheckedCreateWithoutJobReportsInput>
+}
+
+export type UserAccountUpsertWithoutJobReportsInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutJobReportsInput, Prisma.UserAccountUncheckedUpdateWithoutJobReportsInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutJobReportsInput, Prisma.UserAccountUncheckedCreateWithoutJobReportsInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutJobReportsInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutJobReportsInput, Prisma.UserAccountUncheckedUpdateWithoutJobReportsInput>
+}
+
+export type UserAccountUpdateWithoutJobReportsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutJobReportsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -2599,6 +3025,8 @@ export type UserAccountCountOutputType = {
   outbox: number
   emailChangeRequests: number
   passwordChangeOperations: number
+  savedJobs: number
+  jobReports: number
 }
 
 export type UserAccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2612,6 +3040,8 @@ export type UserAccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   outbox?: boolean | UserAccountCountOutputTypeCountOutboxArgs
   emailChangeRequests?: boolean | UserAccountCountOutputTypeCountEmailChangeRequestsArgs
   passwordChangeOperations?: boolean | UserAccountCountOutputTypeCountPasswordChangeOperationsArgs
+  savedJobs?: boolean | UserAccountCountOutputTypeCountSavedJobsArgs
+  jobReports?: boolean | UserAccountCountOutputTypeCountJobReportsArgs
 }
 
 /**
@@ -2694,6 +3124,20 @@ export type UserAccountCountOutputTypeCountPasswordChangeOperationsArgs<ExtArgs 
   where?: Prisma.PasswordChangeOperationWhereInput
 }
 
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountSavedJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SavedJobWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountJobReportsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.JobReportWhereInput
+}
+
 
 export type UserAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2722,6 +3166,8 @@ export type UserAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   emailChangeRequests?: boolean | Prisma.UserAccount$emailChangeRequestsArgs<ExtArgs>
   passwordChangeAttemptWindow?: boolean | Prisma.UserAccount$passwordChangeAttemptWindowArgs<ExtArgs>
   passwordChangeOperations?: boolean | Prisma.UserAccount$passwordChangeOperationsArgs<ExtArgs>
+  savedJobs?: boolean | Prisma.UserAccount$savedJobsArgs<ExtArgs>
+  jobReports?: boolean | Prisma.UserAccount$jobReportsArgs<ExtArgs>
   _count?: boolean | Prisma.UserAccountCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userAccount"]>
 
@@ -2786,6 +3232,8 @@ export type UserAccountInclude<ExtArgs extends runtime.Types.Extensions.Internal
   emailChangeRequests?: boolean | Prisma.UserAccount$emailChangeRequestsArgs<ExtArgs>
   passwordChangeAttemptWindow?: boolean | Prisma.UserAccount$passwordChangeAttemptWindowArgs<ExtArgs>
   passwordChangeOperations?: boolean | Prisma.UserAccount$passwordChangeOperationsArgs<ExtArgs>
+  savedJobs?: boolean | Prisma.UserAccount$savedJobsArgs<ExtArgs>
+  jobReports?: boolean | Prisma.UserAccount$jobReportsArgs<ExtArgs>
   _count?: boolean | Prisma.UserAccountCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserAccountIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2808,6 +3256,8 @@ export type $UserAccountPayload<ExtArgs extends runtime.Types.Extensions.Interna
     emailChangeRequests: Prisma.$EmailChangeRequestPayload<ExtArgs>[]
     passwordChangeAttemptWindow: Prisma.$PasswordChangeAttemptWindowPayload<ExtArgs> | null
     passwordChangeOperations: Prisma.$PasswordChangeOperationPayload<ExtArgs>[]
+    savedJobs: Prisma.$SavedJobPayload<ExtArgs>[]
+    jobReports: Prisma.$JobReportPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3230,6 +3680,8 @@ export interface Prisma__UserAccountClient<T, Null = never, ExtArgs extends runt
   emailChangeRequests<T extends Prisma.UserAccount$emailChangeRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$emailChangeRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailChangeRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   passwordChangeAttemptWindow<T extends Prisma.UserAccount$passwordChangeAttemptWindowArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$passwordChangeAttemptWindowArgs<ExtArgs>>): Prisma.Prisma__PasswordChangeAttemptWindowClient<runtime.Types.Result.GetResult<Prisma.$PasswordChangeAttemptWindowPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   passwordChangeOperations<T extends Prisma.UserAccount$passwordChangeOperationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$passwordChangeOperationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PasswordChangeOperationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  savedJobs<T extends Prisma.UserAccount$savedJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$savedJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  jobReports<T extends Prisma.UserAccount$jobReportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$jobReportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3977,6 +4429,54 @@ export type UserAccount$passwordChangeOperationsArgs<ExtArgs extends runtime.Typ
   take?: number
   skip?: number
   distinct?: Prisma.PasswordChangeOperationScalarFieldEnum | Prisma.PasswordChangeOperationScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.savedJobs
+ */
+export type UserAccount$savedJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SavedJob
+   */
+  select?: Prisma.SavedJobSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SavedJob
+   */
+  omit?: Prisma.SavedJobOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SavedJobInclude<ExtArgs> | null
+  where?: Prisma.SavedJobWhereInput
+  orderBy?: Prisma.SavedJobOrderByWithRelationInput | Prisma.SavedJobOrderByWithRelationInput[]
+  cursor?: Prisma.SavedJobWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SavedJobScalarFieldEnum | Prisma.SavedJobScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.jobReports
+ */
+export type UserAccount$jobReportsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the JobReport
+   */
+  select?: Prisma.JobReportSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the JobReport
+   */
+  omit?: Prisma.JobReportOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JobReportInclude<ExtArgs> | null
+  where?: Prisma.JobReportWhereInput
+  orderBy?: Prisma.JobReportOrderByWithRelationInput | Prisma.JobReportOrderByWithRelationInput[]
+  cursor?: Prisma.JobReportWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.JobReportScalarFieldEnum | Prisma.JobReportScalarFieldEnum[]
 }
 
 /**

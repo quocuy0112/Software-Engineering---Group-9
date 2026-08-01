@@ -1,8 +1,9 @@
 # SmartHire
 
 SmartHire is a full-stack application for building a secure talent workspace
-for candidates and hiring teams. The current release focuses on Identity and
-Access Management; advanced recruitment modules are still under development.
+for candidates and hiring teams. The current release includes Identity and
+Access Management, professional profiles, and a public job board with
+candidate-controlled recruitment actions.
 
 ## Table of Contents
 
@@ -25,7 +26,12 @@ Access Management; advanced recruitment modules are still under development.
 - Forgot password, password reset, and full account recovery with a 24-hour
   security hold.
 - Audit logging, rate limiting, and a transactional email outbox.
-- Foundation pages for Home, Dashboard, and Profile.
+- Professional profile and account-preference management.
+- Public job browse, Vietnamese-diacritic-insensitive search, filters, sorting,
+  stable pagination, and approved job details.
+- Authenticated save/remove, private job reporting, and transactional job
+  applications with confirmed CVs, consent, immutable snapshots, audit, and
+  provider-neutral notification work.
 
 ## Architecture and Tech Stack
 
@@ -152,20 +158,22 @@ SMTP and Resend are optional. Configure either provider in
 
 ## Common Commands
 
-| Command                | Purpose                                              |
-| ---------------------- | ---------------------------------------------------- |
-| `npm run dev`          | Start the web app and email worker                   |
-| `npm run dev:web`      | Start only Next.js                                   |
-| `npm start`            | Start an already-built production server             |
-| `npm run email:worker` | Start only the email worker                          |
-| `npm run db:up`        | Start PostgreSQL                                     |
-| `npm run db:down`      | Stop PostgreSQL and retain its data                  |
-| `npm run db:status`    | Show PostgreSQL status                               |
-| `npm run db:logs`      | Follow PostgreSQL logs                               |
-| `npm run db:migrate`   | Apply migrations to the local database               |
-| `npm run db:studio`    | Open Prisma Studio                                   |
-| `npm run db:verify`    | Verify migrations against a temporary clean database |
-| `npm run db:reset`     | Delete the volume and recreate the local database    |
+| Command                  | Purpose                                              |
+| ------------------------ | ---------------------------------------------------- |
+| `npm run dev`            | Start the web app and email worker                   |
+| `npm run dev:web`        | Start only Next.js                                   |
+| `npm start`              | Start an already-built production server             |
+| `npm run email:worker`   | Start only the email worker                          |
+| `npm run test:job-board` | Run focused Job Board tests                          |
+| `npm run perf:job-board` | Run the 100-sample Job Board performance harness     |
+| `npm run db:up`          | Start PostgreSQL                                     |
+| `npm run db:down`        | Stop PostgreSQL and retain its data                  |
+| `npm run db:status`      | Show PostgreSQL status                               |
+| `npm run db:logs`        | Follow PostgreSQL logs                               |
+| `npm run db:migrate`     | Apply migrations to the local database               |
+| `npm run db:studio`      | Open Prisma Studio                                   |
+| `npm run db:verify`      | Verify migrations against a temporary clean database |
+| `npm run db:reset`       | Delete the volume and recreate the local database    |
 
 > **Warning:** `npm run db:reset` permanently deletes all data in the current
 > local PostgreSQL volume.
@@ -180,6 +188,7 @@ npm run lint
 npm run typecheck
 npm test
 npm run build
+npm run test:job-board
 ```
 
 Run browser end-to-end tests with:
@@ -242,6 +251,10 @@ npm run test:e2e
 - [Implementation plan](spec-kit/specs/001-identity-authentication-account-recovery/plan.md)
 - [Feature specification](spec-kit/specs/001-identity-authentication-account-recovery/spec.md)
 - [OpenAPI contract](spec-kit/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml)
+- [Job Board feature specification](spec-kit/specs/003-job-board-and-advanced-search/spec.md)
+- [Job Board implementation plan](spec-kit/specs/003-job-board-and-advanced-search/plan.md)
+- [Job Board OpenAPI contract](spec-kit/specs/003-job-board-and-advanced-search/contracts/openapi.yaml)
+- [Job Board data lifecycle](docs/operations/job-board-data-lifecycle.md)
 
 ## Security
 

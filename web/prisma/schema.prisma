@@ -123,33 +123,117 @@ enum OutboxStatus {
   DEAD
 }
 
+enum JobPostingStatus {
+  DRAFT
+  PENDING_REVIEW
+  ACTIVE
+  CLOSED
+  EXPIRED
+  REJECTED
+  REMOVED
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  INTERNSHIP
+  TEMPORARY
+}
+
+enum ExperienceLevel {
+  ENTRY
+  JUNIOR
+  MID
+  SENIOR
+  LEAD
+  MANAGER
+}
+
+enum WorkArrangement {
+  ONSITE
+  HYBRID
+  REMOTE
+}
+
+enum SalaryPeriod {
+  HOUR
+  MONTH
+  YEAR
+}
+
+enum ApplicationQuestionKind {
+  TEXT
+  BOOLEAN
+  SINGLE_CHOICE
+}
+
+enum JobReportReason {
+  FRAUD
+  MISLEADING
+  DUPLICATE
+  DISCRIMINATORY
+  INAPPROPRIATE
+  OTHER
+}
+
+enum JobReportStatus {
+  PENDING_REVIEW
+  RESOLVED
+  DISMISSED
+}
+
+enum ApplicationStage {
+  APPLIED
+  VIEWED
+  SHORTLISTED
+  INTERVIEWING
+  OFFERED
+  HIRED
+  OFFER_DECLINED
+  REJECTED
+  WAITLISTED
+}
+
+enum RecruitmentNotificationAudience {
+  CANDIDATE
+  COMPANY
+}
+
+enum RecruitmentNotificationKind {
+  APPLICATION_SUBMITTED
+  APPLICATION_RECEIVED
+}
+
 model UserAccount {
-  id                String                    @id
-  name              String
-  email             String                    @unique
-  normalizedEmail   String                    @unique
-  emailVerified     Boolean                   @default(false)
-  image             String?
-  state             AccountState              @default(PENDING_VERIFICATION)
-  twoFactorEnabled  Boolean                   @default(false)
-  stateChangedAt    DateTime                  @default(now())
-  deletedAt         DateTime?
-  createdAt         DateTime                  @default(now())
-  updatedAt         DateTime                  @updatedAt
-  accounts          AuthProviderAccount[]
-  sessions          Session[]
-  verifications     Verification[]
-  twoFactor         TwoFactor?
-  candidateIdentity CandidateIdentity?
-  securityTokens    SecurityToken[]
-  passwordResetOperations PasswordResetOperation[]
+  id                            String                         @id
+  name                          String
+  email                         String                         @unique
+  normalizedEmail               String                         @unique
+  emailVerified                 Boolean                        @default(false)
+  image                         String?
+  state                         AccountState                   @default(PENDING_VERIFICATION)
+  twoFactorEnabled              Boolean                        @default(false)
+  stateChangedAt                DateTime                       @default(now())
+  deletedAt                     DateTime?
+  createdAt                     DateTime                       @default(now())
+  updatedAt                     DateTime                       @updatedAt
+  accounts                      AuthProviderAccount[]
+  sessions                      Session[]
+  verifications                 Verification[]
+  twoFactor                     TwoFactor?
+  candidateIdentity             CandidateIdentity?
+  securityTokens                SecurityToken[]
+  passwordResetOperations       PasswordResetOperation[]
   fullAccountRecoveryOperations FullAccountRecoveryOperation[]
-  challenges        AuthenticationChallenge[]
-  outbox            EmailOutbox[]
-  preferences       AccountPreferences?
-  emailChangeRequests EmailChangeRequest[]
-  passwordChangeAttemptWindow PasswordChangeAttemptWindow?
-  passwordChangeOperations PasswordChangeOperation[]
+  challenges                    AuthenticationChallenge[]
+  outbox                        EmailOutbox[]
+  preferences                   AccountPreferences?
+  emailChangeRequests           EmailChangeRequest[]
+  passwordChangeAttemptWindow   PasswordChangeAttemptWindow?
+  passwordChangeOperations      PasswordChangeOperation[]
+  savedJobs                     SavedJob[]
+  jobReports                    JobReport[]
 
   @@index([state, id])
   @@map("user")
@@ -226,11 +310,13 @@ model TwoFactor {
 }
 
 model CandidateIdentity {
-  userId    String      @id
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  user      UserAccount @relation(fields: [userId], references: [id], onDelete: Restrict)
-  profile   CandidateProfile?
+  userId          String            @id
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  user            UserAccount       @relation(fields: [userId], references: [id], onDelete: Restrict)
+  profile         CandidateProfile?
+  cvs             CandidateCv[]
+  jobApplications JobApplication[]
 }
 
 model CandidateProfile {
@@ -295,17 +381,18 @@ model Skill {
   createdAt      DateTime                @default(now())
   updatedAt      DateTime                @updatedAt
   profiles       CandidateProfileSkill[]
+  jobPostings    JobPostingSkill[]
 }
 
 model CandidateProfileSkill {
-  profileId  String
-  skillId    String
+  profileId   String
+  skillId     String
   displayName String
-  position   Int
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
-  profile    CandidateProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  skill      Skill            @relation(fields: [skillId], references: [id], onDelete: Restrict)
+  position    Int
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  profile     CandidateProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  skill       Skill            @relation(fields: [skillId], references: [id], onDelete: Restrict)
 
   @@id([profileId, skillId])
   @@unique([profileId, position])
@@ -328,38 +415,38 @@ model SocialLink {
 }
 
 model AccountPreferences {
-  userId                    String             @id
-  language                  PreferenceLanguage @default(VI)
-  timezone                  String             @default("Asia/Ho_Chi_Minh")
-  applicationUpdatesEmail   Boolean            @default(true)
-  jobRecommendationsEmail   Boolean            @default(true)
-  accountSecurityEmail      Boolean            @default(true)
-  createdAt                 DateTime           @default(now())
-  updatedAt                 DateTime           @updatedAt
-  user                      UserAccount        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                  String             @id
+  language                PreferenceLanguage @default(VI)
+  timezone                String             @default("Asia/Ho_Chi_Minh")
+  applicationUpdatesEmail Boolean            @default(true)
+  jobRecommendationsEmail Boolean            @default(true)
+  accountSecurityEmail    Boolean            @default(true)
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+  user                    UserAccount        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model EmailChangeRequest {
-  id                       String            @id @default(cuid())
-  userId                   String
-  proposedEmail            String
-  normalizedProposedEmail  String
-  tokenDigest              String            @unique
-  status                   EmailChangeStatus @default(PENDING)
-  expiresAt                DateTime
-  consumedAt               DateTime?
-  supersededAt             DateTime?
-  resolvedAt               DateTime?
-  idempotencyKey           String
-  correlationId            String
-  verificationOutboxId     String?           @unique
-  oldEmailNoticeOutboxId   String?           @unique
-  createdBySessionId       String
-  createdAt                DateTime          @default(now())
-  updatedAt                DateTime          @updatedAt
-  user                     UserAccount       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  verificationOutbox       EmailOutbox?      @relation("EmailChangeVerificationOutbox", fields: [verificationOutboxId], references: [id], onDelete: SetNull)
-  oldEmailNoticeOutbox     EmailOutbox?      @relation("EmailChangeOldAddressOutbox", fields: [oldEmailNoticeOutboxId], references: [id], onDelete: SetNull)
+  id                      String            @id @default(cuid())
+  userId                  String
+  proposedEmail           String
+  normalizedProposedEmail String
+  tokenDigest             String            @unique
+  status                  EmailChangeStatus @default(PENDING)
+  expiresAt               DateTime
+  consumedAt              DateTime?
+  supersededAt            DateTime?
+  resolvedAt              DateTime?
+  idempotencyKey          String
+  correlationId           String
+  verificationOutboxId    String?           @unique
+  oldEmailNoticeOutboxId  String?           @unique
+  createdBySessionId      String
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+  user                    UserAccount       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verificationOutbox      EmailOutbox?      @relation("EmailChangeVerificationOutbox", fields: [verificationOutboxId], references: [id], onDelete: SetNull)
+  oldEmailNoticeOutbox    EmailOutbox?      @relation("EmailChangeOldAddressOutbox", fields: [oldEmailNoticeOutboxId], references: [id], onDelete: SetNull)
 
   @@unique([userId, idempotencyKey])
   @@index([status, expiresAt])
@@ -401,19 +488,19 @@ model PasswordChangeOperation {
 }
 
 model SecurityToken {
-  id                 String        @id @default(cuid())
-  userId             String
-  purpose            TokenPurpose
-  status             TokenStatus   @default(ACTIVE)
-  tokenDigest        String        @unique
-  expiresAt          DateTime
-  consumedAt         DateTime?
-  supersededAt       DateTime?
-  createdAt          DateTime      @default(now())
-  createdByRequestId String
-  user               UserAccount   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  outbox             EmailOutbox[]
-  passwordResetOperation PasswordResetOperation?
+  id                           String                        @id @default(cuid())
+  userId                       String
+  purpose                      TokenPurpose
+  status                       TokenStatus                   @default(ACTIVE)
+  tokenDigest                  String                        @unique
+  expiresAt                    DateTime
+  consumedAt                   DateTime?
+  supersededAt                 DateTime?
+  createdAt                    DateTime                      @default(now())
+  createdByRequestId           String
+  user                         UserAccount                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  outbox                       EmailOutbox[]
+  passwordResetOperation       PasswordResetOperation?
   fullAccountRecoveryOperation FullAccountRecoveryOperation?
 
   @@index([expiresAt, status])
@@ -451,56 +538,56 @@ model PasswordResetOperation {
 }
 
 model FullAccountRecoveryOperation {
-  id                                    String                         @id
-  userId                                String
-  confirmationTokenId                   String                         @unique
-  operationKey                          String                         @unique
-  status                                FullAccountRecoveryStatus      @default(CONFIRMED_HOLD)
-  confirmationProofDigest               String                         @unique
-  confirmationExpiresAt                 DateTime
-  confirmationConsumedAt                DateTime
-  confirmationFinalizedAt               DateTime?
-  completionProofDigest                 String                         @unique
-  completionProofCiphertext             String
-  completionProofExpiresAt              DateTime
-  completionConsumedAt                  DateTime?
-  completionKey                         String?                        @unique
-  cancellationProofDigest               String                         @unique
-  cancellationProofCiphertext           String
-  cancellationProofExpiresAt            DateTime
-  cancellationConsumedAt                DateTime?
-  holdStartedAt                         DateTime
-  holdEndsAt                            DateTime
-  holdSessionsRevokedAt                 DateTime?
-  holdChallengesInvalidatedAt           DateTime?
-  confirmationAuditIntentKey            String                         @unique
-  confirmationFinalAuditId              String?                        @unique
-  pendingNotificationIdempotencyKey     String                         @unique
-  pendingNotificationOutboxId           String?                        @unique
-  pendingNotificationEnqueuedAt         DateTime?
-  cancellationNotificationIdempotencyKey String                        @unique
-  cancellationNotificationOutboxId      String?                        @unique
-  cancellationAuditId                   String?                        @unique
-  cancelledAt                           DateTime?
-  completionAuditIntentKey              String                         @unique
-  completionNotificationIdempotencyKey  String                         @unique
-  completionNotificationOutboxId        String?                        @unique
-  completionFinalAuditId                String?                        @unique
-  passwordUpdatedAt                     DateTime?
-  twoFactorDisabledAt                   DateTime?
-  completionSessionsRevokedAt           DateTime?
-  completionChallengesInvalidatedAt     DateTime?
-  completionNotificationEnqueuedAt      DateTime?
-  completionAuditFinalizedAt            DateTime?
-  failureCode                           FullAccountRecoveryFailureCode?
-  retryAt                               DateTime?
-  executionOwner                        String?
-  leaseExpiresAt                        DateTime?
-  completedAt                           DateTime?
-  createdAt                             DateTime                       @default(now())
-  updatedAt                             DateTime                       @updatedAt
-  user                                  UserAccount                    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  confirmationToken                     SecurityToken                  @relation(fields: [confirmationTokenId], references: [id], onDelete: Restrict)
+  id                                     String                          @id
+  userId                                 String
+  confirmationTokenId                    String                          @unique
+  operationKey                           String                          @unique
+  status                                 FullAccountRecoveryStatus       @default(CONFIRMED_HOLD)
+  confirmationProofDigest                String                          @unique
+  confirmationExpiresAt                  DateTime
+  confirmationConsumedAt                 DateTime
+  confirmationFinalizedAt                DateTime?
+  completionProofDigest                  String                          @unique
+  completionProofCiphertext              String
+  completionProofExpiresAt               DateTime
+  completionConsumedAt                   DateTime?
+  completionKey                          String?                         @unique
+  cancellationProofDigest                String                          @unique
+  cancellationProofCiphertext            String
+  cancellationProofExpiresAt             DateTime
+  cancellationConsumedAt                 DateTime?
+  holdStartedAt                          DateTime
+  holdEndsAt                             DateTime
+  holdSessionsRevokedAt                  DateTime?
+  holdChallengesInvalidatedAt            DateTime?
+  confirmationAuditIntentKey             String                          @unique
+  confirmationFinalAuditId               String?                         @unique
+  pendingNotificationIdempotencyKey      String                          @unique
+  pendingNotificationOutboxId            String?                         @unique
+  pendingNotificationEnqueuedAt          DateTime?
+  cancellationNotificationIdempotencyKey String                          @unique
+  cancellationNotificationOutboxId       String?                         @unique
+  cancellationAuditId                    String?                         @unique
+  cancelledAt                            DateTime?
+  completionAuditIntentKey               String                          @unique
+  completionNotificationIdempotencyKey   String                          @unique
+  completionNotificationOutboxId         String?                         @unique
+  completionFinalAuditId                 String?                         @unique
+  passwordUpdatedAt                      DateTime?
+  twoFactorDisabledAt                    DateTime?
+  completionSessionsRevokedAt            DateTime?
+  completionChallengesInvalidatedAt      DateTime?
+  completionNotificationEnqueuedAt       DateTime?
+  completionAuditFinalizedAt             DateTime?
+  failureCode                            FullAccountRecoveryFailureCode?
+  retryAt                                DateTime?
+  executionOwner                         String?
+  leaseExpiresAt                         DateTime?
+  completedAt                            DateTime?
+  createdAt                              DateTime                        @default(now())
+  updatedAt                              DateTime                        @updatedAt
+  user                                   UserAccount                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  confirmationToken                      SecurityToken                   @relation(fields: [confirmationTokenId], references: [id], onDelete: Restrict)
 
   @@index([userId, status])
   @@index([status, holdEndsAt])
@@ -509,18 +596,18 @@ model FullAccountRecoveryOperation {
 }
 
 model AuthenticationChallenge {
-  id            String           @id @default(cuid())
-  handleDigest  String           @unique
-  userId        String
-  purpose       ChallengePurpose
-  expiresAt     DateTime
-  attemptCount  Int              @default(0)
-  maxAttempts   Int              @default(5)
-  consumedAt    DateTime?
-  contextDigest String?
+  id               String           @id @default(cuid())
+  handleDigest     String           @unique
+  userId           String
+  purpose          ChallengePurpose
+  expiresAt        DateTime
+  attemptCount     Int              @default(0)
+  maxAttempts      Int              @default(5)
+  consumedAt       DateTime?
+  contextDigest    String?
   verifiedTotpStep BigInt?
-  createdAt     DateTime         @default(now())
-  user          UserAccount      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt        DateTime         @default(now())
+  user             UserAccount      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([handleDigest, expiresAt])
   @@index([userId, expiresAt])
@@ -540,29 +627,29 @@ model RateLimitBucket {
 }
 
 model EmailOutbox {
-  id                String         @id @default(cuid())
-  kind              EmailKind
-  userId            String?
-  securityTokenId   String?
-  recipientRef      String
-  recipientCiphertext String?
-  recipientPurpose  String?
-  templateVersion   String
-  payloadRef        Json
-  idempotencyKey    String         @unique
-  status            OutboxStatus   @default(PENDING)
-  attempts          Int            @default(0)
-  leaseOwner        String?
-  leaseExpiresAt    DateTime?
-  nextAttemptAt     DateTime       @default(now())
-  providerMessageId String?
-  safeErrorCode     String?
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  user              UserAccount?   @relation(fields: [userId], references: [id], onDelete: SetNull)
-  securityToken     SecurityToken? @relation(fields: [securityTokenId], references: [id], onDelete: SetNull)
-  emailChangeVerificationFor EmailChangeRequest? @relation("EmailChangeVerificationOutbox")
-  emailChangeOldAddressFor EmailChangeRequest? @relation("EmailChangeOldAddressOutbox")
+  id                            String                   @id @default(cuid())
+  kind                          EmailKind
+  userId                        String?
+  securityTokenId               String?
+  recipientRef                  String
+  recipientCiphertext           String?
+  recipientPurpose              String?
+  templateVersion               String
+  payloadRef                    Json
+  idempotencyKey                String                   @unique
+  status                        OutboxStatus             @default(PENDING)
+  attempts                      Int                      @default(0)
+  leaseOwner                    String?
+  leaseExpiresAt                DateTime?
+  nextAttemptAt                 DateTime                 @default(now())
+  providerMessageId             String?
+  safeErrorCode                 String?
+  createdAt                     DateTime                 @default(now())
+  updatedAt                     DateTime                 @updatedAt
+  user                          UserAccount?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  securityToken                 SecurityToken?           @relation(fields: [securityTokenId], references: [id], onDelete: SetNull)
+  emailChangeVerificationFor    EmailChangeRequest?      @relation("EmailChangeVerificationOutbox")
+  emailChangeOldAddressFor      EmailChangeRequest?      @relation("EmailChangeOldAddressOutbox")
   passwordChangeNotificationFor PasswordChangeOperation? @relation("PasswordChangeNotificationOutbox")
 
   @@index([status, nextAttemptAt])
@@ -570,23 +657,234 @@ model EmailOutbox {
 }
 
 model AuditEvent {
-  id              String      @id @default(cuid())
-  occurredAt      DateTime    @default(now())
-  actorType       String
-  actorUserId     String?
-  actorSessionId  String?
-  action          String
-  targetType      String
-  targetId        String?
-  result          AuditResult
-  correlationId   String
-  ipPrefixDigest  String?
-  userAgentFamily String?
-  context         Json
+  id                      String                   @id @default(cuid())
+  occurredAt              DateTime                 @default(now())
+  actorType               String
+  actorUserId             String?
+  actorSessionId          String?
+  action                  String
+  targetType              String
+  targetId                String?
+  result                  AuditResult
+  correlationId           String
+  ipPrefixDigest          String?
+  userAgentFamily         String?
+  context                 Json
   passwordChangeOperation PasswordChangeOperation? @relation("PasswordChangeFinalAudit")
 
   @@index([actorUserId, occurredAt])
   @@index([targetType, targetId, occurredAt])
   @@index([action, occurredAt])
   @@index([correlationId])
+}
+
+model Company {
+  id                String       @id @default(cuid())
+  slug              String       @unique
+  legalName         String
+  displayName       String
+  logoUrl           String?
+  websiteUrl        String?
+  publicDescription String?
+  publicLocation    String?
+  verifiedAt        DateTime?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  jobPostings       JobPosting[]
+
+  @@index([verifiedAt, id])
+}
+
+model JobPosting {
+  id                       String                @id @default(cuid())
+  companyId                String
+  slug                     String                @unique
+  title                    String
+  normalizedTitle          String
+  summary                  String
+  description              String
+  responsibilities         String
+  requirements             String
+  benefits                 String?
+  location                 String
+  normalizedLocation       String
+  employmentType           EmploymentType
+  experienceLevel          ExperienceLevel
+  workArrangement          WorkArrangement
+  salaryMin                Decimal?              @db.Decimal(14, 2)
+  salaryMax                Decimal?              @db.Decimal(14, 2)
+  salaryCurrency           String?               @db.VarChar(3)
+  salaryPeriod             SalaryPeriod?
+  searchDocumentNormalized String                @db.Text
+  status                   JobPostingStatus      @default(DRAFT)
+  approvedAt               DateTime?
+  publishedAt              DateTime?
+  applicationDeadline      DateTime?
+  closedAt                 DateTime?
+  removedAt                DateTime?
+  version                  Int                   @default(1)
+  createdAt                DateTime              @default(now())
+  updatedAt                DateTime              @updatedAt
+  company                  Company               @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  skills                   JobPostingSkill[]
+  questions                ApplicationQuestion[]
+  savedBy                  SavedJob[]
+  reports                  JobReport[]
+  applications             JobApplication[]
+
+  @@index([status, publishedAt(sort: Desc), id])
+  @@index([status, applicationDeadline, id])
+  @@index([employmentType, experienceLevel, workArrangement])
+  @@index([salaryCurrency, salaryPeriod, salaryMax(sort: Desc), id])
+  @@index([companyId, status, id])
+}
+
+model JobPostingSkill {
+  jobPostingId String
+  skillId      String
+  displayName  String
+  required     Boolean    @default(false)
+  position     Int
+  createdAt    DateTime   @default(now())
+  jobPosting   JobPosting @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
+  skill        Skill      @relation(fields: [skillId], references: [id], onDelete: Restrict)
+
+  @@id([jobPostingId, skillId])
+  @@unique([jobPostingId, position])
+  @@index([skillId, jobPostingId])
+}
+
+model ApplicationQuestion {
+  id           String                  @id @default(cuid())
+  jobPostingId String
+  prompt       String
+  description  String?
+  kind         ApplicationQuestionKind
+  required     Boolean                 @default(false)
+  options      Json?
+  position     Int
+  version      Int                     @default(1)
+  active       Boolean                 @default(true)
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+  jobPosting   JobPosting              @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
+  answers      ApplicationAnswer[]
+
+  @@unique([jobPostingId, position])
+  @@index([jobPostingId, active, position])
+}
+
+model CandidateCv {
+  id              String            @id @default(cuid())
+  candidateUserId String
+  displayName     String
+  fileName        String
+  mimeType        String
+  byteSize        Int
+  storageKey      String            @unique
+  checksumSha256  String
+  version         Int               @default(1)
+  confirmedAt     DateTime?
+  archivedAt      DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  candidate       CandidateIdentity @relation(fields: [candidateUserId], references: [userId], onDelete: Restrict)
+  applications    JobApplication[]
+
+  @@index([candidateUserId, confirmedAt, archivedAt])
+}
+
+model SavedJob {
+  userId       String
+  jobPostingId String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  user         UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobPosting   JobPosting  @relation(fields: [jobPostingId], references: [id], onDelete: Restrict)
+
+  @@id([userId, jobPostingId])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([jobPostingId])
+}
+
+model JobReport {
+  id             String          @id @default(cuid())
+  reporterUserId String
+  jobPostingId   String
+  reason         JobReportReason
+  details        String?
+  status         JobReportStatus @default(PENDING_REVIEW)
+  unresolvedKey  String?         @unique
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  resolvedAt     DateTime?
+  reporter       UserAccount     @relation(fields: [reporterUserId], references: [id], onDelete: Restrict)
+  jobPosting     JobPosting      @relation(fields: [jobPostingId], references: [id], onDelete: Restrict)
+
+  @@index([jobPostingId, status, createdAt])
+  @@index([reporterUserId, createdAt(sort: Desc)])
+}
+
+model JobApplication {
+  id                      String                        @id @default(cuid())
+  candidateUserId         String
+  jobPostingId            String
+  selectedCvId            String
+  stage                   ApplicationStage              @default(APPLIED)
+  coverLetter             String?
+  profileSnapshot         Json
+  cvSnapshot              Json
+  jobSnapshot             Json
+  consentVersion          String
+  consentedAt             DateTime
+  idempotencyKey          String
+  submissionBindingDigest String
+  submittedAt             DateTime                      @default(now())
+  createdAt               DateTime                      @default(now())
+  updatedAt               DateTime                      @updatedAt
+  candidate               CandidateIdentity             @relation(fields: [candidateUserId], references: [userId], onDelete: Restrict)
+  jobPosting              JobPosting                    @relation(fields: [jobPostingId], references: [id], onDelete: Restrict)
+  selectedCv              CandidateCv                   @relation(fields: [selectedCvId], references: [id], onDelete: Restrict)
+  answers                 ApplicationAnswer[]
+  notificationWork        RecruitmentNotificationWork[]
+
+  @@unique([candidateUserId, jobPostingId])
+  @@unique([candidateUserId, idempotencyKey])
+  @@index([jobPostingId, stage, submittedAt])
+  @@index([candidateUserId, submittedAt(sort: Desc)])
+}
+
+model ApplicationAnswer {
+  id               String              @id @default(cuid())
+  applicationId    String
+  questionId       String
+  questionSnapshot Json
+  answer           Json
+  createdAt        DateTime            @default(now())
+  application      JobApplication      @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  question         ApplicationQuestion @relation(fields: [questionId], references: [id], onDelete: Restrict)
+
+  @@unique([applicationId, questionId])
+  @@index([questionId])
+}
+
+model RecruitmentNotificationWork {
+  id              String                          @id @default(cuid())
+  applicationId   String
+  audience        RecruitmentNotificationAudience
+  kind            RecruitmentNotificationKind
+  targetReference String
+  payloadRef      Json
+  idempotencyKey  String                          @unique
+  status          OutboxStatus                    @default(PENDING)
+  attempts        Int                             @default(0)
+  nextAttemptAt   DateTime                        @default(now())
+  safeErrorCode   String?
+  createdAt       DateTime                        @default(now())
+  updatedAt       DateTime                        @updatedAt
+  application     JobApplication                  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@unique([applicationId, audience, kind])
+  @@index([status, nextAttemptAt])
+  @@index([applicationId])
 }

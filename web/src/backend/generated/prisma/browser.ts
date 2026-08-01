@@ -132,3 +132,53 @@ export type EmailOutbox = Prisma.EmailOutboxModel
  * 
  */
 export type AuditEvent = Prisma.AuditEventModel
+/**
+ * Model Company
+ * 
+ */
+export type Company = Prisma.CompanyModel
+/**
+ * Model JobPosting
+ * 
+ */
+export type JobPosting = Prisma.JobPostingModel
+/**
+ * Model JobPostingSkill
+ * 
+ */
+export type JobPostingSkill = Prisma.JobPostingSkillModel
+/**
+ * Model ApplicationQuestion
+ * 
+ */
+export type ApplicationQuestion = Prisma.ApplicationQuestionModel
+/**
+ * Model CandidateCv
+ * 
+ */
+export type CandidateCv = Prisma.CandidateCvModel
+/**
+ * Model SavedJob
+ * 
+ */
+export type SavedJob = Prisma.SavedJobModel
+/**
+ * Model JobReport
+ * 
+ */
+export type JobReport = Prisma.JobReportModel
+/**
+ * Model JobApplication
+ * 
+ */
+export type JobApplication = Prisma.JobApplicationModel
+/**
+ * Model ApplicationAnswer
+ * 
+ */
+export type ApplicationAnswer = Prisma.ApplicationAnswerModel
+/**
+ * Model RecruitmentNotificationWork
+ * 
+ */
+export type RecruitmentNotificationWork = Prisma.RecruitmentNotificationWorkModel
