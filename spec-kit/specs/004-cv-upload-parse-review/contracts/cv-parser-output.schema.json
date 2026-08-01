@@ -1,0 +1,345 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smarthire.example/spec-kit/004/contracts/cv-parser-output.schema.json",
+  "title": "SmartHire CV parser output cv-draft-v1",
+  "description": "Untrusted extraction-only output. SmartHire validates it as a whole and assigns proposal identifiers after validation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "scalars",
+    "experiences",
+    "education",
+    "skills",
+    "socialLinks"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "cv-draft-v1"
+    },
+    "scalars": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["headline", "summary", "phone", "location"],
+      "properties": {
+        "headline": {
+          "$ref": "#/$defs/nullableHeadlineProposal"
+        },
+        "summary": {
+          "$ref": "#/$defs/nullableSummaryProposal"
+        },
+        "phone": {
+          "$ref": "#/$defs/nullablePhoneProposal"
+        },
+        "location": {
+          "$ref": "#/$defs/nullableLocationProposal"
+        }
+      }
+    },
+    "experiences": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/$defs/experienceProposal"
+      }
+    },
+    "education": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/$defs/educationProposal"
+      }
+    },
+    "skills": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/$defs/skillProposal"
+      }
+    },
+    "socialLinks": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "$ref": "#/$defs/socialLinkProposal"
+      }
+    }
+  },
+  "$defs": {
+    "confidence": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "sourceSegmentIds": {
+      "type": "array",
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80,
+        "pattern": "^[A-Za-z0-9._:-]+$"
+      }
+    },
+    "headlineProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "confidence", "sourceSegmentIds"],
+      "properties": {
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        },
+        "sourceSegmentIds": {
+          "$ref": "#/$defs/sourceSegmentIds"
+        }
+      }
+    },
+    "nullableHeadlineProposal": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/headlineProposal"
+        }
+      ]
+    },
+    "summaryProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "confidence", "sourceSegmentIds"],
+      "properties": {
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 5000
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        },
+        "sourceSegmentIds": {
+          "$ref": "#/$defs/sourceSegmentIds"
+        }
+      }
+    },
+    "nullableSummaryProposal": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/summaryProposal"
+        }
+      ]
+    },
+    "phoneProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "confidence", "sourceSegmentIds"],
+      "properties": {
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        },
+        "sourceSegmentIds": {
+          "$ref": "#/$defs/sourceSegmentIds"
+        }
+      }
+    },
+    "nullablePhoneProposal": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/phoneProposal"
+        }
+      ]
+    },
+    "locationProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "confidence", "sourceSegmentIds"],
+      "properties": {
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        },
+        "sourceSegmentIds": {
+          "$ref": "#/$defs/sourceSegmentIds"
+        }
+      }
+    },
+    "nullableLocationProposal": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/locationProposal"
+        }
+      ]
+    },
+    "experienceProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "company",
+        "description",
+        "startDate",
+        "endDate",
+        "isCurrent",
+        "confidence",
+        "sourceSegmentIds"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "company": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "description": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 3000
+        },
+        "startDate": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "endDate": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            }
+          ]
+        },
+        "isCurrent": {
+          "type": "boolean"
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        },
+        "sourceSegmentIds": {
+          "$ref": "#/$defs/sourceSegmentIds"
+        }
+      }
+    },
+    "educationProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "institution",
+        "degree",
+        "field",
+        "startDate",
+        "endDate",
+        "isCurrent",
+        "confidence",
+        "sourceSegmentIds"
+      ],
+      "properties": {
+        "institution": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "degree": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "field": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "startDate": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "endDate": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            }
+          ]
+        },
+        "isCurrent": {
+          "type": "boolean"
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        },
+        "sourceSegmentIds": {
+          "$ref": "#/$defs/sourceSegmentIds"
+        }
+      }
+    },
+    "skillProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "confidence", "sourceSegmentIds"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        },
+        "sourceSegmentIds": {
+          "$ref": "#/$defs/sourceSegmentIds"
+        }
+      }
+    },
+    "socialLinkProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "confidence", "sourceSegmentIds"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 2048,
+          "pattern": "^https?://"
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        },
+        "sourceSegmentIds": {
+          "$ref": "#/$defs/sourceSegmentIds"
+        }
+      }
+    }
+  }
+}

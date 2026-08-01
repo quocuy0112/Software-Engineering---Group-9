@@ -1,0 +1,1762 @@
+openapi: 3.1.0
+info:
+  title: SmartHire CV Upload, Parse, and Review API
+  version: 0.1.0
+  description: >-
+    Browser-facing Feature 004 contracts implemented only by Next.js App Router
+    Route Handlers. Better Auth remains the exclusive browser-session owner.
+    Every protected operation derives account/profile ownership from the
+    session, returns no-store responses, and never exposes source files,
+    extracted text, storage locators, digests, prompts, or provider responses.
+servers:
+  - url: "{configuredOrigin}"
+    variables:
+      configuredOrigin:
+        default: http://localhost:3001
+        description: Deployed same-origin SmartHire web origin.
+tags:
+  - name: CV Imports
+  - name: CV Consent
+  - name: CV Drafts
+paths:
+  /api/account/cv-imports:
+    get:
+      tags: [CV Imports]
+      operationId: listOwnCvImports
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: At most ten safe owned import summaries, newest first.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CvImportList"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [CV Imports]
+      operationId: createOwnCvImport
+      description: >-
+        Reserves account quota before the raw content upload. The operation is
+        bound to the Idempotency-Key by a server-side HMAC.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCvImportRequest"
+      responses:
+        "200":
+          description: Idempotent replay of an existing reservation.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CvUploadReservation"
+        "201":
+          description: A new bounded upload reservation was created.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+            Location:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CvUploadReservation"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "413":
+          $ref: "#/components/responses/PayloadTooLarge"
+        "429":
+          $ref: "#/components/responses/QuotaOrRateLimited"
+        "503":
+          $ref: "#/components/responses/ProcessingUnavailable"
+
+  /api/account/cv-imports/{uploadId}/content:
+    parameters:
+      - $ref: "#/components/parameters/UploadId"
+    put:
+      tags: [CV Imports]
+      operationId: uploadOwnCvImportContent
+      description: >-
+        Streams one raw PDF or DOCX body into encrypted private quarantine.
+        Content-Length must match the reservation and no multipart body is used.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/ContentLength"
+      requestBody:
+        required: true
+        content:
+          application/pdf:
+            schema:
+              type: string
+              format: binary
+              minLength: 1
+              maxLength: 5242880
+          application/vnd.openxmlformats-officedocument.wordprocessingml.document:
+            schema:
+              type: string
+              format: binary
+              minLength: 1
+              maxLength: 5242880
+      responses:
+        "200":
+          description: Idempotent replay of the same completed content upload.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CvContentAccepted"
+        "202":
+          description: Content finalized and asynchronous validation was queued.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+            Location:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CvContentAccepted"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/CvImportNotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "413":
+          $ref: "#/components/responses/PayloadTooLarge"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+
+  /api/account/cv-imports/{uploadId}:
+    parameters:
+      - $ref: "#/components/parameters/UploadId"
+    get:
+      tags: [CV Imports]
+      operationId: getOwnCvImport
+      description: >-
+        Returns authoritative safe state and currently allowed actions. Unknown,
+        foreign, deleted, and expired identifiers use the same response.
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Safe owned import resource.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CvImportResource"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/CvImportNotFound"
+    delete:
+      tags: [CV Imports]
+      operationId: deleteOwnCvImport
+      description: >-
+        Denies access, cancels queued work, and schedules physical cleanup. It is
+        idempotent and never returns source/draft content.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      responses:
+        "204":
+          description: Import is inaccessible and cleanup is scheduled.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/CvImportNotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/account/cv-imports/{uploadId}/consent:
+    parameters:
+      - $ref: "#/components/parameters/UploadId"
+    post:
+      tags: [CV Consent]
+      operationId: grantOwnCvExternalProcessingConsent
+      description: >-
+        Appends a grant for the exact server-selected upload/provider/model/
+        purpose/notice/text binding represented by the signed challenge.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConsentGrantRequest"
+      responses:
+        "201":
+          description: Exact consent grant appended and eligible work queued.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsentOutcome"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/CvImportNotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "503":
+          $ref: "#/components/responses/ProcessingUnavailable"
+    delete:
+      tags: [CV Consent]
+      operationId: revokeOwnCvExternalProcessingConsent
+      description: >-
+        Appends a revocation for the current exact binding and cancels queued
+        dispatch. It cannot recall a request already transmitted.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      responses:
+        "204":
+          description: Consent is now revoked for future dispatch/retry.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/CvImportNotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/account/cv-imports/{uploadId}/retries:
+    parameters:
+      - $ref: "#/components/parameters/UploadId"
+    post:
+      tags: [CV Imports]
+      operationId: retryOwnCvImport
+      description: >-
+        Creates one new durable retry attempt for an eligible terminal state.
+        At most two explicit candidate scan retries and two candidate parser
+        retries are allowed per upload.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              maxProperties: 0
+      responses:
+        "200":
+          description: Idempotent replay of an existing retry request.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CvRetryAccepted"
+        "202":
+          description: A new durable retry was queued or is awaiting consent.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CvRetryAccepted"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/CvImportNotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "429":
+          $ref: "#/components/responses/QuotaOrRateLimited"
+
+  /api/account/cv-drafts/{draftId}:
+    parameters:
+      - $ref: "#/components/parameters/DraftId"
+    get:
+      tags: [CV Drafts]
+      operationId: getOwnCvDraftComparison
+      description: >-
+        Returns the editable draft and live Candidate Profile comparison. It
+        never returns the raw source document or complete extracted text.
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Owned review comparison.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CvDraftComparison"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/CvDraftNotFound"
+    patch:
+      tags: [CV Drafts]
+      operationId: saveOwnCvDraftReview
+      description: >-
+        Replaces the full bounded editable proposal/review payload using both
+        draft and reviewed Profile optimistic revisions.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveCvDraftRequest"
+      responses:
+        "200":
+          description: Draft review saved and revision incremented once.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SaveCvDraftOutcome"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/CvDraftNotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "413":
+          $ref: "#/components/responses/PayloadTooLarge"
+
+  /api/account/cv-drafts/{draftId}/confirm:
+    parameters:
+      - $ref: "#/components/parameters/DraftId"
+    post:
+      tags: [CV Drafts]
+      operationId: confirmOwnCvDraft
+      description: >-
+        Atomically applies exactly the saved selected changes, increments the
+        Candidate Profile revision once, freezes temporary content, and returns
+        a non-content receipt.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfirmCvDraftRequest"
+      responses:
+        "200":
+          description: Idempotent replay returned the original receipt.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CvConfirmationReceipt"
+        "201":
+          description: Draft was atomically imported into Candidate Profile.
+          headers:
+            Cache-Control:
+              $ref: "#/components/headers/NoStoreHeader"
+            Location:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CvConfirmationReceipt"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/CvDraftNotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "413":
+          $ref: "#/components/responses/PayloadTooLarge"
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: better-auth.session_token
+      description: Opaque Better Auth session cookie; exact deployed name may vary.
+    csrfToken:
+      type: apiKey
+      in: header
+      name: X-CSRF-Token
+      description: Existing same-origin mutation proof, validated with Origin and Fetch Metadata.
+
+  headers:
+    NoStoreHeader:
+      description: Sensitive account resources must never be cached.
+      schema:
+        type: string
+        const: no-store
+
+  parameters:
+    UploadId:
+      name: uploadId
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/OpaqueId"
+    DraftId:
+      name: draftId
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/OpaqueId"
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: >-
+        A fresh 16-200 character printable ASCII key. It is purpose-bound and
+        stored only as a server-side HMAC.
+      schema:
+        type: string
+        minLength: 16
+        maxLength: 200
+        pattern: "^[\\x21-\\x7E]+$"
+    ContentLength:
+      name: Content-Length
+      in: header
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 5242880
+
+  responses:
+    AuthenticationRequired:
+      description: A valid Better Auth session is required.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    Forbidden:
+      description: Account is inactive or the same-origin/CSRF boundary rejected the request.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    ValidationError:
+      description: Request shape or bounded field validation failed.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    CvImportNotFound:
+      description: Unknown, foreign, expired, or deleted import.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    CvDraftNotFound:
+      description: Unknown, foreign, confirmed, expired, or deleted draft.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    Conflict:
+      description: Idempotency, revision, or current-state conflict; no partial mutation occurred.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    PayloadTooLarge:
+      description: Raw content or structured JSON exceeds its explicit cap.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    UnsupportedMediaType:
+      description: The content type is not the reserved PDF or DOCX type.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    QuotaOrRateLimited:
+      description: Rolling upload attempt, import-count, storage, or retry cap reached.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    ProcessingUnavailable:
+      description: Scanner or the selected approved parser deployment is unavailable.
+      headers:
+        Cache-Control:
+          $ref: "#/components/headers/NoStoreHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+
+  schemas:
+    OpaqueId:
+      type: string
+      minLength: 10
+      maxLength: 80
+      pattern: "^[A-Za-z0-9_-]+$"
+
+    UtcTimestamp:
+      type: string
+      format: date-time
+
+    CvDocumentKind:
+      type: string
+      enum: [PDF, DOCX]
+
+    CvParserClass:
+      type: string
+      enum: [DETERMINISTIC_INTERNAL, EXTERNAL_OPENAI]
+
+    CvUploadStatus:
+      type: string
+      enum:
+        - AWAITING_CONTENT
+        - VALIDATION_QUEUED
+        - SCAN_QUEUED
+        - SCANNING
+        - EXTRACTION_QUEUED
+        - EXTRACTING
+        - AWAITING_CONSENT
+        - PARSE_QUEUED
+        - PARSING
+        - REVIEW_READY
+        - VALIDATION_FAILED
+        - INFECTED
+        - SCAN_FAILED
+        - EXTRACTION_FAILED
+        - PARSE_FAILED
+        - CONFIRMED
+        - CANCELLED
+        - DELETED
+        - EXPIRED
+
+    CreateCvImportRequest:
+      type: object
+      additionalProperties: false
+      required: [displayFilename, declaredMediaType, declaredBytes, parserClass]
+      properties:
+        displayFilename:
+          type: string
+          minLength: 1
+          maxLength: 255
+        declaredMediaType:
+          type: string
+          enum:
+            - application/pdf
+            - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+        declaredBytes:
+          type: integer
+          minimum: 1
+          maximum: 5242880
+        parserClass:
+          $ref: "#/components/schemas/CvParserClass"
+
+    CvUploadReservation:
+      type: object
+      additionalProperties: false
+      required: [uploadId, status, contentUrl, expiresAt, limits]
+      properties:
+        uploadId:
+          $ref: "#/components/schemas/OpaqueId"
+        status:
+          const: AWAITING_CONTENT
+        contentUrl:
+          type: string
+          pattern: "^/api/account/cv-imports/[A-Za-z0-9_-]+/content$"
+        expiresAt:
+          $ref: "#/components/schemas/UtcTimestamp"
+        limits:
+          type: object
+          additionalProperties: false
+          required: [maximumBytes, requiredContentType, requiredContentLength]
+          properties:
+            maximumBytes:
+              const: 5242880
+            requiredContentType:
+              type: string
+            requiredContentLength:
+              type: integer
+              minimum: 1
+              maximum: 5242880
+
+    CvContentAccepted:
+      type: object
+      additionalProperties: false
+      required: [uploadId, status, replayed, statusUrl]
+      properties:
+        uploadId:
+          $ref: "#/components/schemas/OpaqueId"
+        status:
+          const: VALIDATION_QUEUED
+        replayed:
+          type: boolean
+        statusUrl:
+          type: string
+          pattern: "^/api/account/cv-imports/[A-Za-z0-9_-]+$"
+
+    CvImportList:
+      type: object
+      additionalProperties: false
+      required: [items, limits, processingNotice]
+      properties:
+        items:
+          type: array
+          maxItems: 10
+          items:
+            $ref: "#/components/schemas/CvImportSummary"
+        limits:
+          $ref: "#/components/schemas/CvAccountLimits"
+        processingNotice:
+          $ref: "#/components/schemas/CvProcessingNotice"
+
+    CvAccountLimits:
+      type: object
+      additionalProperties: false
+      required:
+        - maximumFileBytes
+        - maximumImports
+        - maximumStoredBytes
+        - uploadAttemptsPerRollingHour
+      properties:
+        maximumFileBytes:
+          const: 5242880
+        maximumImports:
+          const: 10
+        maximumStoredBytes:
+          const: 52428800
+        uploadAttemptsPerRollingHour:
+          const: 5
+
+    CvProcessingNotice:
+      type: object
+      additionalProperties: false
+      required: [noticeVersion, noticeText, externalConsentRequiredFor]
+      properties:
+        noticeVersion:
+          type: string
+          minLength: 1
+          maxLength: 100
+        noticeText:
+          type: string
+          minLength: 1
+          maxLength: 5000
+        externalConsentRequiredFor:
+          type: array
+          uniqueItems: true
+          maxItems: 1
+          items:
+            const: EXTERNAL_OPENAI
+
+    CvImportSummary:
+      type: object
+      additionalProperties: false
+      required:
+        - uploadId
+        - displayFilename
+        - documentKind
+        - parserClass
+        - status
+        - createdAt
+        - expiresAt
+      properties:
+        uploadId:
+          $ref: "#/components/schemas/OpaqueId"
+        displayFilename:
+          type: [string, "null"]
+          maxLength: 255
+        documentKind:
+          $ref: "#/components/schemas/CvDocumentKind"
+        parserClass:
+          $ref: "#/components/schemas/CvParserClass"
+        status:
+          $ref: "#/components/schemas/CvUploadStatus"
+        createdAt:
+          $ref: "#/components/schemas/UtcTimestamp"
+        expiresAt:
+          $ref: "#/components/schemas/UtcTimestamp"
+        confirmedAt:
+          oneOf:
+            - type: "null"
+            - $ref: "#/components/schemas/UtcTimestamp"
+
+    CvImportResource:
+      type: object
+      additionalProperties: false
+      required:
+        - uploadId
+        - displayFilename
+        - documentKind
+        - parserClass
+        - status
+        - stage
+        - availableActions
+        - scanRetriesRemaining
+        - parseRetriesRemaining
+        - createdAt
+        - expiresAt
+        - draft
+        - processingNotice
+        - consent
+        - failure
+        - receipt
+      properties:
+        uploadId:
+          $ref: "#/components/schemas/OpaqueId"
+        displayFilename:
+          type: [string, "null"]
+          maxLength: 255
+        documentKind:
+          $ref: "#/components/schemas/CvDocumentKind"
+        parserClass:
+          $ref: "#/components/schemas/CvParserClass"
+        status:
+          $ref: "#/components/schemas/CvUploadStatus"
+        stage:
+          type: string
+          enum:
+            [
+              UPLOAD,
+              VALIDATE,
+              SCAN,
+              EXTRACT,
+              CONSENT,
+              PARSE,
+              REVIEW,
+              COMPLETE,
+              TERMINAL,
+            ]
+        availableActions:
+          type: array
+          uniqueItems: true
+          maxItems: 7
+          items:
+            type: string
+            enum:
+              [
+                UPLOAD_CONTENT,
+                GRANT_CONSENT,
+                REVOKE_CONSENT,
+                RETRY,
+                REVIEW,
+                DELETE,
+                MANUAL_PROFILE,
+              ]
+        scanRetriesRemaining:
+          type: integer
+          minimum: 0
+          maximum: 2
+        parseRetriesRemaining:
+          type: integer
+          minimum: 0
+          maximum: 2
+        createdAt:
+          $ref: "#/components/schemas/UtcTimestamp"
+        expiresAt:
+          $ref: "#/components/schemas/UtcTimestamp"
+        draft:
+          oneOf:
+            - type: "null"
+            - $ref: "#/components/schemas/CvDraftReference"
+        processingNotice:
+          $ref: "#/components/schemas/CvProcessingNotice"
+        consent:
+          oneOf:
+            - type: "null"
+            - $ref: "#/components/schemas/ConsentNotice"
+        failure:
+          oneOf:
+            - type: "null"
+            - $ref: "#/components/schemas/SafeFailure"
+        receipt:
+          oneOf:
+            - type: "null"
+            - $ref: "#/components/schemas/CvConfirmationReceipt"
+
+    CvDraftReference:
+      type: object
+      additionalProperties: false
+      required: [draftId, revision, reviewUrl]
+      properties:
+        draftId:
+          $ref: "#/components/schemas/OpaqueId"
+        revision:
+          type: integer
+          minimum: 0
+        reviewUrl:
+          type: string
+
+    ConsentNotice:
+      type: object
+      additionalProperties: false
+      required:
+        - required
+        - granted
+        - providerDisplayName
+        - processingPurpose
+        - noticeText
+        - consentChallenge
+      properties:
+        required:
+          type: boolean
+        granted:
+          type: boolean
+        providerDisplayName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        processingPurpose:
+          type: string
+          minLength: 1
+          maxLength: 300
+        noticeText:
+          type: string
+          minLength: 1
+          maxLength: 5000
+        consentChallenge:
+          type: string
+          minLength: 32
+          maxLength: 2048
+
+    ConsentGrantRequest:
+      type: object
+      additionalProperties: false
+      required: [accepted, consentChallenge]
+      properties:
+        accepted:
+          const: true
+        consentChallenge:
+          type: string
+          minLength: 32
+          maxLength: 2048
+
+    ConsentOutcome:
+      type: object
+      additionalProperties: false
+      required: [uploadId, grantedAt, status]
+      properties:
+        uploadId:
+          $ref: "#/components/schemas/OpaqueId"
+        grantedAt:
+          $ref: "#/components/schemas/UtcTimestamp"
+        status:
+          type: string
+          enum: [PARSE_QUEUED, PARSE_FAILED]
+
+    CvRetryAccepted:
+      type: object
+      additionalProperties: false
+      required: [uploadId, status, scanRetriesRemaining, parseRetriesRemaining]
+      properties:
+        uploadId:
+          $ref: "#/components/schemas/OpaqueId"
+        status:
+          type: string
+          enum: [SCAN_QUEUED, PARSE_QUEUED]
+        scanRetriesRemaining:
+          type: integer
+          minimum: 0
+          maximum: 2
+        parseRetriesRemaining:
+          type: integer
+          minimum: 0
+          maximum: 2
+
+    SafeFailure:
+      type: object
+      additionalProperties: false
+      required: [code, message, retryable, suggestedActions]
+      properties:
+        code:
+          type: string
+          enum:
+            - CONTENT_REQUIRED
+            - CONTENT_LENGTH_MISMATCH
+            - ARTIFACT_INTEGRITY_FAILED
+            - UNSUPPORTED_DOCUMENT
+            - MALFORMED_DOCUMENT
+            - DOCUMENT_ENCRYPTED
+            - DOCUMENT_ACTIVE_CONTENT
+            - DOCUMENT_LIMIT_EXCEEDED
+            - MALWARE_DETECTED
+            - SCANNER_UNAVAILABLE
+            - SCANNER_DEFINITIONS_STALE
+            - EXTRACTION_EMPTY
+            - EXTRACTION_TIMEOUT
+            - EXTRACTION_FAILED
+            - CONSENT_REQUIRED
+            - CONSENT_REVOKED
+            - PARSER_TIMEOUT
+            - PARSER_UNAVAILABLE
+            - PARSER_OUTPUT_INVALID
+            - PARSER_OUTPUT_LIMIT_EXCEEDED
+            - RETRY_LIMIT_REACHED
+            - IMPORT_EXPIRED
+            - IMPORT_DELETED
+        message:
+          type: string
+          minLength: 1
+          maxLength: 500
+        retryable:
+          type: boolean
+        suggestedActions:
+          type: array
+          uniqueItems: true
+          maxItems: 4
+          items:
+            type: string
+            enum: [RETRY, REPLACE_DOCUMENT, MANUAL_PROFILE, DELETE]
+
+    CvDraftComparison:
+      type: object
+      additionalProperties: false
+      required:
+        - draftId
+        - uploadId
+        - draftRevision
+        - sourceProfileRevision
+        - reviewedProfileRevision
+        - currentProfile
+        - proposals
+        - reviewDecisions
+        - expiresAt
+      properties:
+        draftId:
+          $ref: "#/components/schemas/OpaqueId"
+        uploadId:
+          $ref: "#/components/schemas/OpaqueId"
+        draftRevision:
+          type: integer
+          minimum: 0
+        sourceProfileRevision:
+          type: integer
+          minimum: 0
+        reviewedProfileRevision:
+          type: integer
+          minimum: 0
+        currentProfile:
+          $ref: "#/components/schemas/CandidateProfileSnapshot"
+        proposals:
+          $ref: "#/components/schemas/CvEditableProposals"
+        reviewDecisions:
+          $ref: "#/components/schemas/CvReviewDecisions"
+        expiresAt:
+          $ref: "#/components/schemas/UtcTimestamp"
+
+    CandidateProfileSnapshot:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          revision,
+          headline,
+          summary,
+          phone,
+          location,
+          experiences,
+          education,
+          skills,
+          socialLinks,
+        ]
+      properties:
+        revision:
+          type: integer
+          minimum: 0
+        headline:
+          type: [string, "null"]
+          maxLength: 200
+        summary:
+          type: [string, "null"]
+          maxLength: 5000
+        phone:
+          type: [string, "null"]
+          maxLength: 32
+        location:
+          type: [string, "null"]
+          maxLength: 160
+        experiences:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/ProfileExperience"
+        education:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/ProfileEducation"
+        skills:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/ProfileSkill"
+        socialLinks:
+          type: array
+          maxItems: 10
+          items:
+            $ref: "#/components/schemas/ProfileSocialLink"
+
+    Evidence:
+      type: object
+      additionalProperties: false
+      required: [confidence, locations, contextAvailable]
+      properties:
+        confidence:
+          type: [number, "null"]
+          minimum: 0
+          maximum: 1
+        locations:
+          type: array
+          uniqueItems: true
+          maxItems: 20
+          items:
+            type: string
+            minLength: 1
+            maxLength: 100
+        contextAvailable:
+          type: boolean
+        context:
+          type: [string, "null"]
+          maxLength: 500
+
+    ScalarProposal:
+      oneOf:
+        - $ref: "#/components/schemas/HeadlineProposal"
+        - $ref: "#/components/schemas/SummaryProposal"
+        - $ref: "#/components/schemas/PhoneProposal"
+        - $ref: "#/components/schemas/LocationProposal"
+
+    HeadlineProposal:
+      type: object
+      additionalProperties: false
+      required: [proposalId, field, value, evidence]
+      properties:
+        proposalId:
+          $ref: "#/components/schemas/OpaqueId"
+        field:
+          const: headline
+        value:
+          type: string
+          minLength: 1
+          maxLength: 200
+        evidence:
+          $ref: "#/components/schemas/Evidence"
+
+    SummaryProposal:
+      type: object
+      additionalProperties: false
+      required: [proposalId, field, value, evidence]
+      properties:
+        proposalId:
+          $ref: "#/components/schemas/OpaqueId"
+        field:
+          const: summary
+        value:
+          type: string
+          minLength: 1
+          maxLength: 5000
+        evidence:
+          $ref: "#/components/schemas/Evidence"
+
+    PhoneProposal:
+      type: object
+      additionalProperties: false
+      required: [proposalId, field, value, evidence]
+      properties:
+        proposalId:
+          $ref: "#/components/schemas/OpaqueId"
+        field:
+          const: phone
+        value:
+          type: string
+          minLength: 1
+          maxLength: 32
+        evidence:
+          $ref: "#/components/schemas/Evidence"
+
+    LocationProposal:
+      type: object
+      additionalProperties: false
+      required: [proposalId, field, value, evidence]
+      properties:
+        proposalId:
+          $ref: "#/components/schemas/OpaqueId"
+        field:
+          const: location
+        value:
+          type: string
+          minLength: 1
+          maxLength: 160
+        evidence:
+          $ref: "#/components/schemas/Evidence"
+
+    CvEditableProposals:
+      type: object
+      additionalProperties: false
+      required: [scalars, experiences, education, skills, socialLinks]
+      properties:
+        scalars:
+          type: array
+          maxItems: 4
+          items:
+            $ref: "#/components/schemas/ScalarProposal"
+        experiences:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/ExperienceProposal"
+        education:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/EducationProposal"
+        skills:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/SkillProposal"
+        socialLinks:
+          type: array
+          maxItems: 10
+          items:
+            $ref: "#/components/schemas/SocialLinkProposal"
+
+    ExperienceProposal:
+      type: object
+      additionalProperties: false
+      required: [proposalId, value, duplicateTargetIds, evidence]
+      properties:
+        proposalId:
+          $ref: "#/components/schemas/OpaqueId"
+        value:
+          $ref: "#/components/schemas/ProfileExperienceValue"
+        duplicateTargetIds:
+          type: array
+          uniqueItems: true
+          maxItems: 10
+          items:
+            $ref: "#/components/schemas/OpaqueId"
+        evidence:
+          $ref: "#/components/schemas/Evidence"
+
+    EducationProposal:
+      type: object
+      additionalProperties: false
+      required: [proposalId, value, duplicateTargetIds, evidence]
+      properties:
+        proposalId:
+          $ref: "#/components/schemas/OpaqueId"
+        value:
+          $ref: "#/components/schemas/ProfileEducationValue"
+        duplicateTargetIds:
+          type: array
+          uniqueItems: true
+          maxItems: 10
+          items:
+            $ref: "#/components/schemas/OpaqueId"
+        evidence:
+          $ref: "#/components/schemas/Evidence"
+
+    SkillProposal:
+      type: object
+      additionalProperties: false
+      required: [proposalId, value, duplicate, evidence]
+      properties:
+        proposalId:
+          $ref: "#/components/schemas/OpaqueId"
+        value:
+          type: string
+          minLength: 1
+          maxLength: 80
+        duplicate:
+          type: boolean
+        evidence:
+          $ref: "#/components/schemas/Evidence"
+
+    SocialLinkProposal:
+      type: object
+      additionalProperties: false
+      required: [proposalId, value, duplicateTargetIds, evidence]
+      properties:
+        proposalId:
+          $ref: "#/components/schemas/OpaqueId"
+        value:
+          type: string
+          minLength: 8
+          maxLength: 2048
+          pattern: "^https?://"
+        duplicateTargetIds:
+          type: array
+          uniqueItems: true
+          maxItems: 10
+          items:
+            $ref: "#/components/schemas/OpaqueId"
+        evidence:
+          $ref: "#/components/schemas/Evidence"
+
+    ProfileExperienceValue:
+      type: object
+      additionalProperties: false
+      required: [title, company, description, startDate, endDate, isCurrent]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        company:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: [string, "null"]
+          maxLength: 3000
+        startDate:
+          type: string
+          format: date
+        endDate:
+          oneOf:
+            - type: "null"
+            - type: string
+              format: date
+        isCurrent:
+          type: boolean
+
+    ProfileExperience:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - title
+        - company
+        - description
+        - startDate
+        - endDate
+        - isCurrent
+        - position
+      properties:
+        id:
+          $ref: "#/components/schemas/OpaqueId"
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        company:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: [string, "null"]
+          maxLength: 3000
+        startDate:
+          type: string
+          format: date
+        endDate:
+          oneOf:
+            - type: "null"
+            - type: string
+              format: date
+        isCurrent:
+          type: boolean
+        position:
+          type: integer
+          minimum: 0
+          maximum: 49
+
+    ProfileEducationValue:
+      type: object
+      additionalProperties: false
+      required: [institution, degree, field, startDate, endDate, isCurrent]
+      properties:
+        institution:
+          type: string
+          minLength: 1
+          maxLength: 200
+        degree:
+          type: string
+          minLength: 1
+          maxLength: 200
+        field:
+          type: [string, "null"]
+          maxLength: 200
+        startDate:
+          type: string
+          format: date
+        endDate:
+          oneOf:
+            - type: "null"
+            - type: string
+              format: date
+        isCurrent:
+          type: boolean
+
+    ProfileEducation:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - institution
+        - degree
+        - field
+        - startDate
+        - endDate
+        - isCurrent
+        - position
+      properties:
+        id:
+          $ref: "#/components/schemas/OpaqueId"
+        institution:
+          type: string
+          minLength: 1
+          maxLength: 200
+        degree:
+          type: string
+          minLength: 1
+          maxLength: 200
+        field:
+          type: [string, "null"]
+          maxLength: 200
+        startDate:
+          type: string
+          format: date
+        endDate:
+          oneOf:
+            - type: "null"
+            - type: string
+              format: date
+        isCurrent:
+          type: boolean
+        position:
+          type: integer
+          minimum: 0
+          maximum: 49
+
+    ProfileSkill:
+      type: object
+      additionalProperties: false
+      required: [id, displayName, position]
+      properties:
+        id:
+          $ref: "#/components/schemas/OpaqueId"
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 80
+        position:
+          type: integer
+          minimum: 0
+          maximum: 49
+
+    ProfileSocialLink:
+      type: object
+      additionalProperties: false
+      required: [id, url, position]
+      properties:
+        id:
+          $ref: "#/components/schemas/OpaqueId"
+        url:
+          type: string
+          minLength: 8
+          maxLength: 2048
+          pattern: "^https?://"
+        position:
+          type: integer
+          minimum: 0
+          maximum: 9
+
+    CvReviewDecisions:
+      type: object
+      additionalProperties: false
+      required:
+        [reviewComplete, scalars, experiences, education, skills, socialLinks]
+      properties:
+        reviewComplete:
+          type: boolean
+        scalars:
+          type: array
+          maxItems: 4
+          items:
+            $ref: "#/components/schemas/ScalarDecision"
+        experiences:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/EntryDecision"
+        education:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/EntryDecision"
+        skills:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/SkillDecision"
+        socialLinks:
+          type: array
+          maxItems: 10
+          items:
+            $ref: "#/components/schemas/EntryDecision"
+
+    ScalarDecision:
+      type: object
+      additionalProperties: false
+      required: [proposalId, action]
+      properties:
+        proposalId:
+          $ref: "#/components/schemas/OpaqueId"
+        action:
+          type: string
+          enum: [ADD, REPLACE, SKIP]
+
+    EntryDecision:
+      oneOf:
+        - $ref: "#/components/schemas/AddEntryDecision"
+        - $ref: "#/components/schemas/ReplaceEntryDecision"
+        - $ref: "#/components/schemas/SkipEntryDecision"
+
+    AddEntryDecision:
+      type: object
+      additionalProperties: false
+      required: [proposalId, action, targetId]
+      properties:
+        proposalId:
+          $ref: "#/components/schemas/OpaqueId"
+        action:
+          const: ADD
+        targetId:
+          type: "null"
+
+    ReplaceEntryDecision:
+      type: object
+      additionalProperties: false
+      required: [proposalId, action, targetId]
+      properties:
+        proposalId:
+          $ref: "#/components/schemas/OpaqueId"
+        action:
+          const: REPLACE
+        targetId:
+          $ref: "#/components/schemas/OpaqueId"
+
+    SkipEntryDecision:
+      type: object
+      additionalProperties: false
+      required: [proposalId, action, targetId]
+      properties:
+        proposalId:
+          $ref: "#/components/schemas/OpaqueId"
+        action:
+          const: SKIP
+        targetId:
+          type: "null"
+
+    SkillDecision:
+      type: object
+      additionalProperties: false
+      required: [proposalId, action]
+      properties:
+        proposalId:
+          $ref: "#/components/schemas/OpaqueId"
+        action:
+          type: string
+          enum: [ADD, SKIP]
+
+    SaveCvDraftRequest:
+      type: object
+      additionalProperties: false
+      required:
+        [baseDraftRevision, reviewedProfileRevision, proposals, reviewDecisions]
+      properties:
+        baseDraftRevision:
+          type: integer
+          minimum: 0
+        reviewedProfileRevision:
+          type: integer
+          minimum: 0
+        proposals:
+          $ref: "#/components/schemas/CvEditableProposals"
+        reviewDecisions:
+          $ref: "#/components/schemas/CvReviewDecisions"
+
+    SaveCvDraftOutcome:
+      type: object
+      additionalProperties: false
+      required: [draftId, draftRevision, reviewedProfileRevision, savedAt]
+      properties:
+        draftId:
+          $ref: "#/components/schemas/OpaqueId"
+        draftRevision:
+          type: integer
+          minimum: 1
+        reviewedProfileRevision:
+          type: integer
+          minimum: 0
+        savedAt:
+          $ref: "#/components/schemas/UtcTimestamp"
+
+    ConfirmCvDraftRequest:
+      type: object
+      additionalProperties: false
+      required: [draftRevision, sourceProfileRevision, reviewedProfileRevision]
+      properties:
+        draftRevision:
+          type: integer
+          minimum: 0
+        sourceProfileRevision:
+          type: integer
+          minimum: 0
+        reviewedProfileRevision:
+          type: integer
+          minimum: 0
+
+    AppliedCounts:
+      type: object
+      additionalProperties: false
+      required: [scalars, experiences, education, skills, socialLinks]
+      properties:
+        scalars:
+          type: integer
+          minimum: 0
+          maximum: 4
+        experiences:
+          type: integer
+          minimum: 0
+          maximum: 50
+        education:
+          type: integer
+          minimum: 0
+          maximum: 50
+        skills:
+          type: integer
+          minimum: 0
+          maximum: 50
+        socialLinks:
+          type: integer
+          minimum: 0
+          maximum: 10
+
+    CvConfirmationReceipt:
+      type: object
+      additionalProperties: false
+      required:
+        - receiptId
+        - uploadId
+        - draftId
+        - confirmedAt
+        - draftRevision
+        - sourceProfileRevision
+        - reviewedProfileRevision
+        - profileRevisionBefore
+        - profileRevisionAfter
+        - appliedCounts
+      properties:
+        receiptId:
+          $ref: "#/components/schemas/OpaqueId"
+        uploadId:
+          $ref: "#/components/schemas/OpaqueId"
+        draftId:
+          $ref: "#/components/schemas/OpaqueId"
+        confirmedAt:
+          $ref: "#/components/schemas/UtcTimestamp"
+        draftRevision:
+          type: integer
+          minimum: 0
+        sourceProfileRevision:
+          type: integer
+          minimum: 0
+        reviewedProfileRevision:
+          type: integer
+          minimum: 0
+        profileRevisionBefore:
+          type: integer
+          minimum: 0
+        profileRevisionAfter:
+          type: integer
+          minimum: 1
+        appliedCounts:
+          $ref: "#/components/schemas/AppliedCounts"
+
+    ApiError:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message, requestId, fieldErrors, latest]
+          properties:
+            code:
+              type: string
+              enum:
+                - VALIDATION_ERROR
+                - AUTHENTICATION_REQUIRED
+                - FORBIDDEN
+                - CSRF_REJECTED
+                - CV_IMPORT_NOT_FOUND
+                - CV_DRAFT_NOT_FOUND
+                - IDEMPOTENCY_KEY_REUSED
+                - DRAFT_REVISION_CONFLICT
+                - PROFILE_REVISION_CONFLICT
+                - IMPORT_STATE_CONFLICT
+                - PAYLOAD_TOO_LARGE
+                - UNSUPPORTED_MEDIA_TYPE
+                - DOCUMENT_REJECTED
+                - UPLOAD_RATE_LIMITED
+                - CV_QUOTA_EXCEEDED
+                - RETRY_LIMIT_REACHED
+                - CONSENT_REQUIRED
+                - CV_PROCESSING_UNAVAILABLE
+            message:
+              type: string
+              minLength: 1
+              maxLength: 500
+            requestId:
+              type: string
+              minLength: 1
+              maxLength: 100
+            fieldErrors:
+              type: array
+              maxItems: 100
+              items:
+                type: object
+                additionalProperties: false
+                required: [path, code, message]
+                properties:
+                  path:
+                    type: string
+                    minLength: 1
+                    maxLength: 200
+                  code:
+                    type: string
+                    minLength: 1
+                    maxLength: 100
+                  message:
+                    type: string
+                    minLength: 1
+                    maxLength: 300
+            latest:
+              oneOf:
+                - type: "null"
+                - $ref: "#/components/schemas/ConflictLatest"
+
+    ConflictLatest:
+      type: object
+      additionalProperties: false
+      required: [draftRevision, profileRevision]
+      properties:
+        draftRevision:
+          type: [integer, "null"]
+          minimum: 0
+        profileRevision:
+          type: [integer, "null"]
+          minimum: 0
