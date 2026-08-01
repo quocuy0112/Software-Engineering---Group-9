@@ -22,6 +22,7 @@ export const getWorkspaceContext = cache(async () => {
     select: {
       name: true,
       email: true,
+      image: true,
       createdAt: true,
       twoFactorEnabled: true,
       fullAccountRecoveryOperations: {
@@ -41,6 +42,7 @@ export const getWorkspaceContext = cache(async () => {
     account: {
       name: account.name,
       email: account.email,
+      image: account.image,
       createdAt: account.createdAt,
       twoFactorEnabled: account.twoFactorEnabled,
     },

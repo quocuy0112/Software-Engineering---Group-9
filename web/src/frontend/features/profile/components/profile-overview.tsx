@@ -11,11 +11,13 @@ import { ProfileExperienceForm } from "./profile-experience-form";
 import { ProfileEducationForm } from "./profile-education-form";
 import { ProfileSocialLinksForm } from "./profile-social-links-form";
 import { ProfileSaveFeedback } from "./profile-save-feedback";
+import { ProfileAvatarEditor } from "./profile-avatar-editor";
 
 type ProfileOverviewProps = {
   account: {
     name: string;
     email: string;
+    image?: string | null;
     memberSince: string;
     twoFactorEnabled: boolean;
   };
@@ -73,6 +75,12 @@ export function ProfileOverview({
       </header>
 
       <ProfileNavigation active="overview" />
+
+      <ProfileAvatarEditor
+        accountName={account.name}
+        initialAvatar={account.image}
+        csrfProof={csrfProof}
+      />
 
       <section className="profile-overview-grid" aria-label="Profile overview">
         <article className="profile-account-card profile-card">

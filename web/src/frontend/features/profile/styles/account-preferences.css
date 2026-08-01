@@ -13,6 +13,12 @@
   box-shadow: var(--sh-shadow-card);
 }
 
+.account-panel-heading {
+  margin-bottom: var(--sh-space-5);
+  padding-bottom: var(--sh-space-4);
+  border-bottom: 1px solid var(--sh-color-border-subtle);
+}
+
 .account-preferences-panel h2 {
   margin: var(--sh-space-1) 0 0;
   color: var(--sh-color-text-primary);
@@ -74,6 +80,7 @@
   color: var(--sh-color-text-primary);
   background: var(--sh-color-surface-card);
   font: inherit;
+  box-shadow: var(--sh-shadow-control);
 }
 
 .account-preferences-form select:hover:not(:disabled),
@@ -121,7 +128,7 @@
   padding: var(--sh-space-3);
   border: 1px solid transparent;
   border-radius: var(--sh-radius-sm);
-  background: var(--sh-color-surface-subtle);
+  background: var(--sh-color-surface-tinted);
 }
 
 .notification-preferences input {

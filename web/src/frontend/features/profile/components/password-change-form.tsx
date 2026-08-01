@@ -21,11 +21,10 @@ export function PasswordChangeForm({ csrfProof }: { csrfProof: string }) {
       aria-labelledby="password-change-title"
     >
       <div className="security-panel-heading">
-        <span
-          className="security-panel-icon security-panel-icon--mint"
-          aria-hidden="true"
-        >
-          ↻
+        <span className="security-panel-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6" />
+          </svg>
         </span>
         <div>
           <p className="panel-kicker">CREDENTIAL SECURITY</p>
@@ -116,14 +115,29 @@ export function PasswordChangeForm({ csrfProof }: { csrfProof: string }) {
           }
         />
 
-        <label className="password-visibility-control">
-          <input
-            type="checkbox"
-            checked={showPasswords}
-            onChange={(event) => setShowPasswords(event.target.checked)}
-          />
-          Show passwords
-        </label>
+        <button
+          className="password-visibility-control"
+          type="button"
+          aria-label={showPasswords ? "Hide passwords" : "Show passwords"}
+          aria-pressed={showPasswords}
+          onClick={() => setShowPasswords((visible) => !visible)}
+        >
+          <svg
+            className="password-visibility-icon"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path
+              d={
+                showPasswords
+                  ? "M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 4.2A10.7 10.7 0 0 1 12 4c5.1 0 8.5 4 9.5 8a12.5 12.5 0 0 1-2.1 4.1M6.2 6.2C3.9 7.8 2.7 10.2 2.5 12c.3 2.1 1.9 5.3 5.9 7.2"
+                  : "M2.5 12S6 4 12 4s9.5 8 9.5 8-3.5 8-9.5 8-9.5-8-9.5-8Zm9.5-3a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"
+              }
+            />
+          </svg>
+          <span>{showPasswords ? "Hide passwords" : "Show passwords"}</span>
+        </button>
 
         <button type="submit" disabled={state.submitting || state.locked}>
           {state.submitting

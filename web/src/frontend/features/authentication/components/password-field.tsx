@@ -29,19 +29,19 @@ export function PasswordField({
           aria-describedby={error ? errorId : props["aria-describedby"]}
         />
         <Button
-          className="secondary-action"
+          className="secondary-action password-visibility-button"
           variant="secondary"
           size="icon"
           aria-label={`${visible ? "Hide" : "Show"} password`}
           title={`${visible ? "Hide" : "Show"} ${label.toLowerCase()}`}
           aria-controls={id}
           aria-pressed={visible}
+          data-visible={visible}
           onClick={() => setVisible((value) => !value)}
         >
           <svg
+            className="password-visibility-icon"
             viewBox="0 0 24 24"
-            width="18"
-            height="18"
             aria-hidden="true"
             focusable="false"
           >

@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { postWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
+import { SmartHireBrand } from "@/frontend/components/ui/smarthire-brand";
 import { WorkspaceNavigation } from "./workspace-navigation";
 
 export function WorkspaceShell({
@@ -14,13 +16,16 @@ export function WorkspaceShell({
 }: {
   children: React.ReactNode;
   csrfProof: string;
-  profile?: { name: string; email: string };
+  profile?: { name: string; email: string; image?: string | null };
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [navigating, startNavigation] = useTransition();
   const [status, setStatus] = useState("");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const avatar = /^data:image\/(?:png|jpeg);base64,/u.test(profile.image ?? "")
+    ? profile.image
+    : null;
 
   async function signOut() {
     if (busy || navigating) return;
@@ -56,16 +61,7 @@ export function WorkspaceShell({
         >
           <div className="workspace-sidebar-header">
             <div className="workspace-sidebar-brand">
-              <Link
-                className="smart-hire-brand"
-                href="/"
-                aria-label="SmartHire home"
-              >
-                <span className="brand-mark" aria-hidden="true">
-                  S
-                </span>
-                <span className="workspace-brand-name">SmartHire</span>
-              </Link>
+              <SmartHireBrand />
               <span className="workspace-product-label">Talent workspace</span>
             </div>
             <button
@@ -108,10 +104,20 @@ export function WorkspaceShell({
               aria-label={"Open profile for " + profile.name}
             >
               <span className="workspace-account-avatar" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <circle cx="12" cy="8" r="3.2" />
-                  <path d="M5.5 19c.7-3.1 3-4.8 6.5-4.8s5.8 1.7 6.5 4.8" />
-                </svg>
+                {avatar ? (
+                  <Image
+                    src={avatar}
+                    alt=""
+                    width={40}
+                    height={40}
+                    unoptimized
+                  />
+                ) : (
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="8" r="3.2" />
+                    <path d="M5.5 19c.7-3.1 3-4.8 6.5-4.8s5.8 1.7 6.5 4.8" />
+                  </svg>
+                )}
               </span>
               <span>
                 <strong>{profile.name}</strong>

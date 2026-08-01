@@ -20,6 +20,7 @@ body {
   font-size: var(--sh-font-size-body);
   line-height: var(--sh-line-height-body);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
@@ -52,7 +53,8 @@ textarea {
     color var(--sh-motion-fast) ease,
     background-color var(--sh-motion-fast) ease,
     border-color var(--sh-motion-fast) ease,
-    box-shadow var(--sh-motion-fast) ease;
+    box-shadow var(--sh-motion-fast) ease,
+    transform var(--sh-motion-fast) ease;
 }
 
 :focus-visible {
@@ -126,6 +128,8 @@ textarea {
   font-weight: var(--sh-font-weight-semibold);
   line-height: 20px;
   text-align: center;
+  text-wrap: balance;
+  box-shadow: var(--sh-shadow-control);
 }
 
 .sh-button:hover:not(:disabled),
@@ -133,12 +137,14 @@ textarea {
 .security-panel button:hover:not(:disabled),
 .home-account > button:hover:not(:disabled) {
   background: var(--sh-color-brand-primary-hover);
+  transform: translateY(-1px);
 }
 
 .sh-button:active:not(:disabled),
 .auth-form button:active:not(:disabled),
 .security-panel button:active:not(:disabled) {
   background: var(--sh-color-brand-primary-pressed);
+  transform: translateY(0);
 }
 
 .sh-button:disabled,
@@ -156,6 +162,7 @@ textarea {
   color: var(--sh-color-text-primary);
   background: var(--sh-color-surface-card);
   border-color: var(--sh-color-border-default);
+  box-shadow: var(--sh-shadow-control);
 }
 
 .sh-button--secondary:hover:not(:disabled),
@@ -182,6 +189,7 @@ textarea {
 .sh-button--ghost {
   color: var(--sh-color-text-secondary);
   background: transparent;
+  box-shadow: none;
 }
 
 .sh-button--small {
@@ -208,6 +216,8 @@ textarea {
   background: var(--sh-color-surface-card);
   font-size: var(--sh-font-size-body-sm);
   line-height: var(--sh-line-height-body-sm);
+  box-shadow: var(--sh-shadow-control);
+  caret-color: var(--sh-color-brand-primary);
 }
 
 .sh-input::placeholder,
@@ -486,10 +496,15 @@ textarea {
   align-items: center;
   gap: var(--sh-space-3);
   color: var(--sh-color-text-primary);
-  font-size: 18px;
+  font-size: 19px;
   font-weight: var(--sh-font-weight-bold);
   line-height: 24px;
+  letter-spacing: -0.025em;
   text-decoration: none;
+}
+
+.smart-hire-brand-name {
+  transform: translateY(-0.5px);
 }
 
 .brand-mark {
@@ -498,9 +513,38 @@ textarea {
   height: 36px;
   flex: 0 0 auto;
   place-items: center;
-  border-radius: 10px;
+  border: 1px solid
+    color-mix(in srgb, var(--sh-color-text-inverse) 22%, transparent);
+  border-radius: var(--sh-radius-sm);
   color: var(--sh-color-text-inverse);
   background: var(--sh-color-brand-primary);
-  font-size: var(--sh-font-size-body-sm);
-  font-weight: var(--sh-font-weight-bold);
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 14%),
+    inset 0 1px 0 rgb(255 255 255 / 18%);
+}
+
+.brand-mark svg {
+  width: 25px;
+  height: 25px;
+  overflow: visible;
+}
+
+.brand-mark-frame {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25;
+  opacity: 0.28;
+}
+
+.brand-mark-letter {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.4;
+}
+
+.brand-mark-node {
+  fill: currentColor;
+  stroke: none;
 }

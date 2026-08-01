@@ -11,7 +11,7 @@ export async function getHomePageContext() {
 
   const profile = await prisma.userAccount.findUnique({
     where: { id: current.userId },
-    select: { name: true, email: true },
+    select: { name: true, email: true, image: true },
   });
   if (!profile) return null;
 

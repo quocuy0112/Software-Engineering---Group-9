@@ -159,14 +159,16 @@ export function ProfileSkillsForm({
           ))}
         </ul>
       ) : null}
-      <button
-        type="button"
-        disabled={fields.length >= 50}
-        onClick={() => append({ label: "" })}
-      >
-        Add skill
-      </button>
-      <p className="profile-field-hint">{fields.length} of 50 skills</p>
+      <div className="professional-profile-add-row">
+        <button
+          type="button"
+          disabled={fields.length >= 50}
+          onClick={() => append({ label: "" })}
+        >
+          Add skill
+        </button>
+        <p className="profile-field-hint">{fields.length} of 50 skills</p>
+      </div>
     </form>
   );
 }
