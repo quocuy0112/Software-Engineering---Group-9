@@ -4,6 +4,8 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { profileAvatarResponseSchema } from "@/shared/contracts/account/profile-avatar";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { localizeAccountMessage } from "../client/localized-account-feedback";
 
 const ACCEPTED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
@@ -69,6 +71,43 @@ export function ProfileAvatarEditor({
   initialAvatar?: string | null;
   csrfProof: string;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy =
+    locale === "vi"
+      ? {
+          kicker: "ẢNH ĐẠI DIỆN",
+          title: "Giúp hồ sơ của bạn dễ nhận diện",
+          description:
+            "Chọn một ảnh rõ nét, SmartHire sẽ tự căn giữa trong khung tròn. Ảnh được lưu cùng tài khoản sau khi tải lại trang.",
+          choose: "Chọn ảnh",
+          another: "Chọn ảnh khác",
+          save: "Lưu ảnh",
+          saving: "Đang lưu…",
+          remove: "Xóa ảnh",
+          help: "Tự động cắt chính giữa · PNG, JPEG hoặc WebP · tối đa 5 MB",
+          invalid: "Chọn ảnh PNG, JPEG hoặc WebP có dung lượng tối đa 5 MB.",
+          readError: "Không thể đọc ảnh đã chọn.",
+          saveError: "Không thể lưu ảnh đại diện.",
+          removeError: "Không thể xóa ảnh đại diện.",
+          preview: `Xem trước ảnh đại diện của ${accountName}`,
+        }
+      : {
+          kicker: "PROFILE PHOTO",
+          title: "Make your profile recognizable",
+          description:
+            "Choose a clear photo and SmartHire will center it in a polished round frame. Save once and it stays with your account after refresh.",
+          choose: "Choose photo",
+          another: "Choose another photo",
+          save: "Save photo",
+          saving: "Saving…",
+          remove: "Remove",
+          help: "Automatic centered crop · PNG, JPEG, or WebP · up to 5 MB",
+          invalid: "Choose a PNG, JPEG, or WebP image up to 5 MB.",
+          readError: "The selected image could not be read.",
+          saveError: "The profile photo could not be saved.",
+          removeError: "The profile photo could not be removed.",
+          preview: `Preview of ${accountName}'s profile photo`,
+        };
   const inputRef = useRef<HTMLInputElement>(null);
   const [avatar, setAvatar] = useState(initialAvatar ?? null);
   const [source, setSource] = useState<string | null>(null);
@@ -85,7 +124,7 @@ export function ProfileAvatarEditor({
     if (!file) return;
     if (!ACCEPTED_TYPES.has(file.type) || file.size > MAX_UPLOAD_BYTES) {
       setFeedbackTone("error");
-      setFeedback("Choose a PNG, JPEG, or WebP image up to 5 MB.");
+      setFeedback(copy.invalid);
       return;
     }
     const reader = new FileReader();
@@ -95,7 +134,7 @@ export function ProfileAvatarEditor({
     };
     reader.onerror = () => {
       setFeedbackTone("error");
-      setFeedback("The selected image could not be read.");
+      setFeedback(copy.readError);
     };
     reader.readAsDataURL(file);
   }
@@ -122,21 +161,22 @@ export function ProfileAvatarEditor({
           body !== null &&
           "message" in body &&
           typeof body.message === "string"
-            ? body.message
-            : "The profile photo could not be saved.";
+            ? localizeAccountMessage(locale, body.message)
+            : copy.saveError;
         throw new Error(message);
       }
       setAvatar(parsed.data.image);
       setSource(null);
       if (inputRef.current) inputRef.current.value = "";
       setFeedbackTone("success");
-      setFeedback(parsed.data.message);
-      toast.success(parsed.data.message, { id: "profile-avatar" });
+      const message = localizeAccountMessage(locale, parsed.data.message);
+      setFeedback(message);
+      toast.success(message, { id: "profile-avatar" });
     } catch (error) {
       const message =
         error instanceof Error && error.message
           ? error.message
-          : "The profile photo could not be saved.";
+          : copy.saveError;
       setFeedbackTone("error");
       setFeedback(message);
       toast.error(message, { id: "profile-avatar" });
@@ -157,19 +197,17 @@ export function ProfileAvatarEditor({
       const body: unknown = await response.json();
       const parsed = profileAvatarResponseSchema.safeParse(body);
       if (!response.ok || !parsed.success) {
-        throw new Error("The profile photo could not be removed.");
+        throw new Error(copy.removeError);
       }
       setAvatar(null);
       setSource(null);
       if (inputRef.current) inputRef.current.value = "";
       setFeedbackTone("success");
-      setFeedback(parsed.data.message);
-      toast.success(parsed.data.message, { id: "profile-avatar" });
+      const message = localizeAccountMessage(locale, parsed.data.message);
+      setFeedback(message);
+      toast.success(message, { id: "profile-avatar" });
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "The profile photo could not be removed.";
+      const message = error instanceof Error ? error.message : copy.removeError;
       setFeedbackTone("error");
       setFeedback(message);
       toast.error(message, { id: "profile-avatar" });
@@ -179,14 +217,15 @@ export function ProfileAvatarEditor({
   }
 
   return (
-    <section className="profile-avatar-panel" aria-labelledby="avatar-title">
+    <section
+      id="profile-avatar-section"
+      className="profile-avatar-panel"
+      aria-labelledby="avatar-title"
+    >
       <div className="profile-avatar-copy">
-        <p className="panel-kicker">PROFILE PHOTO</p>
-        <h2 id="avatar-title">Make your profile recognizable</h2>
-        <p>
-          Choose a clear photo and SmartHire will center it in a polished round
-          frame. Save once and it stays with your account after refresh.
-        </p>
+        <p className="panel-kicker">{copy.kicker}</p>
+        <h2 id="avatar-title">{copy.title}</h2>
+        <p>{copy.description}</p>
       </div>
 
       <div className="profile-avatar-editor">
@@ -194,7 +233,7 @@ export function ProfileAvatarEditor({
           {preview ? (
             <Image
               src={preview}
-              alt={`Preview of ${accountName}'s profile photo`}
+              alt={copy.preview}
               width={384}
               height={384}
               unoptimized
@@ -217,7 +256,7 @@ export function ProfileAvatarEditor({
             className="profile-avatar-file-label"
             htmlFor="profile-avatar-file"
           >
-            {preview ? "Choose another photo" : "Choose photo"}
+            {preview ? copy.another : copy.choose}
           </label>
 
           <div className="profile-avatar-actions">
@@ -226,7 +265,7 @@ export function ProfileAvatarEditor({
               disabled={!source || busy}
               onClick={() => void save()}
             >
-              {busy ? "Saving…" : "Save photo"}
+              {busy ? copy.saving : copy.save}
             </button>
             {avatar ? (
               <button
@@ -235,13 +274,11 @@ export function ProfileAvatarEditor({
                 disabled={busy}
                 onClick={() => void remove()}
               >
-                Remove
+                {copy.remove}
               </button>
             ) : null}
           </div>
-          <p className="profile-avatar-help">
-            Automatic centered crop · PNG, JPEG, or WebP · up to 5 MB
-          </p>
+          <p className="profile-avatar-help">{copy.help}</p>
           <div
             className="profile-avatar-feedback"
             data-tone={feedbackTone}

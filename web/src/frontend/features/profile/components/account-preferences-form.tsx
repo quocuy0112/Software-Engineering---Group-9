@@ -34,6 +34,26 @@ export function AccountPreferencesForm({
   onChange: (preferences: AccountPreferences) => void;
   onSave: () => Promise<boolean>;
 }) {
+  const copy =
+    preferences.language === "vi"
+      ? {
+          language: "Ngôn ngữ giao diện",
+          timezone: "Múi giờ",
+          timezoneHint: "Sử dụng mã múi giờ IANA được hỗ trợ.",
+          timezoneWarning:
+            "Múi giờ đã lưu không còn được hỗ trợ. Hãy giữ nguyên hoặc chọn múi giờ khác.",
+          saving: "Đang lưu tùy chọn…",
+          save: "Lưu tùy chọn",
+        }
+      : {
+          language: "Interface language",
+          timezone: "Timezone",
+          timezoneHint: "Use a supported IANA timezone identifier.",
+          timezoneWarning:
+            "This stored timezone is no longer supported. Keep it unchanged or choose a supported replacement.",
+          saving: "Saving preferences…",
+          save: "Save preferences",
+        };
   return (
     <form
       className="account-preferences-form"
@@ -43,7 +63,7 @@ export function AccountPreferencesForm({
       }}
     >
       <div className="account-preferences-fields">
-        <label htmlFor="preference-language">Language</label>
+        <label htmlFor="preference-language">{copy.language}</label>
         <select
           id="preference-language"
           value={preferences.language}
@@ -58,7 +78,7 @@ export function AccountPreferencesForm({
           <option value="en">English</option>
         </select>
 
-        <label htmlFor="preference-timezone">Timezone</label>
+        <label htmlFor="preference-timezone">{copy.timezone}</label>
         <input
           id="preference-timezone"
           list="preference-timezones"
@@ -84,26 +104,26 @@ export function AccountPreferencesForm({
         </datalist>
         {preferences.timezoneSupported ? (
           <p id="timezone-guidance" className="preference-guidance">
-            Use a supported IANA timezone identifier.
+            {copy.timezoneHint}
           </p>
         ) : (
           <p
             id="timezone-unsupported-guidance"
             className="preference-guidance preference-guidance--warning"
           >
-            This stored timezone is no longer supported. You may keep it
-            unchanged or choose a supported replacement.
+            {copy.timezoneWarning}
           </p>
         )}
       </div>
       <NotificationPreferences
         value={preferences.emailNotifications}
+        locale={preferences.language}
         onChange={(emailNotifications) =>
           onChange({ ...preferences, emailNotifications })
         }
       />
       <button type="submit" disabled={saving}>
-        {saving ? "Saving preferences..." : "Save preferences"}
+        {saving ? copy.saving : copy.save}
       </button>
     </form>
   );

@@ -11,6 +11,11 @@ import {
   passwordChangeOutcomeSchema,
   passwordChangeRequestSchema,
 } from "@/shared/contracts/account/password-change";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import {
+  localizeAccountMessage,
+  localizeFieldErrors,
+} from "./localized-account-feedback";
 
 export type PasswordChangeValues = {
   currentPassword: string;
@@ -41,6 +46,7 @@ async function responseJson(response: Response): Promise<unknown> {
 }
 
 export function usePasswordChange(csrfProof: string) {
+  const locale = useWorkspaceLocale();
   const [values, setValues] = useState<PasswordChangeValues>(emptyValues);
   const [feedback, setFeedback] = useState<PasswordChangeFeedback | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -90,8 +96,12 @@ export function usePasswordChange(csrfProof: string) {
       );
       fail(
         mismatch
-          ? "The new-password confirmation must match."
-          : "Use 12 to 128 valid Unicode characters for the new password.",
+          ? locale === "vi"
+            ? "Mật khẩu xác nhận phải trùng khớp."
+            : "The new-password confirmation must match."
+          : locale === "vi"
+            ? "Mật khẩu mới phải có từ 12 đến 128 ký tự Unicode hợp lệ."
+            : "Use 12 to 128 valid Unicode characters for the new password.",
       );
       return false;
     }
@@ -116,12 +126,16 @@ export function usePasswordChange(csrfProof: string) {
       if (!response.ok) {
         const error = accountErrorSchema.safeParse(body);
         if (!error.success) {
-          fail("The password change could not be completed. Try again.");
+          fail(
+            locale === "vi"
+              ? "Không thể hoàn tất việc đổi mật khẩu. Hãy thử lại."
+              : "The password change could not be completed. Try again.",
+          );
           return false;
         }
         fail(
-          error.data.message,
-          error.data.fieldErrors,
+          localizeAccountMessage(locale, error.data.message, error.data.code),
+          localizeFieldErrors(locale, error.data.fieldErrors),
           error.data.retryAfterSeconds,
         );
         if (response.status !== 503) idempotency.current = null;
@@ -130,14 +144,19 @@ export function usePasswordChange(csrfProof: string) {
       const outcome = passwordChangeOutcomeSchema.safeParse(body);
       if (!outcome.success) throw new Error("PASSWORD_CHANGE_RESPONSE_INVALID");
       setValues(emptyValues);
-      setFeedback({ kind: "success", message: outcome.data.message });
+      const message = localizeAccountMessage(locale, outcome.data.message);
+      setFeedback({ kind: "success", message });
       idempotency.current = null;
-      toast.success(outcome.data.message, {
+      toast.success(message, {
         id: "password-change-feedback",
       });
       return true;
     } catch {
-      fail("The password change could not be completed. Try again.");
+      fail(
+        locale === "vi"
+          ? "Không thể hoàn tất việc đổi mật khẩu. Hãy thử lại."
+          : "The password change could not be completed. Try again.",
+      );
       return false;
     } finally {
       active.current = false;

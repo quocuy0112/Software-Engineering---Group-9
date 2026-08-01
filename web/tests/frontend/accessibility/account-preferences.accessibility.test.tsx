@@ -4,6 +4,11 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ProfilePreferencesView } from "@/frontend/features/profile/components/profile-preferences-view";
 
+const navigation = vi.hoisted(() => ({ refresh: vi.fn() }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => navigation,
+}));
+
 const defaults = {
   language: "vi" as const,
   timezone: "Asia/Ho_Chi_Minh",
@@ -27,14 +32,14 @@ describe("account-preferences accessibility", () => {
         csrfProof="csrf-proof"
       />,
     );
-    expect(screen.getByLabelText("Language")).toHaveValue("vi");
-    expect(screen.getByLabelText("Timezone")).toHaveValue("Asia/Ho_Chi_Minh");
-    expect(screen.getByLabelText("Application updates")).toBeChecked();
-    expect(screen.getByLabelText("Job recommendations")).toBeChecked();
-    const security = screen.getByLabelText("Account security");
+    expect(screen.getByLabelText("Ngôn ngữ giao diện")).toHaveValue("vi");
+    expect(screen.getByLabelText("Múi giờ")).toHaveValue("Asia/Ho_Chi_Minh");
+    expect(screen.getByLabelText("Cập nhật hồ sơ ứng tuyển")).toBeChecked();
+    expect(screen.getByLabelText("Gợi ý cơ hội nghề nghiệp")).toBeChecked();
+    const security = screen.getByLabelText("Bảo mật tài khoản");
     expect(security).toBeChecked();
     expect(security).toBeDisabled();
-    expect(screen.getByText(/cannot be disabled/i)).toBeVisible();
+    expect(screen.getByText(/luôn được bật/i)).toBeVisible();
   });
 
   it("submits a complete set once, reconciles authoritative state, and announces success", async () => {
@@ -58,7 +63,7 @@ describe("account-preferences accessibility", () => {
         csrfProof="csrf-proof"
       />,
     );
-    fireEvent.change(screen.getByLabelText("Language"), {
+    fireEvent.change(screen.getByLabelText("Ngôn ngữ giao diện"), {
       target: { value: "en" },
     });
     fireEvent.change(screen.getByLabelText("Timezone"), {
@@ -81,7 +86,7 @@ describe("account-preferences accessibility", () => {
         }),
       }),
     );
-    expect(screen.getByLabelText("Language")).toHaveValue("en");
+    expect(screen.getByLabelText("Interface language")).toHaveValue("en");
     expect(screen.getByLabelText("Timezone")).toHaveValue("UTC");
   });
 
@@ -102,14 +107,14 @@ describe("account-preferences accessibility", () => {
         csrfProof="csrf-proof"
       />,
     );
-    fireEvent.change(screen.getByLabelText("Timezone"), {
+    fireEvent.change(screen.getByLabelText("Múi giờ"), {
       target: { value: "Mars/Olympus" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Save preferences" }));
+    fireEvent.click(screen.getByRole("button", { name: "Lưu tùy chọn" }));
     const alert = await screen.findByRole("alert");
-    expect(alert).toHaveTextContent("Choose a supported timezone.");
+    expect(alert).toHaveTextContent("Hãy chọn múi giờ được hỗ trợ.");
     await waitFor(() => expect(alert).toHaveFocus());
-    expect(screen.getByLabelText("Timezone")).toHaveValue("Mars/Olympus");
+    expect(screen.getByLabelText("Múi giờ")).toHaveValue("Mars/Olympus");
   });
 
   it("preserves and explains an unsupported stored timezone", () => {
@@ -123,10 +128,8 @@ describe("account-preferences accessibility", () => {
         csrfProof="csrf-proof"
       />,
     );
-    expect(screen.getByLabelText("Timezone")).toHaveValue(
-      "Legacy/Removed_Zone",
-    );
-    expect(screen.getByText(/no longer supported/i)).toBeVisible();
+    expect(screen.getByLabelText("Múi giờ")).toHaveValue("Legacy/Removed_Zone");
+    expect(screen.getByText(/không còn được hỗ trợ/i)).toBeVisible();
   });
 
   it("ships keyboard focus, non-color cues, reduced motion, and 320px safety", () => {
