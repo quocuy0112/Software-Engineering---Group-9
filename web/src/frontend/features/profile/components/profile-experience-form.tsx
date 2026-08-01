@@ -159,23 +159,25 @@ export function ProfileExperienceForm({
           </li>
         ))}
       </ol>
-      <button
-        type="button"
-        disabled={fields.length >= 50}
-        onClick={() =>
-          append({
-            title: "",
-            company: "",
-            description: "",
-            startDate: "",
-            endDate: "",
-            current: false,
-          })
-        }
-      >
-        Add experience
-      </button>
-      <p className="profile-field-hint">{fields.length} of 50 entries</p>
+      <div className="professional-profile-add-row">
+        <button
+          type="button"
+          disabled={fields.length >= 50}
+          onClick={() =>
+            append({
+              title: "",
+              company: "",
+              description: "",
+              startDate: "",
+              endDate: "",
+              current: false,
+            })
+          }
+        >
+          Add experience
+        </button>
+        <p className="profile-field-hint">{fields.length} of 50 entries</p>
+      </div>
     </form>
   );
 }

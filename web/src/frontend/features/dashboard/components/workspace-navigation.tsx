@@ -43,9 +43,15 @@ export function WorkspaceNavigation({
         aria-controls="workspace-navigation"
         onClick={() => setMenuOpen((open) => !open)}
       >
-        <span className="menu-toggle-icon" aria-hidden="true">
-          {menuOpen ? "×" : "☰"}
-        </span>
+        <svg
+          className="menu-toggle-icon"
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d={menuOpen ? "M6 6l12 12M18 6 6 18" : "M4 7h16M4 12h16M4 17h16"}
+          />
+        </svg>
         {menuOpen ? "Close workspace menu" : "Open workspace menu"}
       </button>
       <nav
@@ -54,6 +60,7 @@ export function WorkspaceNavigation({
         aria-label="Workspace"
         data-open={menuOpen}
       >
+        <p className="workspace-nav-label">Workspace</p>
         <div className="workspace-navigation-scroll">
           {destinations.map((destination) => {
             const active =

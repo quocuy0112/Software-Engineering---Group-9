@@ -11,14 +11,11 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
           <SmartHireBrand />
 
           <div className="auth-visual-copy">
-            <p className="auth-eyebrow">SECURE TALENT WORKSPACE</p>
-            <h2>
-              Your next opportunity,
-              <br /> thoughtfully connected.
-            </h2>
+            <p className="auth-eyebrow">YOUR STORY. YOUR NEXT MOVE.</p>
+            <h2>Opportunity starts with a story worth seeing.</h2>
             <p>
-              Build a trusted professional identity and keep every important
-              account action protected.
+              Shape a professional identity that feels true to you, while
+              SmartHire keeps every important account action protected.
             </p>
           </div>
 

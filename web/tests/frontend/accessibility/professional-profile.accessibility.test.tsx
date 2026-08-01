@@ -78,6 +78,14 @@ describe("professional profile accessibility", () => {
     expect(
       screen.getByRole("button", { name: "Remove social link 1" }),
     ).toHaveAttribute("type", "button");
+
+    fireEvent.click(screen.getByRole("button", { name: "Add GitHub profile" }));
+    expect(screen.getByLabelText("GitHub URL")).toHaveValue(
+      "https://github.com/",
+    );
+    expect(
+      screen.getByRole("button", { name: "GitHub profile added" }),
+    ).toBeDisabled();
   });
 
   it("uses explicit text and ARIA semantics instead of color-only state", () => {

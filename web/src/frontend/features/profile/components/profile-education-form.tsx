@@ -151,23 +151,25 @@ export function ProfileEducationForm({
           </li>
         ))}
       </ol>
-      <button
-        type="button"
-        disabled={fields.length >= 50}
-        onClick={() =>
-          append({
-            institution: "",
-            degree: "",
-            field: "",
-            startDate: "",
-            endDate: "",
-            current: false,
-          })
-        }
-      >
-        Add education
-      </button>
-      <p className="profile-field-hint">{fields.length} of 50 entries</p>
+      <div className="professional-profile-add-row">
+        <button
+          type="button"
+          disabled={fields.length >= 50}
+          onClick={() =>
+            append({
+              institution: "",
+              degree: "",
+              field: "",
+              startDate: "",
+              endDate: "",
+              current: false,
+            })
+          }
+        >
+          Add education
+        </button>
+        <p className="profile-field-hint">{fields.length} of 50 entries</p>
+      </div>
     </form>
   );
 }
