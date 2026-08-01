@@ -15,13 +15,16 @@
 - An uploaded CV is an import source for this feature, not a permanent candidate
   document. A separate retained document library for job applications is outside
   Feature 004.
-- The MVP uses a privately operated ClamAV service through `clamd`, with malware
-  signatures maintained by `freshclam`. Local development uses Docker Compose;
-  production keeps the service on a private network. A public sample-sharing
+- Feature 004 uses a privately operated ClamAV service through `clamd`, with
+  malware signatures maintained by `freshclam`. The CV scan worker and
+  `clamd` are co-located on the same host or pod and communicate only through a
+  Unix-domain socket; `clamd` exposes no TCP listener. Local development uses
+  co-located Docker Compose services sharing the socket. A public sample-sharing
   scanning service MUST NOT receive candidate CV files.
-- Q: Which malware scanner does the MVP use? → A: Use private ClamAV through
-  `clamd`, update signatures with `freshclam`, run it through Docker Compose
-  locally and a private-network service in production, and keep it behind a
+- Q: Which malware scanner does the initial P0 release use? → A: Use private
+  ClamAV through `clamd`, update signatures with `freshclam`, co-locate it with
+  the scan worker, communicate through a shared Unix-domain socket in local and
+  production environments, disable TCP listening, and keep it behind a
   replaceable scanner interface.
 - The upload content digest is used for integrity verification and request
   idempotency only. It MUST NOT cause automatic cross-account deduplication or
@@ -52,12 +55,21 @@
   provider, purpose, privacy-notice version, and consent-text version until
   revocation or upload expiry. Any change to those bindings requires a new
   explicit grant.
-- A separate administrator dead-letter interface is outside MVP scope. Failed
+- A separate administrator dead-letter interface is outside P0 scope. Failed
   parsing attempts remain durable and observable without requiring direct
   database mutation as a supported workflow.
 - External semantic processing requires durable, versioned consent evidence
   linked to the exact upload, purpose, and provider before any CV content is
   dispatched.
+- The constitutional upload limit is decimal 5 MB, exactly 5,000,000 bytes; MiB
+  is not used for the source-file limit.
+- User-facing latency success criteria use P95 over a documented representative
+  workload and report sample size, test duration, P50/P95/P99, maximum latency,
+  and error rate. Correctness, security, privacy, retention, and explicit hard
+  workflow deadlines remain all-case requirements.
+- User Story priorities define implementation and independent-test order only.
+  A releasable P0 Feature 004 includes all five stories plus every applicable
+  quality gate; US1 and US2 alone are a non-release technical checkpoint.
 
 ## User Scenarios & Testing _(mandatory)_
 
@@ -72,17 +84,18 @@ for processing.
 to a reviewable draft is the foundation of the feature. No later review or
 profile update is trustworthy without it.
 
-**Independent Test**: Upload one valid text-based PDF or DOCX of at most 5 MiB
-for an active candidate, observe each processing state, and verify that a draft
-is produced without changing Candidate Profile.
+**Independent Test**: Upload one valid text-based PDF or DOCX of at most 5 MB
+(5,000,000 bytes) for an active candidate, observe each processing state, and
+verify that a draft is produced without changing Candidate Profile.
 
 **Acceptance Scenarios**:
 
 1. **Given** an active authenticated candidate with available upload quota,
-   **When** they upload a valid, clean, text-based PDF or DOCX of at most 5 MiB,
-   **Then** the file is quarantined, validated, scanned, queued, parsed
-   asynchronously, and presented as a separate reviewable draft without any
-   Candidate Profile change.
+   **When** they upload a valid, clean, text-based PDF or DOCX of at most 5 MB
+   (5,000,000 bytes), **Then** the file is quarantined, envelope-validated,
+   scanned, structurally validated and extracted only after a clean scan,
+   queued, parsed asynchronously, and presented as a separate reviewable draft
+   without any Candidate Profile change.
 2. **Given** an uploaded file whose extension, declared type, content signature,
    or internal structure does not consistently identify an allowed document,
    **When** validation completes, **Then** the upload is rejected before parsing
@@ -97,6 +110,10 @@ is produced without changing Candidate Profile.
 5. **Given** the same upload request is retried with the same idempotency key and
    identical content, **When** the server accepts the retry, **Then** it returns
    the original upload outcome and does not create another file or job.
+6. **Given** the candidate opens the CV import page, **When** either the internal
+   or external parser class is available, **Then** the same versioned
+   CV-processing privacy notice is visible; choosing external processing also
+   presents a separate unselected consent control.
 
 ---
 
@@ -170,7 +187,7 @@ states, bounded retry behavior, and an immediate manual path in each case.
    or an oversized draft, **When** the result is validated, **Then** it is treated
    as untrusted invalid output, no draft is partially accepted, and a safe error
    is shown.
-3. **Given** a PDF contains no usable text and OCR is not available in MVP,
+3. **Given** a PDF contains no usable text and OCR is not available in P0,
    **When** extraction completes, **Then** the candidate is told that the scanned
    document cannot be parsed and can upload a text-based document or edit their
    profile manually.
@@ -248,15 +265,17 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
    the candidate is told that revocation cannot undo processing already
    completed by a provider.
 4. **Given** an active upload or draft owned by the candidate, **When** they
-   delete it, **Then** pending work is cancelled, access is immediately denied,
-   and physical deletion is completed within the defined deletion window.
+   cancel and delete it, **Then** the import becomes `CANCELLED`, pending work
+   is cancelled, access is immediately denied, and physical/database content
+   deletion completes within 24 hours before the import becomes `DELETED`.
 5. **Given** an upload or draft reaches its expiry time, **When** any user or job
    attempts to access it, **Then** access is denied immediately even if physical
    storage cleanup is still pending.
 
 ### Edge Cases
 
-- A zero-byte file, file over 5 MiB, file with multiple misleading extensions,
+- A zero-byte file, file over 5 MB (5,000,000 bytes), file with multiple
+  misleading extensions,
   renamed executable, polyglot document, truncated document, or unsupported old
   binary word-processing document is uploaded.
 - A PDF is password-protected, encrypted, contains embedded files or active
@@ -309,11 +328,16 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
 #### Upload Validation and Quotas
 
 - **FR-005**: The system MUST accept only PDF and DOCX files of greater than zero
-  bytes and no more than 5 MiB. Client-side checks MAY provide early feedback
-  but MUST NOT replace authoritative server-side enforcement.
+  bytes and no more than 5 MB, defined as exactly 5,000,000 bytes. Client-side
+  checks MAY provide early feedback but MUST NOT replace authoritative
+  server-side enforcement.
 - **FR-006**: Acceptance MUST require agreement among the normalized filename
   extension, declared media type, content signature, and successfully validated
   internal document structure; no single indicator is sufficient by itself.
+  Before a clean malware result, validation MUST be limited to bounded transport,
+  length, extension, declared-type, and signature checks. Format-aware internal
+  structure validation MUST run only after a clean scan and before semantic
+  parsing.
 - **FR-007**: Corrupt, truncated, encrypted, password-protected, macro-enabled,
   active-content, embedded-file, or structurally unsafe documents MUST be
   rejected before semantic parsing.
@@ -346,14 +370,17 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
 #### Quarantine, Malware Scanning, and Private Storage
 
 - **FR-016**: Every received file MUST remain quarantined and inaccessible to
-  document extraction, semantic parsing, inline display, or ordinary download
-  until validation and a trustworthy malware scan both succeed.
-- **FR-017**: Malware scanning for the MVP MUST use a privately operated ClamAV
-  service through `clamd`, with signatures updated by `freshclam`. Local
-  development MUST provide it through Docker Compose, production MUST expose it
-  only on a private network, and neither environment MAY contribute candidate
-  files to a public or partner-shared sample corpus. Application code MUST access
-  it through a replaceable malware-scanner interface.
+  format-aware structure validation, document extraction, semantic parsing,
+  inline display, or ordinary download until the bounded pre-scan checks and a
+  trustworthy malware scan both succeed.
+- **FR-017**: Malware scanning for the P0 release MUST use a privately operated
+  ClamAV service through `clamd`, with signatures updated by `freshclam`. The scan
+  worker and `clamd` MUST be co-located on the same host/pod and communicate
+  only through a shared Unix-domain socket in local Docker Compose and
+  production; `clamd` MUST expose no TCP listener. Neither environment MAY
+  contribute candidate files to a public or partner-shared sample corpus.
+  Application code MUST access it through a replaceable malware-scanner
+  interface.
 - **FR-018**: Scan state MUST distinguish at least pending, scanning, clean,
   infected, and error outcomes. An error, timeout, unsupported result, stale
   signature state, or unavailable scanner MUST NOT be interpreted as clean.
@@ -365,15 +392,20 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
 - **FR-021**: An infected file MUST never be parsed or made retrievable, MUST show
   the candidate a safe non-diagnostic rejection, and MUST be physically removed
   within 24 hours while retaining only minimal audit evidence.
-- **FR-022**: An indeterminate scan MAY be retried at most three times within five
-  minutes. If no trustworthy clean result is obtained, the upload MUST enter a
-  visible scan-failed state and require an explicit candidate retry or replacement
-  upload.
+- **FR-022**: One automatic scan cycle MUST contain exactly one initial
+  assessment and at most two automatic retry assessments, for no more than three
+  automatic attempts completed within five minutes from the initial attempt's
+  start. If no trustworthy clean result is obtained, the upload MUST enter a
+  visible scan-failed state. The candidate MAY then request at most two
+  additional single-attempt scan retries; neither request starts another
+  automatic retry cycle. Replacement upload remains available.
 - **FR-023**: Stored CV content, extracted source text, and drafts MUST remain
   private to their owning account and approved processing workers. They MUST NOT
   receive stable public URLs or be served as executable content.
 - **FR-024**: Sensitive CV artifacts MUST be protected in transit and at rest,
-  and access to the original document MUST use a short-lived, owner-authorized
+  browser/provider network traffic MUST use HTTPS, and scanner transfer MUST
+  remain same-host/pod Unix-domain-socket IPC rather than network traffic.
+  Access to the original document MUST use a short-lived, owner-authorized
   retrieval path when retrieval is explicitly permitted.
 - **FR-025**: Feature 004 review MUST use safe structured values and source
   context rather than embedding an untrusted original document inline.
@@ -398,8 +430,10 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
   reconciliation process for missing or orphaned artifacts. `expiresAt` alone
   does not satisfy this requirement.
 - **FR-030**: Candidate deletion MUST cancel pending work, prevent new retries or
-  confirmation, delete source and extracted content idempotently, release quota,
-  and retain only the minimum non-content audit evidence required by policy.
+  confirmation, transition an active import to `CANCELLED`, deny content access
+  immediately, delete source/extracted/draft/provenance content idempotently
+  within 24 hours, release quota, transition to `DELETED` after purge, and
+  retain only the minimum non-content audit evidence required by policy.
 
 #### Asynchronous Extraction and Parsing
 
@@ -408,7 +442,9 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
   interface MUST NOT remain blocked while waiting for a parsing result.
 - **FR-032**: The candidate MUST be able to distinguish upload, validation,
   scanning, queued, parsing, review-ready, scan-failed, parse-failed, cancelled,
-  expired, and confirmed states through persistent status feedback.
+  physically deleted, expired, and confirmed states through persistent status
+  feedback. Cancelling active work and completing physical deletion MUST remain
+  distinct visible lifecycle outcomes.
 - **FR-033**: Processing work MUST be durable, idempotent, bounded by leases or
   equivalent recovery controls, and safe to resume after worker interruption
   without producing duplicate drafts.
@@ -435,10 +471,11 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
 - **FR-041**: Oversized parser output MUST NOT be truncated or partially stored.
   It MUST end the attempt with a safe `PARSER_OUTPUT_LIMIT_EXCEEDED` result and
   make manual entry or a permitted retry immediately available.
-- **FR-042**: Each semantic parsing attempt MUST time out after 60 seconds, use at
-  most three automatic attempts with bounded backoff, and reach a terminal
-  result within three minutes of the first attempt under documented normal
-  service conditions.
+- **FR-042**: Each semantic parsing attempt MUST time out after 60 seconds. The
+  initial automatic cycle MUST contain one initial attempt and at most two
+  automatic retries with bounded backoff (three automatic attempts total), and
+  MUST reach a terminal result within three minutes of the first attempt under
+  documented normal service conditions.
 - **FR-043**: When all automatic parsing attempts fail, the job MUST enter a
   terminal parse-failed state, preserve a safe failure history, and immediately
   offer the candidate the existing Candidate Profile editor from Feature 002,
@@ -446,17 +483,18 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
   empty CV draft, and opening it MUST NOT discard the failed import's
   status/history.
 - **FR-044**: A candidate MAY initiate at most two parsing retries for one clean,
-  unexpired upload. Each retry MUST create a new traceable attempt while leaving
-  prior terminal attempts immutable.
-- **FR-045**: MVP MUST NOT automatically send CV content to a different external
-  provider after failure. Any future cross-provider fallback requires prior
-  consent that explicitly covers the destination provider.
-- **FR-046**: MVP MUST NOT require an administrator dead-letter interface or
-  direct database edits for candidate recovery. Terminal failures MUST remain
-  observable for operations while candidate retry and manual entry remain the
-  supported recovery paths.
+  unexpired upload. Each retry MUST create exactly one new traceable attempt,
+  MUST NOT restart the automatic retry cycle, and MUST leave prior terminal
+  attempts immutable.
+- **FR-045**: The P0 release MUST NOT automatically send CV content to a
+  different external provider after failure. Any future cross-provider fallback
+  requires prior consent that explicitly covers the destination provider.
+- **FR-046**: The P0 release MUST NOT require an administrator dead-letter
+  interface or direct database edits for candidate recovery. Terminal failures
+  MUST remain observable for operations while candidate retry and manual entry
+  remain the supported recovery paths.
 - **FR-047**: A document with insufficient machine-readable text MUST produce a
-  clear unsupported-scan result in MVP. OCR is deferred, and the candidate MUST
+  clear unsupported-scan result in P0. OCR is deferred, and the candidate MUST
   be able to upload a text-based document or proceed manually.
 - **FR-048**: Instructions, links, hidden text, or other content inside a CV MUST
   be treated only as candidate document data and MUST NOT cause tool execution,
@@ -578,7 +616,9 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
   storage paths, parser instructions, or database details.
 - **FR-078**: The interface MUST provide persistent, keyboard-accessible upload,
   progress, review, conflict, success, failure, retry, manual-entry, cancellation,
-  and deletion controls at desktop and 320-pixel mobile widths.
+  and deletion controls at desktop and 320-pixel mobile widths. An active import
+  MUST expose an explicit cancel-and-delete action whose confirmation explains
+  the immediate logical denial and pending physical purge.
 - **FR-079**: Processing and save status changes MUST be announced to assistive
   technology without unexpectedly moving focus. Error summaries MUST identify
   affected fields in text, and color MUST NOT be the only status indicator.
@@ -672,22 +712,23 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
   application attachment.
 - Recruiter, company member, administrator, or public access to candidate CV
   files or drafts through normal product interfaces.
-- OCR for image-only documents in MVP.
+- OCR for image-only documents in P0.
 - Resume rewriting, grammar enhancement, content invention, candidate scoring,
   ranking, job recommendations, gap analysis, or automated recruitment actions.
 - Automatic fallback among external semantic-processing providers.
 - A user-facing administrator dead-letter queue or direct database edits as a
   supported recovery workflow.
-- Formats other than PDF and DOCX, files larger than 5 MiB, and profile fields
-  outside the existing Candidate Profile aggregate.
+- Formats other than PDF and DOCX, files larger than 5 MB (5,000,000 bytes), and
+  profile fields outside the existing Candidate Profile aggregate.
 
 ## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 
-- **SC-001**: Under documented local and production-like test conditions, 100%
-  of supported uploads at or below 5 MiB receive an accepted or actionable
-  rejected validation result within 5 seconds after the final byte is received.
+- **SC-001**: Under documented local and production-like test conditions, the
+  P95 time for supported uploads at or below 5 MB (5,000,000 bytes) to receive
+  an accepted or actionable rejected pre-scan validation result MUST be no more
+  than 5 seconds after the final byte is received.
 - **SC-002**: Across the malicious-file verification corpus, 100% of invalid,
   infected, indeterminate, or unscanned files are prevented from reaching
   extraction, semantic parsing, review, and profile confirmation.
@@ -695,13 +736,17 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
   review-ready draft or an actionable terminal result within 60 seconds, and
   100% reach an actionable terminal result within 3 minutes under the documented
   provider conditions.
-- **SC-004**: Candidates can load a review-ready draft in at most 3 seconds and
-  receive visible success, validation, or concurrency feedback for a draft save
-  or confirmation in at most 2 seconds, excluding asynchronous upload and parse
-  time.
-- **SC-005**: In representative usability testing, at least 90% of candidates
-  complete upload, review, correction, selective import, and confirmation on the
-  first attempt without assistance or unintended profile overwrites.
+- **SC-004**: P95 review-ready draft load time MUST be no more than 3 seconds,
+  and P95 time to visible success, validation, or concurrency feedback for a
+  draft save or confirmation MUST be no more than 2 seconds, excluding
+  asynchronous upload and parse time.
+- **SC-005**: In a moderated representative usability study with at least 30
+  candidate participants, 15 using a desktop viewport and 15 using a 320-pixel
+  mobile viewport, at least 90% MUST complete upload, review, correction,
+  selective import, and confirmation on their first uninterrupted attempt
+  without moderator intervention or unintended profile overwrites. The study
+  MUST include both PDF and DOCX fixtures and Vietnamese plus English or
+  bilingual CV content.
 - **SC-006**: In all concurrency tests, no stale draft edit, stale confirmation,
   duplicate confirmation, or concurrent direct profile save silently loses a
   candidate-authored change or creates a partial/duplicate profile outcome.
@@ -712,10 +757,10 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
   evidence for the exact upload, provider, and purpose before document content
   leaves the approved private processing boundary.
 - **SC-009**: Expired or candidate-deleted artifacts become inaccessible
-  immediately, infected/rejected/incomplete artifacts are physically removed
-  within 24 hours, unconfirmed imports within 30 days, and confirmed import
-  source files, extracted text, complete draft payloads, and provenance within 7
-  days of confirmation.
+  immediately; candidate-deleted and infected/rejected/incomplete content is
+  physically removed within 24 hours, unconfirmed imports within 30 days, and
+  confirmed import source files, extracted text, complete draft payloads, and
+  provenance within 7 days of confirmation.
 - **SC-010**: Privacy scans of logs, errors, analytics, traces, and audit records
   find zero raw CV content, filenames, contact details, content digests, storage
   locators, consent text, prompts, tokens, sessions, or raw provider/scanner
@@ -733,18 +778,20 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
   enforcement, Candidate Profile aggregate, profile validation rules, safe text
   normalization, audit boundary, and profile revision established by Features
   001 and 002.
-- The MVP treats uploaded CVs solely as temporary import sources. A future
+- The P0 release treats uploaded CVs solely as temporary import sources. A future
   permanent `CandidateDocument` capability requires its own approved scope,
   authorization, retention, and application-attachment behavior.
 - The initial malware scanner is a private, fail-closed ClamAV service accessed
-  through `clamd`; `freshclam` maintains signatures, Docker Compose provides the
-  local service, and production places it on a private network. Planning pins the
-  exact image/version, signature-freshness threshold, readiness gate, resource
-  limits, and adapter contract. Public sample-sharing submission is prohibited.
+  through `clamd`; `freshclam` maintains signatures. Local Docker Compose and
+  production co-locate the CV scan worker with `clamd` and share a Unix-domain
+  socket while disabling TCP. Planning pins the exact image/version,
+  signature-freshness threshold, readiness gate, resource limits, socket
+  permissions, and adapter contract. Public sample-sharing submission is
+  prohibited.
 - Private temporary file storage and a durable asynchronous worker capability
   are new Feature 004 dependencies. Planning must select their initial providers,
   local-development equivalents, failure behavior, and replacement boundaries.
-- PDF and DOCX documents are expected to contain machine-readable text in MVP.
+- PDF and DOCX documents are expected to contain machine-readable text in P0.
   OCR is deferred, but image-only documents receive an actionable manual path.
 - Semantic parsing may be internal or external. External processing is optional,
   cannot occur without exact consent, and cannot disable manual profile editing
@@ -755,3 +802,8 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
   and are not expanded by CV import.
 - Test performance targets are measured with documented file corpus, network,
   storage, scanner, parser/provider, worker, database, and hardware conditions.
+  Every latency report states sample size, test duration, concurrency,
+  P50/P95/P99, maximum latency, error rate, and cold/warm conditions.
+- All five user stories and applicable quality gates are required for a
+  releasable P0 Feature 004. Independently testable earlier story combinations
+  are technical demonstration checkpoints only.

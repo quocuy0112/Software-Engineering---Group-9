@@ -116,13 +116,13 @@ paths:
               type: string
               format: binary
               minLength: 1
-              maxLength: 5242880
+              maxLength: 5000000
           application/vnd.openxmlformats-officedocument.wordprocessingml.document:
             schema:
               type: string
               format: binary
               minLength: 1
-              maxLength: 5242880
+              maxLength: 5000000
       responses:
         "200":
           description: Idempotent replay of the same completed content upload.
@@ -167,8 +167,10 @@ paths:
       tags: [CV Imports]
       operationId: getOwnCvImport
       description: >-
-        Returns authoritative safe state and currently allowed actions. Unknown,
-        foreign, deleted, and expired identifiers use the same response.
+        Returns authoritative safe state and currently allowed actions. Unknown
+        and foreign identifiers use the same response. An owner may receive a
+        content-free CANCELLED, DELETED, or EXPIRED tombstone; no temporary CV
+        content becomes accessible again.
       security:
         - sessionCookie: []
       responses:
@@ -191,17 +193,24 @@ paths:
       tags: [CV Imports]
       operationId: deleteOwnCvImport
       description: >-
-        Denies access, cancels queued work, and schedules physical cleanup. It is
-        idempotent and never returns source/draft content.
+        Transitions an active owned import to CANCELLED, denies content access,
+        cancels queued work, and schedules physical/database cleanup within 24
+        hours. It is idempotent and never returns source/draft content.
       security:
         - sessionCookie: []
           csrfToken: []
       responses:
-        "204":
-          description: Import is inaccessible and cleanup is scheduled.
+        "202":
+          description: >-
+            Import is inaccessible and cleanup is scheduled, or an idempotent
+            replay returns the current CANCELLED/DELETED lifecycle state.
           headers:
             Cache-Control:
               $ref: "#/components/headers/NoStoreHeader"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CvDeletionOutcome"
         "401":
           $ref: "#/components/responses/AuthenticationRequired"
         "403":
@@ -501,7 +510,7 @@ components:
       schema:
         type: integer
         minimum: 1
-        maximum: 5242880
+        maximum: 5000000
 
   responses:
     AuthenticationRequired:
@@ -532,7 +541,7 @@ components:
           schema:
             $ref: "#/components/schemas/ApiError"
     CvImportNotFound:
-      description: Unknown, foreign, expired, or deleted import.
+      description: Unknown or foreign import, or a tombstone past metadata retention.
       headers:
         Cache-Control:
           $ref: "#/components/headers/NoStoreHeader"
@@ -658,7 +667,7 @@ components:
         declaredBytes:
           type: integer
           minimum: 1
-          maximum: 5242880
+          maximum: 5000000
         parserClass:
           $ref: "#/components/schemas/CvParserClass"
 
@@ -682,13 +691,13 @@ components:
           required: [maximumBytes, requiredContentType, requiredContentLength]
           properties:
             maximumBytes:
-              const: 5242880
+              const: 5000000
             requiredContentType:
               type: string
             requiredContentLength:
               type: integer
               minimum: 1
-              maximum: 5242880
+              maximum: 5000000
 
     CvContentAccepted:
       type: object
@@ -730,7 +739,7 @@ components:
         - uploadAttemptsPerRollingHour
       properties:
         maximumFileBytes:
-          const: 5242880
+          const: 5000000
         maximumImports:
           const: 10
         maximumStoredBytes:
@@ -810,6 +819,9 @@ components:
         - consent
         - failure
         - receipt
+        - contentInaccessibleAt
+        - deleteAfter
+        - deletedAt
       properties:
         uploadId:
           $ref: "#/components/schemas/OpaqueId"
@@ -882,6 +894,18 @@ components:
           oneOf:
             - type: "null"
             - $ref: "#/components/schemas/CvConfirmationReceipt"
+        contentInaccessibleAt:
+          oneOf:
+            - type: "null"
+            - $ref: "#/components/schemas/UtcTimestamp"
+        deleteAfter:
+          oneOf:
+            - type: "null"
+            - $ref: "#/components/schemas/UtcTimestamp"
+        deletedAt:
+          oneOf:
+            - type: "null"
+            - $ref: "#/components/schemas/UtcTimestamp"
 
     CvDraftReference:
       type: object
@@ -939,6 +963,29 @@ components:
           type: string
           minLength: 32
           maxLength: 2048
+
+    CvDeletionOutcome:
+      type: object
+      additionalProperties: false
+      required:
+        [uploadId, status, contentInaccessibleAt, deleteAfter, deletedAt, statusUrl]
+      properties:
+        uploadId:
+          $ref: "#/components/schemas/OpaqueId"
+        status:
+          type: string
+          enum: [CANCELLED, DELETED]
+        contentInaccessibleAt:
+          $ref: "#/components/schemas/UtcTimestamp"
+        deleteAfter:
+          $ref: "#/components/schemas/UtcTimestamp"
+        deletedAt:
+          oneOf:
+            - type: "null"
+            - $ref: "#/components/schemas/UtcTimestamp"
+        statusUrl:
+          type: string
+          pattern: "^/api/account/cv-imports/[A-Za-z0-9_-]+$"
 
     ConsentOutcome:
       type: object
@@ -1108,6 +1155,10 @@ components:
     Evidence:
       type: object
       additionalProperties: false
+      description: >-
+        Bounded verified provenance. Missing provenance is explicit as an empty
+        locations array, null confidence/context, and contextAvailable=false;
+        clients must display that unavailable state rather than imply a source.
       required: [confidence, locations, contextAvailable]
       properties:
         confidence:

@@ -6,7 +6,7 @@
 
 ## Content Quality
 
-- [ ] No implementation details (languages, frameworks, APIs)
+- [x] No implementation details beyond explicitly approved security/provider constraints
 - [x] Focused on user value and business needs
 - [x] Written for non-technical stakeholders
 - [x] All mandatory sections completed
@@ -27,19 +27,28 @@
 - [x] All functional requirements have clear acceptance criteria
 - [x] User scenarios cover primary flows
 - [x] Feature meets measurable outcomes defined in Success Criteria
-- [ ] No implementation details leak into specification
+- [x] No unapproved implementation details leak into specification
 
 ## Notes
 
-- Validation iteration 1 passed all checklist items.
-- The specification contains 5 prioritized user stories, 25 Given/When/Then
+- Validation iteration 3 passed after the 2026-08-01 consistency remediation
+  and read-only cross-artifact re-analysis.
+- The specification contains 5 prioritized user stories, 26 Given/When/Then
   acceptance scenarios, 80 testable functional requirements, and 12 measurable
   outcomes.
-- Scanner, storage, parser, worker, and external-provider behavior is defined as
-  user-visible or security-relevant capability. Product/library names, database
-  representation, route shape, job mechanism, and deployment topology remain
-  blocking implementation-planning decisions rather than specification detail.
+- ClamAV and same-host/pod Unix-domain-socket transport are retained as explicit,
+  user-approved security/provider constraints. Database representation, route
+  shape, job mechanism, and concrete application code structure remain planning
+  concerns rather than specification detail.
 - The eight clarified ownership gaps are covered explicitly: scan evidence,
   quota and retention enforcement, digest purpose, bounded draft sizes,
   concurrent draft revision handling, terminal provider failure, no unsupported
-  MVP dead-letter workflow, and durable versioned external-processing consent.
+  P0 dead-letter workflow, and durable versioned external-processing consent.
+- The remediation also fixes the decimal 5,000,000-byte limit, P95 latency
+  semantics, three-total automatic scan attempts plus two single candidate
+  retries, pre-scan versus post-clean structural validation, all-parser privacy
+  notice, CANCELLED-to-DELETED lifecycle, 24-hour candidate deletion, explicit
+  missing-provenance behavior, and the 30-participant usability protocol.
+- Final analysis maps all 80 functional requirements and 12 success criteria to
+  executable coverage across 150 sequentially valid tasks, with no remaining
+  Critical, High, Medium, or Low finding.

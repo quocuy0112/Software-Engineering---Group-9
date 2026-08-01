@@ -23,8 +23,8 @@ deployment, and observability behavior consistent.
   evidence.
 - Synchronous parsing inside the upload request was rejected because scanner,
   extraction, and provider latency cannot meet a reliable request lifetime.
-- Redis or a hosted queue was rejected for the MVP because PostgreSQL leases
-  already provide durable recovery and the expected throughput is bounded.
+- Redis or a hosted queue was rejected for the P0 release because PostgreSQL
+  leases already provide durable recovery and the expected throughput is bounded.
 
 ## 2. Upload Protocol, Admission, and Idempotency
 
@@ -92,15 +92,29 @@ and [SSE-KMS](https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncr
 
 **Decision**: Use private ClamAV `1.4` LTS, initially `1.4.5`, from the official
 `clamav/clamav:1.4_base` image. Pin the resolved OCI digest during implementation.
-Communicate with `clamd` through framed `INSTREAM`; never mount or provide an
-artifact host path. Local Compose binds TCP `3310` to loopback only. Persist
-signature data for `freshclam`, require definitions no older than 24 hours,
-limit the stream to 6 MiB, and time out a scan after 20 seconds.
+Co-locate `clamd` and the CV worker on the same pod/host and communicate through
+framed `INSTREAM` over `/run/clamav/clamd.sock`. Local Compose uses a dedicated
+runtime volume shared only by those containers; production uses the equivalent
+sidecar or same-host runtime volume. A dedicated numeric group shared by exactly
+the worker and daemon owns the socket with mode `0660`; startup removes stale
+socket entries and readiness rejects wrong ownership/mode. Disable
+`TCPSocket`/`TCPAddr` and publish no scanner port.
+Never mount or provide an artifact host path to `clamd`. Persist signature data
+for `freshclam`, require definitions no older than 24 hours, limit the daemon
+stream to 6 MiB, and time out a scan after 20 seconds.
 
 **Rationale**: `clamd` gives a well-understood local scanning boundary without
-sending candidate files to another cloud. `INSTREAM` preserves storage
-abstraction and avoids path traversal. Version/digest pinning plus signature-age
-checks make the dependency reproducible and fail closed.
+sending candidate files to another cloud. A Unix-domain socket removes network
+transport and therefore does not weaken the constitution's HTTPS requirement;
+it is also lower-overhead and narrower than a TCP listener. `INSTREAM` preserves
+storage abstraction and avoids path traversal. Version/digest pinning plus
+signature-age checks make the dependency reproducible and fail closed.
+
+For local filesystem parity, Compose bind-mounts the host
+`web/.local/cv-storage` into the worker at `/app/.local/cv-storage` and overrides
+the worker's storage root and PostgreSQL endpoint for container paths. Web and
+email processes keep their host-native paths and cannot mount the scanner
+socket. This avoids passing a Windows/macOS host path into the Linux worker.
 
 **Alternatives considered**:
 
@@ -109,6 +123,9 @@ checks make the dependency reproducible and fail closed.
 - Provider-native asynchronous S3 scanning was not selected for the first
   implementation because it would make local parity and provider replacement
   harder; it can implement `MalwareScanner` later.
+- Private-network or loopback TCP was rejected because it still creates a
+  network listener, conflicts with the project's network-transport policy, and
+  is unnecessary when the worker and daemon are deliberately co-located.
 - Skipping scans in development was rejected. Contributors should exercise the
   same clean/infected/indeterminate transitions using EICAR fixtures.
 
@@ -158,8 +175,9 @@ attempts as durable PostgreSQL rows. Workers claim small batches with
 `FOR UPDATE SKIP LOCKED`, commit an owner and lease before external I/O, and
 finalize only the currently owned lease. Expired leases become claimable.
 
-Allow at most three automatic scan attempts plus two explicit candidate scan
-attempts, and three automatic parser attempts plus two candidate parser retries.
+For each stage, allow one initial attempt plus at most two automatic retries
+(three automatic attempts total), followed by at most two candidate-initiated
+single attempts. A candidate retry never restarts the automatic retry cycle.
 Each explicit retry has a separate immutable idempotency row bound to the prior
 terminal attempt, stage, and new attempt, so an old key remains replayable and
 cannot be rebound after state changes. A partial unique index permits only one
@@ -177,7 +195,7 @@ dead-letter queue from leaving the UI indefinitely pending.
 - An in-memory queue was rejected because a process restart would lose work.
 - Unlimited/exponential retries were rejected because they can exceed the
   three-minute terminal bound and amplify provider incidents.
-- An MVP admin retry UI was rejected as unnecessary scope. Operational staff
+- A P0 admin retry UI was rejected as unnecessary scope. Operational staff
   can inspect non-content metrics, while candidates own the bounded retry path.
 
 ## 7. Parser Interface and Provider Choice
@@ -224,15 +242,20 @@ deployment privacy control. See [OpenAI data controls](https://platform.openai.c
 
 ## 8. Consent and Audit Evidence
 
-**Decision**: Store append-only consent events rather than a mutable boolean.
-A grant or revocation is bound to the account, upload, provider, provider class,
-model, purpose, notice version, and consent-text version. Before every external
-dispatch the worker verifies the latest exact grant and absence of a later
-revocation. A version/provider change requires a new grant.
+**Decision**: Show a versioned CV-processing privacy notice for every parser
+class and include its safe projection in the import list/status contracts. Store
+append-only consent events rather than a mutable boolean only for external
+transmission. An external grant or revocation is bound to the account, upload,
+provider, provider class, model, purpose, notice version, and consent-text
+version. Before every external dispatch the worker verifies the latest exact
+grant and absence of a later revocation. A version/provider change requires a
+new grant.
 
-**Rationale**: Timestamped immutable evidence answers what the candidate agreed
-to and supports revocation between retries. It also prevents consent for one
-upload or provider from silently authorizing another.
+**Rationale**: The general notice explains CV processing even when all work is
+internal; it is disclosure, not an external-transmission consent gate.
+Timestamped immutable external-consent evidence answers what the candidate
+agreed to and supports revocation between retries. It also prevents consent for
+one upload or provider from silently authorizing another.
 
 **Alternatives considered**:
 
@@ -304,7 +327,9 @@ worker applies these deadlines:
 - unconfirmed uploads/drafts/provenance: deletion by 30 days from upload;
 - confirmed content: inaccessible immediately and physically deleted in 7 days;
 - candidate deletion: inaccessible and work-cancelled in the transaction, then
-  physically removed within the applicable deadline.
+  physically/database removed within 24 hours; the aggregate remains
+  `CANCELLED` while cleanup is pending and becomes `DELETED` only after all
+  temporary content is gone.
 
 Quota reservation is released only as tracked bytes are physically deleted,
 so a cleanup outage cannot create unbounded retained storage. A reconciliation
@@ -323,7 +348,9 @@ URLs, analytics, service-worker caches, or persisted query caches. All responses
 are `Cache-Control: no-store`.
 
 Status, retry, consent, conflicts, and errors have persistent text in addition
-to optional toasts. Keyboard operation, focus management, live-region status,
+to optional toasts. Evidence explicitly displays an unavailable/missing state
+when verified provenance or context is absent; the UI never implies a source
+that was not verified. Keyboard operation, focus management, live-region status,
 reduced motion, contrast, and a 320-pixel viewport are acceptance requirements.
 
 **Rationale**: Polling fits the existing stack and bounded processing time
@@ -354,6 +381,37 @@ Package versions researched for this plan:
 | `yauzl`              |    `3.4.0` | compatible with project Node | MIT          |
 | `@types/yauzl`       |    `3.4.0` | development only             | MIT          |
 | `fast-xml-parser`    |   `5.10.1` | compatible with project Node | MIT          |
+
+## 14. Frontend Stylesheet Ownership
+
+**Decision**: Feature 004 uses the existing Tailwind CSS and shadcn/ui
+conventions for design-system primitives and simple utility styling. When a
+component needs custom selectors, responsive behavior, focus treatment, or
+reduced-motion rules, it may add an optional CSS Module in the same directory
+with the same basename as its TSX owner, for example
+`cv-upload-form.tsx`/`cv-upload-form.module.css`. A route `page.tsx` may likewise
+own an optional adjacent `page.module.css`. Only the matching TSX file imports
+that module.
+
+Feature 004 does not create a feature-level `styles/` directory, catch-all
+stylesheets such as `cv-import.css` or `cv-review.css`, `:global` selectors, or
+cross-component CSS Module imports. It also does not add Feature 004 selectors
+or imports to `app/globals.css` or the inherited shared `base.css`,
+`workspace.css`, `profile.css`, and `responsive.css` files. Components may
+consume existing design tokens and custom properties without taking ownership
+of those shared stylesheets. A CSS Module is optional; utility-only components
+do not create empty companion files.
+
+**Rationale**: The global bootstrap is small, but broad shared stylesheets have
+accumulated unrelated component rules and become merge-conflict and maintenance
+hotspots. Co-locating custom CSS makes ownership, deletion, review, and parallel
+implementation explicit while preserving the existing design system.
+
+**Alternatives rejected**: Centralized Feature 004 stylesheets were rejected
+because unrelated components would share a high-conflict file. Extending global
+or inherited shared stylesheets was rejected because it would widen their
+responsibility. Requiring a CSS file for every TSX file was rejected because
+empty modules add ceremony without improving ownership.
 
 ## Resolved Unknowns
 

@@ -193,8 +193,8 @@ Aggregate root for one candidate import.
 | `parserClass`                | Enabled configured `CvParserClass`, not a raw provider/model                        |
 | `status`                     | `CvUploadStatus` aggregate state                                                    |
 | `declaredMediaType`          | Allowlisted `application/pdf` or DOCX media type                                    |
-| `declaredBytes`              | Integer from 1 through 5 MiB                                                        |
-| `actualBytes`                | Nullable until the body finalizes; then 1 through 5 MiB and equal to received bytes |
+| `declaredBytes`              | Integer from 1 through 5,000,000 bytes (decimal 5 MB)                              |
+| `actualBytes`                | Nullable until the body finalizes; then 1 through 5,000,000 and equal to received bytes |
 | `quotaReservationBytes`      | Initial declared source bytes plus 512 KiB extraction allowance                     |
 | `quotaReservationRemaining`  | Outstanding allowance converted/released only under the account quota lock          |
 | `sourceSha256`               | Nullable 32-byte server-computed digest; never returned or logged                   |
@@ -202,9 +202,9 @@ Aggregate root for one candidate import.
 | `idempotencyDigest`          | Purpose-separated HMAC of create/upload operation key                               |
 | `createBindingDigest`        | HMAC of canonical filename/type/length/parser metadata; never returned or logged    |
 | `failureCode`                | Nullable allowlisted safe code only                                                 |
-| `automaticScanAttemptsUsed`  | Integer from 0 through 3                                                            |
+| `automaticScanAttemptsUsed`  | Integer from 0 through 3; includes the initial attempt plus at most two automatic retries |
 | `candidateScanRetriesUsed`   | Integer from 0 through 2                                                            |
-| `automaticParseAttemptsUsed` | Integer from 0 through 3                                                            |
+| `automaticParseAttemptsUsed` | Integer from 0 through 3; includes the initial attempt plus at most two automatic retries |
 | `candidateParseRetriesUsed`  | Integer from 0 through 2                                                            |
 | `contentReceivedAt`          | Nullable completion time for the raw body                                           |
 | `contentInaccessibleAt`      | Nullable logical-denial timestamp                                                   |
@@ -233,8 +233,11 @@ Invariants:
 - `CANCELLED`/`DELETED`/`EXPIRED` require `contentInaccessibleAt`; no
   content-bearing API may return data after that timestamp even if physical
   cleanup is pending.
-- Candidate deletion sets `contentInaccessibleAt`, cancels claimable work, and
-  schedules artifacts within the same transaction.
+- Candidate deletion sets `status = CANCELLED`, `contentInaccessibleAt`, and a
+  `deleteAfter` no later than 24 hours after the request, cancels claimable work,
+  and schedules every source/extracted/draft/provenance payload in the same
+  transaction. It becomes `DELETED` only after those payloads are scrubbed and
+  all tracked artifacts are physically absent.
 
 Indexes:
 
@@ -526,11 +529,11 @@ receipt; rebinding any component returns conflict.
 
 ```text
 AWAITING_CONTENT
-  -> VALIDATION_QUEUED
+  -> VALIDATION_QUEUED (bounded envelope/length/magic checks only)
   -> SCAN_QUEUED
   -> SCANNING
        -> INFECTED | SCAN_FAILED
-       -> EXTRACTION_QUEUED
+       -> EXTRACTION_QUEUED (post-CLEAN deep structure validation/extraction)
        -> EXTRACTING
             -> EXTRACTION_FAILED
             -> AWAITING_CONSENT (external only)
@@ -541,7 +544,7 @@ AWAITING_CONTENT
                       -> CONFIRMED
 
 Any non-confirmed state -> CANCELLED | EXPIRED
-CANCELLED               -> DELETED after content cleanup
+CANCELLED               -> DELETED after all physical/database content cleanup
 Validation rejection    -> VALIDATION_FAILED
 AWAITING_CONSENT        -> PARSE_QUEUED after exact grant
 PARSE_FAILED            -> PARSE_QUEUED through a bounded candidate retry
@@ -624,6 +627,7 @@ transaction; it is decremented when physical deletion later succeeds.
 | Unconfirmed source and extracted text         | At delete/expiry            | 30 days from upload at latest          | cleanup worker + S3 31-day safeguard |
 | Editable draft/provenance                     | At delete/expiry            | 30 days from upload at latest          | cleanup worker                       |
 | Confirmed source/text/draft/provenance        | In confirmation transaction | Within 7 days                          | cleanup worker                       |
+| Candidate-deleted source/text/draft/provenance | In cancellation transaction | Within 24 hours of deletion request    | cleanup worker + storage adapter     |
 | Consent/attempt metadata/confirmation receipt | Not CV content; minimized   | Project account/audit retention policy | database retention owner             |
 
 Cleanup uses leases and idempotent outcomes. The worker nulls encrypted display
