@@ -6,64 +6,6 @@ import { useReplayableStatus } from "@/frontend/features/authentication/componen
 import { Button } from "@/frontend/components/ui/button";
 import { Modal } from "@/frontend/components/ui/modal";
 
-const MAX_TWO_FACTOR_MANAGEMENT_ATTEMPTS = 5;
-const TWO_FACTOR_MANAGEMENT_ATTEMPTS_WINDOW_SECONDS = 10 * 60;
-const TWO_FACTOR_MANAGEMENT_STORAGE_KEY_PREFIX =
-  "smarthire-two-factor-management-attempts:";
-
-type AttemptState = {
-  count: number;
-  lockedUntil?: number;
-};
-
-// The attempt counter must be scoped to the signed-in account, otherwise one
-// account's failed attempts lock out every other account that shares the
-// browser. We key on the session's CSRF proof (unique per authenticated
-// session) rather than a single shared constant. Until the proof has loaded
-// we don't have a safe key to read/write yet, so treat state as untracked.
-function getStorageKey(sessionProof: string) {
-  return `${TWO_FACTOR_MANAGEMENT_STORAGE_KEY_PREFIX}${sessionProof}`;
-}
-
-function readAttemptState(sessionProof: string) {
-  if (typeof window === "undefined" || !sessionProof)
-    return { count: 0 } as AttemptState;
-  const storageKey = getStorageKey(sessionProof);
-  const stored = window.localStorage.getItem(storageKey);
-  if (!stored) return { count: 0 } as AttemptState;
-
-  try {
-    const parsed = JSON.parse(stored) as AttemptState;
-    if (parsed.lockedUntil && parsed.lockedUntil > Date.now()) {
-      return parsed;
-    }
-    if (parsed.lockedUntil && parsed.lockedUntil <= Date.now()) {
-      window.localStorage.removeItem(storageKey);
-    }
-    return { count: parsed.count ?? 0 } as AttemptState;
-  } catch {
-    window.localStorage.removeItem(storageKey);
-    return { count: 0 } as AttemptState;
-  }
-}
-
-function writeAttemptState(
-  sessionProof: string,
-  nextCount: number,
-  lockedUntil?: number,
-) {
-  if (typeof window === "undefined" || !sessionProof) return;
-  const storageKey = getStorageKey(sessionProof);
-  if (nextCount <= 0) {
-    window.localStorage.removeItem(storageKey);
-    return;
-  }
-  window.localStorage.setItem(
-    storageKey,
-    JSON.stringify({ count: nextCount, lockedUntil }),
-  );
-}
-
 function getLockedMessage(lockedUntil: number) {
   const minutes = Math.max(1, Math.ceil((lockedUntil - Date.now()) / 60000));
   return `Too many failed attempts. This verification flow is temporarily locked. Please try again in ${minutes} minute${minutes === 1 ? "" : "s"}.`;
@@ -82,6 +24,7 @@ export function TwoFactorManagement({
     [tone, setTone] = useState<"error" | "success">("success"),
     [busy, setBusy] = useState(false),
     [isLocked, setIsLocked] = useState(false),
+    [lockedUntil, setLockedUntil] = useState<number | null>(null),
     [confirmAction, setConfirmAction] = useState<
       "regenerate" | "disable" | null
     >(null);
@@ -91,12 +34,6 @@ export function TwoFactorManagement({
       .then((v) => {
         const sessionProof = v?.csrfProof ?? "";
         setProof(sessionProof);
-        const state = readAttemptState(sessionProof);
-        if (state.lockedUntil && state.lockedUntil > Date.now()) {
-          setIsLocked(true);
-          setTone("error");
-          setStatus(getLockedMessage(state.lockedUntil));
-        }
       });
     return () => {
       setCodes([]);
@@ -110,14 +47,24 @@ export function TwoFactorManagement({
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
   }, [codes]);
+  useEffect(() => {
+    if (!lockedUntil) return;
+    const timer = window.setTimeout(
+      () => {
+        setLockedUntil(null);
+        setIsLocked(false);
+      },
+      Math.max(0, lockedUntil - Date.now()),
+    );
+    return () => window.clearTimeout(timer);
+  }, [lockedUntil]);
   async function submit(path: string) {
     if (busy) return;
 
-    const state = readAttemptState(proof);
-    if (state.lockedUntil && state.lockedUntil > Date.now()) {
+    if (lockedUntil && lockedUntil > Date.now()) {
       setIsLocked(true);
       setTone("error");
-      setStatus(getLockedMessage(state.lockedUntil));
+      setStatus(getLockedMessage(lockedUntil));
       return;
     }
 
@@ -131,28 +78,34 @@ export function TwoFactorManagement({
       });
       const b = await r.json().catch(() => ({}));
       if (!r.ok) {
-        const nextAttempts = (state.count ?? 0) + 1;
-        const remainingAttempts =
-          MAX_TWO_FACTOR_MANAGEMENT_ATTEMPTS - nextAttempts;
-        const lockedUntil =
-          nextAttempts >= MAX_TWO_FACTOR_MANAGEMENT_ATTEMPTS
-            ? Date.now() + TWO_FACTOR_MANAGEMENT_ATTEMPTS_WINDOW_SECONDS * 1000
-            : undefined;
-
-        writeAttemptState(proof, nextAttempts, lockedUntil);
         setTone("error");
-        if (lockedUntil) {
+        if (r.status === 429) {
+          const supplied = Number.parseInt(
+            r.headers.get("Retry-After") ?? "",
+            10,
+          );
+          const retryAfterSeconds =
+            Number.isSafeInteger(supplied) && supplied > 0 ? supplied : 60;
+          const until = Date.now() + retryAfterSeconds * 1_000;
+          setLockedUntil(until);
           setIsLocked(true);
-          setStatus(getLockedMessage(lockedUntil));
+          setStatus(getLockedMessage(until));
+        } else if (r.status === 401) {
+          setIsLocked(false);
+          setStatus("The password or verification code is invalid.");
+        } else if (r.status === 403) {
+          setIsLocked(false);
+          setStatus("Your security proof is no longer valid. Reload the page.");
         } else {
           setIsLocked(false);
           setStatus(
-            `That verification code is invalid. (${remainingAttempts} attempt${remainingAttempts === 1 ? "" : "s"} remaining)`,
+            typeof b.message === "string"
+              ? b.message
+              : "Two-factor management is temporarily unavailable. Please try again.",
           );
         }
         return;
       }
-      writeAttemptState(proof, 0);
       setIsLocked(false);
       setTone("success");
       if (path.includes("regenerate")) {
@@ -163,6 +116,11 @@ export function TwoFactorManagement({
         setStatus("Two-factor authentication disabled.");
         onDisabled?.();
       }
+    } catch {
+      setTone("error");
+      setStatus(
+        "Two-factor management is temporarily unavailable. Please try again.",
+      );
     } finally {
       setBusy(false);
       setPassword("");

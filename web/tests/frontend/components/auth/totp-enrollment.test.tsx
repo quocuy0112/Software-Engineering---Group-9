@@ -175,7 +175,8 @@ describe("TOTP enrollment UI", () => {
     expect(String(verifyCall?.[0])).not.toContain("123456");
   });
 
-  it("shows the remaining TOTP verification attempts before the limit is reached", async () => {
+  it("reports an invalid code without persisting the CSRF proof", async () => {
+    window.localStorage.clear();
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url.endsWith("/api/identity/sessions")) {
@@ -215,9 +216,10 @@ describe("TOTP enrollment UI", () => {
 
     await waitFor(() =>
       expect(screen.getByRole("status")).toHaveTextContent(
-        "4 attempts remaining",
+        "That code could not be verified. Try again.",
       ),
     );
+    expect(window.localStorage).toHaveLength(0);
   });
 
   it("prevents duplicate submission while the request is in flight", async () => {

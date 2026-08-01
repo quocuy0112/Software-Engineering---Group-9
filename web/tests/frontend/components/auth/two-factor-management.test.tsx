@@ -108,4 +108,38 @@ describe("two-factor management UI", () => {
     expect(fetch).toHaveBeenCalledTimes(2);
     resolve(Response.json({ message: "ok" }));
   });
+  it("reports provider failures without persisting proof or blaming the code", async () => {
+    window.localStorage.clear();
+    const fetch = vi.fn((url: string) =>
+      url.includes("sessions")
+        ? Promise.resolve(Response.json({ csrfProof: "sensitive-proof" }))
+        : Promise.resolve(
+            Response.json(
+              {
+                message:
+                  "Two-factor management is temporarily unavailable. Please try again.",
+              },
+              { status: 502 },
+            ),
+          ),
+    );
+    vi.stubGlobal("fetch", fetch);
+    render(<TwoFactorManagement />);
+    await waitFor(() => expect(fetch).toHaveBeenCalled());
+    fireEvent.change(screen.getByLabelText("Current password"), {
+      target: { value: "password" },
+    });
+    fireEvent.change(screen.getByLabelText("Six-digit TOTP code"), {
+      target: { value: "123456" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Regenerate/ }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Regenerate codes" }),
+    );
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "temporarily unavailable",
+    );
+    expect(screen.getByRole("status")).not.toHaveTextContent("invalid");
+    expect(window.localStorage).toHaveLength(0);
+  });
 });

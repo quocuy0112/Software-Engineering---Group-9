@@ -1,20 +1,23 @@
 import "server-only";
 import { prisma } from "@/backend/database/prisma";
 import { DueOutboxProcessor } from "./due-outbox-processor";
+import {
+  requestEmailWorkerStop,
+  runEmailWorkerUntilStopped,
+} from "./email-worker-lifecycle";
 const processor = new DueOutboxProcessor();
-let closing = false;
-async function shutdown() {
-  if (closing) return;
-  closing = true;
-  processor.stop();
-  await prisma.$disconnect();
+let stopping = false;
+function stop() {
+  if (stopping) return;
+  stopping = true;
+  requestEmailWorkerStop(processor);
 }
-process.once("SIGINT", () => void shutdown());
-process.once("SIGTERM", () => void shutdown());
-processor
-  .run()
-  .then(shutdown)
-  .catch(async () => {
-    await shutdown();
+process.once("SIGINT", stop);
+process.once("SIGTERM", stop);
+void runEmailWorkerUntilStopped(processor, () => prisma.$disconnect())
+  .then((succeeded) => {
+    if (!succeeded) process.exitCode = 1;
+  })
+  .catch(() => {
     process.exitCode = 1;
   });

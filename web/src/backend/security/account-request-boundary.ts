@@ -1,4 +1,5 @@
 import "server-only";
+import { randomUUID } from "node:crypto";
 import { z, type ZodType } from "zod";
 import { prisma } from "@/backend/database/prisma";
 import { serverEnvironment } from "@/backend/env/runtime";
@@ -6,6 +7,7 @@ import { requireSession } from "@/backend/auth/session/require-session";
 import { validateSameOrigin } from "@/backend/security/csrf/csrf";
 import { validCsrfProof } from "@/backend/security/csrf/csrf-proof";
 import { noStoreHeaders } from "@/backend/security/response-headers";
+import { safeErrorCode } from "@/backend/security/redaction";
 import {
   accountErrorSchema,
   type AccountError,
@@ -164,11 +166,19 @@ export function accountErrorResponse(error: unknown): Response {
         : undefined,
     });
   }
+  const correlationId = randomUUID();
+  const code = safeErrorCode(error);
+  console.error(
+    `[account-api] request failed correlationId=${correlationId} code=${code}`,
+  );
   return accountJson(
     {
       code: "INTERNAL_ERROR",
       message: "The request could not be completed.",
     },
-    { status: 503 },
+    {
+      status: 503,
+      headers: { "X-Correlation-ID": correlationId },
+    },
   );
 }

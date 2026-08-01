@@ -34,11 +34,23 @@ export async function POST(request: Request) {
       parsed.data.code,
       { headers: request.headers, subject },
     );
-  if (!result.ok)
+  if (!result.ok) {
+    const headers = new Headers(noStoreHeaders);
+    if (result.status === 429 && result.retryAfterSeconds) {
+      headers.set("Retry-After", String(result.retryAfterSeconds));
+    }
     return Response.json(
-      { message: "Verification could not be completed." },
-      { status: result.status, headers: noStoreHeaders },
+      {
+        message:
+          result.status === 429
+            ? "Too many attempts. Please wait before trying again."
+            : result.status === 502
+              ? "Two-factor management is temporarily unavailable. Please try again."
+              : "Verification could not be completed.",
+      },
+      { status: result.status, headers },
     );
+  }
   return Response.json(
     { backupCodes: result.backupCodes },
     { headers: noStoreHeaders },

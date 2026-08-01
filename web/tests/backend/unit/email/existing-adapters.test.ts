@@ -1,5 +1,6 @@
-import { readdir, readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { CaptureEmailAdapter } from "@/backend/email/capture-adapter";
 import { ResendEmailAdapter } from "@/backend/email/resend-adapter";
@@ -15,19 +16,21 @@ const message = {
 
 describe("existing email adapters", () => {
   it("keeps local capture functional", async () => {
-    const directory = resolve(process.cwd(), ".local", "mail");
-    const before = new Set(await readdir(directory).catch(() => []));
-    const result = await new CaptureEmailAdapter().send(message);
-    expect(result.providerMessageId).toMatch(/^capture:/);
-    const created = (await readdir(directory)).filter(
-      (name) => !before.has(name),
-    );
-    const bodies = await Promise.all(
-      created.map((name) => readFile(resolve(directory, name), "utf8")),
-    );
-    expect(
-      bodies.filter((body) => body.includes(message.idempotencyKey)),
-    ).toHaveLength(1);
+    const directory = await mkdtemp(join(tmpdir(), "smarthire-mail-"));
+    try {
+      const result = await new CaptureEmailAdapter(directory).send(message);
+      expect(result.providerMessageId).toMatch(/^capture:/);
+      const bodies = await Promise.all(
+        (await readdir(directory)).map((name) =>
+          readFile(resolve(directory, name), "utf8"),
+        ),
+      );
+      expect(
+        bodies.filter((body) => body.includes(message.idempotencyKey)),
+      ).toHaveLength(1);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
   });
   it("keeps Resend delivery functional through its provider boundary", async () => {
     const send = vi

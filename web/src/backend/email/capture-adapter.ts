@@ -10,14 +10,17 @@ import type {
 } from "./email-service";
 
 export class CaptureEmailAdapter implements EmailService {
+  constructor(
+    private readonly directory = resolve(process.cwd(), ".local", "mail"),
+  ) {}
+
   async send(message: EmailMessage): Promise<EmailDelivery> {
     const configured = serverEnvironment.EMAIL_CAPTURE_DIR.split(
       String.fromCharCode(92),
     ).join("/");
     if (configured !== ".local/mail" && configured !== "local/mail")
       throw new Error("INVALID_EMAIL_CAPTURE_DIRECTORY");
-    const directory = resolve(process.cwd(), ".local", "mail");
-    await mkdir(directory, { recursive: true });
+    await mkdir(this.directory, { recursive: true });
     const id = randomUUID();
     const body = [
       `To: ${message.recipient}`,
@@ -33,7 +36,7 @@ export class CaptureEmailAdapter implements EmailService {
       message.html,
       "",
     ].join("\n");
-    await writeFile(resolve(directory, `${Date.now()}-${id}.eml`), body, {
+    await writeFile(resolve(this.directory, `${Date.now()}-${id}.eml`), body, {
       encoding: "utf8",
       flag: "wx",
     });

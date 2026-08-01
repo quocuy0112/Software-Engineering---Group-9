@@ -44,6 +44,8 @@ describe("browser state policy", () => {
       "src/frontend/features/profile/components/profile-preferences-view.tsx",
       "src/frontend/features/profile/components/profile-skills-form.tsx",
       "src/frontend/features/profile/components/profile-social-links-form.tsx",
+      "src/frontend/features/profile/components/totp-enrollment.tsx",
+      "src/frontend/features/profile/components/two-factor-management.tsx",
       "src/frontend/features/profile/components/verify-email-change-form.tsx",
       "src/app/(auth)/verify-email-change/page.tsx",
     ];

@@ -1,5 +1,6 @@
-import { readFile, readdir, rm } from "node:fs/promises";
-import { resolve } from "node:path";
+import { mkdtemp, readFile, readdir, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { CaptureEmailAdapter } from "@/backend/email/capture-adapter";
 import { ResendEmailAdapter } from "@/backend/email/resend-adapter";
@@ -13,23 +14,21 @@ const message = {
 };
 describe("email provider regressions", () => {
   it("keeps capture network-free", async () => {
-    const directory = resolve(process.cwd(), ".local/mail");
-    const before = new Set(await readdir(directory).catch(() => []));
-    await new CaptureEmailAdapter().send(message);
-    const created = (await readdir(directory)).filter(
-      (name) => !before.has(name),
-    );
-    const bodies = await Promise.all(
-      created.map(async (name) => ({
-        name,
-        body: await readFile(resolve(directory, name), "utf8"),
-      })),
-    );
-    const own = bodies.filter(({ body }) =>
-      body.includes(message.idempotencyKey),
-    );
-    expect(own).toHaveLength(1);
-    await Promise.all(own.map(({ name }) => rm(resolve(directory, name))));
+    const directory = await mkdtemp(join(tmpdir(), "smarthire-mail-"));
+    try {
+      await new CaptureEmailAdapter(directory).send(message);
+      const bodies = await Promise.all(
+        (await readdir(directory)).map(async (name) => ({
+          name,
+          body: await readFile(resolve(directory, name), "utf8"),
+        })),
+      );
+      expect(
+        bodies.filter(({ body }) => body.includes(message.idempotencyKey)),
+      ).toHaveLength(1);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
   });
   it("keeps Resend behind EmailService with idempotency", async () => {
     const send = vi
@@ -48,4 +47,27 @@ describe("email provider regressions", () => {
       }),
     );
   });
+  it.each([
+    [422, "validation_error", false],
+    [429, "rate_limit_exceeded", true],
+    [503, "internal_server_error", true],
+  ] as const)(
+    "classifies Resend status %i without retaining provider details",
+    async (statusCode, name, retryable) => {
+      const send = vi.fn().mockResolvedValue({
+        data: null,
+        error: { message: "provider detail", statusCode, name },
+        headers: null,
+      });
+      const adapter = new ResendEmailAdapter(
+        () => ({ emails: { send } }) as never,
+        { apiKey: "test-key", from: "sender@example.test" },
+      );
+      await expect(adapter.send(message)).rejects.toMatchObject({
+        message: "Email delivery failed",
+        code: "EMAIL_PROVIDER_REJECTED",
+        retryable,
+      });
+    },
+  );
 });

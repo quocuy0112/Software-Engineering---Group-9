@@ -12,62 +12,6 @@ import {
   type TotpCode,
 } from "@/shared/contracts/identity/two-factor";
 
-// Must stay in sync with `rateLimitPolicies.totpEnrollment` in policies.ts.
-const MAX_TOTP_ATTEMPTS = 5;
-const TOTP_ATTEMPTS_WINDOW_SECONDS = 10 * 60;
-const TOTP_ATTEMPTS_STORAGE_KEY_PREFIX = "smarthire-totp-attempts:";
-
-type AttemptState = {
-  count: number;
-  lockedUntil?: number;
-};
-
-// The counter must be scoped to the signed-in account (via the session's
-// CSRF proof), never to the password/code the person just typed — keying on
-// the typed value meant a fresh wrong guess always reset the counter to a
-// "new account", so lockouts either never triggered for a real attacker or,
-// worse, got attributed to whatever text happened to be typed rather than
-// to the account attempting enrollment.
-function getStorageKey(sessionProof: string) {
-  return `${TOTP_ATTEMPTS_STORAGE_KEY_PREFIX}${sessionProof}`;
-}
-
-function readAttemptState(sessionProof: string) {
-  if (typeof window === "undefined" || !sessionProof)
-    return { count: 0 } as AttemptState;
-  const storageKey = getStorageKey(sessionProof);
-  const stored = window.localStorage.getItem(storageKey);
-  if (!stored) return { count: 0 } as AttemptState;
-  try {
-    const parsed = JSON.parse(stored) as AttemptState;
-    if (parsed.lockedUntil && parsed.lockedUntil > Date.now()) return parsed;
-    if (parsed.lockedUntil && parsed.lockedUntil <= Date.now()) {
-      window.localStorage.removeItem(storageKey);
-    }
-    return { count: parsed.count ?? 0 } as AttemptState;
-  } catch {
-    window.localStorage.removeItem(storageKey);
-    return { count: 0 } as AttemptState;
-  }
-}
-
-function writeAttemptState(
-  sessionProof: string,
-  nextCount: number,
-  lockedUntil?: number,
-) {
-  if (typeof window === "undefined" || !sessionProof) return;
-  const storageKey = getStorageKey(sessionProof);
-  if (nextCount <= 0) {
-    window.localStorage.removeItem(storageKey);
-    return;
-  }
-  window.localStorage.setItem(
-    storageKey,
-    JSON.stringify({ count: nextCount, lockedUntil }),
-  );
-}
-
 function getLockedMessage(lockedUntil: number) {
   const minutes = Math.max(1, Math.ceil((lockedUntil - Date.now()) / 60000));
   return `Too many failed attempts. Please wait ${minutes} minute${minutes === 1 ? "" : "s"} before trying again.`;
@@ -89,9 +33,9 @@ type Stage = "password" | "verify" | "complete";
  * TOTP enrollment flow for the security settings page.
  *
  * Security posture: the QR data URL, manual key, and backup codes are held only
- * in transient React state. Nothing sensitive is written to localStorage,
- * sessionStorage, global stores, query caches, the URL, analytics, or logs, and
- * all sensitive state is cleared on completion, cancellation, and unmount.
+ * in transient React state. Nothing sensitive is written to persistent browser
+ * storage, global stores, query caches, the URL, analytics, or logs, and all
+ * sensitive state is cleared on completion, cancellation, and unmount.
  */
 export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
   const [proof, setProof] = useState("");
@@ -103,6 +47,20 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
     "message",
   );
   const [isLocked, setIsLocked] = useState(false);
+  const [lockedUntil, setLockedUntil] = useState<number | null>(null);
+
+  const applyServerLock = useCallback((response: Response) => {
+    const supplied = Number.parseInt(
+      response.headers.get("Retry-After") ?? "",
+      10,
+    );
+    const retryAfterSeconds =
+      Number.isSafeInteger(supplied) && supplied > 0 ? supplied : 60;
+    const until = Date.now() + retryAfterSeconds * 1_000;
+    setLockedUntil(until);
+    setIsLocked(true);
+    return until;
+  }, []);
 
   const clearSensitive = useCallback(() => {
     setSetup(null);
@@ -121,12 +79,6 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
           if (!response.ok) return;
           const body = (await response.json()) as { csrfProof: string };
           setProof(body.csrfProof);
-          const state = readAttemptState(body.csrfProof);
-          if (state.lockedUntil && state.lockedUntil > Date.now()) {
-            setIsLocked(true);
-            setStatusTone("error");
-            setStatus(getLockedMessage(state.lockedUntil));
-          }
         } catch {
           // Navigation can abort this background request during route changes.
           return;
@@ -138,6 +90,18 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
       controller.abort();
     };
   }, [setStatus]);
+
+  useEffect(() => {
+    if (!lockedUntil) return;
+    const timer = window.setTimeout(
+      () => {
+        setLockedUntil(null);
+        setIsLocked(false);
+      },
+      Math.max(0, lockedUntil - Date.now()),
+    );
+    return () => window.clearTimeout(timer);
+  }, [lockedUntil]);
 
   // Warn before navigating away while backup codes are still on screen.
   useEffect(() => {
@@ -163,33 +127,30 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
   });
 
   const startEnrollment = passwordForm.handleSubmit(async (values) => {
-    const state = readAttemptState(proof);
-    if (state.lockedUntil && state.lockedUntil > currentTimestamp()) {
+    if (lockedUntil && lockedUntil > currentTimestamp()) {
       setIsLocked(true);
       setStatusTone("error");
-      setStatus(getLockedMessage(state.lockedUntil));
+      setStatus(getLockedMessage(lockedUntil));
       return;
     }
     setStatus("");
-    const response = await fetch("/api/identity/two-factor/enrollment", {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-csrf-token": proof },
-      body: JSON.stringify(values),
-    });
-    const responseBody = (await response.json().catch(() => null)) as {
-      message?: string;
-    } | null;
-    passwordForm.reset({ currentPassword: "" });
-    if (!response.ok) {
-      setStatusTone("error");
-      const passwordRejected =
-        response.status === 401 &&
-        responseBody?.message ===
-          "Please confirm your current password to continue.";
-      if (!passwordRejected) {
-        writeAttemptState(proof, 0);
-        setIsLocked(false);
-        if (
+    try {
+      const response = await fetch("/api/identity/two-factor/enrollment", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-csrf-token": proof,
+        },
+        body: JSON.stringify(values),
+      });
+      const responseBody = (await response.json().catch(() => null)) as {
+        message?: string;
+      } | null;
+      if (!response.ok) {
+        setStatusTone("error");
+        if (response.status === 429) {
+          setStatus(getLockedMessage(applyServerLock(response)));
+        } else if (
           response.status === 401 &&
           responseBody?.message === "Authentication required."
         ) {
@@ -204,73 +165,69 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
         }
         return;
       }
-      const nextAttempts = (state.count ?? 0) + 1;
-      const remaining = MAX_TOTP_ATTEMPTS - nextAttempts;
-      const lockedUntil =
-        nextAttempts >= MAX_TOTP_ATTEMPTS
-          ? currentTimestamp() + TOTP_ATTEMPTS_WINDOW_SECONDS * 1000
-          : undefined;
-      writeAttemptState(proof, nextAttempts, lockedUntil);
-      if (lockedUntil) {
-        setIsLocked(true);
-        setStatus(getLockedMessage(lockedUntil));
-      } else {
-        setIsLocked(false);
-        setStatus(
-          `Please confirm your current password to continue. (${remaining} attempt${remaining === 1 ? "" : "s"} remaining)`,
-        );
-      }
-      return;
+      setIsLocked(false);
+      setSetup(responseBody as Setup);
+      setStage("verify");
+    } catch {
+      setStatusTone("error");
+      setStatus(
+        "Two-factor setup is temporarily unavailable. Please try again.",
+      );
+    } finally {
+      passwordForm.reset({ currentPassword: "" });
     }
-    writeAttemptState(proof, 0);
-    setIsLocked(false);
-    setSetup(responseBody as Setup);
-    setStage("verify");
   });
 
   const verifyCode = codeForm.handleSubmit(async (values) => {
-    const state = readAttemptState(proof);
-    if (state.lockedUntil && state.lockedUntil > currentTimestamp()) {
+    if (lockedUntil && lockedUntil > currentTimestamp()) {
       setIsLocked(true);
       setStatusTone("error");
-      setStatus(getLockedMessage(state.lockedUntil));
+      setStatus(getLockedMessage(lockedUntil));
       return;
     }
     setStatus("");
-    const response = await fetch("/api/identity/two-factor/enrollment/verify", {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-csrf-token": proof },
-      body: JSON.stringify(values),
-    });
-    codeForm.reset({ code: "" });
-    if (!response.ok) {
-      setStatusTone("error");
-      const nextAttempts = (state.count ?? 0) + 1;
-      const remaining = MAX_TOTP_ATTEMPTS - nextAttempts;
-      const lockedUntil =
-        nextAttempts >= MAX_TOTP_ATTEMPTS
-          ? currentTimestamp() + TOTP_ATTEMPTS_WINDOW_SECONDS * 1000
-          : undefined;
-      writeAttemptState(proof, nextAttempts, lockedUntil);
-      if (lockedUntil) {
-        setIsLocked(true);
-        setStatus(getLockedMessage(lockedUntil));
-      } else {
-        setIsLocked(false);
-        setStatus(
-          `That code could not be verified. Try again. (${remaining} attempt${remaining === 1 ? "" : "s"} remaining)`,
-        );
+    try {
+      const response = await fetch(
+        "/api/identity/two-factor/enrollment/verify",
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-csrf-token": proof,
+          },
+          body: JSON.stringify(values),
+        },
+      );
+      if (!response.ok) {
+        setStatusTone("error");
+        if (response.status === 429) {
+          setStatus(getLockedMessage(applyServerLock(response)));
+        } else if (response.status === 401) {
+          setStatus("That code could not be verified. Try again.");
+        } else if (response.status === 403) {
+          setStatus("Your security proof is no longer valid. Reload the page.");
+        } else {
+          setStatus(
+            "Two-factor verification is temporarily unavailable. Please try again.",
+          );
+        }
+        return;
       }
-      return;
+      setIsLocked(false);
+      const body = (await response.json()) as { backupCodes: string[] };
+      setSetup(null);
+      setBackupCodes(body.backupCodes);
+      setStage("complete");
+      setStatusTone("success");
+      setStatus("Two-factor authentication is now enabled.");
+    } catch {
+      setStatusTone("error");
+      setStatus(
+        "Two-factor verification is temporarily unavailable. Please try again.",
+      );
+    } finally {
+      codeForm.reset({ code: "" });
     }
-    writeAttemptState(proof, 0);
-    setIsLocked(false);
-    const body = (await response.json()) as { backupCodes: string[] };
-    setSetup(null);
-    setBackupCodes(body.backupCodes);
-    setStage("complete");
-    setStatusTone("success");
-    setStatus("Two-factor authentication is now enabled.");
   });
 
   function cancel() {

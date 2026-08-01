@@ -14,7 +14,8 @@ const ensureEnvDefault = async (path, key, value) => {
   const contents = await readFile(path, "utf8");
   if (new RegExp(`^${key}=`, "m").test(contents)) return false;
 
-  const separator = contents.length === 0 || contents.endsWith("\n") ? "" : "\n";
+  const separator =
+    contents.length === 0 || contents.endsWith("\n") ? "" : "\n";
   await writeFile(path, `${contents}${separator}${key}=${value}\n`, {
     mode: 0o600,
   });
@@ -22,10 +23,6 @@ const ensureEnvDefault = async (path, key, value) => {
 };
 if (Number(process.versions.node.split(".")[0]) !== 24)
   throw new Error("Node.js 24 is required.");
-if (run("docker", ["--version"]).status !== 0)
-  throw new Error("Docker is required.");
-if (run("docker", ["compose", "version"]).status !== 0)
-  throw new Error("Docker Compose is required.");
 const databasePassword = randomBytes(36).toString("base64url");
 const authSecret = randomBytes(48).toString("base64url");
 const tokenSecret = randomBytes(48).toString("base64url");
@@ -40,9 +37,20 @@ const files = [
     `APP_ENV=local\nNEXT_PUBLIC_APP_URL=http://localhost:3001\nDATABASE_URL=${databaseUrl}\nDIRECT_URL=${databaseUrl}\nBETTER_AUTH_URL=http://localhost:3001\nBETTER_AUTH_SECRET=${authSecret}\nTOKEN_SECRET=${tokenSecret}\nAUDIT_TRUSTED_PROXY_HOPS=0\nAUTH_COOKIE_ENV=local\nEMAIL_ADAPTER=capture\nEMAIL_CAPTURE_DIRECTORY=.local/mail\nEMAIL_CAPTURE_DIR=.local/mail\nRESEND_API_KEY=\nEMAIL_FROM=\nSMTP_HOST=\nSMTP_PORT=\nSMTP_USERNAME=\nSMTP_PASSWORD=\nSMTP_FROM=\nSMTP_SECURE=\nSMTP_USE_TLS=\nSESSION_COOKIE_NAME=smarthire.session\nPRE_AUTH_COOKIE_NAME=smarthire.pre-auth\nCOOKIE_SECURE=false\nCOOKIE_SAME_SITE=lax\n`,
   ],
 ];
-for (const [relativePath, contents] of files) {
+const existingFiles = await Promise.all(
+  files.map(([relativePath]) => exists(resolve(root, relativePath))),
+);
+if (existingFiles.some((present) => !present)) {
+  if (run("docker", ["--version"]).status !== 0)
+    throw new Error("Docker is required to create a new local environment.");
+  if (run("docker", ["compose", "version"]).status !== 0)
+    throw new Error(
+      "Docker Compose is required to create a new local environment.",
+    );
+}
+for (const [index, [relativePath, contents]] of files.entries()) {
   const path = resolve(root, relativePath);
-  if (await exists(path)) {
+  if (existingFiles[index]) {
     const updated = await ensureEnvDefault(
       path,
       "AUDIT_TRUSTED_PROXY_HOPS",
