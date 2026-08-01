@@ -125,7 +125,8 @@ interface CvContentReceiver {
 }
 ```
 
-Admission locks the account quota row. It enforces 1..5 MiB, PDF/DOCX
+Admission locks the account quota row. It enforces 1..5,000,000 bytes (decimal
+5 MB), PDF/DOCX
 declaration, five admitted attempts per rolling hour, ten non-deleted imports,
 and 50 MiB reserved plus retained storage. It reserves declared source bytes
 plus 512 KiB extraction headroom; source/extraction settlement converts actual
@@ -134,9 +135,10 @@ stored bytes and releases unused allowance atomically. The idempotency key is
 HMAC.
 
 The receiver requires exact `Content-Length` and streams at most the reserved
-length/5 MiB. It computes SHA-256 over plaintext, encrypts while writing to a
-random quarantine locator, and never buffers the whole body. On an idempotent
-retry it uses a disposable quarantine object: equal digest/length returns the
+length/5,000,000-byte source limit. It computes SHA-256 over plaintext, encrypts
+while writing to a random quarantine locator, and never buffers the whole body.
+On an idempotent retry it uses a disposable quarantine object: equal
+digest/length returns the
 existing result and deletes the duplicate; mismatch deletes the duplicate and
 returns `409 IDEMPOTENCY_KEY_REUSED`.
 
@@ -343,10 +345,15 @@ interface MalwareScanner {
 }
 ```
 
-The ClamAV adapter uses private TCP `INSTREAM`, bounded frames, 6 MiB
-`StreamMaxLength`, a 20-second timeout, and `PING`/`VERSIONCOMMANDS`/`VERSION`
-readiness. Definitions older than 24 hours fail closed. Raw daemon text is
-parsed inside the adapter and never propagated or logged.
+The ClamAV adapter connects only to `CV_CLAMD_SOCKET_PATH` on the same host/pod
+and uses `INSTREAM` over that Unix-domain socket with bounded frames, a 6 MiB
+daemon `StreamMaxLength`, a 20-second timeout, and
+`PING`/`VERSIONCOMMANDS`/`VERSION` readiness. A dedicated shared numeric group
+owns the socket with mode `0660`; readiness rejects a stale, wrongly owned, or
+world-accessible socket. `TCPSocket`/`TCPAddr` are disabled, no scanner port is
+published, and web/email never mount the socket volume. The client still rejects
+source input above 5,000,000 bytes. Definitions older than 24 hours fail closed.
+Raw daemon text is parsed inside the adapter and never propagated or logged.
 
 ## 7. Structural Validator and Extractor
 
@@ -390,13 +397,16 @@ interface DocumentExtractor {
     declaredKind: "PDF" | "DOCX";
     declaredMediaType: string;
     plaintext: ReadableStream<Uint8Array>;
-    maximumSourceBytes: 5242880;
+    maximumSourceBytes: 5000000;
     maximumOutputUtf8Bytes: 524288;
     deadline: Date;
   }): Promise<ExtractionOutcome>;
 }
 ```
 
+This contract may be invoked only after a persisted `CLEAN` assessment. Before
+that result, callers may perform only bounded envelope/length/leading-magic
+checks and MUST NOT open PDF object graphs, ZIP entries, or XML relationships.
 The production implementation launches a child process with a 15-second hard
 deadline and `--max-old-space-size=192`. It accepts data through bounded IPC or
 anonymous streams, not a user-controlled filesystem path. The parent kills the
@@ -519,7 +529,16 @@ interface CvExternalProcessingBinding {
   consentTextVersion: string;
 }
 
-interface CvConsentLedger {
+interface CvConsentReadGateway {
+  requireLiveGrant(
+    input: CvExternalProcessingBinding & {
+      accountId: AccountId;
+      dispatchAt: Date;
+    },
+  ): Promise<{ consentEventId: string }>;
+}
+
+interface CvConsentLedger extends CvConsentReadGateway {
   grant(
     input: CvExternalProcessingBinding & {
       accountId: AccountId;
@@ -534,12 +553,6 @@ interface CvConsentLedger {
     },
   ): Promise<{ consentEventId: string }>;
 
-  requireLiveGrant(
-    input: CvExternalProcessingBinding & {
-      accountId: AccountId;
-      dispatchAt: Date;
-    },
-  ): Promise<{ consentEventId: string }>;
 }
 ```
 
@@ -547,7 +560,10 @@ Provider/model/purpose/notice/text versions come from reviewed server
 configuration, not the browser. Every dispatch calls `requireLiveGrant` after
 claiming and immediately before transmission. The deployment startup gate must
 also prove API configuration, DPA/privacy/cross-border approval, and verified
-ZDR/equivalent control. Consent never overrides a failed deployment gate.
+ZDR/equivalent control. Foundation implements only `CvConsentReadGateway` so
+retry eligibility can fail closed without depending on consent mutations; US5
+extends it with the `CvConsentLedger` grant/revoke lifecycle. Consent never
+overrides a failed deployment gate.
 
 ## 12. Durable Worker and Leases
 
@@ -609,11 +625,14 @@ interface CvRetryService {
 }
 ```
 
-Only explicitly retryable terminal scan/parse states are accepted. The service
+Only explicitly retryable terminal scan/parse states are accepted. Each initial
+stage cycle consists of one initial attempt and at most two automatic retries
+(three automatic attempts total). The service
 locks quota/upload, verifies ownership, expiry, artifact availability, requires
 a live exact external grant before consuming a parse retry, and checks the
-separate two-scan/two-parse candidate-retry caps, then
-creates an immutable `CvRetryRequest` and new stage attempt in one transaction.
+separate two-scan/two-parse candidate-retry caps, then creates an immutable
+`CvRetryRequest` and exactly one new stage attempt in one transaction. That
+candidate attempt never restarts the automatic retry cycle.
 The retry row binds the account-wide endpoint key HMAC, prior terminal attempt,
 stage, and new attempt. An identical key returns the same attempt even after
 later state changes; a rebound key conflicts.
@@ -708,11 +727,17 @@ parser output outside this repository contract.
 
 ```ts
 interface CvRetentionService {
-  markUploadDeleted(input: {
+  cancelUploadForDeletion(input: {
     accountId: AccountId;
     uploadId: CvUploadId;
     now: Date;
-  }): Promise<void>;
+  }): Promise<{
+    uploadId: CvUploadId;
+    status: "CANCELLED" | "DELETED";
+    contentInaccessibleAt: Date;
+    deleteAfter: Date;
+    deletedAt: Date | null;
+  }>;
 
   expireDue(now: Date, limit: number): Promise<number>;
   deleteDueArtifacts(now: Date, limit: number): Promise<number>;
@@ -728,12 +753,15 @@ interface CvRetentionService {
 }
 ```
 
-Deletion first denies logical access and cancels queued work transactionally.
-Physical storage deletion and DB payload scrubbing are separately leased and
-idempotent. Exact deadlines are 24 hours for incomplete/rejected/infected
-content, 30 days maximum for unconfirmed content, and seven days after confirm.
-Provider lifecycle rules are safeguards only. Cleanup metrics expose counts and
-lag, never locators or content.
+Deletion first transitions an active import to `CANCELLED`, denies logical
+access, and cancels queued work transactionally. Physical storage deletion and DB
+payload scrubbing are separately leased and idempotent. Candidate-requested
+deletion purges every source/extracted/draft/provenance payload within 24 hours
+and changes the aggregate to `DELETED` only after cleanup completes. Other exact
+deadlines are 24 hours for incomplete/rejected/infected content, 30 days maximum
+for unconfirmed content, and seven days after confirm. Provider lifecycle rules
+are safeguards only. Cleanup metrics expose counts and lag, never locators or
+content.
 
 ## 17. Error Mapping
 
@@ -744,7 +772,7 @@ Service/repository/provider errors map at the Route Handler boundary:
 |  400 | `VALIDATION_ERROR`                          | Strict metadata/review request is invalid        |
 |  401 | `AUTHENTICATION_REQUIRED`                   | No valid Better Auth session                     |
 |  403 | `FORBIDDEN` / `CSRF_REJECTED`               | Inactive account or mutation proof failed        |
-|  404 | `CV_IMPORT_NOT_FOUND`                       | Unknown, foreign, expired, or deleted identifier |
+|  404 | `CV_IMPORT_NOT_FOUND`                       | Unknown/foreign ID or purged tombstone           |
 |  409 | `IDEMPOTENCY_KEY_REUSED`                    | Same key is bound to different input             |
 |  409 | `DRAFT_REVISION_CONFLICT`                   | Another tab/device saved first                   |
 |  409 | `PROFILE_REVISION_CONFLICT`                 | Candidate Profile changed after review           |
@@ -755,7 +783,10 @@ Service/repository/provider errors map at the Route Handler boundary:
 |  429 | `UPLOAD_RATE_LIMITED` / `CV_QUOTA_EXCEEDED` | Rolling rate or account quota reached            |
 |  503 | `CV_PROCESSING_UNAVAILABLE`                 | Configured scanner/provider gate unavailable     |
 
-Unknown/foreign/deleted/expired IDs share the same non-disclosing 404. Error
+Unknown and foreign IDs share the same non-disclosing 404. An authenticated
+owner may receive only the bounded content-free `CANCELLED`/`DELETED`/`EXPIRED`
+tombstone defined by OpenAPI so cancellation and cleanup can be observed; no
+source, draft, provenance, filename, or provider detail is recoverable. Error
 details contain field paths and safe actions only, never rejected values or
 document/provider content.
 

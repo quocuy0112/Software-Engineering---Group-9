@@ -7,17 +7,29 @@ so no AWS or OpenAI credential is required.
 
 ## Local Topology and Ports
 
-| Process        | Bind/port                             | Exposure                                         |
+| Process        | Bind/endpoint                         | Exposure                                         |
 | -------------- | ------------------------------------- | ------------------------------------------------ |
 | Next.js web    | `http://localhost:3001`               | Local browser                                    |
 | PostgreSQL     | `127.0.0.1:55432` -> container `5432` | Loopback only                                    |
-| ClamAV `clamd` | `127.0.0.1:3310` -> container `3310`  | Loopback only                                    |
+| ClamAV `clamd` | `/run/clamav/clamd.sock`              | Shared only with the co-located CV worker        |
 | Email worker   | No listening port                     | PostgreSQL client                                |
-| CV worker      | No listening port                     | PostgreSQL, storage, and private `clamd` clients |
+| CV worker      | No listening port                     | PostgreSQL, storage, and private `clamd` client  |
 
-Do not expose `3310` publicly. A production `clamd` endpoint belongs only on the
-private service network. If any configured port is already in use, change the
+ClamAV publishes no host/container TCP port and has `TCPSocket`/`TCPAddr`
+disabled. Local Compose shares a dedicated Unix-socket runtime volume only
+between `clamd` and the containerized CV worker; production uses the same-pod/
+host sidecar pattern. A dedicated shared numeric group owns the socket with mode
+`0660`; web and email services do not mount it. If a configured web/database
+port is already in use, change the
 documented local environment value rather than killing an unrelated process.
+
+Local `http://localhost:3001` is not the production transport model. Production
+must pass the inherited HTTPS gate for trusted ingress/proxy TLS termination,
+HTTP-to-HTTPS redirect, approved HSTS, and secure-cookie/origin preservation.
+The external parser uses only the reviewed allowlisted HTTPS provider endpoint;
+custom base URLs and non-HTTPS destinations fail configuration validation.
+Feature 004 P0 exposes no route that previews, retrieves, or downloads the
+original CV.
 
 ## Prerequisites
 
@@ -26,7 +38,7 @@ documented local environment value rather than killing an unrelated process.
 - Docker Desktop/Engine with Compose v2.
 - At least 4 GiB available to the ClamAV container during signature load and
   scanning.
-- A local PostgreSQL port and ClamAV port not already occupied.
+- A local PostgreSQL port not already occupied; ClamAV requires no TCP port.
 
 Check versions:
 
@@ -57,8 +69,7 @@ The expected non-secret local choices are:
 ```text
 CV_STORAGE_ADAPTER=filesystem
 CV_STORAGE_LOCAL_ROOT=<absolute repo-local gitignored web/.local/cv-storage path>
-CV_CLAMD_HOST=127.0.0.1
-CV_CLAMD_PORT=3310
+CV_CLAMD_SOCKET_PATH=/run/clamav/clamd.sock
 CV_CLAMD_SIGNATURE_MAX_AGE_HOURS=24
 CV_PARSER_ADAPTER=deterministic
 CV_OPENAI_ENABLED=false
@@ -66,11 +77,15 @@ CV_OPENAI_ENABLED=false
 
 The local storage root must be absolute after configuration resolution, must
 remain inside the intended `web/.local/` directory, and must be gitignored.
-Production startup rejects this adapter and root.
+Production startup rejects this adapter and root. Compose bind-mounts that host
+directory to `/app/.local/cv-storage` and overrides the worker's
+`CV_STORAGE_LOCAL_ROOT` plus database endpoint to container-native paths; it
+must not pass a Windows/macOS host path into the Linux worker.
 
 ## 2. Start PostgreSQL and ClamAV
 
-After Feature 004 extends `compose.yaml`, start only required infrastructure:
+After Feature 004 extends `compose.yaml`, start the database and scanner
+sidecar; the development supervisor starts the Compose-backed CV worker later:
 
 ```powershell
 docker compose up -d postgres clamav
@@ -87,19 +102,29 @@ docker compose logs --tail 100 postgres
 ```
 
 The ClamAV service must use the official `clamav/clamav:1.4_base` image pinned
-to the implementation-reviewed digest, a persistent signature volume,
-`StreamMaxLength` of 6 MiB, and loopback binding. Do not log or paste CV content
-while troubleshooting.
+to the implementation-reviewed digest, a persistent signature volume, a
+dedicated runtime socket volume with stale-socket cleanup, `0660` group-only
+permissions, `StreamMaxLength` of 6 MiB, and no TCP listener. Do not log or paste
+CV content while troubleshooting.
 
 Verify expected port owners without altering them:
 
 ```powershell
 Get-NetTCPConnection -State Listen |
-  Where-Object { $_.LocalPort -in 3001, 3310, 55432 } |
+  Where-Object { $_.LocalPort -in 3001, 55432 } |
   Select-Object LocalAddress, LocalPort, OwningProcess
 ```
 
 On macOS/Linux, the equivalent read-only check is `lsof -nP -iTCP -sTCP:LISTEN`.
+After the CV worker starts, run:
+
+```powershell
+docker compose exec cv-worker npm run cv:scanner:check
+```
+
+The check must confirm `/run/clamav/clamd.sock`, expected owner/group, mode
+`0660`, fresh signatures, and readiness. It must also fail on a stale or
+world-accessible socket, or if a scanner TCP listener/published port is configured.
 
 ## 3. Apply and Verify the Database
 
@@ -130,7 +155,7 @@ Local acceptance:
 
 - filesystem storage and deterministic parser are accepted;
 - missing `OPENAI_API_KEY` is accepted because external parsing is disabled;
-- encryption key length/version, storage root, scanner endpoint, fixed caps,
+- encryption key length/version, storage root, scanner socket, fixed caps,
   and local ports are validated without printing secret values.
 
 Production-mode negative checks must reject:
@@ -153,8 +178,9 @@ The root development supervisor must start and supervise:
 
 1. Next.js at `http://localhost:3001`;
 2. the existing email worker;
-3. the new CV worker with scan, extraction, parse, cleanup, and reconciliation
-   loops.
+3. the new containerized CV worker with pre-scan validation/scan, extraction,
+   parse, cleanup, and reconciliation loops, sharing only the Unix-socket volume
+   with `clamd` and the configured encrypted artifact mount with the web process.
 
 Press `Ctrl+C` once to stop the supervisor. It must forward shutdown to all
 children on Windows, macOS, and Linux and leave any interrupted durable lease
@@ -171,8 +197,9 @@ to a shared test environment.
    Confirm the versioned CV-processing privacy notice is visible even for the
    internal parser; its external parser option additionally requires an
    unselected explicit consent control before dispatch.
-2. Choose a clean PDF or DOCX fixture between 1 byte and 5 MiB. The default local
-   parser needs no consent because it is deterministic and non-networked.
+2. Choose a clean PDF or DOCX fixture between 1 and 5,000,000 bytes (decimal
+   5 MB). The default local parser needs no external-transmission consent because
+   it is deterministic and non-networked.
 3. Submit once. Confirm the UI performs reservation then raw upload without a
    second user action.
 4. Observe persistent, announced stages: validation, scan, extraction, parsing,
@@ -201,18 +228,18 @@ local/session storage, persisted query cache, or service-worker cache.
 
 | Fixture/condition                                                                                         | Expected terminal or recovery behavior                                                           |
 | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Empty, >5 MiB, wrong extension/type, mismatched length                                                    | Request rejected safely; no accessible partial artifact                                          |
-| Content magic/structure disagrees with declaration                                                        | `VALIDATION_FAILED`; replace/manual/delete actions                                               |
+| Empty, >5,000,000 bytes, wrong extension/type, mismatched length                                          | Request rejected safely; no accessible partial artifact                                          |
+| Bounded leading magic disagrees with declaration                                                          | `VALIDATION_FAILED`; never scanned/extracted; replace/manual/delete actions                       |
 | EICAR test file                                                                                           | `INFECTED`; never extracted/parsed; cleanup due within 24 hours                                  |
 | `clamd` unavailable or definitions >24h                                                                   | Fail closed; bounded retries, then `SCAN_FAILED` with retry/manual path                          |
-| Password/encrypted/active PDF or >20 pages                                                                | `EXTRACTION_FAILED`; explicit safe reason/action                                                 |
+| Post-clean structure mismatch, password/encrypted/active PDF, or >20 pages                               | `EXTRACTION_FAILED`; explicit safe reason/action; no deep parser ran before `CLEAN`              |
 | DOCX traversal, duplicate entry, macro/OLE/ActiveX, external relation, >1,000 entries or >25 MiB expanded | `EXTRACTION_FAILED`; no Mammoth execution before checks pass                                     |
 | Image-only/empty extraction                                                                               | `EXTRACTION_FAILED`; manual Profile entry offered; no OCR                                        |
 | Extractor >15s or >192 MiB                                                                                | Child terminated; partial output destroyed; worker survives                                      |
 | Parser unknown field, invalid date/URL, excessive array, unknown segment, >256/128 KiB                    | Whole result rejected; no truncated/partial draft                                                |
 | Parser times out/fails all automatic attempts                                                             | `PARSE_FAILED`; up to two candidate retries, replacement, and manual entry immediately available |
 | Candidate retry cap exhausted                                                                             | Stable terminal state with replacement/manual/delete; no hidden admin wait                       |
-| Delete during processing                                                                                  | Logical denial and cancellation commit immediately; later provider result is discarded           |
+| Delete during processing                                                                                  | `CANCELLED` and inaccessible immediately; later result discarded; all content purged within 24h, then `DELETED` |
 | Expiry during review                                                                                      | Non-disclosing not-found/expired behavior; no confirmation                                       |
 
 EICAR is used only through the curated test fixture and private local scanner;
@@ -247,15 +274,18 @@ Required coverage groups:
 - byte-stream abort/overflow/idempotency, AES-GCM tamper detection, filesystem
   and S3 adapter contracts, SHA-256 verification at scan/extraction boundaries,
   source-plus-extraction headroom, and quota concurrency;
-- ClamAV readiness/freshness/timeout/EICAR and no host-path scanning;
-- PDF/DOCX malicious corpus plus child-process memory/time bounds;
+- ClamAV Unix-socket readiness/freshness/timeout/EICAR, no TCP listener, and no
+  host-path scanning;
+- bounded envelope checks before scan, then PDF/DOCX deep-structure malicious
+  corpus only after `CLEAN`, plus child-process memory/time bounds;
 - deterministic Vietnamese/English parser fixtures and strict JSON Schema;
 - lease expiry, duplicate worker, automatic/candidate retry caps, and one active
   parse per account;
 - consent grant/version/revocation races and external dispatch gating;
 - two draft writers, draft save/confirm race, Profile save/confirm race,
   idempotent confirmation, one revision, and transaction rollback;
-- fake-clock 24-hour/30-day/7-day deletion, already-missing object, cleanup
+- fake-clock candidate `CANCELLED` to `DELETED` cleanup within 24 hours plus the
+  24-hour/30-day/7-day retention rules, already-missing object, cleanup
   failure/retry, quota release, and orphan reconciliation;
 - log/audit/metric canaries proving no PII/CV/token/locator content;
 - keyboard/focus/live-region/contrast/reduced-motion behavior and 320-pixel E2E.
@@ -324,11 +354,14 @@ Never wait real days in tests. Seed artifacts/drafts with an injected fake clock
 1. Advance rejected/infected/incomplete content to its 24-hour deadline.
 2. Advance unconfirmed imports to 30 days from upload.
 3. Confirm an import and advance to seven days.
-4. Run logical expiry, physical deletion, database scrubbing, quota release, and
+4. Delete an active candidate import, verify immediate `CANCELLED`/access denial,
+   advance no more than 24 hours, and verify complete physical/database purge
+   before the `DELETED` transition.
+5. Run logical expiry, physical deletion, database scrubbing, quota release, and
    reconciliation loops independently.
-5. Inject provider failure and expired deletion leases; prove safe retry.
-6. Return `ALREADY_ABSENT`; prove deletion and quota decrement occur once.
-7. Seed a known orphan; prove it is scheduled/deleted without its locator
+6. Inject provider failure and expired deletion leases; prove safe retry.
+7. Return `ALREADY_ABSENT`; prove deletion and quota decrement occur once.
+8. Seed a known orphan; prove it is scheduled/deleted without its locator
    appearing in telemetry.
 
 Acceptance requires inaccessible content at the logical deadline and idempotent
@@ -339,25 +372,42 @@ physical/database purge by the relevant maximum deadline.
 Use synthetic clean documents at representative sizes and controlled scanner/
 parser latency. Capture safe aggregate metrics only.
 
-- p95 upload finalization/actionable validation response <=5 seconds after the
+- P95 upload finalization/actionable pre-scan validation response <=5 seconds after the
   last byte;
 - at least 90% review-ready or actionable terminal within 60 seconds and all
   within 3 minutes under documented provider conditions;
-- p95 review load <=3 seconds;
-- p95 draft save and confirmation feedback <=2 seconds;
+- P95 review load <=3 seconds;
+- P95 draft save and confirmation feedback <=2 seconds;
 - cleanup succeeds without manual intervention for at least 99% of the measured
   workload.
 
-Evidence must state dataset size, file-size/format mix, machine/container
-resources, concurrency, parser mode, warmed/cold state, and percentile method.
-Reports contain only synthetic IDs, timings, byte buckets, and safe result codes.
+Before collecting the cleanup percentage, the performance harness owner must
+document the observation unit, numerator, denominator, measurement window,
+deadline treatment, and what counts as manual intervention. The release run
+must reuse that definition rather than choosing it after seeing results.
 
-## 14. Safe Troubleshooting
+Evidence must state dataset size, sample size, test duration, file-size/format
+mix, machine/container resources, concurrency, parser mode, warmed/cold state,
+external-provider conditions, and percentile method. Report P50/P95/P99,
+maximum latency, and error rate. Reports contain only synthetic IDs, timings,
+byte buckets, and safe result codes.
+
+## 14. Usability Evidence
+
+Run the complete upload, review, and confirm protocol with at least 30
+representative participants: at least 15 on desktop and 15 at a 320-pixel mobile
+viewport. The fixture matrix must cover PDF and DOCX plus Vietnamese, English,
+and bilingual CVs. At least 90% must complete the flow correctly on the first
+attempt without assistance. Record only anonymized aggregate completion/error
+counts and environment details; if the threshold is not verified, P0 release is
+blocked rather than inferred.
+
+## 15. Safe Troubleshooting
 
 - `AWAITING_CONTENT`: check reservation expiry and client request headers, not
   the file body.
-- `SCAN_FAILED`: check private reachability, ClamAV health/version, and signature
-  age. Never bypass fail-closed scanning.
+- `SCAN_FAILED`: check the co-located Unix socket, ClamAV health/version, and
+  signature age. Never enable TCP or bypass fail-closed scanning.
 - `EXTRACTION_FAILED`: use safe failure code and synthetic reproduction; do not
   dump the candidate document or extracted strings.
 - `PARSE_FAILED`: check deployment gate, safe provider status/code, attempt

@@ -39,7 +39,8 @@ description: "Task list template for feature implementation"
   Tasks MUST be organized by user story so each story can be:
   - Implemented independently
   - Tested independently
-  - Delivered as an MVP increment
+  - Demonstrated as a technical increment; released only when the complete
+    constitution-required P0 scope and quality gates pass
 
   DO NOT keep these sample tasks in the generated tasks.md file.
   ============================================================================
@@ -74,7 +75,7 @@ Examples of foundational tasks (adjust based on your project):
 
 ---
 
-## Phase 3: User Story 1 - [Title] (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - [Title] (Priority: P1) - Technical Checkpoint
 
 **Goal**: [Brief description of what this story delivers]
 
@@ -212,21 +213,24 @@ Task: "Create [Entity2] model in src/models/[entity2].py"
 
 ## Implementation Strategy
 
-### MVP First (User Story 1 Only)
+### Technical Checkpoint First
 
 1. Complete Phase 1: Setup
 2. Complete Phase 2: Foundational (CRITICAL - blocks all stories)
 3. Complete Phase 3: User Story 1
 4. **STOP and VALIDATE**: Test User Story 1 independently
-5. Deploy/demo if ready
+5. Demo the checkpoint if ready; deploy only if the complete selected release
+   scope satisfies every applicable constitution/P0 gate
 
 ### Incremental Delivery
 
 1. Complete Setup + Foundational → Foundation ready
-2. Add User Story 1 → Test independently → Deploy/Demo (MVP!)
-3. Add User Story 2 → Test independently → Deploy/Demo
-4. Add User Story 3 → Test independently → Deploy/Demo
+2. Add User Story 1 → Test independently → Demo checkpoint
+3. Add User Story 2 → Test independently → Demo checkpoint
+4. Add User Story 3 → Test independently → Demo checkpoint
 5. Each story adds value without breaking previous stories
+6. Define the releasable P0 scope from the constitution and feature
+   requirements; never infer that User Story 1 alone is releasable
 
 ### Parallel Team Strategy
 
