@@ -2,9 +2,49 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePasswordChange } from "../client/use-password-change";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import {
+  UnsavedChangesIndicator,
+  useUnsavedChangesGuard,
+} from "../client/unsaved-changes";
 
 export function PasswordChangeForm({ csrfProof }: { csrfProof: string }) {
+  const locale = useWorkspaceLocale();
+  const copy =
+    locale === "vi"
+      ? {
+          kicker: "BẢO MẬT MẬT KHẨU",
+          title: "Đổi mật khẩu",
+          policy:
+            "Sử dụng từ 12 đến 128 ký tự Unicode. Có thể dùng khoảng trắng; không bắt buộc riêng chữ hoa, chữ thường, chữ số hay ký hiệu.",
+          retry: (seconds: number) => ` Thử lại sau ${seconds} giây.`,
+          current: "Mật khẩu hiện tại",
+          next: "Mật khẩu mới",
+          confirm: "Xác nhận mật khẩu mới",
+          show: "Hiện mật khẩu",
+          hide: "Ẩn mật khẩu",
+          changing: "Đang đổi mật khẩu...",
+          locked: (seconds: number) => `Thử lại sau ${seconds} giây`,
+          change: "Đổi mật khẩu",
+        }
+      : {
+          kicker: "CREDENTIAL SECURITY",
+          title: "Change password",
+          policy:
+            "Use 12 to 128 Unicode characters. Spaces are allowed; uppercase, lowercase, digits, and symbols are not individually required.",
+          retry: (seconds: number) => ` Try again in ${seconds} seconds.`,
+          current: "Current password",
+          next: "New password",
+          confirm: "Confirm new password",
+          show: "Show passwords",
+          hide: "Hide passwords",
+          changing: "Changing password...",
+          locked: (seconds: number) => `Try again in ${seconds} seconds`,
+          change: "Change password",
+        };
   const state = usePasswordChange(csrfProof);
+  const dirty = Object.values(state.values).some(Boolean);
+  useUnsavedChangesGuard(dirty);
   const [showPasswords, setShowPasswords] = useState(false);
   const feedbackRef = useRef<HTMLDivElement>(null);
 
@@ -27,13 +67,13 @@ export function PasswordChangeForm({ csrfProof }: { csrfProof: string }) {
           </svg>
         </span>
         <div>
-          <p className="panel-kicker">CREDENTIAL SECURITY</p>
-          <h2 id="password-change-title">Change password</h2>
+          <p className="panel-kicker">{copy.kicker}</p>
+          <h2 id="password-change-title">{copy.title}</h2>
+          <UnsavedChangesIndicator dirty={dirty} />
         </div>
       </div>
       <p className="security-panel-copy" id="password-change-policy">
-        Use 12 to 128 Unicode characters. Spaces are allowed; uppercase,
-        lowercase, digits, and symbols are not individually required.
+        {copy.policy}
       </p>
       <div
         ref={feedbackRef}
@@ -54,7 +94,7 @@ export function PasswordChangeForm({ csrfProof }: { csrfProof: string }) {
           <>
             <strong>{state.feedback.message}</strong>
             {state.retryAfterSeconds > 0 ? (
-              <span> Try again in {state.retryAfterSeconds} seconds.</span>
+              <span>{copy.retry(state.retryAfterSeconds)}</span>
             ) : null}
             {errors ? (
               <ul>
@@ -75,7 +115,7 @@ export function PasswordChangeForm({ csrfProof }: { csrfProof: string }) {
           void state.submit();
         }}
       >
-        <label htmlFor="password-change-current">Current password</label>
+        <label htmlFor="password-change-current">{copy.current}</label>
         <input
           id="password-change-current"
           type={type}
@@ -87,7 +127,7 @@ export function PasswordChangeForm({ csrfProof }: { csrfProof: string }) {
           }
         />
 
-        <label htmlFor="password-change-new">New password</label>
+        <label htmlFor="password-change-new">{copy.next}</label>
         <input
           id="password-change-new"
           type={type}
@@ -100,9 +140,7 @@ export function PasswordChangeForm({ csrfProof }: { csrfProof: string }) {
           }
         />
 
-        <label htmlFor="password-change-confirmation">
-          Confirm new password
-        </label>
+        <label htmlFor="password-change-confirmation">{copy.confirm}</label>
         <input
           id="password-change-confirmation"
           type={type}
@@ -118,7 +156,7 @@ export function PasswordChangeForm({ csrfProof }: { csrfProof: string }) {
         <button
           className="password-visibility-control"
           type="button"
-          aria-label={showPasswords ? "Hide passwords" : "Show passwords"}
+          aria-label={showPasswords ? copy.hide : copy.show}
           aria-pressed={showPasswords}
           onClick={() => setShowPasswords((visible) => !visible)}
         >
@@ -136,15 +174,15 @@ export function PasswordChangeForm({ csrfProof }: { csrfProof: string }) {
               }
             />
           </svg>
-          <span>{showPasswords ? "Hide passwords" : "Show passwords"}</span>
+          <span>{showPasswords ? copy.hide : copy.show}</span>
         </button>
 
         <button type="submit" disabled={state.submitting || state.locked}>
           {state.submitting
-            ? "Changing password..."
+            ? copy.changing
             : state.locked
-              ? `Try again in ${state.retryAfterSeconds} seconds`
-              : "Change password"}
+              ? copy.locked(state.retryAfterSeconds)
+              : copy.change}
         </button>
       </form>
     </section>

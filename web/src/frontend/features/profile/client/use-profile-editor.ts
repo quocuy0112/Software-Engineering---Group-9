@@ -9,6 +9,11 @@ import {
   type ProfileSectionMutation,
 } from "@/shared/contracts/account/profile";
 import type { AccountError } from "@/shared/contracts/account/common";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import {
+  localizeAccountMessage,
+  localizeFieldErrors,
+} from "./localized-account-feedback";
 
 type WithoutBaseRevision<T> = T extends unknown
   ? Omit<T, "baseRevision">
@@ -33,6 +38,7 @@ export function useProfileEditor(
   initialProfile: CandidateProfileContract | undefined,
   csrfProof: string,
 ) {
+  const locale = useWorkspaceLocale();
   const [profile, setProfile] = useState(initialProfile);
   const [loading, setLoading] = useState(initialProfile === undefined);
   const [loadError, setLoadError] = useState(false);
@@ -102,9 +108,15 @@ export function useProfileEditor(
             kind: "error",
             message:
               typeof accountError.message === "string"
-                ? accountError.message
-                : "The profile section could not be saved.",
-            fieldErrors: accountError.fieldErrors,
+                ? localizeAccountMessage(
+                    locale,
+                    accountError.message,
+                    accountError.code,
+                  )
+                : locale === "vi"
+                  ? "Không thể lưu mục hồ sơ."
+                  : "The profile section could not be saved.",
+            fieldErrors: localizeFieldErrors(locale, accountError.fieldErrors),
           };
           setFeedback(next);
           toast.error(next.message, { id: "professional-profile-save" });
@@ -117,7 +129,7 @@ export function useProfileEditor(
         const normalized = outcome.data.warnings.length > 0;
         const kind =
           outcome.data.conflictApplied || normalized ? "warning" : "success";
-        const message = outcome.data.message;
+        const message = localizeAccountMessage(locale, outcome.data.message);
         setFeedback({ kind, message });
         if (kind === "success") {
           toast.success(message, { id: "professional-profile-save" });
@@ -127,7 +139,10 @@ export function useProfileEditor(
         await load(false);
         return true;
       } catch {
-        const message = "The profile section could not be saved.";
+        const message =
+          locale === "vi"
+            ? "Không thể lưu mục hồ sơ."
+            : "The profile section could not be saved.";
         setFeedback({ kind: "error", message });
         toast.error(message, { id: "professional-profile-save" });
         return false;
@@ -136,7 +151,7 @@ export function useProfileEditor(
         setSavingSection(null);
       }
     },
-    [csrfProof, focusFirstError, load, profile],
+    [csrfProof, focusFirstError, load, locale, profile],
   );
 
   return {

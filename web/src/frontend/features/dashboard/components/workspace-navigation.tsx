@@ -3,11 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-
-const destinations = [
-  { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
-  { href: "/profile", label: "Profile", icon: "profile" },
-] as const;
+import { useWorkspaceLocale } from "../client/workspace-locale";
 
 export function WorkspaceNavigation({
   busy,
@@ -18,6 +14,31 @@ export function WorkspaceNavigation({
   collapsed: boolean;
   onSignOut: () => void;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy =
+    locale === "vi"
+      ? {
+          dashboard: "Tổng quan",
+          profile: "Hồ sơ",
+          workspace: "Không gian làm việc",
+          openMenu: "Mở menu làm việc",
+          closeMenu: "Đóng menu làm việc",
+          signOut: "Đăng xuất",
+          signingOut: "Đang đăng xuất…",
+        }
+      : {
+          dashboard: "Dashboard",
+          profile: "Profile",
+          workspace: "Workspace",
+          openMenu: "Open workspace menu",
+          closeMenu: "Close workspace menu",
+          signOut: "Sign out",
+          signingOut: "Signing out…",
+        };
+  const destinations = [
+    { href: "/dashboard", label: copy.dashboard, icon: "dashboard" },
+    { href: "/profile", label: copy.profile, icon: "profile" },
+  ] as const;
   const pathname = usePathname() ?? "/";
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -52,15 +73,15 @@ export function WorkspaceNavigation({
             d={menuOpen ? "M6 6l12 12M18 6 6 18" : "M4 7h16M4 12h16M4 17h16"}
           />
         </svg>
-        {menuOpen ? "Close workspace menu" : "Open workspace menu"}
+        {menuOpen ? copy.closeMenu : copy.openMenu}
       </button>
       <nav
         id="workspace-navigation"
         className="workspace-navigation"
-        aria-label="Workspace"
+        aria-label={locale === "vi" ? "Không gian làm việc" : "Workspace"}
         data-open={menuOpen}
       >
-        <p className="workspace-nav-label">Workspace</p>
+        <p className="workspace-nav-label">{copy.workspace}</p>
         <div className="workspace-navigation-scroll">
           {destinations.map((destination) => {
             const active =
@@ -90,12 +111,14 @@ export function WorkspaceNavigation({
             onClick={onSignOut}
             disabled={busy}
             aria-busy={busy}
-            aria-label={busy ? "Signing out" : "Sign out"}
-            title={collapsed ? (busy ? "Signing out" : "Sign out") : undefined}
+            aria-label={busy ? copy.signingOut : copy.signOut}
+            title={
+              collapsed ? (busy ? copy.signingOut : copy.signOut) : undefined
+            }
           >
             <NavIcon name="signout" />
             <span className="workspace-navigation-label">
-              {busy ? "Signing out…" : "Sign out"}
+              {busy ? copy.signingOut : copy.signOut}
             </span>
           </button>
         </div>

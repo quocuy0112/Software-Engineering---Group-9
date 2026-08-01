@@ -1,9 +1,3 @@
-@media (max-width: 1279px) {
-  .profile-placeholder-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 1023px) {
   .auth-page {
     grid-template-columns: minmax(320px, 40%) minmax(0, 60%);
@@ -74,10 +68,6 @@
     grid-column: auto;
   }
 
-  .profile-placeholder-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .profile-section-heading {
     display: block;
   }
@@ -118,15 +108,6 @@
 
   .page-heading-badge {
     margin-top: var(--sh-space-3);
-  }
-
-  .dashboard-coming-later {
-    grid-template-columns: 40px minmax(0, 1fr);
-  }
-
-  .coming-later-pill {
-    grid-column: 2;
-    justify-self: start;
   }
 
   .profile-account-details > div {
@@ -193,7 +174,6 @@
 
   .backup-codes,
   .security-panel [role="alert"] ul,
-  .profile-placeholder-grid,
   .factor-mode-switcher {
     grid-template-columns: 1fr;
   }

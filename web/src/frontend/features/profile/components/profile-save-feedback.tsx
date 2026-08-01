@@ -1,14 +1,32 @@
+"use client";
+
 import type { ProfileEditorFeedback } from "../client/use-profile-editor";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 
 export function ProfileSaveFeedback({
   feedback,
 }: {
   feedback: ProfileEditorFeedback | null;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy =
+    locale === "vi"
+      ? {
+          label: "Phản hồi lưu dữ liệu",
+          success: "Đã lưu:",
+          warning: "Cần chú ý:",
+          error: "Không thể lưu:",
+        }
+      : {
+          label: "Save feedback",
+          success: "Saved:",
+          warning: "Attention:",
+          error: "Could not save:",
+        };
   return (
     <section
       className="professional-profile-feedback"
-      aria-label="Save feedback"
+      aria-label={copy.label}
       aria-live="polite"
       aria-atomic="true"
     >
@@ -20,10 +38,10 @@ export function ProfileSaveFeedback({
         >
           <strong>
             {feedback.kind === "success"
-              ? "Saved:"
+              ? copy.success
               : feedback.kind === "warning"
-                ? "Attention:"
-                : "Could not save:"}
+                ? copy.warning
+                : copy.error}
           </strong>{" "}
           {feedback.message}
         </p>

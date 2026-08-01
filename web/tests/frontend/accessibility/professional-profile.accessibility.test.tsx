@@ -106,6 +106,28 @@ describe("professional profile accessibility", () => {
     ).toHaveAttribute("aria-live", "polite");
   });
 
+  it("marks edited sections and blocks accidental in-app navigation", () => {
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+    render(
+      <ProfileOverview
+        account={account}
+        initialProfile={emptyProfile}
+        csrfProof="csrf-proof"
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText("Headline"), {
+      target: { value: "Senior product engineer" },
+    });
+    expect(screen.getByText("Unsaved")).toBeVisible();
+    expect(fireEvent.click(screen.getByRole("link", { name: "Account" }))).toBe(
+      false,
+    );
+    expect(confirm).toHaveBeenCalledWith(
+      "You have unsaved changes. Are you sure you want to leave this page?",
+    );
+  });
+
   it("ships 320px-safe and reduced-motion styles", () => {
     const css = readFileSync(
       resolve(

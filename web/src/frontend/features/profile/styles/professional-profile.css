@@ -4,6 +4,15 @@
   overflow-wrap: anywhere;
 }
 
+#profile-avatar-section,
+#profile-basics-section,
+#profile-skills-section,
+#profile-experience-section,
+#profile-education-section,
+#profile-social-section {
+  scroll-margin-top: var(--sh-space-6);
+}
+
 .professional-profile-page button,
 .professional-profile-page input,
 .professional-profile-page textarea {
@@ -136,6 +145,26 @@
   font-size: var(--sh-font-size-h3);
   font-weight: var(--sh-font-weight-bold);
   line-height: var(--sh-line-height-h3);
+}
+
+.profile-unsaved-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  width: fit-content;
+  margin-top: 0.45rem;
+  color: #9a5b08;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+}
+
+.profile-unsaved-indicator > span {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: #e69a26;
+  box-shadow: 0 0 0 0.22rem rgb(230 154 38 / 14%);
 }
 
 .professional-profile-fields {
@@ -296,6 +325,15 @@
   letter-spacing: -0.03em;
 }
 
+.social-platform-mark svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
 [data-platform="github"] .social-platform-mark {
   background: var(--sh-color-text-primary);
 }
@@ -334,6 +372,30 @@
 
 .social-link-row input[type="url"] {
   font-size: var(--sh-font-size-body-sm);
+}
+
+.social-link-error {
+  grid-column: 2 / -1;
+}
+
+.social-link-preview {
+  display: inline-flex;
+  min-height: var(--sh-control-height-sm);
+  align-items: center;
+  gap: var(--sh-space-1);
+  padding: 0 var(--sh-space-3);
+  border: 1px solid var(--sh-color-brand-primary);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-info-bg);
+  font-size: var(--sh-font-size-body-sm);
+  font-weight: var(--sh-font-weight-semibold);
+  text-decoration: none;
+}
+
+.social-link-preview:hover {
+  color: var(--sh-color-text-inverse);
+  background: var(--sh-color-brand-primary);
 }
 
 .professional-profile-list-row,
@@ -460,6 +522,10 @@
 
   .profile-field-error,
   .profile-field-hint {
+    grid-column: 1;
+  }
+
+  .social-link-error {
     grid-column: 1;
   }
 

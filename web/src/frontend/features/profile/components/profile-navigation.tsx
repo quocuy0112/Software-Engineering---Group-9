@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 
 export type ProfileNavigationDestination = {
   href: string;
@@ -21,15 +22,30 @@ export function ProfileNavigation({
   active: string;
   destinations?: readonly ProfileNavigationDestination[];
 }) {
+  const locale = useWorkspaceLocale();
+  const labels =
+    locale === "vi"
+      ? {
+          overview: "Nghề nghiệp",
+          account: "Tài khoản",
+          preferences: "Tùy chọn",
+          security: "Bảo mật",
+          sessions: "Phiên đăng nhập",
+        }
+      : null;
   return (
-    <nav className="profile-navigation" aria-label="Profile">
+    <nav
+      className="profile-navigation"
+      aria-label={locale === "vi" ? "Hồ sơ" : "Profile"}
+    >
       {destinations.map((destination) => (
         <Link
           key={destination.href}
           href={destination.href}
           aria-current={destination.key === active ? "page" : undefined}
         >
-          {destination.label}
+          {labels?.[destination.key as keyof typeof labels] ??
+            destination.label}
         </Link>
       ))}
     </nav>
