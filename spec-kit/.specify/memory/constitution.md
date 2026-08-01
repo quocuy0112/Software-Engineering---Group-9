@@ -1,3 +1,28 @@
+<!--
+Sync Impact Report
+- Version change: unversioned baseline (treated as 1.x) -> 2.0.0
+- Modified principles:
+  - Principle II - Security, Privacy, and Tenant Isolation: clarified the
+    existing 5 MB upload cap as decimal 5,000,000 bytes without changing it.
+  - Principle VI - Measurable Quality and Accessible Experience: mandatory
+    latency targets now use explicit P95 acceptance semantics with transparent
+    outlier/error reporting; correctness, security, retention, and hard workflow
+    deadlines remain non-percentile gates.
+- Added sections: none
+- Removed sections: none
+- Templates:
+  - ✅ spec-kit/.specify/templates/plan-template.md updated to use the explicit
+    P95 notation in its performance-constraint example.
+  - ✅ spec-kit/.specify/templates/spec-template.md updated to distinguish an
+    independently testable story checkpoint from a releasable P0 workflow.
+  - ✅ spec-kit/.specify/templates/tasks-template.md updated to prevent a partial
+    P0 story slice from being labelled or deployed as a complete MVP.
+  - ✅ spec-kit/.specify/templates/commands/ reviewed; directory is not present.
+- Runtime guidance:
+  - ✅ README.md and AGENTS.md reviewed; no principle reference requires change.
+- Follow-up TODOs: none.
+-->
+
 # SmartHire Constitution
 
 This constitution defines the mandatory constraints that every SmartHire
@@ -48,8 +73,8 @@ Personal, recruitment, and company data MUST be protected by design.
 - Passwords MUST be securely hashed and MUST NOT be stored in plain text.
 - Sensitive traffic MUST use HTTPS. Inputs and uploaded files MUST be validated
   before processing.
-- CV uploads MUST be limited to PDF and DOCX files with a maximum size of 5 MB,
-  unless this constitution is amended.
+- CV uploads MUST be limited to PDF and DOCX files with a maximum size of 5 MB
+  (exactly 5,000,000 bytes), unless this constitution is amended.
 - Secrets and production personal data MUST NOT be committed to the repository,
   written to ordinary application logs, or sent to an AI provider unless
   required for the approved feature and protected by the defined data policy.
@@ -147,21 +172,32 @@ value than many disconnected demonstrations.
 
 ### Principle VI - Measurable Quality and Accessible Experience
 
-Quality claims MUST be verifiable under stated conditions.
+Quality claims MUST be verifiable under stated conditions. Unless an approved
+feature specification defines a stricter percentile, the latency targets in the
+table below MUST be evaluated at the 95th percentile (P95) over a documented,
+representative test window. This percentile convention is the project SLA
+baseline because it resists isolated network, scheduling, and cold-start jitter
+while still measuring sustained user experience.
 
-| Interaction                 |              Mandatory target |
-| --------------------------- | ----------------------------: |
-| Page load                   |                   ≤ 3 seconds |
-| Dashboard navigation        |                   ≤ 2 seconds |
-| Job search and filtering    |                   ≤ 2 seconds |
-| Profile update              |                   ≤ 2 seconds |
-| Kanban visual response      |            ≤ 500 milliseconds |
-| In-app notification         |                   ≤ 5 seconds |
-| AI semantic scoring         | ≤ 20 seconds and asynchronous |
-| Export up to 10,000 records |                  ≤ 10 seconds |
+| Interaction                 |                  Mandatory target |
+| --------------------------- | --------------------------------: |
+| Page load                   |                       P95 ≤ 3 seconds |
+| Dashboard navigation        |                       P95 ≤ 2 seconds |
+| Job search and filtering    |                       P95 ≤ 2 seconds |
+| Profile update              |                       P95 ≤ 2 seconds |
+| Kanban visual response      |                P95 ≤ 500 milliseconds |
+| In-app notification         |                       P95 ≤ 5 seconds |
+| AI semantic scoring         | P95 ≤ 20 seconds and asynchronous |
+| Export up to 10,000 records |                      P95 ≤ 10 seconds |
 
 - Each performance claim MUST identify its environment, dataset, measurement
-  method, and relevant external-service conditions.
+  method, sample size, test duration, concurrency, percentile calculation,
+  maximum observed latency, error rate, and relevant external-service
+  conditions.
+- P95 applies only to latency/service-level measurements. Authorization,
+  validation correctness, transactional integrity, privacy, retention/deletion
+  deadlines, and any requirement explicitly identified as a hard deadline MUST
+  still pass for every tested case.
 - The 99.5% availability figure MUST be treated as a design target unless it is
   measured over a defined deployment period.
 - Candidate workflows MUST support responsive mobile use and clearly preserve
@@ -174,8 +210,10 @@ Quality claims MUST be verifiable under stated conditions.
 - Color MUST NOT be the only means of communicating a score, state, success, or
   failure.
 
-**Rationale:** Numeric targets without test conditions are not evidence, and a
-workflow that excludes supported users is incomplete.
+**Rationale:** P95 is the standard SmartHire latency SLA because a transparent
+percentile captures sustained experience more honestly than a brittle maximum.
+Numeric targets without test conditions or outlier/error reporting are not
+evidence, and a workflow that excludes supported users is incomplete.
 
 ### Principle VII - Maintainable and Provider-Independent Architecture
 
@@ -334,3 +372,5 @@ they do not conflict with this constitution.
   change.
 - Compliance MUST be checked when generating or updating a specification, plan,
   or task list.
+
+**Version**: 2.0.0 | **Ratified**: 2026-07-11 | **Last Amended**: 2026-08-01
