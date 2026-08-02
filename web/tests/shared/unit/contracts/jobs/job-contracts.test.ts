@@ -6,6 +6,7 @@ import {
 } from "@/shared/contracts/jobs/discovery";
 import {
   applicationSubmissionSchema,
+  candidateCvOptionSchema,
   jobReportInputSchema,
 } from "@/shared/contracts/jobs/actions";
 
@@ -63,6 +64,22 @@ describe("job board transport contracts", () => {
     ).toThrow();
     expect(() =>
       applicationSubmissionSchema.parse({ ...valid, consentAccepted: false }),
+    ).toThrow();
+  });
+
+  it("uses the constitutional decimal CV byte limit", () => {
+    const option = {
+      id: "cv-1",
+      displayName: "Application CV",
+      fileName: "application.pdf",
+      mimeType: "application/pdf" as const,
+      byteSize: 5_000_000,
+      version: 1,
+      confirmedAt: "2026-08-01T00:00:00.000Z",
+    };
+    expect(candidateCvOptionSchema.parse(option).byteSize).toBe(5_000_000);
+    expect(() =>
+      candidateCvOptionSchema.parse({ ...option, byteSize: 5_000_001 }),
     ).toThrow();
   });
 

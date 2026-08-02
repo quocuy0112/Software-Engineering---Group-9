@@ -62,11 +62,7 @@ export const candidateCvOptionSchema = z
       "application/pdf",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ]),
-    byteSize: z
-      .number()
-      .int()
-      .min(1)
-      .max(5 * 1024 * 1024),
+    byteSize: z.number().int().min(1).max(5_000_000),
     version: z.number().int().positive(),
     confirmedAt: z.string().datetime(),
   })

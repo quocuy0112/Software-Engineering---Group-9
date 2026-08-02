@@ -116,6 +116,17 @@ describe("application submission policy", () => {
     ).toThrow("APPLICATION_ANSWER_INVALID");
   });
 
+  it("accepts the exact decimal 5 MB boundary", () => {
+    expect(() =>
+      prepareApplicationSubmission(
+        { ...context, cv: { ...context.cv, byteSize: 5_000_000 } },
+        command,
+        "2026-08-01",
+        now,
+      ),
+    ).not.toThrow();
+  });
+
   it("rejects foreign, unconfirmed, archived, or oversized CVs", () => {
     expect(() =>
       prepareApplicationSubmission(
@@ -135,7 +146,7 @@ describe("application submission policy", () => {
     ).toThrow("APPLICATION_CV_INELIGIBLE");
     expect(() =>
       prepareApplicationSubmission(
-        { ...context, cv: { ...context.cv, byteSize: 5 * 1024 * 1024 + 1 } },
+        { ...context, cv: { ...context.cv, byteSize: 5_000_001 } },
         command,
         "2026-08-01",
         now,

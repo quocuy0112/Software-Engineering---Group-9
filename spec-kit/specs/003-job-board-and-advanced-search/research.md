@@ -95,3 +95,19 @@
 **Rationale**: The current exact package set covers the feature and avoids added supply-chain/lockfile risk.
 
 **Alternatives considered**: New slug, transliteration, search, or state libraries whose marginal value is insufficient.
+
+## Decision 13: Keep retained application CVs separate from Feature 004 imports
+
+**Decision**: Continue consuming a confirmed retained `CandidateCv` through a provider-independent boundary. Do not treat Feature 004 uploads, artifacts, drafts, provenance, or confirmation receipts as application attachments. Production UC-APP-01 is gated until an approved retained-document producer supplies that boundary.
+
+**Rationale**: Feature 004 is purpose-limited to temporary Profile import and must delete confirmed source content within seven days. Reusing those locators would break its consent and retention contract; treating a content-free receipt as a CV would weaken the approved application use case.
+
+**Alternatives considered**: Silently retain a Feature 004 source, use a confirmation receipt as the attachment, or remove CV selection from UC-APP-01. Each conflicts with an approved feature boundary or use-case requirement.
+
+## Decision 14: Keep one Feature 003 migration before merge
+
+**Decision**: Keep all Feature 003 database work in `008_job_board_advanced_search` while the branch remains unmerged, including the exact decimal 5,000,000-byte CV constraint. Represent all three JobPosting trigram indexes in Prisma with raw GIN operator classes. Feature 004 retains its distinct `008_cv_upload_parse_review` directory.
+
+**Rationale**: A single feature migration is easier to review and matches the user's branch workflow. The two `008_*` directory names remain unique and deterministically ordered by their full names. Omitting unsupported/raw indexes from Prisma causes generated development migrations to propose destructive drops.
+
+**Alternatives considered**: Keep a second Job Board hardening migration, accept the generated index-drop migration, or retain the old 5 MiB cap. The first adds avoidable pre-merge history and the others create performance or constitutional problems.

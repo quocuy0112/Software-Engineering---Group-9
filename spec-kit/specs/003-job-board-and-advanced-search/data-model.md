@@ -148,21 +148,21 @@ Joins a posting to the existing normalized `Skill` catalog.
 
 Minimal integration record consumed from the candidate CV workflow.
 
-| Field                  | Type                      | Rules                                                |
-| ---------------------- | ------------------------- | ---------------------------------------------------- |
-| id                     | opaque ID                 | primary key                                          |
-| candidateUserId        | CandidateIdentity user ID | required FK, owner derived from session              |
-| displayName / fileName | string                    | bounded display metadata                             |
-| mimeType               | string                    | PDF or DOCX media type                               |
-| byteSize               | integer                   | 1 through 5 MB constitutional limit                  |
-| storageKey             | string                    | opaque provider-independent private object reference |
-| checksumSha256         | string                    | 64 lowercase hex characters                          |
-| version                | positive integer          | immutable content version                            |
-| confirmedAt            | nullable timestamp        | must be non-null to apply                            |
-| archivedAt             | nullable timestamp        | archived CV cannot be newly selected                 |
-| createdAt / updatedAt  | timestamp                 | managed                                              |
+| Field                  | Type                      | Rules                                                                                      |
+| ---------------------- | ------------------------- | ------------------------------------------------------------------------------------------ |
+| id                     | opaque ID                 | primary key                                                                                |
+| candidateUserId        | CandidateIdentity user ID | required FK, owner derived from session                                                    |
+| displayName / fileName | string                    | bounded display metadata                                                                   |
+| mimeType               | string                    | PDF or DOCX media type                                                                     |
+| byteSize               | integer                   | 1 through exactly 5,000,000 bytes                                                          |
+| storageKey             | string                    | opaque retained private-document reference; never a Feature 004 temporary-artifact locator |
+| checksumSha256         | string                    | 64 lowercase hex characters                                                                |
+| version                | positive integer          | immutable content version                                                                  |
+| confirmedAt            | nullable timestamp        | must be non-null to apply                                                                  |
+| archivedAt             | nullable timestamp        | archived CV cannot be newly selected                                                       |
+| createdAt / updatedAt  | timestamp                 | managed                                                                                    |
 
-Relationships: belongs to CandidateIdentity; may be referenced by many applications. Deleting a CV is restricted while required by retained application evidence.
+Relationships: belongs to CandidateIdentity; may be referenced by many applications. Deleting a CV is restricted while required by retained application evidence. Feature 004's `CvUpload`, `CvStoredArtifact`, draft, provenance, and confirmation receipt do not satisfy this entity because their source content is temporary and cleanup-controlled.
 
 ### SavedJob
 
@@ -254,7 +254,7 @@ Constraint: unique `(applicationId, questionId)`.
 ### Apply
 
 1. Validate session, CSRF, strict input, idempotency key, and submission digest.
-2. In a serializable/retry-safe transaction, lock/re-read CandidateIdentity, CandidateProfile, CandidateCv, JobPosting/company/questions, and duplicate application.
+2. In a serializable/retry-safe transaction, lock/re-read CandidateIdentity, CandidateProfile, retained CandidateCv, JobPosting/company/questions, and duplicate application.
 3. Reject inactive account, unconfirmed/foreign/archived CV, unavailable job, expired deadline, missing required profile data/answers/consent, or changed idempotency binding.
 4. Create `JobApplication`, snapshots, answers, one successful AuditEvent, and two provider-neutral notification work rows.
 5. Commit once; notification delivery occurs later and cannot roll back the application.
@@ -280,4 +280,5 @@ Later transitions follow the constitutional canonical pipeline and require human
 - Public removal is a lifecycle change, not physical deletion. Saved jobs may retain only a neutral reference.
 - User/account deletion immediately blocks access; retained application/report/audit evidence follows the approved legal retention and deletion process.
 - Application snapshots and answers cannot be altered by later profile/CV/job edits.
+- Feature 004 cleanup remains authoritative for its temporary artifacts; no CandidateCv reference may delay or bypass those deletion deadlines.
 - Physical deletion order, when approved, removes notification work and answers before applications; shared JobPosting/Skill/Company records are not cascaded from a candidate deletion.

@@ -844,6 +844,9 @@ model JobPosting {
   @@index([employmentType, experienceLevel, workArrangement])
   @@index([salaryCurrency, salaryPeriod, salaryMax(sort: Desc), id])
   @@index([companyId, status, id])
+  @@index([normalizedTitle(ops: raw("gin_trgm_ops"))], type: Gin, map: "JobPosting_normalizedTitle_trgm_idx")
+  @@index([normalizedLocation(ops: raw("gin_trgm_ops"))], type: Gin, map: "JobPosting_normalizedLocation_trgm_idx")
+  @@index([searchDocumentNormalized(ops: raw("gin_trgm_ops"))], type: Gin, map: "JobPosting_searchDocumentNormalized_trgm_idx")
 }
 
 model JobPostingSkill {

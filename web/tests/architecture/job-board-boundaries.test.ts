@@ -56,6 +56,37 @@ describe("Feature 003 architecture boundaries", () => {
     expect(schema.match(/^model Session \{/gmu)).toHaveLength(1);
   });
 
+  it("keeps the reviewed job-search trigram indexes represented in Prisma", () => {
+    const schema = readFileSync(
+      resolve(process.cwd(), "prisma/schema.prisma"),
+      "utf8",
+    );
+    for (const indexName of [
+      "JobPosting_normalizedTitle_trgm_idx",
+      "JobPosting_normalizedLocation_trgm_idx",
+      "JobPosting_searchDocumentNormalized_trgm_idx",
+    ]) {
+      expect(schema).toContain(indexName);
+    }
+    expect(schema.match(/ops: raw\("gin_trgm_ops"\)/gu)).toHaveLength(3);
+  });
+
+  it("does not silently promote temporary Feature 004 imports into application attachments", () => {
+    const cvImportSources = files(/\/(?:services|repositories)\/cv-import\//u)
+      .map(read)
+      .join("\n");
+    expect(cvImportSources).not.toMatch(/CandidateCv|candidateCv/u);
+
+    const applicationSources = files(
+      /\/(?:services|repositories)\/jobs\/(?:application-policy|prisma-job-application-repository)\.ts$/u,
+    )
+      .map(read)
+      .join("\n");
+    expect(applicationSources).not.toMatch(
+      /CvUpload|CvStoredArtifact|cvUpload|cvStoredArtifact/u,
+    );
+  });
+
   it("keeps application and report enforcement human-controlled", () => {
     const jobSources = files(/\/(?:backend|app)\/.*jobs?\//u)
       .map(read)

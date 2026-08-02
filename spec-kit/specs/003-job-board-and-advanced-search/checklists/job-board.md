@@ -59,3 +59,4 @@
 
 - Reviewed 2026-08-01 against `spec.md`, `plan.md`, `data-model.md`, both contract documents, `quickstart.md`, and `tasks.md`.
 - 27/27 requirement-quality checks pass; runtime behavior remains subject to the generated test and release tasks.
+- Re-reviewed 2026-08-02 against Features 002/004; the separate retained-CV boundary, exact 5,000,000-byte cap, inherited session lifecycle, and forward-only post-merge hardening are covered by `integration-boundaries.md`.

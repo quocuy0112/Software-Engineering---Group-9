@@ -18,7 +18,7 @@ Better Auth 1.6.25 remains the exclusive browser-session owner. No hosted search
 - Root `package-lock.json` and existing installed dependencies; this feature adds no runtime package.
 - PostgreSQL 16.12 through Compose on `localhost:55432`.
 - Feature 001 identity and Feature 002 candidate profile migrations/runtime.
-- Two disposable verified/active candidate accounts and isolated company/job/CV fixtures created by the focused test harness.
+- Two disposable verified/active candidate accounts and isolated company/job/retained-CV fixtures created by the focused test harness. Fixtures validate the consumer contract only and are not production ingestion evidence.
 - Controlled Clock and documented performance environment.
 
 Do not commit `.env`, `web/.env.local`, private CV fixture content, captured mail, logs, coverage, or test output. Do not use `npm run db:reset` during routine validation because it deletes the local PostgreSQL volume.
@@ -42,11 +42,12 @@ Open `http://localhost:3001/jobs`. Focused Playwright setup creates and removes 
 ## Migration Gate
 
 1. Run `npm run db:verify` against an empty temporary database and a Feature 002-upgraded database.
-2. Confirm migration `008_job_board_advanced_search` is additive and no applied migration was edited.
+2. Confirm Feature 003 uses the single `008_job_board_advanced_search` migration and no previously merged Feature 001/002/004 migration was edited.
 3. Confirm `pg_trgm`, normalized search indexes, status/time indexes, composite saved/application unique constraints, nullable unresolved-report uniqueness, and answer/question ordering constraints.
-4. Confirm salary both-or-neither/range constraints, CV PDF/DOCX/5-MB checks, application initial-stage check, and notification idempotency.
-5. Confirm production migration contains no company/job/candidate/CV seed rows.
-6. Confirm the reviewed roll-forward/recovery procedure in `plan.md` and preserve a database backup before applying to non-disposable data.
+4. Confirm salary both-or-neither/range constraints, CV PDF/DOCX/exact-5,000,000-byte checks, application initial-stage check, and notification idempotency.
+5. On the merged Feature 004 baseline, confirm Prisma proposes no deletion of `JobPosting_*_trgm_idx` and no Feature 004 temporary artifact is referenced by CandidateCv.
+6. Confirm production migration contains no company/job/candidate/CV seed rows.
+7. Confirm the reviewed roll-forward/recovery procedure in `plan.md` and preserve a database backup before applying to non-disposable data.
 
 ## Static and Contract Gates
 
@@ -133,7 +134,7 @@ PostgreSQL integration tests, not mocks or SQLite, are required for trigram sear
 
 ## Walkthrough 5: Apply
 
-1. Candidate A must have name, headline, location, one confirmed PDF/DOCX CV <= 5 MB, and no existing application. Open Apply and verify only A's confirmed unarchived CVs.
+1. Candidate A must have name, headline, location, one confirmed retained PDF/DOCX CV of at most 5,000,000 bytes, and no existing application. Open Apply and verify only A's confirmed unarchived retained CVs. A Feature 004 import receipt alone must still produce the no-confirmed-CV path.
 2. Submit all required TEXT/BOOLEAN/SINGLE_CHOICE answers, optional cover letter, and active consent.
 3. Confirm exactly one application with stage `APPLIED`, candidate/job/CV linkage, bounded v1 snapshots, question snapshots/answers, consent evidence, successful audit, and two pending notification-work rows.
 4. Repeat the identical idempotency key and body. Confirm the existing successful application with no duplicate audit/notification work.
@@ -155,6 +156,8 @@ For every protected read/mutation:
 - inspect responses, ordinary logs, audit, analytics, and notifications for raw search text, report detail, answers, cover letter, profile/CV snapshot, object key, checksum, cookie/token, CSRF proof, raw headers/IP, or provider/database errors.
 
 No unauthorized mutation or sensitive disclosure is acceptable.
+
+Before production release, replace fixture evidence with an approved retained-CV producer contract covering explicit purpose/consent, private encrypted storage, malware-safety evidence, retention/deletion, archival, and safe handoff. Feature 004 temporary imports must continue to meet their own deletion deadlines unchanged.
 
 ## Accessibility and Responsive Evidence
 

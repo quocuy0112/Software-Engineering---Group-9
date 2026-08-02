@@ -14,7 +14,7 @@ Deliver a public SmartHire job catalogue and detail experience plus authenticate
 
 **Primary Dependencies**: Next.js 16.2.11, React 19.2.3, Zod 4.3.6, Prisma and `@prisma/adapter-pg` 7.9.0, `pg` 8.16.3, React Hook Form 7.82.0, TanStack Query 5.101.4, Sonner 2.0.7, and the existing Tailwind CSS 4.1.18/design tokens
 
-**Storage**: PostgreSQL 16.12 as the sole relational production database; existing opaque provider-backed browser sessions; opaque CV storage references only
+**Storage**: PostgreSQL 16.12 as the sole relational production database; existing opaque provider-backed browser sessions; opaque retained-CV storage references only. Feature 004 temporary artifact locators are explicitly ineligible.
 
 **Testing**: Vitest 4.1.10, Testing Library 16.3.1, Playwright 1.57.0, PostgreSQL integration tests, OpenAPI parity, architecture boundary tests, accessibility checks, and a production-build performance harness
 
@@ -24,23 +24,23 @@ Deliver a public SmartHire job catalogue and detail experience plus authenticate
 
 **Performance Goals**: p95 catalogue/search/filter and job detail at or below 2 seconds; public page load at or below 3 seconds under documented normal load
 
-**Constraints**: Public field allowlists; no AI search/recommendation; Better Auth remains the exclusive session owner; protected writes require active server session, same-origin/CSRF proof, strict validation, ownership derivation, and uniqueness/idempotency; application commit is transactional; reports never auto-moderate postings
+**Constraints**: Public field allowlists; no AI search/recommendation; Better Auth remains the exclusive session owner; protected writes require active server session, same-origin/CSRF proof, strict validation, ownership derivation, and uniqueness/idempotency; application commit is transactional; retained CVs are PDF/DOCX and exactly `1..5,000,000` bytes; Feature 004 temporary imports cannot become attachments implicitly; reports never auto-moderate postings
 
 **Scale/Scope**: Index for at least 100,000 public/historical postings, 10,000 active postings, 1,000,000 applications, 50 skills and 20 questions per posting, and 50 results per request
 
 ## Constitution Check
 
-*GATE: PASS before Phase 0 research; PASS again after Phase 1 design.*
+_GATE: PASS before Phase 0 research; PASS again after Phase 1 design._
 
-| Principle / boundary | Design evidence | Result |
-|---|---|---|
-| Human-controlled recruitment | No scoring or automated hiring. Reports enter `Pending Review` and cannot change a posting without a later human moderation action. | PASS |
-| Security, privacy, tenant isolation | Public repositories select explicit fields. Save/report/apply derive the actor from the existing server session. Application/CV/report content is not public or logged. | PASS |
-| Deterministic core | Search normalization, filters, ordering, and eligibility are deterministic. AI search keywords and semantic recommendations are excluded. | PASS |
-| State, audit, integrity | `Applied` is the initial canonical stage. Uniqueness prevents duplicates. Application snapshots, audit, and notification work share one transaction. | PASS |
-| Scope discipline | All three Must workflows include UI, authorization, persistence, failures, and tests; both requested Should workflows are P2 increments. External feature boundaries are explicit. | PASS |
-| Quality/accessibility | Plan includes p95 measurement, keyboard and accessibility tests, non-color states, and 320-pixel evidence. | PASS |
-| Maintainable architecture | App Router handlers stay thin; services own policy; repositories own persistence; shared contracts validate trust boundaries; no second session/database/provider is introduced. | PASS |
+| Principle / boundary                | Design evidence                                                                                                                                                                                                                                                                                              | Result                       |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------- |
+| Human-controlled recruitment        | No scoring or automated hiring. Reports enter `Pending Review` and cannot change a posting without a later human moderation action.                                                                                                                                                                          | PASS                         |
+| Security, privacy, tenant isolation | Public repositories select explicit fields. Save/report/apply derive the actor from the existing server session. Application/CV/report content is not public or logged.                                                                                                                                      | PASS                         |
+| Deterministic core                  | Search normalization, filters, ordering, and eligibility are deterministic. AI search keywords and semantic recommendations are excluded.                                                                                                                                                                    | PASS                         |
+| State, audit, integrity             | `Applied` is the initial canonical stage. Uniqueness prevents duplicates. Application snapshots, audit, and notification work share one transaction.                                                                                                                                                         | PASS                         |
+| Scope discipline                    | All three Must workflows include UI, authorization, persistence, failures, and tests; both requested Should workflows are P2 increments. UC-JOB-04 remains backlog. Production Apply is explicitly gated on the separately approved retained-CV provider rather than misusing Feature 004 temporary content. | PASS WITH RELEASE DEPENDENCY |
+| Quality/accessibility               | Plan includes p95 measurement, keyboard and accessibility tests, non-color states, and 320-pixel evidence.                                                                                                                                                                                                   | PASS                         |
+| Maintainable architecture           | App Router handlers stay thin; services own policy; repositories own persistence; shared contracts validate trust boundaries; no second session/database/provider is introduced.                                                                                                                             | PASS                         |
 
 ### Post-Design Re-check
 
@@ -48,7 +48,7 @@ Deliver a public SmartHire job catalogue and detail experience plus authenticate
 - OpenAPI exposes public fields only and gives protected mutations consistent authentication, CSRF, validation, conflict, and rate-limit responses.
 - Provider-neutral notification work does not couple application validity to delivery or introduce a second email/session mechanism.
 - The migration is additive and forward-only; no Feature 001/002 migration is edited.
-- No constitutional violation or unresolved clarification remains.
+- No constitutional design violation or unresolved product ambiguity remains. Production UC-APP-01 stays blocked until the retained-CV provider gate is satisfied.
 
 ## Architecture and Boundaries
 
@@ -90,13 +90,35 @@ Application transaction
 - Reports use a nullable unique unresolved key plus the existing database rate limiter; a later moderation workflow clears the key on resolution.
 - Report text, answers, CV/profile snapshots, credentials, cookies, raw headers, and raw network data are excluded from ordinary logs and audit context.
 
+## Inherited Browser Session Boundary
+
+Feature 003 defines no browser-session mechanism. Better Auth remains the exclusive owner established by Feature 001:
+
+- authentication state is an opaque PostgreSQL-backed session referenced only by the server-controlled cookie;
+- production uses `__Host-smarthire.session` with `Secure`, `HttpOnly`, `SameSite=Lax`, `Path=/`, and no `Domain`; local HTTP uses unprefixed `smarthire.session` without `Secure`;
+- every protected Job Board request reuses server validation plus ACTIVE-account, 30-minute idle-expiry, and creation-plus-seven-day absolute-expiry enforcement;
+- logout and explicit session management revoke selected sessions, password reset revokes all account sessions, and natural expiry is denied even before cleanup removes old rows;
+- Feature 003 introduces no authentication cookie, JWT, session table, localStorage/sessionStorage credential, or alternate lifecycle.
+
+Public discovery may resolve an optional session only to project the current actor's save/apply state. Any actor-scoped response is `private, no-store`; anonymous public projections may use the documented short public cache.
+
+## Retained CV and Feature 004 Boundary
+
+UC-APP-01 consumes `CandidateCv`, a separately retained application document. It is not produced by Feature 004, whose approved contract treats uploads as temporary import sources and deletes confirmed source content within seven days.
+
+- `CandidateCv.storageKey` must reference an approved retained private-document provider and must never reference `CvUpload`, `CvStoredArtifact`, extracted text, draft payload, provenance, or a Feature 004 cleanup-controlled locator.
+- The application form returns only safe confirmed document options; commit rechecks candidate ownership, confirmation, archival state, PDF/DOCX media type, and the decimal `5,000,000`-byte limit.
+- Controlled fixtures may exercise the consumer contract, but production release evidence must identify the approved retained-document producer, consent/purpose notice, malware-safety inheritance, encryption, retention/deletion owner, and replacement boundary.
+- If that provider is absent, the candidate receives the existing no-confirmed-CV recovery path and no application is created. The system must not weaken UC-APP-01 by treating a confirmation receipt as a file attachment.
+
 ## Migration and Recovery
 
-1. Add enums, public company/job structures, normalized search columns, skills/questions, confirmed CV metadata, saved jobs, reports, applications, answers, and notification work without rewriting identity/profile rows.
+1. Add enums, public company/job structures, normalized search columns, skills/questions, confirmed retained-CV metadata, saved jobs, reports, applications, answers, and notification work without rewriting identity/profile rows.
 2. Enable `pg_trgm` if absent and add reviewed indexes after invariant checks.
 3. Do not seed production in the migration; tests and quickstart use isolated fixtures.
-4. Verify both a clean database and a Feature 002-upgraded database without editing applied migrations.
-5. Recover by reviewed roll-forward migration; restore from tested backup if affected production data cannot be safely repaired.
+4. Because Feature 003 is not yet merged, keep its schema in the single `008_job_board_advanced_search` migration, including the exact decimal 5,000,000-byte constraint and three trigram indexes. The separate Feature 004 migration remains `008_cv_upload_parse_review`; Prisma orders the distinct full directory names deterministically on the merged branch.
+5. Never accept a generated migration that drops the reviewed trigram indexes. Verify clean, Feature 002-upgraded, and Feature 004-upgraded databases without editing migrations after this feature is merged or applied outside disposable development.
+6. Recover later changes by reviewed roll-forward migration; restore from tested backup if affected production data cannot be safely repaired.
 
 ## Project Structure
 
@@ -110,7 +132,11 @@ spec-kit/specs/003-job-board-and-advanced-search/
 ├── data-model.md
 ├── quickstart.md
 ├── contracts/{openapi.yaml,internal-contracts.md}
-├── checklists/{requirements.md,job-board.md}
+├── checklists/
+│   ├── {requirements.md,job-board.md,integration-boundaries.md}
+│   ├── {foundation-results.md,integration-results.md,migration-results.md}
+│   ├── {us1-...,us2-...,us3-...,us4-...,us5-...-results.md}
+│   └── {traceability.md,release-results.md,usability-results.md}
 └── tasks.md
 ```
 
@@ -135,11 +161,15 @@ web/
 
 - Contract: strict Zod schemas, OpenAPI parity, public allowlist, canonical errors.
 - Unit: normalization, bounds, cursors, ordering, availability, report rules, eligibility, and snapshots.
-- PostgreSQL integration: visibility/indexes, uniqueness races, rate limiting, rollback, audit/notification atomicity, authorization matrix.
+- PostgreSQL integration: visibility/indexes, clean/002/004 upgrade paths, uniqueness races, rate limiting, rollback, audit/notification atomicity, authorization matrix.
+- Cross-feature boundary: exact decimal CV cap, approved retained-CV references only, and architecture tests that prevent Feature 004 temporary artifacts from becoming application attachments.
 - Frontend: URL state, empty/retry/loading, action reconciliation, validation, keyboard flows, 320-pixel layout, non-color states.
 - E2E: browse/detail, login return, save/remove, report, apply, and duplicate/closed/session/failure recovery.
 - Quality: format, lint, typecheck, full Vitest, Playwright desktop/mobile, migration verification, build, and p95 harness.
+- Per-story evidence: each US1-US5 checklist combines the detailed independent
+  flow, failures, contracts, source/tests, exit gate, and aggregate
+  non-sensitive results without overstating production readiness.
 
 ## Complexity Tracking
 
-No constitutional exception or added deployment unit is required.
+No constitutional exception or added deployment unit is required. The retained-CV producer is a release dependency, not an implicit Feature 004 scope expansion.

@@ -109,7 +109,7 @@ export function prepareApplicationSubmission(
     !cv.confirmedAt ||
     cv.archivedAt ||
     cv.byteSize < 1 ||
-    cv.byteSize > 5 * 1024 * 1024 ||
+    cv.byteSize > 5_000_000 ||
     ![
       "application/pdf",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

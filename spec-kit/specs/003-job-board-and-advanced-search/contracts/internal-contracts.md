@@ -231,7 +231,8 @@ interface JobApplicationRepository {
 
 - Account is active and CandidateIdentity belongs to the session user.
 - Job remains approved/active/published and deadline/close time has not passed.
-- CV belongs to the candidate, is confirmed, unarchived, PDF/DOCX, and <= 5 MB.
+- CV belongs to the candidate, is retained by an approved application-document provider, is confirmed, unarchived, PDF/DOCX, and `1..5,000,000` bytes.
+- CV storage identity is independent of Feature 004 temporary uploads/artifacts; a Feature 004 receipt or cleanup-controlled locator is ineligible.
 - Required profile fields, active questions, answer kind/choice/bounds, and active consent version are satisfied.
 - Existing `(candidateUserId, jobId)` is authoritative; a matching retry returns it.
 - Existing `(candidateUserId, idempotencyKey)` with another binding returns `409 IDEMPOTENCY_KEY_REUSED`.
