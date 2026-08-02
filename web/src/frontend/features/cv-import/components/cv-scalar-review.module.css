@@ -1,32 +1,81 @@
 .root,
 .card {
   display: grid;
-  gap: 1rem;
+  min-width: 0;
+  gap: var(--sh-space-4);
+}
+
+.root > h2 {
+  margin: var(--sh-space-3) 0 0;
+  font-size: var(--sh-font-size-h2);
+  line-height: var(--sh-line-height-h2);
 }
 
 .card {
-  border: 1px solid var(--color-border, #cbd5e1);
-  border-radius: 0.75rem;
-  padding: 1rem;
+  padding: var(--sh-space-5);
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-md);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-control);
+}
+
+.card > h3 {
+  margin: 0;
+  padding-bottom: var(--sh-space-3);
+  border-bottom: 1px solid var(--sh-color-border-subtle);
+  font-size: var(--sh-font-size-h3);
+  line-height: var(--sh-line-height-h3);
+  text-transform: capitalize;
 }
 
 .comparison {
   display: grid;
-  gap: 1rem;
+  gap: var(--sh-space-4);
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .comparison > div,
 .choices {
   display: grid;
-  gap: 0.5rem;
+  min-width: 0;
+  gap: var(--sh-space-2);
+}
+
+.comparison > div:first-child {
+  align-content: start;
+  padding: var(--sh-space-4);
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-color-surface-subtle);
+}
+
+.comparison strong,
+.comparison label,
+.choices legend {
+  color: var(--sh-color-text-primary);
+  font-size: var(--sh-font-size-body-sm);
+  font-weight: var(--sh-font-weight-semibold);
+}
+
+.comparison p {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--sh-color-text-secondary);
+  font-size: var(--sh-font-size-body-sm);
+  white-space: pre-wrap;
 }
 
 .comparison input,
 .comparison textarea {
   box-sizing: border-box;
   inline-size: 100%;
-  min-block-size: 2.75rem;
+  min-block-size: var(--sh-control-height);
+  padding: 11px var(--sh-space-3);
+  border: 1px solid var(--sh-color-border-default);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-control);
 }
 
 .comparison textarea {
@@ -35,16 +84,33 @@
 }
 
 .choices {
-  border: 0;
   grid-template-columns: repeat(3, minmax(0, max-content));
   margin: 0;
-  padding: 0;
+  padding: var(--sh-space-3) var(--sh-space-4);
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-color-surface-tinted);
+}
+
+.choices legend {
+  padding-inline: var(--sh-space-2);
 }
 
 .choices label {
-  align-items: center;
   display: flex;
-  gap: 0.4rem;
+  min-height: 36px;
+  align-items: center;
+  gap: var(--sh-space-2);
+  padding-inline: var(--sh-space-2);
+  border-radius: 6px;
+  font-size: var(--sh-font-size-body-sm);
+  text-transform: capitalize;
+}
+
+.choices input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--sh-color-brand-primary);
 }
 
 .card :is(input, textarea):focus-visible {
@@ -53,6 +119,10 @@
 }
 
 @media (max-width: 32rem) {
+  .card {
+    padding: var(--sh-space-4);
+  }
+
   .comparison,
   .choices {
     grid-template-columns: 1fr;

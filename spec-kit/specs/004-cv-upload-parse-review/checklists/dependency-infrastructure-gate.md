@@ -29,7 +29,7 @@
 | ------------------ | -------------------------------------------------------------------------------------------------------------------- |
 | ClamAV image       | `clamav/clamav:1.4_base@sha256:35ec19c1e8cbee7cae8a35c3b0ac62957d99b418e6902035b89a1778c39433e7`                     |
 | ClamAV engine      | `1.4.5`                                                                                                              |
-| Worker base        | `node:24.18.0-alpine@sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432d679c54fbfd`                        |
+| Worker base        | `node:24.18.0-alpine3.23@sha256:595398b0081eacda8e1c4c5b97b76cd1020e4d58a8ebcb4843b9bca1e79e7436`                    |
 | Worker image       | `smarthire-cv-worker:local`, digest `sha256:c977feda8021550b971e91fd30d0b001105120173a6de8d57a6d8ea9a1a276c9`, 58 MB |
 | Scanner socket     | `/run/clamav/clamd.sock`, socket mode/owner/group `0660:100:101`                                                     |
 | Scanner networking | no `TCPSocket`/`TCPAddr`, no live 3310/7357 listener, no published port                                              |
