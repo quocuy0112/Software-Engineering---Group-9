@@ -20,6 +20,8 @@ web/.env.local
 # Local application data
 **/.local/
 web/.local/mail/
+# Encrypted CV artifacts are ephemeral and must be removed by the retention job.
+web/.local/cv-storage/
 mail-output/
 email-preview/
 

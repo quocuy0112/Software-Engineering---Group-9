@@ -132,3 +132,53 @@ export type EmailOutbox = Prisma.EmailOutboxModel
  * 
  */
 export type AuditEvent = Prisma.AuditEventModel
+/**
+ * Model CvAccountQuota
+ * 
+ */
+export type CvAccountQuota = Prisma.CvAccountQuotaModel
+/**
+ * Model CvUpload
+ * 
+ */
+export type CvUpload = Prisma.CvUploadModel
+/**
+ * Model CvStoredArtifact
+ * 
+ */
+export type CvStoredArtifact = Prisma.CvStoredArtifactModel
+/**
+ * Model CvScanAssessment
+ * 
+ */
+export type CvScanAssessment = Prisma.CvScanAssessmentModel
+/**
+ * Model CvExtraction
+ * 
+ */
+export type CvExtraction = Prisma.CvExtractionModel
+/**
+ * Model CvParseJob
+ * 
+ */
+export type CvParseJob = Prisma.CvParseJobModel
+/**
+ * Model CvRetryRequest
+ * 
+ */
+export type CvRetryRequest = Prisma.CvRetryRequestModel
+/**
+ * Model CvDraft
+ * 
+ */
+export type CvDraft = Prisma.CvDraftModel
+/**
+ * Model CvProcessingConsent
+ * 
+ */
+export type CvProcessingConsent = Prisma.CvProcessingConsentModel
+/**
+ * Model CvImportConfirmation
+ * 
+ */
+export type CvImportConfirmation = Prisma.CvImportConfirmationModel

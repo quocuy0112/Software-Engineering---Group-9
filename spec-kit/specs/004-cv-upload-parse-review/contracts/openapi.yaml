@@ -318,7 +318,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/CvRetryAccepted"
         "202":
-          description: A new durable retry was queued or is awaiting consent.
+          description: A new durable retry was queued.
           headers:
             Cache-Control:
               $ref: "#/components/headers/NoStoreHeader"
@@ -800,6 +800,31 @@ components:
             - $ref: "#/components/schemas/UtcTimestamp"
 
     CvImportResource:
+      oneOf:
+        - $ref: "#/components/schemas/CvImportDetail"
+        - $ref: "#/components/schemas/CvImportTombstone"
+
+    CvImportTombstone:
+      type: object
+      additionalProperties: false
+      required:
+        [uploadId, status, contentInaccessibleAt, deleteAfter, deletedAt]
+      properties:
+        uploadId:
+          $ref: "#/components/schemas/OpaqueId"
+        status:
+          type: string
+          enum: [CANCELLED, DELETED, EXPIRED]
+        contentInaccessibleAt:
+          $ref: "#/components/schemas/UtcTimestamp"
+        deleteAfter:
+          $ref: "#/components/schemas/UtcTimestamp"
+        deletedAt:
+          oneOf:
+            - type: "null"
+            - $ref: "#/components/schemas/UtcTimestamp"
+
+    CvImportDetail:
       type: object
       additionalProperties: false
       required:
@@ -968,7 +993,14 @@ components:
       type: object
       additionalProperties: false
       required:
-        [uploadId, status, contentInaccessibleAt, deleteAfter, deletedAt, statusUrl]
+        [
+          uploadId,
+          status,
+          contentInaccessibleAt,
+          deleteAfter,
+          deletedAt,
+          statusUrl,
+        ]
       properties:
         uploadId:
           $ref: "#/components/schemas/OpaqueId"
@@ -1047,6 +1079,7 @@ components:
             - PARSER_UNAVAILABLE
             - PARSER_OUTPUT_INVALID
             - PARSER_OUTPUT_LIMIT_EXCEEDED
+            - CV_PROCESSING_FAILED
             - RETRY_LIMIT_REACHED
             - IMPORT_EXPIRED
             - IMPORT_DELETED
@@ -1803,7 +1836,8 @@ components:
     ConflictLatest:
       type: object
       additionalProperties: false
-      required: [draftRevision, profileRevision]
+      required:
+        [draftRevision, profileRevision, draftUpdatedAt, profileUpdatedAt]
       properties:
         draftRevision:
           type: [integer, "null"]
@@ -1811,3 +1845,11 @@ components:
         profileRevision:
           type: [integer, "null"]
           minimum: 0
+        draftUpdatedAt:
+          oneOf:
+            - type: "null"
+            - $ref: "#/components/schemas/UtcTimestamp"
+        profileUpdatedAt:
+          oneOf:
+            - type: "null"
+            - $ref: "#/components/schemas/UtcTimestamp"

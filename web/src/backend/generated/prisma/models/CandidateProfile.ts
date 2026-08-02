@@ -253,6 +253,9 @@ export type CandidateProfileWhereInput = {
   education?: Prisma.ProfileEducationListRelationFilter
   skills?: Prisma.CandidateProfileSkillListRelationFilter
   socialLinks?: Prisma.SocialLinkListRelationFilter
+  cvUploads?: Prisma.CvUploadListRelationFilter
+  cvDrafts?: Prisma.CvDraftListRelationFilter
+  cvConfirmations?: Prisma.CvImportConfirmationListRelationFilter
 }
 
 export type CandidateProfileOrderByWithRelationInput = {
@@ -270,6 +273,9 @@ export type CandidateProfileOrderByWithRelationInput = {
   education?: Prisma.ProfileEducationOrderByRelationAggregateInput
   skills?: Prisma.CandidateProfileSkillOrderByRelationAggregateInput
   socialLinks?: Prisma.SocialLinkOrderByRelationAggregateInput
+  cvUploads?: Prisma.CvUploadOrderByRelationAggregateInput
+  cvDrafts?: Prisma.CvDraftOrderByRelationAggregateInput
+  cvConfirmations?: Prisma.CvImportConfirmationOrderByRelationAggregateInput
 }
 
 export type CandidateProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -290,6 +296,9 @@ export type CandidateProfileWhereUniqueInput = Prisma.AtLeast<{
   education?: Prisma.ProfileEducationListRelationFilter
   skills?: Prisma.CandidateProfileSkillListRelationFilter
   socialLinks?: Prisma.SocialLinkListRelationFilter
+  cvUploads?: Prisma.CvUploadListRelationFilter
+  cvDrafts?: Prisma.CvDraftListRelationFilter
+  cvConfirmations?: Prisma.CvImportConfirmationListRelationFilter
 }, "id" | "candidateUserId">
 
 export type CandidateProfileOrderByWithAggregationInput = {
@@ -338,6 +347,9 @@ export type CandidateProfileCreateInput = {
   education?: Prisma.ProfileEducationCreateNestedManyWithoutProfileInput
   skills?: Prisma.CandidateProfileSkillCreateNestedManyWithoutProfileInput
   socialLinks?: Prisma.SocialLinkCreateNestedManyWithoutProfileInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutProfileInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutProfileInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutProfileInput
 }
 
 export type CandidateProfileUncheckedCreateInput = {
@@ -354,6 +366,9 @@ export type CandidateProfileUncheckedCreateInput = {
   education?: Prisma.ProfileEducationUncheckedCreateNestedManyWithoutProfileInput
   skills?: Prisma.CandidateProfileSkillUncheckedCreateNestedManyWithoutProfileInput
   socialLinks?: Prisma.SocialLinkUncheckedCreateNestedManyWithoutProfileInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutProfileInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutProfileInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutProfileInput
 }
 
 export type CandidateProfileUpdateInput = {
@@ -370,6 +385,9 @@ export type CandidateProfileUpdateInput = {
   education?: Prisma.ProfileEducationUpdateManyWithoutProfileNestedInput
   skills?: Prisma.CandidateProfileSkillUpdateManyWithoutProfileNestedInput
   socialLinks?: Prisma.SocialLinkUpdateManyWithoutProfileNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutProfileNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutProfileNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutProfileNestedInput
 }
 
 export type CandidateProfileUncheckedUpdateInput = {
@@ -386,6 +404,9 @@ export type CandidateProfileUncheckedUpdateInput = {
   education?: Prisma.ProfileEducationUncheckedUpdateManyWithoutProfileNestedInput
   skills?: Prisma.CandidateProfileSkillUncheckedUpdateManyWithoutProfileNestedInput
   socialLinks?: Prisma.SocialLinkUncheckedUpdateManyWithoutProfileNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutProfileNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutProfileNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutProfileNestedInput
 }
 
 export type CandidateProfileCreateManyInput = {
@@ -565,6 +586,48 @@ export type CandidateProfileUpdateOneRequiredWithoutSocialLinksNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CandidateProfileUpdateToOneWithWhereWithoutSocialLinksInput, Prisma.CandidateProfileUpdateWithoutSocialLinksInput>, Prisma.CandidateProfileUncheckedUpdateWithoutSocialLinksInput>
 }
 
+export type CandidateProfileCreateNestedOneWithoutCvUploadsInput = {
+  create?: Prisma.XOR<Prisma.CandidateProfileCreateWithoutCvUploadsInput, Prisma.CandidateProfileUncheckedCreateWithoutCvUploadsInput>
+  connectOrCreate?: Prisma.CandidateProfileCreateOrConnectWithoutCvUploadsInput
+  connect?: Prisma.CandidateProfileWhereUniqueInput
+}
+
+export type CandidateProfileUpdateOneRequiredWithoutCvUploadsNestedInput = {
+  create?: Prisma.XOR<Prisma.CandidateProfileCreateWithoutCvUploadsInput, Prisma.CandidateProfileUncheckedCreateWithoutCvUploadsInput>
+  connectOrCreate?: Prisma.CandidateProfileCreateOrConnectWithoutCvUploadsInput
+  upsert?: Prisma.CandidateProfileUpsertWithoutCvUploadsInput
+  connect?: Prisma.CandidateProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CandidateProfileUpdateToOneWithWhereWithoutCvUploadsInput, Prisma.CandidateProfileUpdateWithoutCvUploadsInput>, Prisma.CandidateProfileUncheckedUpdateWithoutCvUploadsInput>
+}
+
+export type CandidateProfileCreateNestedOneWithoutCvDraftsInput = {
+  create?: Prisma.XOR<Prisma.CandidateProfileCreateWithoutCvDraftsInput, Prisma.CandidateProfileUncheckedCreateWithoutCvDraftsInput>
+  connectOrCreate?: Prisma.CandidateProfileCreateOrConnectWithoutCvDraftsInput
+  connect?: Prisma.CandidateProfileWhereUniqueInput
+}
+
+export type CandidateProfileUpdateOneRequiredWithoutCvDraftsNestedInput = {
+  create?: Prisma.XOR<Prisma.CandidateProfileCreateWithoutCvDraftsInput, Prisma.CandidateProfileUncheckedCreateWithoutCvDraftsInput>
+  connectOrCreate?: Prisma.CandidateProfileCreateOrConnectWithoutCvDraftsInput
+  upsert?: Prisma.CandidateProfileUpsertWithoutCvDraftsInput
+  connect?: Prisma.CandidateProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CandidateProfileUpdateToOneWithWhereWithoutCvDraftsInput, Prisma.CandidateProfileUpdateWithoutCvDraftsInput>, Prisma.CandidateProfileUncheckedUpdateWithoutCvDraftsInput>
+}
+
+export type CandidateProfileCreateNestedOneWithoutCvConfirmationsInput = {
+  create?: Prisma.XOR<Prisma.CandidateProfileCreateWithoutCvConfirmationsInput, Prisma.CandidateProfileUncheckedCreateWithoutCvConfirmationsInput>
+  connectOrCreate?: Prisma.CandidateProfileCreateOrConnectWithoutCvConfirmationsInput
+  connect?: Prisma.CandidateProfileWhereUniqueInput
+}
+
+export type CandidateProfileUpdateOneRequiredWithoutCvConfirmationsNestedInput = {
+  create?: Prisma.XOR<Prisma.CandidateProfileCreateWithoutCvConfirmationsInput, Prisma.CandidateProfileUncheckedCreateWithoutCvConfirmationsInput>
+  connectOrCreate?: Prisma.CandidateProfileCreateOrConnectWithoutCvConfirmationsInput
+  upsert?: Prisma.CandidateProfileUpsertWithoutCvConfirmationsInput
+  connect?: Prisma.CandidateProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CandidateProfileUpdateToOneWithWhereWithoutCvConfirmationsInput, Prisma.CandidateProfileUpdateWithoutCvConfirmationsInput>, Prisma.CandidateProfileUncheckedUpdateWithoutCvConfirmationsInput>
+}
+
 export type CandidateProfileCreateWithoutCandidateInput = {
   id?: string
   headline?: string | null
@@ -578,6 +641,9 @@ export type CandidateProfileCreateWithoutCandidateInput = {
   education?: Prisma.ProfileEducationCreateNestedManyWithoutProfileInput
   skills?: Prisma.CandidateProfileSkillCreateNestedManyWithoutProfileInput
   socialLinks?: Prisma.SocialLinkCreateNestedManyWithoutProfileInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutProfileInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutProfileInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutProfileInput
 }
 
 export type CandidateProfileUncheckedCreateWithoutCandidateInput = {
@@ -593,6 +659,9 @@ export type CandidateProfileUncheckedCreateWithoutCandidateInput = {
   education?: Prisma.ProfileEducationUncheckedCreateNestedManyWithoutProfileInput
   skills?: Prisma.CandidateProfileSkillUncheckedCreateNestedManyWithoutProfileInput
   socialLinks?: Prisma.SocialLinkUncheckedCreateNestedManyWithoutProfileInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutProfileInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutProfileInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutProfileInput
 }
 
 export type CandidateProfileCreateOrConnectWithoutCandidateInput = {
@@ -624,6 +693,9 @@ export type CandidateProfileUpdateWithoutCandidateInput = {
   education?: Prisma.ProfileEducationUpdateManyWithoutProfileNestedInput
   skills?: Prisma.CandidateProfileSkillUpdateManyWithoutProfileNestedInput
   socialLinks?: Prisma.SocialLinkUpdateManyWithoutProfileNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutProfileNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutProfileNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutProfileNestedInput
 }
 
 export type CandidateProfileUncheckedUpdateWithoutCandidateInput = {
@@ -639,6 +711,9 @@ export type CandidateProfileUncheckedUpdateWithoutCandidateInput = {
   education?: Prisma.ProfileEducationUncheckedUpdateManyWithoutProfileNestedInput
   skills?: Prisma.CandidateProfileSkillUncheckedUpdateManyWithoutProfileNestedInput
   socialLinks?: Prisma.SocialLinkUncheckedUpdateManyWithoutProfileNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutProfileNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutProfileNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutProfileNestedInput
 }
 
 export type CandidateProfileCreateWithoutExperiencesInput = {
@@ -654,6 +729,9 @@ export type CandidateProfileCreateWithoutExperiencesInput = {
   education?: Prisma.ProfileEducationCreateNestedManyWithoutProfileInput
   skills?: Prisma.CandidateProfileSkillCreateNestedManyWithoutProfileInput
   socialLinks?: Prisma.SocialLinkCreateNestedManyWithoutProfileInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutProfileInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutProfileInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutProfileInput
 }
 
 export type CandidateProfileUncheckedCreateWithoutExperiencesInput = {
@@ -669,6 +747,9 @@ export type CandidateProfileUncheckedCreateWithoutExperiencesInput = {
   education?: Prisma.ProfileEducationUncheckedCreateNestedManyWithoutProfileInput
   skills?: Prisma.CandidateProfileSkillUncheckedCreateNestedManyWithoutProfileInput
   socialLinks?: Prisma.SocialLinkUncheckedCreateNestedManyWithoutProfileInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutProfileInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutProfileInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutProfileInput
 }
 
 export type CandidateProfileCreateOrConnectWithoutExperiencesInput = {
@@ -700,6 +781,9 @@ export type CandidateProfileUpdateWithoutExperiencesInput = {
   education?: Prisma.ProfileEducationUpdateManyWithoutProfileNestedInput
   skills?: Prisma.CandidateProfileSkillUpdateManyWithoutProfileNestedInput
   socialLinks?: Prisma.SocialLinkUpdateManyWithoutProfileNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutProfileNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutProfileNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutProfileNestedInput
 }
 
 export type CandidateProfileUncheckedUpdateWithoutExperiencesInput = {
@@ -715,6 +799,9 @@ export type CandidateProfileUncheckedUpdateWithoutExperiencesInput = {
   education?: Prisma.ProfileEducationUncheckedUpdateManyWithoutProfileNestedInput
   skills?: Prisma.CandidateProfileSkillUncheckedUpdateManyWithoutProfileNestedInput
   socialLinks?: Prisma.SocialLinkUncheckedUpdateManyWithoutProfileNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutProfileNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutProfileNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutProfileNestedInput
 }
 
 export type CandidateProfileCreateWithoutEducationInput = {
@@ -730,6 +817,9 @@ export type CandidateProfileCreateWithoutEducationInput = {
   experiences?: Prisma.ProfileExperienceCreateNestedManyWithoutProfileInput
   skills?: Prisma.CandidateProfileSkillCreateNestedManyWithoutProfileInput
   socialLinks?: Prisma.SocialLinkCreateNestedManyWithoutProfileInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutProfileInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutProfileInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutProfileInput
 }
 
 export type CandidateProfileUncheckedCreateWithoutEducationInput = {
@@ -745,6 +835,9 @@ export type CandidateProfileUncheckedCreateWithoutEducationInput = {
   experiences?: Prisma.ProfileExperienceUncheckedCreateNestedManyWithoutProfileInput
   skills?: Prisma.CandidateProfileSkillUncheckedCreateNestedManyWithoutProfileInput
   socialLinks?: Prisma.SocialLinkUncheckedCreateNestedManyWithoutProfileInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutProfileInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutProfileInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutProfileInput
 }
 
 export type CandidateProfileCreateOrConnectWithoutEducationInput = {
@@ -776,6 +869,9 @@ export type CandidateProfileUpdateWithoutEducationInput = {
   experiences?: Prisma.ProfileExperienceUpdateManyWithoutProfileNestedInput
   skills?: Prisma.CandidateProfileSkillUpdateManyWithoutProfileNestedInput
   socialLinks?: Prisma.SocialLinkUpdateManyWithoutProfileNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutProfileNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutProfileNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutProfileNestedInput
 }
 
 export type CandidateProfileUncheckedUpdateWithoutEducationInput = {
@@ -791,6 +887,9 @@ export type CandidateProfileUncheckedUpdateWithoutEducationInput = {
   experiences?: Prisma.ProfileExperienceUncheckedUpdateManyWithoutProfileNestedInput
   skills?: Prisma.CandidateProfileSkillUncheckedUpdateManyWithoutProfileNestedInput
   socialLinks?: Prisma.SocialLinkUncheckedUpdateManyWithoutProfileNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutProfileNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutProfileNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutProfileNestedInput
 }
 
 export type CandidateProfileCreateWithoutSkillsInput = {
@@ -806,6 +905,9 @@ export type CandidateProfileCreateWithoutSkillsInput = {
   experiences?: Prisma.ProfileExperienceCreateNestedManyWithoutProfileInput
   education?: Prisma.ProfileEducationCreateNestedManyWithoutProfileInput
   socialLinks?: Prisma.SocialLinkCreateNestedManyWithoutProfileInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutProfileInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutProfileInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutProfileInput
 }
 
 export type CandidateProfileUncheckedCreateWithoutSkillsInput = {
@@ -821,6 +923,9 @@ export type CandidateProfileUncheckedCreateWithoutSkillsInput = {
   experiences?: Prisma.ProfileExperienceUncheckedCreateNestedManyWithoutProfileInput
   education?: Prisma.ProfileEducationUncheckedCreateNestedManyWithoutProfileInput
   socialLinks?: Prisma.SocialLinkUncheckedCreateNestedManyWithoutProfileInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutProfileInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutProfileInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutProfileInput
 }
 
 export type CandidateProfileCreateOrConnectWithoutSkillsInput = {
@@ -852,6 +957,9 @@ export type CandidateProfileUpdateWithoutSkillsInput = {
   experiences?: Prisma.ProfileExperienceUpdateManyWithoutProfileNestedInput
   education?: Prisma.ProfileEducationUpdateManyWithoutProfileNestedInput
   socialLinks?: Prisma.SocialLinkUpdateManyWithoutProfileNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutProfileNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutProfileNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutProfileNestedInput
 }
 
 export type CandidateProfileUncheckedUpdateWithoutSkillsInput = {
@@ -867,6 +975,9 @@ export type CandidateProfileUncheckedUpdateWithoutSkillsInput = {
   experiences?: Prisma.ProfileExperienceUncheckedUpdateManyWithoutProfileNestedInput
   education?: Prisma.ProfileEducationUncheckedUpdateManyWithoutProfileNestedInput
   socialLinks?: Prisma.SocialLinkUncheckedUpdateManyWithoutProfileNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutProfileNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutProfileNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutProfileNestedInput
 }
 
 export type CandidateProfileCreateWithoutSocialLinksInput = {
@@ -882,6 +993,9 @@ export type CandidateProfileCreateWithoutSocialLinksInput = {
   experiences?: Prisma.ProfileExperienceCreateNestedManyWithoutProfileInput
   education?: Prisma.ProfileEducationCreateNestedManyWithoutProfileInput
   skills?: Prisma.CandidateProfileSkillCreateNestedManyWithoutProfileInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutProfileInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutProfileInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutProfileInput
 }
 
 export type CandidateProfileUncheckedCreateWithoutSocialLinksInput = {
@@ -897,6 +1011,9 @@ export type CandidateProfileUncheckedCreateWithoutSocialLinksInput = {
   experiences?: Prisma.ProfileExperienceUncheckedCreateNestedManyWithoutProfileInput
   education?: Prisma.ProfileEducationUncheckedCreateNestedManyWithoutProfileInput
   skills?: Prisma.CandidateProfileSkillUncheckedCreateNestedManyWithoutProfileInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutProfileInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutProfileInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutProfileInput
 }
 
 export type CandidateProfileCreateOrConnectWithoutSocialLinksInput = {
@@ -928,6 +1045,9 @@ export type CandidateProfileUpdateWithoutSocialLinksInput = {
   experiences?: Prisma.ProfileExperienceUpdateManyWithoutProfileNestedInput
   education?: Prisma.ProfileEducationUpdateManyWithoutProfileNestedInput
   skills?: Prisma.CandidateProfileSkillUpdateManyWithoutProfileNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutProfileNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutProfileNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutProfileNestedInput
 }
 
 export type CandidateProfileUncheckedUpdateWithoutSocialLinksInput = {
@@ -943,6 +1063,273 @@ export type CandidateProfileUncheckedUpdateWithoutSocialLinksInput = {
   experiences?: Prisma.ProfileExperienceUncheckedUpdateManyWithoutProfileNestedInput
   education?: Prisma.ProfileEducationUncheckedUpdateManyWithoutProfileNestedInput
   skills?: Prisma.CandidateProfileSkillUncheckedUpdateManyWithoutProfileNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutProfileNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutProfileNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutProfileNestedInput
+}
+
+export type CandidateProfileCreateWithoutCvUploadsInput = {
+  id?: string
+  headline?: string | null
+  summary?: string | null
+  phone?: string | null
+  location?: string | null
+  revision?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutProfileInput
+  experiences?: Prisma.ProfileExperienceCreateNestedManyWithoutProfileInput
+  education?: Prisma.ProfileEducationCreateNestedManyWithoutProfileInput
+  skills?: Prisma.CandidateProfileSkillCreateNestedManyWithoutProfileInput
+  socialLinks?: Prisma.SocialLinkCreateNestedManyWithoutProfileInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutProfileInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutProfileInput
+}
+
+export type CandidateProfileUncheckedCreateWithoutCvUploadsInput = {
+  id?: string
+  candidateUserId: string
+  headline?: string | null
+  summary?: string | null
+  phone?: string | null
+  location?: string | null
+  revision?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  experiences?: Prisma.ProfileExperienceUncheckedCreateNestedManyWithoutProfileInput
+  education?: Prisma.ProfileEducationUncheckedCreateNestedManyWithoutProfileInput
+  skills?: Prisma.CandidateProfileSkillUncheckedCreateNestedManyWithoutProfileInput
+  socialLinks?: Prisma.SocialLinkUncheckedCreateNestedManyWithoutProfileInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutProfileInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutProfileInput
+}
+
+export type CandidateProfileCreateOrConnectWithoutCvUploadsInput = {
+  where: Prisma.CandidateProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.CandidateProfileCreateWithoutCvUploadsInput, Prisma.CandidateProfileUncheckedCreateWithoutCvUploadsInput>
+}
+
+export type CandidateProfileUpsertWithoutCvUploadsInput = {
+  update: Prisma.XOR<Prisma.CandidateProfileUpdateWithoutCvUploadsInput, Prisma.CandidateProfileUncheckedUpdateWithoutCvUploadsInput>
+  create: Prisma.XOR<Prisma.CandidateProfileCreateWithoutCvUploadsInput, Prisma.CandidateProfileUncheckedCreateWithoutCvUploadsInput>
+  where?: Prisma.CandidateProfileWhereInput
+}
+
+export type CandidateProfileUpdateToOneWithWhereWithoutCvUploadsInput = {
+  where?: Prisma.CandidateProfileWhereInput
+  data: Prisma.XOR<Prisma.CandidateProfileUpdateWithoutCvUploadsInput, Prisma.CandidateProfileUncheckedUpdateWithoutCvUploadsInput>
+}
+
+export type CandidateProfileUpdateWithoutCvUploadsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  headline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutProfileNestedInput
+  experiences?: Prisma.ProfileExperienceUpdateManyWithoutProfileNestedInput
+  education?: Prisma.ProfileEducationUpdateManyWithoutProfileNestedInput
+  skills?: Prisma.CandidateProfileSkillUpdateManyWithoutProfileNestedInput
+  socialLinks?: Prisma.SocialLinkUpdateManyWithoutProfileNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutProfileNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutProfileNestedInput
+}
+
+export type CandidateProfileUncheckedUpdateWithoutCvUploadsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  headline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  experiences?: Prisma.ProfileExperienceUncheckedUpdateManyWithoutProfileNestedInput
+  education?: Prisma.ProfileEducationUncheckedUpdateManyWithoutProfileNestedInput
+  skills?: Prisma.CandidateProfileSkillUncheckedUpdateManyWithoutProfileNestedInput
+  socialLinks?: Prisma.SocialLinkUncheckedUpdateManyWithoutProfileNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutProfileNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutProfileNestedInput
+}
+
+export type CandidateProfileCreateWithoutCvDraftsInput = {
+  id?: string
+  headline?: string | null
+  summary?: string | null
+  phone?: string | null
+  location?: string | null
+  revision?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutProfileInput
+  experiences?: Prisma.ProfileExperienceCreateNestedManyWithoutProfileInput
+  education?: Prisma.ProfileEducationCreateNestedManyWithoutProfileInput
+  skills?: Prisma.CandidateProfileSkillCreateNestedManyWithoutProfileInput
+  socialLinks?: Prisma.SocialLinkCreateNestedManyWithoutProfileInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutProfileInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutProfileInput
+}
+
+export type CandidateProfileUncheckedCreateWithoutCvDraftsInput = {
+  id?: string
+  candidateUserId: string
+  headline?: string | null
+  summary?: string | null
+  phone?: string | null
+  location?: string | null
+  revision?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  experiences?: Prisma.ProfileExperienceUncheckedCreateNestedManyWithoutProfileInput
+  education?: Prisma.ProfileEducationUncheckedCreateNestedManyWithoutProfileInput
+  skills?: Prisma.CandidateProfileSkillUncheckedCreateNestedManyWithoutProfileInput
+  socialLinks?: Prisma.SocialLinkUncheckedCreateNestedManyWithoutProfileInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutProfileInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutProfileInput
+}
+
+export type CandidateProfileCreateOrConnectWithoutCvDraftsInput = {
+  where: Prisma.CandidateProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.CandidateProfileCreateWithoutCvDraftsInput, Prisma.CandidateProfileUncheckedCreateWithoutCvDraftsInput>
+}
+
+export type CandidateProfileUpsertWithoutCvDraftsInput = {
+  update: Prisma.XOR<Prisma.CandidateProfileUpdateWithoutCvDraftsInput, Prisma.CandidateProfileUncheckedUpdateWithoutCvDraftsInput>
+  create: Prisma.XOR<Prisma.CandidateProfileCreateWithoutCvDraftsInput, Prisma.CandidateProfileUncheckedCreateWithoutCvDraftsInput>
+  where?: Prisma.CandidateProfileWhereInput
+}
+
+export type CandidateProfileUpdateToOneWithWhereWithoutCvDraftsInput = {
+  where?: Prisma.CandidateProfileWhereInput
+  data: Prisma.XOR<Prisma.CandidateProfileUpdateWithoutCvDraftsInput, Prisma.CandidateProfileUncheckedUpdateWithoutCvDraftsInput>
+}
+
+export type CandidateProfileUpdateWithoutCvDraftsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  headline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutProfileNestedInput
+  experiences?: Prisma.ProfileExperienceUpdateManyWithoutProfileNestedInput
+  education?: Prisma.ProfileEducationUpdateManyWithoutProfileNestedInput
+  skills?: Prisma.CandidateProfileSkillUpdateManyWithoutProfileNestedInput
+  socialLinks?: Prisma.SocialLinkUpdateManyWithoutProfileNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutProfileNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutProfileNestedInput
+}
+
+export type CandidateProfileUncheckedUpdateWithoutCvDraftsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  headline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  experiences?: Prisma.ProfileExperienceUncheckedUpdateManyWithoutProfileNestedInput
+  education?: Prisma.ProfileEducationUncheckedUpdateManyWithoutProfileNestedInput
+  skills?: Prisma.CandidateProfileSkillUncheckedUpdateManyWithoutProfileNestedInput
+  socialLinks?: Prisma.SocialLinkUncheckedUpdateManyWithoutProfileNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutProfileNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutProfileNestedInput
+}
+
+export type CandidateProfileCreateWithoutCvConfirmationsInput = {
+  id?: string
+  headline?: string | null
+  summary?: string | null
+  phone?: string | null
+  location?: string | null
+  revision?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutProfileInput
+  experiences?: Prisma.ProfileExperienceCreateNestedManyWithoutProfileInput
+  education?: Prisma.ProfileEducationCreateNestedManyWithoutProfileInput
+  skills?: Prisma.CandidateProfileSkillCreateNestedManyWithoutProfileInput
+  socialLinks?: Prisma.SocialLinkCreateNestedManyWithoutProfileInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutProfileInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutProfileInput
+}
+
+export type CandidateProfileUncheckedCreateWithoutCvConfirmationsInput = {
+  id?: string
+  candidateUserId: string
+  headline?: string | null
+  summary?: string | null
+  phone?: string | null
+  location?: string | null
+  revision?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  experiences?: Prisma.ProfileExperienceUncheckedCreateNestedManyWithoutProfileInput
+  education?: Prisma.ProfileEducationUncheckedCreateNestedManyWithoutProfileInput
+  skills?: Prisma.CandidateProfileSkillUncheckedCreateNestedManyWithoutProfileInput
+  socialLinks?: Prisma.SocialLinkUncheckedCreateNestedManyWithoutProfileInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutProfileInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutProfileInput
+}
+
+export type CandidateProfileCreateOrConnectWithoutCvConfirmationsInput = {
+  where: Prisma.CandidateProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.CandidateProfileCreateWithoutCvConfirmationsInput, Prisma.CandidateProfileUncheckedCreateWithoutCvConfirmationsInput>
+}
+
+export type CandidateProfileUpsertWithoutCvConfirmationsInput = {
+  update: Prisma.XOR<Prisma.CandidateProfileUpdateWithoutCvConfirmationsInput, Prisma.CandidateProfileUncheckedUpdateWithoutCvConfirmationsInput>
+  create: Prisma.XOR<Prisma.CandidateProfileCreateWithoutCvConfirmationsInput, Prisma.CandidateProfileUncheckedCreateWithoutCvConfirmationsInput>
+  where?: Prisma.CandidateProfileWhereInput
+}
+
+export type CandidateProfileUpdateToOneWithWhereWithoutCvConfirmationsInput = {
+  where?: Prisma.CandidateProfileWhereInput
+  data: Prisma.XOR<Prisma.CandidateProfileUpdateWithoutCvConfirmationsInput, Prisma.CandidateProfileUncheckedUpdateWithoutCvConfirmationsInput>
+}
+
+export type CandidateProfileUpdateWithoutCvConfirmationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  headline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutProfileNestedInput
+  experiences?: Prisma.ProfileExperienceUpdateManyWithoutProfileNestedInput
+  education?: Prisma.ProfileEducationUpdateManyWithoutProfileNestedInput
+  skills?: Prisma.CandidateProfileSkillUpdateManyWithoutProfileNestedInput
+  socialLinks?: Prisma.SocialLinkUpdateManyWithoutProfileNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutProfileNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutProfileNestedInput
+}
+
+export type CandidateProfileUncheckedUpdateWithoutCvConfirmationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  headline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  experiences?: Prisma.ProfileExperienceUncheckedUpdateManyWithoutProfileNestedInput
+  education?: Prisma.ProfileEducationUncheckedUpdateManyWithoutProfileNestedInput
+  skills?: Prisma.CandidateProfileSkillUncheckedUpdateManyWithoutProfileNestedInput
+  socialLinks?: Prisma.SocialLinkUncheckedUpdateManyWithoutProfileNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutProfileNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutProfileNestedInput
 }
 
 
@@ -955,6 +1342,9 @@ export type CandidateProfileCountOutputType = {
   education: number
   skills: number
   socialLinks: number
+  cvUploads: number
+  cvDrafts: number
+  cvConfirmations: number
 }
 
 export type CandidateProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -962,6 +1352,9 @@ export type CandidateProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.
   education?: boolean | CandidateProfileCountOutputTypeCountEducationArgs
   skills?: boolean | CandidateProfileCountOutputTypeCountSkillsArgs
   socialLinks?: boolean | CandidateProfileCountOutputTypeCountSocialLinksArgs
+  cvUploads?: boolean | CandidateProfileCountOutputTypeCountCvUploadsArgs
+  cvDrafts?: boolean | CandidateProfileCountOutputTypeCountCvDraftsArgs
+  cvConfirmations?: boolean | CandidateProfileCountOutputTypeCountCvConfirmationsArgs
 }
 
 /**
@@ -1002,6 +1395,27 @@ export type CandidateProfileCountOutputTypeCountSocialLinksArgs<ExtArgs extends 
   where?: Prisma.SocialLinkWhereInput
 }
 
+/**
+ * CandidateProfileCountOutputType without action
+ */
+export type CandidateProfileCountOutputTypeCountCvUploadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CvUploadWhereInput
+}
+
+/**
+ * CandidateProfileCountOutputType without action
+ */
+export type CandidateProfileCountOutputTypeCountCvDraftsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CvDraftWhereInput
+}
+
+/**
+ * CandidateProfileCountOutputType without action
+ */
+export type CandidateProfileCountOutputTypeCountCvConfirmationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CvImportConfirmationWhereInput
+}
+
 
 export type CandidateProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1018,6 +1432,9 @@ export type CandidateProfileSelect<ExtArgs extends runtime.Types.Extensions.Inte
   education?: boolean | Prisma.CandidateProfile$educationArgs<ExtArgs>
   skills?: boolean | Prisma.CandidateProfile$skillsArgs<ExtArgs>
   socialLinks?: boolean | Prisma.CandidateProfile$socialLinksArgs<ExtArgs>
+  cvUploads?: boolean | Prisma.CandidateProfile$cvUploadsArgs<ExtArgs>
+  cvDrafts?: boolean | Prisma.CandidateProfile$cvDraftsArgs<ExtArgs>
+  cvConfirmations?: boolean | Prisma.CandidateProfile$cvConfirmationsArgs<ExtArgs>
   _count?: boolean | Prisma.CandidateProfileCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["candidateProfile"]>
 
@@ -1066,6 +1483,9 @@ export type CandidateProfileInclude<ExtArgs extends runtime.Types.Extensions.Int
   education?: boolean | Prisma.CandidateProfile$educationArgs<ExtArgs>
   skills?: boolean | Prisma.CandidateProfile$skillsArgs<ExtArgs>
   socialLinks?: boolean | Prisma.CandidateProfile$socialLinksArgs<ExtArgs>
+  cvUploads?: boolean | Prisma.CandidateProfile$cvUploadsArgs<ExtArgs>
+  cvDrafts?: boolean | Prisma.CandidateProfile$cvDraftsArgs<ExtArgs>
+  cvConfirmations?: boolean | Prisma.CandidateProfile$cvConfirmationsArgs<ExtArgs>
   _count?: boolean | Prisma.CandidateProfileCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CandidateProfileIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1083,6 +1503,9 @@ export type $CandidateProfilePayload<ExtArgs extends runtime.Types.Extensions.In
     education: Prisma.$ProfileEducationPayload<ExtArgs>[]
     skills: Prisma.$CandidateProfileSkillPayload<ExtArgs>[]
     socialLinks: Prisma.$SocialLinkPayload<ExtArgs>[]
+    cvUploads: Prisma.$CvUploadPayload<ExtArgs>[]
+    cvDrafts: Prisma.$CvDraftPayload<ExtArgs>[]
+    cvConfirmations: Prisma.$CvImportConfirmationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1493,6 +1916,9 @@ export interface Prisma__CandidateProfileClient<T, Null = never, ExtArgs extends
   education<T extends Prisma.CandidateProfile$educationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CandidateProfile$educationArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfileEducationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   skills<T extends Prisma.CandidateProfile$skillsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CandidateProfile$skillsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CandidateProfileSkillPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   socialLinks<T extends Prisma.CandidateProfile$socialLinksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CandidateProfile$socialLinksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SocialLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  cvUploads<T extends Prisma.CandidateProfile$cvUploadsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CandidateProfile$cvUploadsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CvUploadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  cvDrafts<T extends Prisma.CandidateProfile$cvDraftsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CandidateProfile$cvDraftsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CvDraftPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  cvConfirmations<T extends Prisma.CandidateProfile$cvConfirmationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CandidateProfile$cvConfirmationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CvImportConfirmationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2025,6 +2451,78 @@ export type CandidateProfile$socialLinksArgs<ExtArgs extends runtime.Types.Exten
   take?: number
   skip?: number
   distinct?: Prisma.SocialLinkScalarFieldEnum | Prisma.SocialLinkScalarFieldEnum[]
+}
+
+/**
+ * CandidateProfile.cvUploads
+ */
+export type CandidateProfile$cvUploadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CvUpload
+   */
+  select?: Prisma.CvUploadSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CvUpload
+   */
+  omit?: Prisma.CvUploadOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CvUploadInclude<ExtArgs> | null
+  where?: Prisma.CvUploadWhereInput
+  orderBy?: Prisma.CvUploadOrderByWithRelationInput | Prisma.CvUploadOrderByWithRelationInput[]
+  cursor?: Prisma.CvUploadWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CvUploadScalarFieldEnum | Prisma.CvUploadScalarFieldEnum[]
+}
+
+/**
+ * CandidateProfile.cvDrafts
+ */
+export type CandidateProfile$cvDraftsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CvDraft
+   */
+  select?: Prisma.CvDraftSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CvDraft
+   */
+  omit?: Prisma.CvDraftOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CvDraftInclude<ExtArgs> | null
+  where?: Prisma.CvDraftWhereInput
+  orderBy?: Prisma.CvDraftOrderByWithRelationInput | Prisma.CvDraftOrderByWithRelationInput[]
+  cursor?: Prisma.CvDraftWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CvDraftScalarFieldEnum | Prisma.CvDraftScalarFieldEnum[]
+}
+
+/**
+ * CandidateProfile.cvConfirmations
+ */
+export type CandidateProfile$cvConfirmationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CvImportConfirmation
+   */
+  select?: Prisma.CvImportConfirmationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CvImportConfirmation
+   */
+  omit?: Prisma.CvImportConfirmationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CvImportConfirmationInclude<ExtArgs> | null
+  where?: Prisma.CvImportConfirmationWhereInput
+  orderBy?: Prisma.CvImportConfirmationOrderByWithRelationInput | Prisma.CvImportConfirmationOrderByWithRelationInput[]
+  cursor?: Prisma.CvImportConfirmationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CvImportConfirmationScalarFieldEnum | Prisma.CvImportConfirmationScalarFieldEnum[]
 }
 
 /**

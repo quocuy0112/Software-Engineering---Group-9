@@ -46,6 +46,22 @@ export const authenticationAuditAction = z.enum([
   "password_change.succeeded",
   "password_change.failed",
   "password_change.locked",
+  "cv_import.reserved",
+  "cv_import.content_received",
+  "cv_import.stage_completed",
+  "cv_import.retry_requested",
+  "cv_import.draft_saved",
+  "cv_import.confirmed",
+  "cv_import.deleted",
+  "cv_import.expired",
+  "cv_import.consent_granted",
+  "cv_import.consent_revoked",
+  "cv_import.cleanup_completed",
+  "cv_import.cleanup_failed",
+  "cv_import.external_dispatch_completed",
+  "cv_import.external_dispatch_failed",
+  "cv_import.content_scrubbed",
+  "cv_import.reconciled",
 ]);
 
 const auditContextSchema = z
@@ -70,6 +86,14 @@ const auditContextSchema = z
     twoFactorDisabled: z.boolean().optional(),
     backupCodesInvalidated: z.boolean().optional(),
     automaticSessionCreated: z.boolean().optional(),
+    parserClass: z
+      .enum(["DETERMINISTIC_INTERNAL", "EXTERNAL_OPENAI"])
+      .optional(),
+    schemaVersion: z.string().max(100).optional(),
+    noticeVersion: z.string().max(100).optional(),
+    revision: z.number().int().min(0).optional(),
+    durationBucket: z.string().max(40).optional(),
+    lagBucket: z.string().max(40).optional(),
   })
   .strict();
 
@@ -91,6 +115,10 @@ export const authenticationAuditEventSchema = z
       "account_recovery",
       "email_change",
       "password_change",
+      "cv_import",
+      "cv_draft",
+      "cv_consent",
+      "cv_confirmation",
     ]),
     targetId: z.string().min(1).nullable().optional(),
     result: z.enum(["SUCCESS", "FAILURE", "DENIED"]),

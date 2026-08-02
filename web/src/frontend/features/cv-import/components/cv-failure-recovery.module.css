@@ -1,0 +1,83 @@
+.root {
+  box-sizing: border-box;
+  display: grid;
+  inline-size: 100%;
+  min-inline-size: 0;
+  gap: 1rem;
+  border: 2px solid var(--color-error, #b91c1c);
+  border-radius: 0.75rem;
+  background: var(--color-error-surface, #fef2f2);
+  color: var(--color-error-text, #7f1d1d);
+  padding: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.summary,
+.summary p,
+.counter,
+.status,
+.guidance {
+  margin: 0;
+}
+
+.summary {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.code code {
+  font-weight: 700;
+}
+
+.counter,
+.status {
+  font-weight: 650;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.actions a,
+.actions button {
+  box-sizing: border-box;
+  display: inline-flex;
+  min-block-size: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 0.85rem;
+  text-align: center;
+}
+
+.actions :is(a, button):focus-visible,
+.summary h2:focus-visible {
+  outline: 3px solid var(--color-focus, #1d4ed8);
+  outline-offset: 3px;
+}
+
+.guidance {
+  color: var(--color-text-muted, #334155);
+}
+
+@media (max-width: 32rem) {
+  .actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .actions a,
+  .actions button {
+    inline-size: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .root * {
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto;
+    transition-duration: 0.01ms !important;
+  }
+}

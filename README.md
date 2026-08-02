@@ -11,6 +11,7 @@ Access Management; advanced recruitment modules are still under development.
 - [Prerequisites](#prerequisites)
 - [Local Setup](#local-setup)
 - [Local Email](#local-email)
+- [CV Import Runtime and Security](#cv-import-runtime-and-security)
 - [Common Commands](#common-commands)
 - [Quality Checks](#quality-checks)
 - [Project Structure](#project-structure)
@@ -26,6 +27,9 @@ Access Management; advanced recruitment modules are still under development.
   security hold.
 - Audit logging, rate limiting, and a transactional email outbox.
 - Foundation pages for Home, Dashboard, and Profile.
+- Private PDF/DOCX CV upload, asynchronous malware scan/extraction/parsing,
+  candidate review, selective Profile confirmation, consent, retry, and
+  retention/deletion workflows.
 
 ## Architecture and Tech Stack
 
@@ -108,21 +112,28 @@ Open the application at:
 http://localhost:3001
 ```
 
-Local PostgreSQL is available at `localhost:55432`.
+Local PostgreSQL is available at `127.0.0.1:55432`. The only host ports in the
+local topology are web `3001` and loopback-only PostgreSQL `55432`; ClamAV and
+both workers publish no port.
 
 `npm run env:init` creates `.env`, `web/.env.local`, and secure local
 secrets. Existing files are preserved and never overwritten.
 
-`npm run dev` starts both:
+`npm run dev` supervises:
 
 - Next.js on port `3001`.
-- The Email Outbox worker.
+- the Email Outbox worker; and
+- the Compose-backed CV worker and its co-located ClamAV service.
+
+One `Ctrl+C` is forwarded to the child processes and stops the CV worker and
+ClamAV while retaining durable PostgreSQL and scanner-signature volumes.
 
 Run them separately when debugging:
 
 ```bash
 npm run dev:web
 npm run email:worker
+docker compose up --build postgres clamav cv-worker
 ```
 
 Development mode compiles a route the first time it is opened, so its first
@@ -135,7 +146,8 @@ npm start
 ```
 
 Run `npm run email:worker` in another terminal when testing email flows against
-the production server.
+the production server. Run the CV worker through Compose rather than as a host
+process so it receives the Linux storage mount and private scanner socket.
 
 ## Local Email
 
@@ -150,22 +162,57 @@ SMTP and Resend are optional. Configure either provider in
 `web/.env.local` using
 [`web/.env.example`](web/.env.example), then restart the application.
 
+## CV Import Runtime and Security
+
+The web process reserves and streams private artifacts; a durable CV worker
+claims scan, extraction, parse, cleanup, and reconciliation work from
+PostgreSQL. Locally, ClamAV and that worker share only
+`/run/clamav/clamd.sock` with group-only mode `0660`. Production must use the
+same-host or same-pod topology. Never expose a scanner TCP port or mount the
+socket into the web/email processes.
+
+Candidate-visible bounded retries are the recovery mechanism. P0 has no hidden
+admin dead-letter queue or admin-only resume step: after caps are exhausted the
+candidate can replace/delete the import or continue through manual Profile
+entry. Cleanup and reconciliation must keep running when new upload or parser
+dispatch is disabled. Use only the committed synthetic/curated fixtures for
+debugging; never dump a candidate document, extracted text, storage locator, or
+provider payload into logs.
+
+P0 deliberately has no original-CV preview, retrieval, or download endpoint.
+Production also inherits the trusted-ingress HTTPS gate: TLS termination,
+HTTP-to-HTTPS redirect, approved HSTS, secure-cookie/origin preservation, and
+the fixed allowlisted HTTPS OpenAI endpoint must all be verified. Custom or
+non-HTTPS provider endpoints are rejected. S3 and external OpenAI dispatch stay
+disabled until every provider/privacy gate documented in the
+[Feature 004 quickstart](spec-kit/specs/004-cv-upload-parse-review/quickstart.md)
+is approved.
+
+Feature 004 UI uses existing Tailwind/shadcn primitives first. Custom styling is
+optional and, when needed, belongs in an adjacent same-basename CSS Module
+(`component.tsx` + `component.module.css`). Feature-level catch-all styles,
+`:global`, cross-component CSS Module imports, and leakage into global/shared
+stylesheets are prohibited and architecture-tested.
+
 ## Common Commands
 
-| Command                | Purpose                                              |
-| ---------------------- | ---------------------------------------------------- |
-| `npm run dev`          | Start the web app and email worker                   |
-| `npm run dev:web`      | Start only Next.js                                   |
-| `npm start`            | Start an already-built production server             |
-| `npm run email:worker` | Start only the email worker                          |
-| `npm run db:up`        | Start PostgreSQL                                     |
-| `npm run db:down`      | Stop PostgreSQL and retain its data                  |
-| `npm run db:status`    | Show PostgreSQL status                               |
-| `npm run db:logs`      | Follow PostgreSQL logs                               |
-| `npm run db:migrate`   | Apply migrations to the local database               |
-| `npm run db:studio`    | Open Prisma Studio                                   |
-| `npm run db:verify`    | Verify migrations against a temporary clean database |
-| `npm run db:reset`     | Delete the volume and recreate the local database    |
+| Command                                                  | Purpose                                                        |
+| -------------------------------------------------------- | -------------------------------------------------------------- |
+| `npm run dev`                                            | Supervise web, email worker, Compose CV worker, and ClamAV     |
+| `npm run dev:web`                                        | Start only Next.js                                             |
+| `npm start`                                              | Start an already-built production server                       |
+| `npm run email:worker`                                   | Start only the email worker                                    |
+| `docker compose exec cv-worker npm run cv:scanner:check` | Verify the private scanner socket/readiness from the CV worker |
+| `npm run test:cv-import`                                 | Run Feature 004 Vitest/architecture checks                     |
+| `npm run test:cv-import:e2e`                             | Run serial Feature 004 browser journeys                        |
+| `npm run db:up`                                          | Start PostgreSQL                                               |
+| `npm run db:down`                                        | Stop Compose services and retain their data                    |
+| `npm run db:status`                                      | Show PostgreSQL status                                         |
+| `npm run db:logs`                                        | Follow PostgreSQL logs                                         |
+| `npm run db:migrate`                                     | Apply migrations to the local database                         |
+| `npm run db:studio`                                      | Open Prisma Studio                                             |
+| `npm run db:verify`                                      | Verify migrations against a temporary clean database           |
+| `npm run db:reset`                                       | Delete the volume and recreate the local database              |
 
 > **Warning:** `npm run db:reset` permanently deletes all data in the current
 > local PostgreSQL volume.
@@ -179,6 +226,8 @@ npm run env:check
 npm run lint
 npm run typecheck
 npm test
+npm run test:cv-import -- --pool=forks --no-file-parallelism --maxWorkers=1
+npm run test:cv-import:e2e
 npm run build
 ```
 
@@ -242,6 +291,8 @@ npm run test:e2e
 - [Implementation plan](spec-kit/specs/001-identity-authentication-account-recovery/plan.md)
 - [Feature specification](spec-kit/specs/001-identity-authentication-account-recovery/spec.md)
 - [OpenAPI contract](spec-kit/specs/001-identity-authentication-account-recovery/contracts/openapi.yaml)
+- [Feature 004 implementation plan](spec-kit/specs/004-cv-upload-parse-review/plan.md)
+- [Feature 004 verification quickstart](spec-kit/specs/004-cv-upload-parse-review/quickstart.md)
 
 ## Security
 

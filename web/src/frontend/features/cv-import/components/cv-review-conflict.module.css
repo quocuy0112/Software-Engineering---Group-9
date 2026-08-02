@@ -1,0 +1,58 @@
+.root {
+  border: 2px solid var(--color-warning, #a16207);
+  color: var(--color-warning-text, #713f12);
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.root p {
+  margin: 0;
+}
+
+.preview,
+.preview dl,
+.metadata {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.preview h3,
+.preview dl,
+.preview dd {
+  margin: 0;
+}
+
+.preview dl > div {
+  border-inline-start: 3px solid currentColor;
+  padding-inline-start: 0.75rem;
+}
+
+.preview dt {
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.preview dd {
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.actions button:focus-visible,
+.root h2:focus-visible {
+  outline: 3px solid var(--color-focus, #1d4ed8);
+  outline-offset: 2px;
+}
+
+@media (max-width: 32rem) {
+  .actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
