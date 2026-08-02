@@ -12,6 +12,7 @@ import {
 } from "@/shared/contracts/account/email-change";
 import { accountErrorSchema } from "@/shared/contracts/account/common";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { notifyAccountNameUpdated } from "./account-identity-events";
 import { localizeAccountMessage } from "./localized-account-feedback";
 
 export type AccountIdentityFeedback = {
@@ -79,6 +80,7 @@ export function useAccountIdentity(
       const parsed = accountIdentityMutationOutcomeSchema.safeParse(body);
       if (!parsed.success) throw new Error("IDENTITY_RESPONSE_INVALID");
       setIdentity(parsed.data.identity);
+      notifyAccountNameUpdated(parsed.data.identity.name);
       const message = localizeAccountMessage(locale, parsed.data.message);
       setFeedback({ kind: "success", message });
       toast.success(message, { id: "account-identity-feedback" });

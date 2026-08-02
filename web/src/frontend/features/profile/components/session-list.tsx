@@ -9,7 +9,9 @@ import {
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
 import { AppProviders } from "@/frontend/providers/app-providers";
 import { Badge } from "@/frontend/components/ui/badge";
+import { Button } from "@/frontend/components/ui/button";
 import { EmptyState } from "@/frontend/components/ui/empty-state";
+import { Modal } from "@/frontend/components/ui/modal";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 
 export function SessionList({ embedded = false }: { embedded?: boolean }) {
@@ -29,7 +31,6 @@ function SessionListContent({ embedded = false }: { embedded?: boolean }) {
           loadError: "Không thể tải các phiên đăng nhập.",
           revoked: "Đã thu hồi phiên đăng nhập.",
           revokeError: "Không thể thu hồi phiên đăng nhập.",
-          loaded: "Đã tải các phiên đăng nhập.",
           kicker: "TRUY CẬP ĐANG HOẠT ĐỘNG",
           title: "Phiên đăng nhập",
           subtitle:
@@ -41,6 +42,12 @@ function SessionListContent({ embedded = false }: { embedded?: boolean }) {
           current: "hiện tại",
           lastActive: "Hoạt động gần nhất",
           revoke: "Thu hồi phiên",
+          revokeTitle: "Thu hồi phiên đăng nhập?",
+          revokeDescription:
+            "Thiết bị này sẽ phải đăng nhập lại để tiếp tục truy cập SmartHire.",
+          cancel: "Hủy",
+          confirmRevoke: "Thu hồi phiên",
+          revoking: "Đang thu hồi…",
           emptyTitle: "Không có phiên đang hoạt động",
           emptyCopy: "Không có phiên đăng nhập nào để hiển thị.",
         }
@@ -49,7 +56,6 @@ function SessionListContent({ embedded = false }: { embedded?: boolean }) {
           loadError: "Unable to load sessions.",
           revoked: "Session revoked.",
           revokeError: "Unable to revoke session.",
-          loaded: "Sessions loaded successfully.",
           kicker: "ACTIVE ACCESS",
           title: "Sessions",
           subtitle:
@@ -61,10 +67,17 @@ function SessionListContent({ embedded = false }: { embedded?: boolean }) {
           current: "current",
           lastActive: "Last active",
           revoke: "Revoke session",
+          revokeTitle: "Revoke this session?",
+          revokeDescription:
+            "This device will need to sign in again before it can access SmartHire.",
+          cancel: "Cancel",
+          confirmRevoke: "Revoke session",
+          revoking: "Revoking…",
           emptyTitle: "No active sessions",
           emptyCopy: "No active sessions are available to display.",
         };
   const [proof, setProof] = useState("");
+  const [sessionToRevoke, setSessionToRevoke] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const sessionsQuery = useQuery(sessionListQueryOptions(setProof));
   const revokeMutation = useMutation({
@@ -84,7 +97,7 @@ function SessionListContent({ embedded = false }: { embedded?: boolean }) {
         ? copy.revoked
         : revokeMutation.isError
           ? copy.revokeError
-          : copy.loaded;
+          : "";
   const statusTone =
     sessionsQuery.isError || revokeMutation.isError
       ? "error"
@@ -110,7 +123,12 @@ function SessionListContent({ embedded = false }: { embedded?: boolean }) {
           </Badge>
         </header>
       ) : null}
-      <AuthStatus id="session-list-status" status={status} tone={statusTone} />
+      <AuthStatus
+        id="session-list-status"
+        status={status}
+        tone={statusTone}
+        toastOnChange={false}
+      />
       <div className="sessions-panel-heading">
         <div>
           <p className="panel-kicker">{copy.devicesKicker}</p>
@@ -140,7 +158,7 @@ function SessionListContent({ embedded = false }: { embedded?: boolean }) {
               <button
                 className="session-revoke-button"
                 type="button"
-                onClick={() => revokeMutation.mutate(session.reference)}
+                onClick={() => setSessionToRevoke(session.reference)}
                 disabled={revokeMutation.isPending}
               >
                 {copy.revoke}
@@ -157,6 +175,37 @@ function SessionListContent({ embedded = false }: { embedded?: boolean }) {
           description={copy.emptyCopy}
         />
       ) : null}
+      <Modal
+        open={sessionToRevoke !== null}
+        title={copy.revokeTitle}
+        description={copy.revokeDescription}
+        tone="destructive"
+        busy={revokeMutation.isPending}
+        onClose={() => setSessionToRevoke(null)}
+      >
+        <div className="sh-modal-actions">
+          <Button
+            variant="secondary"
+            disabled={revokeMutation.isPending}
+            onClick={() => setSessionToRevoke(null)}
+          >
+            {copy.cancel}
+          </Button>
+          <Button
+            data-autofocus
+            variant="danger"
+            disabled={revokeMutation.isPending}
+            onClick={() => {
+              if (!sessionToRevoke) return;
+              revokeMutation.mutate(sessionToRevoke, {
+                onSuccess: () => setSessionToRevoke(null),
+              });
+            }}
+          >
+            {revokeMutation.isPending ? copy.revoking : copy.confirmRevoke}
+          </Button>
+        </div>
+      </Modal>
     </section>
   );
 }

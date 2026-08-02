@@ -46,8 +46,6 @@ export function DashboardView({
           configured: "Sẵn sàng",
           nextKicker: "BƯỚC TIẾP THEO",
           nextTitle: "Làm hồ sơ của bạn nổi bật hơn",
-          quickKicker: "TRUY CẬP NHANH",
-          quickTitle: "Quản lý không gian của bạn",
           basics: "Thêm tiêu đề và phần giới thiệu",
           avatar: "Thêm ảnh đại diện",
           skillsStep: "Thêm kỹ năng nổi bật",
@@ -64,15 +62,7 @@ export function DashboardView({
           socialPending: "Thêm ít nhất một hồ sơ hoặc website",
           remaining: (count: number) =>
             count === 0 ? "Đã hoàn thiện" : `Còn ${count} bước`,
-          profile: "Hồ sơ",
-          profileHint: "Cập nhật thông tin nghề nghiệp",
-          preferences: "Tùy chọn",
-          preferencesHint: "Ngôn ngữ và múi giờ",
-          security: "Bảo mật",
-          securityHint: "Mật khẩu, 2FA và mã dự phòng",
-          sessions: "Phiên đăng nhập",
-          sessionsHint: "Kiểm tra các thiết bị đang đăng nhập",
-          shortcuts: "Lối tắt Dashboard",
+          workspaceSections: "Khu vực quản lý hồ sơ và tài khoản",
         }
       : {
           kicker: "YOUR CAREER WORKSPACE",
@@ -104,8 +94,6 @@ export function DashboardView({
           configured: "Available",
           nextKicker: "NEXT STEPS",
           nextTitle: "Make your profile stronger",
-          quickKicker: "QUICK ACCESS",
-          quickTitle: "Manage your workspace",
           basics: "Add a headline and summary",
           avatar: "Add a profile photo",
           skillsStep: "Add your strongest skills",
@@ -123,15 +111,7 @@ export function DashboardView({
           socialPending: "Add at least one profile or website",
           remaining: (count: number) =>
             count === 0 ? "Profile ready" : `${count} steps left`,
-          profile: "Profile",
-          profileHint: "Update your professional details",
-          preferences: "Preferences",
-          preferencesHint: "Language and timezone",
-          security: "Security",
-          securityHint: "Password, 2FA, and backup codes",
-          sessions: "Sessions",
-          sessionsHint: "Review signed-in devices",
-          shortcuts: "Dashboard shortcuts",
+          workspaceSections: "Profile and account management areas",
         };
 
   const headlineLength = profile.basics.headline?.trim().length ?? 0;
@@ -218,7 +198,12 @@ export function DashboardView({
         </div>
         <div
           className="dashboard-progress"
-          aria-label={`${copy.completion}: ${completion}%`}
+          role="progressbar"
+          aria-label={copy.completion}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={completion}
+          aria-valuetext={`${completion}% ${copy.complete}`}
         >
           <svg viewBox="0 0 120 120" aria-hidden="true">
             <circle
@@ -244,7 +229,10 @@ export function DashboardView({
         </div>
       </section>
 
-      <section className="dashboard-feature-grid" aria-label={copy.quickTitle}>
+      <section
+        className="dashboard-feature-grid"
+        aria-label={copy.workspaceSections}
+      >
         <Link className="feature-card dashboard-current-card" href="/profile">
           <div className="feature-icon" aria-hidden="true">
             <DashboardIcon name="profile" />
@@ -317,68 +305,6 @@ export function DashboardView({
               </li>
             ))}
           </ul>
-        </section>
-
-        <section
-          className="dashboard-panel"
-          aria-labelledby="quick-access-title"
-        >
-          <div className="dashboard-panel-header">
-            <div>
-              <p className="panel-kicker">{copy.quickKicker}</p>
-              <h2 id="quick-access-title">{copy.quickTitle}</h2>
-            </div>
-          </div>
-          <div className="dashboard-links" aria-label={copy.shortcuts}>
-            <Link href="/profile">
-              <span className="shortcut-icon" aria-hidden="true">
-                <DashboardIcon name="profile" />
-              </span>
-              <span>
-                <strong>{copy.profile}</strong>
-                <small>{copy.profileHint}</small>
-              </span>
-              <span className="shortcut-arrow" aria-hidden="true">
-                <DashboardIcon name="arrow" />
-              </span>
-            </Link>
-            <Link href="/profile/preferences">
-              <span className="shortcut-icon" aria-hidden="true">
-                <DashboardIcon name="preferences" />
-              </span>
-              <span>
-                <strong>{copy.preferences}</strong>
-                <small>{copy.preferencesHint}</small>
-              </span>
-              <span className="shortcut-arrow" aria-hidden="true">
-                <DashboardIcon name="arrow" />
-              </span>
-            </Link>
-            <Link href="/profile/security">
-              <span className="shortcut-icon" aria-hidden="true">
-                <DashboardIcon name="shield" />
-              </span>
-              <span>
-                <strong>{copy.security}</strong>
-                <small>{copy.securityHint}</small>
-              </span>
-              <span className="shortcut-arrow" aria-hidden="true">
-                <DashboardIcon name="arrow" />
-              </span>
-            </Link>
-            <Link href="/profile/sessions">
-              <span className="shortcut-icon" aria-hidden="true">
-                <DashboardIcon name="device" />
-              </span>
-              <span>
-                <strong>{copy.sessions}</strong>
-                <small>{copy.sessionsHint}</small>
-              </span>
-              <span className="shortcut-arrow" aria-hidden="true">
-                <DashboardIcon name="arrow" />
-              </span>
-            </Link>
-          </div>
         </section>
       </div>
     </div>

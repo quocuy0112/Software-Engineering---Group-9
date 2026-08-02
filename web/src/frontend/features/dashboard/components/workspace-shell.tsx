@@ -3,10 +3,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { postWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
 import { SmartHireBrand } from "@/frontend/components/ui/smarthire-brand";
+import {
+  ACCOUNT_NAME_UPDATED_EVENT,
+  type AccountNameUpdatedDetail,
+} from "@/frontend/features/profile/client/account-identity-events";
 import { WorkspaceLocaleProvider } from "../client/workspace-locale";
 import { WorkspaceNavigation } from "./workspace-navigation";
 
@@ -29,10 +33,31 @@ export function WorkspaceShell({
   const [navigating, startNavigation] = useTransition();
   const [status, setStatus] = useState("");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const avatar = /^data:image\/(?:png|jpeg);base64,/u.test(profile.image ?? "")
-    ? profile.image
+  const [nameOverride, setNameOverride] = useState<string | null>(null);
+
+  useEffect(() => {
+    const synchronizeName = (event: Event) => {
+      const name = (event as CustomEvent<AccountNameUpdatedDetail>).detail
+        ?.name;
+      if (typeof name !== "string" || !name.trim()) return;
+      setNameOverride(name);
+      router.refresh();
+    };
+    window.addEventListener(ACCOUNT_NAME_UPDATED_EVENT, synchronizeName);
+    return () =>
+      window.removeEventListener(ACCOUNT_NAME_UPDATED_EVENT, synchronizeName);
+  }, [router]);
+
+  const workspaceProfile = nameOverride
+    ? { ...profile, name: nameOverride }
+    : profile;
+
+  const avatar = /^data:image\/(?:png|jpeg);base64,/u.test(
+    workspaceProfile.image ?? "",
+  )
+    ? workspaceProfile.image
     : null;
-  const locale = profile.locale ?? "en";
+  const locale = workspaceProfile.locale ?? "en";
   const copy =
     locale === "vi"
       ? {
@@ -42,7 +67,7 @@ export function WorkspaceShell({
           collapse: "Thu gọn thanh điều hướng",
           workspace: "Hồ sơ ứng viên",
           greeting: "Rất vui được gặp bạn",
-          openProfile: `Mở hồ sơ của ${profile.name}`,
+          openProfile: `Mở hồ sơ của ${workspaceProfile.name}`,
           manageProfile: "Quản lý hồ sơ",
           signOutError: "Không thể đăng xuất. Vui lòng thử lại.",
         }
@@ -53,7 +78,7 @@ export function WorkspaceShell({
           collapse: "Collapse workspace sidebar",
           workspace: "Candidate workspace",
           greeting: "Good to see you",
-          openProfile: `Open profile for ${profile.name}`,
+          openProfile: `Open profile for ${workspaceProfile.name}`,
           manageProfile: "Manage your profile",
           signOutError: "Unable to sign out. Please try again.",
         };
@@ -146,8 +171,8 @@ export function WorkspaceShell({
                   )}
                 </span>
                 <span>
-                  <strong>{profile.name}</strong>
-                  <small>{profile.email || copy.manageProfile}</small>
+                  <strong>{workspaceProfile.name}</strong>
+                  <small>{workspaceProfile.email || copy.manageProfile}</small>
                 </span>
               </Link>
             </header>

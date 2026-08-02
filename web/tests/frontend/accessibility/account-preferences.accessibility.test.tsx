@@ -42,6 +42,32 @@ describe("account-preferences accessibility", () => {
     expect(screen.getByText(/luôn được bật/i)).toBeVisible();
   });
 
+  it("provides a searchable IANA timezone list with current GMT offsets", async () => {
+    render(
+      <ProfilePreferencesView
+        initialPreferences={defaults}
+        csrfProof="csrf-proof"
+      />,
+    );
+
+    const timezone = screen.getByRole("combobox", { name: /Múi giờ/i });
+    expect(timezone).toHaveAttribute("list", "preference-timezones");
+
+    await waitFor(() => {
+      expect(
+        document.querySelectorAll("#preference-timezones option").length,
+      ).toBeGreaterThan(400);
+    });
+
+    const vietnam = document.querySelector(
+      '#preference-timezones option[value="Asia/Ho_Chi_Minh"]',
+    );
+    expect(vietnam).toHaveAttribute(
+      "label",
+      expect.stringMatching(/^GMT\+07:00 · Asia — Ho Chi Minh$/),
+    );
+  });
+
   it("submits a complete set once, reconciles authoritative state, and announces success", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
       Response.json({

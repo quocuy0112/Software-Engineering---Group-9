@@ -13,6 +13,7 @@ import type {
   ProfileEditorFeedback,
   ProfileSectionDraft,
 } from "../client/use-profile-editor";
+import { ProfileSaveFeedback } from "./profile-save-feedback";
 
 type BasicsValues = {
   headline: string;
@@ -115,6 +116,7 @@ export function ProfileBasicsForm({
           {saving ? copy.saving : copy.save}
         </button>
       </div>
+      <ProfileSaveFeedback feedback={feedback} />
       <div className="professional-profile-fields">
         <label htmlFor="profile-headline">{copy.headline}</label>
         <input
@@ -122,9 +124,15 @@ export function ProfileBasicsForm({
           {...register("headline")}
           data-field-path="basics.headline"
           maxLength={200}
+          aria-invalid={Boolean(fieldError("basics.headline"))}
+          aria-describedby={
+            fieldError("basics.headline") ? "profile-headline-error" : undefined
+          }
         />
         {fieldError("basics.headline") ? (
-          <p className="profile-field-error">{fieldError("basics.headline")}</p>
+          <p id="profile-headline-error" className="profile-field-error">
+            {fieldError("basics.headline")}
+          </p>
         ) : null}
 
         <label htmlFor="profile-summary">{copy.summary}</label>
@@ -135,9 +143,15 @@ export function ProfileBasicsForm({
           maxLength={5_000}
           rows={5}
           onInput={growSummary}
+          aria-invalid={Boolean(fieldError("basics.summary"))}
+          aria-describedby={
+            fieldError("basics.summary") ? "profile-summary-error" : undefined
+          }
         />
         {fieldError("basics.summary") ? (
-          <p className="profile-field-error">{fieldError("basics.summary")}</p>
+          <p id="profile-summary-error" className="profile-field-error">
+            {fieldError("basics.summary")}
+          </p>
         ) : null}
 
         <label htmlFor="profile-phone">{copy.phone}</label>
@@ -147,13 +161,20 @@ export function ProfileBasicsForm({
           data-field-path="basics.phone"
           inputMode="tel"
           maxLength={32}
-          aria-describedby="profile-phone-hint"
+          aria-invalid={Boolean(fieldError("basics.phone"))}
+          aria-describedby={
+            fieldError("basics.phone")
+              ? "profile-phone-hint profile-phone-error"
+              : "profile-phone-hint"
+          }
         />
         <p id="profile-phone-hint" className="profile-field-hint">
           {copy.phoneHint}
         </p>
         {fieldError("basics.phone") ? (
-          <p className="profile-field-error">{fieldError("basics.phone")}</p>
+          <p id="profile-phone-error" className="profile-field-error">
+            {fieldError("basics.phone")}
+          </p>
         ) : null}
 
         <label htmlFor="profile-location">{copy.location}</label>
@@ -162,9 +183,15 @@ export function ProfileBasicsForm({
           {...register("location")}
           data-field-path="basics.location"
           maxLength={160}
+          aria-invalid={Boolean(fieldError("basics.location"))}
+          aria-describedby={
+            fieldError("basics.location") ? "profile-location-error" : undefined
+          }
         />
         {fieldError("basics.location") ? (
-          <p className="profile-field-error">{fieldError("basics.location")}</p>
+          <p id="profile-location-error" className="profile-field-error">
+            {fieldError("basics.location")}
+          </p>
         ) : null}
       </div>
     </form>

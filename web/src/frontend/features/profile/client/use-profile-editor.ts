@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 import {
   candidateProfileSchema,
   profileMutationOutcomeSchema,
@@ -19,8 +18,10 @@ type WithoutBaseRevision<T> = T extends unknown
   ? Omit<T, "baseRevision">
   : never;
 export type ProfileSectionDraft = WithoutBaseRevision<ProfileSectionMutation>;
+export type ProfileSectionName = ProfileSectionMutation["section"];
 
 export type ProfileEditorFeedback = {
+  section: ProfileSectionName;
   kind: "success" | "warning" | "error";
   message: string;
   fieldErrors?: Record<string, string[]>;
@@ -105,6 +106,7 @@ export function useProfileEditor(
         if (!response.ok) {
           const accountError = (body ?? {}) as Partial<AccountError>;
           const next: ProfileEditorFeedback = {
+            section: draft.section,
             kind: "error",
             message:
               typeof accountError.message === "string"
@@ -119,7 +121,6 @@ export function useProfileEditor(
             fieldErrors: localizeFieldErrors(locale, accountError.fieldErrors),
           };
           setFeedback(next);
-          toast.error(next.message, { id: "professional-profile-save" });
           focusFirstError(next.fieldErrors);
           return false;
         }
@@ -130,12 +131,7 @@ export function useProfileEditor(
         const kind =
           outcome.data.conflictApplied || normalized ? "warning" : "success";
         const message = localizeAccountMessage(locale, outcome.data.message);
-        setFeedback({ kind, message });
-        if (kind === "success") {
-          toast.success(message, { id: "professional-profile-save" });
-        } else {
-          toast.warning(message, { id: "professional-profile-save" });
-        }
+        setFeedback({ section: draft.section, kind, message });
         await load(false);
         return true;
       } catch {
@@ -143,8 +139,7 @@ export function useProfileEditor(
           locale === "vi"
             ? "Không thể lưu mục hồ sơ."
             : "The profile section could not be saved.";
-        setFeedback({ kind: "error", message });
-        toast.error(message, { id: "professional-profile-save" });
+        setFeedback({ section: draft.section, kind: "error", message });
         return false;
       } finally {
         savingRef.current = null;

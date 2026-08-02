@@ -10,7 +10,6 @@ import { ProfileSkillsForm } from "./profile-skills-form";
 import { ProfileExperienceForm } from "./profile-experience-form";
 import { ProfileEducationForm } from "./profile-education-form";
 import { ProfileSocialLinksForm } from "./profile-social-links-form";
-import { ProfileSaveFeedback } from "./profile-save-feedback";
 import { ProfileAvatarEditor } from "./profile-avatar-editor";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 
@@ -225,33 +224,47 @@ export function ProfileOverview({
           </section>
         ) : null}
 
-        <ProfileSaveFeedback feedback={editor.feedback} />
-
         <div className="professional-profile-sections">
           <ProfileBasicsForm
             profile={profile}
             saving={editor.savingSection === "basics"}
-            feedback={editor.feedback}
+            feedback={
+              editor.feedback?.section === "basics" ? editor.feedback : null
+            }
             onSave={editor.save}
           />
           <ProfileSkillsForm
             profile={profile}
             saving={editor.savingSection === "skills"}
+            feedback={
+              editor.feedback?.section === "skills" ? editor.feedback : null
+            }
             onSave={editor.save}
           />
           <ProfileExperienceForm
             profile={profile}
             saving={editor.savingSection === "experience"}
+            feedback={
+              editor.feedback?.section === "experience" ? editor.feedback : null
+            }
             onSave={editor.save}
           />
           <ProfileEducationForm
             profile={profile}
             saving={editor.savingSection === "education"}
+            feedback={
+              editor.feedback?.section === "education" ? editor.feedback : null
+            }
             onSave={editor.save}
           />
           <ProfileSocialLinksForm
             profile={profile}
             saving={editor.savingSection === "socialLinks"}
+            feedback={
+              editor.feedback?.section === "socialLinks"
+                ? editor.feedback
+                : null
+            }
             onSave={editor.save}
           />
         </div>

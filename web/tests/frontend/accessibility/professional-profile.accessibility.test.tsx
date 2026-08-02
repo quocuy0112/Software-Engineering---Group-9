@@ -102,8 +102,39 @@ describe("professional profile accessibility", () => {
     expect(screen.getByText(/no education added/i)).toBeVisible();
     expect(screen.getByText(/no professional links added/i)).toBeVisible();
     expect(
-      screen.getByRole("region", { name: "Save feedback" }),
-    ).toHaveAttribute("aria-live", "polite");
+      screen.queryByRole("region", { name: "Save feedback" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("renders recognizable filled brand marks for each social platform", () => {
+    render(
+      <ProfileOverview
+        account={account}
+        initialProfile={emptyProfile}
+        csrfProof="csrf-proof"
+      />,
+    );
+
+    const expectedPathFragments = {
+      linkedin: "M20.447 20.452",
+      github: "M12 .297c-6.63",
+      facebook: "M24 12.073",
+      instagram: "M12 2.163",
+    } as const;
+
+    for (const [platform, pathFragment] of Object.entries(
+      expectedPathFragments,
+    )) {
+      const icon = document.querySelector(
+        `[data-platform="${platform}"] .social-platform-mark svg`,
+      );
+      expect(icon).toHaveAttribute("viewBox", "0 0 24 24");
+      expect(icon).toHaveAttribute("focusable", "false");
+      expect(icon?.querySelector("path")).toHaveAttribute(
+        "d",
+        expect.stringContaining(pathFragment),
+      );
+    }
   });
 
   it("marks edited sections and blocks accidental in-app navigation", () => {

@@ -19,6 +19,7 @@ describe("navigation session boundary", () => {
       "src/app/(workspace)/dashboard/page.tsx",
       "src/app/(workspace)/settings/security/page.tsx",
       "src/app/(workspace)/settings/sessions/page.tsx",
+      "src/app/(workspace)/profile/sessions/page.tsx",
     ];
     for (const path of pages) {
       const source = await readFile(path, "utf8");
@@ -26,6 +27,14 @@ describe("navigation session boundary", () => {
         /requireSession|WorkspaceShell|localStorage|sessionStorage/,
       );
     }
+  });
+
+  it("keeps the sessions view inside a client boundary for its query and locale hooks", async () => {
+    const view = await readFile(
+      "src/frontend/features/profile/components/profile-sessions-view.tsx",
+      "utf8",
+    );
+    expect(view.trimStart()).toMatch(/^"use client";/u);
   });
 
   it("keeps workspace navigation presentation-only and non-persistent", async () => {
