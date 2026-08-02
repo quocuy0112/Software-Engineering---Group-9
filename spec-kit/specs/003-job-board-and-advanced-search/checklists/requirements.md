@@ -33,3 +33,4 @@
 
 - Validation iteration 1: 16/16 items pass.
 - Clarification used the approved SmartHire constitution and the detailed candidate-job-journey use cases; no unresolved decision required another user question.
+- Revalidated 2026-08-02 after the Feature 004 merge: 16/16 items pass; the retained-CV release dependency and decimal byte limit are explicit.

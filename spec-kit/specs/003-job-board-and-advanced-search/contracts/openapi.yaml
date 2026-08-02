@@ -259,8 +259,8 @@ components:
     sessionCookie:
       type: apiKey
       in: cookie
-      name: __Secure-smarthire.session_token
-      description: Symbolic exclusive HttpOnly browser session cookie; deployed name is configuration-owned.
+      name: __Host-smarthire.session
+      description: Exclusive production HttpOnly browser session cookie; local HTTP uses unprefixed smarthire.session.
     csrfToken:
       type: apiKey
       in: header
@@ -493,7 +493,7 @@ components:
         displayName: { type: string }
         fileName: { type: string }
         mimeType: { type: string }
-        byteSize: { type: integer, minimum: 1, maximum: 5242880 }
+        byteSize: { type: integer, minimum: 1, maximum: 5000000 }
         version: { type: integer, minimum: 1 }
         confirmedAt: { type: string, format: date-time }
     ApplicationQuestion:

@@ -20,9 +20,19 @@
 
 No additional critical ambiguity remains after reconciling the requested use cases with the SmartHire constitution and approved candidate-job-journey specification.
 
-## User Scenarios & Testing *(mandatory)*
+### Session 2026-08-02
+
+- Q: Does Feature 004 automatically provide the retained CV attachment required by UC-APP-01? → A: No. Feature 004 imports a temporary source into Candidate Profile and must delete that source; `CandidateCv` is a separate retained, confirmed application-document dependency and must never point at a temporary Feature 004 artifact.
+- Q: What exact CV size bound applies at the application boundary? → A: The constitutional decimal limit is `1..5,000,000` bytes, not 5 MiB.
+- Q: Which optional Job Board capabilities are included now? → A: UC-JOB-03 and UC-JOB-05 remain the selected P2/Should increments. UC-JOB-04 remains a later backlog option because canonical safe URLs already provide its prerequisite without expanding this delivery.
+
+The specification is functionally clarified. Production release of UC-APP-01 remains gated on an approved upstream capability that creates retained `CandidateCv` records under its own consent, storage, retention, deletion, and malware-safety contract; controlled fixtures prove only this feature's consumer boundary.
+
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Browse, Search, and Filter Jobs (Priority: P1)
+
+**Detailed checklist and evidence**: [US1 Browse, Search, and Filter Jobs](checklists/us1-browse-search-filter-results.md)
 
 As a visitor or authenticated user, I can browse active approved jobs and narrow the catalogue with normalized keywords, filters, sorting, and pagination so that I can find relevant opportunities efficiently.
 
@@ -43,6 +53,8 @@ As a visitor or authenticated user, I can browse active approved jobs and narrow
 
 ### User Story 2 - View Job Details (Priority: P1)
 
+**Detailed checklist and evidence**: [US2 View Job Details](checklists/us2-view-job-details-results.md)
+
 As a visitor or authenticated user, I can open a stable public job link and review the complete permitted job and company information so that I can decide whether to apply or retain the opportunity.
 
 **Why this priority**: Candidates need trustworthy details before they can make an informed application decision.
@@ -60,6 +72,8 @@ As a visitor or authenticated user, I can open a stable public job link and revi
 ---
 
 ### User Story 3 - Apply for a Job (Priority: P1)
+
+**Detailed checklist and evidence**: [US3 Apply for a Job](checklists/us3-apply-for-job-results.md)
 
 As an authenticated candidate, I can review my confirmed profile and CV, answer job-specific questions, accept the current consent, and submit one application so that the hiring company can evaluate my candidacy.
 
@@ -80,6 +94,8 @@ As an authenticated candidate, I can review my confirmed profile and CV, answer 
 
 ### User Story 4 - Save or Remove a Job (Priority: P2)
 
+**Detailed checklist and evidence**: [US4 Save or Remove a Job](checklists/us4-save-remove-job-results.md)
+
 As an authenticated user, I can save a job for later or remove it from my saved collection so that I can organize opportunities without creating duplicate records.
 
 **Why this priority**: Saving improves continuity but is not required to discover, inspect, or apply for a job.
@@ -97,6 +113,8 @@ As an authenticated user, I can save a job for later or remove it from my saved 
 ---
 
 ### User Story 5 - Report a Job Posting (Priority: P2)
+
+**Detailed checklist and evidence**: [US5 Report a Job Posting](checklists/us5-report-job-results.md)
 
 As an authenticated user, I can privately report a suspected fraudulent, misleading, discriminatory, duplicate, inappropriate, or policy-violating posting so that authorized moderators can review it without an automatic enforcement decision.
 
@@ -122,11 +140,12 @@ As an authenticated user, I can privately report a suspected fraudulent, mislead
 - Save, report, and apply mutations reject cross-site requests, expired/revoked sessions, suspended/deleted accounts, and client-supplied ownership identifiers.
 - Free text in jobs, application answers, cover letters, and reports is validated and safely displayed; executable markup never runs.
 - Application eligibility is rechecked in the committing operation, including job status, deadline, account state, CV confirmation, and duplicate ownership.
+- A temporary Feature 004 upload, draft, artifact, or confirmation receipt is never treated as a retained application attachment; absence of an approved retained `CandidateCv` produces the ordinary no-confirmed-CV recovery path.
 - Concurrent apply, save, remove, and report requests converge through uniqueness or idempotency controls rather than timing-dependent client behavior.
 - Notification-provider failure cannot corrupt or roll back a committed application.
 - Loading, empty, validation, success, unavailable, and retry states are perceivable without relying only on color and remain operable by keyboard at 320 CSS pixels.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -153,9 +172,9 @@ As an authenticated user, I can privately report a suspected fraudulent, mislead
 - **FR-021 [UC-JOB-05]**: The system MUST prevent more than one unresolved report by the same user for the same job and reason while returning a neutral already-received result.
 - **FR-022 [UC-JOB-05]**: Report submission MUST be abuse-controlled, audited, and incapable by itself of automatically removing or changing a posting.
 - **FR-023 [UC-APP-01]**: Only an authenticated active Candidate identity MAY submit an application, and ownership MUST be derived exclusively from the verified server session.
-- **FR-024 [UC-APP-01]**: The application flow MUST identify missing required profile information and MUST require selection of a currently confirmed, candidate-owned CV.
+- **FR-024 [UC-APP-01]**: The application flow MUST identify missing required profile information and MUST require selection of a currently confirmed, unarchived, candidate-owned retained `CandidateCv` of `1..5,000,000` bytes; a temporary Feature 004 import artifact or confirmation receipt alone MUST NOT qualify as an application attachment.
 - **FR-025 [UC-APP-01]**: The application form MUST collect all active required job-specific answers, optional supported information, and explicit acceptance of the current application-consent version.
-- **FR-026 [UC-APP-01]**: Immediately before committing, the system MUST recheck job availability, deadline, candidate eligibility, CV confirmation and ownership, required answers, consent, and duplicate-application rules.
+- **FR-026 [UC-APP-01]**: Immediately before committing, the system MUST recheck job availability, deadline, candidate eligibility, retained-CV confirmation, ownership, archival and exact byte-size rules, required answers, consent, and duplicate-application rules.
 - **FR-027 [UC-APP-01]**: A successful submission MUST transactionally create exactly one application in the canonical `Applied` stage together with immutable/versioned snapshots of relevant candidate profile, selected CV metadata/content reference, job information, submitted answers, and consent version.
 - **FR-028 [UC-APP-01]**: Repeated or concurrent submissions by one candidate to one job MUST return the existing successful application and MUST NOT create duplicates.
 - **FR-029 [UC-APP-01]**: Application persistence failure MUST roll back partial application data; notification delivery failure after commit MUST NOT invalidate the application and MUST remain retryable.
@@ -173,14 +192,14 @@ As an authenticated user, I can privately report a suspected fraudulent, mislead
 - **Job Skill/Tag**: A normalized searchable label related to one or more postings while preserving a public display label and relevance/requirement metadata.
 - **Saved Job**: A user-scoped unique relationship to a posting with creation time; it may preserve a neutral reference after public availability changes.
 - **Job Report**: A private, user-scoped moderation concern with reason, bounded details, review state, timestamps, and uniqueness for unresolved duplicate concerns.
-- **Candidate CV**: Candidate-owned CV material with confirmation state and versioned metadata; this feature consumes confirmed CVs but does not define upload or parsing.
+- **Candidate CV**: Candidate-owned, retained application document with confirmation state, versioned metadata, private storage, and its own retention/deletion contract; this feature consumes it but does not silently promote Feature 004 temporary imports into it.
 - **Application Question**: A versioned posting-specific prompt with required/optional status, order, and bounded answer rules.
 - **Job Application**: The unique candidate-to-posting submission with canonical recruitment stage, submission time, idempotency identity, and immutable/versioned snapshots.
 - **Application Answer**: A snapshot answer tied to the exact question version presented at submission.
 - **Application Consent Snapshot**: The consent version and acceptance time recorded for the application.
 - **Notification Work and Audit Event**: Durable, privacy-minimized evidence for asynchronous notification delivery and critical actions.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 
@@ -198,7 +217,7 @@ As an authenticated user, I can privately report a suspected fraudulent, mislead
 - Existing SmartHire authentication remains the exclusive browser-session mechanism and every normal authenticated account retains a Candidate identity.
 - Job creation, company membership management, employer verification, moderation decisions, CV upload/parsing, application tracking, scoring, recruiter pipeline management, and notification consumption are separate functional groups; this feature defines only the integration boundary required to discover jobs and create notification work.
 - Job-management or test fixtures provide approved active postings; this feature does not expose recruiter job-create/edit/publish APIs.
-- Candidate-profile/CV workflows provide confirmed profile and CV data. Until upload/parsing is delivered, controlled fixtures may create confirmed CV records for application validation.
+- Candidate Profile comes from Features 002/004. Feature 004 intentionally does not provide retained application documents. An approved upstream retained-document capability must create `CandidateCv` records before production UC-APP-01 release; controlled fixtures may create them only for isolated contract and application validation.
 - A candidate may have at most one application per job in this release; withdrawal and reapplication rules are outside this feature.
 - Salary matching uses explicitly disclosed structured salary data and a supported currency/period; postings with undisclosed or incompatible salary data do not satisfy a numeric salary filter.
 - Relevance sorting is deterministic and based on approved searchable job fields; AI-generated search keywords and LLM-based recommendations are excluded.
@@ -215,4 +234,5 @@ As an authenticated user, I can privately report a suspected fraudulent, mislead
 - UC-JOB-04 sharing controls beyond ordinary canonical URLs.
 - Recruiter job creation/editing/lifecycle screens and Administrator moderation/review interfaces.
 - Candidate CV upload, parsing, confirmation, application-history tracking, scoring, recommendations, pipeline transitions, and notification inbox/email delivery UI.
+- Silent promotion, reuse, or long-term retention of Feature 004 temporary source files, extracted text, drafts, provenance, or confirmation receipts as application attachments.
 - AI-generated keywords, semantic job recommendations, AI hiring decisions, and any automatic enforcement based solely on a report.
