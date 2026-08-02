@@ -102,7 +102,7 @@ describe("reset password form", () => {
         id: "reset-password-status",
       }),
     );
-    expect(screen.getByRole("status")).toHaveAttribute("data-tone", "error");
+    expect(screen.getByRole("alert")).toHaveAttribute("data-tone", "error");
     expect(fetchMock).not.toHaveBeenCalled();
     expect(navigation.replace).not.toHaveBeenCalled();
     expect(password).toHaveValue("correct horse 2026");

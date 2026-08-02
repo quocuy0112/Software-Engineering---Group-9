@@ -16,6 +16,7 @@ export default async function ProfilePage() {
       account={{
         name: context.account.name,
         email: context.account.email,
+        image: context.account.image,
         memberSince: context.account.createdAt.toLocaleDateString(),
         twoFactorEnabled: context.account.twoFactorEnabled,
       }}

@@ -156,6 +156,15 @@ export function normalizeSocialUrl(value: string): string {
   ) {
     throw new ProfileValidationError("socialLinks.url", "URL");
   }
+  const host = url.hostname.toLowerCase().replace(/^www\./u, "");
+  const path = url.pathname.replace(/\/+$/u, "");
+  const incompletePlatformProfile =
+    (["github.com", "facebook.com", "instagram.com"].includes(host) &&
+      path === "") ||
+    (host === "linkedin.com" && ["", "/in"].includes(path));
+  if (incompletePlatformProfile) {
+    throw new ProfileValidationError("socialLinks.url", "INCOMPLETE");
+  }
   return url.toString();
 }
 

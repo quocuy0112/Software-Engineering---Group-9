@@ -3,11 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-
-const destinations = [
-  { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
-  { href: "/profile", label: "Profile", icon: "profile" },
-] as const;
+import { useWorkspaceLocale } from "../client/workspace-locale";
 
 export function WorkspaceNavigation({
   busy,
@@ -18,19 +14,60 @@ export function WorkspaceNavigation({
   collapsed: boolean;
   onSignOut: () => void;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy =
+    locale === "vi"
+      ? {
+          dashboard: "Tổng quan",
+          profile: "Hồ sơ",
+          workspace: "Không gian làm việc",
+          openMenu: "Mở menu làm việc",
+          closeMenu: "Đóng menu làm việc",
+          signOut: "Đăng xuất",
+          signingOut: "Đang đăng xuất…",
+        }
+      : {
+          dashboard: "Dashboard",
+          profile: "Profile",
+          workspace: "Workspace",
+          openMenu: "Open workspace menu",
+          closeMenu: "Close workspace menu",
+          signOut: "Sign out",
+          signingOut: "Signing out…",
+        };
+  const destinations = [
+    { href: "/dashboard", label: copy.dashboard, icon: "dashboard" },
+    { href: "/profile", label: copy.profile, icon: "profile" },
+  ] as const;
   const pathname = usePathname() ?? "/";
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const navigationRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!menuOpen) return;
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key !== "Escape") return;
-      setMenuOpen(false);
-      toggleRef.current?.focus();
+    function closeMenu(event: KeyboardEvent | PointerEvent) {
+      if (event instanceof KeyboardEvent) {
+        if (event.key !== "Escape") return;
+        setMenuOpen(false);
+        toggleRef.current?.focus();
+        return;
+      }
+      const target = event.target;
+      if (
+        target instanceof Node &&
+        !navigationRef.current?.contains(target) &&
+        !toggleRef.current?.contains(target)
+      ) {
+        setMenuOpen(false);
+      }
     }
-    document.addEventListener("keydown", closeOnEscape);
-    return () => document.removeEventListener("keydown", closeOnEscape);
+    document.addEventListener("keydown", closeMenu);
+    document.addEventListener("pointerdown", closeMenu);
+    return () => {
+      document.removeEventListener("keydown", closeMenu);
+      document.removeEventListener("pointerdown", closeMenu);
+    };
   }, [menuOpen]);
 
   return (
@@ -43,17 +80,25 @@ export function WorkspaceNavigation({
         aria-controls="workspace-navigation"
         onClick={() => setMenuOpen((open) => !open)}
       >
-        <span className="menu-toggle-icon" aria-hidden="true">
-          {menuOpen ? "×" : "☰"}
-        </span>
-        {menuOpen ? "Close workspace menu" : "Open workspace menu"}
+        <svg
+          className="menu-toggle-icon"
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d={menuOpen ? "M6 6l12 12M18 6 6 18" : "M4 7h16M4 12h16M4 17h16"}
+          />
+        </svg>
+        {menuOpen ? copy.closeMenu : copy.openMenu}
       </button>
       <nav
+        ref={navigationRef}
         id="workspace-navigation"
         className="workspace-navigation"
-        aria-label="Workspace"
+        aria-label={locale === "vi" ? "Không gian làm việc" : "Workspace"}
         data-open={menuOpen}
       >
+        <p className="workspace-nav-label">{copy.workspace}</p>
         <div className="workspace-navigation-scroll">
           {destinations.map((destination) => {
             const active =
@@ -83,12 +128,14 @@ export function WorkspaceNavigation({
             onClick={onSignOut}
             disabled={busy}
             aria-busy={busy}
-            aria-label={busy ? "Signing out" : "Sign out"}
-            title={collapsed ? (busy ? "Signing out" : "Sign out") : undefined}
+            aria-label={busy ? copy.signingOut : copy.signOut}
+            title={
+              collapsed ? (busy ? copy.signingOut : copy.signOut) : undefined
+            }
           >
             <NavIcon name="signout" />
             <span className="workspace-navigation-label">
-              {busy ? "Signing out…" : "Sign out"}
+              {busy ? copy.signingOut : copy.signOut}
             </span>
           </button>
         </div>

@@ -26,7 +26,7 @@ afterEach(() => {
 });
 
 describe("password-change accessibility", () => {
-  it("labels all fields, permits paste, exposes autocomplete, and toggles visibility", () => {
+  it("labels all fields, permits paste, exposes autocomplete, and toggles each field's visibility", () => {
     render(<PasswordChangeForm csrfProof="csrf-proof" />);
     const current = screen.getByLabelText("Current password");
     const next = screen.getByLabelText("New password");
@@ -40,9 +40,17 @@ describe("password-change accessibility", () => {
       }),
     ).toBe(true);
     expect(current).toHaveAttribute("type", "password");
-    fireEvent.click(screen.getByLabelText("Show passwords"));
+    expect(next).toHaveAttribute("type", "password");
+    expect(confirmation).toHaveAttribute("type", "password");
+    fireEvent.click(screen.getByLabelText("Show passwords: Current password"));
     expect(current).toHaveAttribute("type", "text");
+    expect(next).toHaveAttribute("type", "password");
+    fireEvent.click(screen.getByLabelText("Show passwords: New password"));
     expect(next).toHaveAttribute("type", "text");
+    expect(confirmation).toHaveAttribute("type", "password");
+    fireEvent.click(
+      screen.getByLabelText("Show passwords: Confirm new password"),
+    );
     expect(confirmation).toHaveAttribute("type", "text");
     expect(screen.getByText(/12 to 128 Unicode characters/i)).toBeVisible();
     expect(screen.getByText(/spaces are allowed/i)).toBeVisible();
@@ -137,5 +145,11 @@ describe("password-change accessibility", () => {
     expect(css).toMatch(/focus-visible/);
     expect(css).toMatch(/prefers-reduced-motion:\s*reduce/);
     expect(css).toMatch(/\[data-feedback-kind=["']error["']\]/);
+    const baseCss = readFileSync(
+      resolve(process.cwd(), "src/frontend/styles/base.css"),
+      "utf8",
+    );
+    expect(baseCss).toMatch(/\.password-control/);
+    expect(baseCss).toMatch(/\.password-visibility-button/);
   });
 });

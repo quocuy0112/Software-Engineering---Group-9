@@ -4,14 +4,25 @@ import { resolve } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { AuthShell } from "@/frontend/features/authentication/components/auth-shell";
 import { WorkspaceShell } from "@/frontend/features/dashboard/components/workspace-shell";
+import { DashboardView } from "@/frontend/features/dashboard/components/dashboard-view";
 import { ProfileNavigation } from "@/frontend/features/profile/components/profile-navigation";
-import DashboardPage from "@/app/(workspace)/dashboard/page";
+import { ProfileAccountView } from "@/frontend/features/profile/components/profile-account-view";
 
-const navigation = vi.hoisted(() => ({ replace: vi.fn() }));
+const navigation = vi.hoisted(() => ({ replace: vi.fn(), refresh: vi.fn() }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/profile/security",
   useRouter: () => navigation,
 }));
+
+const emptyProfile = {
+  revision: 0,
+  empty: true,
+  basics: { headline: null, summary: null, phone: null, location: null },
+  skills: [],
+  experience: [],
+  education: [],
+  socialLinks: [],
+};
 
 describe("identity navigation shells", () => {
   it("exposes branded public auth links and an accessible destination landmark", () => {
@@ -45,6 +56,31 @@ describe("identity navigation shells", () => {
     const signIn = screen.getByRole("link", { name: "Sign in" });
     signIn.focus();
     expect(signIn).toHaveFocus();
+  });
+
+  it("applies the persisted Vietnamese locale across the workspace shell", () => {
+    render(
+      <WorkspaceShell
+        csrfProof="proof"
+        profile={{
+          name: "Thao Nguyen",
+          email: "thao@example.test",
+          locale: "vi",
+        }}
+      >
+        <ProfileNavigation active="overview" />
+      </WorkspaceShell>,
+    );
+
+    expect(screen.getByRole("link", { name: "Tổng quan" })).toHaveAttribute(
+      "href",
+      "/dashboard",
+    );
+    expect(screen.getByRole("button", { name: "Đăng xuất" })).toBeVisible();
+    expect(screen.getByRole("link", { name: "Nghề nghiệp" })).toHaveAttribute(
+      "href",
+      "/profile",
+    );
   });
 
   it("marks the active workspace destination and controls the mobile menu", () => {
@@ -102,6 +138,75 @@ describe("identity navigation shells", () => {
     ).toHaveFocus();
   });
 
+  it("closes the mobile menu when the user taps outside it", () => {
+    render(
+      <WorkspaceShell
+        csrfProof="proof"
+        profile={{ name: "Thao Nguyen", email: "thao@example.test" }}
+      >
+        <h1>Security</h1>
+      </WorkspaceShell>,
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Open workspace menu" }),
+    );
+    fireEvent.pointerDown(document.body);
+    expect(
+      screen.getByRole("button", { name: "Open workspace menu" }),
+    ).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("updates the workspace account chip immediately after the full name is saved", async () => {
+    navigation.refresh.mockClear();
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      Response.json({
+        identity: {
+          name: "Binh Nguyen",
+          email: "thao@example.test",
+          emailVerified: true,
+          accountState: "ACTIVE",
+          createdAt: "2026-07-31T00:00:00.000Z",
+          pendingEmailChange: null,
+        },
+        warnings: [],
+        message: "Account identity saved.",
+      }),
+    );
+
+    render(
+      <WorkspaceShell
+        csrfProof="proof"
+        profile={{ name: "Thao Nguyen", email: "thao@example.test" }}
+      >
+        <ProfileAccountView
+          csrfProof="proof"
+          initialIdentity={{
+            name: "Thao Nguyen",
+            email: "thao@example.test",
+            emailVerified: true,
+            accountState: "ACTIVE",
+            createdAt: "2026-07-31T00:00:00.000Z",
+            pendingEmailChange: null,
+          }}
+        />
+      </WorkspaceShell>,
+    );
+
+    fireEvent.change(screen.getByLabelText("Full name"), {
+      target: { value: "Binh Nguyen" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save full name" }));
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("link", { name: "Open profile for Binh Nguyen" }),
+      ).toBeVisible(),
+    );
+    expect(navigation.refresh).toHaveBeenCalledTimes(1);
+    fetchMock.mockRestore();
+  });
+
   it("collapses the desktop sidebar while keeping navigation and sign-out accessible", () => {
     render(
       <WorkspaceShell csrfProof="proof">
@@ -150,19 +255,88 @@ describe("identity navigation shells", () => {
     expect(css).toContain("width: var(--sh-sidebar-current-width);");
   });
 
-  it("keeps the dashboard limited to identity shortcuts and future placeholders", () => {
-    render(<DashboardPage />);
+  it("shows actionable dashboard data without future placeholders", () => {
+    render(
+      <DashboardView
+        account={{
+          name: "Thao Nguyen",
+          hasAvatar: false,
+          twoFactorEnabled: false,
+        }}
+        profile={emptyProfile}
+      />,
+    );
     expect(screen.getByRole("heading", { name: "Dashboard" })).toBeVisible();
-    expect(screen.getByRole("link", { name: /Security/ })).toHaveAttribute(
-      "href",
-      "/profile/security",
-    );
-    expect(screen.getByRole("link", { name: /Sessions/ })).toHaveAttribute(
-      "href",
-      "/profile/sessions",
-    );
-    expect(screen.getByText(/coming later/i)).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: /Account security/ }),
+    ).toHaveAttribute("href", "/profile/security");
+    expect(
+      screen.getByRole("progressbar", { name: "Profile completion" }),
+    ).toHaveAttribute("aria-valuenow", "0");
+    expect(screen.queryByText(/coming later/i)).toBeNull();
     expect(screen.queryByText(/jobs|applications|analytics/i)).toBeNull();
+  });
+
+  it("scores profile quality and links every remaining step to its editor", () => {
+    render(
+      <DashboardView
+        account={{
+          name: "Thao Nguyen",
+          hasAvatar: true,
+          twoFactorEnabled: true,
+        }}
+        profile={{
+          revision: 1,
+          empty: false,
+          basics: {
+            headline: "Senior software product engineer",
+            summary:
+              "I design and deliver reliable software products with cross-functional teams, measurable outcomes, thoughtful accessibility, and maintainable engineering practices.",
+            phone: null,
+            location: null,
+          },
+          skills: [
+            { id: "skill-1", label: "TypeScript" },
+            { id: "skill-2", label: "Product design" },
+            { id: "skill-3", label: "Accessibility" },
+          ],
+          experience: [
+            {
+              id: "experience-1",
+              title: "Senior Engineer",
+              company: "SmartHire",
+              description:
+                "Led the delivery of accessible product experiences and improved reliability across the core candidate workflow.",
+              startDate: "2024-01-01",
+              endDate: null,
+              current: true,
+            },
+          ],
+          education: [
+            {
+              id: "education-1",
+              institution: "HCMUS",
+              degree: "Bachelor",
+              field: "Software Engineering",
+              startDate: "2023-01-01",
+              endDate: null,
+              current: true,
+            },
+          ],
+          socialLinks: [
+            { id: "social-1", url: "https://github.com/smarthire" },
+          ],
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("progressbar", { name: "Profile completion" }),
+    ).toHaveAttribute("aria-valuenow", "100");
+    expect(screen.getByText("Profile ready")).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: /Add a professional link/i }),
+    ).toHaveAttribute("href", "/profile#profile-social-section");
   });
 
   it("exposes directly addressable profile tabs with active state", () => {
@@ -270,7 +444,7 @@ describe("identity navigation shells", () => {
       }),
     );
     await waitFor(() =>
-      expect(screen.getByRole("status")).toHaveTextContent(
+      expect(screen.getByRole("alert")).toHaveTextContent(
         "Unable to sign out. Please try again.",
       ),
     );

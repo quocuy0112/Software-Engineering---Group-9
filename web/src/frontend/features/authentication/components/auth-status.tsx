@@ -8,18 +8,19 @@ export function AuthStatus({
   status,
   tone = "message",
   id,
+  toastOnChange = true,
 }: {
   status: string;
   tone?: "message" | "error" | "success";
   id?: string;
+  toastOnChange?: boolean;
 }) {
   useEffect(() => {
-    if (!status) return;
+    if (!toastOnChange || !status) return;
     const messages = status
       .split(/\r?\n/)
       .map((message) => message.trim())
       .filter(Boolean);
-
     if (messages.length === 0) return;
 
     const baseToastId = id ?? "auth-status";
@@ -34,15 +35,15 @@ export function AuthStatus({
       else if (typeof toast === "function") toast(message, { id: toastId });
       else toastFallback.info?.(message, { id: toastId });
     });
-  }, [id, status, tone]);
+  }, [id, status, toastOnChange, tone]);
 
   const alertTone: AlertTone = tone === "message" ? "info" : tone;
 
   return status ? (
     <Alert
       id={id}
-      role="status"
-      aria-live="polite"
+      role={tone === "error" ? "alert" : "status"}
+      aria-live={tone === "error" ? "assertive" : "polite"}
       tone={alertTone}
       className="auth-status"
     >

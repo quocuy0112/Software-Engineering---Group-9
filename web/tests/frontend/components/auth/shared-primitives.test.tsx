@@ -47,9 +47,10 @@ describe("shared auth primitives", () => {
   });
   it("announces and focuses the error summary", () => {
     render(<FormFeedback errors={["Email is required"]} status="Waiting" />);
-    expect(screen.getByRole("status")).toHaveTextContent("Waiting");
+    const alerts = screen.getAllByRole("alert");
+    expect(alerts[1]).toHaveTextContent("Waiting");
     expect(focusErrorSummary()).toBe(true);
-    expect(screen.getByRole("alert")).toHaveFocus();
+    expect(alerts[0]).toHaveFocus();
   });
   it("suppresses duplicate submissions and exposes busy state", async () => {
     let release!: () => void;

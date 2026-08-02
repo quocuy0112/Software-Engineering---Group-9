@@ -5,6 +5,11 @@ import type { AccountPreferences } from "@/shared/contracts/account/preferences"
 import { useAccountPreferences } from "../client/use-account-preferences";
 import { AccountPreferencesForm } from "./account-preferences-form";
 import { ProfileNavigation } from "./profile-navigation";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import {
+  UnsavedChangesIndicator,
+  useUnsavedChangesGuard,
+} from "../client/unsaved-changes";
 
 export function ProfilePreferencesView({
   initialPreferences,
@@ -13,7 +18,27 @@ export function ProfilePreferencesView({
   initialPreferences: AccountPreferences;
   csrfProof: string;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy =
+    locale === "vi"
+      ? {
+          kicker: "TRẢI NGHIỆM CỦA BẠN",
+          title: "Tùy chọn",
+          subtitle:
+            "Đồng bộ ngôn ngữ và múi giờ trên mọi thiết bị đã đăng nhập.",
+          panel: "THIẾT LẬP TÀI KHOẢN",
+          panelTitle: "Tùy chọn tài khoản",
+        }
+      : {
+          kicker: "YOUR EXPERIENCE",
+          title: "Preferences",
+          subtitle:
+            "Keep language and timezone consistent across every signed-in device.",
+          panel: "ACCOUNT DEFAULTS",
+          panelTitle: "Account preferences",
+        };
   const state = useAccountPreferences(initialPreferences, csrfProof);
+  useUnsavedChangesGuard(state.dirty);
   const feedbackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -24,12 +49,9 @@ export function ProfilePreferencesView({
     <div className="profile-page account-preferences-page">
       <header className="page-heading profile-heading">
         <div>
-          <p className="workspace-kicker">YOUR EXPERIENCE</p>
-          <h1 id="workspace-page-title">Preferences</h1>
-          <p className="page-heading-copy">
-            Keep language, timezone, and permitted email choices consistent
-            across every signed-in device.
-          </p>
+          <p className="workspace-kicker">{copy.kicker}</p>
+          <h1 id="workspace-page-title">{copy.title}</h1>
+          <p className="page-heading-copy">{copy.subtitle}</p>
         </div>
       </header>
       <ProfileNavigation active="preferences" />
@@ -39,8 +61,9 @@ export function ProfilePreferencesView({
       >
         <div className="account-panel-heading">
           <div>
-            <p className="panel-kicker">ACCOUNT DEFAULTS</p>
-            <h2 id="preferences-form-title">Account preferences</h2>
+            <p className="panel-kicker">{copy.panel}</p>
+            <h2 id="preferences-form-title">{copy.panelTitle}</h2>
+            <UnsavedChangesIndicator dirty={state.dirty} />
           </div>
         </div>
         <div

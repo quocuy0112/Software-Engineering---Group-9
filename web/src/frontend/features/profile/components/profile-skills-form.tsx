@@ -6,8 +6,17 @@ import {
   skillSuggestionsResponseSchema,
   type CandidateProfileContract,
 } from "@/shared/contracts/account/profile";
-import type { ProfileSectionDraft } from "../client/use-profile-editor";
+import type {
+  ProfileEditorFeedback,
+  ProfileSectionDraft,
+} from "../client/use-profile-editor";
 import { useServerFormReconciliation } from "../client/use-server-form-reconciliation";
+import {
+  UnsavedChangesIndicator,
+  useUnsavedChangesGuard,
+} from "../client/unsaved-changes";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { ProfileSaveFeedback } from "./profile-save-feedback";
 
 type SkillValues = {
   skills: Array<{ id?: string; label: string }>;
@@ -16,16 +25,55 @@ type SkillValues = {
 export function ProfileSkillsForm({
   profile,
   saving,
+  feedback,
   onSave,
 }: {
   profile: CandidateProfileContract;
   saving: boolean;
+  feedback: ProfileEditorFeedback | null;
   onSave: (draft: ProfileSectionDraft) => Promise<boolean>;
 }) {
-  const { control, register, handleSubmit, reset, setValue } =
-    useForm<SkillValues>({
-      defaultValues: { skills: profile.skills },
-    });
+  const locale = useWorkspaceLocale();
+  const copy =
+    locale === "vi"
+      ? {
+          kicker: "THẾ MẠNH CÓ THỂ TÌM KIẾM",
+          title: "Kỹ năng",
+          saving: "Đang lưu kỹ năng…",
+          save: "Lưu kỹ năng",
+          empty: "Bạn chưa thêm kỹ năng nào.",
+          skill: "Kỹ năng",
+          up: "Di chuyển lên",
+          down: "Di chuyển xuống",
+          remove: "Xóa",
+          suggestion: "Dùng gợi ý",
+          add: "Thêm kỹ năng",
+          suggestions: "Gợi ý kỹ năng",
+        }
+      : {
+          kicker: "SEARCHABLE STRENGTHS",
+          title: "Skills",
+          saving: "Saving skills…",
+          save: "Save skills",
+          empty: "No skills added yet.",
+          skill: "Skill",
+          up: "Move up",
+          down: "Move down",
+          remove: "Remove",
+          suggestion: "Use suggestion",
+          add: "Add skill",
+          suggestions: "Skill suggestions",
+        };
+  const {
+    control,
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { isDirty },
+  } = useForm<SkillValues>({
+    defaultValues: { skills: profile.skills },
+  });
   const { fields, append, remove, move } = useFieldArray({
     control,
     name: "skills",
@@ -42,6 +90,9 @@ export function ProfileSkillsForm({
     suggestionResult.query === normalizedQuery ? suggestionResult.items : [];
 
   useServerFormReconciliation({ skills: profile.skills }, reset);
+  useUnsavedChangesGuard(isDirty);
+
+  const fieldError = (path: string) => feedback?.fieldErrors?.[path]?.[0];
 
   useEffect(() => {
     if (!normalizedQuery) return;
@@ -75,6 +126,7 @@ export function ProfileSkillsForm({
 
   return (
     <form
+      id="profile-skills-section"
       className="professional-profile-section"
       aria-labelledby="profile-skills-title"
       onSubmit={handleSubmit(async ({ skills }) => {
@@ -88,23 +140,34 @@ export function ProfileSkillsForm({
     >
       <div className="professional-profile-section-heading">
         <div>
-          <p className="panel-kicker">SEARCHABLE STRENGTHS</p>
-          <h2 id="profile-skills-title">Skills</h2>
+          <p className="panel-kicker">{copy.kicker}</p>
+          <h2 id="profile-skills-title">{copy.title}</h2>
+          <UnsavedChangesIndicator dirty={isDirty} />
         </div>
         <button type="submit" disabled={saving}>
-          {saving ? "Saving skills…" : "Save skills"}
+          {saving ? copy.saving : copy.save}
         </button>
       </div>
-      {fields.length === 0 ? <p>No skills added yet.</p> : null}
+      <ProfileSaveFeedback feedback={feedback} />
+      {fields.length === 0 ? <p>{copy.empty}</p> : null}
       <ol className="professional-profile-list">
         {fields.map((field, index) => (
           <li key={field.fieldKey} className="professional-profile-list-row">
             <input type="hidden" {...register(`skills.${index}.id`)} />
-            <label htmlFor={`profile-skill-${index}`}>Skill {index + 1}</label>
+            <label htmlFor={`profile-skill-${index}`}>
+              {copy.skill} {index + 1}
+            </label>
             <input
               id={`profile-skill-${index}`}
               maxLength={80}
               autoComplete="off"
+              data-field-path={`skills.${index}.label`}
+              aria-invalid={Boolean(fieldError(`skills.${index}.label`))}
+              aria-describedby={
+                fieldError(`skills.${index}.label`)
+                  ? `profile-skill-${index}-error`
+                  : undefined
+              }
               {...register(`skills.${index}.label`, {
                 onChange: (event) => {
                   setActiveIndex(index);
@@ -112,36 +175,56 @@ export function ProfileSkillsForm({
                 },
               })}
             />
+            {fieldError(`skills.${index}.label`) ? (
+              <p
+                id={`profile-skill-${index}-error`}
+                className="profile-field-error"
+              >
+                {fieldError(`skills.${index}.label`)}
+              </p>
+            ) : null}
             <div className="professional-profile-row-actions">
               <button
                 type="button"
-                aria-label={`Move skill ${index + 1} up`}
+                aria-label={
+                  locale === "vi"
+                    ? `Di chuyển kỹ năng ${index + 1} lên`
+                    : `Move skill ${index + 1} up`
+                }
                 disabled={index === 0}
                 onClick={() => move(index, index - 1)}
               >
-                Move up
+                {copy.up}
               </button>
               <button
                 type="button"
-                aria-label={`Move skill ${index + 1} down`}
+                aria-label={
+                  locale === "vi"
+                    ? `Di chuyển kỹ năng ${index + 1} xuống`
+                    : `Move skill ${index + 1} down`
+                }
                 disabled={index === fields.length - 1}
                 onClick={() => move(index, index + 1)}
               >
-                Move down
+                {copy.down}
               </button>
               <button
                 type="button"
-                aria-label={`Remove skill ${index + 1}`}
+                aria-label={
+                  locale === "vi"
+                    ? `Xóa kỹ năng ${index + 1}`
+                    : `Remove skill ${index + 1}`
+                }
                 onClick={() => remove(index)}
               >
-                Remove
+                {copy.remove}
               </button>
             </div>
           </li>
         ))}
       </ol>
       {suggestions.length ? (
-        <ul className="profile-suggestions" aria-label="Skill suggestions">
+        <ul className="profile-suggestions" aria-label={copy.suggestions}>
           {suggestions.map((suggestion) => (
             <li key={suggestion.id}>
               <button
@@ -153,20 +236,22 @@ export function ProfileSkillsForm({
                   setQuery("");
                 }}
               >
-                Use suggestion {suggestion.label}
+                {copy.suggestion} {suggestion.label}
               </button>
             </li>
           ))}
         </ul>
       ) : null}
-      <button
-        type="button"
-        disabled={fields.length >= 50}
-        onClick={() => append({ label: "" })}
-      >
-        Add skill
-      </button>
-      <p className="profile-field-hint">{fields.length} of 50 skills</p>
+      <div className="professional-profile-add-row">
+        <button
+          type="button"
+          disabled={fields.length >= 50}
+          onClick={() => append({ label: "" })}
+        >
+          {copy.add}
+        </button>
+        <p className="profile-field-hint">{fields.length} / 50</p>
+      </div>
     </form>
   );
 }
