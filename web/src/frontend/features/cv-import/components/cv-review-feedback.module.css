@@ -1,0 +1,25 @@
+.root {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.status,
+.error p {
+  margin: 0;
+}
+
+.status {
+  font-weight: 600;
+}
+
+.error {
+  background: var(--color-error-surface, #fef2f2);
+  border: 2px solid var(--color-error, #b91c1c);
+  color: var(--color-error-text, #7f1d1d);
+  padding: 1rem;
+}
+
+.error:focus-visible {
+  outline: 3px solid var(--color-focus, #1d4ed8);
+  outline-offset: 2px;
+}

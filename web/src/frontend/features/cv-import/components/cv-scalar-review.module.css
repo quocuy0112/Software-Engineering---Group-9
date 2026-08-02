@@ -1,0 +1,67 @@
+.root,
+.card {
+  display: grid;
+  gap: 1rem;
+}
+
+.card {
+  border: 1px solid var(--color-border, #cbd5e1);
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+.comparison {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.comparison > div,
+.choices {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.comparison input,
+.comparison textarea {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: 2.75rem;
+}
+
+.comparison textarea {
+  min-block-size: 8rem;
+  resize: vertical;
+}
+
+.choices {
+  border: 0;
+  grid-template-columns: repeat(3, minmax(0, max-content));
+  margin: 0;
+  padding: 0;
+}
+
+.choices label {
+  align-items: center;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.card :is(input, textarea):focus-visible {
+  outline: 3px solid var(--color-focus, #1d4ed8);
+  outline-offset: 2px;
+}
+
+@media (max-width: 32rem) {
+  .comparison,
+  .choices {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card * {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -9,6 +9,7 @@ export type ProfileNavigationDestination = {
 
 export const foundationProfileDestinations = [
   { href: "/profile", label: "Professional", key: "overview" },
+  { href: "/profile/cv-imports", label: "CV imports", key: "cv-imports" },
   { href: "/profile/account", label: "Account", key: "account" },
   { href: "/profile/preferences", label: "Preferences", key: "preferences" },
   { href: "/profile/security", label: "Security", key: "security" },

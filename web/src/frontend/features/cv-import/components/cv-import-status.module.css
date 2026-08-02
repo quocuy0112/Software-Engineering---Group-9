@@ -1,0 +1,63 @@
+.root {
+  display: grid;
+  min-width: 0;
+  gap: 1rem;
+}
+
+.state {
+  padding: 0.75rem;
+  border-inline-start: 0.35rem solid currentColor;
+}
+
+.timeline {
+  display: grid;
+  margin: 0;
+  padding-inline-start: 1.5rem;
+  gap: 0.4rem;
+}
+
+.timeline [aria-current="step"] {
+  font-weight: 750;
+  text-decoration: underline;
+  text-decoration-thickness: 0.15em;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.actions button,
+.actions a {
+  min-height: 2.75rem;
+  padding: 0.65rem 0.85rem;
+}
+
+.actions :is(button, a):focus-visible {
+  outline: 3px solid var(--color-focus, #1d4ed8);
+  outline-offset: 2px;
+}
+
+.pollError {
+  margin: 0;
+  border-inline-start: 0.35rem solid var(--color-error, #b91c1c);
+  color: var(--color-error-text, #7f1d1d);
+  padding: 0.75rem;
+}
+
+@media (max-width: 32rem) {
+  .actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .root * {
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto;
+    transition-duration: 0.01ms !important;
+  }
+}

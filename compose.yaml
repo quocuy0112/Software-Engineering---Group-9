@@ -17,5 +17,75 @@ services:
       timeout: 5s
       retries: 12
       start_period: 5s
+  clamav:
+    image: clamav/clamav:1.4_base@sha256:35ec19c1e8cbee7cae8a35c3b0ac62957d99b418e6902035b89a1778c39433e7
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "/opt/smarthire/clamav-entrypoint.sh"]
+    environment:
+      CLAMD_STARTUP_TIMEOUT_SECONDS: "1800"
+      FRESHCLAM_CHECKS_PER_DAY: "12"
+    group_add:
+      - "101"
+    volumes:
+      - clamav_signatures:/var/lib/clamav
+      - clamav_runtime:/run/clamav
+      - ./infra/clamav/clamd.conf:/etc/clamav/clamd.conf:ro
+      - ./infra/clamav/freshclam.conf:/etc/clamav/freshclam.conf:ro
+      - ./infra/clamav/entrypoint.sh:/opt/smarthire/clamav-entrypoint.sh:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "printf health > /tmp/.clamd-health && clamdscan --config-file=/etc/clamav/clamd.conf --no-summary /tmp/.clamd-health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30m
+    mem_limit: 4g
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+  cv-worker:
+    build:
+      context: .
+      dockerfile: web/Dockerfile.cv-worker
+    image: smarthire-cv-worker:local
+    restart: "no"
+    env_file:
+      - .env
+      - web/.env.local
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${CV_WORKER_POSTGRES_DB:-${POSTGRES_DB}}?schema=public
+      DIRECT_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${CV_WORKER_POSTGRES_DB:-${POSTGRES_DB}}?schema=public
+      CV_WORKER_ENABLED: ${CV_WORKER_ENABLED:-true}
+      CV_STORAGE_LOCAL_ROOT: /app/.local/cv-storage
+      CV_STORAGE_DOCKER_BIND_MOUNT: "true"
+      CV_CLAMD_SOCKET_PATH: /run/clamav/clamd.sock
+    command:
+      [
+        "node",
+        "--conditions=react-server",
+        "--import",
+        "tsx",
+        "scripts/run-cv-worker.mjs",
+      ]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clamav:
+        condition: service_healthy
+    group_add:
+      - "101"
+    volumes:
+      - ./web/.local/cv-storage:/app/.local/cv-storage
+      - clamav_runtime:/run/clamav
+    tmpfs:
+      - /tmp:size=64m,mode=1777
 volumes:
   postgres_data:
+  clamav_signatures:
+  clamav_runtime:

@@ -1,0 +1,98 @@
+.root,
+.group,
+.card,
+.fields,
+.choices {
+  display: grid;
+  gap: 1rem;
+}
+
+.group {
+  border-block-start: 1px solid var(--color-border, #cbd5e1);
+  padding-block-start: 1rem;
+}
+
+.groupControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.card {
+  border: 1px solid var(--color-border, #cbd5e1);
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+.fields {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.fields label,
+.card > label,
+.target {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.fields input,
+.fields textarea,
+.card > label input,
+.target select {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: 2.75rem;
+}
+
+.fields textarea {
+  min-block-size: 7rem;
+  resize: vertical;
+}
+
+.fullWidth,
+.target {
+  grid-column: 1 / -1;
+}
+
+.checkbox {
+  align-items: center;
+  display: flex !important;
+  flex-direction: row;
+}
+
+.checkbox input {
+  inline-size: auto;
+}
+
+.choices {
+  border: 0;
+  grid-template-columns: repeat(3, minmax(0, max-content));
+  margin: 0;
+  padding: 0;
+}
+
+.choices label:not(.target) {
+  align-items: center;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.card :is(button, input, select, textarea):focus-visible,
+.groupControls button:focus-visible {
+  outline: 3px solid var(--color-focus, #1d4ed8);
+  outline-offset: 2px;
+}
+
+@media (max-width: 32rem) {
+  .fields,
+  .choices {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root * {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms !important;
+  }
+}

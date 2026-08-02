@@ -123,33 +123,137 @@ enum OutboxStatus {
   DEAD
 }
 
+enum CvDocumentKind {
+  PDF
+  DOCX
+}
+
+enum CvParserClass {
+  DETERMINISTIC_INTERNAL
+  EXTERNAL_OPENAI
+}
+
+enum CvUploadStatus {
+  AWAITING_CONTENT
+  VALIDATION_QUEUED
+  SCAN_QUEUED
+  SCANNING
+  EXTRACTION_QUEUED
+  EXTRACTING
+  AWAITING_CONSENT
+  PARSE_QUEUED
+  PARSING
+  REVIEW_READY
+  VALIDATION_FAILED
+  INFECTED
+  SCAN_FAILED
+  EXTRACTION_FAILED
+  PARSE_FAILED
+  CONFIRMED
+  CANCELLED
+  DELETED
+  EXPIRED
+}
+
+enum CvArtifactKind {
+  SOURCE_DOCUMENT
+  EXTRACTED_TEXT
+}
+
+enum CvArtifactStatus {
+  QUARANTINED
+  AVAILABLE
+  DELETE_PENDING
+  DELETING
+  DELETED
+  DELETE_FAILED
+}
+
+enum CvScanStatus {
+  QUEUED
+  PROCESSING
+  CLEAN
+  INFECTED
+  INDETERMINATE
+  CANCELLED
+}
+
+enum CvExtractionStatus {
+  QUEUED
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+
+enum CvParseStatus {
+  QUEUED
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+
+enum CvParseTrigger {
+  INITIAL
+  AUTOMATIC_RETRY
+  CANDIDATE_RETRY
+}
+
+enum CvRetryStage {
+  SCAN
+  PARSE
+}
+
+enum CvDraftStatus {
+  EDITABLE
+  CONFIRMED
+  DELETED
+  EXPIRED
+}
+
+enum CvConsentAction {
+  GRANTED
+  REVOKED
+}
+
 model UserAccount {
-  id                String                    @id
-  name              String
-  email             String                    @unique
-  normalizedEmail   String                    @unique
-  emailVerified     Boolean                   @default(false)
-  image             String?
-  state             AccountState              @default(PENDING_VERIFICATION)
-  twoFactorEnabled  Boolean                   @default(false)
-  stateChangedAt    DateTime                  @default(now())
-  deletedAt         DateTime?
-  createdAt         DateTime                  @default(now())
-  updatedAt         DateTime                  @updatedAt
-  accounts          AuthProviderAccount[]
-  sessions          Session[]
-  verifications     Verification[]
-  twoFactor         TwoFactor?
-  candidateIdentity CandidateIdentity?
-  securityTokens    SecurityToken[]
-  passwordResetOperations PasswordResetOperation[]
+  id                            String                         @id
+  name                          String
+  email                         String                         @unique
+  normalizedEmail               String                         @unique
+  emailVerified                 Boolean                        @default(false)
+  image                         String?
+  state                         AccountState                   @default(PENDING_VERIFICATION)
+  twoFactorEnabled              Boolean                        @default(false)
+  stateChangedAt                DateTime                       @default(now())
+  deletedAt                     DateTime?
+  createdAt                     DateTime                       @default(now())
+  updatedAt                     DateTime                       @updatedAt
+  accounts                      AuthProviderAccount[]
+  sessions                      Session[]
+  verifications                 Verification[]
+  twoFactor                     TwoFactor?
+  candidateIdentity             CandidateIdentity?
+  securityTokens                SecurityToken[]
+  passwordResetOperations       PasswordResetOperation[]
   fullAccountRecoveryOperations FullAccountRecoveryOperation[]
-  challenges        AuthenticationChallenge[]
-  outbox            EmailOutbox[]
-  preferences       AccountPreferences?
-  emailChangeRequests EmailChangeRequest[]
-  passwordChangeAttemptWindow PasswordChangeAttemptWindow?
-  passwordChangeOperations PasswordChangeOperation[]
+  challenges                    AuthenticationChallenge[]
+  outbox                        EmailOutbox[]
+  preferences                   AccountPreferences?
+  emailChangeRequests           EmailChangeRequest[]
+  passwordChangeAttemptWindow   PasswordChangeAttemptWindow?
+  passwordChangeOperations      PasswordChangeOperation[]
+  cvQuota                       CvAccountQuota?
+  cvUploads                     CvUpload[]
+  cvStoredArtifacts             CvStoredArtifact[]
+  cvScanAssessments             CvScanAssessment[]
+  cvExtractions                 CvExtraction[]
+  cvParseJobs                   CvParseJob[]
+  cvRetryRequests               CvRetryRequest[]
+  cvDrafts                      CvDraft[]
+  cvConsentEvents               CvProcessingConsent[]
+  cvConfirmations               CvImportConfirmation[]
 
   @@index([state, id])
   @@map("user")
@@ -226,10 +330,10 @@ model TwoFactor {
 }
 
 model CandidateIdentity {
-  userId    String      @id
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  user      UserAccount @relation(fields: [userId], references: [id], onDelete: Restrict)
+  userId    String            @id
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  user      UserAccount       @relation(fields: [userId], references: [id], onDelete: Restrict)
   profile   CandidateProfile?
 }
 
@@ -248,6 +352,9 @@ model CandidateProfile {
   education       ProfileEducation[]
   skills          CandidateProfileSkill[]
   socialLinks     SocialLink[]
+  cvUploads       CvUpload[]
+  cvDrafts        CvDraft[]
+  cvConfirmations CvImportConfirmation[]
 
   @@index([candidateUserId])
 }
@@ -298,14 +405,14 @@ model Skill {
 }
 
 model CandidateProfileSkill {
-  profileId  String
-  skillId    String
+  profileId   String
+  skillId     String
   displayName String
-  position   Int
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
-  profile    CandidateProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  skill      Skill            @relation(fields: [skillId], references: [id], onDelete: Restrict)
+  position    Int
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  profile     CandidateProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  skill       Skill            @relation(fields: [skillId], references: [id], onDelete: Restrict)
 
   @@id([profileId, skillId])
   @@unique([profileId, position])
@@ -328,38 +435,38 @@ model SocialLink {
 }
 
 model AccountPreferences {
-  userId                    String             @id
-  language                  PreferenceLanguage @default(VI)
-  timezone                  String             @default("Asia/Ho_Chi_Minh")
-  applicationUpdatesEmail   Boolean            @default(true)
-  jobRecommendationsEmail   Boolean            @default(true)
-  accountSecurityEmail      Boolean            @default(true)
-  createdAt                 DateTime           @default(now())
-  updatedAt                 DateTime           @updatedAt
-  user                      UserAccount        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                  String             @id
+  language                PreferenceLanguage @default(VI)
+  timezone                String             @default("Asia/Ho_Chi_Minh")
+  applicationUpdatesEmail Boolean            @default(true)
+  jobRecommendationsEmail Boolean            @default(true)
+  accountSecurityEmail    Boolean            @default(true)
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+  user                    UserAccount        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model EmailChangeRequest {
-  id                       String            @id @default(cuid())
-  userId                   String
-  proposedEmail            String
-  normalizedProposedEmail  String
-  tokenDigest              String            @unique
-  status                   EmailChangeStatus @default(PENDING)
-  expiresAt                DateTime
-  consumedAt               DateTime?
-  supersededAt             DateTime?
-  resolvedAt               DateTime?
-  idempotencyKey           String
-  correlationId            String
-  verificationOutboxId     String?           @unique
-  oldEmailNoticeOutboxId   String?           @unique
-  createdBySessionId       String
-  createdAt                DateTime          @default(now())
-  updatedAt                DateTime          @updatedAt
-  user                     UserAccount       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  verificationOutbox       EmailOutbox?      @relation("EmailChangeVerificationOutbox", fields: [verificationOutboxId], references: [id], onDelete: SetNull)
-  oldEmailNoticeOutbox     EmailOutbox?      @relation("EmailChangeOldAddressOutbox", fields: [oldEmailNoticeOutboxId], references: [id], onDelete: SetNull)
+  id                      String            @id @default(cuid())
+  userId                  String
+  proposedEmail           String
+  normalizedProposedEmail String
+  tokenDigest             String            @unique
+  status                  EmailChangeStatus @default(PENDING)
+  expiresAt               DateTime
+  consumedAt              DateTime?
+  supersededAt            DateTime?
+  resolvedAt              DateTime?
+  idempotencyKey          String
+  correlationId           String
+  verificationOutboxId    String?           @unique
+  oldEmailNoticeOutboxId  String?           @unique
+  createdBySessionId      String
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+  user                    UserAccount       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verificationOutbox      EmailOutbox?      @relation("EmailChangeVerificationOutbox", fields: [verificationOutboxId], references: [id], onDelete: SetNull)
+  oldEmailNoticeOutbox    EmailOutbox?      @relation("EmailChangeOldAddressOutbox", fields: [oldEmailNoticeOutboxId], references: [id], onDelete: SetNull)
 
   @@unique([userId, idempotencyKey])
   @@index([status, expiresAt])
@@ -401,19 +508,19 @@ model PasswordChangeOperation {
 }
 
 model SecurityToken {
-  id                 String        @id @default(cuid())
-  userId             String
-  purpose            TokenPurpose
-  status             TokenStatus   @default(ACTIVE)
-  tokenDigest        String        @unique
-  expiresAt          DateTime
-  consumedAt         DateTime?
-  supersededAt       DateTime?
-  createdAt          DateTime      @default(now())
-  createdByRequestId String
-  user               UserAccount   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  outbox             EmailOutbox[]
-  passwordResetOperation PasswordResetOperation?
+  id                           String                        @id @default(cuid())
+  userId                       String
+  purpose                      TokenPurpose
+  status                       TokenStatus                   @default(ACTIVE)
+  tokenDigest                  String                        @unique
+  expiresAt                    DateTime
+  consumedAt                   DateTime?
+  supersededAt                 DateTime?
+  createdAt                    DateTime                      @default(now())
+  createdByRequestId           String
+  user                         UserAccount                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  outbox                       EmailOutbox[]
+  passwordResetOperation       PasswordResetOperation?
   fullAccountRecoveryOperation FullAccountRecoveryOperation?
 
   @@index([expiresAt, status])
@@ -451,56 +558,56 @@ model PasswordResetOperation {
 }
 
 model FullAccountRecoveryOperation {
-  id                                    String                         @id
-  userId                                String
-  confirmationTokenId                   String                         @unique
-  operationKey                          String                         @unique
-  status                                FullAccountRecoveryStatus      @default(CONFIRMED_HOLD)
-  confirmationProofDigest               String                         @unique
-  confirmationExpiresAt                 DateTime
-  confirmationConsumedAt                DateTime
-  confirmationFinalizedAt               DateTime?
-  completionProofDigest                 String                         @unique
-  completionProofCiphertext             String
-  completionProofExpiresAt              DateTime
-  completionConsumedAt                  DateTime?
-  completionKey                         String?                        @unique
-  cancellationProofDigest               String                         @unique
-  cancellationProofCiphertext           String
-  cancellationProofExpiresAt            DateTime
-  cancellationConsumedAt                DateTime?
-  holdStartedAt                         DateTime
-  holdEndsAt                            DateTime
-  holdSessionsRevokedAt                 DateTime?
-  holdChallengesInvalidatedAt           DateTime?
-  confirmationAuditIntentKey            String                         @unique
-  confirmationFinalAuditId              String?                        @unique
-  pendingNotificationIdempotencyKey     String                         @unique
-  pendingNotificationOutboxId           String?                        @unique
-  pendingNotificationEnqueuedAt         DateTime?
-  cancellationNotificationIdempotencyKey String                        @unique
-  cancellationNotificationOutboxId      String?                        @unique
-  cancellationAuditId                   String?                        @unique
-  cancelledAt                           DateTime?
-  completionAuditIntentKey              String                         @unique
-  completionNotificationIdempotencyKey  String                         @unique
-  completionNotificationOutboxId        String?                        @unique
-  completionFinalAuditId                String?                        @unique
-  passwordUpdatedAt                     DateTime?
-  twoFactorDisabledAt                   DateTime?
-  completionSessionsRevokedAt           DateTime?
-  completionChallengesInvalidatedAt     DateTime?
-  completionNotificationEnqueuedAt      DateTime?
-  completionAuditFinalizedAt            DateTime?
-  failureCode                           FullAccountRecoveryFailureCode?
-  retryAt                               DateTime?
-  executionOwner                        String?
-  leaseExpiresAt                        DateTime?
-  completedAt                           DateTime?
-  createdAt                             DateTime                       @default(now())
-  updatedAt                             DateTime                       @updatedAt
-  user                                  UserAccount                    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  confirmationToken                     SecurityToken                  @relation(fields: [confirmationTokenId], references: [id], onDelete: Restrict)
+  id                                     String                          @id
+  userId                                 String
+  confirmationTokenId                    String                          @unique
+  operationKey                           String                          @unique
+  status                                 FullAccountRecoveryStatus       @default(CONFIRMED_HOLD)
+  confirmationProofDigest                String                          @unique
+  confirmationExpiresAt                  DateTime
+  confirmationConsumedAt                 DateTime
+  confirmationFinalizedAt                DateTime?
+  completionProofDigest                  String                          @unique
+  completionProofCiphertext              String
+  completionProofExpiresAt               DateTime
+  completionConsumedAt                   DateTime?
+  completionKey                          String?                         @unique
+  cancellationProofDigest                String                          @unique
+  cancellationProofCiphertext            String
+  cancellationProofExpiresAt             DateTime
+  cancellationConsumedAt                 DateTime?
+  holdStartedAt                          DateTime
+  holdEndsAt                             DateTime
+  holdSessionsRevokedAt                  DateTime?
+  holdChallengesInvalidatedAt            DateTime?
+  confirmationAuditIntentKey             String                          @unique
+  confirmationFinalAuditId               String?                         @unique
+  pendingNotificationIdempotencyKey      String                          @unique
+  pendingNotificationOutboxId            String?                         @unique
+  pendingNotificationEnqueuedAt          DateTime?
+  cancellationNotificationIdempotencyKey String                          @unique
+  cancellationNotificationOutboxId       String?                         @unique
+  cancellationAuditId                    String?                         @unique
+  cancelledAt                            DateTime?
+  completionAuditIntentKey               String                          @unique
+  completionNotificationIdempotencyKey   String                          @unique
+  completionNotificationOutboxId         String?                         @unique
+  completionFinalAuditId                 String?                         @unique
+  passwordUpdatedAt                      DateTime?
+  twoFactorDisabledAt                    DateTime?
+  completionSessionsRevokedAt            DateTime?
+  completionChallengesInvalidatedAt      DateTime?
+  completionNotificationEnqueuedAt       DateTime?
+  completionAuditFinalizedAt             DateTime?
+  failureCode                            FullAccountRecoveryFailureCode?
+  retryAt                                DateTime?
+  executionOwner                         String?
+  leaseExpiresAt                         DateTime?
+  completedAt                            DateTime?
+  createdAt                              DateTime                        @default(now())
+  updatedAt                              DateTime                        @updatedAt
+  user                                   UserAccount                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  confirmationToken                      SecurityToken                   @relation(fields: [confirmationTokenId], references: [id], onDelete: Restrict)
 
   @@index([userId, status])
   @@index([status, holdEndsAt])
@@ -509,18 +616,18 @@ model FullAccountRecoveryOperation {
 }
 
 model AuthenticationChallenge {
-  id            String           @id @default(cuid())
-  handleDigest  String           @unique
-  userId        String
-  purpose       ChallengePurpose
-  expiresAt     DateTime
-  attemptCount  Int              @default(0)
-  maxAttempts   Int              @default(5)
-  consumedAt    DateTime?
-  contextDigest String?
+  id               String           @id @default(cuid())
+  handleDigest     String           @unique
+  userId           String
+  purpose          ChallengePurpose
+  expiresAt        DateTime
+  attemptCount     Int              @default(0)
+  maxAttempts      Int              @default(5)
+  consumedAt       DateTime?
+  contextDigest    String?
   verifiedTotpStep BigInt?
-  createdAt     DateTime         @default(now())
-  user          UserAccount      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt        DateTime         @default(now())
+  user             UserAccount      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([handleDigest, expiresAt])
   @@index([userId, expiresAt])
@@ -540,29 +647,29 @@ model RateLimitBucket {
 }
 
 model EmailOutbox {
-  id                String         @id @default(cuid())
-  kind              EmailKind
-  userId            String?
-  securityTokenId   String?
-  recipientRef      String
-  recipientCiphertext String?
-  recipientPurpose  String?
-  templateVersion   String
-  payloadRef        Json
-  idempotencyKey    String         @unique
-  status            OutboxStatus   @default(PENDING)
-  attempts          Int            @default(0)
-  leaseOwner        String?
-  leaseExpiresAt    DateTime?
-  nextAttemptAt     DateTime       @default(now())
-  providerMessageId String?
-  safeErrorCode     String?
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  user              UserAccount?   @relation(fields: [userId], references: [id], onDelete: SetNull)
-  securityToken     SecurityToken? @relation(fields: [securityTokenId], references: [id], onDelete: SetNull)
-  emailChangeVerificationFor EmailChangeRequest? @relation("EmailChangeVerificationOutbox")
-  emailChangeOldAddressFor EmailChangeRequest? @relation("EmailChangeOldAddressOutbox")
+  id                            String                   @id @default(cuid())
+  kind                          EmailKind
+  userId                        String?
+  securityTokenId               String?
+  recipientRef                  String
+  recipientCiphertext           String?
+  recipientPurpose              String?
+  templateVersion               String
+  payloadRef                    Json
+  idempotencyKey                String                   @unique
+  status                        OutboxStatus             @default(PENDING)
+  attempts                      Int                      @default(0)
+  leaseOwner                    String?
+  leaseExpiresAt                DateTime?
+  nextAttemptAt                 DateTime                 @default(now())
+  providerMessageId             String?
+  safeErrorCode                 String?
+  createdAt                     DateTime                 @default(now())
+  updatedAt                     DateTime                 @updatedAt
+  user                          UserAccount?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  securityToken                 SecurityToken?           @relation(fields: [securityTokenId], references: [id], onDelete: SetNull)
+  emailChangeVerificationFor    EmailChangeRequest?      @relation("EmailChangeVerificationOutbox")
+  emailChangeOldAddressFor      EmailChangeRequest?      @relation("EmailChangeOldAddressOutbox")
   passwordChangeNotificationFor PasswordChangeOperation? @relation("PasswordChangeNotificationOutbox")
 
   @@index([status, nextAttemptAt])
@@ -570,23 +677,332 @@ model EmailOutbox {
 }
 
 model AuditEvent {
-  id              String      @id @default(cuid())
-  occurredAt      DateTime    @default(now())
-  actorType       String
-  actorUserId     String?
-  actorSessionId  String?
-  action          String
-  targetType      String
-  targetId        String?
-  result          AuditResult
-  correlationId   String
-  ipPrefixDigest  String?
-  userAgentFamily String?
-  context         Json
+  id                      String                   @id @default(cuid())
+  occurredAt              DateTime                 @default(now())
+  actorType               String
+  actorUserId             String?
+  actorSessionId          String?
+  action                  String
+  targetType              String
+  targetId                String?
+  result                  AuditResult
+  correlationId           String
+  ipPrefixDigest          String?
+  userAgentFamily         String?
+  context                 Json
   passwordChangeOperation PasswordChangeOperation? @relation("PasswordChangeFinalAudit")
 
   @@index([actorUserId, occurredAt])
   @@index([targetType, targetId, occurredAt])
   @@index([action, occurredAt])
   @@index([correlationId])
+}
+
+model CvAccountQuota {
+  accountId     String      @id
+  reservedBytes Int         @default(0)
+  retainedBytes Int         @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  account       UserAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+model CvUpload {
+  id                         String                @id @default(cuid())
+  accountId                  String
+  profileId                  String
+  documentKind               CvDocumentKind
+  parserClass                CvParserClass
+  status                     CvUploadStatus        @default(AWAITING_CONTENT)
+  declaredMediaType          String
+  declaredBytes              Int
+  actualBytes                Int?
+  quotaReservationBytes      Int
+  quotaReservationRemaining  Int
+  sourceSha256               Bytes?
+  displayFilenameCiphertext  String?
+  idempotencyDigest          Bytes
+  createBindingDigest        Bytes
+  failureCode                String?
+  automaticScanAttemptsUsed  Int                   @default(0)
+  candidateScanRetriesUsed   Int                   @default(0)
+  automaticParseAttemptsUsed Int                   @default(0)
+  candidateParseRetriesUsed  Int                   @default(0)
+  contentReceivedAt          DateTime?
+  contentInaccessibleAt      DateTime?
+  expiresAt                  DateTime
+  deleteAfter                DateTime?
+  deletedAt                  DateTime?
+  confirmedAt                DateTime?
+  createdAt                  DateTime              @default(now())
+  updatedAt                  DateTime              @updatedAt
+  account                    UserAccount           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  profile                    CandidateProfile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  artifacts                  CvStoredArtifact[]
+  scanAssessments            CvScanAssessment[]
+  extractions                CvExtraction[]
+  parseJobs                  CvParseJob[]
+  retryRequests              CvRetryRequest[]
+  draft                      CvDraft?
+  consentEvents              CvProcessingConsent[]
+  confirmation               CvImportConfirmation?
+
+  @@unique([accountId, idempotencyDigest])
+  @@index([accountId, createdAt(sort: Desc)])
+  @@index([status, expiresAt])
+  @@index([deleteAfter])
+  @@index([profileId])
+}
+
+model CvStoredArtifact {
+  id                    String             @id @default(cuid())
+  uploadId              String
+  accountId             String
+  kind                  CvArtifactKind
+  status                CvArtifactStatus   @default(QUARANTINED)
+  storageAdapter        String
+  storageLocator        String
+  encryptionKeyVersion  Int
+  encryptionIv          Bytes
+  authenticationTag     Bytes
+  plaintextBytes        Int
+  ciphertextBytes       Int
+  plaintextSha256       Bytes
+  availableAt           DateTime?
+  contentInaccessibleAt DateTime?
+  deleteAfter           DateTime?
+  deleteLeaseOwner      String?
+  deleteLeaseExpiresAt  DateTime?
+  deleteAttempts        Int                @default(0)
+  deleteFailureCode     String?
+  deletedAt             DateTime?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  upload                CvUpload           @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  account               UserAccount        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  scanInputs            CvScanAssessment[] @relation("CvScanSourceArtifact")
+  extractionInputs      CvExtraction[]     @relation("CvExtractionSourceArtifact")
+  extractionOutput      CvExtraction?      @relation("CvExtractionOutputArtifact")
+
+  @@unique([storageAdapter, storageLocator])
+  @@index([uploadId, kind])
+  @@index([status, deleteAfter, deleteLeaseExpiresAt])
+  @@index([accountId])
+}
+
+model CvScanAssessment {
+  id                   String           @id @default(cuid())
+  uploadId             String
+  sourceArtifactId     String
+  accountId            String
+  attemptNumber        Int
+  candidateInitiated   Boolean          @default(false)
+  status               CvScanStatus     @default(QUEUED)
+  engineName           String?
+  engineVersion        String?
+  signatureVersion     String?
+  signaturePublishedAt DateTime?
+  failureCode          String?
+  leaseOwner           String?
+  leaseExpiresAt       DateTime?
+  startedAt            DateTime?
+  completedAt          DateTime?
+  createdAt            DateTime         @default(now())
+  upload               CvUpload         @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  sourceArtifact       CvStoredArtifact @relation("CvScanSourceArtifact", fields: [sourceArtifactId], references: [id], onDelete: Cascade)
+  account              UserAccount      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  extractions          CvExtraction[]
+  priorRetryRequests   CvRetryRequest[] @relation("CvRetryPriorScan")
+  newRetryRequests     CvRetryRequest[] @relation("CvRetryNewScan")
+
+  @@unique([uploadId, attemptNumber])
+  @@index([status, leaseExpiresAt, createdAt], map: "CvScanAssessment_claim_idx")
+  @@index([accountId])
+}
+
+model CvExtraction {
+  id                 String             @id @default(cuid())
+  uploadId           String
+  sourceArtifactId   String
+  scanAssessmentId   String
+  accountId          String
+  outputArtifactId   String?            @unique
+  attemptNumber      Int
+  status             CvExtractionStatus @default(QUEUED)
+  extractorName      String?
+  extractorVersion   String?
+  rulesVersion       String?
+  pageCount          Int?
+  entryCount         Int?
+  expandedBytes      Int?
+  segmentCount       Int?
+  extractedUtf8Bytes Int?
+  failureCode        String?
+  leaseOwner         String?
+  leaseExpiresAt     DateTime?
+  startedAt          DateTime?
+  completedAt        DateTime?
+  createdAt          DateTime           @default(now())
+  upload             CvUpload           @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  sourceArtifact     CvStoredArtifact   @relation("CvExtractionSourceArtifact", fields: [sourceArtifactId], references: [id], onDelete: Cascade)
+  scanAssessment     CvScanAssessment   @relation(fields: [scanAssessmentId], references: [id], onDelete: Cascade)
+  account            UserAccount        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  outputArtifact     CvStoredArtifact?  @relation("CvExtractionOutputArtifact", fields: [outputArtifactId], references: [id], onDelete: SetNull)
+  parseJobs          CvParseJob[]
+
+  @@unique([uploadId, attemptNumber])
+  @@index([status, leaseExpiresAt, createdAt], map: "CvExtraction_claim_idx")
+  @@index([accountId])
+}
+
+model CvParseJob {
+  id                    String               @id @default(cuid())
+  uploadId              String
+  extractionId          String
+  accountId             String
+  consentEventId        String?
+  previousAttemptId     String?
+  attemptNumber         Int
+  trigger               CvParseTrigger
+  status                CvParseStatus        @default(QUEUED)
+  parserClass           CvParserClass
+  provider              String
+  model                 String
+  purposeVersion        String
+  inputVersion          String
+  instructionVersion    String
+  schemaVersion         String
+  providerRequestIdHmac Bytes?
+  failureCode           String?
+  leaseOwner            String?
+  leaseExpiresAt        DateTime?
+  startedAt             DateTime?
+  completedAt           DateTime?
+  createdAt             DateTime             @default(now())
+  upload                CvUpload             @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  extraction            CvExtraction         @relation(fields: [extractionId], references: [id], onDelete: Cascade)
+  account               UserAccount          @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  consentEvent          CvProcessingConsent? @relation("CvParseConsent", fields: [consentEventId], references: [id], onDelete: SetNull)
+  previousAttempt       CvParseJob?          @relation("CvParseRetryChain", fields: [previousAttemptId], references: [id], onDelete: SetNull)
+  nextAttempts          CvParseJob[]         @relation("CvParseRetryChain")
+  priorRetryRequests    CvRetryRequest[]     @relation("CvRetryPriorParse")
+  newRetryRequests      CvRetryRequest[]     @relation("CvRetryNewParse")
+  draft                 CvDraft?
+
+  @@unique([uploadId, attemptNumber])
+  @@index([status, leaseExpiresAt, createdAt], map: "CvParseJob_claim_idx")
+  @@index([accountId])
+  @@index([previousAttemptId])
+}
+
+model CvRetryRequest {
+  id                    String            @id @default(cuid())
+  accountId             String
+  uploadId              String
+  stage                 CvRetryStage
+  idempotencyDigest     Bytes
+  priorScanAssessmentId String?
+  scanAssessmentId      String?
+  priorParseJobId       String?
+  parseJobId            String?
+  createdAt             DateTime          @default(now())
+  account               UserAccount       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  upload                CvUpload          @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  priorScanAssessment   CvScanAssessment? @relation("CvRetryPriorScan", fields: [priorScanAssessmentId], references: [id], onDelete: SetNull)
+  scanAssessment        CvScanAssessment? @relation("CvRetryNewScan", fields: [scanAssessmentId], references: [id], onDelete: SetNull)
+  priorParseJob         CvParseJob?       @relation("CvRetryPriorParse", fields: [priorParseJobId], references: [id], onDelete: SetNull)
+  parseJob              CvParseJob?       @relation("CvRetryNewParse", fields: [parseJobId], references: [id], onDelete: SetNull)
+
+  @@unique([accountId, idempotencyDigest])
+  @@index([uploadId, createdAt])
+}
+
+model CvDraft {
+  id                      String                @id @default(cuid())
+  uploadId                String                @unique
+  accountId               String
+  profileId               String
+  parseJobId              String                @unique
+  status                  CvDraftStatus         @default(EDITABLE)
+  schemaVersion           String
+  revision                Int                   @default(0)
+  sourceProfileRevision   Int
+  reviewedProfileRevision Int
+  proposalPayload         Json?
+  reviewPayload           Json?
+  provenancePayload       Json?
+  payloadBytes            Int                   @default(0)
+  provenanceBytes         Int                   @default(0)
+  expiresAt               DateTime
+  contentInaccessibleAt   DateTime?
+  payloadDeleteAfter      DateTime?
+  payloadDeletedAt        DateTime?
+  confirmedAt             DateTime?
+  createdAt               DateTime              @default(now())
+  updatedAt               DateTime              @updatedAt
+  upload                  CvUpload              @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  account                 UserAccount           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  profile                 CandidateProfile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  parseJob                CvParseJob            @relation(fields: [parseJobId], references: [id], onDelete: Cascade)
+  confirmation            CvImportConfirmation?
+
+  @@index([accountId, status])
+  @@index([expiresAt])
+  @@index([payloadDeleteAfter])
+}
+
+model CvProcessingConsent {
+  id                  String                @id @default(cuid())
+  accountId           String
+  uploadId            String
+  action              CvConsentAction
+  supersedesConsentId String?
+  provider            String
+  providerClass       CvParserClass
+  model               String
+  purposeVersion      String
+  noticeVersion       String
+  consentTextVersion  String
+  occurredAt          DateTime
+  createdAt           DateTime              @default(now())
+  account             UserAccount           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  upload              CvUpload              @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  supersedesConsent   CvProcessingConsent?  @relation("CvConsentChain", fields: [supersedesConsentId], references: [id], onDelete: SetNull)
+  supersededBy        CvProcessingConsent[] @relation("CvConsentChain")
+  parseJobs           CvParseJob[]          @relation("CvParseConsent")
+
+  @@index([uploadId, occurredAt(sort: Desc)])
+  @@index([accountId, occurredAt(sort: Desc)])
+  @@index([supersedesConsentId])
+}
+
+model CvImportConfirmation {
+  id                       String           @id @default(cuid())
+  accountId                String
+  profileId                String
+  uploadId                 String           @unique
+  draftId                  String           @unique
+  idempotencyDigest        Bytes
+  selectionManifestVersion String
+  selectionManifestDigest  Bytes
+  selectionManifest        Json
+  draftRevision            Int
+  sourceProfileRevision    Int
+  reviewedProfileRevision  Int
+  profileRevisionBefore    Int
+  profileRevisionAfter     Int
+  appliedScalarCount       Int              @default(0)
+  appliedExperienceCount   Int              @default(0)
+  appliedEducationCount    Int              @default(0)
+  appliedSkillCount        Int              @default(0)
+  appliedSocialLinkCount   Int              @default(0)
+  confirmedAt              DateTime
+  createdAt                DateTime         @default(now())
+  account                  UserAccount      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  profile                  CandidateProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  upload                   CvUpload         @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  draft                    CvDraft          @relation(fields: [draftId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, idempotencyDigest])
+  @@index([profileId, confirmedAt(sort: Desc)])
 }

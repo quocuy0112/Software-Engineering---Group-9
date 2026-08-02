@@ -36,6 +36,7 @@ type SafeFailureCode =
   | "PARSER_UNAVAILABLE"
   | "PARSER_OUTPUT_INVALID"
   | "PARSER_OUTPUT_LIMIT_EXCEEDED"
+  | "CV_PROCESSING_FAILED"
   | "RETRY_LIMIT_REACHED"
   | "IMPORT_EXPIRED"
   | "IMPORT_DELETED";
@@ -552,7 +553,6 @@ interface CvConsentLedger extends CvConsentReadGateway {
       occurredAt: Date;
     },
   ): Promise<{ consentEventId: string }>;
-
 }
 ```
 
@@ -672,7 +672,8 @@ replace choices.
 
 Every save submits the complete bounded editable/review payload and uses
 compare-and-swap. A stale draft returns `409 DRAFT_REVISION_CONFLICT` and safe
-latest comparison metadata. A changed Profile returns
+latest comparison metadata containing only the draft/Profile revisions and
+their UTC `updatedAt` timestamps. A changed Profile returns
 `409 PROFILE_REVISION_CONFLICT`. The client retains unsaved values in memory and
 requires an explicit compare/reload action; it never silently overwrites them.
 
