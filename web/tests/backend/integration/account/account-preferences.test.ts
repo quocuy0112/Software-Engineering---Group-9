@@ -23,7 +23,7 @@ describe("account preferences persistence", () => {
     await expect(
       new AccountPreferencesService().get(owner.userId),
     ).resolves.toMatchObject({
-      language: "vi",
+      language: "en",
       timezone: "Asia/Ho_Chi_Minh",
       timezoneSupported: true,
       emailNotifications: {
@@ -61,7 +61,7 @@ describe("account preferences persistence", () => {
       result.preferences,
     );
     await expect(service.get(legacy.userId)).resolves.toMatchObject({
-      language: "vi",
+      language: "en",
       timezone: "Asia/Ho_Chi_Minh",
     });
     expect(

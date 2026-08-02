@@ -79,7 +79,8 @@ test("reads defaults, validates and persists a complete owner-scoped preference 
   await expect(
     owner.page.getByRole("heading", { name: "Preferences", exact: true }),
   ).toBeVisible();
-  await expect(owner.page.getByLabel("Language")).toHaveValue("vi");
+  await expect(owner.page.getByLabel("Language")).toHaveValue("en");
+  await expect(owner.page.getByLabel("Language")).toBeDisabled();
   await expect(owner.page.getByLabel("Timezone")).toHaveValue(
     "Asia/Ho_Chi_Minh",
   );
@@ -96,7 +97,6 @@ test("reads defaults, validates and persists a complete owner-scoped preference 
   ).toContainText(/supported timezone/i);
   await expect(owner.page.getByLabel("Timezone")).toHaveValue("Mars/Olympus");
 
-  await owner.page.getByLabel("Language").selectOption("en");
   await owner.page.getByLabel("Timezone").fill("UTC");
   await owner.page.getByLabel("Application updates").uncheck();
   await owner.page.getByLabel("Job recommendations").uncheck();
@@ -113,8 +113,7 @@ test("reads defaults, validates and persists a complete owner-scoped preference 
 
   const other = await registerVerifyAndLogin(browser, "preferences-other");
   await other.page.goto("/profile/preferences");
-  await expect(other.page.getByLabel("Language")).toHaveValue("vi");
-  await other.page.getByLabel("Language").selectOption("en");
+  await expect(other.page.getByLabel("Language")).toHaveValue("en");
   await other.page.getByLabel("Timezone").fill("Europe/Paris");
   await other.page.getByRole("button", { name: "Save preferences" }).click();
   await expect(other.page.getByRole("status")).toContainText(/saved/i);

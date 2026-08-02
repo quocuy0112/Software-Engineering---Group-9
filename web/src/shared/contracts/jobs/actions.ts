@@ -1,0 +1,141 @@
+import { z } from "zod";
+
+export const jobProblemSchema = z
+  .object({
+    code: z.string().min(1).max(80),
+    message: z.string().min(1).max(500),
+    fieldErrors: z.record(z.string(), z.array(z.string()).max(5)).optional(),
+    retryAfterSeconds: z.number().int().positive().optional(),
+  })
+  .strict();
+
+export const savedJobOutcomeSchema = z
+  .object({
+    jobId: z.string().min(1).max(128),
+    saved: z.boolean(),
+    message: z.string().min(1).max(300),
+  })
+  .strict();
+
+export const jobReportReasonSchema = z.enum([
+  "FRAUD",
+  "MISLEADING",
+  "DUPLICATE",
+  "DISCRIMINATORY",
+  "INAPPROPRIATE",
+  "OTHER",
+]);
+
+export const jobReportInputSchema = z
+  .object({
+    reason: jobReportReasonSchema,
+    details: z.string().trim().max(2000).nullable(),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (
+      ["OTHER", "MISLEADING", "DISCRIMINATORY"].includes(value.reason) &&
+      (value.details?.length ?? 0) < 20
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["details"],
+        message: "Provide at least 20 characters of detail for this reason.",
+      });
+    }
+  });
+
+export const jobReportOutcomeSchema = z
+  .object({
+    received: z.literal(true),
+    duplicate: z.boolean(),
+    message: z.string().min(1).max(300),
+  })
+  .strict();
+
+export const candidateCvOptionSchema = z
+  .object({
+    id: z.string().min(1).max(128),
+    displayName: z.string().min(1).max(200),
+    fileName: z.string().min(1).max(255),
+    mimeType: z.enum([
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ]),
+    byteSize: z.number().int().min(1).max(5_000_000),
+    version: z.number().int().positive(),
+    confirmedAt: z.string().datetime(),
+  })
+  .strict();
+
+export const applicationQuestionSchema = z
+  .object({
+    id: z.string().min(1).max(128),
+    prompt: z.string().min(1).max(500),
+    description: z.string().max(1000).nullable(),
+    kind: z.enum(["TEXT", "BOOLEAN", "SINGLE_CHOICE"]),
+    required: z.boolean(),
+    options: z.array(z.string().min(1).max(200)).min(2).max(20).nullable(),
+    version: z.number().int().positive(),
+  })
+  .strict();
+
+export const applicationFormSchema = z
+  .object({
+    jobId: z.string().min(1).max(128),
+    jobTitle: z.string().min(1).max(200),
+    companyName: z.string().min(1).max(160),
+    profileReady: z.boolean(),
+    missingProfileFields: z.array(z.string().min(1).max(80)).max(20),
+    cvs: z.array(candidateCvOptionSchema).max(50),
+    questions: z.array(applicationQuestionSchema).max(20),
+    consentVersion: z.string().min(1).max(64),
+    csrfToken: z.string().min(1).max(256),
+  })
+  .strict();
+
+export const applicationAnswerInputSchema = z
+  .object({
+    questionId: z.string().min(1).max(128),
+    value: z.union([z.string().trim().max(3000), z.boolean()]),
+  })
+  .strict();
+
+export const applicationSubmissionSchema = z
+  .object({
+    cvId: z.string().min(1).max(128),
+    answers: z.array(applicationAnswerInputSchema).max(20),
+    coverLetter: z.string().trim().max(5000).nullable(),
+    consentVersion: z.string().min(1).max(64),
+    consentAccepted: z.literal(true),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    const ids = value.answers.map((answer) => answer.questionId);
+    if (new Set(ids).size !== ids.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["answers"],
+        message: "Answer each question once.",
+      });
+    }
+  });
+
+export const applicationOutcomeSchema = z
+  .object({
+    applicationId: z.string().min(1).max(128),
+    jobId: z.string().min(1).max(128),
+    stage: z.literal("APPLIED"),
+    submittedAt: z.string().datetime(),
+    created: z.boolean(),
+    message: z.string().min(1).max(300),
+  })
+  .strict();
+
+export const idempotencyKeySchema = z.string().min(16).max(128);
+
+export type JobProblem = z.infer<typeof jobProblemSchema>;
+export type JobReportInput = z.infer<typeof jobReportInputSchema>;
+export type ApplicationForm = z.infer<typeof applicationFormSchema>;
+export type ApplicationSubmission = z.infer<typeof applicationSubmissionSchema>;
+export type ApplicationOutcome = z.infer<typeof applicationOutcomeSchema>;

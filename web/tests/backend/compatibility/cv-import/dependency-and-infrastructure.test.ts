@@ -7,7 +7,7 @@ const repositoryRoot = resolve(process.cwd(), "..");
 const reviewedClamAvDigest =
   "sha256:35ec19c1e8cbee7cae8a35c3b0ac62957d99b418e6902035b89a1778c39433e7";
 const reviewedWorkerBaseDigest =
-  "sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432d679c54fbfd";
+  "sha256:595398b0081eacda8e1c4c5b97b76cd1020e4d58a8ebcb4843b9bca1e79e7436";
 
 const reviewedPackages = {
   "@aws-sdk/client-s3": { version: "3.1101.0", license: "Apache-2.0" },
@@ -166,7 +166,7 @@ describe.sequential("Feature 004 dependency and infrastructure gate", () => {
       `clamav/clamav:1.4_base@${reviewedClamAvDigest}`,
     );
     expect(dockerfile).toContain(
-      `node:24.18.0-alpine@${reviewedWorkerBaseDigest}`,
+      `node:24.18.0-alpine3.23@${reviewedWorkerBaseDigest}`,
     );
     expect(composeSource).not.toMatch(/clamav:[\s\S]*?ports:/u);
 

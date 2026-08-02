@@ -37,30 +37,17 @@ export function AccountPreferencesForm({
     setTimezoneOptions(getTimezoneOptions([initialTimezone.current]));
   }, []);
 
-  const copy =
-    preferences.language === "vi"
-      ? {
-          language: "Ngôn ngữ giao diện",
-          timezone: "Múi giờ",
-          timezoneHint: "Sử dụng mã múi giờ IANA được hỗ trợ.",
-          timezoneWarning:
-            "Múi giờ đã lưu không còn được hỗ trợ. Hãy giữ nguyên hoặc chọn múi giờ khác.",
-          saving: "Đang lưu tùy chọn…",
-          save: "Lưu tùy chọn",
-        }
-      : {
-          language: "Interface language",
-          timezone: "Timezone",
-          timezoneHint: "Use a supported IANA timezone identifier.",
-          timezoneWarning:
-            "This stored timezone is no longer supported. Keep it unchanged or choose a supported replacement.",
-          saving: "Saving preferences…",
-          save: "Save preferences",
-        };
-  const timezoneListHint =
-    preferences.language === "vi"
-      ? `Tìm theo GMT, khu vực hoặc thành phố. Danh sách gồm ${timezoneOptions.length || "các"} múi giờ IANA mà thiết bị hỗ trợ; GMT phản ánh giờ hiện tại và tự điều chỉnh theo DST.`
-      : `Search by GMT offset, region, or city. The list includes ${timezoneOptions.length || "the"} IANA timezones supported by this device; GMT reflects the current time and adjusts for DST.`;
+  const copy = {
+    language: "Interface language",
+    languageHint: "English is the system interface language.",
+    timezone: "Timezone",
+    timezoneHint: "Use a supported IANA timezone identifier.",
+    timezoneWarning:
+      "This stored timezone is no longer supported. Keep it unchanged or choose a supported replacement.",
+    saving: "Saving preferences…",
+    save: "Save preferences",
+  };
+  const timezoneListHint = `Search by GMT offset, region, or city. The list includes ${timezoneOptions.length || "the"} IANA timezones supported by this device; GMT reflects the current time and adjusts for DST.`;
   return (
     <form
       className="account-preferences-form"
@@ -73,17 +60,15 @@ export function AccountPreferencesForm({
         <label htmlFor="preference-language">{copy.language}</label>
         <select
           id="preference-language"
-          value={preferences.language}
-          onChange={(event) =>
-            onChange({
-              ...preferences,
-              language: event.target.value as "vi" | "en",
-            })
-          }
+          value="en"
+          aria-describedby="interface-language-guidance"
+          disabled
         >
-          <option value="vi">Tiếng Việt</option>
           <option value="en">English</option>
         </select>
+        <p id="interface-language-guidance" className="preference-guidance">
+          {copy.languageHint}
+        </p>
 
         <label htmlFor="preference-timezone">{copy.timezone}</label>
         <input
@@ -134,7 +119,6 @@ export function AccountPreferencesForm({
       </div>
       <NotificationPreferences
         value={preferences.emailNotifications}
-        locale={preferences.language}
         onChange={(emailNotifications) =>
           onChange({ ...preferences, emailNotifications })
         }

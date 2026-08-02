@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useWorkspaceLocale } from "../client/workspace-locale";
 
 export function WorkspaceNavigation({
   busy,
@@ -14,29 +13,19 @@ export function WorkspaceNavigation({
   collapsed: boolean;
   onSignOut: () => void;
 }) {
-  const locale = useWorkspaceLocale();
-  const copy =
-    locale === "vi"
-      ? {
-          dashboard: "Tổng quan",
-          profile: "Hồ sơ",
-          workspace: "Không gian làm việc",
-          openMenu: "Mở menu làm việc",
-          closeMenu: "Đóng menu làm việc",
-          signOut: "Đăng xuất",
-          signingOut: "Đang đăng xuất…",
-        }
-      : {
-          dashboard: "Dashboard",
-          profile: "Profile",
-          workspace: "Workspace",
-          openMenu: "Open workspace menu",
-          closeMenu: "Close workspace menu",
-          signOut: "Sign out",
-          signingOut: "Signing out…",
-        };
+  const copy = {
+    dashboard: "Dashboard",
+    jobs: "Jobs",
+    profile: "Profile",
+    workspace: "Workspace",
+    openMenu: "Open workspace menu",
+    closeMenu: "Close workspace menu",
+    signOut: "Sign out",
+    signingOut: "Signing out…",
+  };
   const destinations = [
     { href: "/dashboard", label: copy.dashboard, icon: "dashboard" },
+    { href: "/jobs", label: copy.jobs, icon: "jobs" },
     { href: "/profile", label: copy.profile, icon: "profile" },
   ] as const;
   const pathname = usePathname() ?? "/";
@@ -95,7 +84,7 @@ export function WorkspaceNavigation({
         ref={navigationRef}
         id="workspace-navigation"
         className="workspace-navigation"
-        aria-label={locale === "vi" ? "Không gian làm việc" : "Workspace"}
+        aria-label="Workspace"
         data-open={menuOpen}
       >
         <p className="workspace-nav-label">{copy.workspace}</p>
@@ -158,6 +147,14 @@ function NavIcon({ name }: { name: string }) {
       <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
         <circle cx="10" cy="6.5" r="3" />
         <path d="M4 17c.7-3.2 2.7-4.8 6-4.8s5.3 1.6 6 4.8" />
+      </svg>
+    );
+  }
+  if (name === "jobs") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
+        <rect x="3" y="6" width="14" height="10" rx="2" />
+        <path d="M7 6V4.8C7 3.8 7.8 3 8.8 3h2.4c1 0 1.8.8 1.8 1.8V6M3 10h14M8 10v1h4v-1" />
       </svg>
     );
   }

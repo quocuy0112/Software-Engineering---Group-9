@@ -38,7 +38,7 @@
     - Deploy a functional group with Spec-Kit.
     - Write the AI Usage Report following the required format.
 * **To-do Tasks:** 
-    - Deploy 2 main Feature Groups using Spec-Kit.
+    - Deploy 1 main Feature Group using Spec-Kit.
     - Test the system, fix bugs, improve UI/UX.
     - Write the AI Usage Report following the required format.
 * **Issues/Obstacles:** 
@@ -50,7 +50,7 @@
     - Complete Diagram 3 for full operation.
     - Write the AI Usage Report following the required format.
 * **To-do Tasks:**
-    - Deploy 2 main Feature Groups using Spec-Kit.
+    - Deploy 1 main Feature Group using Spec-Kit.
     - Execute frontend and backend division for the project.
     - Test the system, fix bugs, improve UI/UX.
     - Record and edit the demo video.

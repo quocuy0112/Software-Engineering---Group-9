@@ -15,13 +15,23 @@ export type AccountPreferencesFeedback = {
   message: string;
 };
 
+function normalizeEnglishPreferences(
+  preferences: AccountPreferences,
+): AccountPreferences {
+  return { ...preferences, language: "en" };
+}
+
 export function useAccountPreferences(
   initialPreferences: AccountPreferences,
   csrfProof: string,
 ) {
   const router = useRouter();
-  const [preferences, setPreferences] = useState(initialPreferences);
-  const [savedPreferences, setSavedPreferences] = useState(initialPreferences);
+  const [preferences, setPreferences] = useState(() =>
+    normalizeEnglishPreferences(initialPreferences),
+  );
+  const [savedPreferences, setSavedPreferences] = useState(() =>
+    normalizeEnglishPreferences(initialPreferences),
+  );
   const [feedback, setFeedback] = useState<AccountPreferencesFeedback | null>(
     null,
   );
@@ -29,7 +39,7 @@ export function useAccountPreferences(
   const active = useRef(false);
 
   const update = (next: AccountPreferences) => {
-    setPreferences(next);
+    setPreferences(normalizeEnglishPreferences(next));
     setFeedback(null);
   };
 
@@ -46,7 +56,7 @@ export function useAccountPreferences(
           "X-CSRF-Token": csrfProof,
         },
         body: JSON.stringify({
-          language: preferences.language,
+          language: "en",
           timezone: preferences.timezone,
           emailNotifications: preferences.emailNotifications,
         }),
@@ -55,26 +65,20 @@ export function useAccountPreferences(
       if (!response.ok) {
         const parsed = accountErrorSchema.safeParse(body);
         const message = parsed.success
-          ? localizeAccountMessage(
-              preferences.language,
-              parsed.data.message,
-              parsed.data.code,
-            )
-          : preferences.language === "vi"
-            ? "Không thể lưu tùy chọn."
-            : "The preferences could not be saved.";
+          ? localizeAccountMessage("en", parsed.data.message, parsed.data.code)
+          : "The preferences could not be saved.";
         setFeedback({ kind: "error", message });
         toast.error(message, { id: "account-preferences-feedback" });
         return false;
       }
       const parsed = accountPreferencesMutationOutcomeSchema.safeParse(body);
       if (!parsed.success) throw new Error("PREFERENCES_RESPONSE_INVALID");
-      setPreferences(parsed.data.preferences);
-      setSavedPreferences(parsed.data.preferences);
-      const message = localizeAccountMessage(
-        parsed.data.preferences.language,
-        parsed.data.message,
+      const normalizedPreferences = normalizeEnglishPreferences(
+        parsed.data.preferences,
       );
+      setPreferences(normalizedPreferences);
+      setSavedPreferences(normalizedPreferences);
+      const message = localizeAccountMessage("en", parsed.data.message);
       setFeedback({ kind: "success", message });
       toast.success(message, {
         id: "account-preferences-feedback",
@@ -82,10 +86,7 @@ export function useAccountPreferences(
       router.refresh();
       return true;
     } catch {
-      const message =
-        preferences.language === "vi"
-          ? "Không thể lưu tùy chọn."
-          : "The preferences could not be saved.";
+      const message = "The preferences could not be saved.";
       setFeedback({ kind: "error", message });
       toast.error(message, { id: "account-preferences-feedback" });
       return false;

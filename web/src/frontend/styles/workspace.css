@@ -574,7 +574,7 @@
 
 .dashboard-feature-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--sh-space-4);
   margin-top: var(--sh-space-6);
 }

@@ -5,7 +5,6 @@ import type { AccountPreferences } from "@/shared/contracts/account/preferences"
 import { useAccountPreferences } from "../client/use-account-preferences";
 import { AccountPreferencesForm } from "./account-preferences-form";
 import { ProfileNavigation } from "./profile-navigation";
-import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 import {
   UnsavedChangesIndicator,
   useUnsavedChangesGuard,
@@ -18,25 +17,14 @@ export function ProfilePreferencesView({
   initialPreferences: AccountPreferences;
   csrfProof: string;
 }) {
-  const locale = useWorkspaceLocale();
-  const copy =
-    locale === "vi"
-      ? {
-          kicker: "TRẢI NGHIỆM CỦA BẠN",
-          title: "Tùy chọn",
-          subtitle:
-            "Đồng bộ ngôn ngữ và múi giờ trên mọi thiết bị đã đăng nhập.",
-          panel: "THIẾT LẬP TÀI KHOẢN",
-          panelTitle: "Tùy chọn tài khoản",
-        }
-      : {
-          kicker: "YOUR EXPERIENCE",
-          title: "Preferences",
-          subtitle:
-            "Keep language and timezone consistent across every signed-in device.",
-          panel: "ACCOUNT DEFAULTS",
-          panelTitle: "Account preferences",
-        };
+  const copy = {
+    kicker: "YOUR EXPERIENCE",
+    title: "Preferences",
+    subtitle:
+      "Keep timezone and notification settings consistent across every signed-in device.",
+    panel: "ACCOUNT DEFAULTS",
+    panelTitle: "Account preferences",
+  };
   const state = useAccountPreferences(initialPreferences, csrfProof);
   useUnsavedChangesGuard(state.dirty);
   const feedbackRef = useRef<HTMLDivElement>(null);

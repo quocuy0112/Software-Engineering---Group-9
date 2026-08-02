@@ -1,0 +1,643 @@
+openapi: 3.1.0
+info:
+  title: SmartHire Job Board and Application API
+  version: 0.1.0
+  description: >-
+    Browser-facing contracts for UC-JOB-01, UC-JOB-02, UC-JOB-03,
+    UC-JOB-05, and UC-APP-01. Public endpoints expose approved fields only.
+    Protected operations derive actor ownership from the exclusive Better Auth
+    session and require same-origin/session-bound CSRF validation.
+servers:
+  - url: https://{configured-origin}
+tags:
+  - name: Job Discovery
+  - name: Saved Jobs
+  - name: Job Reports
+  - name: Applications
+paths:
+  /api/jobs:
+    get:
+      tags: [Job Discovery]
+      operationId: searchPublicJobs
+      description: >-
+        Returns only approved active postings. Keyword/location/skill text is
+        case-insensitive and Vietnamese-diacritic-insensitive. Pagination is
+        opaque keyset pagination with deterministic tie-breaking.
+      parameters:
+        - name: q
+          in: query
+          schema: { type: string, maxLength: 200 }
+        - name: location
+          in: query
+          schema: { type: string, maxLength: 160 }
+        - name: employmentType
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            maxItems: 5
+            uniqueItems: true
+            items: { $ref: "#/components/schemas/EmploymentType" }
+        - name: experienceLevel
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            maxItems: 6
+            uniqueItems: true
+            items: { $ref: "#/components/schemas/ExperienceLevel" }
+        - name: workArrangement
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            maxItems: 3
+            uniqueItems: true
+            items: { $ref: "#/components/schemas/WorkArrangement" }
+        - name: skills
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            maxItems: 20
+            uniqueItems: true
+            items: { type: string, minLength: 1, maxLength: 80 }
+        - name: salaryMin
+          in: query
+          schema: { type: number, minimum: 0 }
+        - name: salaryMax
+          in: query
+          schema: { type: number, minimum: 0 }
+        - name: salaryCurrency
+          in: query
+          schema: { type: string, pattern: "^[A-Z]{3}$", default: VND }
+        - name: salaryPeriod
+          in: query
+          schema: { $ref: "#/components/schemas/SalaryPeriod" }
+        - name: postedWithinDays
+          in: query
+          schema: { type: integer, enum: [1, 3, 7, 14, 30] }
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [RELEVANCE, NEWEST, SALARY_DESC]
+            default: RELEVANCE
+        - name: cursor
+          in: query
+          schema: { type: string, maxLength: 1024 }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      responses:
+        "200":
+          description: Complete public result page or an empty page.
+          headers:
+            Cache-Control: { $ref: "#/components/headers/PublicSearchCache" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/JobSearchResponse" }
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "503": { $ref: "#/components/responses/TemporarilyUnavailable" }
+  /api/jobs/{slug}:
+    get:
+      tags: [Job Discovery]
+      operationId: getPublicJobDetail
+      parameters:
+        - $ref: "#/components/parameters/JobSlug"
+      responses:
+        "200":
+          description: Active or historically public closed/expired job.
+          headers:
+            Cache-Control: { $ref: "#/components/headers/PublicDetailCache" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/JobDetail" }
+        "404": { $ref: "#/components/responses/NeutralJobUnavailable" }
+        "503": { $ref: "#/components/responses/TemporarilyUnavailable" }
+  /api/saved-jobs/{jobId}:
+    put:
+      tags: [Saved Jobs]
+      operationId: saveOwnJob
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+      responses:
+        "200":
+          description: Job is authoritatively saved; repeated requests are successful.
+          headers:
+            Cache-Control: { $ref: "#/components/headers/NoStore" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SavedJobOutcome" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/ProtectedMutationDenied" }
+        "404": { $ref: "#/components/responses/NeutralJobUnavailable" }
+        "503": { $ref: "#/components/responses/TemporarilyUnavailable" }
+    delete:
+      tags: [Saved Jobs]
+      operationId: removeOwnSavedJob
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+      responses:
+        "200":
+          description: Job is authoritatively unsaved; missing relationships are successful.
+          headers:
+            Cache-Control: { $ref: "#/components/headers/NoStore" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SavedJobOutcome" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/ProtectedMutationDenied" }
+        "503": { $ref: "#/components/responses/TemporarilyUnavailable" }
+  /api/jobs/{jobId}/reports:
+    post:
+      tags: [Job Reports]
+      operationId: reportJob
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/JobReportInput" }
+      responses:
+        "201":
+          description: New private pending-review report created.
+          headers:
+            Cache-Control: { $ref: "#/components/headers/NoStore" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/JobReportOutcome" }
+        "200":
+          description: A matching unresolved concern already exists; neutral response.
+          headers:
+            Cache-Control: { $ref: "#/components/headers/NoStore" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/JobReportOutcome" }
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/ProtectedMutationDenied" }
+        "404": { $ref: "#/components/responses/NeutralJobUnavailable" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503": { $ref: "#/components/responses/TemporarilyUnavailable" }
+  /api/jobs/{jobId}/application-form:
+    get:
+      tags: [Applications]
+      operationId: getOwnApplicationForm
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+      responses:
+        "200":
+          description: Candidate-owned eligible application form projection.
+          headers:
+            Cache-Control: { $ref: "#/components/headers/NoStore" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApplicationForm" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/CandidateIneligible" }
+        "404": { $ref: "#/components/responses/NeutralJobUnavailable" }
+        "409": { $ref: "#/components/responses/ApplicationExists" }
+        "503": { $ref: "#/components/responses/TemporarilyUnavailable" }
+  /api/jobs/{jobId}/applications:
+    post:
+      tags: [Applications]
+      operationId: submitOwnApplication
+      description: >-
+        Creates exactly one Applied application. The Idempotency-Key is scoped
+        to the candidate and bound to the normalized submission.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ApplicationSubmission" }
+      responses:
+        "201":
+          description: New application committed with audit and notification work.
+          headers:
+            Cache-Control: { $ref: "#/components/headers/NoStore" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApplicationOutcome" }
+        "200":
+          description: Same application already committed; idempotent authoritative result.
+          headers:
+            Cache-Control: { $ref: "#/components/headers/NoStore" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApplicationOutcome" }
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/ProtectedMutationDenied" }
+        "404": { $ref: "#/components/responses/NeutralJobUnavailable" }
+        "409": { $ref: "#/components/responses/ApplicationConflict" }
+        "503": { $ref: "#/components/responses/TemporarilyUnavailable" }
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: __Host-smarthire.session
+      description: Exclusive production HttpOnly browser session cookie; local HTTP uses unprefixed smarthire.session.
+    csrfToken:
+      type: apiKey
+      in: header
+      name: X-CSRF-Token
+  parameters:
+    JobId:
+      name: jobId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    JobSlug:
+      name: slug
+      in: path
+      required: true
+      schema:
+        { type: string, pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$", maxLength: 220 }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, minLength: 16, maxLength: 128 }
+  headers:
+    NoStore:
+      schema: { type: string, const: "no-store, max-age=0" }
+    PublicSearchCache:
+      schema:
+        {
+          type: string,
+          example: "public, max-age=30, stale-while-revalidate=60",
+        }
+    PublicDetailCache:
+      schema:
+        {
+          type: string,
+          example: "public, max-age=30, stale-while-revalidate=60",
+        }
+    RetryAfter:
+      schema: { type: integer, minimum: 1 }
+  schemas:
+    EmploymentType:
+      type: string
+      enum: [FULL_TIME, PART_TIME, CONTRACT, INTERNSHIP, TEMPORARY]
+    ExperienceLevel:
+      type: string
+      enum: [ENTRY, JUNIOR, MID, SENIOR, LEAD, MANAGER]
+    WorkArrangement:
+      type: string
+      enum: [ONSITE, HYBRID, REMOTE]
+    SalaryPeriod:
+      type: string
+      enum: [HOUR, MONTH, YEAR]
+    PublicJobState:
+      type: string
+      enum: [ACTIVE, CLOSED, EXPIRED]
+    Salary:
+      type: [object, "null"]
+      additionalProperties: false
+      required: [minimum, maximum, currency, period]
+      properties:
+        minimum: { type: number, minimum: 0 }
+        maximum: { type: number, minimum: 0 }
+        currency: { type: string, pattern: "^[A-Z]{3}$" }
+        period: { $ref: "#/components/schemas/SalaryPeriod" }
+    PublicCompany:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          slug,
+          displayName,
+          logoUrl,
+          websiteUrl,
+          publicDescription,
+          publicLocation,
+        ]
+      properties:
+        slug: { type: string }
+        displayName: { type: string, minLength: 1, maxLength: 160 }
+        logoUrl: { type: [string, "null"], format: uri }
+        websiteUrl: { type: [string, "null"], format: uri }
+        publicDescription: { type: [string, "null"], maxLength: 3000 }
+        publicLocation: { type: [string, "null"], maxLength: 160 }
+    PublicJobActions:
+      type: object
+      additionalProperties: false
+      required: [authenticated, saved, applied, canSave, canReport, canApply]
+      properties:
+        authenticated: { type: boolean }
+        saved: { type: boolean }
+        applied: { type: boolean }
+        canSave: { type: boolean }
+        canReport: { type: boolean }
+        canApply: { type: boolean }
+    JobCard:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          id,
+          slug,
+          title,
+          company,
+          location,
+          employmentType,
+          experienceLevel,
+          workArrangement,
+          salary,
+          summary,
+          skills,
+          publishedAt,
+          applicationDeadline,
+          actions,
+        ]
+      properties:
+        id: { type: string }
+        slug: { type: string }
+        title: { type: string, maxLength: 200 }
+        company: { $ref: "#/components/schemas/PublicCompany" }
+        location: { type: string, maxLength: 160 }
+        employmentType: { $ref: "#/components/schemas/EmploymentType" }
+        experienceLevel: { $ref: "#/components/schemas/ExperienceLevel" }
+        workArrangement: { $ref: "#/components/schemas/WorkArrangement" }
+        salary: { $ref: "#/components/schemas/Salary" }
+        summary: { type: string, maxLength: 500 }
+        skills:
+          type: array
+          maxItems: 50
+          items: { type: string, minLength: 1, maxLength: 80 }
+        publishedAt: { type: string, format: date-time }
+        applicationDeadline: { type: [string, "null"], format: date-time }
+        actions: { $ref: "#/components/schemas/PublicJobActions" }
+    JobSearchResponse:
+      type: object
+      additionalProperties: false
+      required: [items, total, nextCursor, criteria]
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items: { $ref: "#/components/schemas/JobCard" }
+        total: { type: integer, minimum: 0 }
+        nextCursor: { type: [string, "null"] }
+        criteria:
+          type: object
+          additionalProperties: true
+          description: Valid normalized criteria accepted for this response.
+    JobDetail:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          id,
+          slug,
+          title,
+          company,
+          location,
+          employmentType,
+          experienceLevel,
+          workArrangement,
+          salary,
+          summary,
+          skills,
+          publishedAt,
+          applicationDeadline,
+          actions,
+          state,
+          description,
+          responsibilities,
+          requirements,
+          benefits,
+          canonicalUrl,
+        ]
+      properties:
+        id: { type: string }
+        slug: { type: string }
+        title: { type: string, maxLength: 200 }
+        company: { $ref: "#/components/schemas/PublicCompany" }
+        location: { type: string, maxLength: 160 }
+        employmentType: { $ref: "#/components/schemas/EmploymentType" }
+        experienceLevel: { $ref: "#/components/schemas/ExperienceLevel" }
+        workArrangement: { $ref: "#/components/schemas/WorkArrangement" }
+        salary: { $ref: "#/components/schemas/Salary" }
+        summary: { type: string, maxLength: 500 }
+        skills:
+          type: array
+          maxItems: 50
+          items: { type: string, minLength: 1, maxLength: 80 }
+        publishedAt: { type: string, format: date-time }
+        applicationDeadline: { type: [string, "null"], format: date-time }
+        actions: { $ref: "#/components/schemas/PublicJobActions" }
+        state: { $ref: "#/components/schemas/PublicJobState" }
+        description: { type: string, maxLength: 20000 }
+        responsibilities: { type: string, maxLength: 12000 }
+        requirements: { type: string, maxLength: 12000 }
+        benefits: { type: [string, "null"], maxLength: 8000 }
+        canonicalUrl: { type: string, format: uri }
+    SavedJobOutcome:
+      type: object
+      additionalProperties: false
+      required: [jobId, saved, message]
+      properties:
+        jobId: { type: string }
+        saved: { type: boolean }
+        message: { type: string }
+    JobReportInput:
+      type: object
+      additionalProperties: false
+      required: [reason, details]
+      properties:
+        reason:
+          type: string
+          enum:
+            [FRAUD, MISLEADING, DUPLICATE, DISCRIMINATORY, INAPPROPRIATE, OTHER]
+        details: { type: [string, "null"], maxLength: 2000 }
+    JobReportOutcome:
+      type: object
+      additionalProperties: false
+      required: [received, duplicate, message]
+      properties:
+        received: { type: boolean, const: true }
+        duplicate: { type: boolean }
+        message: { type: string }
+    CandidateCvOption:
+      type: object
+      additionalProperties: false
+      required:
+        [id, displayName, fileName, mimeType, byteSize, version, confirmedAt]
+      properties:
+        id: { type: string }
+        displayName: { type: string }
+        fileName: { type: string }
+        mimeType: { type: string }
+        byteSize: { type: integer, minimum: 1, maximum: 5000000 }
+        version: { type: integer, minimum: 1 }
+        confirmedAt: { type: string, format: date-time }
+    ApplicationQuestion:
+      type: object
+      additionalProperties: false
+      required: [id, prompt, description, kind, required, options, version]
+      properties:
+        id: { type: string }
+        prompt: { type: string, maxLength: 500 }
+        description: { type: [string, "null"], maxLength: 1000 }
+        kind: { type: string, enum: [TEXT, BOOLEAN, SINGLE_CHOICE] }
+        required: { type: boolean }
+        options:
+          type: [array, "null"]
+          maxItems: 20
+          items: { type: string, maxLength: 200 }
+        version: { type: integer, minimum: 1 }
+    ApplicationForm:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          jobId,
+          jobTitle,
+          companyName,
+          profileReady,
+          missingProfileFields,
+          cvs,
+          questions,
+          consentVersion,
+          csrfToken,
+        ]
+      properties:
+        jobId: { type: string }
+        jobTitle: { type: string }
+        companyName: { type: string }
+        profileReady: { type: boolean }
+        missingProfileFields:
+          type: array
+          items: { type: string }
+        cvs:
+          type: array
+          items: { $ref: "#/components/schemas/CandidateCvOption" }
+        questions:
+          type: array
+          maxItems: 20
+          items: { $ref: "#/components/schemas/ApplicationQuestion" }
+        consentVersion: { type: string, maxLength: 64 }
+        csrfToken:
+          {
+            type: string,
+            description: Session-bound CSRF proof; never persisted by the client.,
+          }
+    ApplicationAnswerInput:
+      type: object
+      additionalProperties: false
+      required: [questionId, value]
+      properties:
+        questionId: { type: string, minLength: 1, maxLength: 128 }
+        value:
+          oneOf:
+            - { type: string, maxLength: 3000 }
+            - { type: boolean }
+    ApplicationSubmission:
+      type: object
+      additionalProperties: false
+      required: [cvId, answers, coverLetter, consentVersion, consentAccepted]
+      properties:
+        cvId: { type: string, minLength: 1, maxLength: 128 }
+        answers:
+          type: array
+          maxItems: 20
+          items: { $ref: "#/components/schemas/ApplicationAnswerInput" }
+        coverLetter: { type: [string, "null"], maxLength: 5000 }
+        consentVersion: { type: string, minLength: 1, maxLength: 64 }
+        consentAccepted: { type: boolean, const: true }
+    ApplicationOutcome:
+      type: object
+      additionalProperties: false
+      required: [applicationId, jobId, stage, submittedAt, created, message]
+      properties:
+        applicationId: { type: string }
+        jobId: { type: string }
+        stage: { type: string, const: APPLIED }
+        submittedAt: { type: string, format: date-time }
+        created: { type: boolean }
+        message: { type: string }
+    Problem:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        fieldErrors:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: string }
+  responses:
+    ValidationFailed:
+      description: Strict input or query validation failed; valid criteria/form data may be retained by the client.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    AuthenticationRequired:
+      description: Active session required. Client may navigate to login with a validated internal return destination.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    ProtectedMutationDenied:
+      description: Account, same-origin, CSRF, candidate, or ownership policy denied the mutation.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    CandidateIneligible:
+      description: Candidate profile or confirmed CV prerequisite is incomplete.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    NeutralJobUnavailable:
+      description: Job is unavailable; response does not reveal whether it is missing, private, removed, pending, or rejected.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    ApplicationExists:
+      description: Candidate already has an application for this job.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApplicationOutcome" }
+    ApplicationConflict:
+      description: Job closed/changed, duplicate exists, or Idempotency-Key was reused for different input.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    RateLimited:
+      description: Reporting abuse-control window exceeded.
+      headers:
+        Retry-After: { $ref: "#/components/headers/RetryAfter" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    TemporarilyUnavailable:
+      description: Complete authoritative response or mutation could not be produced; safe retry is available.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Problem" }

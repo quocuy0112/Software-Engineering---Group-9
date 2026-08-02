@@ -252,6 +252,8 @@ export type UserAccountWhereInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestListRelationFilter
   passwordChangeAttemptWindow?: Prisma.XOR<Prisma.PasswordChangeAttemptWindowNullableScalarRelationFilter, Prisma.PasswordChangeAttemptWindowWhereInput> | null
   passwordChangeOperations?: Prisma.PasswordChangeOperationListRelationFilter
+  savedJobs?: Prisma.SavedJobListRelationFilter
+  jobReports?: Prisma.JobReportListRelationFilter
   cvQuota?: Prisma.XOR<Prisma.CvAccountQuotaNullableScalarRelationFilter, Prisma.CvAccountQuotaWhereInput> | null
   cvUploads?: Prisma.CvUploadListRelationFilter
   cvStoredArtifacts?: Prisma.CvStoredArtifactListRelationFilter
@@ -291,6 +293,8 @@ export type UserAccountOrderByWithRelationInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestOrderByRelationAggregateInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowOrderByWithRelationInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationOrderByRelationAggregateInput
+  savedJobs?: Prisma.SavedJobOrderByRelationAggregateInput
+  jobReports?: Prisma.JobReportOrderByRelationAggregateInput
   cvQuota?: Prisma.CvAccountQuotaOrderByWithRelationInput
   cvUploads?: Prisma.CvUploadOrderByRelationAggregateInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactOrderByRelationAggregateInput
@@ -333,6 +337,8 @@ export type UserAccountWhereUniqueInput = Prisma.AtLeast<{
   emailChangeRequests?: Prisma.EmailChangeRequestListRelationFilter
   passwordChangeAttemptWindow?: Prisma.XOR<Prisma.PasswordChangeAttemptWindowNullableScalarRelationFilter, Prisma.PasswordChangeAttemptWindowWhereInput> | null
   passwordChangeOperations?: Prisma.PasswordChangeOperationListRelationFilter
+  savedJobs?: Prisma.SavedJobListRelationFilter
+  jobReports?: Prisma.JobReportListRelationFilter
   cvQuota?: Prisma.XOR<Prisma.CvAccountQuotaNullableScalarRelationFilter, Prisma.CvAccountQuotaWhereInput> | null
   cvUploads?: Prisma.CvUploadListRelationFilter
   cvStoredArtifacts?: Prisma.CvStoredArtifactListRelationFilter
@@ -408,6 +414,8 @@ export type UserAccountCreateInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -447,6 +455,8 @@ export type UserAccountUncheckedCreateInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -486,6 +496,8 @@ export type UserAccountUpdateInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -525,6 +537,8 @@ export type UserAccountUncheckedUpdateInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -861,6 +875,34 @@ export type UserAccountUpdateOneWithoutOutboxNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutOutboxInput, Prisma.UserAccountUpdateWithoutOutboxInput>, Prisma.UserAccountUncheckedUpdateWithoutOutboxInput>
 }
 
+export type UserAccountCreateNestedOneWithoutSavedJobsInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSavedJobsInput, Prisma.UserAccountUncheckedCreateWithoutSavedJobsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSavedJobsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutSavedJobsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSavedJobsInput, Prisma.UserAccountUncheckedCreateWithoutSavedJobsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSavedJobsInput
+  upsert?: Prisma.UserAccountUpsertWithoutSavedJobsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutSavedJobsInput, Prisma.UserAccountUpdateWithoutSavedJobsInput>, Prisma.UserAccountUncheckedUpdateWithoutSavedJobsInput>
+}
+
+export type UserAccountCreateNestedOneWithoutJobReportsInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutJobReportsInput, Prisma.UserAccountUncheckedCreateWithoutJobReportsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutJobReportsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutJobReportsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutJobReportsInput, Prisma.UserAccountUncheckedCreateWithoutJobReportsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutJobReportsInput
+  upsert?: Prisma.UserAccountUpsertWithoutJobReportsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutJobReportsInput, Prisma.UserAccountUpdateWithoutJobReportsInput>, Prisma.UserAccountUncheckedUpdateWithoutJobReportsInput>
+}
+
 export type UserAccountCreateNestedOneWithoutCvQuotaInput = {
   create?: Prisma.XOR<Prisma.UserAccountCreateWithoutCvQuotaInput, Prisma.UserAccountUncheckedCreateWithoutCvQuotaInput>
   connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutCvQuotaInput
@@ -1027,6 +1069,8 @@ export type UserAccountCreateWithoutAccountsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -1065,6 +1109,8 @@ export type UserAccountUncheckedCreateWithoutAccountsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -1119,6 +1165,8 @@ export type UserAccountUpdateWithoutAccountsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -1157,6 +1205,8 @@ export type UserAccountUncheckedUpdateWithoutAccountsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -1195,6 +1245,8 @@ export type UserAccountCreateWithoutSessionsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -1233,6 +1285,8 @@ export type UserAccountUncheckedCreateWithoutSessionsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -1287,6 +1341,8 @@ export type UserAccountUpdateWithoutSessionsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -1325,6 +1381,8 @@ export type UserAccountUncheckedUpdateWithoutSessionsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -1363,6 +1421,8 @@ export type UserAccountCreateWithoutVerificationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -1401,6 +1461,8 @@ export type UserAccountUncheckedCreateWithoutVerificationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -1455,6 +1517,8 @@ export type UserAccountUpdateWithoutVerificationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -1493,6 +1557,8 @@ export type UserAccountUncheckedUpdateWithoutVerificationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -1531,6 +1597,8 @@ export type UserAccountCreateWithoutTwoFactorInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -1569,6 +1637,8 @@ export type UserAccountUncheckedCreateWithoutTwoFactorInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -1623,6 +1693,8 @@ export type UserAccountUpdateWithoutTwoFactorInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -1661,6 +1733,8 @@ export type UserAccountUncheckedUpdateWithoutTwoFactorInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -1699,6 +1773,8 @@ export type UserAccountCreateWithoutCandidateIdentityInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -1737,6 +1813,8 @@ export type UserAccountUncheckedCreateWithoutCandidateIdentityInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -1791,6 +1869,8 @@ export type UserAccountUpdateWithoutCandidateIdentityInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -1829,6 +1909,8 @@ export type UserAccountUncheckedUpdateWithoutCandidateIdentityInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -1867,6 +1949,8 @@ export type UserAccountCreateWithoutPreferencesInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -1905,6 +1989,8 @@ export type UserAccountUncheckedCreateWithoutPreferencesInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -1959,6 +2045,8 @@ export type UserAccountUpdateWithoutPreferencesInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -1997,6 +2085,8 @@ export type UserAccountUncheckedUpdateWithoutPreferencesInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -2035,6 +2125,8 @@ export type UserAccountCreateWithoutEmailChangeRequestsInput = {
   preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -2073,6 +2165,8 @@ export type UserAccountUncheckedCreateWithoutEmailChangeRequestsInput = {
   preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -2127,6 +2221,8 @@ export type UserAccountUpdateWithoutEmailChangeRequestsInput = {
   preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -2165,6 +2261,8 @@ export type UserAccountUncheckedUpdateWithoutEmailChangeRequestsInput = {
   preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -2203,6 +2301,8 @@ export type UserAccountCreateWithoutPasswordChangeAttemptWindowInput = {
   preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -2241,6 +2341,8 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeAttemptWindowInput = 
   preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -2295,6 +2397,8 @@ export type UserAccountUpdateWithoutPasswordChangeAttemptWindowInput = {
   preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -2333,6 +2437,8 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeAttemptWindowInput = 
   preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -2371,6 +2477,8 @@ export type UserAccountCreateWithoutPasswordChangeOperationsInput = {
   preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -2409,6 +2517,8 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeOperationsInput = {
   preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -2463,6 +2573,8 @@ export type UserAccountUpdateWithoutPasswordChangeOperationsInput = {
   preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -2501,6 +2613,8 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeOperationsInput = {
   preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -2539,6 +2653,8 @@ export type UserAccountCreateWithoutSecurityTokensInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -2577,6 +2693,8 @@ export type UserAccountUncheckedCreateWithoutSecurityTokensInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -2631,6 +2749,8 @@ export type UserAccountUpdateWithoutSecurityTokensInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -2669,6 +2789,8 @@ export type UserAccountUncheckedUpdateWithoutSecurityTokensInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -2707,6 +2829,8 @@ export type UserAccountCreateWithoutPasswordResetOperationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -2745,6 +2869,8 @@ export type UserAccountUncheckedCreateWithoutPasswordResetOperationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -2799,6 +2925,8 @@ export type UserAccountUpdateWithoutPasswordResetOperationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -2837,6 +2965,8 @@ export type UserAccountUncheckedUpdateWithoutPasswordResetOperationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -2875,6 +3005,8 @@ export type UserAccountCreateWithoutFullAccountRecoveryOperationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -2913,6 +3045,8 @@ export type UserAccountUncheckedCreateWithoutFullAccountRecoveryOperationsInput 
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -2967,6 +3101,8 @@ export type UserAccountUpdateWithoutFullAccountRecoveryOperationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -3005,6 +3141,8 @@ export type UserAccountUncheckedUpdateWithoutFullAccountRecoveryOperationsInput 
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -3043,6 +3181,8 @@ export type UserAccountCreateWithoutChallengesInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -3081,6 +3221,8 @@ export type UserAccountUncheckedCreateWithoutChallengesInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -3135,6 +3277,8 @@ export type UserAccountUpdateWithoutChallengesInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -3173,6 +3317,8 @@ export type UserAccountUncheckedUpdateWithoutChallengesInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -3211,6 +3357,8 @@ export type UserAccountCreateWithoutOutboxInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -3249,6 +3397,8 @@ export type UserAccountUncheckedCreateWithoutOutboxInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -3303,6 +3453,8 @@ export type UserAccountUpdateWithoutOutboxInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -3341,6 +3493,360 @@ export type UserAccountUncheckedUpdateWithoutOutboxInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+}
+
+export type UserAccountCreateWithoutSavedJobsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+}
+
+export type UserAccountUncheckedCreateWithoutSavedJobsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+}
+
+export type UserAccountCreateOrConnectWithoutSavedJobsInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSavedJobsInput, Prisma.UserAccountUncheckedCreateWithoutSavedJobsInput>
+}
+
+export type UserAccountUpsertWithoutSavedJobsInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutSavedJobsInput, Prisma.UserAccountUncheckedUpdateWithoutSavedJobsInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSavedJobsInput, Prisma.UserAccountUncheckedCreateWithoutSavedJobsInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutSavedJobsInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutSavedJobsInput, Prisma.UserAccountUncheckedUpdateWithoutSavedJobsInput>
+}
+
+export type UserAccountUpdateWithoutSavedJobsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutSavedJobsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+}
+
+export type UserAccountCreateWithoutJobReportsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+}
+
+export type UserAccountUncheckedCreateWithoutJobReportsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+}
+
+export type UserAccountCreateOrConnectWithoutJobReportsInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutJobReportsInput, Prisma.UserAccountUncheckedCreateWithoutJobReportsInput>
+}
+
+export type UserAccountUpsertWithoutJobReportsInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutJobReportsInput, Prisma.UserAccountUncheckedUpdateWithoutJobReportsInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutJobReportsInput, Prisma.UserAccountUncheckedCreateWithoutJobReportsInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutJobReportsInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutJobReportsInput, Prisma.UserAccountUncheckedUpdateWithoutJobReportsInput>
+}
+
+export type UserAccountUpdateWithoutJobReportsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutJobReportsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -3380,6 +3886,8 @@ export type UserAccountCreateWithoutCvQuotaInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
   cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
@@ -3418,6 +3926,8 @@ export type UserAccountUncheckedCreateWithoutCvQuotaInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
   cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
@@ -3472,6 +3982,8 @@ export type UserAccountUpdateWithoutCvQuotaInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
   cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
@@ -3510,6 +4022,8 @@ export type UserAccountUncheckedUpdateWithoutCvQuotaInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
   cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
@@ -3548,6 +4062,8 @@ export type UserAccountCreateWithoutCvUploadsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
   cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
@@ -3586,6 +4102,8 @@ export type UserAccountUncheckedCreateWithoutCvUploadsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
   cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
@@ -3640,6 +4158,8 @@ export type UserAccountUpdateWithoutCvUploadsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
   cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
@@ -3678,6 +4198,8 @@ export type UserAccountUncheckedUpdateWithoutCvUploadsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
   cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
@@ -3716,6 +4238,8 @@ export type UserAccountCreateWithoutCvStoredArtifactsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
@@ -3754,6 +4278,8 @@ export type UserAccountUncheckedCreateWithoutCvStoredArtifactsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
@@ -3808,6 +4334,8 @@ export type UserAccountUpdateWithoutCvStoredArtifactsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
@@ -3846,6 +4374,8 @@ export type UserAccountUncheckedUpdateWithoutCvStoredArtifactsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
@@ -3884,6 +4414,8 @@ export type UserAccountCreateWithoutCvScanAssessmentsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -3922,6 +4454,8 @@ export type UserAccountUncheckedCreateWithoutCvScanAssessmentsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -3976,6 +4510,8 @@ export type UserAccountUpdateWithoutCvScanAssessmentsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -4014,6 +4550,8 @@ export type UserAccountUncheckedUpdateWithoutCvScanAssessmentsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -4052,6 +4590,8 @@ export type UserAccountCreateWithoutCvExtractionsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -4090,6 +4630,8 @@ export type UserAccountUncheckedCreateWithoutCvExtractionsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -4144,6 +4686,8 @@ export type UserAccountUpdateWithoutCvExtractionsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -4182,6 +4726,8 @@ export type UserAccountUncheckedUpdateWithoutCvExtractionsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -4220,6 +4766,8 @@ export type UserAccountCreateWithoutCvParseJobsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -4258,6 +4806,8 @@ export type UserAccountUncheckedCreateWithoutCvParseJobsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -4312,6 +4862,8 @@ export type UserAccountUpdateWithoutCvParseJobsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -4350,6 +4902,8 @@ export type UserAccountUncheckedUpdateWithoutCvParseJobsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -4388,6 +4942,8 @@ export type UserAccountCreateWithoutCvRetryRequestsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -4426,6 +4982,8 @@ export type UserAccountUncheckedCreateWithoutCvRetryRequestsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -4480,6 +5038,8 @@ export type UserAccountUpdateWithoutCvRetryRequestsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -4518,6 +5078,8 @@ export type UserAccountUncheckedUpdateWithoutCvRetryRequestsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -4556,6 +5118,8 @@ export type UserAccountCreateWithoutCvDraftsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -4594,6 +5158,8 @@ export type UserAccountUncheckedCreateWithoutCvDraftsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -4648,6 +5214,8 @@ export type UserAccountUpdateWithoutCvDraftsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -4686,6 +5254,8 @@ export type UserAccountUncheckedUpdateWithoutCvDraftsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -4724,6 +5294,8 @@ export type UserAccountCreateWithoutCvConsentEventsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -4762,6 +5334,8 @@ export type UserAccountUncheckedCreateWithoutCvConsentEventsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -4816,6 +5390,8 @@ export type UserAccountUpdateWithoutCvConsentEventsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -4854,6 +5430,8 @@ export type UserAccountUncheckedUpdateWithoutCvConsentEventsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -4892,6 +5470,8 @@ export type UserAccountCreateWithoutCvConfirmationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
@@ -4930,6 +5510,8 @@ export type UserAccountUncheckedCreateWithoutCvConfirmationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
   cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
@@ -4984,6 +5566,8 @@ export type UserAccountUpdateWithoutCvConfirmationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
@@ -5022,6 +5606,8 @@ export type UserAccountUncheckedUpdateWithoutCvConfirmationsInput = {
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
   passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
   cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
   cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
   cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
@@ -5049,6 +5635,8 @@ export type UserAccountCountOutputType = {
   outbox: number
   emailChangeRequests: number
   passwordChangeOperations: number
+  savedJobs: number
+  jobReports: number
   cvUploads: number
   cvStoredArtifacts: number
   cvScanAssessments: number
@@ -5071,6 +5659,8 @@ export type UserAccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   outbox?: boolean | UserAccountCountOutputTypeCountOutboxArgs
   emailChangeRequests?: boolean | UserAccountCountOutputTypeCountEmailChangeRequestsArgs
   passwordChangeOperations?: boolean | UserAccountCountOutputTypeCountPasswordChangeOperationsArgs
+  savedJobs?: boolean | UserAccountCountOutputTypeCountSavedJobsArgs
+  jobReports?: boolean | UserAccountCountOutputTypeCountJobReportsArgs
   cvUploads?: boolean | UserAccountCountOutputTypeCountCvUploadsArgs
   cvStoredArtifacts?: boolean | UserAccountCountOutputTypeCountCvStoredArtifactsArgs
   cvScanAssessments?: boolean | UserAccountCountOutputTypeCountCvScanAssessmentsArgs
@@ -5165,6 +5755,20 @@ export type UserAccountCountOutputTypeCountPasswordChangeOperationsArgs<ExtArgs 
 /**
  * UserAccountCountOutputType without action
  */
+export type UserAccountCountOutputTypeCountSavedJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SavedJobWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountJobReportsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.JobReportWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
 export type UserAccountCountOutputTypeCountCvUploadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.CvUploadWhereInput
 }
@@ -5253,6 +5857,8 @@ export type UserAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   emailChangeRequests?: boolean | Prisma.UserAccount$emailChangeRequestsArgs<ExtArgs>
   passwordChangeAttemptWindow?: boolean | Prisma.UserAccount$passwordChangeAttemptWindowArgs<ExtArgs>
   passwordChangeOperations?: boolean | Prisma.UserAccount$passwordChangeOperationsArgs<ExtArgs>
+  savedJobs?: boolean | Prisma.UserAccount$savedJobsArgs<ExtArgs>
+  jobReports?: boolean | Prisma.UserAccount$jobReportsArgs<ExtArgs>
   cvQuota?: boolean | Prisma.UserAccount$cvQuotaArgs<ExtArgs>
   cvUploads?: boolean | Prisma.UserAccount$cvUploadsArgs<ExtArgs>
   cvStoredArtifacts?: boolean | Prisma.UserAccount$cvStoredArtifactsArgs<ExtArgs>
@@ -5327,6 +5933,8 @@ export type UserAccountInclude<ExtArgs extends runtime.Types.Extensions.Internal
   emailChangeRequests?: boolean | Prisma.UserAccount$emailChangeRequestsArgs<ExtArgs>
   passwordChangeAttemptWindow?: boolean | Prisma.UserAccount$passwordChangeAttemptWindowArgs<ExtArgs>
   passwordChangeOperations?: boolean | Prisma.UserAccount$passwordChangeOperationsArgs<ExtArgs>
+  savedJobs?: boolean | Prisma.UserAccount$savedJobsArgs<ExtArgs>
+  jobReports?: boolean | Prisma.UserAccount$jobReportsArgs<ExtArgs>
   cvQuota?: boolean | Prisma.UserAccount$cvQuotaArgs<ExtArgs>
   cvUploads?: boolean | Prisma.UserAccount$cvUploadsArgs<ExtArgs>
   cvStoredArtifacts?: boolean | Prisma.UserAccount$cvStoredArtifactsArgs<ExtArgs>
@@ -5359,6 +5967,8 @@ export type $UserAccountPayload<ExtArgs extends runtime.Types.Extensions.Interna
     emailChangeRequests: Prisma.$EmailChangeRequestPayload<ExtArgs>[]
     passwordChangeAttemptWindow: Prisma.$PasswordChangeAttemptWindowPayload<ExtArgs> | null
     passwordChangeOperations: Prisma.$PasswordChangeOperationPayload<ExtArgs>[]
+    savedJobs: Prisma.$SavedJobPayload<ExtArgs>[]
+    jobReports: Prisma.$JobReportPayload<ExtArgs>[]
     cvQuota: Prisma.$CvAccountQuotaPayload<ExtArgs> | null
     cvUploads: Prisma.$CvUploadPayload<ExtArgs>[]
     cvStoredArtifacts: Prisma.$CvStoredArtifactPayload<ExtArgs>[]
@@ -5791,6 +6401,8 @@ export interface Prisma__UserAccountClient<T, Null = never, ExtArgs extends runt
   emailChangeRequests<T extends Prisma.UserAccount$emailChangeRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$emailChangeRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailChangeRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   passwordChangeAttemptWindow<T extends Prisma.UserAccount$passwordChangeAttemptWindowArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$passwordChangeAttemptWindowArgs<ExtArgs>>): Prisma.Prisma__PasswordChangeAttemptWindowClient<runtime.Types.Result.GetResult<Prisma.$PasswordChangeAttemptWindowPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   passwordChangeOperations<T extends Prisma.UserAccount$passwordChangeOperationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$passwordChangeOperationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PasswordChangeOperationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  savedJobs<T extends Prisma.UserAccount$savedJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$savedJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  jobReports<T extends Prisma.UserAccount$jobReportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$jobReportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   cvQuota<T extends Prisma.UserAccount$cvQuotaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$cvQuotaArgs<ExtArgs>>): Prisma.Prisma__CvAccountQuotaClient<runtime.Types.Result.GetResult<Prisma.$CvAccountQuotaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   cvUploads<T extends Prisma.UserAccount$cvUploadsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$cvUploadsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CvUploadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   cvStoredArtifacts<T extends Prisma.UserAccount$cvStoredArtifactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$cvStoredArtifactsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CvStoredArtifactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -6548,6 +7160,54 @@ export type UserAccount$passwordChangeOperationsArgs<ExtArgs extends runtime.Typ
   take?: number
   skip?: number
   distinct?: Prisma.PasswordChangeOperationScalarFieldEnum | Prisma.PasswordChangeOperationScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.savedJobs
+ */
+export type UserAccount$savedJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SavedJob
+   */
+  select?: Prisma.SavedJobSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SavedJob
+   */
+  omit?: Prisma.SavedJobOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SavedJobInclude<ExtArgs> | null
+  where?: Prisma.SavedJobWhereInput
+  orderBy?: Prisma.SavedJobOrderByWithRelationInput | Prisma.SavedJobOrderByWithRelationInput[]
+  cursor?: Prisma.SavedJobWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SavedJobScalarFieldEnum | Prisma.SavedJobScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.jobReports
+ */
+export type UserAccount$jobReportsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the JobReport
+   */
+  select?: Prisma.JobReportSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the JobReport
+   */
+  omit?: Prisma.JobReportOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JobReportInclude<ExtArgs> | null
+  where?: Prisma.JobReportWhereInput
+  orderBy?: Prisma.JobReportOrderByWithRelationInput | Prisma.JobReportOrderByWithRelationInput[]
+  cursor?: Prisma.JobReportWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.JobReportScalarFieldEnum | Prisma.JobReportScalarFieldEnum[]
 }
 
 /**

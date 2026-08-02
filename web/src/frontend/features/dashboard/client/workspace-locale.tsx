@@ -8,13 +8,11 @@ const WorkspaceLocaleContext = createContext<WorkspaceLocale>("en");
 
 export function WorkspaceLocaleProvider({
   children,
-  locale,
 }: {
   children: React.ReactNode;
-  locale: WorkspaceLocale;
 }) {
   return (
-    <WorkspaceLocaleContext.Provider value={locale}>
+    <WorkspaceLocaleContext.Provider value="en">
       {children}
     </WorkspaceLocaleContext.Provider>
   );

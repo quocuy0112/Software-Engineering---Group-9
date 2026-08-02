@@ -39,14 +39,17 @@ export function HomePageView({ context }: HomePageViewProps) {
             career move into one thoughtful workspace.
           </p>
           <nav className="home-actions" aria-label="Home actions">
-            <Link className="home-action home-action--primary" href="/login">
-              Sign in
+            <Link className="home-action home-action--primary" href="/jobs">
+              Browse jobs
               <span aria-hidden="true">→</span>
             </Link>
             <Link
               className="home-action home-action--secondary"
-              href="/register"
+              href="/login?returnTo=%2Fjobs"
             >
+              Sign in
+            </Link>
+            <Link className="home-action home-action--secondary" href="/register">
               Create account
             </Link>
           </nav>
