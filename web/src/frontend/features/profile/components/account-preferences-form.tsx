@@ -1,16 +1,12 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import type { AccountPreferences } from "@/shared/contracts/account/preferences";
+import {
+  getTimezoneOptions,
+  type TimezoneOption,
+} from "../client/timezone-options";
 import { NotificationPreferences } from "./notification-preferences";
-
-const commonTimezones = [
-  "Asia/Ho_Chi_Minh",
-  "UTC",
-  "Asia/Bangkok",
-  "Asia/Singapore",
-  "Europe/Paris",
-  "America/New_York",
-];
 
 function supportsTimezone(timezone: string): boolean {
   try {
@@ -34,6 +30,13 @@ export function AccountPreferencesForm({
   onChange: (preferences: AccountPreferences) => void;
   onSave: () => Promise<boolean>;
 }) {
+  const [timezoneOptions, setTimezoneOptions] = useState<TimezoneOption[]>([]);
+  const initialTimezone = useRef(preferences.timezone);
+
+  useEffect(() => {
+    setTimezoneOptions(getTimezoneOptions([initialTimezone.current]));
+  }, []);
+
   const copy =
     preferences.language === "vi"
       ? {
@@ -54,6 +57,10 @@ export function AccountPreferencesForm({
           saving: "Saving preferences…",
           save: "Save preferences",
         };
+  const timezoneListHint =
+    preferences.language === "vi"
+      ? `Tìm theo GMT, khu vực hoặc thành phố. Danh sách gồm ${timezoneOptions.length || "các"} múi giờ IANA mà thiết bị hỗ trợ; GMT phản ánh giờ hiện tại và tự điều chỉnh theo DST.`
+      : `Search by GMT offset, region, or city. The list includes ${timezoneOptions.length || "the"} IANA timezones supported by this device; GMT reflects the current time and adjusts for DST.`;
   return (
     <form
       className="account-preferences-form"
@@ -84,10 +91,11 @@ export function AccountPreferencesForm({
           list="preference-timezones"
           maxLength={100}
           value={preferences.timezone}
+          placeholder="GMT+07:00 · Asia/Ho_Chi_Minh"
           aria-describedby={
             preferences.timezoneSupported
-              ? "timezone-guidance"
-              : "timezone-unsupported-guidance"
+              ? "timezone-guidance timezone-list-guidance"
+              : "timezone-unsupported-guidance timezone-list-guidance"
           }
           onChange={(event) =>
             onChange({
@@ -98,10 +106,19 @@ export function AccountPreferencesForm({
           }
         />
         <datalist id="preference-timezones">
-          {commonTimezones.map((timezone) => (
-            <option value={timezone} key={timezone} />
+          {timezoneOptions.map((timezone) => (
+            <option
+              value={timezone.value}
+              label={timezone.label}
+              key={timezone.value}
+            >
+              {timezone.label}
+            </option>
           ))}
         </datalist>
+        <p id="timezone-list-guidance" className="preference-guidance">
+          {timezoneListHint}
+        </p>
         {preferences.timezoneSupported ? (
           <p id="timezone-guidance" className="preference-guidance">
             {copy.timezoneHint}

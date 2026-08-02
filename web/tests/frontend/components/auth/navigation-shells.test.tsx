@@ -6,8 +6,9 @@ import { AuthShell } from "@/frontend/features/authentication/components/auth-sh
 import { WorkspaceShell } from "@/frontend/features/dashboard/components/workspace-shell";
 import { DashboardView } from "@/frontend/features/dashboard/components/dashboard-view";
 import { ProfileNavigation } from "@/frontend/features/profile/components/profile-navigation";
+import { ProfileAccountView } from "@/frontend/features/profile/components/profile-account-view";
 
-const navigation = vi.hoisted(() => ({ replace: vi.fn() }));
+const navigation = vi.hoisted(() => ({ replace: vi.fn(), refresh: vi.fn() }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/profile/security",
   useRouter: () => navigation,
@@ -137,6 +138,75 @@ describe("identity navigation shells", () => {
     ).toHaveFocus();
   });
 
+  it("closes the mobile menu when the user taps outside it", () => {
+    render(
+      <WorkspaceShell
+        csrfProof="proof"
+        profile={{ name: "Thao Nguyen", email: "thao@example.test" }}
+      >
+        <h1>Security</h1>
+      </WorkspaceShell>,
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Open workspace menu" }),
+    );
+    fireEvent.pointerDown(document.body);
+    expect(
+      screen.getByRole("button", { name: "Open workspace menu" }),
+    ).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("updates the workspace account chip immediately after the full name is saved", async () => {
+    navigation.refresh.mockClear();
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      Response.json({
+        identity: {
+          name: "Binh Nguyen",
+          email: "thao@example.test",
+          emailVerified: true,
+          accountState: "ACTIVE",
+          createdAt: "2026-07-31T00:00:00.000Z",
+          pendingEmailChange: null,
+        },
+        warnings: [],
+        message: "Account identity saved.",
+      }),
+    );
+
+    render(
+      <WorkspaceShell
+        csrfProof="proof"
+        profile={{ name: "Thao Nguyen", email: "thao@example.test" }}
+      >
+        <ProfileAccountView
+          csrfProof="proof"
+          initialIdentity={{
+            name: "Thao Nguyen",
+            email: "thao@example.test",
+            emailVerified: true,
+            accountState: "ACTIVE",
+            createdAt: "2026-07-31T00:00:00.000Z",
+            pendingEmailChange: null,
+          }}
+        />
+      </WorkspaceShell>,
+    );
+
+    fireEvent.change(screen.getByLabelText("Full name"), {
+      target: { value: "Binh Nguyen" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save full name" }));
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("link", { name: "Open profile for Binh Nguyen" }),
+      ).toBeVisible(),
+    );
+    expect(navigation.refresh).toHaveBeenCalledTimes(1);
+    fetchMock.mockRestore();
+  });
+
   it("collapses the desktop sidebar while keeping navigation and sign-out accessible", () => {
     render(
       <WorkspaceShell csrfProof="proof">
@@ -197,15 +267,12 @@ describe("identity navigation shells", () => {
       />,
     );
     expect(screen.getByRole("heading", { name: "Dashboard" })).toBeVisible();
-    expect(screen.getByRole("link", { name: /Security/ })).toHaveAttribute(
-      "href",
-      "/profile/security",
-    );
-    expect(screen.getByRole("link", { name: /Sessions/ })).toHaveAttribute(
-      "href",
-      "/profile/sessions",
-    );
-    expect(screen.getByLabelText("Profile completion: 0%")).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: /Account security/ }),
+    ).toHaveAttribute("href", "/profile/security");
+    expect(
+      screen.getByRole("progressbar", { name: "Profile completion" }),
+    ).toHaveAttribute("aria-valuenow", "0");
     expect(screen.queryByText(/coming later/i)).toBeNull();
     expect(screen.queryByText(/jobs|applications|analytics/i)).toBeNull();
   });
@@ -263,7 +330,9 @@ describe("identity navigation shells", () => {
       />,
     );
 
-    expect(screen.getByLabelText("Profile completion: 100%")).toBeVisible();
+    expect(
+      screen.getByRole("progressbar", { name: "Profile completion" }),
+    ).toHaveAttribute("aria-valuenow", "100");
     expect(screen.getByText("Profile ready")).toBeVisible();
     expect(
       screen.getByRole("link", { name: /Add a professional link/i }),
@@ -375,7 +444,7 @@ describe("identity navigation shells", () => {
       }),
     );
     await waitFor(() =>
-      expect(screen.getByRole("status")).toHaveTextContent(
+      expect(screen.getByRole("alert")).toHaveTextContent(
         "Unable to sign out. Please try again.",
       ),
     );

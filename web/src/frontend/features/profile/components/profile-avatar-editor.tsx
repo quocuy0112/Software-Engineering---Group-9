@@ -4,6 +4,8 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { profileAvatarResponseSchema } from "@/shared/contracts/account/profile-avatar";
+import { Button } from "@/frontend/components/ui/button";
+import { Modal } from "@/frontend/components/ui/modal";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 import { localizeAccountMessage } from "../client/localized-account-feedback";
 
@@ -84,6 +86,11 @@ export function ProfileAvatarEditor({
           save: "Lưu ảnh",
           saving: "Đang lưu…",
           remove: "Xóa ảnh",
+          removeTitle: "Xóa ảnh đại diện?",
+          removeDescription:
+            "Ảnh đại diện hiện tại sẽ bị xóa khỏi tài khoản của bạn.",
+          cancel: "Hủy",
+          confirmRemove: "Xóa ảnh",
           help: "Tự động cắt chính giữa · PNG, JPEG hoặc WebP · tối đa 5 MB",
           invalid: "Chọn ảnh PNG, JPEG hoặc WebP có dung lượng tối đa 5 MB.",
           readError: "Không thể đọc ảnh đã chọn.",
@@ -101,6 +108,11 @@ export function ProfileAvatarEditor({
           save: "Save photo",
           saving: "Saving…",
           remove: "Remove",
+          removeTitle: "Remove profile photo?",
+          removeDescription:
+            "Your current profile photo will be removed from your account.",
+          cancel: "Cancel",
+          confirmRemove: "Remove photo",
           help: "Automatic centered crop · PNG, JPEG, or WebP · up to 5 MB",
           invalid: "Choose a PNG, JPEG, or WebP image up to 5 MB.",
           readError: "The selected image could not be read.",
@@ -116,6 +128,7 @@ export function ProfileAvatarEditor({
   const [feedbackTone, setFeedbackTone] = useState<"success" | "error">(
     "success",
   );
+  const [removeConfirmationOpen, setRemoveConfirmationOpen] = useState(false);
 
   const preview = source ?? avatar;
 
@@ -185,8 +198,8 @@ export function ProfileAvatarEditor({
     }
   }
 
-  async function remove() {
-    if (busy) return;
+  async function remove(): Promise<boolean> {
+    if (busy) return false;
     setBusy(true);
     setFeedback("");
     try {
@@ -206,11 +219,13 @@ export function ProfileAvatarEditor({
       const message = localizeAccountMessage(locale, parsed.data.message);
       setFeedback(message);
       toast.success(message, { id: "profile-avatar" });
+      return true;
     } catch (error) {
       const message = error instanceof Error ? error.message : copy.removeError;
       setFeedbackTone("error");
       setFeedback(message);
       toast.error(message, { id: "profile-avatar" });
+      return false;
     } finally {
       setBusy(false);
     }
@@ -272,7 +287,7 @@ export function ProfileAvatarEditor({
                 className="profile-avatar-remove"
                 type="button"
                 disabled={busy}
-                onClick={() => void remove()}
+                onClick={() => setRemoveConfirmationOpen(true)}
               >
                 {copy.remove}
               </button>
@@ -288,6 +303,36 @@ export function ProfileAvatarEditor({
           </div>
         </div>
       </div>
+      <Modal
+        open={removeConfirmationOpen}
+        title={copy.removeTitle}
+        description={copy.removeDescription}
+        tone="destructive"
+        busy={busy}
+        onClose={() => setRemoveConfirmationOpen(false)}
+      >
+        <div className="sh-modal-actions">
+          <Button
+            variant="secondary"
+            disabled={busy}
+            onClick={() => setRemoveConfirmationOpen(false)}
+          >
+            {copy.cancel}
+          </Button>
+          <Button
+            data-autofocus
+            variant="danger"
+            disabled={busy}
+            onClick={() => {
+              void remove().then((removed) => {
+                if (removed) setRemoveConfirmationOpen(false);
+              });
+            }}
+          >
+            {busy ? copy.saving : copy.confirmRemove}
+          </Button>
+        </div>
+      </Modal>
     </section>
   );
 }

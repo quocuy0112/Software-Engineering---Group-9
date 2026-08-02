@@ -42,16 +42,32 @@ export function WorkspaceNavigation({
   const pathname = usePathname() ?? "/";
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const navigationRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!menuOpen) return;
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key !== "Escape") return;
-      setMenuOpen(false);
-      toggleRef.current?.focus();
+    function closeMenu(event: KeyboardEvent | PointerEvent) {
+      if (event instanceof KeyboardEvent) {
+        if (event.key !== "Escape") return;
+        setMenuOpen(false);
+        toggleRef.current?.focus();
+        return;
+      }
+      const target = event.target;
+      if (
+        target instanceof Node &&
+        !navigationRef.current?.contains(target) &&
+        !toggleRef.current?.contains(target)
+      ) {
+        setMenuOpen(false);
+      }
     }
-    document.addEventListener("keydown", closeOnEscape);
-    return () => document.removeEventListener("keydown", closeOnEscape);
+    document.addEventListener("keydown", closeMenu);
+    document.addEventListener("pointerdown", closeMenu);
+    return () => {
+      document.removeEventListener("keydown", closeMenu);
+      document.removeEventListener("pointerdown", closeMenu);
+    };
   }, [menuOpen]);
 
   return (
@@ -76,6 +92,7 @@ export function WorkspaceNavigation({
         {menuOpen ? copy.closeMenu : copy.openMenu}
       </button>
       <nav
+        ref={navigationRef}
         id="workspace-navigation"
         className="workspace-navigation"
         aria-label={locale === "vi" ? "Không gian làm việc" : "Workspace"}

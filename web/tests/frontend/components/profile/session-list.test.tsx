@@ -1,25 +1,19 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { SessionList } from "@/frontend/features/profile/components/session-list";
 
-const { toast } = vi.hoisted(() => ({
-  toast: Object.assign(vi.fn(), {
-    error: vi.fn(),
-    success: vi.fn(),
-  }),
-}));
-
-vi.mock("sonner", () => ({ toast }));
-
 afterEach(() => {
   vi.restoreAllMocks();
-  toast.mockClear();
-  toast.error.mockClear();
-  toast.success.mockClear();
 });
 
 describe("session list loading feedback", () => {
-  it("replaces the loading toast with a success toast after sessions load", async () => {
+  it("shows loading inline and clears routine feedback after sessions load", async () => {
     let resolveRequest!: (response: Response) => void;
     const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(
       () =>
@@ -30,11 +24,7 @@ describe("session list loading feedback", () => {
 
     render(<SessionList />);
 
-    await waitFor(() =>
-      expect(toast).toHaveBeenCalledWith("Loading sessions.", {
-        id: "session-list-status",
-      }),
-    );
+    expect(screen.getByRole("status")).toHaveTextContent("Loading sessions.");
 
     resolveRequest(
       Response.json({
@@ -44,12 +34,8 @@ describe("session list loading feedback", () => {
     );
 
     await waitFor(() =>
-      expect(toast.success).toHaveBeenCalledWith(
-        "Sessions loaded successfully.",
-        { id: "session-list-status" },
-      ),
+      expect(screen.queryByRole("status")).not.toBeInTheDocument(),
     );
-    expect(toast.error).not.toHaveBeenCalled();
     expect(
       screen.getByText("No active sessions are available to display."),
     ).toBeVisible();
@@ -58,18 +44,57 @@ describe("session list loading feedback", () => {
     });
   });
 
-  it("replaces the loading toast with an error toast when loading fails", async () => {
+  it("uses an assertive inline alert when loading fails", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       Response.json({ message: "Unavailable" }, { status: 503 }),
     );
 
     render(<SessionList />);
 
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith("Unable to load sessions.", {
-        id: "session-list-status",
-      }),
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Unable to load sessions.",
     );
-    expect(toast.success).not.toHaveBeenCalled();
+  });
+
+  it("asks for confirmation before revoking another device", async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation((input) => {
+        if (String(input).endsWith("/device-1")) {
+          return Promise.resolve(Response.json({ ok: true }));
+        }
+        return Promise.resolve(
+          Response.json({
+            sessions: [
+              {
+                reference: "device-1",
+                device: "Chrome on Windows",
+                approximateLocation: "Ho Chi Minh City",
+                lastActiveAt: "2026-08-01T00:00:00.000Z",
+                current: false,
+              },
+            ],
+            csrfProof: "csrf-proof",
+          }),
+        );
+      });
+
+    render(<SessionList />);
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Revoke session" }),
+    );
+
+    const dialog = screen.getByRole("dialog", { name: "Revoke this session?" });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: "Revoke session" }),
+    );
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/identity/sessions/device-1",
+        expect.objectContaining({ method: "DELETE" }),
+      ),
+    );
   });
 });

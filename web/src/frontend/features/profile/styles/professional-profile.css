@@ -88,8 +88,7 @@
 }
 
 .professional-profile-feedback {
-  min-height: var(--sh-space-2);
-  margin-bottom: var(--sh-space-4);
+  margin: 0 0 var(--sh-space-4);
   border-color: transparent;
   background: transparent;
 }
@@ -115,6 +114,14 @@
   border-color: var(--sh-color-error);
   color: var(--sh-color-error);
   background: var(--sh-color-error-bg);
+}
+
+.professional-profile-feedback ul {
+  margin: var(--sh-space-2) 0 0;
+  padding-left: var(--sh-space-5);
+  color: var(--sh-color-error);
+  font-size: var(--sh-font-size-caption);
+  line-height: var(--sh-line-height-caption);
 }
 
 .professional-profile-sections {
@@ -155,7 +162,7 @@
   margin-top: 0.45rem;
   color: #9a5b08;
   font-size: 0.78rem;
-  font-weight: 750;
+  font-weight: var(--sh-font-weight-semibold);
   letter-spacing: 0.02em;
 }
 
@@ -218,6 +225,11 @@
   outline: 2px solid var(--sh-color-border-focus);
   outline-offset: 2px;
   box-shadow: none;
+}
+
+.professional-profile-section input[aria-invalid="true"],
+.professional-profile-section textarea[aria-invalid="true"] {
+  border-color: var(--sh-color-error);
 }
 
 .profile-field-error,
@@ -326,16 +338,19 @@
 }
 
 .social-platform-mark svg {
+  display: block;
   width: 22px;
   height: 22px;
   fill: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.8;
+  stroke: none;
+}
+
+[data-platform="linkedin"] .social-platform-mark {
+  background: #0a66c2;
 }
 
 [data-platform="github"] .social-platform-mark {
-  background: var(--sh-color-text-primary);
+  background: #181717;
 }
 
 [data-platform="facebook"] .social-platform-mark {
@@ -467,7 +482,7 @@
 
 .professional-profile-row-actions button,
 .profile-suggestions button {
-  min-height: var(--sh-control-height-sm);
+  min-height: 44px;
   padding-inline: var(--sh-space-3);
   border-color: var(--sh-color-border-default);
   color: var(--sh-color-text-primary);

@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ProfileAvatarEditor } from "@/frontend/features/profile/components/profile-avatar-editor";
 
@@ -75,6 +81,13 @@ describe("profile avatar editor", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Remove" }));
+    const dialog = screen.getByRole("dialog", {
+      name: "Remove profile photo?",
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: "Remove photo" }),
+    );
 
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith(

@@ -3,12 +3,16 @@
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
-import type { ProfileSectionDraft } from "../client/use-profile-editor";
+import type {
+  ProfileEditorFeedback,
+  ProfileSectionDraft,
+} from "../client/use-profile-editor";
 import { useServerFormReconciliation } from "../client/use-server-form-reconciliation";
 import {
   UnsavedChangesIndicator,
   useUnsavedChangesGuard,
 } from "../client/unsaved-changes";
+import { ProfileSaveFeedback } from "./profile-save-feedback";
 
 type SocialValues = {
   socialLinks: Array<{ id?: string; url: string }>;
@@ -80,31 +84,25 @@ function isCompleteSocialUrl(value: string) {
   return true;
 }
 
+const socialPlatformIconPaths = {
+  linkedin:
+    "M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zM7.119 20.452H3.555V9h3.564v11.452z",
+  github:
+    "M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577v-1.6c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.084-.729.084-.729 1.205.084 1.838 1.237 1.838 1.237 1.07 1.835 2.809 1.305 3.495.998.108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.931 0-1.31.465-2.381 1.235-3.221-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.046.138 3.006.404 2.292-1.552 3.297-1.23 3.297-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.911 1.23 3.221 0 4.61-2.805 5.626-5.475 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.216.694.825.576C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12",
+  facebook:
+    "M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z",
+  instagram:
+    "M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.265-.057 1.645-.069 4.849-.069zm0-2.163C8.74 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.74 0 12s.014 3.667.072 4.947c.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.74 24 12 24s3.667-.014 4.947-.072c4.354-.2 6.782-2.618 6.979-6.98.058-1.28.072-1.687.072-4.947s-.014-3.667-.072-4.947c-.196-4.354-2.617-6.78-6.979-6.98C15.667.014 15.26 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88z",
+} as const;
+
 function SocialPlatformIcon({
   name,
 }: {
   name: (typeof socialPlatforms)[number]["id"];
 }) {
-  if (name === "instagram") {
-    return (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
-        <circle cx="12" cy="12" r="4" />
-        <circle cx="17.5" cy="6.7" r="1" fill="currentColor" stroke="none" />
-      </svg>
-    );
-  }
-  const path = {
-    linkedin:
-      "M4 9h3v10H4Zm1.5-5A1.7 1.7 0 1 1 5.5 7.4 1.7 1.7 0 0 1 5.5 4ZM10 9h3v1.5c1.1-1.8 6-2.5 6 3.5v5h-3v-4.5c0-2.7-3-2.4-3 0V19h-3Z",
-    github:
-      "M12 3.5a8.5 8.5 0 0 0-2.7 16.6c.4.1.5-.2.5-.4v-1.6c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.2 1.9.9 2.3.7.1-.5.3-.9.6-1.1-1.8-.2-3.6-.9-3.6-4a3.1 3.1 0 0 1 .8-2.2 2.9 2.9 0 0 1 .1-2.2s.7-.2 2.3.8a8 8 0 0 1 4.2 0c1.6-1 2.3-.8 2.3-.8a2.9 2.9 0 0 1 .1 2.2 3.1 3.1 0 0 1 .8 2.2c0 3.1-1.9 3.8-3.6 4 .3.2.6.7.6 1.4v2.2c0 .2.1.5.5.4A8.5 8.5 0 0 0 12 3.5Z",
-    facebook:
-      "M14 8h3V4.3c-.5-.1-2-.3-3.4-.3C10.8 4 9 5.7 9 8.8V12H6v4h3v7h4v-7h3.2l.5-4H13V9.2c0-.8.2-1.2 1-1.2Z",
-  }[name];
   return (
-    <svg viewBox="0 0 24 24">
-      <path d={path} />
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d={socialPlatformIconPaths[name]} />
     </svg>
   );
 }
@@ -112,10 +110,12 @@ function SocialPlatformIcon({
 export function ProfileSocialLinksForm({
   profile,
   saving,
+  feedback,
   onSave,
 }: {
   profile: CandidateProfileContract;
   saving: boolean;
+  feedback: ProfileEditorFeedback | null;
   onSave: (draft: ProfileSectionDraft) => Promise<boolean>;
 }) {
   const locale = useWorkspaceLocale();
@@ -206,6 +206,7 @@ export function ProfileSocialLinksForm({
           {saving ? copy.saving : copy.save}
         </button>
       </div>
+      <ProfileSaveFeedback feedback={feedback} />
       <section
         className="social-link-picker"
         aria-labelledby="social-picker-title"
@@ -254,6 +255,10 @@ export function ProfileSocialLinksForm({
         {fields.map((field, index) => {
           const value = links[index]?.url ?? "";
           const platform = platformFor(value);
+          const serverError =
+            feedback?.fieldErrors?.[`socialLinks.${index}.url`]?.[0];
+          const linkError =
+            errors.socialLinks?.[index]?.url?.message ?? serverError;
           return (
             <li
               key={field.fieldKey}
@@ -271,14 +276,21 @@ export function ProfileSocialLinksForm({
                 maxLength={2_048}
                 placeholder="https://example.com/your-profile"
                 data-field-path={`socialLinks.${index}.url`}
+                aria-invalid={Boolean(linkError)}
+                aria-describedby={
+                  linkError ? `profile-social-${index}-error` : undefined
+                }
                 {...register(`socialLinks.${index}.url`, {
                   validate: (url) =>
                     isCompleteSocialUrl(url) || copy.incomplete,
                 })}
               />
-              {errors.socialLinks?.[index]?.url?.message ? (
-                <p className="profile-field-error social-link-error">
-                  {errors.socialLinks[index]?.url?.message}
+              {linkError ? (
+                <p
+                  id={`profile-social-${index}-error`}
+                  className="profile-field-error social-link-error"
+                >
+                  {linkError}
                 </p>
               ) : null}
               <div className="professional-profile-row-actions">

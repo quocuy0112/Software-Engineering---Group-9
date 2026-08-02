@@ -2,13 +2,17 @@
 
 import { useFieldArray, useForm } from "react-hook-form";
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
-import type { ProfileSectionDraft } from "../client/use-profile-editor";
+import type {
+  ProfileEditorFeedback,
+  ProfileSectionDraft,
+} from "../client/use-profile-editor";
 import { useServerFormReconciliation } from "../client/use-server-form-reconciliation";
 import {
   UnsavedChangesIndicator,
   useUnsavedChangesGuard,
 } from "../client/unsaved-changes";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { ProfileSaveFeedback } from "./profile-save-feedback";
 
 type EducationValues = {
   education: Array<{
@@ -33,10 +37,12 @@ const valuesFrom = (profile: CandidateProfileContract): EducationValues => ({
 export function ProfileEducationForm({
   profile,
   saving,
+  feedback,
   onSave,
 }: {
   profile: CandidateProfileContract;
   saving: boolean;
+  feedback: ProfileEditorFeedback | null;
   onSave: (draft: ProfileSectionDraft) => Promise<boolean>;
 }) {
   const locale = useWorkspaceLocale();
@@ -94,6 +100,8 @@ export function ProfileEducationForm({
   useServerFormReconciliation(valuesFrom(profile), reset);
   useUnsavedChangesGuard(isDirty);
 
+  const fieldError = (path: string) => feedback?.fieldErrors?.[path]?.[0];
+
   return (
     <form
       id="profile-education-section"
@@ -121,6 +129,7 @@ export function ProfileEducationForm({
           {saving ? copy.saving : copy.save}
         </button>
       </div>
+      <ProfileSaveFeedback feedback={feedback} />
       {fields.length === 0 ? <p>{copy.empty}</p> : null}
       <ol className="professional-profile-list">
         {fields.map((field, index) => (
@@ -135,6 +144,10 @@ export function ProfileEducationForm({
                 <input
                   required
                   maxLength={200}
+                  data-field-path={`education.${index}.institution`}
+                  aria-invalid={Boolean(
+                    fieldError(`education.${index}.institution`),
+                  )}
                   {...register(`education.${index}.institution`)}
                 />
               </label>
@@ -143,6 +156,10 @@ export function ProfileEducationForm({
                 <input
                   required
                   maxLength={200}
+                  data-field-path={`education.${index}.degree`}
+                  aria-invalid={Boolean(
+                    fieldError(`education.${index}.degree`),
+                  )}
                   {...register(`education.${index}.degree`)}
                 />
               </label>
@@ -150,6 +167,8 @@ export function ProfileEducationForm({
                 {copy.field}
                 <input
                   maxLength={200}
+                  data-field-path={`education.${index}.field`}
+                  aria-invalid={Boolean(fieldError(`education.${index}.field`))}
                   {...register(`education.${index}.field`)}
                 />
               </label>
@@ -158,6 +177,10 @@ export function ProfileEducationForm({
                 <input
                   type="date"
                   required
+                  data-field-path={`education.${index}.startDate`}
+                  aria-invalid={Boolean(
+                    fieldError(`education.${index}.startDate`),
+                  )}
                   {...register(`education.${index}.startDate`)}
                 />
               </label>
@@ -165,12 +188,20 @@ export function ProfileEducationForm({
                 {copy.end}
                 <input
                   type="date"
+                  data-field-path={`education.${index}.endDate`}
+                  aria-invalid={Boolean(
+                    fieldError(`education.${index}.endDate`),
+                  )}
                   {...register(`education.${index}.endDate`)}
                 />
               </label>
               <label className="professional-profile-checkbox">
                 <input
                   type="checkbox"
+                  data-field-path={`education.${index}.current`}
+                  aria-invalid={Boolean(
+                    fieldError(`education.${index}.current`),
+                  )}
                   {...register(`education.${index}.current`)}
                 />
                 {copy.current}

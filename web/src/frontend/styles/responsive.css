@@ -92,7 +92,7 @@
   }
 
   .auth-navigation a {
-    min-height: 40px;
+    min-height: 44px;
     font-size: var(--sh-font-size-label);
   }
 

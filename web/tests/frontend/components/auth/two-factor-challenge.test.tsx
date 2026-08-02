@@ -79,7 +79,7 @@ describe("two-factor challenge", () => {
 
     await screen.findByText(/Try again in 10 minutes/i);
     expect(screen.getByRole("button", { name: "Verify" })).toBeDisabled();
-    expect(screen.getByRole("status")).toHaveAttribute("aria-live", "polite");
+    expect(screen.getByRole("alert")).toHaveAttribute("aria-live", "assertive");
   });
   it("clears sensitive state on unmount and fits a 320px-safe layout", () => {
     const { unmount, container } = render(<TwoFactorChallenge />);

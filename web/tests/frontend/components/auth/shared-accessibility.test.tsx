@@ -1,42 +1,31 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
 import { FormFeedback } from "@/frontend/features/authentication/components/form-feedback";
 
-const { toast } = vi.hoisted(() => ({
-  toast: {
-    dismiss: vi.fn(),
-    error: vi.fn(),
-    success: vi.fn(),
-    info: vi.fn(),
-  },
-}));
-vi.mock("sonner", () => ({ toast }));
-
 describe("shared accessibility and feedback", () => {
-  it("keeps inline live feedback while sending the same safe message to Sonner", async () => {
+  it("keeps errors in an assertive inline alert", () => {
     render(
       <AuthStatus status="Verification could not be completed." tone="error" />,
     );
-    expect(screen.getByRole("status")).toHaveTextContent(
+    expect(screen.getByRole("alert")).toHaveTextContent(
       "could not be completed",
     );
-    await vi.waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith(
-        "Verification could not be completed.",
-        { id: "auth-status" },
-      ),
-    );
+    expect(screen.getByRole("alert")).toHaveAttribute("aria-live", "assertive");
   });
 
   it("preserves labelled error summaries and keyboard focus", () => {
     render(
       <FormFeedback errors={["Email is required"]} status="Please review" />,
     );
-    const summary = screen.getByRole("alert");
+    const summary = screen
+      .getByText("Please review the form")
+      .closest<HTMLElement>("[role='alert']");
+    expect(summary).not.toBeNull();
+    if (!summary) throw new Error("Expected the error summary.");
     summary.focus();
     expect(summary).toHaveFocus();
-    expect(screen.getByRole("status")).toHaveTextContent("Please review");
+    expect(screen.getAllByRole("alert")[1]).toHaveTextContent("Please review");
     fireEvent.keyDown(summary, { key: "Escape" });
     expect(summary).toBeInTheDocument();
   });

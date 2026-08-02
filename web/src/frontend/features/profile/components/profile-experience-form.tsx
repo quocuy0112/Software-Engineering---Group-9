@@ -2,13 +2,17 @@
 
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
-import type { ProfileSectionDraft } from "../client/use-profile-editor";
+import type {
+  ProfileEditorFeedback,
+  ProfileSectionDraft,
+} from "../client/use-profile-editor";
 import { useServerFormReconciliation } from "../client/use-server-form-reconciliation";
 import {
   UnsavedChangesIndicator,
   useUnsavedChangesGuard,
 } from "../client/unsaved-changes";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { ProfileSaveFeedback } from "./profile-save-feedback";
 
 type ExperienceValues = {
   experience: Array<{
@@ -33,10 +37,12 @@ const valuesFrom = (profile: CandidateProfileContract): ExperienceValues => ({
 export function ProfileExperienceForm({
   profile,
   saving,
+  feedback,
   onSave,
 }: {
   profile: CandidateProfileContract;
   saving: boolean;
+  feedback: ProfileEditorFeedback | null;
   onSave: (draft: ProfileSectionDraft) => Promise<boolean>;
 }) {
   const locale = useWorkspaceLocale();
@@ -96,6 +102,8 @@ export function ProfileExperienceForm({
   useServerFormReconciliation(valuesFrom(profile), reset);
   useUnsavedChangesGuard(isDirty);
 
+  const fieldError = (path: string) => feedback?.fieldErrors?.[path]?.[0];
+
   return (
     <form
       id="profile-experience-section"
@@ -123,6 +131,7 @@ export function ProfileExperienceForm({
           {saving ? copy.saving : copy.save}
         </button>
       </div>
+      <ProfileSaveFeedback feedback={feedback} />
       {fields.length === 0 ? <p>{copy.empty}</p> : null}
       <ol className="professional-profile-list">
         {fields.map((field, index) => (
@@ -137,6 +146,10 @@ export function ProfileExperienceForm({
                 <input
                   maxLength={200}
                   required
+                  data-field-path={`experience.${index}.title`}
+                  aria-invalid={Boolean(
+                    fieldError(`experience.${index}.title`),
+                  )}
                   {...register(`experience.${index}.title`)}
                 />
               </label>
@@ -145,6 +158,10 @@ export function ProfileExperienceForm({
                 <input
                   maxLength={200}
                   required
+                  data-field-path={`experience.${index}.company`}
+                  aria-invalid={Boolean(
+                    fieldError(`experience.${index}.company`),
+                  )}
                   {...register(`experience.${index}.company`)}
                 />
               </label>
@@ -153,6 +170,10 @@ export function ProfileExperienceForm({
                 <textarea
                   maxLength={3_000}
                   rows={4}
+                  data-field-path={`experience.${index}.description`}
+                  aria-invalid={Boolean(
+                    fieldError(`experience.${index}.description`),
+                  )}
                   {...register(`experience.${index}.description`)}
                 />
               </label>
@@ -161,6 +182,10 @@ export function ProfileExperienceForm({
                 <input
                   type="date"
                   required
+                  data-field-path={`experience.${index}.startDate`}
+                  aria-invalid={Boolean(
+                    fieldError(`experience.${index}.startDate`),
+                  )}
                   {...register(`experience.${index}.startDate`)}
                 />
               </label>
@@ -169,12 +194,20 @@ export function ProfileExperienceForm({
                 <input
                   type="date"
                   disabled={values[index]?.current}
+                  data-field-path={`experience.${index}.endDate`}
+                  aria-invalid={Boolean(
+                    fieldError(`experience.${index}.endDate`),
+                  )}
                   {...register(`experience.${index}.endDate`)}
                 />
               </label>
               <label className="professional-profile-checkbox">
                 <input
                   type="checkbox"
+                  data-field-path={`experience.${index}.current`}
+                  aria-invalid={Boolean(
+                    fieldError(`experience.${index}.current`),
+                  )}
                   {...register(`experience.${index}.current`, {
                     onChange: (event) => {
                       if (event.target.checked) {

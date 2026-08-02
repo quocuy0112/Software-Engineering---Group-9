@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
-import "@fontsource-variable/inter/wght.css";
+import "@fontsource/be-vietnam-pro/400.css";
+import "@fontsource/be-vietnam-pro/500.css";
+import "@fontsource/be-vietnam-pro/600.css";
+import "@fontsource/be-vietnam-pro/700.css";
 import { serverEnvironment } from "@/backend/env/runtime";
 import "./globals.css";
 import { Toaster } from "sonner";
