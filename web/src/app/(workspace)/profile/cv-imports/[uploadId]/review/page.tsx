@@ -10,6 +10,7 @@ import { CvDraftReview } from "@/frontend/features/cv-import/components/cv-draft
 import { ProfileNavigation } from "@/frontend/features/profile/components/profile-navigation";
 import { cvUploadIdSchema } from "@/shared/contracts/cv-import/common";
 import type { CvDraftComparison } from "@/shared/contracts/cv-import/review";
+import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -64,25 +65,42 @@ export default async function CvDraftReviewPage({
   }
 
   return (
-    <main>
-      <header>
-        <Link href={`/profile/cv-imports/${uploadId}`}>
-          Back to import status
+    <main className={styles.page}>
+      <header className={styles.header}>
+        <Link
+          className={styles.backLink}
+          href={`/profile/cv-imports/${uploadId}`}
+        >
+          <span aria-hidden="true">←</span> Back to import status
         </Link>
+        <div className={styles.context}>
+          <p>HUMAN-REVIEWED IMPORT</p>
+          <strong>You remain in control of every profile change.</strong>
+        </div>
       </header>
       <ProfileNavigation active="cv-imports" />
-      {resource.receipt ? (
-        <CvConfirmationReceipt receipt={resource.receipt} />
-      ) : initial ? (
-        <CvDraftReview csrfProof={context.csrfProof} initial={initial} />
-      ) : (
-        <section aria-labelledby="review-unavailable-heading">
-          <h1 id="review-unavailable-heading">CV review is not available</h1>
-          <p role="status">
-            Current import status: {resource.status.toLowerCase()}.
-          </p>
-        </section>
-      )}
+      <div className={styles.content}>
+        {resource.receipt ? (
+          <CvConfirmationReceipt receipt={resource.receipt} />
+        ) : initial ? (
+          <CvDraftReview csrfProof={context.csrfProof} initial={initial} />
+        ) : (
+          <section
+            className={styles.unavailable}
+            aria-labelledby="review-unavailable-heading"
+          >
+            <span aria-hidden="true">i</span>
+            <div>
+              <h1 id="review-unavailable-heading">
+                CV review is not available
+              </h1>
+              <p role="status">
+                Current import status: {resource.status.toLowerCase()}.
+              </p>
+            </div>
+          </section>
+        )}
+      </div>
     </main>
   );
 }
