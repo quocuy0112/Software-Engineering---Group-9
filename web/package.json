@@ -37,6 +37,7 @@
     "db:status": "prisma migrate status",
     "db:verify": "node ../scripts/verify-migrations.mjs",
     "db:seed:jobs": "tsx scripts/seed-development-jobs.ts",
+    "db:deploy": "prisma migrate deploy",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio"
   },
