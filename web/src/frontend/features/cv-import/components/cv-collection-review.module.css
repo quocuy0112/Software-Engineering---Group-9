@@ -4,24 +4,57 @@
 .fields,
 .choices {
   display: grid;
-  gap: 1rem;
+  min-width: 0;
+  gap: var(--sh-space-4);
+}
+
+.root > h2 {
+  margin: var(--sh-space-3) 0 0;
+  font-size: var(--sh-font-size-h2);
+  line-height: var(--sh-line-height-h2);
 }
 
 .group {
-  border-block-start: 1px solid var(--color-border, #cbd5e1);
-  padding-block-start: 1rem;
+  padding-block-start: var(--sh-space-5);
+  border-block-start: 1px solid var(--sh-color-border-default);
+}
+
+.group > h3 {
+  margin: 0;
+  font-size: var(--sh-font-size-h3);
+  line-height: var(--sh-line-height-h3);
 }
 
 .groupControls {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: var(--sh-space-2);
+}
+
+.groupControls button {
+  min-height: var(--sh-control-height-sm);
+  padding: 0 var(--sh-space-4);
+  border: 1px solid var(--sh-color-border-default);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-text-secondary);
+  background: var(--sh-color-surface-card);
+  font-size: var(--sh-font-size-body-sm);
+  font-weight: var(--sh-font-weight-semibold);
+  box-shadow: var(--sh-shadow-control);
+}
+
+.groupControls button:hover {
+  border-color: var(--sh-color-brand-primary);
+  color: var(--sh-color-brand-primary-hover);
+  background: var(--sh-color-info-bg);
 }
 
 .card {
-  border: 1px solid var(--color-border, #cbd5e1);
-  border-radius: 0.75rem;
-  padding: 1rem;
+  padding: var(--sh-space-5);
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-md);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-control);
 }
 
 .fields {
@@ -32,7 +65,12 @@
 .card > label,
 .target {
   display: grid;
-  gap: 0.4rem;
+  min-width: 0;
+  gap: var(--sh-space-2);
+  color: var(--sh-color-text-primary);
+  font-size: var(--sh-font-size-body-sm);
+  font-weight: var(--sh-font-weight-semibold);
+  text-transform: capitalize;
 }
 
 .fields input,
@@ -41,7 +79,15 @@
 .target select {
   box-sizing: border-box;
   inline-size: 100%;
-  min-block-size: 2.75rem;
+  min-block-size: var(--sh-control-height);
+  padding: 11px var(--sh-space-3);
+  border: 1px solid var(--sh-color-border-default);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+  font-weight: var(--sh-font-weight-regular);
+  text-transform: none;
+  box-shadow: var(--sh-shadow-control);
 }
 
 .fields textarea {
@@ -55,26 +101,46 @@
 }
 
 .checkbox {
-  align-items: center;
   display: flex !important;
   flex-direction: row;
+  align-items: center;
 }
 
 .checkbox input {
-  inline-size: auto;
+  inline-size: 20px;
+  min-block-size: 20px;
+  accent-color: var(--sh-color-brand-primary);
 }
 
 .choices {
-  border: 0;
   grid-template-columns: repeat(3, minmax(0, max-content));
   margin: 0;
-  padding: 0;
+  padding: var(--sh-space-3) var(--sh-space-4);
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-color-surface-tinted);
+}
+
+.choices legend {
+  padding-inline: var(--sh-space-2);
+  font-size: var(--sh-font-size-body-sm);
+  font-weight: var(--sh-font-weight-semibold);
 }
 
 .choices label:not(.target) {
-  align-items: center;
   display: flex;
-  gap: 0.4rem;
+  min-height: 36px;
+  align-items: center;
+  gap: var(--sh-space-2);
+  padding-inline: var(--sh-space-2);
+  font-size: var(--sh-font-size-body-sm);
+  text-transform: capitalize;
+}
+
+.choices label:not(.target) input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--sh-color-brand-primary);
 }
 
 .card :is(button, input, select, textarea):focus-visible,
@@ -84,9 +150,18 @@
 }
 
 @media (max-width: 32rem) {
+  .card {
+    padding: var(--sh-space-4);
+  }
+
   .fields,
   .choices {
     grid-template-columns: 1fr;
+  }
+
+  .groupControls {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 
