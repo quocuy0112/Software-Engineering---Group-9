@@ -123,6 +123,88 @@ enum OutboxStatus {
   DEAD
 }
 
+enum JobPostingStatus {
+  DRAFT
+  PENDING_REVIEW
+  ACTIVE
+  CLOSED
+  EXPIRED
+  REJECTED
+  REMOVED
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  INTERNSHIP
+  TEMPORARY
+}
+
+enum ExperienceLevel {
+  ENTRY
+  JUNIOR
+  MID
+  SENIOR
+  LEAD
+  MANAGER
+}
+
+enum WorkArrangement {
+  ONSITE
+  HYBRID
+  REMOTE
+}
+
+enum SalaryPeriod {
+  HOUR
+  MONTH
+  YEAR
+}
+
+enum ApplicationQuestionKind {
+  TEXT
+  BOOLEAN
+  SINGLE_CHOICE
+}
+
+enum JobReportReason {
+  FRAUD
+  MISLEADING
+  DUPLICATE
+  DISCRIMINATORY
+  INAPPROPRIATE
+  OTHER
+}
+
+enum JobReportStatus {
+  PENDING_REVIEW
+  RESOLVED
+  DISMISSED
+}
+
+enum ApplicationStage {
+  APPLIED
+  VIEWED
+  SHORTLISTED
+  INTERVIEWING
+  OFFERED
+  HIRED
+  OFFER_DECLINED
+  REJECTED
+  WAITLISTED
+}
+
+enum RecruitmentNotificationAudience {
+  CANDIDATE
+  COMPANY
+}
+
+enum RecruitmentNotificationKind {
+  APPLICATION_SUBMITTED
+  APPLICATION_RECEIVED
+}
+
 enum CvDocumentKind {
   PDF
   DOCX
@@ -244,6 +326,8 @@ model UserAccount {
   emailChangeRequests           EmailChangeRequest[]
   passwordChangeAttemptWindow   PasswordChangeAttemptWindow?
   passwordChangeOperations      PasswordChangeOperation[]
+  savedJobs                     SavedJob[]
+  jobReports                    JobReport[]
   cvQuota                       CvAccountQuota?
   cvUploads                     CvUpload[]
   cvStoredArtifacts             CvStoredArtifact[]
@@ -330,11 +414,13 @@ model TwoFactor {
 }
 
 model CandidateIdentity {
-  userId    String            @id
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
-  user      UserAccount       @relation(fields: [userId], references: [id], onDelete: Restrict)
-  profile   CandidateProfile?
+  userId          String            @id
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  user            UserAccount       @relation(fields: [userId], references: [id], onDelete: Restrict)
+  profile         CandidateProfile?
+  cvs             CandidateCv[]
+  jobApplications JobApplication[]
 }
 
 model CandidateProfile {
@@ -402,6 +488,7 @@ model Skill {
   createdAt      DateTime                @default(now())
   updatedAt      DateTime                @updatedAt
   profiles       CandidateProfileSkill[]
+  jobPostings    JobPostingSkill[]
 }
 
 model CandidateProfileSkill {
@@ -696,6 +783,217 @@ model AuditEvent {
   @@index([targetType, targetId, occurredAt])
   @@index([action, occurredAt])
   @@index([correlationId])
+}
+
+model Company {
+  id                String       @id @default(cuid())
+  slug              String       @unique
+  legalName         String
+  displayName       String
+  logoUrl           String?
+  websiteUrl        String?
+  publicDescription String?
+  publicLocation    String?
+  verifiedAt        DateTime?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  jobPostings       JobPosting[]
+
+  @@index([verifiedAt, id])
+}
+
+model JobPosting {
+  id                       String                @id @default(cuid())
+  companyId                String
+  slug                     String                @unique
+  title                    String
+  normalizedTitle          String
+  summary                  String
+  description              String
+  responsibilities         String
+  requirements             String
+  benefits                 String?
+  location                 String
+  normalizedLocation       String
+  employmentType           EmploymentType
+  experienceLevel          ExperienceLevel
+  workArrangement          WorkArrangement
+  salaryMin                Decimal?              @db.Decimal(14, 2)
+  salaryMax                Decimal?              @db.Decimal(14, 2)
+  salaryCurrency           String?               @db.VarChar(3)
+  salaryPeriod             SalaryPeriod?
+  searchDocumentNormalized String                @db.Text
+  status                   JobPostingStatus      @default(DRAFT)
+  approvedAt               DateTime?
+  publishedAt              DateTime?
+  applicationDeadline      DateTime?
+  closedAt                 DateTime?
+  removedAt                DateTime?
+  version                  Int                   @default(1)
+  createdAt                DateTime              @default(now())
+  updatedAt                DateTime              @updatedAt
+  company                  Company               @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  skills                   JobPostingSkill[]
+  questions                ApplicationQuestion[]
+  savedBy                  SavedJob[]
+  reports                  JobReport[]
+  applications             JobApplication[]
+
+  @@index([status, publishedAt(sort: Desc), id])
+  @@index([status, applicationDeadline, id])
+  @@index([employmentType, experienceLevel, workArrangement])
+  @@index([salaryCurrency, salaryPeriod, salaryMax(sort: Desc), id])
+  @@index([companyId, status, id])
+}
+
+model JobPostingSkill {
+  jobPostingId String
+  skillId      String
+  displayName  String
+  required     Boolean    @default(false)
+  position     Int
+  createdAt    DateTime   @default(now())
+  jobPosting   JobPosting @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
+  skill        Skill      @relation(fields: [skillId], references: [id], onDelete: Restrict)
+
+  @@id([jobPostingId, skillId])
+  @@unique([jobPostingId, position])
+  @@index([skillId, jobPostingId])
+}
+
+model ApplicationQuestion {
+  id           String                  @id @default(cuid())
+  jobPostingId String
+  prompt       String
+  description  String?
+  kind         ApplicationQuestionKind
+  required     Boolean                 @default(false)
+  options      Json?
+  position     Int
+  version      Int                     @default(1)
+  active       Boolean                 @default(true)
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+  jobPosting   JobPosting              @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
+  answers      ApplicationAnswer[]
+
+  @@unique([jobPostingId, position])
+  @@index([jobPostingId, active, position])
+}
+
+model CandidateCv {
+  id              String            @id @default(cuid())
+  candidateUserId String
+  displayName     String
+  fileName        String
+  mimeType        String
+  byteSize        Int
+  storageKey      String            @unique
+  checksumSha256  String
+  version         Int               @default(1)
+  confirmedAt     DateTime?
+  archivedAt      DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  candidate       CandidateIdentity @relation(fields: [candidateUserId], references: [userId], onDelete: Restrict)
+  applications    JobApplication[]
+
+  @@index([candidateUserId, confirmedAt, archivedAt])
+}
+
+model SavedJob {
+  userId       String
+  jobPostingId String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  user         UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobPosting   JobPosting  @relation(fields: [jobPostingId], references: [id], onDelete: Restrict)
+
+  @@id([userId, jobPostingId])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([jobPostingId])
+}
+
+model JobReport {
+  id             String          @id @default(cuid())
+  reporterUserId String
+  jobPostingId   String
+  reason         JobReportReason
+  details        String?
+  status         JobReportStatus @default(PENDING_REVIEW)
+  unresolvedKey  String?         @unique
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  resolvedAt     DateTime?
+  reporter       UserAccount     @relation(fields: [reporterUserId], references: [id], onDelete: Restrict)
+  jobPosting     JobPosting      @relation(fields: [jobPostingId], references: [id], onDelete: Restrict)
+
+  @@index([jobPostingId, status, createdAt])
+  @@index([reporterUserId, createdAt(sort: Desc)])
+}
+
+model JobApplication {
+  id                      String                        @id @default(cuid())
+  candidateUserId         String
+  jobPostingId            String
+  selectedCvId            String
+  stage                   ApplicationStage              @default(APPLIED)
+  coverLetter             String?
+  profileSnapshot         Json
+  cvSnapshot              Json
+  jobSnapshot             Json
+  consentVersion          String
+  consentedAt             DateTime
+  idempotencyKey          String
+  submissionBindingDigest String
+  submittedAt             DateTime                      @default(now())
+  createdAt               DateTime                      @default(now())
+  updatedAt               DateTime                      @updatedAt
+  candidate               CandidateIdentity             @relation(fields: [candidateUserId], references: [userId], onDelete: Restrict)
+  jobPosting              JobPosting                    @relation(fields: [jobPostingId], references: [id], onDelete: Restrict)
+  selectedCv              CandidateCv                   @relation(fields: [selectedCvId], references: [id], onDelete: Restrict)
+  answers                 ApplicationAnswer[]
+  notificationWork        RecruitmentNotificationWork[]
+
+  @@unique([candidateUserId, jobPostingId])
+  @@unique([candidateUserId, idempotencyKey])
+  @@index([jobPostingId, stage, submittedAt])
+  @@index([candidateUserId, submittedAt(sort: Desc)])
+}
+
+model ApplicationAnswer {
+  id               String              @id @default(cuid())
+  applicationId    String
+  questionId       String
+  questionSnapshot Json
+  answer           Json
+  createdAt        DateTime            @default(now())
+  application      JobApplication      @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  question         ApplicationQuestion @relation(fields: [questionId], references: [id], onDelete: Restrict)
+
+  @@unique([applicationId, questionId])
+  @@index([questionId])
+}
+
+model RecruitmentNotificationWork {
+  id              String                          @id @default(cuid())
+  applicationId   String
+  audience        RecruitmentNotificationAudience
+  kind            RecruitmentNotificationKind
+  targetReference String
+  payloadRef      Json
+  idempotencyKey  String                          @unique
+  status          OutboxStatus                    @default(PENDING)
+  attempts        Int                             @default(0)
+  nextAttemptAt   DateTime                        @default(now())
+  safeErrorCode   String?
+  createdAt       DateTime                        @default(now())
+  updatedAt       DateTime                        @updatedAt
+  application     JobApplication                  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@unique([applicationId, audience, kind])
+  @@index([status, nextAttemptAt])
+  @@index([applicationId])
 }
 
 model CvAccountQuota {

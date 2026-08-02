@@ -5,6 +5,10 @@ import { config as loadEnvironment } from "dotenv";
 
 loadEnvironment({ path: ".env.local", quiet: true });
 
+// PostgreSQL timestamp columns are timezone-naive. Run tests in UTC so the
+// controlled clocks used by lease, retry, and retention tests stay portable.
+process.env.TZ = "UTC";
+
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -19,9 +23,10 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./tests/setup.ts"],
     exclude: ["tests/system/e2e/**", "node_modules/**"],
-    // Integration files share one local PostgreSQL service. Bounding file-level
-    // concurrency also keeps timing-sensitive UI effects from being starved.
-    maxWorkers: 2,
+    // Integration files share one local PostgreSQL service and several cleanup
+    // workers intentionally claim across uploads. Run files sequentially so
+    // independent fixtures cannot deadlock or consume each other's due work.
+    maxWorkers: 1,
     testTimeout: 15_000,
   },
 });

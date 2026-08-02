@@ -33,7 +33,7 @@ describe("account-preferences validation", () => {
     await expect(
       new AccountPreferencesService(repository).get("preferences-user"),
     ).resolves.toEqual({
-      language: "vi",
+      language: "en",
       timezone: "Asia/Ho_Chi_Minh",
       timezoneSupported: true,
       emailNotifications: {

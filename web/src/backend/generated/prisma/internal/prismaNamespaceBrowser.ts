@@ -74,6 +74,16 @@ export const ModelName = {
   RateLimitBucket: 'RateLimitBucket',
   EmailOutbox: 'EmailOutbox',
   AuditEvent: 'AuditEvent',
+  Company: 'Company',
+  JobPosting: 'JobPosting',
+  JobPostingSkill: 'JobPostingSkill',
+  ApplicationQuestion: 'ApplicationQuestion',
+  CandidateCv: 'CandidateCv',
+  SavedJob: 'SavedJob',
+  JobReport: 'JobReport',
+  JobApplication: 'JobApplication',
+  ApplicationAnswer: 'ApplicationAnswer',
+  RecruitmentNotificationWork: 'RecruitmentNotificationWork',
   CvAccountQuota: 'CvAccountQuota',
   CvUpload: 'CvUpload',
   CvStoredArtifact: 'CvStoredArtifact',
@@ -514,6 +524,186 @@ export const AuditEventScalarFieldEnum = {
 } as const
 
 export type AuditEventScalarFieldEnum = (typeof AuditEventScalarFieldEnum)[keyof typeof AuditEventScalarFieldEnum]
+
+
+export const CompanyScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  legalName: 'legalName',
+  displayName: 'displayName',
+  logoUrl: 'logoUrl',
+  websiteUrl: 'websiteUrl',
+  publicDescription: 'publicDescription',
+  publicLocation: 'publicLocation',
+  verifiedAt: 'verifiedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
+
+
+export const JobPostingScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  slug: 'slug',
+  title: 'title',
+  normalizedTitle: 'normalizedTitle',
+  summary: 'summary',
+  description: 'description',
+  responsibilities: 'responsibilities',
+  requirements: 'requirements',
+  benefits: 'benefits',
+  location: 'location',
+  normalizedLocation: 'normalizedLocation',
+  employmentType: 'employmentType',
+  experienceLevel: 'experienceLevel',
+  workArrangement: 'workArrangement',
+  salaryMin: 'salaryMin',
+  salaryMax: 'salaryMax',
+  salaryCurrency: 'salaryCurrency',
+  salaryPeriod: 'salaryPeriod',
+  searchDocumentNormalized: 'searchDocumentNormalized',
+  status: 'status',
+  approvedAt: 'approvedAt',
+  publishedAt: 'publishedAt',
+  applicationDeadline: 'applicationDeadline',
+  closedAt: 'closedAt',
+  removedAt: 'removedAt',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobPostingScalarFieldEnum = (typeof JobPostingScalarFieldEnum)[keyof typeof JobPostingScalarFieldEnum]
+
+
+export const JobPostingSkillScalarFieldEnum = {
+  jobPostingId: 'jobPostingId',
+  skillId: 'skillId',
+  displayName: 'displayName',
+  required: 'required',
+  position: 'position',
+  createdAt: 'createdAt'
+} as const
+
+export type JobPostingSkillScalarFieldEnum = (typeof JobPostingSkillScalarFieldEnum)[keyof typeof JobPostingSkillScalarFieldEnum]
+
+
+export const ApplicationQuestionScalarFieldEnum = {
+  id: 'id',
+  jobPostingId: 'jobPostingId',
+  prompt: 'prompt',
+  description: 'description',
+  kind: 'kind',
+  required: 'required',
+  options: 'options',
+  position: 'position',
+  version: 'version',
+  active: 'active',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ApplicationQuestionScalarFieldEnum = (typeof ApplicationQuestionScalarFieldEnum)[keyof typeof ApplicationQuestionScalarFieldEnum]
+
+
+export const CandidateCvScalarFieldEnum = {
+  id: 'id',
+  candidateUserId: 'candidateUserId',
+  displayName: 'displayName',
+  fileName: 'fileName',
+  mimeType: 'mimeType',
+  byteSize: 'byteSize',
+  storageKey: 'storageKey',
+  checksumSha256: 'checksumSha256',
+  version: 'version',
+  confirmedAt: 'confirmedAt',
+  archivedAt: 'archivedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CandidateCvScalarFieldEnum = (typeof CandidateCvScalarFieldEnum)[keyof typeof CandidateCvScalarFieldEnum]
+
+
+export const SavedJobScalarFieldEnum = {
+  userId: 'userId',
+  jobPostingId: 'jobPostingId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SavedJobScalarFieldEnum = (typeof SavedJobScalarFieldEnum)[keyof typeof SavedJobScalarFieldEnum]
+
+
+export const JobReportScalarFieldEnum = {
+  id: 'id',
+  reporterUserId: 'reporterUserId',
+  jobPostingId: 'jobPostingId',
+  reason: 'reason',
+  details: 'details',
+  status: 'status',
+  unresolvedKey: 'unresolvedKey',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  resolvedAt: 'resolvedAt'
+} as const
+
+export type JobReportScalarFieldEnum = (typeof JobReportScalarFieldEnum)[keyof typeof JobReportScalarFieldEnum]
+
+
+export const JobApplicationScalarFieldEnum = {
+  id: 'id',
+  candidateUserId: 'candidateUserId',
+  jobPostingId: 'jobPostingId',
+  selectedCvId: 'selectedCvId',
+  stage: 'stage',
+  coverLetter: 'coverLetter',
+  profileSnapshot: 'profileSnapshot',
+  cvSnapshot: 'cvSnapshot',
+  jobSnapshot: 'jobSnapshot',
+  consentVersion: 'consentVersion',
+  consentedAt: 'consentedAt',
+  idempotencyKey: 'idempotencyKey',
+  submissionBindingDigest: 'submissionBindingDigest',
+  submittedAt: 'submittedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobApplicationScalarFieldEnum = (typeof JobApplicationScalarFieldEnum)[keyof typeof JobApplicationScalarFieldEnum]
+
+
+export const ApplicationAnswerScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  questionId: 'questionId',
+  questionSnapshot: 'questionSnapshot',
+  answer: 'answer',
+  createdAt: 'createdAt'
+} as const
+
+export type ApplicationAnswerScalarFieldEnum = (typeof ApplicationAnswerScalarFieldEnum)[keyof typeof ApplicationAnswerScalarFieldEnum]
+
+
+export const RecruitmentNotificationWorkScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  audience: 'audience',
+  kind: 'kind',
+  targetReference: 'targetReference',
+  payloadRef: 'payloadRef',
+  idempotencyKey: 'idempotencyKey',
+  status: 'status',
+  attempts: 'attempts',
+  nextAttemptAt: 'nextAttemptAt',
+  safeErrorCode: 'safeErrorCode',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RecruitmentNotificationWorkScalarFieldEnum = (typeof RecruitmentNotificationWorkScalarFieldEnum)[keyof typeof RecruitmentNotificationWorkScalarFieldEnum]
 
 
 export const CvAccountQuotaScalarFieldEnum = {

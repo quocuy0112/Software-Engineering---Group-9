@@ -58,26 +58,25 @@ describe("identity navigation shells", () => {
     expect(signIn).toHaveFocus();
   });
 
-  it("applies the persisted Vietnamese locale across the workspace shell", () => {
+  it("keeps the workspace shell in English", () => {
     render(
       <WorkspaceShell
         csrfProof="proof"
         profile={{
           name: "Thao Nguyen",
           email: "thao@example.test",
-          locale: "vi",
         }}
       >
         <ProfileNavigation active="overview" />
       </WorkspaceShell>,
     );
 
-    expect(screen.getByRole("link", { name: "Tổng quan" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute(
       "href",
       "/dashboard",
     );
-    expect(screen.getByRole("button", { name: "Đăng xuất" })).toBeVisible();
-    expect(screen.getByRole("link", { name: "Nghề nghiệp" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Sign out" })).toBeVisible();
+    expect(screen.getByRole("link", { name: "Professional" })).toHaveAttribute(
       "href",
       "/profile",
     );
@@ -271,10 +270,13 @@ describe("identity navigation shells", () => {
       screen.getByRole("link", { name: /Account security/ }),
     ).toHaveAttribute("href", "/profile/security");
     expect(
+      screen.getByRole("link", { name: /Job opportunities/ }),
+    ).toHaveAttribute("href", "/jobs");
+    expect(
       screen.getByRole("progressbar", { name: "Profile completion" }),
     ).toHaveAttribute("aria-valuenow", "0");
     expect(screen.queryByText(/coming later/i)).toBeNull();
-    expect(screen.queryByText(/jobs|applications|analytics/i)).toBeNull();
+    expect(screen.queryByText(/applications|analytics/i)).toBeNull();
   });
 
   it("scores profile quality and links every remaining step to its editor", () => {

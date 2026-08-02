@@ -25,7 +25,6 @@ export function WorkspaceShell({
     name: string;
     email: string;
     image?: string | null;
-    locale?: "vi" | "en";
   };
 }) {
   const router = useRouter();
@@ -57,31 +56,17 @@ export function WorkspaceShell({
   )
     ? workspaceProfile.image
     : null;
-  const locale = workspaceProfile.locale ?? "en";
-  const copy =
-    locale === "vi"
-      ? {
-          product: "Không gian nghề nghiệp",
-          sidebar: "Thanh bên không gian làm việc",
-          expand: "Mở rộng thanh điều hướng",
-          collapse: "Thu gọn thanh điều hướng",
-          workspace: "Hồ sơ ứng viên",
-          greeting: "Rất vui được gặp bạn",
-          openProfile: `Mở hồ sơ của ${workspaceProfile.name}`,
-          manageProfile: "Quản lý hồ sơ",
-          signOutError: "Không thể đăng xuất. Vui lòng thử lại.",
-        }
-      : {
-          product: "Talent workspace",
-          sidebar: "Workspace sidebar",
-          expand: "Expand workspace sidebar",
-          collapse: "Collapse workspace sidebar",
-          workspace: "Candidate workspace",
-          greeting: "Good to see you",
-          openProfile: `Open profile for ${workspaceProfile.name}`,
-          manageProfile: "Manage your profile",
-          signOutError: "Unable to sign out. Please try again.",
-        };
+  const copy = {
+    product: "Talent workspace",
+    sidebar: "Workspace sidebar",
+    expand: "Expand workspace sidebar",
+    collapse: "Collapse workspace sidebar",
+    workspace: "Candidate workspace",
+    greeting: "Good to see you",
+    openProfile: `Open profile for ${workspaceProfile.name}`,
+    manageProfile: "Manage your profile",
+    signOutError: "Unable to sign out. Please try again.",
+  };
 
   async function signOut() {
     if (busy || navigating) return;
@@ -105,8 +90,8 @@ export function WorkspaceShell({
   }
 
   return (
-    <WorkspaceLocaleProvider locale={locale}>
-      <main className="workspace-page" lang={locale}>
+    <WorkspaceLocaleProvider>
+      <main className="workspace-page" lang="en">
         <div
           className="workspace-layout"
           data-sidebar-collapsed={sidebarCollapsed}

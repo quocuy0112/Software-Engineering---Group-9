@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { Badge } from "@/frontend/components/ui/badge";
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
-import { useWorkspaceLocale } from "../client/workspace-locale";
 
 export function DashboardView({
   account,
@@ -12,107 +11,55 @@ export function DashboardView({
   account: { name: string; hasAvatar: boolean; twoFactorEnabled: boolean };
   profile: CandidateProfileContract;
 }) {
-  const locale = useWorkspaceLocale();
-  const copy =
-    locale === "vi"
-      ? {
-          kicker: "KHÔNG GIAN NGHỀ NGHIỆP CỦA BẠN",
-          title: "Tổng quan",
-          subtitle:
-            "Những thông tin quan trọng và bước tiếp theo, trong một nơi.",
-          badge: "Hồ sơ ứng viên",
-          welcome: "CHÀO MỪNG TRỞ LẠI",
-          heroTitle: (name: string) =>
-            `${name}, hãy hoàn thiện dấu ấn nghề nghiệp của bạn.`,
-          heroCopy:
-            "SmartHire đang tổng hợp tiến độ từ chính hồ sơ và cài đặt bảo mật hiện tại của bạn.",
-          completeProfile: "Hoàn thiện hồ sơ",
-          viewProfile: "Xem hồ sơ",
-          completion: "Mức độ hoàn thiện",
-          complete: "hoàn tất",
-          profileTitle: "Hồ sơ nghề nghiệp",
-          profileCopy:
-            "Quản lý giới thiệu, kinh nghiệm, học vấn và kỹ năng của bạn.",
-          skills: "kỹ năng",
-          experiences: "kinh nghiệm",
-          securityTitle: "Bảo mật tài khoản",
-          securityCopy:
-            "Kiểm soát mật khẩu, xác thực hai lớp và các phiên đăng nhập.",
-          protected: "Đã bật 2FA",
-          recommended: "Nên bật 2FA",
-          preferencesTitle: "Tùy chọn cá nhân",
-          preferencesCopy:
-            "Chọn ngôn ngữ, múi giờ và thông báo bảo mật phù hợp.",
-          configured: "Sẵn sàng",
-          nextKicker: "BƯỚC TIẾP THEO",
-          nextTitle: "Làm hồ sơ của bạn nổi bật hơn",
-          basics: "Thêm tiêu đề và phần giới thiệu",
-          avatar: "Thêm ảnh đại diện",
-          skillsStep: "Thêm kỹ năng nổi bật",
-          experienceStep: "Thêm kinh nghiệm làm việc",
-          educationStep: "Thêm học vấn",
-          socialStep: "Thêm liên kết nghề nghiệp",
-          done: "Đã hoàn tất",
-          pending: "Cần bổ sung",
-          basicsPending: "Tiêu đề từ 20 ký tự và giới thiệu từ 120 ký tự",
-          skillsPending: "Thêm ít nhất 3 kỹ năng nổi bật",
-          experiencePending: "Thêm ít nhất một kinh nghiệm",
-          educationPending: "Thêm ít nhất một học vấn",
-          avatarPending: "Tải lên ảnh đại diện rõ nét",
-          socialPending: "Thêm ít nhất một hồ sơ hoặc website",
-          remaining: (count: number) =>
-            count === 0 ? "Đã hoàn thiện" : `Còn ${count} bước`,
-          workspaceSections: "Khu vực quản lý hồ sơ và tài khoản",
-        }
-      : {
-          kicker: "YOUR CAREER WORKSPACE",
-          title: "Dashboard",
-          subtitle: "Your important details and next steps, all in one place.",
-          badge: "Candidate profile",
-          welcome: "WELCOME BACK",
-          heroTitle: (name: string) =>
-            `${name}, keep building a profile that feels like you.`,
-          heroCopy:
-            "SmartHire tracks progress from your real profile and current security settings.",
-          completeProfile: "Complete profile",
-          viewProfile: "View profile",
-          completion: "Profile completion",
-          complete: "complete",
-          profileTitle: "Professional profile",
-          profileCopy:
-            "Manage your introduction, experience, education, and skills.",
-          skills: "skills",
-          experiences: "experiences",
-          securityTitle: "Account security",
-          securityCopy:
-            "Control your password, two-factor authentication, and sessions.",
-          protected: "2FA enabled",
-          recommended: "2FA recommended",
-          preferencesTitle: "Personal preferences",
-          preferencesCopy:
-            "Choose the language, timezone, and security notices that fit you.",
-          configured: "Available",
-          nextKicker: "NEXT STEPS",
-          nextTitle: "Make your profile stronger",
-          basics: "Add a headline and summary",
-          avatar: "Add a profile photo",
-          skillsStep: "Add your strongest skills",
-          experienceStep: "Add work experience",
-          educationStep: "Add education",
-          socialStep: "Add a professional link",
-          done: "Complete",
-          pending: "Needs attention",
-          basicsPending:
-            "Use a 20+ character headline and 120+ character summary",
-          skillsPending: "Add at least 3 strong skills",
-          experiencePending: "Add at least one experience",
-          educationPending: "Add at least one education entry",
-          avatarPending: "Upload a clear profile photo",
-          socialPending: "Add at least one profile or website",
-          remaining: (count: number) =>
-            count === 0 ? "Profile ready" : `${count} steps left`,
-          workspaceSections: "Profile and account management areas",
-        };
+  const copy = {
+    kicker: "YOUR CAREER WORKSPACE",
+    title: "Dashboard",
+    subtitle: "Your important details and next steps, all in one place.",
+    badge: "Candidate profile",
+    welcome: "WELCOME BACK",
+    heroTitle: (name: string) =>
+      `${name}, keep building a profile that feels like you.`,
+    heroCopy:
+      "SmartHire tracks progress from your real profile and current security settings.",
+    completeProfile: "Complete profile",
+    viewProfile: "View profile",
+    completion: "Profile completion",
+    complete: "complete",
+    profileTitle: "Professional profile",
+    profileCopy: "Manage your introduction, experience, education, and skills.",
+    skills: "skills",
+    experiences: "experiences",
+    jobsTitle: "Job opportunities",
+    jobsCopy: "Search and filter active roles, then save or apply when ready.",
+    browseJobs: "Browse jobs",
+    securityTitle: "Account security",
+    securityCopy:
+      "Control your password, two-factor authentication, and sessions.",
+    protected: "2FA enabled",
+    recommended: "2FA recommended",
+    preferencesTitle: "Personal preferences",
+    preferencesCopy: "Review your timezone and security notification settings.",
+    configured: "Available",
+    nextKicker: "NEXT STEPS",
+    nextTitle: "Make your profile stronger",
+    basics: "Add a headline and summary",
+    avatar: "Add a profile photo",
+    skillsStep: "Add your strongest skills",
+    experienceStep: "Add work experience",
+    educationStep: "Add education",
+    socialStep: "Add a professional link",
+    done: "Complete",
+    pending: "Needs attention",
+    basicsPending: "Use a 20+ character headline and 120+ character summary",
+    skillsPending: "Add at least 3 strong skills",
+    experiencePending: "Add at least one experience",
+    educationPending: "Add at least one education entry",
+    avatarPending: "Upload a clear profile photo",
+    socialPending: "Add at least one profile or website",
+    remaining: (count: number) =>
+      count === 0 ? "Profile ready" : `${count} steps left`,
+    workspaceSections: "Job, profile, and account management areas",
+  };
 
   const headlineLength = profile.basics.headline?.trim().length ?? 0;
   const summaryLength = profile.basics.summary?.trim().length ?? 0;
@@ -244,6 +191,14 @@ export function DashboardView({
             {copy.experiences}
           </span>
         </Link>
+        <Link className="feature-card dashboard-current-card" href="/jobs">
+          <div className="feature-icon" aria-hidden="true">
+            <DashboardIcon name="jobs" />
+          </div>
+          <h2>{copy.jobsTitle}</h2>
+          <p>{copy.jobsCopy}</p>
+          <Badge tone="info">{copy.browseJobs}</Badge>
+        </Link>
         <Link
           className="feature-card dashboard-current-card"
           href="/profile/security"
@@ -318,6 +273,7 @@ function DashboardIcon({
     | "arrow"
     | "check"
     | "device"
+    | "jobs"
     | "plus"
     | "preferences"
     | "profile"
@@ -332,6 +288,12 @@ function DashboardIcon({
       <>
         <rect x="4" y="5" width="16" height="12" rx="2" />
         <path d="M9 20h6" />
+      </>
+    ),
+    jobs: (
+      <>
+        <rect x="3" y="7" width="18" height="12" rx="2" />
+        <path d="M8 7V5.5A2.5 2.5 0 0 1 10.5 3h3A2.5 2.5 0 0 1 16 5.5V7M3 11h18M9 11v1.5h6V11" />
       </>
     ),
     plus: <path d="M12 5v14M5 12h14" />,
