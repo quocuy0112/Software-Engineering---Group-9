@@ -13,7 +13,16 @@ import {
   cvDraftReviewFixture,
 } from "../../../fixtures/cv-draft-review";
 
-afterEach(() => vi.unstubAllGlobals());
+const { toast } = vi.hoisted(() => ({
+  toast: { error: vi.fn() },
+}));
+
+vi.mock("sonner", () => ({ toast }));
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+  toast.error.mockClear();
+});
 
 describe("CV draft review", () => {
   it("compares, edits, exposes evidence, and keeps bulk choices independent", () => {
@@ -103,6 +112,123 @@ describe("CV draft review", () => {
     expect(request.proposals.scalars[0].value).toBe("Edited platform engineer");
     expect(await screen.findByText("Review saved.")).toBeVisible();
     expect(screen.getByText("Review draft revision 1")).toBeVisible();
+  });
+
+  it("blocks invalid local values, shows a toast, and marks the exact field", () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <CvDraftReview initial={cvDraftReviewFixture} csrfProof="csrf_test" />,
+    );
+
+    const headline = screen.getByLabelText("Proposed headline");
+    fireEvent.change(headline, { target: { value: "   " } });
+    fireEvent.click(screen.getByRole("button", { name: "Save review" }));
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(headline).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getAllByText("Headline is required.").length).toBeGreaterThan(
+      0,
+    );
+    expect(toast.error).toHaveBeenCalledWith("Review could not be saved.", {
+      id: "cv-review-save-error",
+      description: expect.stringContaining("Headline is required."),
+    });
+    expect(headline).toHaveFocus();
+  });
+
+  it("requires replace instead of add when a Profile scalar already exists", () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const invalidInitial = {
+      ...cvDraftReviewFixture,
+      reviewDecisions: {
+        ...cvDraftReviewFixture.reviewDecisions,
+        scalars: [
+          {
+            ...cvDraftReviewFixture.reviewDecisions.scalars[0],
+            action: "ADD" as const,
+          },
+        ],
+      },
+    };
+    render(<CvDraftReview initial={invalidInitial} csrfProof="csrf_test" />);
+
+    const scalarDecision = screen.getByRole("group", {
+      name: "Decision for headline",
+    });
+    expect(
+      within(scalarDecision).queryByRole("radio", { name: "add" }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(scalarDecision).getByRole("radio", { name: "replace" }),
+    ).toBeVisible();
+    fireEvent.change(screen.getByLabelText("Proposed headline"), {
+      target: { value: "Edited headline" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save review" }));
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(scalarDecision).toHaveAttribute("aria-invalid", "true");
+    expect(
+      screen.getAllByText(
+        "Headline already has a Profile value. Choose replace or skip.",
+      ).length,
+    ).toBeGreaterThan(0);
+    expect(toast.error).toHaveBeenCalledWith("Review could not be saved.", {
+      id: "cv-review-save-error",
+      description:
+        "Headline already has a Profile value. Choose replace or skip.",
+    });
+  });
+
+  it("surfaces server field errors in a toast and highlights the matching input", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "Review the highlighted fields.",
+            requestId: "request-test",
+            fieldErrors: [
+              {
+                path: "experiences.0.startDate",
+                code: "FUTURE",
+                message: "This value is invalid.",
+              },
+            ],
+            latest: null,
+          },
+        }),
+        { status: 400 },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <CvDraftReview initial={cvDraftReviewFixture} csrfProof="csrf_test" />,
+    );
+
+    fireEvent.change(screen.getByLabelText("Proposed headline"), {
+      target: { value: "Edited headline" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save review" }));
+
+    const startDate = (await screen.findAllByLabelText("Start date"))[0];
+    await waitFor(() =>
+      expect(startDate).toHaveAttribute("aria-invalid", "true"),
+    );
+    expect(
+      screen.getAllByText("Start date cannot be in the future.").length,
+    ).toBeGreaterThan(0);
+    expect(toast.error).toHaveBeenCalledWith("Review could not be saved.", {
+      id: "cv-review-save-error",
+      description: "Start date cannot be in the future.",
+      duration: 8_000,
+    });
+    expect(screen.getByText("Review action failed")).toBeVisible();
+    expect(startDate).toHaveFocus();
+    fireEvent.change(startDate, { target: { value: "2020-01-01" } });
+    expect(startDate).toHaveAttribute("aria-invalid", "false");
   });
 
   it("requires explicit impact acknowledgement and renders a non-content receipt", async () => {

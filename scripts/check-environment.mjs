@@ -186,6 +186,7 @@ if (await canAccess("web/.env.local")) {
   );
   check(
     isStrictBoolean(appEnvironment.CV_OPENAI_ENABLED) &&
+      isStrictBoolean(appEnvironment.CV_OPENAI_LOCAL_DEV_ENABLED) &&
       isStrictBoolean(appEnvironment.CV_OPENAI_DPA_APPROVED) &&
       isStrictBoolean(appEnvironment.CV_OPENAI_CROSS_BORDER_APPROVED) &&
       isStrictBoolean(appEnvironment.CV_OPENAI_ZDR_APPROVED),
@@ -266,14 +267,20 @@ if (await canAccess("web/.env.local")) {
   );
   const localCvConfigurationValid =
     appEnvironment.CV_STORAGE_ADAPTER === "filesystem" &&
-    appEnvironment.CV_PARSER_ADAPTER === "deterministic" &&
-    appEnvironment.CV_OPENAI_ENABLED === "false";
+    ((appEnvironment.CV_PARSER_ADAPTER === "deterministic" &&
+      appEnvironment.CV_OPENAI_ENABLED === "false" &&
+      appEnvironment.CV_OPENAI_LOCAL_DEV_ENABLED === "false") ||
+      (appEnvironment.CV_PARSER_ADAPTER === "openai" &&
+        appEnvironment.CV_OPENAI_ENABLED === "true" &&
+        appEnvironment.CV_OPENAI_LOCAL_DEV_ENABLED === "true" &&
+        Boolean(appEnvironment.OPENAI_API_KEY)));
   const productionCvConfigurationValid =
     appEnvironment.CV_STORAGE_ADAPTER === "s3" &&
     productionS3CoordinatesValid &&
     productionUsesRoleCredentials &&
     appEnvironment.CV_PARSER_ADAPTER === "openai" &&
     appEnvironment.CV_OPENAI_ENABLED === "true" &&
+    appEnvironment.CV_OPENAI_LOCAL_DEV_ENABLED === "false" &&
     appEnvironment.CV_OPENAI_MODEL === "gpt-5.4-mini-2026-03-17" &&
     Boolean(appEnvironment.OPENAI_API_KEY) &&
     appEnvironment.CV_OPENAI_DPA_APPROVED === "true" &&
@@ -283,7 +290,7 @@ if (await canAccess("web/.env.local")) {
     isProduction ? productionCvConfigurationValid : localCvConfigurationValid,
     isProduction
       ? "production CV storage/parser configuration fails closed"
-      : "local CV storage/parser configuration is private and network-free",
+      : "local CV storage/parser configuration is explicit and private",
   );
 
   const sharedCvKeys = [
@@ -295,6 +302,7 @@ if (await canAccess("web/.env.local")) {
     "CV_CLAMD_SIGNATURE_MAX_AGE_HOURS",
     "CV_PARSER_ADAPTER",
     "CV_OPENAI_ENABLED",
+    "CV_OPENAI_LOCAL_DEV_ENABLED",
     "CV_WORKER_ENABLED",
     "CV_CLEANUP_ENABLED",
   ];

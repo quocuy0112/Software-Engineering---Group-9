@@ -16,6 +16,12 @@ import {
   cvDraftReviewFixture,
 } from "../../../fixtures/cv-draft-review";
 
+const navigation = vi.hoisted(() => ({
+  prefetch: vi.fn(),
+  replace: vi.fn(),
+}));
+vi.mock("next/navigation", () => ({ useRouter: () => navigation }));
+
 const componentRoot = resolve(
   process.cwd(),
   "src/frontend/features/cv-import/components",

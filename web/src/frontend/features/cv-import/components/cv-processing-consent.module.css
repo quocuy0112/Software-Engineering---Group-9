@@ -56,6 +56,59 @@
   padding: 0.65rem 0.85rem;
 }
 
+.revokeButton {
+  display: inline-flex;
+  min-height: var(--sh-control-height);
+  align-items: center;
+  justify-content: center;
+  gap: var(--sh-space-2);
+  padding: 0 var(--sh-space-4) !important;
+  border: 1px solid color-mix(in srgb, var(--sh-color-error) 52%, transparent);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-error);
+  background: var(--sh-color-surface-card);
+  font-size: var(--sh-font-size-button);
+  font-weight: var(--sh-font-weight-semibold);
+  box-shadow: var(--sh-shadow-control);
+  cursor: pointer;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.revokeButton:hover:not(:disabled) {
+  border-color: var(--sh-color-error);
+  background: var(--sh-color-error-bg);
+  box-shadow: 0 6px 18px
+    color-mix(in srgb, var(--sh-color-error) 14%, transparent);
+  transform: translateY(-1px);
+}
+
+.revokeButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.revokeButton:disabled {
+  border-color: var(--sh-color-border-subtle);
+  color: var(--sh-color-disabled-text);
+  background: var(--sh-color-disabled-bg);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.revokeButton[aria-busy="true"]::before {
+  width: 14px;
+  height: 14px;
+  border: 2px solid color-mix(in srgb, currentcolor 28%, transparent);
+  border-top-color: currentcolor;
+  border-radius: var(--sh-radius-full);
+  content: "";
+  animation: cvConsentSpin 800ms linear infinite;
+}
+
 .grant :is(input, button):focus-visible,
 .granted button:focus-visible {
   outline: 3px solid var(--color-focus, #1d4ed8);
@@ -79,7 +132,40 @@
 
 .status {
   min-height: 1.5rem;
+  padding: 0.65rem 0.75rem;
+  border-inline-start: 4px solid var(--sh-color-info);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-info);
+  background: var(--sh-color-info-bg);
   font-weight: 650;
+  transition:
+    border-color 200ms ease,
+    color 200ms ease,
+    background-color 200ms ease;
+}
+
+.status[data-tone="pending"] {
+  border-color: var(--sh-color-warning);
+  color: var(--sh-color-warning);
+  background: var(--sh-color-warning-bg);
+}
+
+.status[data-tone="success"] {
+  border-color: var(--sh-color-success);
+  color: var(--sh-color-success);
+  background: var(--sh-color-success-bg);
+}
+
+.status[data-tone="error"] {
+  border-color: var(--sh-color-error);
+  color: var(--sh-color-error);
+  background: var(--sh-color-error-bg);
+}
+
+@keyframes cvConsentSpin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 32rem) {

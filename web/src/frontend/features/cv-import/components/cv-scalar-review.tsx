@@ -12,12 +12,14 @@ export function CvScalarReview({
   currentProfile,
   proposals,
   decisions,
+  fieldErrors,
   onProposalChange,
   onDecisionChange,
 }: {
   currentProfile: CvDraftComparison["currentProfile"];
   proposals: CvEditableProposals["scalars"];
   decisions: CvReviewDecisions["scalars"];
+  fieldErrors: Readonly<Record<string, string>>;
   onProposalChange: (proposalId: string, value: string) => void;
   onDecisionChange: (
     proposalId: string,
@@ -30,9 +32,23 @@ export function CvScalarReview({
   return (
     <section className={styles.root} aria-labelledby="cv-scalar-heading">
       <h2 id="cv-scalar-heading">Profile details</h2>
-      {proposals.map((proposal: ScalarProposal) => {
-        const current = currentProfile[proposal.field] ?? "Not set";
+      {proposals.map((proposal: ScalarProposal, index) => {
+        const currentValue = currentProfile[proposal.field];
+        const hasCurrentValue = currentValue !== null;
+        const current = currentValue ?? "Not set";
         const fieldId = `cv-scalar-${proposal.proposalId}`;
+        const fieldPath = `proposals.scalars.${index}.value`;
+        const fieldError = fieldErrors[fieldPath];
+        const errorId = `${fieldId}-error`;
+        const decisionIndex = decisions.findIndex(
+          (decision) => decision.proposalId === proposal.proposalId,
+        );
+        const decisionPath = `reviewDecisions.scalars.${decisionIndex}.action`;
+        const decisionError = fieldErrors[decisionPath];
+        const decisionErrorId = `${fieldId}-decision-error`;
+        const availableActions = hasCurrentValue
+          ? (["REPLACE", "SKIP"] as const)
+          : (["ADD", "SKIP"] as const);
         return (
           <article className={styles.card} key={proposal.proposalId}>
             <h3>{proposal.field}</h3>
@@ -46,8 +62,11 @@ export function CvScalarReview({
                 {proposal.field === "summary" ? (
                   <textarea
                     id={fieldId}
+                    data-cv-review-field={fieldPath}
                     value={proposal.value}
                     maxLength={5_000}
+                    aria-invalid={Boolean(fieldError)}
+                    aria-describedby={fieldError ? errorId : undefined}
                     onChange={(event) =>
                       onProposalChange(proposal.proposalId, event.target.value)
                     }
@@ -55,6 +74,7 @@ export function CvScalarReview({
                 ) : (
                   <input
                     id={fieldId}
+                    data-cv-review-field={fieldPath}
                     value={proposal.value}
                     maxLength={
                       proposal.field === "phone"
@@ -63,16 +83,34 @@ export function CvScalarReview({
                           ? 160
                           : 200
                     }
+                    aria-invalid={Boolean(fieldError)}
+                    aria-describedby={fieldError ? errorId : undefined}
                     onChange={(event) =>
                       onProposalChange(proposal.proposalId, event.target.value)
                     }
                   />
                 )}
+                {fieldError ? (
+                  <p className={styles.fieldError} id={errorId}>
+                    {fieldError}
+                  </p>
+                ) : null}
               </div>
             </div>
-            <fieldset className={styles.choices}>
+            <fieldset
+              className={styles.choices}
+              data-cv-review-field={decisionPath}
+              aria-invalid={Boolean(decisionError)}
+              aria-describedby={decisionError ? decisionErrorId : undefined}
+              tabIndex={decisionError ? -1 : undefined}
+            >
               <legend>Decision for {proposal.field}</legend>
-              {(["ADD", "REPLACE", "SKIP"] as const).map((action) => (
+              <p className={styles.decisionHint}>
+                {hasCurrentValue
+                  ? "This field already has a Profile value. Replace it or keep the current value."
+                  : "This field is empty on the Profile. Add it or skip the proposal."}
+              </p>
+              {availableActions.map((action) => (
                 <label key={action}>
                   <input
                     type="radio"
@@ -88,6 +126,11 @@ export function CvScalarReview({
                   {action.toLowerCase()}
                 </label>
               ))}
+              {decisionError ? (
+                <p className={styles.fieldError} id={decisionErrorId}>
+                  {decisionError}
+                </p>
+              ) : null}
             </fieldset>
             <CvEvidence evidence={proposal.evidence} />
           </article>

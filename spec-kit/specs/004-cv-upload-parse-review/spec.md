@@ -110,10 +110,12 @@ verify that a draft is produced without changing Candidate Profile.
 5. **Given** the same upload request is retried with the same idempotency key and
    identical content, **When** the server accepts the retry, **Then** it returns
    the original upload outcome and does not create another file or job.
-6. **Given** the candidate opens the CV import page, **When** either the internal
-   or external parser class is available, **Then** the same versioned
-   CV-processing privacy notice is visible; choosing external processing also
-   presents a separate unselected consent control.
+6. **Given** the candidate opens the CV import page, **When** one or more parser
+   classes are available, **Then** the same versioned CV-processing privacy
+   notice is visible for every choice and the candidate selects the parser for
+   that upload. When both internal and external parsing are available, choosing
+   one does not remove the other choice for a later upload; choosing external
+   processing also presents a separate unselected consent control.
 
 ---
 
@@ -135,15 +137,22 @@ only selected valid changes are applied as one complete profile revision.
 
 1. **Given** a review-ready draft, **When** the candidate opens it, **Then** they
    can compare current and proposed values, see uncertainty and source context,
-   and choose add, replace, edit, or skip per scalar field, per experience,
-   education, or social-link entry, and per individual skill; a structured entry
-   can be edited before selection but is selected as one unit.
+   and choose an action per scalar field, per experience, education, or
+   social-link entry, and per individual skill. A scalar whose current Profile
+   value is empty offers add or skip; a scalar whose current Profile value is
+   already populated offers replace or skip. A structured entry can be edited
+   before selection but is selected as one unit.
 2. **Given** proposed experience, education, skill, or social-link data that
-   resembles an existing profile entry, **When** the candidate reviews it,
-   **Then** the possible duplicate is identified but never merged automatically.
+   resembles an existing Profile entry, or a proposed skill or social link that
+   duplicates another proposal in the same draft, **When** the candidate reviews
+   or saves it, **Then** the possible duplicate is identified at the affected
+   entry but never merged automatically.
 3. **Given** the candidate edits draft values, **When** they save, **Then** the
-   same validation and safe text rules used by Candidate Profile are applied and
-   a visible saved revision is returned.
+   same validation and safe text rules used by Candidate Profile are applied. A
+   valid save returns a visible saved revision; an invalid save preserves the
+   edits, shows a brief error notification plus a persistent summary, identifies
+   each affected field with text and an invalid-field indicator, and moves focus
+   to the first affected control so the candidate can correct it.
 4. **Given** a valid reviewed draft and an unchanged source profile revision,
    **When** the candidate confirms selected changes, **Then** all selected
    profile changes, the new profile revision, the confirmed draft state, and the
@@ -450,7 +459,11 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
   without producing duplicate drafts.
 - **FR-034**: Safe document extraction and semantic CV interpretation MUST be
   independently replaceable capabilities. A parser MUST receive only the
-  minimum approved input and MUST NOT own profile persistence.
+  minimum approved input and MUST NOT own profile persistence. The candidate
+  MUST select one currently available parser class for each upload; when both
+  internal and external classes are available, both MUST remain independently
+  selectable for later uploads and the recorded choice MUST remain bound to its
+  own upload.
 - **FR-035**: A parser result MUST be stored only as a separate draft. No parser,
   retry, fallback, or worker MAY directly update Candidate Profile.
 - **FR-036**: Parsing MAY extract and structure candidate-provided information
@@ -510,17 +523,25 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
   section location. Missing provenance MUST be visibly identified rather than
   invented.
 - **FR-051**: Review MUST show current and proposed values and let the candidate
-  add, replace, edit, or skip scalar profile information per field; experience,
-  education, and social-link collections per entry; and skills individually
-  before confirmation. A structured entry MAY be edited before selection, but
-  its nested properties MUST be selected and applied as one entry rather than
-  independently.
+  choose add or skip for a scalar whose current Profile value is empty, and
+  replace or skip for a scalar whose current Profile value is populated;
+  experience, education, and social-link collections MUST be selected per entry,
+  and skills individually, before confirmation. A structured entry MAY be edited
+  before selection, but its nested properties MUST be selected and applied as
+  one entry rather than independently. The server MUST reject a decision that
+  no longer matches the authoritative current Profile state.
 - **FR-052**: Possible duplicate experiences, education entries, skills, and
-  links MUST be identified using the approved normalization rules but MUST NOT
-  be merged, removed, or replaced without the candidate's explicit choice.
+  links against the current Profile, plus duplicate proposed skills and social
+  links within the same draft, MUST be identified using the approved
+  normalization rules but MUST NOT be merged, removed, or replaced without the
+  candidate's explicit choice.
 - **FR-053**: Candidate edits to a draft MUST satisfy the same normalization,
   safe-text, length, date, URL, collection-limit, and required-value rules that
-  apply to direct Candidate Profile entry.
+  apply to direct Candidate Profile entry. A rejected save MUST return stable,
+  field-addressable validation details; the interface MUST preserve the
+  candidate's unsaved edits, present a persistent error summary and a brief
+  supplemental notification, identify the affected controls in text as well as
+  visually, and focus the first affected control.
 - **FR-054**: Every successful draft save MUST atomically increment and return a
   draft revision.
 - **FR-055**: Every draft save MUST name the revision on which it is based. A
@@ -621,7 +642,10 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
   the immediate logical denial and pending physical purge.
 - **FR-079**: Processing and save status changes MUST be announced to assistive
   technology without unexpectedly moving focus. Error summaries MUST identify
-  affected fields in text, and color MUST NOT be the only status indicator.
+  affected fields in text, each invalid review control MUST expose its invalid
+  state and associated message programmatically, and color MUST NOT be the only
+  status indicator. Moving focus to the first invalid control after an explicit
+  failed save is permitted and MUST NOT discard candidate edits.
 - **FR-080**: The candidate MUST be able to navigate away from long-running work
   and return without losing completed server-side progress or saved draft edits.
 
@@ -689,8 +713,11 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
   required physical-deletion windows, idempotent cleanup, quota release, and
   orphan reconciliation.
 - Component and accessibility tests MUST cover keyboard upload/review, persistent
-  and announced progress, descriptive error summaries, unsaved/conflict states,
-  reduced motion, sufficient contrast, and no horizontal overflow at 320 pixels.
+  and announced progress, scalar action availability derived from the current
+  Profile, local and server field-addressable save failures, supplemental error
+  notification, descriptive persistent error summaries, invalid-control focus,
+  unsaved/conflict states, reduced motion, sufficient contrast, and no
+  horizontal overflow at 320 pixels.
 - End-to-end tests MUST cover the complete clean upload-to-confirm journey,
   infected rejection, scan failure, parse failure/manual recovery, consent grant
   and revocation, concurrent review, stale profile comparison, expiry, and

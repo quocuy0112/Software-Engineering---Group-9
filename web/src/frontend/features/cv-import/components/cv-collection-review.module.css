@@ -95,6 +95,22 @@
   resize: vertical;
 }
 
+.fields :is(input, textarea)[aria-invalid="true"],
+.card > label input[aria-invalid="true"],
+.target select[aria-invalid="true"] {
+  border-color: var(--color-error, #b91c1c);
+  background: var(--color-error-surface, #fef2f2);
+  box-shadow: 0 0 0 1px var(--color-error, #b91c1c);
+}
+
+.fieldError {
+  color: var(--color-error-text, #7f1d1d);
+  font-size: var(--sh-font-size-caption);
+  font-weight: var(--sh-font-weight-semibold);
+  line-height: var(--sh-line-height-caption);
+  text-transform: none;
+}
+
 .fullWidth,
 .target {
   grid-column: 1 / -1;

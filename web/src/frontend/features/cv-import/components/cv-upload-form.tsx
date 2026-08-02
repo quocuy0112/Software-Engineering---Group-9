@@ -26,8 +26,13 @@ const subscribeToHydration = () => () => undefined;
 export function CvUploadForm({
   csrfProof,
   onUpload,
+  parserAvailability = { deterministic: true, external: true },
 }: {
   csrfProof: string;
+  parserAvailability?: Readonly<{
+    deterministic: boolean;
+    external: boolean;
+  }>;
   onUpload(
     file: File,
     parserClass: CvParserClass,
@@ -35,8 +40,12 @@ export function CvUploadForm({
   ): Promise<void>;
 }) {
   const [file, setFile] = useState<File | null>(null);
-  const [parserClass, setParserClass] = useState<CvParserClass>(
-    "DETERMINISTIC_INTERNAL",
+  const [parserClass, setParserClass] = useState<CvParserClass | null>(
+    parserAvailability.deterministic
+      ? "DETERMINISTIC_INTERNAL"
+      : parserAvailability.external
+        ? "EXTERNAL_OPENAI"
+        : null,
   );
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState("Ready to upload a CV.");
@@ -86,15 +95,18 @@ export function CvUploadForm({
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (!file) return showError("Choose a PDF or DOCX CV before uploading.");
+    if (!parserClass) return showError("No CV parser is currently available.");
     setBusy(true);
     setError(null);
     setMessage("Uploading CV…");
     try {
       await onUpload(file, parserClass, csrfProof);
       setMessage("CV upload submitted for secure processing.");
-    } catch {
+    } catch (cause) {
       showError(
-        "The CV upload failed. Try again or enter your profile manually.",
+        cause instanceof Error && cause.message.includes("not available")
+          ? cause.message
+          : "The CV upload failed. Try again or enter your profile manually.",
       );
       setMessage("Upload failed.");
     } finally {
@@ -111,7 +123,7 @@ export function CvUploadForm({
       data-reduced-motion-safe="true"
       noValidate
     >
-      <CvProcessingNotice parserClass={parserClass} />
+      {parserClass ? <CvProcessingNotice parserClass={parserClass} /> : null}
       {error ? (
         <div className={styles.error} role="alert" tabIndex={-1} ref={errorRef}>
           {error}
@@ -131,24 +143,77 @@ export function CvUploadForm({
           PDF or DOCX, maximum 5 MB (5,000,000 bytes).
         </small>
       </div>
-      <div className={styles.field}>
-        <label htmlFor="cv-upload-parser">Parser</label>
-        <select
-          id="cv-upload-parser"
-          value={parserClass}
-          onChange={(event) =>
-            setParserClass(event.currentTarget.value as CvParserClass)
-          }
-          disabled={busy || !hydrated}
-        >
-          <option value="DETERMINISTIC_INTERNAL">
-            SmartHire deterministic parser
-          </option>
-          <option value="EXTERNAL_OPENAI">Approved external parser</option>
-        </select>
-      </div>
+      <fieldset className={styles.parserFieldset}>
+        <legend>Choose a parser for this upload</legend>
+        <p className={styles.parserGuidance}>
+          Each CV can use a different parser. Your choice is saved with this
+          import.
+        </p>
+        <div className={styles.parserOptions}>
+          <label
+            className={styles.parserOption}
+            data-selected={parserClass === "DETERMINISTIC_INTERNAL"}
+            data-disabled={!parserAvailability.deterministic}
+          >
+            <input
+              type="radio"
+              name="cv-upload-parser"
+              value="DETERMINISTIC_INTERNAL"
+              checked={parserClass === "DETERMINISTIC_INTERNAL"}
+              onChange={() => {
+                setParserClass("DETERMINISTIC_INTERNAL");
+                setMessage("SmartHire parser selected for this CV.");
+              }}
+              disabled={busy || !hydrated || !parserAvailability.deterministic}
+            />
+            <span className={styles.parserMark} aria-hidden="true">
+              SH
+            </span>
+            <span className={styles.parserCopy}>
+              <strong>SmartHire deterministic</strong>
+              <small>
+                Runs locally without sending text to an AI provider.
+              </small>
+            </span>
+            <span className={styles.parserBadge}>
+              {parserAvailability.deterministic ? "Local" : "Unavailable"}
+            </span>
+          </label>
+          <label
+            className={styles.parserOption}
+            data-selected={parserClass === "EXTERNAL_OPENAI"}
+            data-disabled={!parserAvailability.external}
+          >
+            <input
+              type="radio"
+              name="cv-upload-parser"
+              value="EXTERNAL_OPENAI"
+              checked={parserClass === "EXTERNAL_OPENAI"}
+              onChange={() => {
+                setParserClass("EXTERNAL_OPENAI");
+                setMessage(
+                  "OpenAI selected. You will grant consent after secure text extraction.",
+                );
+              }}
+              disabled={busy || !hydrated || !parserAvailability.external}
+            />
+            <span className={styles.parserMark} aria-hidden="true">
+              AI
+            </span>
+            <span className={styles.parserCopy}>
+              <strong>External OpenAI</strong>
+              <small>
+                AI-assisted parsing after scanning, extraction, and consent.
+              </small>
+            </span>
+            <span className={styles.parserBadge}>
+              {parserAvailability.external ? "AI ready" : "Not configured"}
+            </span>
+          </label>
+        </div>
+      </fieldset>
       <div className={styles.actions}>
-        <button type="submit" disabled={!hydrated || busy}>
+        <button type="submit" disabled={!hydrated || busy || !parserClass}>
           {busy ? "Uploading…" : "Upload CV"}
         </button>
         <a href="/profile">Enter profile manually</a>

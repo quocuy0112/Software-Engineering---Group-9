@@ -598,7 +598,12 @@ means lease ownership was lost and the result is discarded.
 
 Update with `WHERE id = ? AND accountId = ? AND status = 'EDITABLE' AND
 revision = baseDraftRevision`. Validate the live Profile revision before save.
-Success writes the full bounded review payload and increments `revision` once.
+Revalidate scalar actions against the live Profile (`ADD` only for an empty
+field, `REPLACE` only for a populated field) and reject normalized duplicate
+proposed skills/social links. Semantic failures return canonical proposal or
+decision paths, including `ACTION_MISMATCH` at
+`reviewDecisions.scalars.{index}.action`, without writing the payload. Success
+writes the full bounded review payload and increments `revision` once.
 A zero-row update maps to `409 DRAFT_REVISION_CONFLICT` with the latest safe
 revision/comparison; unsaved browser values are not submitted automatically.
 

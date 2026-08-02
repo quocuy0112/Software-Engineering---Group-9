@@ -58,24 +58,103 @@
 }
 
 .workflowProgress {
-  display: flex;
+  --progress-accent: var(--sh-color-info);
+  --progress-background: var(--sh-color-info-bg);
+  display: grid;
   min-width: 0;
+  grid-template-columns: 28px minmax(0, 1fr) minmax(7rem, 11rem) auto;
   align-items: center;
-  justify-content: space-between;
   gap: var(--sh-space-4);
   padding: var(--sh-space-3) var(--sh-space-4);
-  border: 1px solid var(--sh-color-focus-ring-bg);
+  border: 1px solid color-mix(in srgb, var(--progress-accent) 35%, transparent);
   border-radius: var(--sh-radius-sm);
-  color: var(--sh-color-info);
-  background: var(--sh-color-info-bg);
+  color: var(--progress-accent);
+  background: var(--progress-background);
+  transition:
+    border-color 220ms ease,
+    color 220ms ease,
+    background-color 220ms ease;
+}
+
+.workflowProgress[data-state="AWAITING_CONSENT"],
+.workflowProgress[data-state="AI_PENDING"] {
+  --progress-accent: var(--sh-color-warning);
+  --progress-background: var(--sh-color-warning-bg);
+}
+
+.workflowProgress[data-state="SUCCESS"] {
+  --progress-accent: var(--sh-color-success);
+  --progress-background: var(--sh-color-success-bg);
+}
+
+.workflowProgress[data-state="ERROR"],
+.workflowProgress[data-state="STATUS_ERROR"] {
+  --progress-accent: var(--sh-color-error);
+  --progress-background: var(--sh-color-error-bg);
+}
+
+.progressIcon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  justify-self: center;
+  border: 3px solid color-mix(in srgb, var(--progress-accent) 28%, transparent);
+  border-top-color: var(--progress-accent);
+  border-radius: var(--sh-radius-full);
+}
+
+.workflowProgress:not([data-state="IDLE"]):not([data-state="SUCCESS"]):not(
+    [data-state="COMPLETE"]
+  ):not([data-state="ERROR"]):not([data-state="STATUS_ERROR"])
+  .progressIcon {
+  animation: cvWorkspaceSpin 900ms linear infinite;
+}
+
+.workflowProgress:is(
+    [data-state="IDLE"],
+    [data-state="SUCCESS"],
+    [data-state="COMPLETE"],
+    [data-state="ERROR"],
+    [data-state="STATUS_ERROR"]
+  )
+  .progressIcon {
+  border-color: var(--progress-accent);
+  background: var(--progress-accent);
 }
 
 .workflowStatus {
+  display: grid;
   min-width: 0;
   min-height: 0;
+  gap: 2px;
   margin: 0;
   font-size: var(--sh-font-size-body-sm);
-  font-weight: var(--sh-font-weight-medium);
+}
+
+.workflowStatus strong {
+  font-weight: var(--sh-font-weight-bold);
+}
+
+.workflowStatus span {
+  color: var(--sh-color-text-secondary);
+  font-size: var(--sh-font-size-caption);
+  line-height: var(--sh-line-height-caption);
+}
+
+.progressTrack {
+  height: 7px;
+  overflow: hidden;
+  border-radius: var(--sh-radius-full);
+  background: color-mix(in srgb, var(--progress-accent) 17%, transparent);
+}
+
+.progressTrack > span {
+  display: block;
+  min-width: 2px;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--progress-accent);
+  transition: width 400ms ease;
 }
 
 .statusLink {
@@ -99,6 +178,12 @@
   text-decoration: underline;
 }
 
+@keyframes cvWorkspaceSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 32rem) {
   .uploadPanel,
   .historyPanel {
@@ -113,7 +198,12 @@
 
   .workflowProgress {
     align-items: stretch;
-    flex-direction: column;
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+
+  .progressTrack,
+  .statusLink {
+    grid-column: 1 / -1;
   }
 
   .statusLink {

@@ -34,6 +34,10 @@ export function CvProcessingConsent({
   const accepted =
     acceptance.challenge === notice.consentChallenge && acceptance.accepted;
   const [busy, setBusy] = useState<ConsentAction | null>(null);
+  const [feedbackTone, setFeedbackTone] = useState<
+    "neutral" | "pending" | "success" | "error"
+  >(notice.granted ? "success" : "neutral");
+  const [sessionExpired, setSessionExpired] = useState(false);
   const [message, setMessage] = useState(
     notice.granted
       ? "External processing consent is active."
@@ -45,6 +49,7 @@ export function CvProcessingConsent({
       return;
     activeAction.current = "grant";
     setBusy("grant");
+    setFeedbackTone("pending");
     setMessage("Granting external processing consent…");
     try {
       await onGrant({
@@ -58,10 +63,17 @@ export function CvProcessingConsent({
       setMessage(
         "Consent granted. Approved external processing may now continue.",
       );
-    } catch {
+      setFeedbackTone("success");
+    } catch (cause) {
+      const expired =
+        cause instanceof Error && cause.message === "CV_SESSION_EXPIRED";
+      setSessionExpired(expired);
       setMessage(
-        "Consent could not be granted. External processing remains blocked.",
+        expired
+          ? "Your session expired. Sign in again before granting consent."
+          : "Consent could not be granted. External processing remains blocked.",
       );
+      setFeedbackTone("error");
       heading.current?.focus();
     } finally {
       activeAction.current = null;
@@ -73,14 +85,22 @@ export function CvProcessingConsent({
     if (activeAction.current || !canRevoke || !notice.granted) return;
     activeAction.current = "revoke";
     setBusy("revoke");
+    setFeedbackTone("pending");
     setMessage("Revoking consent for future processing…");
     try {
       await onRevoke();
       setMessage("Consent revoked. Future external processing is blocked.");
-    } catch {
+      setFeedbackTone("success");
+    } catch (cause) {
+      const expired =
+        cause instanceof Error && cause.message === "CV_SESSION_EXPIRED";
+      setSessionExpired(expired);
       setMessage(
-        "Consent could not be revoked. Refresh the status before continuing.",
+        expired
+          ? "Your session expired. Sign in again before changing consent."
+          : "Consent could not be revoked. Refresh the status before continuing.",
       );
+      setFeedbackTone("error");
       heading.current?.focus();
     } finally {
       activeAction.current = null;
@@ -121,12 +141,15 @@ export function CvProcessingConsent({
         <div className={styles.granted}>
           <p>{notice.noticeText}</p>
           <button
+            className={styles.revokeButton}
             type="button"
-            disabled={!canRevoke || Boolean(busy)}
+            disabled={!canRevoke || Boolean(busy) || sessionExpired}
             aria-busy={busy === "revoke"}
             onClick={() => void revoke()}
           >
-            Revoke consent for future processing
+            {busy === "revoke"
+              ? "Revoking consent..."
+              : "Revoke consent for future processing"}
           </button>
           {!canRevoke ? (
             <p className={styles.explanation}>
@@ -141,7 +164,7 @@ export function CvProcessingConsent({
             <input
               type="checkbox"
               checked={accepted}
-              disabled={!canGrant || Boolean(busy)}
+              disabled={!canGrant || Boolean(busy) || sessionExpired}
               onChange={(event) =>
                 setAcceptance({
                   challenge: notice.consentChallenge,
@@ -153,11 +176,13 @@ export function CvProcessingConsent({
           </label>
           <button
             type="button"
-            disabled={!canGrant || !accepted || Boolean(busy)}
+            disabled={!canGrant || !accepted || Boolean(busy) || sessionExpired}
             aria-busy={busy === "grant"}
             onClick={() => void grant()}
           >
-            Grant external processing consent
+            {busy === "grant"
+              ? "Granting consent..."
+              : "Grant external processing consent"}
           </button>
           {!canGrant ? (
             <p className={styles.explanation}>
@@ -174,8 +199,9 @@ export function CvProcessingConsent({
       </p>
       <p
         className={styles.status}
-        role="status"
-        aria-live="polite"
+        data-tone={feedbackTone}
+        role={feedbackTone === "error" ? "alert" : "status"}
+        aria-live={feedbackTone === "error" ? "assertive" : "polite"}
         aria-atomic="true"
       >
         {message}

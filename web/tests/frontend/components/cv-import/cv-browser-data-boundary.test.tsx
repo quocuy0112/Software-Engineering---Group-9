@@ -38,9 +38,7 @@ describe("CV browser data boundary", () => {
     fireEvent.change(screen.getByLabelText("CV file"), {
       target: { files: [file] },
     });
-    fireEvent.change(screen.getByLabelText("Parser"), {
-      target: { value: "EXTERNAL_OPENAI" },
-    });
+    fireEvent.click(screen.getByRole("radio", { name: /external openai/i }));
     fireEvent.click(screen.getByRole("button", { name: /upload cv/i }));
     await waitFor(() => expect(onUpload).toHaveBeenCalledOnce());
     expect(onUpload).toHaveBeenCalledWith(

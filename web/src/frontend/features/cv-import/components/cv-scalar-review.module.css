@@ -41,6 +41,12 @@
   gap: var(--sh-space-2);
 }
 
+.choices[aria-invalid="true"] {
+  border-color: var(--color-error, #b91c1c);
+  background: var(--color-error-surface, #fef2f2);
+  box-shadow: 0 0 0 1px var(--color-error, #b91c1c);
+}
+
 .comparison > div:first-child {
   align-content: start;
   padding: var(--sh-space-4);
@@ -55,6 +61,19 @@
   color: var(--sh-color-text-primary);
   font-size: var(--sh-font-size-body-sm);
   font-weight: var(--sh-font-weight-semibold);
+}
+
+.decisionHint {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--sh-color-text-secondary);
+  font-size: var(--sh-font-size-caption);
+  font-weight: var(--sh-font-weight-regular);
+  line-height: var(--sh-line-height-caption);
+}
+
+.choices .fieldError {
+  grid-column: 1 / -1;
 }
 
 .comparison p {
@@ -76,6 +95,20 @@
   color: var(--sh-color-text-primary);
   background: var(--sh-color-surface-card);
   box-shadow: var(--sh-shadow-control);
+}
+
+.comparison :is(input, textarea)[aria-invalid="true"] {
+  border-color: var(--color-error, #b91c1c);
+  background: var(--color-error-surface, #fef2f2);
+  box-shadow: 0 0 0 1px var(--color-error, #b91c1c);
+}
+
+.fieldError {
+  margin: 0;
+  color: var(--color-error-text, #7f1d1d);
+  font-size: var(--sh-font-size-caption);
+  font-weight: var(--sh-font-weight-semibold);
+  line-height: var(--sh-line-height-caption);
 }
 
 .comparison textarea {

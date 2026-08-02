@@ -5,6 +5,15 @@ import { config as loadEnvironment } from "dotenv";
 
 loadEnvironment({ path: ".env.local", quiet: true });
 
+// The interactive local app may opt in to the external parser, but the normal
+// automated suite must stay deterministic and network-free. The dedicated
+// synthetic live compatibility test is the only opt-in exception.
+if (process.env.CV_OPENAI_LIVE_SYNTHETIC !== "1") {
+  process.env.CV_PARSER_ADAPTER = "deterministic";
+  process.env.CV_OPENAI_ENABLED = "false";
+  process.env.CV_OPENAI_LOCAL_DEV_ENABLED = "false";
+  process.env.OPENAI_API_KEY = "";
+}
 // PostgreSQL timestamp columns are timezone-naive. Run tests in UTC so the
 // controlled clocks used by lease, retry, and retention tests stay portable.
 process.env.TZ = "UTC";

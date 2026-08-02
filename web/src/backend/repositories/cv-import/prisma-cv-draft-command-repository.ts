@@ -29,6 +29,12 @@ function ids(value: unknown) {
     .sort();
 }
 
+function scalarDecisionValidationError(path: string, message: string) {
+  return new CvImportServiceError("VALIDATION_ERROR", {
+    fieldErrors: [{ path, code: "ACTION_MISMATCH", message }],
+  });
+}
+
 function validateDecisionSemantics(
   proposals: CvEditableProposals,
   decisions: CvReviewDecisions,
@@ -51,16 +57,26 @@ function validateDecisionSemantics(
   const scalarFields = new Map(
     proposals.scalars.map((proposal) => [proposal.proposalId, proposal.field]),
   );
-  for (const decision of decisions.scalars) {
+  for (const [index, decision] of decisions.scalars.entries()) {
     if (decision.action === "SKIP") continue;
     const field = scalarFields.get(decision.proposalId);
-    if (!field) throw new CvImportServiceError("VALIDATION_ERROR");
+    if (!field)
+      throw scalarDecisionValidationError(
+        `reviewDecisions.scalars.${index}.action`,
+        "Choose a valid action for this proposed profile field.",
+      );
     const current = profile[field];
-    if (
-      (decision.action === "ADD" && current !== null) ||
-      (decision.action === "REPLACE" && current === null)
-    )
-      throw new CvImportServiceError("VALIDATION_ERROR");
+    const label = field.replace(/^./u, (value) => value.toUpperCase());
+    if (decision.action === "ADD" && current !== null)
+      throw scalarDecisionValidationError(
+        `reviewDecisions.scalars.${index}.action`,
+        `${label} already has a Profile value. Choose replace or skip.`,
+      );
+    if (decision.action === "REPLACE" && current === null)
+      throw scalarDecisionValidationError(
+        `reviewDecisions.scalars.${index}.action`,
+        `${label} is not set on the Profile. Choose add or skip.`,
+      );
   }
   for (const [group, owned] of [
     [decisions.experiences, profile.experienceIds],

@@ -2,7 +2,7 @@ import "server-only";
 
 import { createHmac, randomUUID } from "node:crypto";
 
-import { cvConfiguration } from "@/backend/cv/config";
+import { cvConfiguration, cvParserAvailability } from "@/backend/cv/config";
 import { createMetadataCryptor } from "@/backend/cv/encryption/metadata-cryptor";
 import { prisma } from "@/backend/database/prisma";
 import { serverEnvironment } from "@/backend/env/runtime";
@@ -79,6 +79,7 @@ function documentKind(
 }
 
 function defaultDependencies(): CreateCvImportDependencies {
+  const parserAvailability = cvParserAvailability(cvConfiguration);
   const keys = Object.fromEntries(
     Object.entries(cvConfiguration.encryption.encodedKeys).map(
       ([version, key]) => [Number(version), Buffer.from(key, "base64")],
@@ -108,9 +109,8 @@ function defaultDependencies(): CreateCvImportDependencies {
     now: () => new Date(),
     parserAllowed: (parserClass) =>
       parserClass === "DETERMINISTIC_INTERNAL"
-        ? cvConfiguration.parser.adapter === "deterministic"
-        : cvConfiguration.parser.enabled &&
-          cvConfiguration.parser.privacyApproved,
+        ? parserAvailability.deterministic
+        : parserAvailability.external,
   };
 }
 

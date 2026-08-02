@@ -8,19 +8,87 @@ import type {
   CvReviewDecisions,
 } from "@/shared/contracts/cv-import/review";
 import type { z } from "zod";
-import { cvConflictLatestSchema } from "@/shared/contracts/cv-import/common";
+import {
+  cvConflictLatestSchema,
+  type CvApiError,
+} from "@/shared/contracts/cv-import/common";
 import { cvConfirmationReceiptSchema } from "@/shared/contracts/cv-import/review";
 
 type Receipt = z.infer<typeof cvConfirmationReceiptSchema>;
 type ConflictLatest = z.infer<typeof cvConflictLatestSchema>;
+export type CvReviewFieldError = CvApiError["error"]["fieldErrors"][number];
 
 type SafeApiError = Readonly<{
   error?: Readonly<{
     code?: string;
     message?: string;
+    fieldErrors?: CvReviewFieldError[];
     latest?: ConflictLatest | null;
   }>;
 }>;
+
+const fieldLabels: Readonly<Record<string, string>> = {
+  company: "Company",
+  degree: "Degree",
+  description: "Description",
+  endDate: "End date",
+  field: "Field of study",
+  headline: "Headline",
+  institution: "Institution",
+  location: "Location",
+  phone: "Phone number",
+  startDate: "Start date",
+  summary: "Summary",
+  title: "Job title",
+  url: "Social link",
+  value: "Value",
+};
+
+function fieldLabel(path: string) {
+  if (path.includes(".skills.")) return "Skill";
+  if (path.includes(".socialLinks.")) return "Social link";
+  const segment = path.split(".").at(-1) ?? "value";
+  return fieldLabels[segment] ?? segment.replace(/([a-z])([A-Z])/gu, "$1 $2");
+}
+
+export function presentCvReviewFieldError(
+  fieldError: CvReviewFieldError,
+): CvReviewFieldError {
+  const genericMessage = [
+    "Enter a valid value.",
+    "This field is required.",
+    "This value is invalid.",
+  ].includes(fieldError.message);
+  if (!genericMessage) return fieldError;
+  const label = fieldLabel(fieldError.path);
+  const message =
+    {
+      CURRENT_HAS_END: `${label} must be empty for a current entry.`,
+      DATE: `${label} must be a valid date.`,
+      DATE_RANGE: `${label} must be after the start date and cannot be in the future.`,
+      DUPLICATE: `${label} duplicates another proposed value.`,
+      FORMAT: `${label} has an invalid format.`,
+      FUTURE: `${label} cannot be in the future.`,
+      INCOMPLETE: `${label} must include a complete profile URL.`,
+      LENGTH: `${label} has an invalid length.`,
+      REQUIRED: fieldError.path.endsWith("endDate")
+        ? `${label} is required unless the entry is current.`
+        : `${label} is required.`,
+      URL: `${label} must be a valid http or https URL.`,
+    }[fieldError.code] ?? fieldError.message;
+  return { ...fieldError, message };
+}
+
+function saveErrorSummary(
+  message: string,
+  fieldErrors: readonly CvReviewFieldError[],
+) {
+  if (!fieldErrors.length) return message;
+  const first = fieldErrors[0]?.message ?? message;
+  return fieldErrors.length === 1
+    ? first
+    : `${first} Check ${fieldErrors.length} highlighted fields.`;
+}
 
 export type CvReviewConflict = Readonly<{
   code: "DRAFT_REVISION_CONFLICT" | "PROFILE_REVISION_CONFLICT";
@@ -57,6 +125,7 @@ export function useCvDraftReview(input: {
   );
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<CvReviewFieldError[]>([]);
   const [conflict, setConflict] = useState<CvReviewConflict | null>(null);
   const [latestComparison, setLatestComparison] =
     useState<CvDraftComparison | null>(null);
@@ -110,6 +179,7 @@ export function useCvDraftReview(input: {
     setConflict(null);
     setLatestComparison(null);
     setError(null);
+    setFieldErrors([]);
   }, []);
 
   const loadLatest = useCallback(async () => {
@@ -121,12 +191,21 @@ export function useCvDraftReview(input: {
     return (await response.json()) as CvDraftComparison;
   }, [authoritative.draftId]);
 
+  const clearFieldErrors = useCallback((paths: readonly string[]) => {
+    if (!paths.length) return;
+    const selected = new Set(paths);
+    setFieldErrors((current) =>
+      current.filter((fieldError) => !selected.has(fieldError.path)),
+    );
+  }, []);
+
   const save = useCallback(async () => {
     if (activeOperation.current || conflict) return false;
     activeOperation.current = "save";
     setPending("save");
     setError(null);
     setMessage(null);
+    setFieldErrors([]);
     try {
       const response = await fetch(
         `/api/account/cv-drafts/${authoritative.draftId}`,
@@ -163,9 +242,16 @@ export function useCvDraftReview(input: {
           setLatestComparison(null);
           return false;
         }
-        throw new Error(
-          failure.error?.message ?? "The review could not be saved.",
+        const nextFieldErrors = (failure.error?.fieldErrors ?? []).map(
+          presentCvReviewFieldError,
         );
+        const summary = saveErrorSummary(
+          failure.error?.message ?? "The review could not be saved.",
+          nextFieldErrors,
+        );
+        setFieldErrors(nextFieldErrors);
+        setError(summary);
+        return false;
       }
       const next = await loadLatest();
       applyAuthoritative(next);
@@ -173,11 +259,12 @@ export function useCvDraftReview(input: {
       setMessage("Review saved.");
       return true;
     } catch (caught) {
-      setError(
+      const summary =
         caught instanceof Error
           ? caught.message
-          : "The review could not be saved.",
-      );
+          : "The review could not be saved.";
+      setError(summary);
+      setFieldErrors([]);
       return false;
     } finally {
       activeOperation.current = null;
@@ -346,11 +433,13 @@ export function useCvDraftReview(input: {
       pending,
       message,
       error,
+      fieldErrors,
       conflict,
       latestComparison,
       receipt,
       setProposals: mutateProposals,
       setDecisions: mutateDecisions,
+      clearFieldErrors,
       save,
       confirm,
       compareLatest,
@@ -359,6 +448,7 @@ export function useCvDraftReview(input: {
     }),
     [
       authoritative,
+      clearFieldErrors,
       compareLatest,
       confirm,
       conflict,
@@ -366,6 +456,7 @@ export function useCvDraftReview(input: {
       dirty,
       discardAndReload,
       error,
+      fieldErrors,
       latestComparison,
       message,
       mutateDecisions,

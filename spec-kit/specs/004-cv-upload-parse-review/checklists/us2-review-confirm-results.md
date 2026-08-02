@@ -38,6 +38,24 @@ seven-day deletion scheduling; one confirmation audit event; component,
 accessibility, 320-pixel, and stylesheet-boundary checks; and indistinguishable
 cross-account denial.
 
+## 2026-08-02 review-validation synchronization addendum
+
+The US2 regression matrix was extended after the review-save feedback repair:
+
+- `cv-draft-save.test.ts`: **5/5 passed**, including the exact
+  `reviewDecisions.scalars.{index}.action` `ACTION_MISMATCH` response when `ADD`
+  is submitted for an already populated Profile scalar;
+- `cv-draft-review.test.tsx`: **6/6 passed**, including local validation before
+  PATCH, server `fieldErrors`, Profile-aware scalar choices, preserved edits,
+  field-level invalid treatment/focus, and persistent feedback with a
+  supplemental error toast;
+- workspace TypeScript typecheck and focused ESLint over the changed backend,
+  client, component, and test files completed with **0 errors**.
+
+These 11 focused tests supplement rather than replace the original T090 matrix.
+They confirm that a rejected save does not increment the draft revision or hide
+the actionable field from the candidate.
+
 ## Local timing evidence
 
 The browser observations are one serialized warm-path sample per required

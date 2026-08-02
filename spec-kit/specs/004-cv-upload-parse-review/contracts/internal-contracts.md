@@ -791,6 +791,14 @@ source, draft, provenance, filename, or provider detail is recoverable. Error
 details contain field paths and safe actions only, never rejected values or
 document/provider content.
 
+Draft-save validation uses canonical paths from the complete PATCH body. Scalar
+choices that disagree with the authoritative current Profile return
+`VALIDATION_ERROR` with field code `ACTION_MISMATCH` at
+`reviewDecisions.scalars.{index}.action`. Normalized duplicate proposed skills
+or social links return a safe duplicate code at the affected proposal field.
+These are validation results, not concurrency conflicts; no partial draft write
+or revision increment occurs.
+
 ## 18. Telemetry and Redaction Contract
 
 Allowed dimensions:

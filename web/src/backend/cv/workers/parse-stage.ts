@@ -47,17 +47,16 @@ function defaults(): Dependencies {
   const external = cvConfiguration.parser.apiKey
     ? new OpenAiCvParser({ apiKey: cvConfiguration.parser.apiKey })
     : undefined;
-  const deterministic: CvParser =
-    process.env.NODE_ENV === "production"
-      ? {
-          parserClass: "DETERMINISTIC_INTERNAL",
-          async parse() {
-            throw new Error("PARSER_UNAVAILABLE");
-          },
-        }
-      : new DeterministicCvParser({
-          environment: process.env.NODE_ENV ?? "development",
-        });
+  const deterministic: CvParser = !cvConfiguration.parser.deterministicEnabled
+    ? {
+        parserClass: "DETERMINISTIC_INTERNAL",
+        async parse() {
+          throw new Error("PARSER_UNAVAILABLE");
+        },
+      }
+    : new DeterministicCvParser({
+        environment: serverEnvironment.APP_ENV,
+      });
   return {
     segments: new ExtractedSegmentStore({ storage, cryptor }),
     deterministic,
@@ -328,7 +327,7 @@ export class ParseStageProcessor {
         // adapter transmits. P0 never attempts a fallback provider.
         await this.assertExternalDispatchAuthorized(work, context);
       } else {
-        if (configuration.parser.adapter !== "deterministic")
+        if (!configuration.parser.deterministicEnabled)
           throw new Error("PARSER_UNAVAILABLE");
         parser = this.dependencies.deterministic;
       }

@@ -5,6 +5,7 @@ import {
   CV_APPROVED_OPENAI_ENDPOINT,
   CV_APPROVED_OPENAI_MODEL,
   cvConfiguration,
+  cvParserAvailability,
   type CvConfiguration,
 } from "@/backend/cv/config";
 import { DeterministicCvParser } from "@/backend/cv/parsing/deterministic";
@@ -20,11 +21,13 @@ function approvedConfiguration(
     ...cvConfiguration,
     parser: {
       adapter: "openai",
+      deterministicEnabled: false,
       endpoint: CV_APPROVED_OPENAI_ENDPOINT,
       model: CV_APPROVED_OPENAI_MODEL,
       enabled: true,
       apiKey: "synthetic-approved-key",
       privacyApproved: true,
+      localDevelopmentEnabled: false,
       ...parser,
     },
   };
@@ -50,6 +53,29 @@ describe("external CV dispatch gate", () => {
     expect(() =>
       assertCvExternalDeploymentGate(approvedConfiguration(override)),
     ).toThrow(expect.objectContaining({ code: "CV_PROCESSING_UNAVAILABLE" }));
+  });
+
+  it("allows an explicit local development gate without production privacy assertions", () => {
+    expect(() =>
+      assertCvExternalDeploymentGate(
+        approvedConfiguration({
+          privacyApproved: false,
+          localDevelopmentEnabled: true,
+        }),
+      ),
+    ).not.toThrow();
+  });
+
+  it("can expose deterministic and OpenAI parsers at the same time in local development", () => {
+    expect(
+      cvParserAvailability(
+        approvedConfiguration({
+          deterministicEnabled: true,
+          privacyApproved: false,
+          localDevelopmentEnabled: true,
+        }),
+      ),
+    ).toEqual({ deterministic: true, external: true });
   });
 
   it("forbids the deterministic fixture parser in production", () => {
@@ -138,5 +164,9 @@ describe("external CV dispatch gate", () => {
     expect(source).not.toMatch(
       /fallbackParser|secondaryProvider|alternateProvider/iu,
     );
+    expect(source).not.toMatch(
+      /configuration\.parser\.adapter\s*!==\s*["']deterministic["']/u,
+    );
+    expect(source).toContain("environment: serverEnvironment.APP_ENV");
   });
 });

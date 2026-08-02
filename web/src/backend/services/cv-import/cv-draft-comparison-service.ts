@@ -25,6 +25,16 @@ import { CvImportServiceError } from "./cv-http-errors";
 
 const normalizer = new PlainTextNormalizer();
 
+function reviewFieldValidationError(
+  path: string,
+  code: string,
+  message = "This value is invalid.",
+) {
+  return new CvImportServiceError("VALIDATION_ERROR", {
+    fieldErrors: [{ path, code, message }],
+  });
+}
+
 function normalizedText(
   value: string,
   field: string,
@@ -37,7 +47,12 @@ function normalizedText(
     required: true,
     multiline,
   }).value;
-  if (!result) throw new CvImportServiceError("VALIDATION_ERROR");
+  if (!result)
+    throw reviewFieldValidationError(
+      field,
+      "REQUIRED",
+      "This field is required.",
+    );
   return result;
 }
 
@@ -69,7 +84,7 @@ function normalizeProposals(
   const educationAuthority = authoritativeMap(comparison, "education");
   const skillAuthority = authoritativeMap(comparison, "skills");
   const linkAuthority = authoritativeMap(comparison, "socialLinks");
-  const scalars = requested.scalars.map((proposal) => {
+  const scalars = requested.scalars.map((proposal, index) => {
     const source = scalarAuthority.get(proposal.proposalId);
     if (!source || !("field" in source) || source.field !== proposal.field)
       throw new CvImportServiceError("VALIDATION_ERROR");
@@ -86,7 +101,7 @@ function normalizeProposals(
         ? validateProfilePhone(proposal.value)
         : normalizedText(
             proposal.value,
-            `scalars.${proposal.field}`,
+            `proposals.scalars.${index}.value`,
             maximum,
             proposal.field === "summary",
           );
@@ -196,13 +211,27 @@ function normalizeProposals(
     };
   });
   const skillKeys = new Set<string>();
-  const skills = requested.skills.map((proposal) => {
+  const skills = requested.skills.map((proposal, index) => {
     const source = skillAuthority.get(proposal.proposalId);
     if (!source || !("evidence" in source))
       throw new CvImportServiceError("VALIDATION_ERROR");
-    const normalized = normalizeSkillName(proposal.value);
+    let normalized: ReturnType<typeof normalizeSkillName>;
+    try {
+      normalized = normalizeSkillName(proposal.value);
+    } catch (error) {
+      if (error instanceof ProfileValidationError)
+        throw reviewFieldValidationError(
+          `proposals.skills.${index}.value`,
+          error.code,
+        );
+      throw error;
+    }
     if (skillKeys.has(normalized.normalizedName))
-      throw new CvImportServiceError("VALIDATION_ERROR");
+      throw reviewFieldValidationError(
+        `proposals.skills.${index}.value`,
+        "DUPLICATE",
+        "Remove or rename the duplicate skill.",
+      );
     skillKeys.add(normalized.normalizedName);
     return {
       ...proposal,
@@ -216,12 +245,27 @@ function normalizeProposals(
     };
   });
   const linkKeys = new Set<string>();
-  const socialLinks = requested.socialLinks.map((proposal) => {
+  const socialLinks = requested.socialLinks.map((proposal, index) => {
     const source = linkAuthority.get(proposal.proposalId);
     if (!source || !("evidence" in source))
       throw new CvImportServiceError("VALIDATION_ERROR");
-    const value = normalizeSocialUrl(proposal.value);
-    if (linkKeys.has(value)) throw new CvImportServiceError("VALIDATION_ERROR");
+    let value: string;
+    try {
+      value = normalizeSocialUrl(proposal.value);
+    } catch (error) {
+      if (error instanceof ProfileValidationError)
+        throw reviewFieldValidationError(
+          `proposals.socialLinks.${index}.value`,
+          error.code,
+        );
+      throw error;
+    }
+    if (linkKeys.has(value))
+      throw reviewFieldValidationError(
+        `proposals.socialLinks.${index}.value`,
+        "DUPLICATE",
+        "Remove the duplicate social link.",
+      );
     linkKeys.add(value);
     return {
       ...proposal,
