@@ -1,23 +1,16 @@
-import process from "node:process";
+import { createHash } from "node:crypto";
+import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { config as loadEnvironment } from "dotenv";
+import { z } from "zod";
 import { PrismaClient } from "../src/backend/generated/prisma/client";
 
 const webRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const defaultCatalogPath = resolve(webRoot, "data/jobs/catalog.v1.json");
 loadEnvironment({ path: resolve(webRoot, ".env.local"), quiet: true });
-
-if (process.env.APP_ENV !== "local") {
-  throw new Error("Job demo data can only be seeded when APP_ENV=local.");
-}
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL is required. Run npm run env:init first.");
-}
-
-const prisma = new PrismaClient({
-  adapter: new PrismaPg(process.env.DATABASE_URL),
-});
 
 const normalize = (value: string) =>
   value
@@ -29,256 +22,367 @@ const normalize = (value: string) =>
     .trim()
     .replace(/\s+/gu, " ");
 
-const skills = [
-  { name: "TypeScript", normalizedName: "typescript" },
-  { name: "React", normalizedName: "react" },
-  { name: "Node.js", normalizedName: "node js" },
-  { name: "SQL", normalizedName: "sql" },
-  { name: "Data Analysis", normalizedName: "data analysis" },
-] as const;
+const companySchema = z
+  .object({
+    id: z.string().min(1).max(128),
+    slug: z
+      .string()
+      .min(1)
+      .max(160)
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u),
+    legalName: z.string().min(1).max(200),
+    displayName: z.string().min(1).max(160),
+    websiteUrl: z.string().url().nullable(),
+    publicDescription: z.string().max(3_000).nullable(),
+    publicLocation: z.string().max(160).nullable(),
+    verifiedAt: z.string().datetime(),
+  })
+  .strict();
 
-const jobs = [
-  {
-    id: "demo-job-typescript-engineer",
-    slug: "typescript-engineer-smarthire-demo",
-    title: "TypeScript Engineer",
-    summary: "Build reliable and accessible hiring experiences for candidates.",
-    description:
-      "Join a product team building secure recruitment workflows used by candidates and hiring teams.",
-    responsibilities:
-      "Deliver product increments, review code, improve performance, and collaborate with design and QA.",
-    requirements:
-      "Strong TypeScript fundamentals, experience with web applications, and clear communication.",
-    benefits:
-      "Hybrid work, learning budget, private health insurance, and modern equipment.",
-    location: "Ho Chi Minh City",
-    employmentType: "FULL_TIME",
-    experienceLevel: "MID",
-    workArrangement: "HYBRID",
-    salaryMin: 30_000_000,
-    salaryMax: 50_000_000,
-    skillNames: ["typescript", "react", "node js"],
-  },
-  {
-    id: "demo-job-frontend-react",
-    slug: "frontend-react-engineer-smarthire-demo",
-    title: "Frontend React Engineer",
-    summary:
-      "Create fast, inclusive interfaces for a growing HR technology platform.",
-    description:
-      "Work closely with product designers to turn complex recruitment journeys into simple experiences.",
-    responsibilities:
-      "Build React components, test user flows, improve accessibility, and maintain frontend quality.",
-    requirements:
-      "Hands-on React and TypeScript experience with a strong understanding of semantic HTML and CSS.",
-    benefits:
-      "Remote-friendly team, flexible hours, and annual professional development support.",
-    location: "Da Nang",
-    employmentType: "FULL_TIME",
-    experienceLevel: "JUNIOR",
-    workArrangement: "REMOTE",
-    salaryMin: 20_000_000,
-    salaryMax: 35_000_000,
-    skillNames: ["react", "typescript"],
-  },
-  {
-    id: "demo-job-backend-node",
-    slug: "senior-backend-nodejs-smarthire-demo",
-    title: "Senior Backend Node.js Engineer",
-    summary: "Design dependable services for high-trust recruitment workflows.",
-    description:
-      "Own backend services that protect candidate data and keep hiring workflows consistent.",
-    responsibilities:
-      "Design APIs, model PostgreSQL data, review security controls, and mentor engineers.",
-    requirements:
-      "Production Node.js, SQL, API design, and transactional data modeling experience.",
-    benefits:
-      "Competitive salary, leadership track, health coverage, and a yearly bonus.",
-    location: "Ha Noi",
-    employmentType: "FULL_TIME",
-    experienceLevel: "SENIOR",
-    workArrangement: "ONSITE",
-    salaryMin: 45_000_000,
-    salaryMax: 70_000_000,
-    skillNames: ["node js", "typescript", "sql"],
-  },
-  {
-    id: "demo-job-data-analyst",
-    slug: "product-data-analyst-smarthire-demo",
-    title: "Product Data Analyst",
-    summary:
-      "Turn recruitment data into practical product and operations insights.",
-    description:
-      "Partner with product and operations teams to understand candidate journeys and marketplace health.",
-    responsibilities:
-      "Define metrics, build trusted analyses, communicate findings, and improve reporting quality.",
-    requirements:
-      "Strong SQL, analytical thinking, data storytelling, and careful handling of private data.",
-    benefits:
-      "Flexible contract, hybrid schedule, and access to analytics training.",
-    location: "Ho Chi Minh City",
-    employmentType: "CONTRACT",
-    experienceLevel: "ENTRY",
-    workArrangement: "HYBRID",
-    salaryMin: 18_000_000,
-    salaryMax: 28_000_000,
-    skillNames: ["sql", "data analysis"],
-  },
-  {
-    id: "demo-job-software-intern",
-    slug: "software-engineering-intern-smarthire-demo",
-    title: "Software Engineering Intern",
-    summary:
-      "Learn modern product engineering while shipping useful features with a mentor.",
-    description:
-      "Join a structured internship with real product work, weekly feedback, and guided technical learning.",
-    responsibilities:
-      "Implement scoped features, write tests, document decisions, and participate in code reviews.",
-    requirements:
-      "Programming fundamentals, curiosity, consistent learning habits, and basic web knowledge.",
-    benefits:
-      "Paid internship, dedicated mentor, team equipment, and conversion opportunities.",
-    location: "Ha Noi",
-    employmentType: "INTERNSHIP",
-    experienceLevel: "ENTRY",
-    workArrangement: "ONSITE",
-    salaryMin: 7_000_000,
-    salaryMax: 12_000_000,
-    skillNames: ["typescript", "react"],
-  },
-] as const;
+const jobSchema = z
+  .object({
+    id: z.string().min(1).max(128),
+    companyId: z.string().min(1).max(128),
+    sourceUrl: z.string().url(),
+    slug: z
+      .string()
+      .min(1)
+      .max(200)
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u),
+    title: z.string().min(1).max(200),
+    summary: z.string().min(1).max(500),
+    description: z.string().min(1).max(20_000),
+    responsibilities: z.string().min(1).max(12_000),
+    requirements: z.string().min(1).max(12_000),
+    benefits: z.string().max(8_000).nullable(),
+    location: z.string().min(1).max(160),
+    employmentType: z.enum([
+      "FULL_TIME",
+      "PART_TIME",
+      "CONTRACT",
+      "INTERNSHIP",
+      "TEMPORARY",
+    ]),
+    experienceLevel: z.enum([
+      "ENTRY",
+      "JUNIOR",
+      "MID",
+      "SENIOR",
+      "LEAD",
+      "MANAGER",
+    ]),
+    workArrangement: z.enum(["ONSITE", "HYBRID", "REMOTE"]),
+    salary: z
+      .object({
+        min: z.number().int().nonnegative(),
+        max: z.number().int().nonnegative(),
+        currency: z.string().regex(/^[A-Z]{3}$/u),
+        period: z.enum(["HOUR", "MONTH", "YEAR"]),
+      })
+      .strict()
+      .refine(({ min, max }) => min <= max, {
+        message: "salary.min must be less than or equal to salary.max",
+      })
+      .nullable(),
+    skills: z
+      .array(
+        z
+          .object({
+            name: z.string().min(1).max(80),
+            required: z.boolean(),
+          })
+          .strict(),
+      )
+      .max(50),
+    questions: z
+      .array(
+        z
+          .object({
+            id: z.string().min(1).max(128),
+            prompt: z.string().min(1).max(500),
+            description: z.string().max(1_000).nullable(),
+            required: z.boolean(),
+          })
+          .strict(),
+      )
+      .max(20),
+    publishedAt: z.string().datetime(),
+    applicationDeadline: z.string().datetime().nullable(),
+  })
+  .strict();
 
-async function seed() {
-  const publishedAt = new Date();
-  const applicationDeadline = new Date(publishedAt);
-  applicationDeadline.setUTCDate(applicationDeadline.getUTCDate() + 60);
+const catalogSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    datasetVersion: z.string().min(1).max(64),
+    source: z.string().min(1).max(64),
+    companies: z.array(companySchema).min(1),
+    jobs: z.array(jobSchema).min(1),
+  })
+  .strict()
+  .superRefine((catalog, context) => {
+    const companyIds = new Set(catalog.companies.map(({ id }) => id));
+    const uniqueFields = [
+      ["company id", catalog.companies.map(({ id }) => id)],
+      ["company slug", catalog.companies.map(({ slug }) => slug)],
+      ["job id", catalog.jobs.map(({ id }) => id)],
+      ["job slug", catalog.jobs.map(({ slug }) => slug)],
+      [
+        "question id",
+        catalog.jobs.flatMap(({ questions }) => questions.map(({ id }) => id)),
+      ],
+    ] as const;
 
-  const company = await prisma.company.upsert({
-    where: { slug: "smarthire-demo" },
-    update: {
-      displayName: "SmartHire Labs",
-      publicDescription:
-        "A verified demo employer used to explore the SmartHire job board locally.",
-      publicLocation: "Viet Nam",
-      websiteUrl: "https://example.com/smarthire-labs",
-      verifiedAt: publishedAt,
-    },
-    create: {
-      id: "demo-company-smarthire-labs",
-      slug: "smarthire-demo",
-      legalName: "SmartHire Labs Demo Company Limited",
-      displayName: "SmartHire Labs",
-      publicDescription:
-        "A verified demo employer used to explore the SmartHire job board locally.",
-      publicLocation: "Viet Nam",
-      websiteUrl: "https://example.com/smarthire-labs",
-      verifiedAt: publishedAt,
-    },
+    for (const [label, values] of uniqueFields) {
+      if (new Set(values).size !== values.length) {
+        context.addIssue({
+          code: "custom",
+          message: `Catalog contains a duplicate ${label}.`,
+        });
+      }
+    }
+
+    for (const job of catalog.jobs) {
+      if (!companyIds.has(job.companyId)) {
+        context.addIssue({
+          code: "custom",
+          message: `Job ${job.id} references unknown company ${job.companyId}.`,
+        });
+      }
+      const normalizedSkills = job.skills.map(({ name }) => normalize(name));
+      if (new Set(normalizedSkills).size !== normalizedSkills.length) {
+        context.addIssue({
+          code: "custom",
+          message: `Job ${job.id} contains duplicate normalized skills.`,
+        });
+      }
+    }
   });
 
-  const skillByName = new Map<string, string>();
-  for (const skill of skills) {
-    const saved = await prisma.skill.upsert({
-      where: { normalizedName: skill.normalizedName },
-      update: { name: skill.name },
-      create: {
-        id: `demo-skill-${skill.normalizedName.replaceAll(" ", "-")}`,
-        ...skill,
-      },
-    });
-    skillByName.set(skill.normalizedName, saved.id);
-  }
+type Catalog = z.infer<typeof catalogSchema>;
 
-  for (const job of jobs) {
-    const searchDocumentNormalized = normalize(
-      `${job.title} ${company.displayName} ${job.location} ${job.skillNames.join(" ")} ${job.summary} ${job.description}`,
-    );
-    const data = {
-      companyId: company.id,
-      title: job.title,
-      normalizedTitle: normalize(job.title),
-      summary: job.summary,
-      description: job.description,
-      responsibilities: job.responsibilities,
-      requirements: job.requirements,
-      benefits: job.benefits,
-      location: job.location,
-      normalizedLocation: normalize(job.location),
-      employmentType: job.employmentType,
-      experienceLevel: job.experienceLevel,
-      workArrangement: job.workArrangement,
-      salaryMin: job.salaryMin,
-      salaryMax: job.salaryMax,
-      salaryCurrency: "VND",
-      salaryPeriod: "MONTH" as const,
-      searchDocumentNormalized,
-      status: "ACTIVE" as const,
-      approvedAt: publishedAt,
-      publishedAt,
-      applicationDeadline,
-      closedAt: null,
-      removedAt: null,
-    };
-    await prisma.jobPosting.upsert({
-      where: { slug: job.slug },
-      update: data,
-      create: { id: job.id, slug: job.slug, ...data },
-    });
+function catalogPathFromArguments(): string {
+  const fileArgument = process.argv.indexOf("--file");
+  if (fileArgument < 0) return defaultCatalogPath;
+  const value = process.argv[fileArgument + 1];
+  if (!value) throw new Error("--file requires a path.");
+  return resolve(process.cwd(), value);
+}
 
-    for (const [position, normalizedName] of job.skillNames.entries()) {
-      const skillId = skillByName.get(normalizedName);
-      if (!skillId) throw new Error(`Missing seeded skill: ${normalizedName}`);
-      await prisma.jobPostingSkill.upsert({
-        where: {
-          jobPostingId_skillId: { jobPostingId: job.id, skillId },
-        },
-        update: {
-          displayName:
-            skills.find((skill) => skill.normalizedName === normalizedName)
-              ?.name ?? normalizedName,
-          required: position === 0,
-          position,
-        },
-        create: {
-          jobPostingId: job.id,
-          skillId,
-          displayName:
-            skills.find((skill) => skill.normalizedName === normalizedName)
-              ?.name ?? normalizedName,
-          required: position === 0,
-          position,
-        },
+async function loadCatalog(): Promise<{ catalog: Catalog; path: string }> {
+  const path = catalogPathFromArguments();
+  const document: unknown = JSON.parse(await readFile(path, "utf8"));
+  return { catalog: catalogSchema.parse(document), path };
+}
+
+function stableSkillId(normalizedName: string): string {
+  const digest = createHash("sha256")
+    .update(normalizedName, "utf8")
+    .digest("hex")
+    .slice(0, 24);
+  return `catalog-skill-${digest}`;
+}
+
+async function importCatalog(prisma: PrismaClient, catalog: Catalog) {
+  return prisma.$transaction(async (transaction) => {
+    for (const company of catalog.companies) {
+      const conflictingSlug = await transaction.company.findUnique({
+        where: { slug: company.slug },
+        select: { id: true },
+      });
+      if (conflictingSlug && conflictingSlug.id !== company.id) {
+        throw new Error(
+          `Company slug already belongs to another row: ${company.slug}`,
+        );
+      }
+
+      const data = {
+        slug: company.slug,
+        legalName: company.legalName,
+        displayName: company.displayName,
+        logoUrl: null,
+        websiteUrl: company.websiteUrl,
+        publicDescription: company.publicDescription,
+        publicLocation: company.publicLocation,
+        verifiedAt: new Date(company.verifiedAt),
+      };
+      await transaction.company.upsert({
+        where: { id: company.id },
+        update: data,
+        create: { id: company.id, ...data },
       });
     }
 
-    await prisma.applicationQuestion.upsert({
-      where: { id: `${job.id}-question-availability` },
-      update: {
-        prompt: "When could you start this role?",
-        kind: "TEXT",
-        required: true,
-        position: 0,
-        active: true,
-      },
-      create: {
-        id: `${job.id}-question-availability`,
-        jobPostingId: job.id,
-        prompt: "When could you start this role?",
-        kind: "TEXT",
-        required: true,
-        position: 0,
-      },
-    });
-  }
+    const companyById = new Map(
+      catalog.companies.map((company) => [company.id, company] as const),
+    );
+    const skillByName = new Map<string, { id: string; name: string }>();
+    for (const job of catalog.jobs) {
+      for (const skill of job.skills) {
+        const normalizedName = normalize(skill.name);
+        if (skillByName.has(normalizedName)) continue;
+        const saved = await transaction.skill.upsert({
+          where: { normalizedName },
+          update: { name: skill.name },
+          create: {
+            id: stableSkillId(normalizedName),
+            name: skill.name,
+            normalizedName,
+          },
+        });
+        skillByName.set(normalizedName, { id: saved.id, name: saved.name });
+      }
+    }
 
-  console.log(
-    `Seeded ${jobs.length} active demo jobs for ${company.displayName}.`,
-  );
+    for (const job of catalog.jobs) {
+      const company = companyById.get(job.companyId);
+      if (!company) throw new Error(`Unknown company for job ${job.id}.`);
+      const conflictingSlug = await transaction.jobPosting.findUnique({
+        where: { slug: job.slug },
+        select: { id: true },
+      });
+      if (conflictingSlug && conflictingSlug.id !== job.id) {
+        throw new Error(`Job slug already belongs to another row: ${job.slug}`);
+      }
+
+      const desiredSkills = job.skills.map((skill, position) => {
+        const saved = skillByName.get(normalize(skill.name));
+        if (!saved) throw new Error(`Missing imported skill ${skill.name}.`);
+        return {
+          jobPostingId: job.id,
+          skillId: saved.id,
+          displayName: skill.name,
+          required: skill.required,
+          position,
+        };
+      });
+      const searchDocumentNormalized = normalize(
+        [
+          job.title,
+          company.displayName,
+          job.location,
+          ...job.skills.map(({ name }) => name),
+          job.summary,
+          job.description,
+          job.responsibilities,
+          job.requirements,
+        ].join(" "),
+      );
+      const data = {
+        companyId: job.companyId,
+        slug: job.slug,
+        title: job.title,
+        normalizedTitle: normalize(job.title),
+        summary: job.summary,
+        description: job.description,
+        responsibilities: job.responsibilities,
+        requirements: job.requirements,
+        benefits: job.benefits,
+        location: job.location,
+        normalizedLocation: normalize(job.location),
+        employmentType: job.employmentType,
+        experienceLevel: job.experienceLevel,
+        workArrangement: job.workArrangement,
+        salaryMin: job.salary?.min ?? null,
+        salaryMax: job.salary?.max ?? null,
+        salaryCurrency: job.salary?.currency ?? null,
+        salaryPeriod: job.salary?.period ?? null,
+        searchDocumentNormalized,
+        status: "ACTIVE" as const,
+        approvedAt: new Date(job.publishedAt),
+        publishedAt: new Date(job.publishedAt),
+        applicationDeadline: job.applicationDeadline
+          ? new Date(job.applicationDeadline)
+          : null,
+        closedAt: null,
+        removedAt: null,
+      };
+      await transaction.jobPosting.upsert({
+        where: { id: job.id },
+        update: data,
+        create: { id: job.id, ...data },
+      });
+
+      await transaction.jobPostingSkill.deleteMany({
+        where: { jobPostingId: job.id },
+      });
+      if (desiredSkills.length > 0) {
+        await transaction.jobPostingSkill.createMany({ data: desiredSkills });
+      }
+
+      const desiredQuestionIds = job.questions.map(({ id }) => id);
+      await transaction.applicationQuestion.updateMany({
+        where: {
+          jobPostingId: job.id,
+          ...(desiredQuestionIds.length > 0
+            ? { id: { notIn: desiredQuestionIds } }
+            : {}),
+          active: true,
+        },
+        data: { active: false },
+      });
+      for (const [position, question] of job.questions.entries()) {
+        const existingQuestion =
+          await transaction.applicationQuestion.findUnique({
+            where: { id: question.id },
+            select: { jobPostingId: true },
+          });
+        if (existingQuestion && existingQuestion.jobPostingId !== job.id) {
+          throw new Error(`Question ${question.id} belongs to another job.`);
+        }
+        const questionData = {
+          prompt: question.prompt,
+          description: question.description,
+          kind: "TEXT" as const,
+          required: question.required,
+          position,
+          active: true,
+        };
+        await transaction.applicationQuestion.upsert({
+          where: { id: question.id },
+          update: questionData,
+          create: {
+            id: question.id,
+            jobPostingId: job.id,
+            ...questionData,
+          },
+        });
+      }
+    }
+
+    return {
+      companies: catalog.companies.length,
+      jobs: catalog.jobs.length,
+      skills: skillByName.size,
+    };
+  });
 }
 
 async function main() {
+  const { catalog, path } = await loadCatalog();
+  if (process.argv.includes("--check")) {
+    console.log(
+      `Validated job catalog ${catalog.datasetVersion}: ${catalog.companies.length} companies and ${catalog.jobs.length} jobs (${path}).`,
+    );
+    return;
+  }
+  if (process.env.APP_ENV !== "local") {
+    throw new Error(
+      "Job catalog data can only be imported when APP_ENV=local.",
+    );
+  }
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is required. Run npm run env:init first.");
+  }
+
+  const prisma = new PrismaClient({
+    adapter: new PrismaPg(process.env.DATABASE_URL),
+  });
   try {
-    await seed();
+    const result = await importCatalog(prisma, catalog);
+    console.log(
+      `Imported job catalog ${catalog.datasetVersion}: ${result.companies} companies, ${result.jobs} jobs and ${result.skills} skills.`,
+    );
   } finally {
     await prisma.$disconnect();
   }

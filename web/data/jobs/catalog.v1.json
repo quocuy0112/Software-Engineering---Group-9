@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "datasetVersion": "2026-08-02.1",
+  "source": "smarthire-curated-demo",
+  "companies": [
+    {
+      "id": "demo-company-smarthire-labs",
+      "slug": "smarthire-demo",
+      "legalName": "SmartHire Labs Demo Company Limited",
+      "displayName": "SmartHire Labs",
+      "websiteUrl": "https://example.com/smarthire-labs",
+      "publicDescription": "Công ty công nghệ nhân sự xây dựng các trải nghiệm tuyển dụng an toàn và dễ tiếp cận.",
+      "publicLocation": "Việt Nam",
+      "verifiedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "demo-company-mekong-digital",
+      "slug": "mekong-digital-demo",
+      "legalName": "Mekong Digital Demo Company Limited",
+      "displayName": "Mekong Digital",
+      "websiteUrl": "https://example.com/mekong-digital",
+      "publicDescription": "Đội ngũ phát triển sản phẩm số cho thị trường Đông Nam Á.",
+      "publicLocation": "Thành phố Hồ Chí Minh",
+      "verifiedAt": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "demo-job-typescript-engineer",
+      "companyId": "demo-company-smarthire-labs",
+      "sourceUrl": "https://example.com/jobs/typescript-engineer",
+      "slug": "typescript-engineer-smarthire-demo",
+      "title": "Kỹ sư TypeScript",
+      "summary": "Phát triển các trải nghiệm tuyển dụng ổn định, an toàn và dễ tiếp cận.",
+      "description": "Bạn sẽ tham gia đội ngũ sản phẩm xây dựng các luồng tuyển dụng phục vụ ứng viên và doanh nghiệp.",
+      "responsibilities": "Phát triển tính năng, review code, cải thiện hiệu năng và phối hợp với thiết kế cùng QA.",
+      "requirements": "Nắm vững TypeScript, có kinh nghiệm phát triển ứng dụng web và giao tiếp rõ ràng.",
+      "benefits": "Làm việc hybrid, ngân sách học tập, bảo hiểm sức khỏe và thiết bị hiện đại.",
+      "location": "Thành phố Hồ Chí Minh",
+      "employmentType": "FULL_TIME",
+      "experienceLevel": "MID",
+      "workArrangement": "HYBRID",
+      "salary": {
+        "min": 30000000,
+        "max": 50000000,
+        "currency": "VND",
+        "period": "MONTH"
+      },
+      "skills": [
+        { "name": "TypeScript", "required": true },
+        { "name": "React", "required": false },
+        { "name": "Node.js", "required": false }
+      ],
+      "questions": [
+        {
+          "id": "demo-job-typescript-engineer-question-availability",
+          "prompt": "Khi nào bạn có thể bắt đầu công việc?",
+          "description": null,
+          "required": true
+        }
+      ],
+      "publishedAt": "2026-01-15T00:00:00.000Z",
+      "applicationDeadline": null
+    },
+    {
+      "id": "demo-job-frontend-react",
+      "companyId": "demo-company-smarthire-labs",
+      "sourceUrl": "https://example.com/jobs/frontend-react-engineer",
+      "slug": "frontend-react-engineer-smarthire-demo",
+      "title": "Kỹ sư Frontend React",
+      "summary": "Xây dựng giao diện nhanh, thân thiện và dễ sử dụng cho nền tảng tuyển dụng.",
+      "description": "Bạn sẽ phối hợp với product designer để biến các luồng nghiệp vụ phức tạp thành trải nghiệm đơn giản.",
+      "responsibilities": "Xây dựng component React, kiểm thử luồng người dùng và cải thiện accessibility.",
+      "requirements": "Có kinh nghiệm React, TypeScript, semantic HTML, CSS và kiểm thử giao diện.",
+      "benefits": "Làm việc từ xa linh hoạt và có ngân sách phát triển nghề nghiệp.",
+      "location": "Đà Nẵng",
+      "employmentType": "FULL_TIME",
+      "experienceLevel": "JUNIOR",
+      "workArrangement": "REMOTE",
+      "salary": {
+        "min": 20000000,
+        "max": 35000000,
+        "currency": "VND",
+        "period": "MONTH"
+      },
+      "skills": [
+        { "name": "React", "required": true },
+        { "name": "TypeScript", "required": true },
+        { "name": "CSS", "required": false }
+      ],
+      "questions": [
+        {
+          "id": "demo-job-frontend-react-question-availability",
+          "prompt": "Khi nào bạn có thể bắt đầu công việc?",
+          "description": null,
+          "required": true
+        }
+      ],
+      "publishedAt": "2026-01-20T00:00:00.000Z",
+      "applicationDeadline": null
+    },
+    {
+      "id": "demo-job-backend-node",
+      "companyId": "demo-company-smarthire-labs",
+      "sourceUrl": "https://example.com/jobs/senior-backend-nodejs",
+      "slug": "senior-backend-nodejs-smarthire-demo",
+      "title": "Kỹ sư Backend Node.js cao cấp",
+      "summary": "Thiết kế các dịch vụ backend đáng tin cậy cho nghiệp vụ tuyển dụng.",
+      "description": "Bạn sẽ phụ trách các dịch vụ bảo vệ dữ liệu ứng viên và duy trì tính nhất quán của hệ thống.",
+      "responsibilities": "Thiết kế API, mô hình dữ liệu PostgreSQL, review bảo mật và hỗ trợ thành viên trong nhóm.",
+      "requirements": "Có kinh nghiệm thực tế với Node.js, SQL, thiết kế API và transaction trong PostgreSQL.",
+      "benefits": "Lương cạnh tranh, lộ trình kỹ thuật, bảo hiểm sức khỏe và thưởng hằng năm.",
+      "location": "Hà Nội",
+      "employmentType": "FULL_TIME",
+      "experienceLevel": "SENIOR",
+      "workArrangement": "ONSITE",
+      "salary": {
+        "min": 45000000,
+        "max": 70000000,
+        "currency": "VND",
+        "period": "MONTH"
+      },
+      "skills": [
+        { "name": "Node.js", "required": true },
+        { "name": "PostgreSQL", "required": true },
+        { "name": "TypeScript", "required": false }
+      ],
+      "questions": [
+        {
+          "id": "demo-job-backend-node-question-availability",
+          "prompt": "Khi nào bạn có thể bắt đầu công việc?",
+          "description": null,
+          "required": true
+        }
+      ],
+      "publishedAt": "2026-01-25T00:00:00.000Z",
+      "applicationDeadline": null
+    },
+    {
+      "id": "demo-job-data-analyst",
+      "companyId": "demo-company-mekong-digital",
+      "sourceUrl": "https://example.com/jobs/product-data-analyst",
+      "slug": "product-data-analyst-smarthire-demo",
+      "title": "Chuyên viên phân tích dữ liệu",
+      "summary": "Chuyển dữ liệu vận hành thành các đề xuất thiết thực cho sản phẩm và kinh doanh.",
+      "description": "Bạn sẽ làm việc với các nhóm sản phẩm và vận hành để xây dựng hệ thống chỉ số đáng tin cậy.",
+      "responsibilities": "Định nghĩa chỉ số, xây dựng báo cáo, phân tích xu hướng và trình bày kết quả.",
+      "requirements": "Thành thạo SQL, có tư duy phân tích và chú trọng chất lượng dữ liệu.",
+      "benefits": "Lịch làm việc hybrid, ngân sách đào tạo phân tích và cơ hội tham gia dự án đa ngành.",
+      "location": "Thành phố Hồ Chí Minh",
+      "employmentType": "CONTRACT",
+      "experienceLevel": "ENTRY",
+      "workArrangement": "HYBRID",
+      "salary": {
+        "min": 18000000,
+        "max": 28000000,
+        "currency": "VND",
+        "period": "MONTH"
+      },
+      "skills": [
+        { "name": "SQL", "required": true },
+        { "name": "Data Analysis", "required": true },
+        { "name": "Power BI", "required": false }
+      ],
+      "questions": [
+        {
+          "id": "demo-job-data-analyst-question-availability",
+          "prompt": "Khi nào bạn có thể bắt đầu công việc?",
+          "description": null,
+          "required": true
+        }
+      ],
+      "publishedAt": "2026-02-15T00:00:00.000Z",
+      "applicationDeadline": null
+    },
+    {
+      "id": "demo-job-software-intern",
+      "companyId": "demo-company-mekong-digital",
+      "sourceUrl": "https://example.com/jobs/software-engineering-intern",
+      "slug": "software-engineering-intern-smarthire-demo",
+      "title": "Thực tập sinh phát triển phần mềm",
+      "summary": "Học quy trình phát triển sản phẩm hiện đại và giao tính năng cùng người hướng dẫn.",
+      "description": "Bạn sẽ tham gia chương trình thực tập có mục tiêu rõ ràng, phản hồi hằng tuần và công việc thực tế.",
+      "responsibilities": "Thực hiện tính năng nhỏ, viết test, cập nhật tài liệu và tham gia review code.",
+      "requirements": "Có kiến thức lập trình cơ bản, tinh thần học hỏi và hiểu biết ban đầu về phát triển web.",
+      "benefits": "Thực tập có lương, mentor riêng, thiết bị làm việc và cơ hội trở thành nhân viên chính thức.",
+      "location": "Hà Nội",
+      "employmentType": "INTERNSHIP",
+      "experienceLevel": "ENTRY",
+      "workArrangement": "ONSITE",
+      "salary": {
+        "min": 7000000,
+        "max": 12000000,
+        "currency": "VND",
+        "period": "MONTH"
+      },
+      "skills": [
+        { "name": "TypeScript", "required": false },
+        { "name": "React", "required": false },
+        { "name": "Git", "required": false }
+      ],
+      "questions": [
+        {
+          "id": "demo-job-software-intern-question-availability",
+          "prompt": "Khi nào bạn có thể bắt đầu kỳ thực tập?",
+          "description": null,
+          "required": true
+        }
+      ],
+      "publishedAt": "2026-02-20T00:00:00.000Z",
+      "applicationDeadline": null
+    }
+  ]
+}

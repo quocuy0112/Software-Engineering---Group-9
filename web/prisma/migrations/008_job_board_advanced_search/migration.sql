@@ -149,7 +149,7 @@ CREATE TABLE "CandidateCv" (
     char_length("displayName") BETWEEN 1 AND 200 AND
     char_length("fileName") BETWEEN 1 AND 255 AND
     "mimeType" IN ('application/pdf','application/vnd.openxmlformats-officedocument.wordprocessingml.document') AND
-    "byteSize" BETWEEN 1 AND 5242880 AND
+    "byteSize" BETWEEN 1 AND 5000000 AND
     "checksumSha256" ~ '^[a-f0-9]{64}$' AND "version" > 0
   )
 );
