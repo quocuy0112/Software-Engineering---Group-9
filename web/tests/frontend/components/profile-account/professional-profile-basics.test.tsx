@@ -142,10 +142,7 @@ describe("professional profile basics", () => {
     expect(await screen.findByRole("status")).toHaveTextContent(
       "Professional basics saved.",
     );
-    expect(toast.success).toHaveBeenCalledWith(
-      "Professional basics saved.",
-      expect.any(Object),
-    );
+    expect(toast.success).not.toHaveBeenCalled();
   });
 
   it("retains failed values, focuses the invalid field, and blocks duplicates", async () => {
@@ -184,7 +181,8 @@ describe("professional profile basics", () => {
       "Review the highlighted fields.",
     );
     expect(phone).toHaveValue("not-a-phone");
+    expect(phone).toHaveAttribute("aria-invalid", "true");
     await waitFor(() => expect(phone).toHaveFocus());
-    expect(toast.error).toHaveBeenCalled();
+    expect(toast.error).not.toHaveBeenCalled();
   });
 });

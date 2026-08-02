@@ -1,19 +1,72 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { PasswordVisibilityButton } from "@/frontend/components/ui/password-visibility-button";
 import { usePasswordChange } from "../client/use-password-change";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import {
+  UnsavedChangesIndicator,
+  useUnsavedChangesGuard,
+} from "../client/unsaved-changes";
 
 export function PasswordChangeForm({ csrfProof }: { csrfProof: string }) {
+  const locale = useWorkspaceLocale();
+  const copy =
+    locale === "vi"
+      ? {
+          kicker: "BẢO MẬT MẬT KHẨU",
+          title: "Đổi mật khẩu",
+          policy:
+            "Sử dụng từ 12 đến 128 ký tự Unicode. Có thể dùng khoảng trắng; không bắt buộc riêng chữ hoa, chữ thường, chữ số hay ký hiệu.",
+          retry: (seconds: number) => ` Thử lại sau ${seconds} giây.`,
+          current: "Mật khẩu hiện tại",
+          next: "Mật khẩu mới",
+          confirm: "Xác nhận mật khẩu mới",
+          show: "Hiện mật khẩu",
+          hide: "Ẩn mật khẩu",
+          changing: "Đang đổi mật khẩu...",
+          locked: (seconds: number) => `Thử lại sau ${seconds} giây`,
+          change: "Đổi mật khẩu",
+        }
+      : {
+          kicker: "CREDENTIAL SECURITY",
+          title: "Change password",
+          policy:
+            "Use 12 to 128 Unicode characters. Spaces are allowed; uppercase, lowercase, digits, and symbols are not individually required.",
+          retry: (seconds: number) => ` Try again in ${seconds} seconds.`,
+          current: "Current password",
+          next: "New password",
+          confirm: "Confirm new password",
+          show: "Show passwords",
+          hide: "Hide passwords",
+          changing: "Changing password...",
+          locked: (seconds: number) => `Try again in ${seconds} seconds`,
+          change: "Change password",
+        };
   const state = usePasswordChange(csrfProof);
-  const [showPasswords, setShowPasswords] = useState(false);
+  const dirty = Object.values(state.values).some(Boolean);
+  useUnsavedChangesGuard(dirty);
+  const [visibleFields, setVisibleFields] = useState({
+    currentPassword: false,
+    newPassword: false,
+    newPasswordConfirmation: false,
+  });
   const feedbackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (state.feedback) feedbackRef.current?.focus();
   }, [state.feedback]);
 
-  const type = showPasswords ? "text" : "password";
   const errors = state.feedback?.fieldErrors;
+
+  const toggleVisibility = (
+    field: "currentPassword" | "newPassword" | "newPasswordConfirmation",
+  ) => {
+    setVisibleFields((current) => ({
+      ...current,
+      [field]: !current[field],
+    }));
+  };
 
   return (
     <section
@@ -27,13 +80,13 @@ export function PasswordChangeForm({ csrfProof }: { csrfProof: string }) {
           </svg>
         </span>
         <div>
-          <p className="panel-kicker">CREDENTIAL SECURITY</p>
-          <h2 id="password-change-title">Change password</h2>
+          <p className="panel-kicker">{copy.kicker}</p>
+          <h2 id="password-change-title">{copy.title}</h2>
+          <UnsavedChangesIndicator dirty={dirty} />
         </div>
       </div>
       <p className="security-panel-copy" id="password-change-policy">
-        Use 12 to 128 Unicode characters. Spaces are allowed; uppercase,
-        lowercase, digits, and symbols are not individually required.
+        {copy.policy}
       </p>
       <div
         ref={feedbackRef}
@@ -54,7 +107,7 @@ export function PasswordChangeForm({ csrfProof }: { csrfProof: string }) {
           <>
             <strong>{state.feedback.message}</strong>
             {state.retryAfterSeconds > 0 ? (
-              <span> Try again in {state.retryAfterSeconds} seconds.</span>
+              <span>{copy.retry(state.retryAfterSeconds)}</span>
             ) : null}
             {errors ? (
               <ul>
@@ -75,76 +128,78 @@ export function PasswordChangeForm({ csrfProof }: { csrfProof: string }) {
           void state.submit();
         }}
       >
-        <label htmlFor="password-change-current">Current password</label>
-        <input
-          id="password-change-current"
-          type={type}
-          autoComplete="current-password"
-          value={state.values.currentPassword}
-          aria-describedby="password-change-policy"
-          onChange={(event) =>
-            state.updateValue("currentPassword", event.target.value)
-          }
-        />
+        <label htmlFor="password-change-current">{copy.current}</label>
+        <div className="password-control">
+          <input
+            className="sh-input"
+            id="password-change-current"
+            type={visibleFields.currentPassword ? "text" : "password"}
+            autoComplete="current-password"
+            value={state.values.currentPassword}
+            aria-describedby="password-change-policy"
+            aria-invalid={Boolean(errors?.currentPassword)}
+            onChange={(event) =>
+              state.updateValue("currentPassword", event.target.value)
+            }
+          />
+          <PasswordVisibilityButton
+            controls="password-change-current"
+            label={`${visibleFields.currentPassword ? copy.hide : copy.show}: ${copy.current}`}
+            visible={visibleFields.currentPassword}
+            onClick={() => toggleVisibility("currentPassword")}
+          />
+        </div>
 
-        <label htmlFor="password-change-new">New password</label>
-        <input
-          id="password-change-new"
-          type={type}
-          autoComplete="new-password"
-          value={state.values.newPassword}
-          aria-describedby="password-change-policy"
-          aria-invalid={Boolean(errors?.newPassword)}
-          onChange={(event) =>
-            state.updateValue("newPassword", event.target.value)
-          }
-        />
+        <label htmlFor="password-change-new">{copy.next}</label>
+        <div className="password-control">
+          <input
+            className="sh-input"
+            id="password-change-new"
+            type={visibleFields.newPassword ? "text" : "password"}
+            autoComplete="new-password"
+            value={state.values.newPassword}
+            aria-describedby="password-change-policy"
+            aria-invalid={Boolean(errors?.newPassword)}
+            onChange={(event) =>
+              state.updateValue("newPassword", event.target.value)
+            }
+          />
+          <PasswordVisibilityButton
+            controls="password-change-new"
+            label={`${visibleFields.newPassword ? copy.hide : copy.show}: ${copy.next}`}
+            visible={visibleFields.newPassword}
+            onClick={() => toggleVisibility("newPassword")}
+          />
+        </div>
 
-        <label htmlFor="password-change-confirmation">
-          Confirm new password
-        </label>
-        <input
-          id="password-change-confirmation"
-          type={type}
-          autoComplete="new-password"
-          value={state.values.newPasswordConfirmation}
-          aria-describedby="password-change-policy"
-          aria-invalid={Boolean(errors?.newPasswordConfirmation)}
-          onChange={(event) =>
-            state.updateValue("newPasswordConfirmation", event.target.value)
-          }
-        />
-
-        <button
-          className="password-visibility-control"
-          type="button"
-          aria-label={showPasswords ? "Hide passwords" : "Show passwords"}
-          aria-pressed={showPasswords}
-          onClick={() => setShowPasswords((visible) => !visible)}
-        >
-          <svg
-            className="password-visibility-icon"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <path
-              d={
-                showPasswords
-                  ? "M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 4.2A10.7 10.7 0 0 1 12 4c5.1 0 8.5 4 9.5 8a12.5 12.5 0 0 1-2.1 4.1M6.2 6.2C3.9 7.8 2.7 10.2 2.5 12c.3 2.1 1.9 5.3 5.9 7.2"
-                  : "M2.5 12S6 4 12 4s9.5 8 9.5 8-3.5 8-9.5 8-9.5-8-9.5-8Zm9.5-3a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"
-              }
-            />
-          </svg>
-          <span>{showPasswords ? "Hide passwords" : "Show passwords"}</span>
-        </button>
+        <label htmlFor="password-change-confirmation">{copy.confirm}</label>
+        <div className="password-control">
+          <input
+            className="sh-input"
+            id="password-change-confirmation"
+            type={visibleFields.newPasswordConfirmation ? "text" : "password"}
+            autoComplete="new-password"
+            value={state.values.newPasswordConfirmation}
+            aria-describedby="password-change-policy"
+            aria-invalid={Boolean(errors?.newPasswordConfirmation)}
+            onChange={(event) =>
+              state.updateValue("newPasswordConfirmation", event.target.value)
+            }
+          />
+          <PasswordVisibilityButton
+            controls="password-change-confirmation"
+            label={`${visibleFields.newPasswordConfirmation ? copy.hide : copy.show}: ${copy.confirm}`}
+            visible={visibleFields.newPasswordConfirmation}
+            onClick={() => toggleVisibility("newPasswordConfirmation")}
+          />
+        </div>
 
         <button type="submit" disabled={state.submitting || state.locked}>
           {state.submitting
-            ? "Changing password..."
+            ? copy.changing
             : state.locked
-              ? `Try again in ${state.retryAfterSeconds} seconds`
-              : "Change password"}
+              ? copy.locked(state.retryAfterSeconds)
+              : copy.change}
         </button>
       </form>
     </section>

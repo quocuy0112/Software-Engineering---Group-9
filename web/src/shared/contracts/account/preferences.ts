@@ -48,7 +48,7 @@ export const accountPreferencesMutationOutcomeSchema = z
   .strict();
 
 export const ACCOUNT_PREFERENCES_DEFAULTS = Object.freeze({
-  language: "vi",
+  language: "en",
   timezone: "Asia/Ho_Chi_Minh",
   emailNotifications: Object.freeze({
     application_updates: true,

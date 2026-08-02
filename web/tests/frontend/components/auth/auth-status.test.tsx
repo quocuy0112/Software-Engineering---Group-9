@@ -1,35 +1,14 @@
-import { render } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
-
-vi.mock("sonner", () => {
-  const toastError = vi.fn();
-  const toastSuccess = vi.fn();
-  const toast = vi.fn();
-  return {
-    toast: Object.assign(toast, {
-      error: toastError,
-      success: toastSuccess,
-    }),
-  };
-});
-
-import { toast } from "sonner";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
 
 describe("AuthStatus", () => {
-  it("splits multiline statuses into separate error messages", () => {
+  it("keeps a multiline error in one assertive inline alert", () => {
     render(<AuthStatus status={"First issue\nSecond issue"} tone="error" />);
 
-    expect(toast.error).toHaveBeenCalledTimes(2);
-    expect(toast.error).toHaveBeenNthCalledWith(
-      1,
-      "First issue",
-      expect.anything(),
-    );
-    expect(toast.error).toHaveBeenNthCalledWith(
-      2,
-      "Second issue",
-      expect.anything(),
-    );
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("First issue");
+    expect(alert).toHaveTextContent("Second issue");
+    expect(alert).toHaveAttribute("aria-live", "assertive");
   });
 });

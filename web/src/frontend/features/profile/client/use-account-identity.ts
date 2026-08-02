@@ -11,6 +11,9 @@ import {
   emailChangeRequestBinding,
 } from "@/shared/contracts/account/email-change";
 import { accountErrorSchema } from "@/shared/contracts/account/common";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { notifyAccountNameUpdated } from "./account-identity-events";
+import { localizeAccountMessage } from "./localized-account-feedback";
 
 export type AccountIdentityFeedback = {
   kind: "success" | "error";
@@ -29,6 +32,7 @@ export function useAccountIdentity(
   initialIdentity: AccountIdentity,
   csrfProof: string,
 ) {
+  const locale = useWorkspaceLocale();
   const [identity, setIdentity] = useState(initialIdentity);
   const [feedback, setFeedback] = useState<AccountIdentityFeedback | null>(
     null,
@@ -62,19 +66,31 @@ export function useAccountIdentity(
         const parsed = accountErrorSchema.safeParse(body);
         fail(
           parsed.success
-            ? parsed.data.message
-            : "The account identity could not be saved.",
+            ? localizeAccountMessage(
+                locale,
+                parsed.data.message,
+                parsed.data.code,
+              )
+            : locale === "vi"
+              ? "Không thể lưu thông tin tài khoản."
+              : "The account identity could not be saved.",
         );
         return false;
       }
       const parsed = accountIdentityMutationOutcomeSchema.safeParse(body);
       if (!parsed.success) throw new Error("IDENTITY_RESPONSE_INVALID");
       setIdentity(parsed.data.identity);
-      setFeedback({ kind: "success", message: parsed.data.message });
-      toast.success(parsed.data.message, { id: "account-identity-feedback" });
+      notifyAccountNameUpdated(parsed.data.identity.name);
+      const message = localizeAccountMessage(locale, parsed.data.message);
+      setFeedback({ kind: "success", message });
+      toast.success(message, { id: "account-identity-feedback" });
       return true;
     } catch {
-      fail("The account identity could not be saved.");
+      fail(
+        locale === "vi"
+          ? "Không thể lưu thông tin tài khoản."
+          : "The account identity could not be saved.",
+      );
       return false;
     } finally {
       activeRequest.current = null;
@@ -91,7 +107,11 @@ export function useAccountIdentity(
     try {
       binding = emailChangeRequestBinding(newEmail);
     } catch {
-      fail("Enter a valid proposed email address.");
+      fail(
+        locale === "vi"
+          ? "Hãy nhập địa chỉ email mới hợp lệ."
+          : "Enter a valid proposed email address.",
+      );
       return false;
     }
     if (!idempotency.current || idempotency.current.binding !== binding) {
@@ -115,8 +135,14 @@ export function useAccountIdentity(
         const parsed = accountErrorSchema.safeParse(body);
         fail(
           parsed.success
-            ? parsed.data.message
-            : "The verification request could not be queued. Try again.",
+            ? localizeAccountMessage(
+                locale,
+                parsed.data.message,
+                parsed.data.code,
+              )
+            : locale === "vi"
+              ? "Không thể gửi yêu cầu xác minh. Hãy thử lại."
+              : "The verification request could not be queued. Try again.",
         );
         return false;
       }
@@ -129,11 +155,16 @@ export function useAccountIdentity(
           expiresAt: parsed.data.expiresAt,
         },
       }));
-      setFeedback({ kind: "success", message: parsed.data.message });
-      toast.success(parsed.data.message, { id: "account-identity-feedback" });
+      const message = localizeAccountMessage(locale, parsed.data.message);
+      setFeedback({ kind: "success", message });
+      toast.success(message, { id: "account-identity-feedback" });
       return true;
     } catch {
-      fail("The verification request could not be queued. Try again.");
+      fail(
+        locale === "vi"
+          ? "Không thể gửi yêu cầu xác minh. Hãy thử lại."
+          : "The verification request could not be queued. Try again.",
+      );
       return false;
     } finally {
       activeRequest.current = null;

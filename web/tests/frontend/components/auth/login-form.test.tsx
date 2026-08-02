@@ -58,7 +58,7 @@ describe("login form", () => {
     expect(screen.getByRole("button", { name: /Signing in/ })).toBeDisabled();
     release();
     await waitFor(() =>
-      expect(screen.getByRole("status")).toHaveTextContent(
+      expect(screen.getByRole("alert")).toHaveTextContent(
         "Email or password is incorrect. (4 attempts remaining)",
       ),
     );
@@ -86,7 +86,7 @@ describe("login form", () => {
     fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
 
     await waitFor(() =>
-      expect(screen.getByRole("status")).toHaveTextContent(
+      expect(screen.getByRole("alert")).toHaveTextContent(
         "Something went wrong. Please try again. (4 attempts remaining)",
       ),
     );
@@ -147,7 +147,7 @@ describe("login form", () => {
     }
 
     await waitFor(() =>
-      expect(screen.getByRole("status")).toHaveTextContent(
+      expect(screen.getByRole("alert")).toHaveTextContent(
         /Your account has been temporarily locked after too many failed sign-in attempts\. Please try again in \d+ minute(s)?\./,
       ),
     );

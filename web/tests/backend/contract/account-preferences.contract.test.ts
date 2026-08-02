@@ -9,7 +9,7 @@ import {
 } from "@/shared/contracts/account/preferences";
 
 const valid = {
-  language: "vi",
+  language: "en",
   timezone: "Asia/Ho_Chi_Minh",
   emailNotifications: {
     application_updates: true,

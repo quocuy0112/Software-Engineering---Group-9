@@ -11,13 +11,23 @@ export function NotificationPreferences({
   value: Notifications;
   onChange: (value: Notifications) => void;
 }) {
+  const copy = {
+    legend: "Email notifications",
+    application: "Application updates",
+    applicationHint: "Status changes for applications and interviews.",
+    jobs: "Job recommendations",
+    jobsHint: "Relevant opportunity suggestions.",
+    security: "Account security",
+    securityHint:
+      "Required security notices stay enabled and cannot be disabled.",
+  };
   return (
     <fieldset className="notification-preferences">
-      <legend>Email notifications</legend>
+      <legend>{copy.legend}</legend>
       <label>
         <input
           type="checkbox"
-          aria-label="Application updates"
+          aria-label={copy.application}
           checked={value.application_updates}
           onChange={(event) =>
             onChange({
@@ -27,14 +37,14 @@ export function NotificationPreferences({
           }
         />
         <span>
-          <strong>Application updates</strong>
-          <small>Status changes for applications and interviews.</small>
+          <strong>{copy.application}</strong>
+          <small>{copy.applicationHint}</small>
         </span>
       </label>
       <label>
         <input
           type="checkbox"
-          aria-label="Job recommendations"
+          aria-label={copy.jobs}
           checked={value.job_recommendations}
           onChange={(event) =>
             onChange({
@@ -44,23 +54,23 @@ export function NotificationPreferences({
           }
         />
         <span>
-          <strong>Job recommendations</strong>
-          <small>Relevant opportunity suggestions.</small>
+          <strong>{copy.jobs}</strong>
+          <small>{copy.jobsHint}</small>
         </span>
       </label>
       <label className="notification-preferences__mandatory">
         <input
           type="checkbox"
-          aria-label="Account security"
+          aria-label={copy.security}
           checked
           disabled
           aria-describedby="account-security-notification-explanation"
           readOnly
         />
         <span>
-          <strong>Account security</strong>
+          <strong>{copy.security}</strong>
           <small id="account-security-notification-explanation">
-            Required security notices stay enabled and cannot be disabled.
+            {copy.securityHint}
           </small>
         </span>
       </label>

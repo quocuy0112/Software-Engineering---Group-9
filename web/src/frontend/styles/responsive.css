@@ -1,6 +1,6 @@
 @media (max-width: 1279px) {
-  .profile-placeholder-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .dashboard-feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -20,11 +20,6 @@
   .dashboard-feature-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .feature-card:last-child {
-    grid-column: 1 / -1;
-  }
-
   .security-grid {
     grid-template-columns: 1fr;
   }
@@ -74,10 +69,6 @@
     grid-column: auto;
   }
 
-  .profile-placeholder-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .profile-section-heading {
     display: block;
   }
@@ -102,7 +93,7 @@
   }
 
   .auth-navigation a {
-    min-height: 40px;
+    min-height: 44px;
     font-size: var(--sh-font-size-label);
   }
 
@@ -118,15 +109,6 @@
 
   .page-heading-badge {
     margin-top: var(--sh-space-3);
-  }
-
-  .dashboard-coming-later {
-    grid-template-columns: 40px minmax(0, 1fr);
-  }
-
-  .coming-later-pill {
-    grid-column: 2;
-    justify-self: start;
   }
 
   .profile-account-details > div {
@@ -193,7 +175,6 @@
 
   .backup-codes,
   .security-panel [role="alert"] ul,
-  .profile-placeholder-grid,
   .factor-mode-switcher {
     grid-template-columns: 1fr;
   }

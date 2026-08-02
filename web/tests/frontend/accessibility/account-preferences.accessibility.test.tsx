@@ -4,6 +4,11 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ProfilePreferencesView } from "@/frontend/features/profile/components/profile-preferences-view";
 
+const navigation = vi.hoisted(() => ({ refresh: vi.fn() }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => navigation,
+}));
+
 const defaults = {
   language: "vi" as const,
   timezone: "Asia/Ho_Chi_Minh",
@@ -27,14 +32,41 @@ describe("account-preferences accessibility", () => {
         csrfProof="csrf-proof"
       />,
     );
-    expect(screen.getByLabelText("Language")).toHaveValue("vi");
+    expect(screen.getByLabelText("Interface language")).toHaveValue("en");
+    expect(screen.getByLabelText("Interface language")).toBeDisabled();
     expect(screen.getByLabelText("Timezone")).toHaveValue("Asia/Ho_Chi_Minh");
     expect(screen.getByLabelText("Application updates")).toBeChecked();
     expect(screen.getByLabelText("Job recommendations")).toBeChecked();
     const security = screen.getByLabelText("Account security");
     expect(security).toBeChecked();
     expect(security).toBeDisabled();
-    expect(screen.getByText(/cannot be disabled/i)).toBeVisible();
+    expect(screen.getByText(/stay enabled/i)).toBeVisible();
+  });
+
+  it("provides a searchable IANA timezone list with current GMT offsets", async () => {
+    render(
+      <ProfilePreferencesView
+        initialPreferences={defaults}
+        csrfProof="csrf-proof"
+      />,
+    );
+
+    const timezone = screen.getByRole("combobox", { name: /Timezone/i });
+    expect(timezone).toHaveAttribute("list", "preference-timezones");
+
+    await waitFor(() => {
+      expect(
+        document.querySelectorAll("#preference-timezones option").length,
+      ).toBeGreaterThan(400);
+    });
+
+    const vietnam = document.querySelector(
+      '#preference-timezones option[value="Asia/Ho_Chi_Minh"]',
+    );
+    expect(vietnam).toHaveAttribute(
+      "label",
+      expect.stringMatching(/^GMT\+07:00 · Asia — Ho Chi Minh$/),
+    );
   });
 
   it("submits a complete set once, reconciles authoritative state, and announces success", async () => {
@@ -58,9 +90,6 @@ describe("account-preferences accessibility", () => {
         csrfProof="csrf-proof"
       />,
     );
-    fireEvent.change(screen.getByLabelText("Language"), {
-      target: { value: "en" },
-    });
     fireEvent.change(screen.getByLabelText("Timezone"), {
       target: { value: "UTC" },
     });
@@ -81,7 +110,8 @@ describe("account-preferences accessibility", () => {
         }),
       }),
     );
-    expect(screen.getByLabelText("Language")).toHaveValue("en");
+    expect(screen.getByLabelText("Interface language")).toHaveValue("en");
+    expect(screen.getByLabelText("Interface language")).toBeDisabled();
     expect(screen.getByLabelText("Timezone")).toHaveValue("UTC");
   });
 

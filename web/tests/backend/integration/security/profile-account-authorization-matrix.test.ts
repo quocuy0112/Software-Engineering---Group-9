@@ -182,7 +182,7 @@ describe("Feature 002 two-account authorization matrix", () => {
       }),
     );
     expect(await preferencesB.json()).toMatchObject({
-      language: "vi",
+      language: "en",
       timezone: "Asia/Ho_Chi_Minh",
     });
   });

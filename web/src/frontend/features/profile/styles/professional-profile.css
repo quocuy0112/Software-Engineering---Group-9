@@ -4,6 +4,15 @@
   overflow-wrap: anywhere;
 }
 
+#profile-avatar-section,
+#profile-basics-section,
+#profile-skills-section,
+#profile-experience-section,
+#profile-education-section,
+#profile-social-section {
+  scroll-margin-top: var(--sh-space-6);
+}
+
 .professional-profile-page button,
 .professional-profile-page input,
 .professional-profile-page textarea {
@@ -79,8 +88,7 @@
 }
 
 .professional-profile-feedback {
-  min-height: var(--sh-space-2);
-  margin-bottom: var(--sh-space-4);
+  margin: 0 0 var(--sh-space-4);
   border-color: transparent;
   background: transparent;
 }
@@ -106,6 +114,14 @@
   border-color: var(--sh-color-error);
   color: var(--sh-color-error);
   background: var(--sh-color-error-bg);
+}
+
+.professional-profile-feedback ul {
+  margin: var(--sh-space-2) 0 0;
+  padding-left: var(--sh-space-5);
+  color: var(--sh-color-error);
+  font-size: var(--sh-font-size-caption);
+  line-height: var(--sh-line-height-caption);
 }
 
 .professional-profile-sections {
@@ -136,6 +152,26 @@
   font-size: var(--sh-font-size-h3);
   font-weight: var(--sh-font-weight-bold);
   line-height: var(--sh-line-height-h3);
+}
+
+.profile-unsaved-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  width: fit-content;
+  margin-top: 0.45rem;
+  color: #9a5b08;
+  font-size: 0.78rem;
+  font-weight: var(--sh-font-weight-semibold);
+  letter-spacing: 0.02em;
+}
+
+.profile-unsaved-indicator > span {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: #e69a26;
+  box-shadow: 0 0 0 0.22rem rgb(230 154 38 / 14%);
 }
 
 .professional-profile-fields {
@@ -189,6 +225,11 @@
   outline: 2px solid var(--sh-color-border-focus);
   outline-offset: 2px;
   box-shadow: none;
+}
+
+.professional-profile-section input[aria-invalid="true"],
+.professional-profile-section textarea[aria-invalid="true"] {
+  border-color: var(--sh-color-error);
 }
 
 .profile-field-error,
@@ -296,8 +337,20 @@
   letter-spacing: -0.03em;
 }
 
+.social-platform-mark svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+  stroke: none;
+}
+
+[data-platform="linkedin"] .social-platform-mark {
+  background: #0a66c2;
+}
+
 [data-platform="github"] .social-platform-mark {
-  background: var(--sh-color-text-primary);
+  background: #181717;
 }
 
 [data-platform="facebook"] .social-platform-mark {
@@ -334,6 +387,30 @@
 
 .social-link-row input[type="url"] {
   font-size: var(--sh-font-size-body-sm);
+}
+
+.social-link-error {
+  grid-column: 2 / -1;
+}
+
+.social-link-preview {
+  display: inline-flex;
+  min-height: var(--sh-control-height-sm);
+  align-items: center;
+  gap: var(--sh-space-1);
+  padding: 0 var(--sh-space-3);
+  border: 1px solid var(--sh-color-brand-primary);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-info-bg);
+  font-size: var(--sh-font-size-body-sm);
+  font-weight: var(--sh-font-weight-semibold);
+  text-decoration: none;
+}
+
+.social-link-preview:hover {
+  color: var(--sh-color-text-inverse);
+  background: var(--sh-color-brand-primary);
 }
 
 .professional-profile-list-row,
@@ -405,7 +482,7 @@
 
 .professional-profile-row-actions button,
 .profile-suggestions button {
-  min-height: var(--sh-control-height-sm);
+  min-height: 44px;
   padding-inline: var(--sh-space-3);
   border-color: var(--sh-color-border-default);
   color: var(--sh-color-text-primary);
@@ -460,6 +537,10 @@
 
   .profile-field-error,
   .profile-field-hint {
+    grid-column: 1;
+  }
+
+  .social-link-error {
     grid-column: 1;
   }
 

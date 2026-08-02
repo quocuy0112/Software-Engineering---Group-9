@@ -108,10 +108,10 @@ describe("TOTP enrollment UI", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Continue" }));
 
-    expect(await screen.findByRole("status")).toHaveTextContent(
+    expect(await screen.findByRole("alert")).toHaveTextContent(
       "Two-factor setup is temporarily unavailable",
     );
-    expect(screen.getByRole("status")).not.toHaveTextContent(
+    expect(screen.getByRole("alert")).not.toHaveTextContent(
       "confirm your current password",
     );
   });
@@ -214,7 +214,7 @@ describe("TOTP enrollment UI", () => {
     fireEvent.click(screen.getByRole("button", { name: "Verify and enable" }));
 
     await waitFor(() =>
-      expect(screen.getByRole("status")).toHaveTextContent(
+      expect(screen.getByRole("alert")).toHaveTextContent(
         "4 attempts remaining",
       ),
     );

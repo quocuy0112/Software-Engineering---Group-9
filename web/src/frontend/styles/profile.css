@@ -48,6 +48,26 @@
   content: "";
 }
 
+@media (max-width: 479px) {
+  .profile-navigation {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow-x: visible;
+  }
+
+  .profile-navigation a {
+    min-width: 0;
+    padding-inline: var(--sh-space-2);
+    line-height: var(--sh-line-height-body-sm);
+    text-align: center;
+    white-space: normal;
+  }
+
+  .profile-navigation a:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
 .profile-overview-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -294,7 +314,7 @@
   line-height: var(--sh-line-height-body-sm);
 }
 
-.profile-future-section {
+.profile-professional-section {
   margin-top: var(--sh-space-8);
 }
 
@@ -319,37 +339,6 @@
   font-size: var(--sh-font-size-body-sm);
   line-height: var(--sh-line-height-body-sm);
   text-align: right;
-}
-
-.profile-placeholder-grid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: var(--sh-space-3);
-}
-
-.profile-placeholder-card {
-  min-width: 0;
-  padding: var(--sh-space-4);
-  border: 1px dashed var(--sh-color-border-default);
-  border-radius: var(--sh-radius-md);
-  background: var(--sh-color-surface-card);
-}
-
-.profile-placeholder-icon {
-  width: 32px;
-  height: 32px;
-}
-
-.profile-placeholder-card h3 {
-  margin: var(--sh-space-3) 0 var(--sh-space-1);
-  font-size: var(--sh-font-size-body-sm);
-  line-height: var(--sh-line-height-body-sm);
-}
-
-.profile-placeholder-card p {
-  margin: 0;
-  color: var(--sh-color-text-muted);
-  font-size: var(--sh-font-size-caption);
 }
 
 .security-grid {
@@ -583,35 +572,6 @@
   max-width: 100%;
 }
 
-.password-visibility-control {
-  display: inline-flex;
-  width: fit-content;
-  min-height: 40px !important;
-  align-items: center;
-  gap: var(--sh-space-2);
-  padding: 0 var(--sh-space-3) !important;
-  border: 1px solid var(--sh-color-border-default) !important;
-  border-radius: var(--sh-radius-full) !important;
-  color: var(--sh-color-text-secondary) !important;
-  background: var(--sh-color-surface-card) !important;
-  box-shadow: var(--sh-shadow-control);
-  font-size: var(--sh-font-size-body-sm) !important;
-  font-weight: var(--sh-font-weight-medium) !important;
-}
-
-.password-visibility-control:hover:not(:disabled) {
-  border-color: var(--sh-color-brand-primary) !important;
-  color: var(--sh-color-brand-primary) !important;
-  background: var(--sh-color-info-bg) !important;
-  transform: none !important;
-}
-
-.password-visibility-control[aria-pressed="true"] {
-  border-color: var(--sh-color-brand-primary) !important;
-  color: var(--sh-color-brand-primary) !important;
-  background: var(--sh-color-brand-soft) !important;
-}
-
 .password-change-feedback {
   margin-bottom: var(--sh-space-4);
   border-radius: var(--sh-radius-sm);
@@ -643,7 +603,7 @@
 }
 
 @media (max-width: 320px) {
-  .password-change-form button {
+  .password-change-form button:not(.password-visibility-button) {
     width: 100%;
   }
 }

@@ -42,7 +42,7 @@ describe("account identity and email-change accessibility", () => {
       <ProfileAccountView initialIdentity={identity} csrfProof="csrf-proof" />,
     );
     expect(screen.getByText("candidate@example.test")).toBeVisible();
-    expect(screen.getByText("ACTIVE")).toBeVisible();
+    expect(screen.getByText("Active")).toBeVisible();
     expect(screen.getByText(/31.*2026|2026/)).toBeVisible();
     const name = screen.getByLabelText("Full name");
     fireEvent.change(name, { target: { value: "Nguyen Van Binh" } });

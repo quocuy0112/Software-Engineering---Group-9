@@ -336,51 +336,6 @@
   line-height: var(--sh-line-height-body-sm);
 }
 
-.password-control {
-  position: relative;
-  min-width: 0;
-}
-
-.password-control .sh-input {
-  padding-right: calc(var(--sh-control-height) + var(--sh-space-2));
-}
-
-.password-control .password-visibility-button {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 40px;
-  min-width: 40px;
-  min-height: 40px;
-  padding: 0;
-  border-color: transparent;
-  color: var(--sh-color-text-muted);
-  background: transparent;
-  box-shadow: none;
-}
-
-.password-control .password-visibility-button:hover:not(:disabled) {
-  border-color: transparent;
-  color: var(--sh-color-brand-primary);
-  background: var(--sh-color-info-bg);
-  transform: none;
-}
-
-.password-control .password-visibility-button[data-visible="true"] {
-  color: var(--sh-color-brand-primary);
-  background: var(--sh-color-brand-soft);
-}
-
-.password-visibility-icon {
-  width: 20px;
-  height: 20px;
-  fill: none;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.8;
-}
-
 .auth-form a,
 .auth-form-content a,
 .auth-motion > a {

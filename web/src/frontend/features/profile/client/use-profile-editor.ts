@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 import {
   candidateProfileSchema,
   profileMutationOutcomeSchema,
@@ -9,13 +8,20 @@ import {
   type ProfileSectionMutation,
 } from "@/shared/contracts/account/profile";
 import type { AccountError } from "@/shared/contracts/account/common";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import {
+  localizeAccountMessage,
+  localizeFieldErrors,
+} from "./localized-account-feedback";
 
 type WithoutBaseRevision<T> = T extends unknown
   ? Omit<T, "baseRevision">
   : never;
 export type ProfileSectionDraft = WithoutBaseRevision<ProfileSectionMutation>;
+export type ProfileSectionName = ProfileSectionMutation["section"];
 
 export type ProfileEditorFeedback = {
+  section: ProfileSectionName;
   kind: "success" | "warning" | "error";
   message: string;
   fieldErrors?: Record<string, string[]>;
@@ -33,6 +39,7 @@ export function useProfileEditor(
   initialProfile: CandidateProfileContract | undefined,
   csrfProof: string,
 ) {
+  const locale = useWorkspaceLocale();
   const [profile, setProfile] = useState(initialProfile);
   const [loading, setLoading] = useState(initialProfile === undefined);
   const [loadError, setLoadError] = useState(false);
@@ -99,15 +106,21 @@ export function useProfileEditor(
         if (!response.ok) {
           const accountError = (body ?? {}) as Partial<AccountError>;
           const next: ProfileEditorFeedback = {
+            section: draft.section,
             kind: "error",
             message:
               typeof accountError.message === "string"
-                ? accountError.message
-                : "The profile section could not be saved.",
-            fieldErrors: accountError.fieldErrors,
+                ? localizeAccountMessage(
+                    locale,
+                    accountError.message,
+                    accountError.code,
+                  )
+                : locale === "vi"
+                  ? "Không thể lưu mục hồ sơ."
+                  : "The profile section could not be saved.",
+            fieldErrors: localizeFieldErrors(locale, accountError.fieldErrors),
           };
           setFeedback(next);
-          toast.error(next.message, { id: "professional-profile-save" });
           focusFirstError(next.fieldErrors);
           return false;
         }
@@ -117,26 +130,23 @@ export function useProfileEditor(
         const normalized = outcome.data.warnings.length > 0;
         const kind =
           outcome.data.conflictApplied || normalized ? "warning" : "success";
-        const message = outcome.data.message;
-        setFeedback({ kind, message });
-        if (kind === "success") {
-          toast.success(message, { id: "professional-profile-save" });
-        } else {
-          toast.warning(message, { id: "professional-profile-save" });
-        }
+        const message = localizeAccountMessage(locale, outcome.data.message);
+        setFeedback({ section: draft.section, kind, message });
         await load(false);
         return true;
       } catch {
-        const message = "The profile section could not be saved.";
-        setFeedback({ kind: "error", message });
-        toast.error(message, { id: "professional-profile-save" });
+        const message =
+          locale === "vi"
+            ? "Không thể lưu mục hồ sơ."
+            : "The profile section could not be saved.";
+        setFeedback({ section: draft.section, kind: "error", message });
         return false;
       } finally {
         savingRef.current = null;
         setSavingSection(null);
       }
     },
-    [csrfProof, focusFirstError, load, profile],
+    [csrfProof, focusFirstError, load, locale, profile],
   );
 
   return {
