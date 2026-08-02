@@ -11,9 +11,14 @@ import styles from "./cv-import-workspace.module.css";
 export function CvImportWorkspace({
   csrfProof,
   initialItems,
+  parserAvailability,
 }: {
   csrfProof: string;
   initialItems: readonly CvImportSummary[];
+  parserAvailability: Readonly<{
+    deterministic: boolean;
+    external: boolean;
+  }>;
 }) {
   const importer = useCvImport({ csrfProof });
   return (
@@ -31,14 +36,31 @@ export function CvImportWorkspace({
         </header>
         <CvUploadForm
           csrfProof={csrfProof}
+          parserAvailability={parserAvailability}
           onUpload={(file, parserClass) => importer.upload(file, parserClass)}
         />
       </section>
 
-      <div className={styles.workflowProgress}>
+      <div
+        className={styles.workflowProgress}
+        data-state={importer.progress.state}
+        data-parser={importer.progress.parserClass ?? "NONE"}
+      >
+        <span className={styles.progressIcon} aria-hidden="true" />
         <p className={styles.workflowStatus} role="status" aria-live="polite">
-          {importer.progress.message}
+          <strong>{importer.progress.title}</strong>
+          <span>{importer.progress.message}</span>
         </p>
+        <div
+          className={styles.progressTrack}
+          role="progressbar"
+          aria-label="CV import progress"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={importer.progress.percentage}
+        >
+          <span style={{ width: `${importer.progress.percentage}%` }} />
+        </div>
         {importer.progress.uploadId ? (
           <Link
             className={styles.statusLink}

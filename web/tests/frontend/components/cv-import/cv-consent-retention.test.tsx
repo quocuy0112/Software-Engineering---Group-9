@@ -20,6 +20,12 @@ import {
   type CvImportResource,
 } from "@/shared/contracts/cv-import/upload";
 
+const navigation = vi.hoisted(() => ({
+  prefetch: vi.fn(),
+  replace: vi.fn(),
+}));
+vi.mock("next/navigation", () => ({ useRouter: () => navigation }));
+
 const challenge =
   "eyJ1IjoidXBsb2FkX2NvbnNlbnRfMTIzNCIsImUiOjE3ODU2MzAwMDB9.signature_fixture_12345678901234567890";
 
@@ -35,7 +41,11 @@ function notice(granted = false): CvConsentNotice {
   };
 }
 
-beforeEach(() => vi.restoreAllMocks());
+beforeEach(() => {
+  vi.restoreAllMocks();
+  navigation.prefetch.mockClear();
+  navigation.replace.mockClear();
+});
 afterEach(() => vi.useRealTimers());
 
 function externalResource(
@@ -133,6 +143,31 @@ describe("CV external consent and retention controls", () => {
     expect(screen.getByRole("status")).toHaveTextContent(
       /future external processing is blocked/i,
     );
+  });
+
+  it("disables repeated revoke attempts after the session expires", async () => {
+    const onRevoke = vi.fn(async () => {
+      throw new Error("CV_SESSION_EXPIRED");
+    });
+    render(
+      <CvProcessingConsent
+        notice={notice(true)}
+        canGrant={false}
+        canRevoke
+        onGrant={vi.fn()}
+        onRevoke={onRevoke}
+      />,
+    );
+    const revoke = screen.getByRole("button", {
+      name: /revoke consent for future processing/i,
+    });
+    fireEvent.click(revoke);
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /session expired/i,
+    );
+    expect(revoke).toBeDisabled();
+    fireEvent.click(revoke);
+    expect(onRevoke).toHaveBeenCalledOnce();
   });
 
   it("shows deadlines and requires a destructive confirmation before immediate cancellation", async () => {

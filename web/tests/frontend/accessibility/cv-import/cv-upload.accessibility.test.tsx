@@ -10,7 +10,15 @@ describe("CV upload accessibility", () => {
       "accept",
       expect.stringContaining(".pdf"),
     );
-    expect(screen.getByLabelText("Parser")).toBeVisible();
+    expect(
+      screen.getByRole("group", { name: /choose a parser/i }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("radio", { name: /smarthire deterministic/i }),
+    ).toBeChecked();
+    expect(
+      screen.getByRole("radio", { name: /external openai/i }),
+    ).toBeEnabled();
     expect(screen.getByRole("status")).toHaveAttribute("aria-live", "polite");
     fireEvent.click(screen.getByRole("button", { name: /upload cv/i }));
     expect(screen.getByRole("alert")).toHaveFocus();

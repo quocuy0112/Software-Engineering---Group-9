@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
+import { cvConfiguration, cvParserAvailability } from "@/backend/cv/config";
 import { listCvImports } from "@/backend/services/cv-import/cv-import-projection";
 import { CvImportWorkspace } from "@/frontend/features/cv-import/components/cv-import-workspace";
 import { ProfileNavigation } from "@/frontend/features/profile/components/profile-navigation";
@@ -13,6 +14,7 @@ export default async function CvImportsPage() {
   const context = await getWorkspaceContext();
   if (!context) redirect("/login?returnTo=%2Fprofile%2Fcv-imports");
   const imports = await listCvImports(context.userId);
+  const parserAvailability = cvParserAvailability(cvConfiguration);
   return (
     <main className={styles.page}>
       <header className={styles.hero}>
@@ -59,6 +61,7 @@ export default async function CvImportsPage() {
       <CvImportWorkspace
         csrfProof={context.csrfProof}
         initialItems={imports.items}
+        parserAvailability={parserAvailability}
       />
     </main>
   );

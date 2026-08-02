@@ -31,6 +31,17 @@
 
 ## Notes
 
+- The 2026-08-02 US2 synchronization refinement makes the existing review
+  requirements explicit: scalar actions depend on the authoritative current
+  Profile value, duplicate proposed skills/social links are field-addressable,
+  and rejected saves preserve edits while showing exact text/ARIA/visual/focus
+  feedback plus persistent and brief notification channels. It refines existing
+  US2 scenarios and FR-051/FR-052/FR-053/FR-079, so the requirement and outcome
+  counts below do not change.
+- The same synchronization records the implemented per-upload parser choice in
+  US1/FR-034 and limits within-draft duplicate rejection to skills and social
+  links, matching the current comparison service. Task IDs T150-T152 are ordered
+  by their actual dependency sequence without changing completed scope.
 - Validation iteration 3 passed after the 2026-08-01 consistency remediation
   and read-only cross-artifact re-analysis.
 - The specification contains 5 prioritized user stories, 26 Given/When/Then
@@ -50,5 +61,5 @@
   notice, CANCELLED-to-DELETED lifecycle, 24-hour candidate deletion, explicit
   missing-provenance behavior, and the 30-participant usability protocol.
 - Final analysis maps all 80 functional requirements and 12 success criteria to
-  executable coverage across 150 sequentially valid tasks, with no remaining
+  executable coverage across 152 sequentially valid tasks, with no remaining
   Critical, High, Medium, or Low finding.

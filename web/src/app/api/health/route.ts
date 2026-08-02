@@ -1,19 +1,15 @@
 import { NextResponse } from "next/server";
-import { cvConfiguration } from "@/backend/cv/config";
+import { cvConfiguration, cvParserAvailability } from "@/backend/cv/config";
 
 export function GET() {
-  const externalParserReady = Boolean(
-    cvConfiguration.parser.adapter === "openai" &&
-    cvConfiguration.parser.enabled &&
-    cvConfiguration.parser.apiKey &&
-    cvConfiguration.parser.privacyApproved,
-  );
+  const parserAvailability = cvParserAvailability(cvConfiguration);
   return NextResponse.json({
     status: "ok",
     cv: {
       cleanupEnabled: cvConfiguration.cleanupEnabled,
       processingEnabled: cvConfiguration.workerEnabled,
-      externalParserReady,
+      deterministicParserReady: parserAvailability.deterministic,
+      externalParserReady: parserAvailability.external,
     },
   });
 }

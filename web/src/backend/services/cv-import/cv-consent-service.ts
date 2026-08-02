@@ -78,7 +78,8 @@ export function assertCvExternalDeploymentGate(
     configuration.parser.model !== CV_APPROVED_OPENAI_MODEL ||
     !configuration.parser.enabled ||
     !configuration.parser.apiKey ||
-    !configuration.parser.privacyApproved
+    (!configuration.parser.privacyApproved &&
+      !configuration.parser.localDevelopmentEnabled)
   ) {
     throw new CvImportServiceError("CV_PROCESSING_UNAVAILABLE");
   }

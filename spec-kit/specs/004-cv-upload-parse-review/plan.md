@@ -13,7 +13,10 @@ its structure and extracts text in a resource-bounded subprocess, and invokes a
 selected parser behind a strict interface. The production external adapter uses
 the OpenAI Responses API only
 after exact, versioned candidate consent and a deployment privacy gate; local
-development and automated tests use a deterministic non-network adapter.
+development defaults to a deterministic non-network adapter. An explicit
+`CV_OPENAI_LOCAL_DEV_ENABLED` opt-in may exercise the external adapter locally
+with a server-only key and the same per-upload consent gate; automated tests
+remain deterministic except for the separately opted-in synthetic live smoke.
 
 Parser output is validated as hostile input and persisted only as an optimistic-
 concurrency CV Draft. Review compares the live Candidate Profile with proposed
@@ -379,7 +382,27 @@ Draft JSON stores proposed/edited values and review actions; provenance stores
 only verified segment references and bounded server-derived context. Current
 Profile values are loaded live and are not copied into the draft. Selection is
 per scalar field, per experience/education/social-link entry, and per skill.
-Structured entry fields can be edited but the entry is selected atomically.
+Structured entry fields can be edited but the entry is selected atomically. The
+review derives valid scalar choices from that live Profile snapshot: an empty
+field exposes `ADD`/`SKIP`, while a populated field exposes `REPLACE`/`SKIP`.
+The repository re-evaluates the same rule against the authoritative Profile in
+the save transaction and returns an `ACTION_MISMATCH` attached to the exact
+`reviewDecisions.scalars.{index}.action` path if the submitted choice is stale
+or invalid.
+
+Review validation is intentionally layered. The browser applies the shared
+normalization, required-value, date, URL, collection-limit, and scalar-action
+rules before PATCH where possible. The service and repository remain
+authoritative, reject duplicate normalized proposed skills/social links, and
+return stable `fieldErrors` with canonical proposal or decision paths. The
+client preserves in-memory edits and the complete server field-error array,
+clears an individual error only when its associated value or decision changes,
+and focuses the first invalid control after an explicit failed save. Every
+failure renders an adjacent text message and programmatic invalid state plus a
+persistent summary; a bounded Sonner error toast is supplemental and never the
+sole feedback channel. Component-owned CSS Modules provide the red invalid
+border/background while text and ARIA associations ensure color is not the only
+signal.
 
 Every PATCH names `baseDraftRevision` and `reviewedProfileRevision`. The
 repository uses a compare-and-swap update and increments the draft revision.
@@ -440,12 +463,21 @@ key, scanner, raw provider model, notice version, or arbitrary parser endpoint.
 ### App Router pages
 
 - `/profile/cv-imports`: display the versioned CV-processing privacy notice for
-  every parser class, create upload, and view bounded owned history. External
-  parsing additionally uses the separate unselected consent control.
+  every parser class, choose the available parser independently for each
+  upload, create upload, and view bounded owned history. In local development,
+  enabling the external adapter does not disable the non-network deterministic
+  adapter. External parsing additionally uses the separate unselected consent
+  control.
 - `/profile/cv-imports/[uploadId]`: persistent progress, consent, failure,
-  retry/delete, manual-profile link, and confirmed receipt.
+  retry/delete, manual-profile link, and confirmed receipt. External imports
+  distinguish pre-dispatch preparation, awaiting consent, provider queue,
+  provider request in progress, schema-validated success, safe provider failure,
+  and temporary status-API failure without exposing raw provider details.
 - `/profile/cv-imports/[uploadId]/review`: current-versus-proposed review,
-  edits/selections, conflicts, and confirmation.
+  edits/selections, Profile-aware scalar actions, field-addressable validation
+  feedback, conflicts, and confirmation. Invalid saves retain edits, focus the
+  first affected control, and show both persistent and brief supplemental
+  feedback.
 - `/profile`: existing Feature 002 editor used for manual recovery.
 
 Progress uses bounded in-memory polling with visibility-aware backoff; server
@@ -464,8 +496,9 @@ analytics. Sonner supplements but never replaces persistent status/error text.
 | standard AWS credential variables/role             | Production S3 role; static credentials are not committed or browser-exposed       |
 | `CV_CLAMD_SOCKET_PATH`                             | Same-host/pod Unix socket; fixed container default `/run/clamav/clamd.sock`; TCP values are rejected |
 | `CV_CLAMD_SIGNATURE_MAX_AGE_HOURS`                 | Fixed deployment validation value `24`                                            |
-| `CV_PARSER_ADAPTER`                                | `deterministic` for local/test or `openai` for approved production                |
+| `CV_PARSER_ADAPTER`                                | `deterministic` by default for local/test, `openai` for approved production or explicit local development; local/test deterministic availability remains independent so each upload may choose either ready parser |
 | `CV_OPENAI_ENABLED`, `OPENAI_API_KEY`              | Server-only external parser gate and credential                                   |
+| `CV_OPENAI_LOCAL_DEV_ENABLED`                      | Local-only explicit network opt-in; forbidden in production and normal automated tests |
 | `CV_OPENAI_MODEL`                                  | Must equal approved snapshot `gpt-5.4-mini-2026-03-17` for this plan              |
 | `CV_OPENAI_ZDR_APPROVED`                           | Explicit production deployment assertion checked with other compliance evidence   |
 
@@ -621,10 +654,12 @@ service, or client-side CV state store is introduced.
   and rejection of custom or non-HTTPS provider destinations.
 - **Component/accessibility**: a versioned processing notice for every parser,
   separate unselected external consent, keyboard upload/review/actions,
-  focus/error summary, announced processing/save/conflict/cancellation states,
-  explicit missing-provenance UI, unsaved local preservation, reduced
-  motion/contrast, persistent feedback, and 320-pixel layout; architecture
-  checks additionally enforce same-directory/same-basename CSS Module ownership,
+  Profile-aware `ADD`/`REPLACE` availability, local and server validation mapped
+  to exact fields, focus/error summary, brief error toast backed by persistent
+  feedback, announced processing/save/conflict/cancellation states, explicit
+  missing-provenance UI, unsaved local preservation, duplicate proposal errors,
+  reduced motion/contrast, and 320-pixel layout; architecture checks
+  additionally enforce same-directory/same-basename CSS Module ownership,
   matching-owner-only imports, and no Feature 004 selectors or imports in
   global/shared stylesheets.
 - **E2E/performance/usability**: full valid upload-to-confirm, every terminal

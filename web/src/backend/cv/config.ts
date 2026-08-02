@@ -29,11 +29,13 @@ export type CvConfiguration = Readonly<{
   }>;
   parser: Readonly<{
     adapter: "deterministic" | "openai";
+    deterministicEnabled: boolean;
     endpoint: typeof CV_APPROVED_OPENAI_ENDPOINT;
     model: typeof CV_APPROVED_OPENAI_MODEL;
     enabled: boolean;
     apiKey: string | null;
     privacyApproved: boolean;
+    localDevelopmentEnabled: boolean;
   }>;
   workerEnabled: boolean;
   cleanupEnabled: true;
@@ -89,11 +91,14 @@ export function createCvConfiguration(env: ServerEnvironment): CvConfiguration {
     }),
     parser: frozen({
       adapter: env.CV_PARSER_ADAPTER,
+      deterministicEnabled: env.APP_ENV !== "production",
       endpoint: CV_APPROVED_OPENAI_ENDPOINT,
       model: CV_APPROVED_OPENAI_MODEL,
       enabled: env.CV_OPENAI_ENABLED,
       apiKey: env.OPENAI_API_KEY || null,
       privacyApproved,
+      localDevelopmentEnabled:
+        env.APP_ENV === "local" && env.CV_OPENAI_LOCAL_DEV_ENABLED,
     }),
     workerEnabled: env.CV_WORKER_ENABLED,
     cleanupEnabled: true as const,
@@ -107,6 +112,20 @@ export function createCvConfiguration(env: ServerEnvironment): CvConfiguration {
       confirmedRetentionDays: 7 as const,
       candidateDeleteRetentionHours: 24 as const,
     }),
+  });
+}
+
+export function cvParserAvailability(
+  configuration: CvConfiguration,
+): Readonly<{ deterministic: boolean; external: boolean }> {
+  return frozen({
+    deterministic: configuration.parser.deterministicEnabled,
+    external:
+      configuration.parser.adapter === "openai" &&
+      configuration.parser.enabled &&
+      Boolean(configuration.parser.apiKey) &&
+      (configuration.parser.privacyApproved ||
+        configuration.parser.localDevelopmentEnabled),
   });
 }
 

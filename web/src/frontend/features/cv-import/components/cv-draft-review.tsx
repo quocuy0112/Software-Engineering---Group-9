@@ -1,8 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 
-import { useCvDraftReview } from "../client/use-cv-draft-review";
+import {
+  presentCvReviewFieldError,
+  useCvDraftReview,
+  type CvReviewFieldError,
+} from "../client/use-cv-draft-review";
 import type {
   CvDraftComparison,
   CvEditableProposals,
@@ -119,9 +124,102 @@ function validationIssues(input: {
     proposals: input.proposals,
     reviewDecisions: input.decisions,
   });
-  const issues = result.success
+  const fieldErrors: CvReviewFieldError[] = result.success
     ? []
-    : result.error.issues.slice(0, 20).map((issue) => issue.message);
+    : result.error.issues.slice(0, 20).map((issue) => {
+        const path = issue.path.join(".") || "request";
+        const label = path
+          .split(".")
+          .at(-1)
+          ?.replace(/([a-z])([A-Z])/gu, "$1 $2");
+        const message =
+          issue.code === "too_small"
+            ? `${label ?? "Value"} is required.`
+            : issue.code === "too_big"
+              ? `${label ?? "Value"} is too long.`
+              : issue.code === "invalid_format"
+                ? `${label ?? "Value"} has an invalid format.`
+                : issue.message;
+        return presentCvReviewFieldError({
+          path,
+          code: issue.code,
+          message,
+        });
+      });
+  const requiredErrors: CvReviewFieldError[] = [];
+  input.proposals.scalars.forEach((proposal, index) => {
+    if (!proposal.value.trim())
+      requiredErrors.push({
+        path: `proposals.scalars.${index}.value`,
+        code: "REQUIRED",
+        message: `${proposal.field.replace(/^./u, (value) => value.toUpperCase())} is required.`,
+      });
+  });
+  input.proposals.experiences.forEach((proposal, index) => {
+    for (const [field, label] of [
+      ["title", "Job title"],
+      ["company", "Company"],
+    ] as const) {
+      if (!proposal.value[field].trim())
+        requiredErrors.push({
+          path: `proposals.experiences.${index}.value.${field}`,
+          code: "REQUIRED",
+          message: `${label} is required.`,
+        });
+    }
+  });
+  input.proposals.education.forEach((proposal, index) => {
+    for (const [field, label] of [
+      ["institution", "Institution"],
+      ["degree", "Degree"],
+    ] as const) {
+      if (!proposal.value[field].trim())
+        requiredErrors.push({
+          path: `proposals.education.${index}.value.${field}`,
+          code: "REQUIRED",
+          message: `${label} is required.`,
+        });
+    }
+  });
+  input.proposals.skills.forEach((proposal, index) => {
+    if (!proposal.value.trim())
+      requiredErrors.push({
+        path: `proposals.skills.${index}.value`,
+        code: "REQUIRED",
+        message: "Skill is required.",
+      });
+  });
+  const decisionErrors: CvReviewFieldError[] = [];
+  input.decisions.scalars.forEach((decision, index) => {
+    if (decision.action === "SKIP") return;
+    const proposal = input.proposals.scalars.find(
+      (candidate) => candidate.proposalId === decision.proposalId,
+    );
+    if (!proposal) {
+      decisionErrors.push({
+        path: `reviewDecisions.scalars.${index}.action`,
+        code: "ACTION_MISMATCH",
+        message: "Choose a valid action for this proposed profile field.",
+      });
+      return;
+    }
+    const current = input.comparison.currentProfile[proposal.field];
+    const label = proposal.field.replace(/^./u, (value) => value.toUpperCase());
+    if (decision.action === "ADD" && current !== null)
+      decisionErrors.push({
+        path: `reviewDecisions.scalars.${index}.action`,
+        code: "ACTION_MISMATCH",
+        message: `${label} already has a Profile value. Choose replace or skip.`,
+      });
+    if (decision.action === "REPLACE" && current === null)
+      decisionErrors.push({
+        path: `reviewDecisions.scalars.${index}.action`,
+        code: "ACTION_MISMATCH",
+        message: `${label} is not set on the Profile. Choose add or skip.`,
+      });
+  });
+  fieldErrors.unshift(...requiredErrors, ...decisionErrors);
+  const issues: string[] = [];
   if (!input.decisions.reviewComplete)
     issues.push("Mark the review as complete before confirmation.");
   for (const group of ["experiences", "education", "socialLinks"] as const) {
@@ -129,12 +227,91 @@ function validationIssues(input: {
       input.decisions[group].some(
         (decision) => decision.action === "REPLACE" && !decision.targetId,
       )
-    )
-      issues.push(
-        `Choose a current Profile target for each ${group} replacement.`,
-      );
+    ) {
+      const message = `Choose a current Profile target for each ${group} replacement.`;
+      issues.push(message);
+      input.decisions[group].forEach((decision, index) => {
+        if (decision.action === "REPLACE" && !decision.targetId)
+          fieldErrors.push({
+            path: `reviewDecisions.${group}.${index}.targetId`,
+            code: "REQUIRED",
+            message,
+          });
+      });
+    }
   }
-  return [...new Set(issues)];
+  const uniqueFieldErrors: CvReviewFieldError[] = [];
+  const fieldPaths = new Set<string>();
+  for (const fieldError of fieldErrors) {
+    const path = canonicalReviewFieldPath(fieldError.path, input.proposals);
+    if (fieldPaths.has(path)) continue;
+    fieldPaths.add(path);
+    uniqueFieldErrors.push(fieldError);
+  }
+  return {
+    issues: [
+      ...new Set([
+        ...uniqueFieldErrors.map((fieldError) => fieldError.message),
+        ...issues,
+      ]),
+    ],
+    fieldErrors: uniqueFieldErrors,
+  };
+}
+
+function canonicalReviewFieldPath(
+  path: string,
+  proposals: CvEditableProposals,
+) {
+  if (path.startsWith("proposals.")) {
+    const parts = path.split(".");
+    const group = parts[1];
+    const index = parts[2];
+    if (group === "scalars" && index && !parts.includes("value"))
+      return `proposals.scalars.${index}.value`;
+    if (
+      ["experiences", "education"].includes(group ?? "") &&
+      index &&
+      parts[3] !== "value"
+    )
+      return ["proposals", group, index, "value", ...parts.slice(3)].join(".");
+    return path;
+  }
+  const collection = path.match(
+    /^(experiences|education)\.(\d+)\.(title|company|description|institution|degree|field|startDate|endDate|isCurrent)$/u,
+  );
+  if (collection)
+    return `proposals.${collection[1]}.${collection[2]}.value.${collection[3]}`;
+  const scalarField = path.match(
+    /^basics\.(headline|summary|phone|location)$/u,
+  );
+  if (scalarField) {
+    const index = proposals.scalars.findIndex(
+      (proposal) => proposal.field === scalarField[1],
+    );
+    if (index >= 0) return `proposals.scalars.${index}.value`;
+  }
+  const skill = path.match(/^skills(?:\.(\d+))?(?:\.label|\.value)?$/u);
+  if (skill) return `proposals.skills.${skill[1] ?? "0"}.value`;
+  const link = path.match(/^socialLinks(?:\.(\d+))?(?:\.url|\.value)?$/u);
+  if (link) return `proposals.socialLinks.${link[1] ?? "0"}.value`;
+  if (path.startsWith("reviewDecisions.")) {
+    const parts = path.split(".");
+    if (parts.length === 3) return `${path}.targetId`;
+  }
+  return path;
+}
+
+function reviewFieldErrorMap(
+  fieldErrors: readonly CvReviewFieldError[],
+  proposals: CvEditableProposals,
+) {
+  const output: Record<string, string> = {};
+  for (const fieldError of fieldErrors) {
+    const path = canonicalReviewFieldPath(fieldError.path, proposals);
+    output[path] ??= fieldError.message;
+  }
+  return output;
 }
 
 export function CvDraftReview({
@@ -149,7 +326,8 @@ export function CvDraftReview({
   const [showValidation, setShowValidation] = useState(false);
   const reviewHeading = useRef<HTMLHeadingElement>(null);
   const validationHeading = useRef<HTMLHeadingElement>(null);
-  const issues = useMemo(
+  const form = useRef<HTMLFormElement>(null);
+  const validation = useMemo(
     () =>
       validationIssues({
         comparison: review.authoritative,
@@ -157,6 +335,23 @@ export function CvDraftReview({
         decisions: review.decisions,
       }),
     [review.authoritative, review.decisions, review.proposals],
+  );
+  const issues = validation.issues;
+  const visibleFieldErrors = useMemo(
+    () =>
+      reviewFieldErrorMap(
+        [
+          ...(showValidation ? validation.fieldErrors : []),
+          ...review.fieldErrors,
+        ],
+        review.proposals,
+      ),
+    [
+      review.fieldErrors,
+      review.proposals,
+      showValidation,
+      validation.fieldErrors,
+    ],
   );
   const preview = useMemo(
     () =>
@@ -179,28 +374,84 @@ export function CvDraftReview({
     }
   }, [review.conflict]);
   useEffect(() => {
-    if (showValidation && (issues.length || !acknowledged))
+    if (
+      showValidation &&
+      (issues.length || !acknowledged) &&
+      validation.fieldErrors.length === 0 &&
+      review.fieldErrors.length === 0
+    )
       validationHeading.current?.focus();
-  }, [acknowledged, issues.length, showValidation]);
+  }, [
+    acknowledged,
+    issues.length,
+    review.fieldErrors.length,
+    showValidation,
+    validation.fieldErrors.length,
+  ]);
+  const serverErrorSignature = review.fieldErrors
+    .map((fieldError) => `${fieldError.path}:${fieldError.code}`)
+    .join("|");
+  const hadServerFieldErrors = useRef(false);
+  useEffect(() => {
+    if (!serverErrorSignature) {
+      hadServerFieldErrors.current = false;
+      return;
+    }
+    if (hadServerFieldErrors.current) return;
+    hadServerFieldErrors.current = true;
+    const firstPath = Object.keys(visibleFieldErrors)[0];
+    const target = Array.from(
+      form.current?.querySelectorAll<HTMLElement>("[data-cv-review-field]") ??
+        [],
+    ).find((element) => element.dataset.cvReviewField === firstPath);
+    target?.focus();
+  }, [serverErrorSignature, visibleFieldErrors]);
 
-  const changeScalarValue = (proposalId: string, value: string) =>
+  const focusField = (path: string | undefined) => {
+    if (!path) return;
+    const canonical = canonicalReviewFieldPath(path, review.proposals);
+    const target = Array.from(
+      form.current?.querySelectorAll<HTMLElement>("[data-cv-review-field]") ??
+        [],
+    ).find((element) => element.dataset.cvReviewField === canonical);
+    target?.focus();
+  };
+
+  const changeScalarValue = (proposalId: string, value: string) => {
+    const index = review.proposals.scalars.findIndex(
+      (proposal) => proposal.proposalId === proposalId,
+    );
+    const field = review.proposals.scalars[index]?.field;
+    review.clearFieldErrors([
+      `proposals.scalars.${index}.value`,
+      ...(field ? [`basics.${field}`, `scalars.${field}`] : []),
+    ]);
     review.setProposals((current) => ({
       ...current,
       scalars: current.scalars.map((proposal) =>
         proposal.proposalId === proposalId ? { ...proposal, value } : proposal,
       ),
     }));
+  };
 
   const changeScalarDecision = (
     proposalId: string,
     action: CvReviewDecisions["scalars"][number]["action"],
-  ) =>
+  ) => {
+    const index = review.decisions.scalars.findIndex(
+      (decision) => decision.proposalId === proposalId,
+    );
+    review.clearFieldErrors([
+      `reviewDecisions.scalars.${index}`,
+      `reviewDecisions.scalars.${index}.action`,
+    ]);
     review.setDecisions((current) => ({
       ...current,
       scalars: current.scalars.map((decision) =>
         decision.proposalId === proposalId ? { ...decision, action } : decision,
       ),
     }));
+  };
 
   const changeCollectionValue = (
     group: CollectionGroup,
@@ -208,6 +459,19 @@ export function CvDraftReview({
     field: string,
     value: string | boolean | null,
   ) => {
+    const index = review.proposals[group].findIndex(
+      (proposal) => proposal.proposalId === proposalId,
+    );
+    const canonicalPath =
+      group === "experiences" || group === "education"
+        ? `proposals.${group}.${index}.value.${field}`
+        : `proposals.${group}.${index}.value`;
+    review.clearFieldErrors([
+      canonicalPath,
+      `${group}.${index}.${field}`,
+      ...(group === "skills" ? ["skills.label"] : []),
+      ...(group === "socialLinks" ? ["socialLinks.url"] : []),
+    ]);
     review.setProposals((current) => {
       if (group === "skills")
         return {
@@ -255,6 +519,13 @@ export function CvDraftReview({
     action: "ADD" | "REPLACE" | "SKIP",
     targetId: string | null,
   ) => {
+    const index = review.decisions[group].findIndex(
+      (decision) => decision.proposalId === proposalId,
+    );
+    review.clearFieldErrors([
+      `reviewDecisions.${group}.${index}`,
+      `reviewDecisions.${group}.${index}.targetId`,
+    ]);
     review.setDecisions((current) => {
       if (group === "skills")
         return {
@@ -284,6 +555,12 @@ export function CvDraftReview({
   };
 
   const setGroupAction = (group: CollectionGroup, action: "ADD" | "SKIP") => {
+    review.clearFieldErrors(
+      review.decisions[group].flatMap((_, index) => [
+        `reviewDecisions.${group}.${index}`,
+        `reviewDecisions.${group}.${index}.targetId`,
+      ]),
+    );
     review.setDecisions((current) => {
       if (group === "skills")
         return {
@@ -302,8 +579,20 @@ export function CvDraftReview({
 
   const save = async () => {
     setShowValidation(true);
-    if (issues.filter((issue) => !issue.startsWith("Mark the review")).length)
+    const blockingIssues = issues.filter(
+      (issue) => !issue.startsWith("Mark the review"),
+    );
+    if (blockingIssues.length) {
+      toast.error("Review could not be saved.", {
+        id: "cv-review-save-error",
+        description:
+          blockingIssues.length === 1
+            ? blockingIssues[0]
+            : `${blockingIssues[0]} Check ${blockingIssues.length} highlighted fields.`,
+      });
+      focusField(validation.fieldErrors[0]?.path);
       return;
+    }
     await review.save();
   };
 
@@ -326,6 +615,7 @@ export function CvDraftReview({
     ).length;
   return (
     <form
+      ref={form}
       className={styles.root}
       data-testid="cv-draft-review"
       data-narrow-layout="320"
@@ -346,6 +636,7 @@ export function CvDraftReview({
       <CvReviewFeedback
         message={review.message}
         error={review.error}
+        fieldErrors={review.fieldErrors}
         dirty={review.dirty}
       />
       {review.conflict ? (
@@ -380,6 +671,7 @@ export function CvDraftReview({
         currentProfile={review.authoritative.currentProfile}
         proposals={review.proposals.scalars}
         decisions={review.decisions.scalars}
+        fieldErrors={visibleFieldErrors}
         onProposalChange={changeScalarValue}
         onDecisionChange={changeScalarDecision}
       />
@@ -387,6 +679,7 @@ export function CvDraftReview({
         currentProfile={review.authoritative.currentProfile}
         proposals={review.proposals}
         decisions={review.decisions}
+        fieldErrors={visibleFieldErrors}
         onValueChange={changeCollectionValue}
         onDecisionChange={changeCollectionDecision}
         onSetGroupAction={setGroupAction}

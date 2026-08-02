@@ -1600,6 +1600,11 @@ components:
         action:
           type: string
           enum: [ADD, REPLACE, SKIP]
+          description: >-
+            ADD is valid only when the authoritative current Profile scalar is
+            empty; REPLACE is valid only when it is populated; SKIP is always
+            valid. A semantic mismatch returns VALIDATION_ERROR with
+            ACTION_MISMATCH at reviewDecisions.scalars.{index}.action.
 
     EntryDecision:
       oneOf:
@@ -1820,10 +1825,12 @@ components:
                     type: string
                     minLength: 1
                     maxLength: 200
+                    description: Canonical request path of the affected proposal, decision, or field.
                   code:
                     type: string
                     minLength: 1
                     maxLength: 100
+                    description: Stable field-level validation code such as ACTION_MISMATCH or DUPLICATE.
                   message:
                     type: string
                     minLength: 1

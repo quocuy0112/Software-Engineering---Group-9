@@ -76,6 +76,7 @@ CV_CLAMD_SOCKET_PATH=/run/clamav/clamd.sock
 CV_CLAMD_SIGNATURE_MAX_AGE_HOURS=24
 CV_PARSER_ADAPTER=deterministic
 CV_OPENAI_ENABLED=false
+CV_OPENAI_LOCAL_DEV_ENABLED=false
 ```
 
 The local storage root must be absolute after configuration resolution, must
@@ -84,6 +85,27 @@ Production startup rejects this adapter and root. Compose bind-mounts that host
 directory to `/app/.local/cv-storage` and overrides the worker's
 `CV_STORAGE_LOCAL_ROOT` plus database endpoint to container-native paths; it
 must not pass a Windows/macOS host path into the Linux worker.
+
+To exercise the reviewed OpenAI adapter from the interactive local application,
+use only a synthetic test CV and set the following matching non-secret values in
+the root `.env` and `web/.env.local`. Keep the key only in the gitignored
+`web/.env.local` or an approved secret manager:
+
+```text
+CV_PARSER_ADAPTER=openai
+CV_OPENAI_ENABLED=true
+CV_OPENAI_LOCAL_DEV_ENABLED=true
+OPENAI_API_KEY=<server-only project key>
+```
+
+This local gate does not assert production DPA, cross-border, or ZDR approval.
+External parsing still stops at `AWAITING_CONSENT` and cannot dispatch until the
+candidate grants the exact per-upload consent. Production rejects the local gate
+and continues to require every reviewed privacy assertion. In this explicit
+local OpenAI mode, the upload page shows both ready choices: SmartHire
+deterministic remains local/non-networked, while External OpenAI follows the
+consent gate. The selected parser is stored per upload; changing the next
+upload's choice does not alter earlier imports.
 
 ## 2. Start PostgreSQL and ClamAV
 
@@ -157,6 +179,8 @@ npm run env:check
 Local acceptance:
 
 - filesystem storage and deterministic parser are accepted;
+- explicit local OpenAI mode is accepted only with the local-development gate,
+  enabled adapter, server-only key, and matching root/web settings;
 - missing `OPENAI_API_KEY` is accepted because external parsing is disabled;
 - encryption key length/version, storage root, scanner socket, fixed caps,
   and local ports are validated without printing secret values.
@@ -213,11 +237,25 @@ to a shared test environment.
 3. Submit once. Confirm the UI performs reservation then raw upload without a
    second user action.
 4. Observe persistent, announced stages: validation, scan, extraction, parsing,
-   and review ready. Reload during processing; the server state must recover.
+   and review ready. For OpenAI, verify the UI separately identifies waiting for
+   consent, request queued, API request in progress, success, and safe failure.
+   A status-refresh failure must say background processing may continue and
+   retry automatically. Reload during processing; the server state must recover.
 5. Open review. Confirm current Profile data is live, each proposal shows its
    provenance/confidence availability, and duplicate hints do not auto-select.
 6. Edit proposals and select scalar fields individually, structured entries as
-   whole entries, and skills individually. Save the complete review.
+   whole entries, and skills individually. For a scalar with no current Profile
+   value, confirm only Add and Skip are offered; for a populated scalar, confirm
+   only Replace and Skip are offered. Save the complete review.
+   - Before the valid save, enter one invalid date/URL or required value. Confirm
+     no PATCH is sent for locally detectable invalid input, edits remain on the
+     page, a brief error toast and persistent summary appear, and the exact
+     control receives a text error, red invalid treatment, `aria-invalid`, and
+     focus.
+   - Correct that control and confirm only its field error clears. A controlled
+     server-side `ACTION_MISMATCH` or duplicate proposed skill/social link must
+     produce the same field-addressable behavior from the API `fieldErrors`
+     response without losing edits.
 7. Open the same draft in a second tab. Save tab A, then save tab B. Tab B must
    receive `DRAFT_REVISION_CONFLICT`, preserve unsaved values in memory, and
    offer compare/reload.
@@ -247,6 +285,8 @@ local/session storage, persisted query cache, or service-worker cache.
 | Image-only/empty extraction                                                                               | `EXTRACTION_FAILED`; manual Profile entry offered; no OCR                                                       |
 | Extractor >15s or >192 MiB                                                                                | Child terminated; partial output destroyed; worker survives                                                     |
 | Parser unknown field, invalid date/URL, excessive array, unknown segment, >256/128 KiB                    | Whole result rejected; no truncated/partial draft                                                               |
+| Review scalar `ADD` for populated Profile field or `REPLACE` for empty field                             | Save rejected with exact decision-path `ACTION_MISMATCH`; edits retained and valid choices shown                |
+| Invalid review value or duplicate normalized proposed skill/social link                                  | Exact field highlighted with text/ARIA error, first invalid focused, persistent summary plus brief toast        |
 | Parser times out/fails all automatic attempts                                                             | `PARSE_FAILED`; up to two candidate retries, replacement, and manual entry immediately available                |
 | Candidate retry cap exhausted                                                                             | Stable terminal state with replacement/manual/delete; no hidden admin wait                                      |
 | Delete during processing                                                                                  | `CANCELLED` and inaccessible immediately; later result discarded; all content purged within 24h, then `DELETED` |
@@ -304,7 +344,11 @@ Required coverage groups:
   parse per account;
 - consent grant/version/revocation races and external dispatch gating;
 - two draft writers, draft save/confirm race, Profile save/confirm race,
-  idempotent confirmation, one revision, and transaction rollback;
+  Profile-aware scalar action semantics, local validation without PATCH,
+  canonical server `fieldErrors`, duplicate proposed skill/social-link errors,
+  invalid-field focus/ARIA/text treatment, supplemental toast backed by a
+  persistent summary, idempotent confirmation, one revision, and transaction
+  rollback;
 - fake-clock candidate `CANCELLED` to `DELETED` cleanup within 24 hours plus the
   24-hour/30-day/7-day retention rules, already-missing object, cleanup
   failure/retry, quota release, and orphan reconciliation;

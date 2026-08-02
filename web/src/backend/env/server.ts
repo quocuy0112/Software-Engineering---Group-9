@@ -89,6 +89,7 @@ const schema = z
     CV_CLAMD_SIGNATURE_MAX_AGE_HOURS: z.literal("24").transform(Number),
     CV_PARSER_ADAPTER: z.enum(["deterministic", "openai"]),
     CV_OPENAI_ENABLED: booleanString,
+    CV_OPENAI_LOCAL_DEV_ENABLED: booleanString,
     OPENAI_API_KEY: z.string().optional().or(z.literal("")),
     CV_OPENAI_MODEL: z.literal("gpt-5.4-mini-2026-03-17"),
     CV_OPENAI_DPA_APPROVED: booleanString,
@@ -150,6 +151,11 @@ const schema = z
       fail("CV_STORAGE_LOCAL_ROOT", "must not contain NUL characters");
     }
     if (production) {
+      if (env.CV_OPENAI_LOCAL_DEV_ENABLED)
+        fail(
+          "CV_OPENAI_LOCAL_DEV_ENABLED",
+          "production forbids the local OpenAI development gate",
+        );
       if (env.CV_STORAGE_ADAPTER !== "s3")
         fail("CV_STORAGE_ADAPTER", "production requires private S3 storage");
       if (!env.CV_S3_BUCKET || !env.CV_S3_REGION || !env.CV_S3_KMS_KEY_ID)
@@ -172,15 +178,33 @@ const schema = z
           "CV_OPENAI_ZDR_APPROVED",
           "production requires every privacy assertion",
         );
-    } else {
+    } else if (env.APP_ENV === "test") {
       if (
         env.CV_STORAGE_ADAPTER !== "filesystem" ||
         env.CV_PARSER_ADAPTER !== "deterministic" ||
-        env.CV_OPENAI_ENABLED
+        env.CV_OPENAI_ENABLED ||
+        env.CV_OPENAI_LOCAL_DEV_ENABLED
       )
         fail(
           "CV_PARSER_ADAPTER",
-          "local and test environments require the network-free deterministic parser",
+          "test environments require the network-free deterministic parser",
+        );
+    } else {
+      const deterministicLocalParser =
+        env.CV_STORAGE_ADAPTER === "filesystem" &&
+        env.CV_PARSER_ADAPTER === "deterministic" &&
+        !env.CV_OPENAI_ENABLED &&
+        !env.CV_OPENAI_LOCAL_DEV_ENABLED;
+      const explicitOpenAiLocalParser =
+        env.CV_STORAGE_ADAPTER === "filesystem" &&
+        env.CV_PARSER_ADAPTER === "openai" &&
+        env.CV_OPENAI_ENABLED &&
+        env.CV_OPENAI_LOCAL_DEV_ENABLED &&
+        Boolean(env.OPENAI_API_KEY);
+      if (!deterministicLocalParser && !explicitOpenAiLocalParser)
+        fail(
+          "CV_PARSER_ADAPTER",
+          "local CV parsing requires deterministic mode or the explicit OpenAI development gate with an API key",
         );
     }
     if (appUrl.origin !== authUrl.origin)

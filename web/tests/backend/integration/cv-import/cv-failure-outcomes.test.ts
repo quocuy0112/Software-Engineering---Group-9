@@ -27,11 +27,13 @@ function approvedExternalConfiguration(): CvConfiguration {
     ...cvConfiguration,
     parser: {
       adapter: "openai",
+      deterministicEnabled: false,
       endpoint: CV_APPROVED_OPENAI_ENDPOINT,
       model: CV_APPROVED_OPENAI_MODEL,
       enabled: true,
       apiKey: "synthetic-approved-key",
       privacyApproved: true,
+      localDevelopmentEnabled: false,
     },
   };
 }

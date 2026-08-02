@@ -1,8 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type { CvUploadStatus } from "@/shared/contracts/cv-import/common";
+import type {
+  CvParserClass,
+  CvUploadStatus,
+} from "@/shared/contracts/cv-import/common";
 import {
   cvConsentOutcomeSchema,
   cvDeletionOutcomeSchema,
@@ -27,6 +31,7 @@ import styles from "./cv-import-status.module.css";
 
 type StatusResource = Readonly<{
   uploadId: string;
+  parserClass?: CvParserClass;
   status: CvUploadStatus;
   stage?: string;
   availableActions?: readonly string[];
@@ -58,6 +63,97 @@ function tombstonePollingAfterMs(resource: StatusResource): number | null {
   return !Number.isNaN(deadline) && Date.now() < deadline ? 2_000 : null;
 }
 
+type TimelineState = "complete" | "current" | "upcoming" | "error";
+
+const stageLabels = {
+  UPLOAD: "Upload",
+  VALIDATE: "Validate",
+  SCAN: "Virus scan",
+  EXTRACT: "Extract text",
+  CONSENT: "Consent",
+  PARSE: "Parse",
+  REVIEW: "Review",
+} as const;
+
+function visualStage(resource: StatusResource): keyof typeof stageLabels {
+  if (resource.status === "VALIDATION_FAILED") return "VALIDATE";
+  if (resource.status === "INFECTED" || resource.status === "SCAN_FAILED")
+    return "SCAN";
+  if (resource.status === "EXTRACTION_FAILED") return "EXTRACT";
+  if (resource.status === "PARSE_FAILED") return "PARSE";
+  if (resource.status === "REVIEW_READY" || resource.status === "CONFIRMED")
+    return "REVIEW";
+  const stage = resource.stage as keyof typeof stageLabels | undefined;
+  return stage && stage in stageLabels ? stage : "UPLOAD";
+}
+
+function timelineState(input: {
+  index: number;
+  currentIndex: number;
+  failed: boolean;
+}): TimelineState {
+  if (input.index < input.currentIndex) return "complete";
+  if (input.index > input.currentIndex) return "upcoming";
+  return input.failed ? "error" : "current";
+}
+
+function aiPresentation(resource: StatusResource): Readonly<{
+  tone: "pending" | "processing" | "success" | "error" | "preparing";
+  badge: string;
+  title: string;
+  message: string;
+}> | null {
+  if (resource.parserClass !== "EXTERNAL_OPENAI") return null;
+  if (resource.status === "AWAITING_CONSENT")
+    return {
+      tone: "pending",
+      badge: "Consent needed",
+      title: "OpenAI is waiting for your permission",
+      message:
+        "No CV text has been sent to OpenAI. Review the consent notice below to continue.",
+    };
+  if (resource.status === "PARSE_QUEUED")
+    return {
+      tone: "pending",
+      badge: "Queued",
+      title: "OpenAI request is queued",
+      message:
+        "Consent is valid and the worker is preparing the request. This page refreshes automatically.",
+    };
+  if (resource.status === "PARSING")
+    return {
+      tone: "processing",
+      badge: "API in progress",
+      title: "OpenAI is extracting profile fields",
+      message:
+        "The API request is running. SmartHire will only mark it successful after validating and saving the structured result.",
+    };
+  if (resource.status === "REVIEW_READY" || resource.status === "CONFIRMED")
+    return {
+      tone: "success",
+      badge: "Success",
+      title: "OpenAI parsing completed",
+      message:
+        "A private draft is ready. Review every suggested field before applying it to your profile.",
+    };
+  if (resource.status === "PARSE_FAILED")
+    return {
+      tone: "error",
+      badge: resource.failure?.code ?? "API error",
+      title: "OpenAI parsing could not finish",
+      message:
+        resource.failure?.message ??
+        "The provider request failed safely. Retry or update your profile manually.",
+    };
+  return {
+    tone: "preparing",
+    badge: "Preparing",
+    title: "SmartHire is preparing the CV for OpenAI",
+    message:
+      "Virus scanning and local text extraction happen first. OpenAI has not been called at this stage.",
+  };
+}
+
 export function CvImportStatus({
   resource,
   loadStatus,
@@ -67,6 +163,7 @@ export function CvImportStatus({
   loadStatus?: () => Promise<StatusResource>;
   csrfProof?: string;
 }) {
+  const router = useRouter();
   const [current, setCurrent] = useState(resource);
   const [pollError, setPollError] = useState<string | null>(null);
   const retryKey = useRef<string | null>(null);
@@ -117,28 +214,39 @@ export function CvImportStatus({
     if (!current.pollingAfterMs) return;
     let active = true;
     let timer: ReturnType<typeof setTimeout> | null = null;
-    const schedule = () => {
+    const schedule = (pollingAfterMs: number) => {
       const delay = document.hidden
-        ? Math.max(current.pollingAfterMs ?? 0, 10_000)
-        : (current.pollingAfterMs ?? 0);
+        ? Math.max(pollingAfterMs, 10_000)
+        : pollingAfterMs;
       timer = setTimeout(() => {
         void refreshStatus()
+          .then((next) => {
+            if (!active || !next.pollingAfterMs) return;
+            schedule(next.pollingAfterMs);
+          })
           .catch(() => {
             if (!active) return;
             setPollError(
               "Status could not be refreshed. SmartHire will keep trying.",
             );
-            schedule();
-          })
-          .then(() => undefined);
+            schedule(pollingAfterMs);
+          });
       }, delay);
     };
-    schedule();
+    schedule(current.pollingAfterMs);
     return () => {
       active = false;
       if (timer) clearTimeout(timer);
     };
   }, [current.pollingAfterMs, refreshStatus]);
+
+  useEffect(() => {
+    if (current.status !== "REVIEW_READY") return;
+    const reviewUrl = `/profile/cv-imports/${current.uploadId}/review`;
+    router.prefetch(reviewUrl);
+    const redirect = setTimeout(() => router.replace(reviewUrl), 320);
+    return () => clearTimeout(redirect);
+  }, [current.status, current.uploadId, router]);
 
   const requestRetry = useCallback(async () => {
     if (!csrfProof)
@@ -241,6 +349,7 @@ export function CvImportStatus({
           body: JSON.stringify(request),
         },
       );
+      if (response.status === 401) throw new Error("CV_SESSION_EXPIRED");
       if (!response.ok) throw new Error("CV_CONSENT_GRANT_FAILED");
       const outcome = cvConsentOutcomeSchema.parse(await response.json());
       if (outcome.uploadId !== current.uploadId)
@@ -261,12 +370,23 @@ export function CvImportStatus({
         headers: { "x-csrf-token": csrfProof },
       },
     );
+    if (response.status === 401) throw new Error("CV_SESSION_EXPIRED");
     if (response.status !== 204) throw new Error("CV_CONSENT_REVOKE_FAILED");
     await refreshStatus();
   }, [csrfProof, current.uploadId, refreshStatus]);
 
   const label = current.status.replaceAll("_", " ").toLowerCase();
   const availableActions = current.availableActions ?? [];
+  const aiStatus = aiPresentation(current);
+  const stages = (
+    current.parserClass === "EXTERNAL_OPENAI"
+      ? ["UPLOAD", "VALIDATE", "SCAN", "EXTRACT", "CONSENT", "PARSE", "REVIEW"]
+      : ["UPLOAD", "VALIDATE", "SCAN", "EXTRACT", "PARSE", "REVIEW"]
+  ) as readonly (keyof typeof stageLabels)[];
+  const activeStage = visualStage(current);
+  const activeStageIndex = Math.max(0, stages.indexOf(activeStage));
+  const failed =
+    current.status.endsWith("_FAILED") || current.status === "INFECTED";
   const hasFailureRecovery = Boolean(
     current.failure &&
     typeof current.scanRetriesRemaining === "number" &&
@@ -277,25 +397,73 @@ export function CvImportStatus({
       <h2 id="cv-status-heading">CV processing status</h2>
       <p
         className={styles.state}
-        role={!hasFailureRecovery && current.stage ? "status" : undefined}
-        aria-live={!hasFailureRecovery && current.stage ? "polite" : undefined}
+        role={
+          !aiStatus && !hasFailureRecovery && current.stage
+            ? "status"
+            : undefined
+        }
+        aria-live={
+          !aiStatus && !hasFailureRecovery && current.stage
+            ? "polite"
+            : undefined
+        }
       >
         <strong>{label}</strong>
         {current.stage
-          ? ` — stage ${current.stage.toLowerCase()}.`
+          ? ` — ${
+              current.parserClass === "EXTERNAL_OPENAI"
+                ? "OpenAI parser"
+                : "SmartHire parser"
+            }, stage ${activeStage.toLowerCase()}.`
           : ". Content is unavailable."}
       </p>
+      {aiStatus ? (
+        <div
+          key={`${current.status}:${aiStatus.tone}`}
+          className={styles.aiStatus}
+          data-tone={aiStatus.tone}
+          role={aiStatus.tone === "error" ? "alert" : "status"}
+          aria-live={aiStatus.tone === "error" ? "assertive" : "polite"}
+          data-testid="openai-status"
+        >
+          <span className={styles.aiIndicator} aria-hidden="true">
+            <span />
+          </span>
+          <div className={styles.aiCopy}>
+            <small>EXTERNAL OPENAI PARSER</small>
+            <strong>{aiStatus.title}</strong>
+            <p>{aiStatus.message}</p>
+          </div>
+          <span className={styles.aiBadge}>{aiStatus.badge}</span>
+        </div>
+      ) : null}
       {current.stage ? (
         <ol className={styles.timeline} aria-label="Processing timeline">
-          {["UPLOAD", "SCAN", "EXTRACT", "PARSE", "REVIEW"].map((stage) => (
-            <li
-              key={stage}
-              aria-current={current.stage === stage ? "step" : undefined}
-            >
-              {current.stage === stage ? "Current: " : ""}
-              {stage.toLowerCase()}
-            </li>
-          ))}
+          {stages.map((stage, index) => {
+            const state = timelineState({
+              index,
+              currentIndex: activeStageIndex,
+              failed,
+            });
+            return (
+              <li
+                key={stage}
+                data-state={state}
+                aria-current={
+                  state === "current" || state === "error" ? "step" : undefined
+                }
+              >
+                <span className={styles.timelineMarker} aria-hidden="true">
+                  {state === "complete" ? "✓" : index + 1}
+                </span>
+                <span>
+                  {state === "current" ? "Current: " : ""}
+                  {state === "error" ? "Failed: " : ""}
+                  {stageLabels[stage]}
+                </span>
+              </li>
+            );
+          })}
         </ol>
       ) : null}
       {pollError ? (

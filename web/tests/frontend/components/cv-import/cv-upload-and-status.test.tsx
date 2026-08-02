@@ -1,11 +1,30 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CvImportList } from "@/frontend/features/cv-import/components/cv-import-list";
 import { CvImportStatus } from "@/frontend/features/cv-import/components/cv-import-status";
 import { CvProcessingNotice } from "@/frontend/features/cv-import/components/cv-processing-notice";
 import { CvUploadForm } from "@/frontend/features/cv-import/components/cv-upload-form";
 import { CV_PROCESSING_NOTICES } from "@/shared/contracts/cv-import/upload";
+
+const navigation = vi.hoisted(() => ({
+  prefetch: vi.fn(),
+  replace: vi.fn(),
+}));
+vi.mock("next/navigation", () => ({ useRouter: () => navigation }));
+
+beforeEach(() => {
+  navigation.prefetch.mockClear();
+  navigation.replace.mockClear();
+});
+
+afterEach(() => vi.useRealTimers());
 
 describe("CV upload and authoritative status UI", () => {
   it("shows a versioned notice for each explicit parser choice", () => {
@@ -27,14 +46,32 @@ describe("CV upload and authoritative status UI", () => {
 
   it("defers exact external consent to the server-bound status lifecycle", () => {
     render(<CvUploadForm csrfProof="csrf_fixture" onUpload={vi.fn()} />);
-    fireEvent.change(screen.getByLabelText("Parser"), {
-      target: { value: "EXTERNAL_OPENAI" },
-    });
+    fireEvent.click(screen.getByRole("radio", { name: /external openai/i }));
     expect(screen.getByRole("note")).toHaveTextContent(
       /blocked until you separately consent/i,
     );
     expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /upload cv/i })).toBeEnabled();
+  });
+
+  it("shows parser availability without making one parser globally exclusive", () => {
+    render(
+      <CvUploadForm
+        csrfProof="csrf_fixture"
+        onUpload={vi.fn()}
+        parserAvailability={{ deterministic: true, external: true }}
+      />,
+    );
+    const deterministic = screen.getByRole("radio", {
+      name: /smarthire deterministic/i,
+    });
+    const external = screen.getByRole("radio", { name: /external openai/i });
+    expect(deterministic).toBeEnabled();
+    expect(external).toBeEnabled();
+    fireEvent.click(external);
+    expect(external).toBeChecked();
+    fireEvent.click(deterministic);
+    expect(deterministic).toBeChecked();
   });
 
   it("validates exact type/5 MB, uploads by keyboard, and preserves text progress", async () => {
@@ -122,5 +159,155 @@ describe("CV upload and authoritative status UI", () => {
     );
     unmount();
     expect(clear).toHaveBeenCalled();
+  });
+
+  it("keeps polling successful responses and redirects as soon as the draft is ready", async () => {
+    vi.useFakeTimers();
+    const loadStatus = vi
+      .fn()
+      .mockResolvedValueOnce({
+        uploadId: "upload_polling_1234",
+        parserClass: "EXTERNAL_OPENAI" as const,
+        status: "PARSING" as const,
+        stage: "PARSE" as const,
+        availableActions: [],
+        pollingAfterMs: 50,
+      })
+      .mockResolvedValueOnce({
+        uploadId: "upload_polling_1234",
+        parserClass: "EXTERNAL_OPENAI" as const,
+        status: "REVIEW_READY" as const,
+        stage: "REVIEW" as const,
+        availableActions: ["REVIEW"],
+        pollingAfterMs: null,
+      });
+    render(
+      <CvImportStatus
+        resource={{
+          uploadId: "upload_polling_1234",
+          parserClass: "EXTERNAL_OPENAI",
+          status: "PARSE_QUEUED",
+          stage: "PARSE",
+          availableActions: [],
+          pollingAfterMs: 50,
+        }}
+        loadStatus={loadStatus}
+      />,
+    );
+
+    await act(async () => vi.advanceTimersByTimeAsync(50));
+    expect(loadStatus).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("openai-status")).toHaveTextContent(
+      /api request is running/i,
+    );
+
+    await act(async () => vi.advanceTimersByTimeAsync(50));
+    expect(loadStatus).toHaveBeenCalledTimes(2);
+    expect(screen.getByTestId("openai-status")).toHaveAttribute(
+      "data-tone",
+      "success",
+    );
+
+    await act(async () => vi.advanceTimersByTimeAsync(320));
+    expect(navigation.prefetch).toHaveBeenCalledWith(
+      "/profile/cv-imports/upload_polling_1234/review",
+    );
+    expect(navigation.replace).toHaveBeenCalledWith(
+      "/profile/cv-imports/upload_polling_1234/review",
+    );
+  });
+
+  it("transitions OpenAI status through consent, pending, API work, success, and safe error", () => {
+    const base = {
+      uploadId: "upload_fixture_1234",
+      parserClass: "EXTERNAL_OPENAI" as const,
+      availableActions: [] as const,
+      pollingAfterMs: null,
+    };
+    const { rerender } = render(
+      <CvImportStatus
+        resource={{
+          ...base,
+          status: "AWAITING_CONSENT",
+          stage: "CONSENT",
+        }}
+      />,
+    );
+    expect(screen.getByTestId("openai-status")).toHaveAttribute(
+      "data-tone",
+      "pending",
+    );
+    expect(screen.getByTestId("openai-status")).toHaveTextContent(
+      /no cv text has been sent/i,
+    );
+
+    rerender(
+      <CvImportStatus
+        key="queued"
+        resource={{ ...base, status: "PARSE_QUEUED", stage: "PARSE" }}
+      />,
+    );
+    expect(screen.getByTestId("openai-status")).toHaveTextContent(/queued/i);
+
+    rerender(
+      <CvImportStatus
+        key="parsing"
+        resource={{ ...base, status: "PARSING", stage: "PARSE" }}
+      />,
+    );
+    expect(screen.getByTestId("openai-status")).toHaveAttribute(
+      "data-tone",
+      "processing",
+    );
+    expect(screen.getByTestId("openai-status")).toHaveTextContent(
+      /api request is running/i,
+    );
+
+    rerender(
+      <CvImportStatus
+        key="success"
+        resource={{
+          ...base,
+          status: "REVIEW_READY",
+          stage: "REVIEW",
+          availableActions: ["REVIEW"],
+        }}
+      />,
+    );
+    expect(screen.getByTestId("openai-status")).toHaveAttribute(
+      "data-tone",
+      "success",
+    );
+    expect(screen.getByRole("link", { name: /review draft/i })).toBeVisible();
+
+    rerender(
+      <CvImportStatus
+        key="failed"
+        resource={{
+          ...base,
+          status: "PARSE_FAILED",
+          stage: "TERMINAL",
+          scanRetriesRemaining: 2,
+          parseRetriesRemaining: 1,
+          failure: {
+            code: "PARSER_TIMEOUT",
+            message: "Processing could not finish safely.",
+            retryable: true,
+            suggestedActions: ["RETRY", "MANUAL_PROFILE", "DELETE"],
+          },
+        }}
+      />,
+    );
+    expect(screen.getByTestId("openai-status")).toHaveAttribute(
+      "data-tone",
+      "error",
+    );
+    expect(screen.getByTestId("openai-status")).toHaveTextContent(
+      /parser_timeout/i,
+    );
+    expect(screen.getByText(/failed: parse/i).closest("li")).toHaveAttribute(
+      "data-state",
+      "error",
+    );
   });
 });

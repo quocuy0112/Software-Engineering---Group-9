@@ -98,6 +98,45 @@ describe.sequential("CV draft complete-payload save", () => {
     ).toThrow("CV_PROVENANCE_LIMIT_EXCEEDED");
   });
 
+  it("returns a field error when add is selected for an existing Profile scalar", async () => {
+    const client = await pool.connect();
+    const seeded = await seedReviewDraft(client, "invalid-scalar-add");
+    accounts.push(seeded.accountId);
+    await client.query(
+      `UPDATE "CandidateProfile" SET "headline" = 'Existing headline' WHERE "id" = $1`,
+      [seeded.profileId],
+    );
+    client.release();
+    const service = new CvDraftComparisonService();
+    const comparison = await service.get(seeded.accountId, seeded.draftId);
+    const reviewDecisions = {
+      ...comparison.reviewDecisions,
+      scalars: comparison.reviewDecisions.scalars.map((decision) => ({
+        ...decision,
+        action: "ADD" as const,
+      })),
+    };
+
+    await expect(
+      service.save(seeded.accountId, seeded.draftId, {
+        baseDraftRevision: 0,
+        reviewedProfileRevision: 0,
+        proposals: comparison.proposals,
+        reviewDecisions,
+      }),
+    ).rejects.toMatchObject({
+      code: "VALIDATION_ERROR",
+      fieldErrors: [
+        {
+          path: "reviewDecisions.scalars.0.action",
+          code: "ACTION_MISMATCH",
+          message:
+            "Headline already has a Profile value. Choose replace or skip.",
+        },
+      ],
+    });
+  });
+
   it("persists explicit add, replace, and skip choices without mutating Profile", async () => {
     const client = await pool.connect();
     const seeded = await seedReviewDraft(client, "decision-semantics");
