@@ -37,6 +37,14 @@ describe("navigation session boundary", () => {
     expect(view.trimStart()).toMatch(/^"use client";/u);
   });
 
+  it("keeps profile navigation inside a client boundary for its locale hook", async () => {
+    const navigation = await readFile(
+      "src/frontend/features/profile/components/profile-navigation.tsx",
+      "utf8",
+    );
+    expect(navigation.trimStart()).toMatch(/^"use client";/u);
+  });
+
   it("keeps workspace navigation presentation-only and non-persistent", async () => {
     const shell = await readFile(
       "src/frontend/features/dashboard/components/workspace-shell.tsx",
