@@ -50,6 +50,7 @@
   color: var(--sh-color-text-primary);
   background: var(--sh-color-surface-card);
   font: inherit;
+  box-shadow: var(--sh-shadow-control);
 }
 
 .account-identity-panel input:hover:not(:disabled) {

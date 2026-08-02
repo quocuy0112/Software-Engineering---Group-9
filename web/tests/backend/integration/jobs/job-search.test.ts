@@ -42,7 +42,10 @@ describe.skipIf(!databaseAvailable)("PostgreSQL public job search", () => {
       null,
       fixture.now,
     );
-    expect(result.rows.map((row) => row.id).sort()).toEqual(
+    const fixtureRows = result.rows.filter(
+      (row) => row.companyId === fixture.company.id,
+    );
+    expect(fixtureRows.map((row) => row.id).sort()).toEqual(
       [fixture.jobs.active.id, fixture.jobs.activeSecond.id].sort(),
     );
   });
@@ -66,8 +69,11 @@ describe.skipIf(!databaseAvailable)("PostgreSQL public job search", () => {
       fixture.userIds[0]!,
       fixture.now,
     );
-    expect(result.rows).toHaveLength(1);
-    expect(result.rows[0]?.id).toBe(fixture.jobs.active.id);
-    expect(result.rows[0]?.title).toBe("Lập trình viên TypeScript");
+    const fixtureRows = result.rows.filter(
+      (row) => row.companyId === fixture.company.id,
+    );
+    expect(fixtureRows).toHaveLength(1);
+    expect(fixtureRows[0]?.id).toBe(fixture.jobs.active.id);
+    expect(fixtureRows[0]?.title).toBe("Lập trình viên TypeScript");
   });
 });

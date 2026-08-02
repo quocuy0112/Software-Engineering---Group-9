@@ -49,8 +49,8 @@ describe("job board OpenAPI and runtime-contract parity", () => {
     ])
       expect(openapi).toContain(`${schema}:`);
 
-    expect(openapi).toContain(
-      "enum: [FRAUD, MISLEADING, DUPLICATE, DISCRIMINATORY, INAPPROPRIATE, OTHER]",
+    expect(openapi).toMatch(
+      /enum:\s*\[\s*FRAUD,\s*MISLEADING,\s*DUPLICATE,\s*DISCRIMINATORY,\s*INAPPROPRIATE,\s*OTHER\s*\]/u,
     );
     expect(openapi).toContain("enum: [RELEVANCE, NEWEST, SALARY_DESC]");
   });

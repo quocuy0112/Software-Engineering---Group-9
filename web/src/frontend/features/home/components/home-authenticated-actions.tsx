@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { postWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
@@ -11,13 +12,16 @@ export function HomeAuthenticatedActions({
   profile,
   csrfProof,
 }: {
-  profile: { name: string; email: string };
+  profile: { name: string; email: string; image?: string | null };
   csrfProof: string;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [navigating, startNavigation] = useTransition();
   const [status, setStatus] = useState("");
+  const avatar = /^data:image\/(?:png|jpeg);base64,/u.test(profile.image ?? "")
+    ? profile.image
+    : null;
 
   async function signOut() {
     if (busy || navigating) return;
@@ -51,10 +55,14 @@ export function HomeAuthenticatedActions({
             aria-label={`Open profile for ${profile.name}`}
           >
             <span className="home-profile-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <circle cx="12" cy="8" r="3.2" />
-                <path d="M5.5 19c.7-3.1 3-4.8 6.5-4.8s5.8 1.7 6.5 4.8" />
-              </svg>
+              {avatar ? (
+                <Image src={avatar} alt="" width={40} height={40} unoptimized />
+              ) : (
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="8" r="3.2" />
+                  <path d="M5.5 19c.7-3.1 3-4.8 6.5-4.8s5.8 1.7 6.5 4.8" />
+                </svg>
+              )}
             </span>
             <span>
               <strong>{profile.name}</strong>
@@ -71,18 +79,20 @@ export function HomeAuthenticatedActions({
         </div>
       </header>
       <section className="home-authenticated-hero" aria-labelledby="home-title">
-        <p className="home-eyebrow">THE TALENT CONNECTION</p>
-        <h1 id="home-title">Make your next great move.</h1>
+        <p className="home-eyebrow">YOUR NEXT CHAPTER, ORGANIZED</p>
+        <h1 id="home-title">
+          Everything you bring. One place to move forward.
+        </h1>
         <p>
-          Your secure SmartHire workspace is ready when you are. Keep your
-          identity protected and shape what comes next.
+          Your secure SmartHire workspace keeps your identity, professional
+          story, and next steps clear—so you can focus on where you want to go.
         </p>
         <nav className="home-actions" aria-label="Workspace actions">
-          <Link className="home-action home-action--primary" href="/dashboard">
-            Dashboard
+          <Link className="home-action home-action--primary" href="/jobs">
+            Browse jobs
           </Link>
-          <Link className="home-action home-action--secondary" href="/profile">
-            Profile
+          <Link className="home-action home-action--secondary" href="/dashboard">
+            Dashboard
           </Link>
         </nav>
       </section>

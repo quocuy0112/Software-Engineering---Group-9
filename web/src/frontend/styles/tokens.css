@@ -3,15 +3,19 @@
   --sh-color-brand-primary: #1d4ed8;
   --sh-color-brand-primary-hover: #1e40af;
   --sh-color-brand-primary-pressed: #1e3a8a;
-  --sh-color-surface-page: #f8fafc;
+  --sh-color-brand-accent: #3b82f6;
+  --sh-color-brand-soft: #dbeafe;
+  --sh-color-surface-page: #f6f8fc;
   --sh-color-surface-card: #ffffff;
   --sh-color-surface-subtle: #f1f5f9;
+  --sh-color-surface-tinted: #f8fbff;
   --sh-color-text-primary: #0f172a;
   --sh-color-text-secondary: #475569;
   --sh-color-text-muted: #64748b;
   --sh-color-text-inverse: #ffffff;
   --sh-color-border-default: #64748b;
   --sh-color-border-subtle: #e2e8f0;
+  --sh-color-border-strong: #475569;
   --sh-color-border-focus: #2563eb;
   --sh-color-focus-ring-bg: #dbeafe;
   --sh-color-success: #15803d;
@@ -24,7 +28,8 @@
   --sh-color-info-bg: #eff6ff;
   --sh-color-disabled-bg: #e2e8f0;
   --sh-color-disabled-text: #64748b;
-  --sh-color-sidebar-background: #0f2a4a;
+  --sh-color-sidebar-background: #102a4c;
+  --sh-color-sidebar-surface: #16385f;
   --sh-color-sidebar-active: #1d4ed8;
   --sh-color-sidebar-text: #e2e8f0;
   --sh-color-sidebar-muted: #93c5fd;
@@ -87,6 +92,10 @@
   --sh-breakpoint-tablet: 768px;
   --sh-breakpoint-desktop: 1280px;
   --sh-breakpoint-wide: 1440px;
-  --sh-shadow-card: 0 1px 2px rgb(15 23 42 / 8%);
-  --sh-shadow-floating: 0 8px 24px rgb(15 23 42 / 14%);
+  --sh-shadow-control: 0 1px 2px rgb(15 23 42 / 6%);
+  --sh-shadow-card: 0 1px 2px rgb(15 23 42 / 5%), 0 8px 24px rgb(15 23 42 / 5%);
+  --sh-shadow-card-hover:
+    0 2px 4px rgb(15 23 42 / 6%), 0 16px 36px rgb(15 23 42 / 10%);
+  --sh-shadow-floating:
+    0 4px 10px rgb(15 23 42 / 8%), 0 24px 64px rgb(15 23 42 / 16%);
 }

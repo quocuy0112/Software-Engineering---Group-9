@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Badge } from "@/frontend/components/ui/badge";
+import { SmartHireMark } from "@/frontend/components/ui/smarthire-brand";
 
 export function DashboardView() {
   return (
@@ -34,9 +35,13 @@ export function DashboardView() {
         <div className="dashboard-hero-art" aria-hidden="true">
           <span className="hero-orbit hero-orbit--one" />
           <span className="hero-orbit hero-orbit--two" />
-          <span className="hero-person">SH</span>
-          <span className="hero-spark hero-spark--one">✦</span>
-          <span className="hero-spark hero-spark--two">✦</span>
+          <SmartHireMark className="hero-person" />
+          <span className="hero-spark hero-spark--one">
+            <DashboardIcon name="spark" />
+          </span>
+          <span className="hero-spark hero-spark--two">
+            <DashboardIcon name="spark" />
+          </span>
         </div>
       </section>
 
@@ -47,27 +52,27 @@ export function DashboardView() {
         <article className="feature-card">
           <span className="feature-card-index">01</span>
           <div className="feature-icon" aria-hidden="true">
-            ◒
+            <DashboardIcon name="profile" />
           </div>
           <h2>Candidate profile</h2>
           <p>
             Shape a clear professional story that is ready to be discovered.
           </p>
-          <Badge className="feature-status">Coming soon</Badge>
+          <Link href="/profile">Open profile</Link>
         </article>
         <article className="feature-card">
           <span className="feature-card-index">02</span>
           <div className="feature-icon" aria-hidden="true">
-            ✦
+            <DashboardIcon name="jobs" />
           </div>
-          <h2>Smart matching</h2>
-          <p>Connect your strengths with meaningful career opportunities.</p>
-          <Badge className="feature-status">Coming soon</Badge>
+          <h2>Job opportunities</h2>
+          <p>Search and filter approved roles, then save or apply when ready.</p>
+          <Link href="/jobs">Browse jobs</Link>
         </article>
         <article className="feature-card">
           <span className="feature-card-index">03</span>
           <div className="feature-icon" aria-hidden="true">
-            ◎
+            <DashboardIcon name="team" />
           </div>
           <h2>Hiring team tools</h2>
           <p>
@@ -92,7 +97,7 @@ export function DashboardView() {
           <ul className="account-checklist">
             <li>
               <span className="checklist-icon" aria-hidden="true">
-                ✓
+                <DashboardIcon name="check" />
               </span>
               <span>
                 <strong>Secure account access</strong>
@@ -106,7 +111,7 @@ export function DashboardView() {
                 className="checklist-icon checklist-icon--soft"
                 aria-hidden="true"
               >
-                +
+                <DashboardIcon name="plus" />
               </span>
               <span>
                 <strong>Add another layer</strong>
@@ -129,40 +134,52 @@ export function DashboardView() {
             </div>
           </div>
           <div className="dashboard-links" aria-label="Dashboard shortcuts">
+            <Link href="/jobs">
+              <span className="shortcut-icon" aria-hidden="true">
+                <DashboardIcon name="jobs" />
+              </span>
+              <span>
+                <strong>Jobs</strong>
+                <small>Search, save, report, and apply</small>
+              </span>
+              <span className="shortcut-arrow" aria-hidden="true">
+                <DashboardIcon name="arrow" />
+              </span>
+            </Link>
             <Link href="/profile">
               <span className="shortcut-icon" aria-hidden="true">
-                ○
+                <DashboardIcon name="profile" />
               </span>
               <span>
                 <strong>Profile</strong>
                 <small>Review your account overview</small>
               </span>
               <span className="shortcut-arrow" aria-hidden="true">
-                →
+                <DashboardIcon name="arrow" />
               </span>
             </Link>
             <Link href="/profile/security">
               <span className="shortcut-icon" aria-hidden="true">
-                ◇
+                <DashboardIcon name="shield" />
               </span>
               <span>
                 <strong>Security</strong>
                 <small>Two-factor authentication and backup codes</small>
               </span>
               <span className="shortcut-arrow" aria-hidden="true">
-                →
+                <DashboardIcon name="arrow" />
               </span>
             </Link>
             <Link href="/profile/sessions">
               <span className="shortcut-icon" aria-hidden="true">
-                □
+                <DashboardIcon name="device" />
               </span>
               <span>
                 <strong>Sessions</strong>
                 <small>Review and revoke signed-in devices</small>
               </span>
               <span className="shortcut-arrow" aria-hidden="true">
-                →
+                <DashboardIcon name="arrow" />
               </span>
             </Link>
           </div>
@@ -173,15 +190,13 @@ export function DashboardView() {
         className="dashboard-coming-later"
         aria-labelledby="future-workspace-title"
       >
-        <span className="coming-later-mark" aria-hidden="true">
-          S
-        </span>
+        <SmartHireMark className="coming-later-mark" />
         <div>
           <p className="panel-kicker">PRODUCT ROADMAP</p>
           <h2 id="future-workspace-title">More workspace areas coming later</h2>
           <p>
-            Candidate and Recruiter workflows will be introduced in a future
-            SmartHire increment.
+            Recruiter workflows and candidate application tracking will be
+            introduced in a future SmartHire increment.
           </p>
         </div>
         <Badge className="coming-later-pill" tone="info">
@@ -189,5 +204,63 @@ export function DashboardView() {
         </Badge>
       </section>
     </div>
+  );
+}
+
+function DashboardIcon({
+  name,
+}: {
+  name:
+    | "arrow"
+    | "check"
+    | "device"
+    | "jobs"
+    | "plus"
+    | "profile"
+    | "shield"
+    | "spark"
+    | "team";
+}) {
+  const paths: Record<typeof name, React.ReactNode> = {
+    arrow: <path d="M5 12h14m-5-5 5 5-5 5" />,
+    check: <path d="m5 12 4 4L19 6" />,
+    device: (
+      <>
+        <rect x="4" y="5" width="16" height="12" rx="2" />
+        <path d="M9 20h6" />
+      </>
+    ),
+    jobs: (
+      <>
+        <rect x="3" y="7" width="18" height="12" rx="2" />
+        <path d="M8 7V5.5A2.5 2.5 0 0 1 10.5 3h3A2.5 2.5 0 0 1 16 5.5V7M3 11h18M9 11v1.5h6V11" />
+      </>
+    ),
+    plus: <path d="M12 5v14M5 12h14" />,
+    profile: (
+      <>
+        <circle cx="12" cy="8" r="3.5" />
+        <path d="M5 20c.8-4 3.1-6 7-6s6.2 2 7 6" />
+      </>
+    ),
+    shield: (
+      <path d="M12 3 5.5 5.5v5.2c0 4.1 2.3 7.6 6.5 9.3 4.2-1.7 6.5-5.2 6.5-9.3V5.5L12 3Zm-3 9 2 2 4-5" />
+    ),
+    spark: (
+      <path d="m12 3 1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3Z" />
+    ),
+    team: (
+      <>
+        <circle cx="9" cy="8" r="3" />
+        <circle cx="17" cy="9" r="2" />
+        <path d="M3.5 20c.6-4 2.5-6 5.5-6s4.9 2 5.5 6M14.5 15c2.8-.4 4.8 1.2 5.5 4" />
+      </>
+    ),
+  };
+
+  return (
+    <svg className="dashboard-icon" viewBox="0 0 24 24" focusable="false">
+      {paths[name]}
+    </svg>
   );
 }

@@ -36,12 +36,17 @@ function salary(job: JobDetail) {
   return `${number.format(job.salary.minimum)} – ${number.format(job.salary.maximum)} per ${job.salary.period.toLowerCase()}`;
 }
 
+const jobDate = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" });
+
 export function JobDetailView({ job }: { job: JobDetail }) {
   const returnTo = encodeURIComponent(`/jobs/${job.slug}`);
   return (
-    <article className="job-panel">
-      <header>
-        <p>{job.company.displayName}</p>
+    <article className="job-panel job-detail-card">
+      <Link className="job-detail-back" href="/jobs">
+        <span aria-hidden="true">←</span> Back to jobs
+      </Link>
+      <header className="job-detail-hero">
+        <p className="job-company-name">{job.company.displayName}</p>
         <h1>{job.title}</h1>
         <span
           className="job-state"
@@ -56,33 +61,49 @@ export function JobDetailView({ job }: { job: JobDetail }) {
           <span>{valueLabel[job.workArrangement]}</span>
         </div>
         <p>{salary(job)}</p>
+        <p className="job-card-timing">
+          Posted {jobDate.format(new Date(job.publishedAt))}
+          {job.applicationDeadline
+            ? ` · Applications close ${jobDate.format(new Date(job.applicationDeadline))}`
+            : ""}
+        </p>
       </header>
-      <section aria-labelledby="job-description">
+      <section className="job-detail-section" aria-labelledby="job-description">
         <h2 id="job-description">About the role</h2>
         <p>{job.description}</p>
       </section>
-      <section aria-labelledby="job-responsibilities">
+      <section
+        className="job-detail-section"
+        aria-labelledby="job-responsibilities"
+      >
         <h2 id="job-responsibilities">Responsibilities</h2>
         <p>{job.responsibilities}</p>
       </section>
-      <section aria-labelledby="job-requirements">
+      <section
+        className="job-detail-section"
+        aria-labelledby="job-requirements"
+      >
         <h2 id="job-requirements">Requirements</h2>
         <p>{job.requirements}</p>
-        <p>{job.skills.join(" · ")}</p>
+        <ul className="job-skills" aria-label="Required skills">
+          {job.skills.map((skill) => (
+            <li key={skill}>{skill}</li>
+          ))}
+        </ul>
       </section>
       {job.benefits ? (
-        <section aria-labelledby="job-benefits">
+        <section className="job-detail-section" aria-labelledby="job-benefits">
           <h2 id="job-benefits">Benefits</h2>
           <p>{job.benefits}</p>
         </section>
       ) : null}
       {job.company.publicDescription ? (
-        <section aria-labelledby="job-company">
+        <section className="job-detail-section" aria-labelledby="job-company">
           <h2 id="job-company">About {job.company.displayName}</h2>
           <p>{job.company.publicDescription}</p>
         </section>
       ) : null}
-      <div className="job-actions" aria-label="Job actions">
+      <div className="job-actions job-detail-actions" aria-label="Job actions">
         {job.state === "ACTIVE" && job.actions.canApply ? (
           job.actions.authenticated ? (
             <JobApplicationAction jobId={job.id} />
@@ -101,7 +122,6 @@ export function JobDetailView({ job }: { job: JobDetail }) {
             Sign in to save or report
           </Link>
         ) : null}
-        <Link href="/jobs">Back to jobs</Link>
       </div>
     </article>
   );

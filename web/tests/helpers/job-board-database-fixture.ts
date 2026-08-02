@@ -74,15 +74,26 @@ export async function createJobBoardDatabaseFixture(
     });
   }
 
-  const skill = await prisma.skill.upsert({
+  let skill = await prisma.skill.findUnique({
     where: { normalizedName: "typescript" },
-    update: {},
-    create: {
-      id: `skill-${suffix}`,
-      name: "TypeScript",
-      normalizedName: "typescript",
-    },
   });
+  if (!skill) {
+    try {
+      skill = await prisma.skill.create({
+        data: {
+          id: `skill-${suffix}`,
+          name: "TypeScript",
+          normalizedName: "typescript",
+        },
+      });
+    } catch (error) {
+      skill = await prisma.skill.findUnique({
+        where: { normalizedName: "typescript" },
+      });
+      if (!skill) throw error;
+    }
+  }
+  const sharedSkill = skill;
   const base = {
     companyId: company.id,
     summary: "Build useful and accessible recruitment products.",
@@ -131,7 +142,7 @@ export async function createJobBoardDatabaseFixture(
         removedAt: input.status === "REMOVED" ? now : null,
         skills: {
           create: {
-            skillId: skill.id,
+            skillId: sharedSkill.id,
             displayName: "TypeScript",
             required: true,
             position: 0,

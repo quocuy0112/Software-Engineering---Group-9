@@ -27,6 +27,7 @@
     "db:logs": "docker compose logs -f postgres",
     "db:status": "docker compose ps postgres",
     "db:verify": "npm run db:verify --workspace @smarthire/web",
+    "db:seed:jobs": "npm run db:seed:jobs --workspace @smarthire/web",
     "db:reset": "docker compose down -v && docker compose up -d postgres",
     "dev": "node scripts/run-local-development.mjs",
     "dev:web": "npm run dev:web --workspace @smarthire/web",

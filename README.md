@@ -104,6 +104,7 @@ npm ci
 npm run env:init
 npm run db:up
 npm run db:migrate
+npm run db:seed:jobs
 npm run env:check
 npm run dev
 ```
@@ -111,13 +112,16 @@ npm run dev
 Open the application at:
 
 ```text
-http://localhost:3001
+http://localhost:3001/jobs
 ```
 
 Local PostgreSQL is available at `localhost:55432`.
 
 `npm run env:init` creates `.env`, `web/.env.local`, and secure local
 secrets. Existing files are preserved and never overwritten.
+
+`npm run db:seed:jobs` is local-only and idempotently creates five active demo
+job postings. It does not create or change candidate accounts or CVs.
 
 `npm run dev` starts both:
 
@@ -166,6 +170,7 @@ SMTP and Resend are optional. Configure either provider in
 | `npm run email:worker`   | Start only the email worker                          |
 | `npm run test:job-board` | Run focused Job Board tests                          |
 | `npm run perf:job-board` | Run the 100-sample Job Board performance harness     |
+| `npm run db:seed:jobs`   | Create or refresh local Job Board demo postings      |
 | `npm run db:up`          | Start PostgreSQL                                     |
 | `npm run db:down`        | Stop PostgreSQL and retain its data                  |
 | `npm run db:status`      | Show PostgreSQL status                               |

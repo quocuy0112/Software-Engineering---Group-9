@@ -180,9 +180,12 @@ export function JobApplicationForm({
 export function JobApplicationAction({ jobId }: { jobId: string }) {
   const [form, setForm] = useState<ApplicationForm | null>(null);
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [outcome, setOutcome] = useState<ApplicationOutcome | null>(null);
   const [error, setError] = useState<string | null>(null);
   async function start() {
     setError(null);
+    setLoading(true);
     try {
       const response = await fetch(`/api/jobs/${jobId}/application-form`, {
         cache: "no-store",
@@ -196,13 +199,21 @@ export function JobApplicationAction({ jobId }: { jobId: string }) {
       setOpen(true);
     } catch {
       setError("Application form could not be loaded.");
+    } finally {
+      setLoading(false);
     }
   }
   return (
     <>
-      <button type="button" onClick={() => void start()}>
-        Apply now
-      </button>
+      {outcome ? (
+        <span role="status" className="job-feedback">
+          {outcome.message}
+        </span>
+      ) : (
+        <button type="button" onClick={() => void start()} disabled={loading}>
+          {loading ? "Loading…" : "Apply now"}
+        </button>
+      )}
       {error ? <span role="alert">{error}</span> : null}
       {open && form ? (
         <div className="job-dialog-backdrop">
@@ -216,7 +227,10 @@ export function JobApplicationAction({ jobId }: { jobId: string }) {
             <JobApplicationForm
               form={form}
               onCancel={() => setOpen(false)}
-              onSubmitted={() => undefined}
+              onSubmitted={(submitted) => {
+                setOutcome(submitted);
+                setOpen(false);
+              }}
             />
           </div>
         </div>

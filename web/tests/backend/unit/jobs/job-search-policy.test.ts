@@ -27,4 +27,35 @@ describe("job search policy", () => {
       parseJobSearchCriteria({ salaryMin: "20", salaryMax: "10" }),
     ).toThrow();
   });
+
+  it("treats empty browser filter controls as omitted criteria", () => {
+    const result = parseJobSearchCriteria({
+      q: "",
+      location: "",
+      employmentType: [""],
+      experienceLevel: [""],
+      workArrangement: [""],
+      skills: [""],
+      salaryMin: "",
+      salaryMax: "",
+      postedWithinDays: "",
+      cursor: "",
+      limit: "",
+    });
+
+    expect(result).toMatchObject({
+      normalizedQuery: "",
+      normalizedLocation: "",
+      normalizedSkills: [],
+      employmentType: [],
+      experienceLevel: [],
+      workArrangement: [],
+      sort: "RELEVANCE",
+      limit: 20,
+    });
+    expect(result.salaryMin).toBeUndefined();
+    expect(result.salaryMax).toBeUndefined();
+    expect(result.postedWithinDays).toBeUndefined();
+    expect(result.cursor).toBeUndefined();
+  });
 });

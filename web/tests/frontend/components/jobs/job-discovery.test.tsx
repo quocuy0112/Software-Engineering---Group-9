@@ -46,6 +46,8 @@ describe("job discovery presentation", () => {
   it("exposes labeled filters and a clear action", () => {
     render(<JobSearchForm criteria={{ q: "TypeScript" }} />);
     expect(screen.getByLabelText(/keywords/i)).toHaveValue("TypeScript");
+    expect(screen.getByLabelText(/maximum salary/i)).toBeVisible();
+    expect(screen.getByRole("option", { name: "3 days" })).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText(/location/i), {
       target: { value: "Đà Nẵng" },
     });

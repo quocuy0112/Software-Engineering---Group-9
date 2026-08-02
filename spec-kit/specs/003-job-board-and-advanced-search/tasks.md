@@ -51,15 +51,15 @@
 - [ ] T015 [P] [US1] Write failing query validation, availability, relevance, tie-break, and cursor unit tests in `web/tests/backend/unit/jobs/job-search-policy.test.ts`
 - [ ] T016 [P] [US1] Write failing PostgreSQL visibility/filter/sort/pagination/concurrency tests in `web/tests/backend/integration/jobs/job-search.test.ts`
 - [ ] T017 [P] [US1] Write failing GET `/api/jobs` contract/public-field tests in `web/tests/backend/contract/jobs/job-search.contract.test.ts`
-- [ ] T018 [P] [US1] Write failing search form, result, empty/error, keyboard, and 320-pixel tests in `web/tests/frontend/components/jobs/job-discovery.test.tsx` and `web/tests/frontend/accessibility/jobs/job-discovery.accessibility.test.tsx`
+- [X] T018 [P] [US1] Write failing search form, result, empty/error, keyboard, and 320-pixel tests in `web/tests/frontend/components/jobs/job-discovery.test.tsx` and `web/tests/frontend/accessibility/jobs/job-discovery.accessibility.test.tsx`
 
 ### Implementation for User Story 1
 
 - [ ] T019 [US1] Implement parameterized indexed public search/count and keyset ordering in `web/src/backend/repositories/jobs/prisma-public-job-repository.ts`
 - [ ] T020 [US1] Implement validation, normalization, public availability, projection, and cursor orchestration in `web/src/backend/services/jobs/job-discovery-service.ts`
 - [ ] T021 [US1] Implement the thin public search handler in `web/src/app/api/jobs/route.ts`
-- [ ] T022 [P] [US1] Implement job search/filter URL controls and accessible result cards in `web/src/frontend/features/jobs/components/job-search-form.tsx` and `web/src/frontend/features/jobs/components/job-card.tsx`
-- [ ] T023 [US1] Implement the server-rendered catalogue, total/empty/retry states, and next-cursor link in `web/src/app/jobs/page.tsx`
+- [X] T022 [P] [US1] Implement job search/filter URL controls and accessible result cards in `web/src/frontend/features/jobs/components/job-search-form.tsx` and `web/src/frontend/features/jobs/components/job-card.tsx`
+- [X] T023 [US1] Implement the server-rendered catalogue, total/empty/retry states, and next-cursor link in `web/src/app/jobs/page.tsx`
 
 **Checkpoint**: UC-JOB-01 works anonymously and independently; inactive/private fields never cross the contract.
 
@@ -75,14 +75,14 @@
 
 - [ ] T024 [P] [US2] Write failing public-detail availability/action projection unit tests in `web/tests/backend/unit/jobs/job-detail-policy.test.ts`
 - [ ] T025 [P] [US2] Write failing GET `/api/jobs/{slug}` neutral-response and field-allowlist tests in `web/tests/backend/contract/jobs/job-detail.contract.test.ts`
-- [ ] T026 [P] [US2] Write failing detail state, action, semantic, keyboard, and 320-pixel tests in `web/tests/frontend/components/jobs/job-detail.test.tsx` and `web/tests/frontend/accessibility/jobs/job-detail.accessibility.test.tsx`
+- [X] T026 [P] [US2] Write failing detail state, action, semantic, keyboard, and 320-pixel tests in `web/tests/frontend/components/jobs/job-detail.test.tsx` and `web/tests/frontend/accessibility/jobs/job-detail.accessibility.test.tsx`
 
 ### Implementation for User Story 2
 
 - [ ] T027 [US2] Add public detail and actor-scoped action-state queries in `web/src/backend/repositories/jobs/prisma-public-job-repository.ts`
 - [ ] T028 [US2] Add active/closed/expired projection, neutral unavailability, and cache policy in `web/src/backend/services/jobs/job-discovery-service.ts`
 - [ ] T029 [US2] Implement the thin detail handler in `web/src/app/api/jobs/[slug]/route.ts`
-- [ ] T030 [P] [US2] Implement approved detail sections, textual state badges, and protected-action entry points in `web/src/frontend/features/jobs/components/job-detail.tsx`
+- [X] T030 [P] [US2] Implement approved detail sections, textual state badges, and protected-action entry points in `web/src/frontend/features/jobs/components/job-detail.tsx`
 - [ ] T031 [US2] Implement metadata/canonical URL, not-found/error behavior, and server-rendered detail page in `web/src/app/jobs/[slug]/page.tsx`
 
 **Checkpoint**: UC-JOB-02 works independently and reveals no moderation or recruiter-private state.

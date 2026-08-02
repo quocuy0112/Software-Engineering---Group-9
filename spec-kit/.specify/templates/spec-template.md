@@ -12,15 +12,20 @@
 
 <!--
   IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
-  Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
-  you should still have a viable MVP (Minimum Viable Product) that delivers value.
+  Each user story/journey must be INDEPENDENTLY TESTABLE - meaning it provides a
+  demonstrable checkpoint with a clear result when tested in isolation.
+  An isolated story is NOT automatically a releasable MVP. For a P0 capability,
+  release scope must still include every interaction, authorization, business
+  rule, persistence, error-handling, privacy, and verification requirement
+  mandated by the project constitution.
 
   Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
   Think of each story as a standalone slice of functionality that can be:
   - Developed independently
   - Tested independently
-  - Deployed independently
-  - Demonstrated to users independently
+  - Demonstrated independently
+  - Deployed independently only when the selected release scope remains
+    constitution-complete
 -->
 
 ### User Story 1 - [Brief Title] (Priority: P1)

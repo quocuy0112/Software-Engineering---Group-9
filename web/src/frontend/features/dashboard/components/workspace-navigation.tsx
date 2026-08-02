@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 const destinations = [
   { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
+  { href: "/jobs", label: "Jobs", icon: "jobs" },
   { href: "/profile", label: "Profile", icon: "profile" },
 ] as const;
 
@@ -43,9 +44,15 @@ export function WorkspaceNavigation({
         aria-controls="workspace-navigation"
         onClick={() => setMenuOpen((open) => !open)}
       >
-        <span className="menu-toggle-icon" aria-hidden="true">
-          {menuOpen ? "×" : "☰"}
-        </span>
+        <svg
+          className="menu-toggle-icon"
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d={menuOpen ? "M6 6l12 12M18 6 6 18" : "M4 7h16M4 12h16M4 17h16"}
+          />
+        </svg>
         {menuOpen ? "Close workspace menu" : "Open workspace menu"}
       </button>
       <nav
@@ -54,6 +61,7 @@ export function WorkspaceNavigation({
         aria-label="Workspace"
         data-open={menuOpen}
       >
+        <p className="workspace-nav-label">Workspace</p>
         <div className="workspace-navigation-scroll">
           {destinations.map((destination) => {
             const active =
@@ -111,6 +119,14 @@ function NavIcon({ name }: { name: string }) {
       <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
         <circle cx="10" cy="6.5" r="3" />
         <path d="M4 17c.7-3.2 2.7-4.8 6-4.8s5.3 1.6 6 4.8" />
+      </svg>
+    );
+  }
+  if (name === "jobs") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
+        <rect x="3" y="6" width="14" height="10" rx="2" />
+        <path d="M7 6V4.8C7 3.8 7.8 3 8.8 3h2.4c1 0 1.8.8 1.8 1.8V6M3 10h14M8 10v1h4v-1" />
       </svg>
     );
   }

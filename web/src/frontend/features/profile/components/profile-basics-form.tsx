@@ -1,5 +1,6 @@
 "use client";
 
+import type { FormEvent } from "react";
 import { useForm } from "react-hook-form";
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
 import { useServerFormReconciliation } from "../client/use-server-form-reconciliation";
@@ -23,6 +24,12 @@ const valuesFrom = (
   phone: basics.phone ?? "",
   location: basics.location ?? "",
 });
+
+function growSummary(event: FormEvent<HTMLTextAreaElement>) {
+  const textarea = event.currentTarget;
+  textarea.style.height = "auto";
+  textarea.style.height = `${Math.max(128, textarea.scrollHeight)}px`;
+}
 
 export function ProfileBasicsForm({
   profile,
@@ -87,6 +94,7 @@ export function ProfileBasicsForm({
           data-field-path="basics.summary"
           maxLength={5_000}
           rows={5}
+          onInput={growSummary}
         />
         {fieldError("basics.summary") ? (
           <p className="profile-field-error">{fieldError("basics.summary")}</p>

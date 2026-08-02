@@ -19,13 +19,28 @@ export const workArrangementSchema = z.enum(["ONSITE", "HYBRID", "REMOTE"]);
 export const salaryPeriodSchema = z.enum(["HOUR", "MONTH", "YEAR"]);
 export const jobSortSchema = z.enum(["RELEVANCE", "NEWEST", "SALARY_DESC"]);
 
+const omitEmptyControlValue = (value: unknown) =>
+  value === "" || value === null ? undefined : value;
+
 const stringArray = <T extends z.ZodType>(item: T, maximum: number) =>
-  z
-    .array(item)
-    .max(maximum)
-    .refine((values) => new Set(values).size === values.length, {
-      message: "Use each value only once.",
-    });
+  z.preprocess(
+    (value) =>
+      Array.isArray(value)
+        ? value.filter((item) => item !== "" && item !== null)
+        : value,
+    z
+      .array(item)
+      .max(maximum)
+      .refine((values) => new Set(values).size === values.length, {
+        message: "Use each value only once.",
+      }),
+  );
+
+const optionalNumber = (schema: z.ZodNumber) =>
+  z.preprocess(
+    omitEmptyControlValue,
+    z.coerce.number().pipe(schema).optional(),
+  );
 
 export const jobSearchQuerySchema = z
   .object({
@@ -35,21 +50,30 @@ export const jobSearchQuerySchema = z
     experienceLevel: stringArray(experienceLevelSchema, 6).default([]),
     workArrangement: stringArray(workArrangementSchema, 3).default([]),
     skills: stringArray(z.string().trim().min(1).max(80), 20).default([]),
-    salaryMin: z.coerce.number().finite().min(0).optional(),
-    salaryMax: z.coerce.number().finite().min(0).optional(),
+    salaryMin: optionalNumber(z.number().finite().min(0)),
+    salaryMax: optionalNumber(z.number().finite().min(0)),
     salaryCurrency: z
       .string()
       .regex(/^[A-Z]{3}$/u)
       .default("VND"),
     salaryPeriod: salaryPeriodSchema.default("MONTH"),
-    postedWithinDays: z.coerce
-      .number()
-      .int()
-      .refine((value) => [1, 3, 7, 14, 30].includes(value))
-      .optional(),
+    postedWithinDays: z.preprocess(
+      omitEmptyControlValue,
+      z.coerce
+        .number()
+        .int()
+        .refine((value) => [1, 3, 7, 14, 30].includes(value))
+        .optional(),
+    ),
     sort: jobSortSchema.default("RELEVANCE"),
-    cursor: z.string().max(1024).optional(),
-    limit: z.coerce.number().int().min(1).max(50).default(20),
+    cursor: z.preprocess(
+      omitEmptyControlValue,
+      z.string().max(1024).optional(),
+    ),
+    limit: z.preprocess(
+      omitEmptyControlValue,
+      z.coerce.number().int().min(1).max(50).default(20),
+    ),
   })
   .strict()
   .superRefine((value, context) => {

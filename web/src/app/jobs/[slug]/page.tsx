@@ -47,22 +47,20 @@ export default async function JobDetailPage({ params }: Props) {
   }
   if (failed || !job) {
     return (
-      <main className="jobs-shell">
-        <div className="jobs-container">
-          <div className="job-panel job-feedback" role="alert">
-            <h1>Job details could not be loaded</h1>
-            <p>Try again in a moment.</p>
-            <Link href="/jobs">Back to jobs</Link>
-          </div>
+      <div className="jobs-page jobs-detail-page">
+        <div className="job-panel job-feedback" role="alert">
+          <h1>Job details could not be loaded</h1>
+          <p>Try again in a moment.</p>
+          <Link className="job-secondary-link" href="/jobs">
+            Back to jobs
+          </Link>
         </div>
-      </main>
+      </div>
     );
   }
   return (
-    <main className="jobs-shell">
-      <div className="jobs-container">
-        <JobDetailView job={job} />
-      </div>
-    </main>
+    <div className="jobs-page jobs-detail-page">
+      <JobDetailView job={job} />
+    </div>
   );
 }
