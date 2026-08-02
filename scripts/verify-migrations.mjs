@@ -22,6 +22,7 @@ const appEnv = Object.fromEntries(
 const verifyDatabase = "smarthire_migration_verify";
 const shadowDatabase = "smarthire_migration_shadow";
 const upgradeDatabase = "smarthire_migration_upgrade_verify";
+const cvUpgradeDatabase = "smarthire_cv_migration_upgrade_verify";
 const baselineMigrations = [
   "001_identity_foundation",
   "002_email_outbox_worker",
@@ -29,6 +30,10 @@ const baselineMigrations = [
   "004_password_reset_recovery_operations",
   "005_full_account_recovery",
   "006_add_two_factor_lockout_fields",
+];
+const cvBaselineMigrations = [
+  ...baselineMigrations,
+  "007_candidate_profile_account_management",
 ];
 
 function databaseUrlFor(database) {
@@ -194,14 +199,119 @@ async function verifyFeatureOneUpgrade() {
   );
 }
 
+async function verifyFeatureFourUpgrade() {
+  const upgradeEnvironment = databaseEnvironment(cvUpgradeDatabase);
+  for (const migration of cvBaselineMigrations) {
+    const sql = await readFile(
+      resolve(app, "prisma/migrations", migration, "migration.sql"),
+      "utf8",
+    );
+    prisma(["db", "execute", "--stdin"], sql, upgradeEnvironment);
+    prisma(
+      ["migrate", "resolve", "--applied", migration],
+      undefined,
+      upgradeEnvironment,
+    );
+  }
+
+  prisma(
+    ["db", "execute", "--stdin"],
+    `INSERT INTO "user" (
+       "id", "name", "email", "normalizedEmail", "emailVerified", "state",
+       "updatedAt"
+     ) VALUES (
+       'cv_upgrade_user', 'CV Upgrade Candidate',
+       'cv-upgrade@example.test', 'cv-upgrade@example.test', true,
+       'ACTIVE', CURRENT_TIMESTAMP
+     );
+     INSERT INTO "CandidateIdentity" ("userId", "updatedAt")
+       VALUES ('cv_upgrade_user', CURRENT_TIMESTAMP);
+     INSERT INTO "CandidateProfile" (
+       "id", "candidateUserId", "headline", "revision", "updatedAt"
+     ) VALUES (
+       'cv_upgrade_profile', 'cv_upgrade_user',
+       'Existing profile survives Feature 004', 7, CURRENT_TIMESTAMP
+     );`,
+    upgradeEnvironment,
+  );
+
+  prisma(["migrate", "deploy"], undefined, upgradeEnvironment);
+  prisma(["migrate", "status"], undefined, upgradeEnvironment);
+  prisma(
+    [
+      "migrate",
+      "diff",
+      "--from-migrations",
+      "prisma/migrations",
+      "--to-config-datasource",
+      "--exit-code",
+    ],
+    undefined,
+    upgradeEnvironment,
+  );
+
+  const client = new Client({
+    connectionString: databaseUrlFor(cvUpgradeDatabase).toString(),
+  });
+  await client.connect();
+  try {
+    const result = await client.query(
+      `SELECT profile."headline", profile."revision",
+              (SELECT COUNT(*) FROM "CvAccountQuota") AS quota_count,
+              to_regclass('"CvUpload"') IS NOT NULL AS cv_upload_exists,
+              EXISTS (
+                SELECT 1 FROM pg_indexes
+                 WHERE indexname = 'CvParseJob_one_active_per_account_idx'
+              ) AS active_parse_index_exists,
+              EXISTS (
+                SELECT 1 FROM pg_trigger
+                 WHERE tgname = 'CvProcessingConsent_append_only'
+                   AND NOT tgisinternal
+              ) AS consent_trigger_exists,
+              (
+                SELECT COUNT(*) FROM "_prisma_migrations"
+                 WHERE migration_name = '008_cv_upload_parse_review'
+                   AND finished_at IS NOT NULL
+              ) AS cv_migration_count
+         FROM "CandidateProfile" profile
+        WHERE profile."id" = 'cv_upgrade_profile'`,
+    );
+    const row = result.rows[0];
+    if (
+      result.rows.length !== 1 ||
+      row.headline !== "Existing profile survives Feature 004" ||
+      Number(row.revision) !== 7 ||
+      Number(row.quota_count) !== 0 ||
+      !row.cv_upload_exists ||
+      !row.active_parse_index_exists ||
+      !row.consent_trigger_exists ||
+      Number(row.cv_migration_count) !== 1
+    ) {
+      throw new Error("Feature 004 forward-upgrade verification differed.");
+    }
+  } finally {
+    await client.end();
+  }
+
+  console.log(
+    "Feature 004 migration over 001-007, data preservation, drift, index, trigger, and lazy-quota verification passed.",
+  );
+}
+
 compose(["config", "--quiet"]);
 databaseTool("pg_isready", "-d", composeEnv.POSTGRES_DB);
-for (const database of [verifyDatabase, shadowDatabase, upgradeDatabase])
+for (const database of [
+  verifyDatabase,
+  shadowDatabase,
+  upgradeDatabase,
+  cvUpgradeDatabase,
+])
   databaseTool("dropdb", "--if-exists", database);
 try {
   databaseTool("createdb", verifyDatabase);
   databaseTool("createdb", shadowDatabase);
   databaseTool("createdb", upgradeDatabase);
+  databaseTool("createdb", cvUpgradeDatabase);
   prisma(["migrate", "deploy"]);
   prisma(["migrate", "status"]);
   prisma([
@@ -217,8 +327,14 @@ try {
     "Fresh migration, drift, and Prisma connectivity verification passed.",
   );
   await verifyFeatureOneUpgrade();
+  await verifyFeatureFourUpgrade();
 } finally {
-  for (const database of [verifyDatabase, shadowDatabase, upgradeDatabase]) {
+  for (const database of [
+    verifyDatabase,
+    shadowDatabase,
+    upgradeDatabase,
+    cvUpgradeDatabase,
+  ]) {
     try {
       databaseTool("dropdb", "--if-exists", database);
     } catch {

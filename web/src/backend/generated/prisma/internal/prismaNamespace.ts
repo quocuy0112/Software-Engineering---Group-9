@@ -429,7 +429,17 @@ export const ModelName = {
   JobReport: 'JobReport',
   JobApplication: 'JobApplication',
   ApplicationAnswer: 'ApplicationAnswer',
-  RecruitmentNotificationWork: 'RecruitmentNotificationWork'
+  RecruitmentNotificationWork: 'RecruitmentNotificationWork',
+  CvAccountQuota: 'CvAccountQuota',
+  CvUpload: 'CvUpload',
+  CvStoredArtifact: 'CvStoredArtifact',
+  CvScanAssessment: 'CvScanAssessment',
+  CvExtraction: 'CvExtraction',
+  CvParseJob: 'CvParseJob',
+  CvRetryRequest: 'CvRetryRequest',
+  CvDraft: 'CvDraft',
+  CvProcessingConsent: 'CvProcessingConsent',
+  CvImportConfirmation: 'CvImportConfirmation'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -445,7 +455,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "auditEvent" | "company" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "applicationAnswer" | "recruitmentNotificationWork"
+    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "auditEvent" | "company" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2891,6 +2901,746 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CvAccountQuota: {
+      payload: Prisma.$CvAccountQuotaPayload<ExtArgs>
+      fields: Prisma.CvAccountQuotaFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CvAccountQuotaFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvAccountQuotaPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CvAccountQuotaFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvAccountQuotaPayload>
+        }
+        findFirst: {
+          args: Prisma.CvAccountQuotaFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvAccountQuotaPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CvAccountQuotaFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvAccountQuotaPayload>
+        }
+        findMany: {
+          args: Prisma.CvAccountQuotaFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvAccountQuotaPayload>[]
+        }
+        create: {
+          args: Prisma.CvAccountQuotaCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvAccountQuotaPayload>
+        }
+        createMany: {
+          args: Prisma.CvAccountQuotaCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CvAccountQuotaCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvAccountQuotaPayload>[]
+        }
+        delete: {
+          args: Prisma.CvAccountQuotaDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvAccountQuotaPayload>
+        }
+        update: {
+          args: Prisma.CvAccountQuotaUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvAccountQuotaPayload>
+        }
+        deleteMany: {
+          args: Prisma.CvAccountQuotaDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CvAccountQuotaUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CvAccountQuotaUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvAccountQuotaPayload>[]
+        }
+        upsert: {
+          args: Prisma.CvAccountQuotaUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvAccountQuotaPayload>
+        }
+        aggregate: {
+          args: Prisma.CvAccountQuotaAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCvAccountQuota>
+        }
+        groupBy: {
+          args: Prisma.CvAccountQuotaGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvAccountQuotaGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CvAccountQuotaCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvAccountQuotaCountAggregateOutputType> | number
+        }
+      }
+    }
+    CvUpload: {
+      payload: Prisma.$CvUploadPayload<ExtArgs>
+      fields: Prisma.CvUploadFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CvUploadFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvUploadPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CvUploadFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvUploadPayload>
+        }
+        findFirst: {
+          args: Prisma.CvUploadFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvUploadPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CvUploadFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvUploadPayload>
+        }
+        findMany: {
+          args: Prisma.CvUploadFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvUploadPayload>[]
+        }
+        create: {
+          args: Prisma.CvUploadCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvUploadPayload>
+        }
+        createMany: {
+          args: Prisma.CvUploadCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CvUploadCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvUploadPayload>[]
+        }
+        delete: {
+          args: Prisma.CvUploadDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvUploadPayload>
+        }
+        update: {
+          args: Prisma.CvUploadUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvUploadPayload>
+        }
+        deleteMany: {
+          args: Prisma.CvUploadDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CvUploadUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CvUploadUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvUploadPayload>[]
+        }
+        upsert: {
+          args: Prisma.CvUploadUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvUploadPayload>
+        }
+        aggregate: {
+          args: Prisma.CvUploadAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCvUpload>
+        }
+        groupBy: {
+          args: Prisma.CvUploadGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvUploadGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CvUploadCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvUploadCountAggregateOutputType> | number
+        }
+      }
+    }
+    CvStoredArtifact: {
+      payload: Prisma.$CvStoredArtifactPayload<ExtArgs>
+      fields: Prisma.CvStoredArtifactFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CvStoredArtifactFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvStoredArtifactPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CvStoredArtifactFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvStoredArtifactPayload>
+        }
+        findFirst: {
+          args: Prisma.CvStoredArtifactFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvStoredArtifactPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CvStoredArtifactFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvStoredArtifactPayload>
+        }
+        findMany: {
+          args: Prisma.CvStoredArtifactFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvStoredArtifactPayload>[]
+        }
+        create: {
+          args: Prisma.CvStoredArtifactCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvStoredArtifactPayload>
+        }
+        createMany: {
+          args: Prisma.CvStoredArtifactCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CvStoredArtifactCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvStoredArtifactPayload>[]
+        }
+        delete: {
+          args: Prisma.CvStoredArtifactDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvStoredArtifactPayload>
+        }
+        update: {
+          args: Prisma.CvStoredArtifactUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvStoredArtifactPayload>
+        }
+        deleteMany: {
+          args: Prisma.CvStoredArtifactDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CvStoredArtifactUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CvStoredArtifactUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvStoredArtifactPayload>[]
+        }
+        upsert: {
+          args: Prisma.CvStoredArtifactUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvStoredArtifactPayload>
+        }
+        aggregate: {
+          args: Prisma.CvStoredArtifactAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCvStoredArtifact>
+        }
+        groupBy: {
+          args: Prisma.CvStoredArtifactGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvStoredArtifactGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CvStoredArtifactCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvStoredArtifactCountAggregateOutputType> | number
+        }
+      }
+    }
+    CvScanAssessment: {
+      payload: Prisma.$CvScanAssessmentPayload<ExtArgs>
+      fields: Prisma.CvScanAssessmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CvScanAssessmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvScanAssessmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CvScanAssessmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvScanAssessmentPayload>
+        }
+        findFirst: {
+          args: Prisma.CvScanAssessmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvScanAssessmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CvScanAssessmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvScanAssessmentPayload>
+        }
+        findMany: {
+          args: Prisma.CvScanAssessmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvScanAssessmentPayload>[]
+        }
+        create: {
+          args: Prisma.CvScanAssessmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvScanAssessmentPayload>
+        }
+        createMany: {
+          args: Prisma.CvScanAssessmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CvScanAssessmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvScanAssessmentPayload>[]
+        }
+        delete: {
+          args: Prisma.CvScanAssessmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvScanAssessmentPayload>
+        }
+        update: {
+          args: Prisma.CvScanAssessmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvScanAssessmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.CvScanAssessmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CvScanAssessmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CvScanAssessmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvScanAssessmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.CvScanAssessmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvScanAssessmentPayload>
+        }
+        aggregate: {
+          args: Prisma.CvScanAssessmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCvScanAssessment>
+        }
+        groupBy: {
+          args: Prisma.CvScanAssessmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvScanAssessmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CvScanAssessmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvScanAssessmentCountAggregateOutputType> | number
+        }
+      }
+    }
+    CvExtraction: {
+      payload: Prisma.$CvExtractionPayload<ExtArgs>
+      fields: Prisma.CvExtractionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CvExtractionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvExtractionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CvExtractionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvExtractionPayload>
+        }
+        findFirst: {
+          args: Prisma.CvExtractionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvExtractionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CvExtractionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvExtractionPayload>
+        }
+        findMany: {
+          args: Prisma.CvExtractionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvExtractionPayload>[]
+        }
+        create: {
+          args: Prisma.CvExtractionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvExtractionPayload>
+        }
+        createMany: {
+          args: Prisma.CvExtractionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CvExtractionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvExtractionPayload>[]
+        }
+        delete: {
+          args: Prisma.CvExtractionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvExtractionPayload>
+        }
+        update: {
+          args: Prisma.CvExtractionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvExtractionPayload>
+        }
+        deleteMany: {
+          args: Prisma.CvExtractionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CvExtractionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CvExtractionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvExtractionPayload>[]
+        }
+        upsert: {
+          args: Prisma.CvExtractionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvExtractionPayload>
+        }
+        aggregate: {
+          args: Prisma.CvExtractionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCvExtraction>
+        }
+        groupBy: {
+          args: Prisma.CvExtractionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvExtractionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CvExtractionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvExtractionCountAggregateOutputType> | number
+        }
+      }
+    }
+    CvParseJob: {
+      payload: Prisma.$CvParseJobPayload<ExtArgs>
+      fields: Prisma.CvParseJobFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CvParseJobFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvParseJobPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CvParseJobFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvParseJobPayload>
+        }
+        findFirst: {
+          args: Prisma.CvParseJobFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvParseJobPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CvParseJobFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvParseJobPayload>
+        }
+        findMany: {
+          args: Prisma.CvParseJobFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvParseJobPayload>[]
+        }
+        create: {
+          args: Prisma.CvParseJobCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvParseJobPayload>
+        }
+        createMany: {
+          args: Prisma.CvParseJobCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CvParseJobCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvParseJobPayload>[]
+        }
+        delete: {
+          args: Prisma.CvParseJobDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvParseJobPayload>
+        }
+        update: {
+          args: Prisma.CvParseJobUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvParseJobPayload>
+        }
+        deleteMany: {
+          args: Prisma.CvParseJobDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CvParseJobUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CvParseJobUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvParseJobPayload>[]
+        }
+        upsert: {
+          args: Prisma.CvParseJobUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvParseJobPayload>
+        }
+        aggregate: {
+          args: Prisma.CvParseJobAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCvParseJob>
+        }
+        groupBy: {
+          args: Prisma.CvParseJobGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvParseJobGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CvParseJobCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvParseJobCountAggregateOutputType> | number
+        }
+      }
+    }
+    CvRetryRequest: {
+      payload: Prisma.$CvRetryRequestPayload<ExtArgs>
+      fields: Prisma.CvRetryRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CvRetryRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvRetryRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CvRetryRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvRetryRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.CvRetryRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvRetryRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CvRetryRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvRetryRequestPayload>
+        }
+        findMany: {
+          args: Prisma.CvRetryRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvRetryRequestPayload>[]
+        }
+        create: {
+          args: Prisma.CvRetryRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvRetryRequestPayload>
+        }
+        createMany: {
+          args: Prisma.CvRetryRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CvRetryRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvRetryRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.CvRetryRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvRetryRequestPayload>
+        }
+        update: {
+          args: Prisma.CvRetryRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvRetryRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.CvRetryRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CvRetryRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CvRetryRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvRetryRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.CvRetryRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvRetryRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.CvRetryRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCvRetryRequest>
+        }
+        groupBy: {
+          args: Prisma.CvRetryRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvRetryRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CvRetryRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvRetryRequestCountAggregateOutputType> | number
+        }
+      }
+    }
+    CvDraft: {
+      payload: Prisma.$CvDraftPayload<ExtArgs>
+      fields: Prisma.CvDraftFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CvDraftFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvDraftPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CvDraftFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvDraftPayload>
+        }
+        findFirst: {
+          args: Prisma.CvDraftFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvDraftPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CvDraftFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvDraftPayload>
+        }
+        findMany: {
+          args: Prisma.CvDraftFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvDraftPayload>[]
+        }
+        create: {
+          args: Prisma.CvDraftCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvDraftPayload>
+        }
+        createMany: {
+          args: Prisma.CvDraftCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CvDraftCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvDraftPayload>[]
+        }
+        delete: {
+          args: Prisma.CvDraftDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvDraftPayload>
+        }
+        update: {
+          args: Prisma.CvDraftUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvDraftPayload>
+        }
+        deleteMany: {
+          args: Prisma.CvDraftDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CvDraftUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CvDraftUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvDraftPayload>[]
+        }
+        upsert: {
+          args: Prisma.CvDraftUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvDraftPayload>
+        }
+        aggregate: {
+          args: Prisma.CvDraftAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCvDraft>
+        }
+        groupBy: {
+          args: Prisma.CvDraftGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvDraftGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CvDraftCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvDraftCountAggregateOutputType> | number
+        }
+      }
+    }
+    CvProcessingConsent: {
+      payload: Prisma.$CvProcessingConsentPayload<ExtArgs>
+      fields: Prisma.CvProcessingConsentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CvProcessingConsentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvProcessingConsentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CvProcessingConsentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvProcessingConsentPayload>
+        }
+        findFirst: {
+          args: Prisma.CvProcessingConsentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvProcessingConsentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CvProcessingConsentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvProcessingConsentPayload>
+        }
+        findMany: {
+          args: Prisma.CvProcessingConsentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvProcessingConsentPayload>[]
+        }
+        create: {
+          args: Prisma.CvProcessingConsentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvProcessingConsentPayload>
+        }
+        createMany: {
+          args: Prisma.CvProcessingConsentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CvProcessingConsentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvProcessingConsentPayload>[]
+        }
+        delete: {
+          args: Prisma.CvProcessingConsentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvProcessingConsentPayload>
+        }
+        update: {
+          args: Prisma.CvProcessingConsentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvProcessingConsentPayload>
+        }
+        deleteMany: {
+          args: Prisma.CvProcessingConsentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CvProcessingConsentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CvProcessingConsentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvProcessingConsentPayload>[]
+        }
+        upsert: {
+          args: Prisma.CvProcessingConsentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvProcessingConsentPayload>
+        }
+        aggregate: {
+          args: Prisma.CvProcessingConsentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCvProcessingConsent>
+        }
+        groupBy: {
+          args: Prisma.CvProcessingConsentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvProcessingConsentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CvProcessingConsentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvProcessingConsentCountAggregateOutputType> | number
+        }
+      }
+    }
+    CvImportConfirmation: {
+      payload: Prisma.$CvImportConfirmationPayload<ExtArgs>
+      fields: Prisma.CvImportConfirmationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CvImportConfirmationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvImportConfirmationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CvImportConfirmationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvImportConfirmationPayload>
+        }
+        findFirst: {
+          args: Prisma.CvImportConfirmationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvImportConfirmationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CvImportConfirmationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvImportConfirmationPayload>
+        }
+        findMany: {
+          args: Prisma.CvImportConfirmationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvImportConfirmationPayload>[]
+        }
+        create: {
+          args: Prisma.CvImportConfirmationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvImportConfirmationPayload>
+        }
+        createMany: {
+          args: Prisma.CvImportConfirmationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CvImportConfirmationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvImportConfirmationPayload>[]
+        }
+        delete: {
+          args: Prisma.CvImportConfirmationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvImportConfirmationPayload>
+        }
+        update: {
+          args: Prisma.CvImportConfirmationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvImportConfirmationPayload>
+        }
+        deleteMany: {
+          args: Prisma.CvImportConfirmationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CvImportConfirmationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CvImportConfirmationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvImportConfirmationPayload>[]
+        }
+        upsert: {
+          args: Prisma.CvImportConfirmationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CvImportConfirmationPayload>
+        }
+        aggregate: {
+          args: Prisma.CvImportConfirmationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCvImportConfirmation>
+        }
+        groupBy: {
+          args: Prisma.CvImportConfirmationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvImportConfirmationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CvImportConfirmationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CvImportConfirmationCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -3524,6 +4274,250 @@ export const RecruitmentNotificationWorkScalarFieldEnum = {
 export type RecruitmentNotificationWorkScalarFieldEnum = (typeof RecruitmentNotificationWorkScalarFieldEnum)[keyof typeof RecruitmentNotificationWorkScalarFieldEnum]
 
 
+export const CvAccountQuotaScalarFieldEnum = {
+  accountId: 'accountId',
+  reservedBytes: 'reservedBytes',
+  retainedBytes: 'retainedBytes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CvAccountQuotaScalarFieldEnum = (typeof CvAccountQuotaScalarFieldEnum)[keyof typeof CvAccountQuotaScalarFieldEnum]
+
+
+export const CvUploadScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  profileId: 'profileId',
+  documentKind: 'documentKind',
+  parserClass: 'parserClass',
+  status: 'status',
+  declaredMediaType: 'declaredMediaType',
+  declaredBytes: 'declaredBytes',
+  actualBytes: 'actualBytes',
+  quotaReservationBytes: 'quotaReservationBytes',
+  quotaReservationRemaining: 'quotaReservationRemaining',
+  sourceSha256: 'sourceSha256',
+  displayFilenameCiphertext: 'displayFilenameCiphertext',
+  idempotencyDigest: 'idempotencyDigest',
+  createBindingDigest: 'createBindingDigest',
+  failureCode: 'failureCode',
+  automaticScanAttemptsUsed: 'automaticScanAttemptsUsed',
+  candidateScanRetriesUsed: 'candidateScanRetriesUsed',
+  automaticParseAttemptsUsed: 'automaticParseAttemptsUsed',
+  candidateParseRetriesUsed: 'candidateParseRetriesUsed',
+  contentReceivedAt: 'contentReceivedAt',
+  contentInaccessibleAt: 'contentInaccessibleAt',
+  expiresAt: 'expiresAt',
+  deleteAfter: 'deleteAfter',
+  deletedAt: 'deletedAt',
+  confirmedAt: 'confirmedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CvUploadScalarFieldEnum = (typeof CvUploadScalarFieldEnum)[keyof typeof CvUploadScalarFieldEnum]
+
+
+export const CvStoredArtifactScalarFieldEnum = {
+  id: 'id',
+  uploadId: 'uploadId',
+  accountId: 'accountId',
+  kind: 'kind',
+  status: 'status',
+  storageAdapter: 'storageAdapter',
+  storageLocator: 'storageLocator',
+  encryptionKeyVersion: 'encryptionKeyVersion',
+  encryptionIv: 'encryptionIv',
+  authenticationTag: 'authenticationTag',
+  plaintextBytes: 'plaintextBytes',
+  ciphertextBytes: 'ciphertextBytes',
+  plaintextSha256: 'plaintextSha256',
+  availableAt: 'availableAt',
+  contentInaccessibleAt: 'contentInaccessibleAt',
+  deleteAfter: 'deleteAfter',
+  deleteLeaseOwner: 'deleteLeaseOwner',
+  deleteLeaseExpiresAt: 'deleteLeaseExpiresAt',
+  deleteAttempts: 'deleteAttempts',
+  deleteFailureCode: 'deleteFailureCode',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CvStoredArtifactScalarFieldEnum = (typeof CvStoredArtifactScalarFieldEnum)[keyof typeof CvStoredArtifactScalarFieldEnum]
+
+
+export const CvScanAssessmentScalarFieldEnum = {
+  id: 'id',
+  uploadId: 'uploadId',
+  sourceArtifactId: 'sourceArtifactId',
+  accountId: 'accountId',
+  attemptNumber: 'attemptNumber',
+  candidateInitiated: 'candidateInitiated',
+  status: 'status',
+  engineName: 'engineName',
+  engineVersion: 'engineVersion',
+  signatureVersion: 'signatureVersion',
+  signaturePublishedAt: 'signaturePublishedAt',
+  failureCode: 'failureCode',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type CvScanAssessmentScalarFieldEnum = (typeof CvScanAssessmentScalarFieldEnum)[keyof typeof CvScanAssessmentScalarFieldEnum]
+
+
+export const CvExtractionScalarFieldEnum = {
+  id: 'id',
+  uploadId: 'uploadId',
+  sourceArtifactId: 'sourceArtifactId',
+  scanAssessmentId: 'scanAssessmentId',
+  accountId: 'accountId',
+  outputArtifactId: 'outputArtifactId',
+  attemptNumber: 'attemptNumber',
+  status: 'status',
+  extractorName: 'extractorName',
+  extractorVersion: 'extractorVersion',
+  rulesVersion: 'rulesVersion',
+  pageCount: 'pageCount',
+  entryCount: 'entryCount',
+  expandedBytes: 'expandedBytes',
+  segmentCount: 'segmentCount',
+  extractedUtf8Bytes: 'extractedUtf8Bytes',
+  failureCode: 'failureCode',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type CvExtractionScalarFieldEnum = (typeof CvExtractionScalarFieldEnum)[keyof typeof CvExtractionScalarFieldEnum]
+
+
+export const CvParseJobScalarFieldEnum = {
+  id: 'id',
+  uploadId: 'uploadId',
+  extractionId: 'extractionId',
+  accountId: 'accountId',
+  consentEventId: 'consentEventId',
+  previousAttemptId: 'previousAttemptId',
+  attemptNumber: 'attemptNumber',
+  trigger: 'trigger',
+  status: 'status',
+  parserClass: 'parserClass',
+  provider: 'provider',
+  model: 'model',
+  purposeVersion: 'purposeVersion',
+  inputVersion: 'inputVersion',
+  instructionVersion: 'instructionVersion',
+  schemaVersion: 'schemaVersion',
+  providerRequestIdHmac: 'providerRequestIdHmac',
+  failureCode: 'failureCode',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type CvParseJobScalarFieldEnum = (typeof CvParseJobScalarFieldEnum)[keyof typeof CvParseJobScalarFieldEnum]
+
+
+export const CvRetryRequestScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  uploadId: 'uploadId',
+  stage: 'stage',
+  idempotencyDigest: 'idempotencyDigest',
+  priorScanAssessmentId: 'priorScanAssessmentId',
+  scanAssessmentId: 'scanAssessmentId',
+  priorParseJobId: 'priorParseJobId',
+  parseJobId: 'parseJobId',
+  createdAt: 'createdAt'
+} as const
+
+export type CvRetryRequestScalarFieldEnum = (typeof CvRetryRequestScalarFieldEnum)[keyof typeof CvRetryRequestScalarFieldEnum]
+
+
+export const CvDraftScalarFieldEnum = {
+  id: 'id',
+  uploadId: 'uploadId',
+  accountId: 'accountId',
+  profileId: 'profileId',
+  parseJobId: 'parseJobId',
+  status: 'status',
+  schemaVersion: 'schemaVersion',
+  revision: 'revision',
+  sourceProfileRevision: 'sourceProfileRevision',
+  reviewedProfileRevision: 'reviewedProfileRevision',
+  proposalPayload: 'proposalPayload',
+  reviewPayload: 'reviewPayload',
+  provenancePayload: 'provenancePayload',
+  payloadBytes: 'payloadBytes',
+  provenanceBytes: 'provenanceBytes',
+  expiresAt: 'expiresAt',
+  contentInaccessibleAt: 'contentInaccessibleAt',
+  payloadDeleteAfter: 'payloadDeleteAfter',
+  payloadDeletedAt: 'payloadDeletedAt',
+  confirmedAt: 'confirmedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CvDraftScalarFieldEnum = (typeof CvDraftScalarFieldEnum)[keyof typeof CvDraftScalarFieldEnum]
+
+
+export const CvProcessingConsentScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  uploadId: 'uploadId',
+  action: 'action',
+  supersedesConsentId: 'supersedesConsentId',
+  provider: 'provider',
+  providerClass: 'providerClass',
+  model: 'model',
+  purposeVersion: 'purposeVersion',
+  noticeVersion: 'noticeVersion',
+  consentTextVersion: 'consentTextVersion',
+  occurredAt: 'occurredAt',
+  createdAt: 'createdAt'
+} as const
+
+export type CvProcessingConsentScalarFieldEnum = (typeof CvProcessingConsentScalarFieldEnum)[keyof typeof CvProcessingConsentScalarFieldEnum]
+
+
+export const CvImportConfirmationScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  profileId: 'profileId',
+  uploadId: 'uploadId',
+  draftId: 'draftId',
+  idempotencyDigest: 'idempotencyDigest',
+  selectionManifestVersion: 'selectionManifestVersion',
+  selectionManifestDigest: 'selectionManifestDigest',
+  selectionManifest: 'selectionManifest',
+  draftRevision: 'draftRevision',
+  sourceProfileRevision: 'sourceProfileRevision',
+  reviewedProfileRevision: 'reviewedProfileRevision',
+  profileRevisionBefore: 'profileRevisionBefore',
+  profileRevisionAfter: 'profileRevisionAfter',
+  appliedScalarCount: 'appliedScalarCount',
+  appliedExperienceCount: 'appliedExperienceCount',
+  appliedEducationCount: 'appliedEducationCount',
+  appliedSkillCount: 'appliedSkillCount',
+  appliedSocialLinkCount: 'appliedSocialLinkCount',
+  confirmedAt: 'confirmedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type CvImportConfirmationScalarFieldEnum = (typeof CvImportConfirmationScalarFieldEnum)[keyof typeof CvImportConfirmationScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -4034,6 +5028,188 @@ export type ListEnumRecruitmentNotificationKindFieldRefInput<$PrismaModel> = Fie
 
 
 /**
+ * Reference to a field of type 'CvDocumentKind'
+ */
+export type EnumCvDocumentKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvDocumentKind'>
+    
+
+
+/**
+ * Reference to a field of type 'CvDocumentKind[]'
+ */
+export type ListEnumCvDocumentKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvDocumentKind[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CvParserClass'
+ */
+export type EnumCvParserClassFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvParserClass'>
+    
+
+
+/**
+ * Reference to a field of type 'CvParserClass[]'
+ */
+export type ListEnumCvParserClassFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvParserClass[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CvUploadStatus'
+ */
+export type EnumCvUploadStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvUploadStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CvUploadStatus[]'
+ */
+export type ListEnumCvUploadStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvUploadStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Bytes'
+ */
+export type BytesFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Bytes'>
+    
+
+
+/**
+ * Reference to a field of type 'Bytes[]'
+ */
+export type ListBytesFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Bytes[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CvArtifactKind'
+ */
+export type EnumCvArtifactKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvArtifactKind'>
+    
+
+
+/**
+ * Reference to a field of type 'CvArtifactKind[]'
+ */
+export type ListEnumCvArtifactKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvArtifactKind[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CvArtifactStatus'
+ */
+export type EnumCvArtifactStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvArtifactStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CvArtifactStatus[]'
+ */
+export type ListEnumCvArtifactStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvArtifactStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CvScanStatus'
+ */
+export type EnumCvScanStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvScanStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CvScanStatus[]'
+ */
+export type ListEnumCvScanStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvScanStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CvExtractionStatus'
+ */
+export type EnumCvExtractionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvExtractionStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CvExtractionStatus[]'
+ */
+export type ListEnumCvExtractionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvExtractionStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CvParseTrigger'
+ */
+export type EnumCvParseTriggerFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvParseTrigger'>
+    
+
+
+/**
+ * Reference to a field of type 'CvParseTrigger[]'
+ */
+export type ListEnumCvParseTriggerFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvParseTrigger[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CvParseStatus'
+ */
+export type EnumCvParseStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvParseStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CvParseStatus[]'
+ */
+export type ListEnumCvParseStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvParseStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CvRetryStage'
+ */
+export type EnumCvRetryStageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvRetryStage'>
+    
+
+
+/**
+ * Reference to a field of type 'CvRetryStage[]'
+ */
+export type ListEnumCvRetryStageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvRetryStage[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CvDraftStatus'
+ */
+export type EnumCvDraftStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvDraftStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CvDraftStatus[]'
+ */
+export type ListEnumCvDraftStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvDraftStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CvConsentAction'
+ */
+export type EnumCvConsentActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvConsentAction'>
+    
+
+
+/**
+ * Reference to a field of type 'CvConsentAction[]'
+ */
+export type ListEnumCvConsentActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CvConsentAction[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -4230,6 +5406,16 @@ export type GlobalOmitConfig = {
   jobApplication?: Prisma.JobApplicationOmit
   applicationAnswer?: Prisma.ApplicationAnswerOmit
   recruitmentNotificationWork?: Prisma.RecruitmentNotificationWorkOmit
+  cvAccountQuota?: Prisma.CvAccountQuotaOmit
+  cvUpload?: Prisma.CvUploadOmit
+  cvStoredArtifact?: Prisma.CvStoredArtifactOmit
+  cvScanAssessment?: Prisma.CvScanAssessmentOmit
+  cvExtraction?: Prisma.CvExtractionOmit
+  cvParseJob?: Prisma.CvParseJobOmit
+  cvRetryRequest?: Prisma.CvRetryRequestOmit
+  cvDraft?: Prisma.CvDraftOmit
+  cvProcessingConsent?: Prisma.CvProcessingConsentOmit
+  cvImportConfirmation?: Prisma.CvImportConfirmationOmit
 }
 
 /* Types for Logging */

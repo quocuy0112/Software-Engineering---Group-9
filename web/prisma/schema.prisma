@@ -205,6 +205,100 @@ enum RecruitmentNotificationKind {
   APPLICATION_RECEIVED
 }
 
+enum CvDocumentKind {
+  PDF
+  DOCX
+}
+
+enum CvParserClass {
+  DETERMINISTIC_INTERNAL
+  EXTERNAL_OPENAI
+}
+
+enum CvUploadStatus {
+  AWAITING_CONTENT
+  VALIDATION_QUEUED
+  SCAN_QUEUED
+  SCANNING
+  EXTRACTION_QUEUED
+  EXTRACTING
+  AWAITING_CONSENT
+  PARSE_QUEUED
+  PARSING
+  REVIEW_READY
+  VALIDATION_FAILED
+  INFECTED
+  SCAN_FAILED
+  EXTRACTION_FAILED
+  PARSE_FAILED
+  CONFIRMED
+  CANCELLED
+  DELETED
+  EXPIRED
+}
+
+enum CvArtifactKind {
+  SOURCE_DOCUMENT
+  EXTRACTED_TEXT
+}
+
+enum CvArtifactStatus {
+  QUARANTINED
+  AVAILABLE
+  DELETE_PENDING
+  DELETING
+  DELETED
+  DELETE_FAILED
+}
+
+enum CvScanStatus {
+  QUEUED
+  PROCESSING
+  CLEAN
+  INFECTED
+  INDETERMINATE
+  CANCELLED
+}
+
+enum CvExtractionStatus {
+  QUEUED
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+
+enum CvParseStatus {
+  QUEUED
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+
+enum CvParseTrigger {
+  INITIAL
+  AUTOMATIC_RETRY
+  CANDIDATE_RETRY
+}
+
+enum CvRetryStage {
+  SCAN
+  PARSE
+}
+
+enum CvDraftStatus {
+  EDITABLE
+  CONFIRMED
+  DELETED
+  EXPIRED
+}
+
+enum CvConsentAction {
+  GRANTED
+  REVOKED
+}
+
 model UserAccount {
   id                            String                         @id
   name                          String
@@ -234,6 +328,16 @@ model UserAccount {
   passwordChangeOperations      PasswordChangeOperation[]
   savedJobs                     SavedJob[]
   jobReports                    JobReport[]
+  cvQuota                       CvAccountQuota?
+  cvUploads                     CvUpload[]
+  cvStoredArtifacts             CvStoredArtifact[]
+  cvScanAssessments             CvScanAssessment[]
+  cvExtractions                 CvExtraction[]
+  cvParseJobs                   CvParseJob[]
+  cvRetryRequests               CvRetryRequest[]
+  cvDrafts                      CvDraft[]
+  cvConsentEvents               CvProcessingConsent[]
+  cvConfirmations               CvImportConfirmation[]
 
   @@index([state, id])
   @@map("user")
@@ -334,6 +438,9 @@ model CandidateProfile {
   education       ProfileEducation[]
   skills          CandidateProfileSkill[]
   socialLinks     SocialLink[]
+  cvUploads       CvUpload[]
+  cvDrafts        CvDraft[]
+  cvConfirmations CvImportConfirmation[]
 
   @@index([candidateUserId])
 }
@@ -887,4 +994,313 @@ model RecruitmentNotificationWork {
   @@unique([applicationId, audience, kind])
   @@index([status, nextAttemptAt])
   @@index([applicationId])
+}
+
+model CvAccountQuota {
+  accountId     String      @id
+  reservedBytes Int         @default(0)
+  retainedBytes Int         @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  account       UserAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+model CvUpload {
+  id                         String                @id @default(cuid())
+  accountId                  String
+  profileId                  String
+  documentKind               CvDocumentKind
+  parserClass                CvParserClass
+  status                     CvUploadStatus        @default(AWAITING_CONTENT)
+  declaredMediaType          String
+  declaredBytes              Int
+  actualBytes                Int?
+  quotaReservationBytes      Int
+  quotaReservationRemaining  Int
+  sourceSha256               Bytes?
+  displayFilenameCiphertext  String?
+  idempotencyDigest          Bytes
+  createBindingDigest        Bytes
+  failureCode                String?
+  automaticScanAttemptsUsed  Int                   @default(0)
+  candidateScanRetriesUsed   Int                   @default(0)
+  automaticParseAttemptsUsed Int                   @default(0)
+  candidateParseRetriesUsed  Int                   @default(0)
+  contentReceivedAt          DateTime?
+  contentInaccessibleAt      DateTime?
+  expiresAt                  DateTime
+  deleteAfter                DateTime?
+  deletedAt                  DateTime?
+  confirmedAt                DateTime?
+  createdAt                  DateTime              @default(now())
+  updatedAt                  DateTime              @updatedAt
+  account                    UserAccount           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  profile                    CandidateProfile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  artifacts                  CvStoredArtifact[]
+  scanAssessments            CvScanAssessment[]
+  extractions                CvExtraction[]
+  parseJobs                  CvParseJob[]
+  retryRequests              CvRetryRequest[]
+  draft                      CvDraft?
+  consentEvents              CvProcessingConsent[]
+  confirmation               CvImportConfirmation?
+
+  @@unique([accountId, idempotencyDigest])
+  @@index([accountId, createdAt(sort: Desc)])
+  @@index([status, expiresAt])
+  @@index([deleteAfter])
+  @@index([profileId])
+}
+
+model CvStoredArtifact {
+  id                    String             @id @default(cuid())
+  uploadId              String
+  accountId             String
+  kind                  CvArtifactKind
+  status                CvArtifactStatus   @default(QUARANTINED)
+  storageAdapter        String
+  storageLocator        String
+  encryptionKeyVersion  Int
+  encryptionIv          Bytes
+  authenticationTag     Bytes
+  plaintextBytes        Int
+  ciphertextBytes       Int
+  plaintextSha256       Bytes
+  availableAt           DateTime?
+  contentInaccessibleAt DateTime?
+  deleteAfter           DateTime?
+  deleteLeaseOwner      String?
+  deleteLeaseExpiresAt  DateTime?
+  deleteAttempts        Int                @default(0)
+  deleteFailureCode     String?
+  deletedAt             DateTime?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  upload                CvUpload           @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  account               UserAccount        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  scanInputs            CvScanAssessment[] @relation("CvScanSourceArtifact")
+  extractionInputs      CvExtraction[]     @relation("CvExtractionSourceArtifact")
+  extractionOutput      CvExtraction?      @relation("CvExtractionOutputArtifact")
+
+  @@unique([storageAdapter, storageLocator])
+  @@index([uploadId, kind])
+  @@index([status, deleteAfter, deleteLeaseExpiresAt])
+  @@index([accountId])
+}
+
+model CvScanAssessment {
+  id                   String           @id @default(cuid())
+  uploadId             String
+  sourceArtifactId     String
+  accountId            String
+  attemptNumber        Int
+  candidateInitiated   Boolean          @default(false)
+  status               CvScanStatus     @default(QUEUED)
+  engineName           String?
+  engineVersion        String?
+  signatureVersion     String?
+  signaturePublishedAt DateTime?
+  failureCode          String?
+  leaseOwner           String?
+  leaseExpiresAt       DateTime?
+  startedAt            DateTime?
+  completedAt          DateTime?
+  createdAt            DateTime         @default(now())
+  upload               CvUpload         @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  sourceArtifact       CvStoredArtifact @relation("CvScanSourceArtifact", fields: [sourceArtifactId], references: [id], onDelete: Cascade)
+  account              UserAccount      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  extractions          CvExtraction[]
+  priorRetryRequests   CvRetryRequest[] @relation("CvRetryPriorScan")
+  newRetryRequests     CvRetryRequest[] @relation("CvRetryNewScan")
+
+  @@unique([uploadId, attemptNumber])
+  @@index([status, leaseExpiresAt, createdAt], map: "CvScanAssessment_claim_idx")
+  @@index([accountId])
+}
+
+model CvExtraction {
+  id                 String             @id @default(cuid())
+  uploadId           String
+  sourceArtifactId   String
+  scanAssessmentId   String
+  accountId          String
+  outputArtifactId   String?            @unique
+  attemptNumber      Int
+  status             CvExtractionStatus @default(QUEUED)
+  extractorName      String?
+  extractorVersion   String?
+  rulesVersion       String?
+  pageCount          Int?
+  entryCount         Int?
+  expandedBytes      Int?
+  segmentCount       Int?
+  extractedUtf8Bytes Int?
+  failureCode        String?
+  leaseOwner         String?
+  leaseExpiresAt     DateTime?
+  startedAt          DateTime?
+  completedAt        DateTime?
+  createdAt          DateTime           @default(now())
+  upload             CvUpload           @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  sourceArtifact     CvStoredArtifact   @relation("CvExtractionSourceArtifact", fields: [sourceArtifactId], references: [id], onDelete: Cascade)
+  scanAssessment     CvScanAssessment   @relation(fields: [scanAssessmentId], references: [id], onDelete: Cascade)
+  account            UserAccount        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  outputArtifact     CvStoredArtifact?  @relation("CvExtractionOutputArtifact", fields: [outputArtifactId], references: [id], onDelete: SetNull)
+  parseJobs          CvParseJob[]
+
+  @@unique([uploadId, attemptNumber])
+  @@index([status, leaseExpiresAt, createdAt], map: "CvExtraction_claim_idx")
+  @@index([accountId])
+}
+
+model CvParseJob {
+  id                    String               @id @default(cuid())
+  uploadId              String
+  extractionId          String
+  accountId             String
+  consentEventId        String?
+  previousAttemptId     String?
+  attemptNumber         Int
+  trigger               CvParseTrigger
+  status                CvParseStatus        @default(QUEUED)
+  parserClass           CvParserClass
+  provider              String
+  model                 String
+  purposeVersion        String
+  inputVersion          String
+  instructionVersion    String
+  schemaVersion         String
+  providerRequestIdHmac Bytes?
+  failureCode           String?
+  leaseOwner            String?
+  leaseExpiresAt        DateTime?
+  startedAt             DateTime?
+  completedAt           DateTime?
+  createdAt             DateTime             @default(now())
+  upload                CvUpload             @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  extraction            CvExtraction         @relation(fields: [extractionId], references: [id], onDelete: Cascade)
+  account               UserAccount          @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  consentEvent          CvProcessingConsent? @relation("CvParseConsent", fields: [consentEventId], references: [id], onDelete: SetNull)
+  previousAttempt       CvParseJob?          @relation("CvParseRetryChain", fields: [previousAttemptId], references: [id], onDelete: SetNull)
+  nextAttempts          CvParseJob[]         @relation("CvParseRetryChain")
+  priorRetryRequests    CvRetryRequest[]     @relation("CvRetryPriorParse")
+  newRetryRequests      CvRetryRequest[]     @relation("CvRetryNewParse")
+  draft                 CvDraft?
+
+  @@unique([uploadId, attemptNumber])
+  @@index([status, leaseExpiresAt, createdAt], map: "CvParseJob_claim_idx")
+  @@index([accountId])
+  @@index([previousAttemptId])
+}
+
+model CvRetryRequest {
+  id                    String            @id @default(cuid())
+  accountId             String
+  uploadId              String
+  stage                 CvRetryStage
+  idempotencyDigest     Bytes
+  priorScanAssessmentId String?
+  scanAssessmentId      String?
+  priorParseJobId       String?
+  parseJobId            String?
+  createdAt             DateTime          @default(now())
+  account               UserAccount       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  upload                CvUpload          @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  priorScanAssessment   CvScanAssessment? @relation("CvRetryPriorScan", fields: [priorScanAssessmentId], references: [id], onDelete: SetNull)
+  scanAssessment        CvScanAssessment? @relation("CvRetryNewScan", fields: [scanAssessmentId], references: [id], onDelete: SetNull)
+  priorParseJob         CvParseJob?       @relation("CvRetryPriorParse", fields: [priorParseJobId], references: [id], onDelete: SetNull)
+  parseJob              CvParseJob?       @relation("CvRetryNewParse", fields: [parseJobId], references: [id], onDelete: SetNull)
+
+  @@unique([accountId, idempotencyDigest])
+  @@index([uploadId, createdAt])
+}
+
+model CvDraft {
+  id                      String                @id @default(cuid())
+  uploadId                String                @unique
+  accountId               String
+  profileId               String
+  parseJobId              String                @unique
+  status                  CvDraftStatus         @default(EDITABLE)
+  schemaVersion           String
+  revision                Int                   @default(0)
+  sourceProfileRevision   Int
+  reviewedProfileRevision Int
+  proposalPayload         Json?
+  reviewPayload           Json?
+  provenancePayload       Json?
+  payloadBytes            Int                   @default(0)
+  provenanceBytes         Int                   @default(0)
+  expiresAt               DateTime
+  contentInaccessibleAt   DateTime?
+  payloadDeleteAfter      DateTime?
+  payloadDeletedAt        DateTime?
+  confirmedAt             DateTime?
+  createdAt               DateTime              @default(now())
+  updatedAt               DateTime              @updatedAt
+  upload                  CvUpload              @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  account                 UserAccount           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  profile                 CandidateProfile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  parseJob                CvParseJob            @relation(fields: [parseJobId], references: [id], onDelete: Cascade)
+  confirmation            CvImportConfirmation?
+
+  @@index([accountId, status])
+  @@index([expiresAt])
+  @@index([payloadDeleteAfter])
+}
+
+model CvProcessingConsent {
+  id                  String                @id @default(cuid())
+  accountId           String
+  uploadId            String
+  action              CvConsentAction
+  supersedesConsentId String?
+  provider            String
+  providerClass       CvParserClass
+  model               String
+  purposeVersion      String
+  noticeVersion       String
+  consentTextVersion  String
+  occurredAt          DateTime
+  createdAt           DateTime              @default(now())
+  account             UserAccount           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  upload              CvUpload              @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  supersedesConsent   CvProcessingConsent?  @relation("CvConsentChain", fields: [supersedesConsentId], references: [id], onDelete: SetNull)
+  supersededBy        CvProcessingConsent[] @relation("CvConsentChain")
+  parseJobs           CvParseJob[]          @relation("CvParseConsent")
+
+  @@index([uploadId, occurredAt(sort: Desc)])
+  @@index([accountId, occurredAt(sort: Desc)])
+  @@index([supersedesConsentId])
+}
+
+model CvImportConfirmation {
+  id                       String           @id @default(cuid())
+  accountId                String
+  profileId                String
+  uploadId                 String           @unique
+  draftId                  String           @unique
+  idempotencyDigest        Bytes
+  selectionManifestVersion String
+  selectionManifestDigest  Bytes
+  selectionManifest        Json
+  draftRevision            Int
+  sourceProfileRevision    Int
+  reviewedProfileRevision  Int
+  profileRevisionBefore    Int
+  profileRevisionAfter     Int
+  appliedScalarCount       Int              @default(0)
+  appliedExperienceCount   Int              @default(0)
+  appliedEducationCount    Int              @default(0)
+  appliedSkillCount        Int              @default(0)
+  appliedSocialLinkCount   Int              @default(0)
+  confirmedAt              DateTime
+  createdAt                DateTime         @default(now())
+  account                  UserAccount      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  profile                  CandidateProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  upload                   CvUpload         @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  draft                    CvDraft          @relation(fields: [draftId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, idempotencyDigest])
+  @@index([profileId, confirmedAt(sort: Desc)])
 }

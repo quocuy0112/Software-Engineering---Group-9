@@ -1,0 +1,104 @@
+.root {
+  display: grid;
+  min-width: 0;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border, #94a3b8);
+  border-radius: 0.75rem;
+}
+
+.binding {
+  display: grid;
+  margin: 0;
+  gap: 0.65rem;
+}
+
+.binding div {
+  display: grid;
+  grid-template-columns: minmax(5rem, 0.3fr) minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.binding dt {
+  font-weight: 750;
+}
+
+.binding dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.grant,
+.granted {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.grant label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  line-height: 1.5;
+}
+
+.grant input {
+  flex: 0 0 auto;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.15rem;
+}
+
+.grant button,
+.granted button {
+  min-height: 2.75rem;
+  justify-self: start;
+  padding: 0.65rem 0.85rem;
+}
+
+.grant :is(input, button):focus-visible,
+.granted button:focus-visible {
+  outline: 3px solid var(--color-focus, #1d4ed8);
+  outline-offset: 3px;
+}
+
+.caveat,
+.explanation,
+.status {
+  margin: 0;
+}
+
+.caveat {
+  padding-inline-start: 0.75rem;
+  border-inline-start: 0.3rem solid var(--color-warning, #a16207);
+}
+
+.explanation {
+  color: var(--color-muted-text, #475569);
+}
+
+.status {
+  min-height: 1.5rem;
+  font-weight: 650;
+}
+
+@media (max-width: 32rem) {
+  .binding div {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+
+  .grant button,
+  .granted button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .root * {
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto;
+    transition-duration: 0.01ms !important;
+  }
+}

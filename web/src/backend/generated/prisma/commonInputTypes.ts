@@ -773,6 +773,271 @@ export type EnumRecruitmentNotificationKindWithAggregatesFilter<$PrismaModel = n
   _max?: Prisma.NestedEnumRecruitmentNotificationKindFilter<$PrismaModel>
 }
 
+export type EnumCvDocumentKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvDocumentKind | Prisma.EnumCvDocumentKindFieldRefInput<$PrismaModel>
+  in?: $Enums.CvDocumentKind[] | Prisma.ListEnumCvDocumentKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvDocumentKind[] | Prisma.ListEnumCvDocumentKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvDocumentKindFilter<$PrismaModel> | $Enums.CvDocumentKind
+}
+
+export type EnumCvParserClassFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvParserClass | Prisma.EnumCvParserClassFieldRefInput<$PrismaModel>
+  in?: $Enums.CvParserClass[] | Prisma.ListEnumCvParserClassFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvParserClass[] | Prisma.ListEnumCvParserClassFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvParserClassFilter<$PrismaModel> | $Enums.CvParserClass
+}
+
+export type EnumCvUploadStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvUploadStatus | Prisma.EnumCvUploadStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvUploadStatus[] | Prisma.ListEnumCvUploadStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvUploadStatus[] | Prisma.ListEnumCvUploadStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvUploadStatusFilter<$PrismaModel> | $Enums.CvUploadStatus
+}
+
+export type IntNullableFilter<$PrismaModel = never> = {
+  equals?: number | Prisma.IntFieldRefInput<$PrismaModel> | null
+  in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
+  notIn?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
+  lt?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  lte?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  gt?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  gte?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedIntNullableFilter<$PrismaModel> | number | null
+}
+
+export type BytesNullableFilter<$PrismaModel = never> = {
+  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel> | null
+  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel> | null
+  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedBytesNullableFilter<$PrismaModel> | runtime.Bytes | null
+}
+
+export type BytesFilter<$PrismaModel = never> = {
+  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel>
+  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBytesFilter<$PrismaModel> | runtime.Bytes
+}
+
+export type EnumCvDocumentKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvDocumentKind | Prisma.EnumCvDocumentKindFieldRefInput<$PrismaModel>
+  in?: $Enums.CvDocumentKind[] | Prisma.ListEnumCvDocumentKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvDocumentKind[] | Prisma.ListEnumCvDocumentKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvDocumentKindWithAggregatesFilter<$PrismaModel> | $Enums.CvDocumentKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvDocumentKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvDocumentKindFilter<$PrismaModel>
+}
+
+export type EnumCvParserClassWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvParserClass | Prisma.EnumCvParserClassFieldRefInput<$PrismaModel>
+  in?: $Enums.CvParserClass[] | Prisma.ListEnumCvParserClassFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvParserClass[] | Prisma.ListEnumCvParserClassFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvParserClassWithAggregatesFilter<$PrismaModel> | $Enums.CvParserClass
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvParserClassFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvParserClassFilter<$PrismaModel>
+}
+
+export type EnumCvUploadStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvUploadStatus | Prisma.EnumCvUploadStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvUploadStatus[] | Prisma.ListEnumCvUploadStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvUploadStatus[] | Prisma.ListEnumCvUploadStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvUploadStatusWithAggregatesFilter<$PrismaModel> | $Enums.CvUploadStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvUploadStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvUploadStatusFilter<$PrismaModel>
+}
+
+export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: number | Prisma.IntFieldRefInput<$PrismaModel> | null
+  in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
+  notIn?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
+  lt?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  lte?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  gt?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  gte?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _avg?: Prisma.NestedFloatNullableFilter<$PrismaModel>
+  _sum?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedIntNullableFilter<$PrismaModel>
+}
+
+export type BytesNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel> | null
+  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel> | null
+  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedBytesNullableWithAggregatesFilter<$PrismaModel> | runtime.Bytes | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedBytesNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedBytesNullableFilter<$PrismaModel>
+}
+
+export type BytesWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel>
+  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBytesWithAggregatesFilter<$PrismaModel> | runtime.Bytes
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedBytesFilter<$PrismaModel>
+  _max?: Prisma.NestedBytesFilter<$PrismaModel>
+}
+
+export type EnumCvArtifactKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvArtifactKind | Prisma.EnumCvArtifactKindFieldRefInput<$PrismaModel>
+  in?: $Enums.CvArtifactKind[] | Prisma.ListEnumCvArtifactKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvArtifactKind[] | Prisma.ListEnumCvArtifactKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvArtifactKindFilter<$PrismaModel> | $Enums.CvArtifactKind
+}
+
+export type EnumCvArtifactStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvArtifactStatus | Prisma.EnumCvArtifactStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvArtifactStatus[] | Prisma.ListEnumCvArtifactStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvArtifactStatus[] | Prisma.ListEnumCvArtifactStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvArtifactStatusFilter<$PrismaModel> | $Enums.CvArtifactStatus
+}
+
+export type EnumCvArtifactKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvArtifactKind | Prisma.EnumCvArtifactKindFieldRefInput<$PrismaModel>
+  in?: $Enums.CvArtifactKind[] | Prisma.ListEnumCvArtifactKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvArtifactKind[] | Prisma.ListEnumCvArtifactKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvArtifactKindWithAggregatesFilter<$PrismaModel> | $Enums.CvArtifactKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvArtifactKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvArtifactKindFilter<$PrismaModel>
+}
+
+export type EnumCvArtifactStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvArtifactStatus | Prisma.EnumCvArtifactStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvArtifactStatus[] | Prisma.ListEnumCvArtifactStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvArtifactStatus[] | Prisma.ListEnumCvArtifactStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvArtifactStatusWithAggregatesFilter<$PrismaModel> | $Enums.CvArtifactStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvArtifactStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvArtifactStatusFilter<$PrismaModel>
+}
+
+export type EnumCvScanStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvScanStatus | Prisma.EnumCvScanStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvScanStatus[] | Prisma.ListEnumCvScanStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvScanStatus[] | Prisma.ListEnumCvScanStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvScanStatusFilter<$PrismaModel> | $Enums.CvScanStatus
+}
+
+export type EnumCvScanStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvScanStatus | Prisma.EnumCvScanStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvScanStatus[] | Prisma.ListEnumCvScanStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvScanStatus[] | Prisma.ListEnumCvScanStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvScanStatusWithAggregatesFilter<$PrismaModel> | $Enums.CvScanStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvScanStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvScanStatusFilter<$PrismaModel>
+}
+
+export type EnumCvExtractionStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvExtractionStatus | Prisma.EnumCvExtractionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvExtractionStatus[] | Prisma.ListEnumCvExtractionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvExtractionStatus[] | Prisma.ListEnumCvExtractionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvExtractionStatusFilter<$PrismaModel> | $Enums.CvExtractionStatus
+}
+
+export type EnumCvExtractionStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvExtractionStatus | Prisma.EnumCvExtractionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvExtractionStatus[] | Prisma.ListEnumCvExtractionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvExtractionStatus[] | Prisma.ListEnumCvExtractionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvExtractionStatusWithAggregatesFilter<$PrismaModel> | $Enums.CvExtractionStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvExtractionStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvExtractionStatusFilter<$PrismaModel>
+}
+
+export type EnumCvParseTriggerFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvParseTrigger | Prisma.EnumCvParseTriggerFieldRefInput<$PrismaModel>
+  in?: $Enums.CvParseTrigger[] | Prisma.ListEnumCvParseTriggerFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvParseTrigger[] | Prisma.ListEnumCvParseTriggerFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvParseTriggerFilter<$PrismaModel> | $Enums.CvParseTrigger
+}
+
+export type EnumCvParseStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvParseStatus | Prisma.EnumCvParseStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvParseStatus[] | Prisma.ListEnumCvParseStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvParseStatus[] | Prisma.ListEnumCvParseStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvParseStatusFilter<$PrismaModel> | $Enums.CvParseStatus
+}
+
+export type EnumCvParseTriggerWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvParseTrigger | Prisma.EnumCvParseTriggerFieldRefInput<$PrismaModel>
+  in?: $Enums.CvParseTrigger[] | Prisma.ListEnumCvParseTriggerFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvParseTrigger[] | Prisma.ListEnumCvParseTriggerFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvParseTriggerWithAggregatesFilter<$PrismaModel> | $Enums.CvParseTrigger
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvParseTriggerFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvParseTriggerFilter<$PrismaModel>
+}
+
+export type EnumCvParseStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvParseStatus | Prisma.EnumCvParseStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvParseStatus[] | Prisma.ListEnumCvParseStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvParseStatus[] | Prisma.ListEnumCvParseStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvParseStatusWithAggregatesFilter<$PrismaModel> | $Enums.CvParseStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvParseStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvParseStatusFilter<$PrismaModel>
+}
+
+export type EnumCvRetryStageFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvRetryStage | Prisma.EnumCvRetryStageFieldRefInput<$PrismaModel>
+  in?: $Enums.CvRetryStage[] | Prisma.ListEnumCvRetryStageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvRetryStage[] | Prisma.ListEnumCvRetryStageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvRetryStageFilter<$PrismaModel> | $Enums.CvRetryStage
+}
+
+export type EnumCvRetryStageWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvRetryStage | Prisma.EnumCvRetryStageFieldRefInput<$PrismaModel>
+  in?: $Enums.CvRetryStage[] | Prisma.ListEnumCvRetryStageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvRetryStage[] | Prisma.ListEnumCvRetryStageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvRetryStageWithAggregatesFilter<$PrismaModel> | $Enums.CvRetryStage
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvRetryStageFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvRetryStageFilter<$PrismaModel>
+}
+
+export type EnumCvDraftStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvDraftStatus | Prisma.EnumCvDraftStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvDraftStatus[] | Prisma.ListEnumCvDraftStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvDraftStatus[] | Prisma.ListEnumCvDraftStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvDraftStatusFilter<$PrismaModel> | $Enums.CvDraftStatus
+}
+
+export type EnumCvDraftStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvDraftStatus | Prisma.EnumCvDraftStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvDraftStatus[] | Prisma.ListEnumCvDraftStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvDraftStatus[] | Prisma.ListEnumCvDraftStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvDraftStatusWithAggregatesFilter<$PrismaModel> | $Enums.CvDraftStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvDraftStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvDraftStatusFilter<$PrismaModel>
+}
+
+export type EnumCvConsentActionFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvConsentAction | Prisma.EnumCvConsentActionFieldRefInput<$PrismaModel>
+  in?: $Enums.CvConsentAction[] | Prisma.ListEnumCvConsentActionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvConsentAction[] | Prisma.ListEnumCvConsentActionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvConsentActionFilter<$PrismaModel> | $Enums.CvConsentAction
+}
+
+export type EnumCvConsentActionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvConsentAction | Prisma.EnumCvConsentActionFieldRefInput<$PrismaModel>
+  in?: $Enums.CvConsentAction[] | Prisma.ListEnumCvConsentActionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvConsentAction[] | Prisma.ListEnumCvConsentActionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvConsentActionWithAggregatesFilter<$PrismaModel> | $Enums.CvConsentAction
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvConsentActionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvConsentActionFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -1500,6 +1765,260 @@ export type NestedEnumRecruitmentNotificationKindWithAggregatesFilter<$PrismaMod
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumRecruitmentNotificationKindFilter<$PrismaModel>
   _max?: Prisma.NestedEnumRecruitmentNotificationKindFilter<$PrismaModel>
+}
+
+export type NestedEnumCvDocumentKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvDocumentKind | Prisma.EnumCvDocumentKindFieldRefInput<$PrismaModel>
+  in?: $Enums.CvDocumentKind[] | Prisma.ListEnumCvDocumentKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvDocumentKind[] | Prisma.ListEnumCvDocumentKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvDocumentKindFilter<$PrismaModel> | $Enums.CvDocumentKind
+}
+
+export type NestedEnumCvParserClassFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvParserClass | Prisma.EnumCvParserClassFieldRefInput<$PrismaModel>
+  in?: $Enums.CvParserClass[] | Prisma.ListEnumCvParserClassFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvParserClass[] | Prisma.ListEnumCvParserClassFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvParserClassFilter<$PrismaModel> | $Enums.CvParserClass
+}
+
+export type NestedEnumCvUploadStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvUploadStatus | Prisma.EnumCvUploadStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvUploadStatus[] | Prisma.ListEnumCvUploadStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvUploadStatus[] | Prisma.ListEnumCvUploadStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvUploadStatusFilter<$PrismaModel> | $Enums.CvUploadStatus
+}
+
+export type NestedBytesNullableFilter<$PrismaModel = never> = {
+  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel> | null
+  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel> | null
+  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedBytesNullableFilter<$PrismaModel> | runtime.Bytes | null
+}
+
+export type NestedBytesFilter<$PrismaModel = never> = {
+  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel>
+  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBytesFilter<$PrismaModel> | runtime.Bytes
+}
+
+export type NestedEnumCvDocumentKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvDocumentKind | Prisma.EnumCvDocumentKindFieldRefInput<$PrismaModel>
+  in?: $Enums.CvDocumentKind[] | Prisma.ListEnumCvDocumentKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvDocumentKind[] | Prisma.ListEnumCvDocumentKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvDocumentKindWithAggregatesFilter<$PrismaModel> | $Enums.CvDocumentKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvDocumentKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvDocumentKindFilter<$PrismaModel>
+}
+
+export type NestedEnumCvParserClassWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvParserClass | Prisma.EnumCvParserClassFieldRefInput<$PrismaModel>
+  in?: $Enums.CvParserClass[] | Prisma.ListEnumCvParserClassFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvParserClass[] | Prisma.ListEnumCvParserClassFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvParserClassWithAggregatesFilter<$PrismaModel> | $Enums.CvParserClass
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvParserClassFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvParserClassFilter<$PrismaModel>
+}
+
+export type NestedEnumCvUploadStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvUploadStatus | Prisma.EnumCvUploadStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvUploadStatus[] | Prisma.ListEnumCvUploadStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvUploadStatus[] | Prisma.ListEnumCvUploadStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvUploadStatusWithAggregatesFilter<$PrismaModel> | $Enums.CvUploadStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvUploadStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvUploadStatusFilter<$PrismaModel>
+}
+
+export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: number | Prisma.IntFieldRefInput<$PrismaModel> | null
+  in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
+  notIn?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
+  lt?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  lte?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  gt?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  gte?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _avg?: Prisma.NestedFloatNullableFilter<$PrismaModel>
+  _sum?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedIntNullableFilter<$PrismaModel>
+}
+
+export type NestedBytesNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel> | null
+  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel> | null
+  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedBytesNullableWithAggregatesFilter<$PrismaModel> | runtime.Bytes | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedBytesNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedBytesNullableFilter<$PrismaModel>
+}
+
+export type NestedBytesWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel>
+  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBytesWithAggregatesFilter<$PrismaModel> | runtime.Bytes
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedBytesFilter<$PrismaModel>
+  _max?: Prisma.NestedBytesFilter<$PrismaModel>
+}
+
+export type NestedEnumCvArtifactKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvArtifactKind | Prisma.EnumCvArtifactKindFieldRefInput<$PrismaModel>
+  in?: $Enums.CvArtifactKind[] | Prisma.ListEnumCvArtifactKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvArtifactKind[] | Prisma.ListEnumCvArtifactKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvArtifactKindFilter<$PrismaModel> | $Enums.CvArtifactKind
+}
+
+export type NestedEnumCvArtifactStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvArtifactStatus | Prisma.EnumCvArtifactStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvArtifactStatus[] | Prisma.ListEnumCvArtifactStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvArtifactStatus[] | Prisma.ListEnumCvArtifactStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvArtifactStatusFilter<$PrismaModel> | $Enums.CvArtifactStatus
+}
+
+export type NestedEnumCvArtifactKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvArtifactKind | Prisma.EnumCvArtifactKindFieldRefInput<$PrismaModel>
+  in?: $Enums.CvArtifactKind[] | Prisma.ListEnumCvArtifactKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvArtifactKind[] | Prisma.ListEnumCvArtifactKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvArtifactKindWithAggregatesFilter<$PrismaModel> | $Enums.CvArtifactKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvArtifactKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvArtifactKindFilter<$PrismaModel>
+}
+
+export type NestedEnumCvArtifactStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvArtifactStatus | Prisma.EnumCvArtifactStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvArtifactStatus[] | Prisma.ListEnumCvArtifactStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvArtifactStatus[] | Prisma.ListEnumCvArtifactStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvArtifactStatusWithAggregatesFilter<$PrismaModel> | $Enums.CvArtifactStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvArtifactStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvArtifactStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumCvScanStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvScanStatus | Prisma.EnumCvScanStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvScanStatus[] | Prisma.ListEnumCvScanStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvScanStatus[] | Prisma.ListEnumCvScanStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvScanStatusFilter<$PrismaModel> | $Enums.CvScanStatus
+}
+
+export type NestedEnumCvScanStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvScanStatus | Prisma.EnumCvScanStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvScanStatus[] | Prisma.ListEnumCvScanStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvScanStatus[] | Prisma.ListEnumCvScanStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvScanStatusWithAggregatesFilter<$PrismaModel> | $Enums.CvScanStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvScanStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvScanStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumCvExtractionStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvExtractionStatus | Prisma.EnumCvExtractionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvExtractionStatus[] | Prisma.ListEnumCvExtractionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvExtractionStatus[] | Prisma.ListEnumCvExtractionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvExtractionStatusFilter<$PrismaModel> | $Enums.CvExtractionStatus
+}
+
+export type NestedEnumCvExtractionStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvExtractionStatus | Prisma.EnumCvExtractionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvExtractionStatus[] | Prisma.ListEnumCvExtractionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvExtractionStatus[] | Prisma.ListEnumCvExtractionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvExtractionStatusWithAggregatesFilter<$PrismaModel> | $Enums.CvExtractionStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvExtractionStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvExtractionStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumCvParseTriggerFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvParseTrigger | Prisma.EnumCvParseTriggerFieldRefInput<$PrismaModel>
+  in?: $Enums.CvParseTrigger[] | Prisma.ListEnumCvParseTriggerFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvParseTrigger[] | Prisma.ListEnumCvParseTriggerFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvParseTriggerFilter<$PrismaModel> | $Enums.CvParseTrigger
+}
+
+export type NestedEnumCvParseStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvParseStatus | Prisma.EnumCvParseStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvParseStatus[] | Prisma.ListEnumCvParseStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvParseStatus[] | Prisma.ListEnumCvParseStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvParseStatusFilter<$PrismaModel> | $Enums.CvParseStatus
+}
+
+export type NestedEnumCvParseTriggerWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvParseTrigger | Prisma.EnumCvParseTriggerFieldRefInput<$PrismaModel>
+  in?: $Enums.CvParseTrigger[] | Prisma.ListEnumCvParseTriggerFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvParseTrigger[] | Prisma.ListEnumCvParseTriggerFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvParseTriggerWithAggregatesFilter<$PrismaModel> | $Enums.CvParseTrigger
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvParseTriggerFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvParseTriggerFilter<$PrismaModel>
+}
+
+export type NestedEnumCvParseStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvParseStatus | Prisma.EnumCvParseStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvParseStatus[] | Prisma.ListEnumCvParseStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvParseStatus[] | Prisma.ListEnumCvParseStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvParseStatusWithAggregatesFilter<$PrismaModel> | $Enums.CvParseStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvParseStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvParseStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumCvRetryStageFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvRetryStage | Prisma.EnumCvRetryStageFieldRefInput<$PrismaModel>
+  in?: $Enums.CvRetryStage[] | Prisma.ListEnumCvRetryStageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvRetryStage[] | Prisma.ListEnumCvRetryStageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvRetryStageFilter<$PrismaModel> | $Enums.CvRetryStage
+}
+
+export type NestedEnumCvRetryStageWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvRetryStage | Prisma.EnumCvRetryStageFieldRefInput<$PrismaModel>
+  in?: $Enums.CvRetryStage[] | Prisma.ListEnumCvRetryStageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvRetryStage[] | Prisma.ListEnumCvRetryStageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvRetryStageWithAggregatesFilter<$PrismaModel> | $Enums.CvRetryStage
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvRetryStageFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvRetryStageFilter<$PrismaModel>
+}
+
+export type NestedEnumCvDraftStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvDraftStatus | Prisma.EnumCvDraftStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvDraftStatus[] | Prisma.ListEnumCvDraftStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvDraftStatus[] | Prisma.ListEnumCvDraftStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvDraftStatusFilter<$PrismaModel> | $Enums.CvDraftStatus
+}
+
+export type NestedEnumCvDraftStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvDraftStatus | Prisma.EnumCvDraftStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CvDraftStatus[] | Prisma.ListEnumCvDraftStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvDraftStatus[] | Prisma.ListEnumCvDraftStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvDraftStatusWithAggregatesFilter<$PrismaModel> | $Enums.CvDraftStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvDraftStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvDraftStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumCvConsentActionFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvConsentAction | Prisma.EnumCvConsentActionFieldRefInput<$PrismaModel>
+  in?: $Enums.CvConsentAction[] | Prisma.ListEnumCvConsentActionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvConsentAction[] | Prisma.ListEnumCvConsentActionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvConsentActionFilter<$PrismaModel> | $Enums.CvConsentAction
+}
+
+export type NestedEnumCvConsentActionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CvConsentAction | Prisma.EnumCvConsentActionFieldRefInput<$PrismaModel>
+  in?: $Enums.CvConsentAction[] | Prisma.ListEnumCvConsentActionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CvConsentAction[] | Prisma.ListEnumCvConsentActionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCvConsentActionWithAggregatesFilter<$PrismaModel> | $Enums.CvConsentAction
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCvConsentActionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCvConsentActionFilter<$PrismaModel>
 }
 
 

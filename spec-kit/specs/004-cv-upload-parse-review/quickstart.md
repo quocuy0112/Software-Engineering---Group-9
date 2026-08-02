@@ -7,13 +7,16 @@ so no AWS or OpenAI credential is required.
 
 ## Local Topology and Ports
 
-| Process        | Bind/endpoint                         | Exposure                                         |
-| -------------- | ------------------------------------- | ------------------------------------------------ |
-| Next.js web    | `http://localhost:3001`               | Local browser                                    |
-| PostgreSQL     | `127.0.0.1:55432` -> container `5432` | Loopback only                                    |
-| ClamAV `clamd` | `/run/clamav/clamd.sock`              | Shared only with the co-located CV worker        |
-| Email worker   | No listening port                     | PostgreSQL client                                |
-| CV worker      | No listening port                     | PostgreSQL, storage, and private `clamd` client  |
+| Process        | Bind/endpoint                         | Exposure                                        |
+| -------------- | ------------------------------------- | ----------------------------------------------- |
+| Next.js web    | `http://localhost:3001`               | Local browser                                   |
+| PostgreSQL     | `127.0.0.1:55432` -> container `5432` | Loopback only                                   |
+| ClamAV `clamd` | `/run/clamav/clamd.sock`              | Shared only with the co-located CV worker       |
+| Email worker   | No listening port                     | PostgreSQL client                               |
+| CV worker      | No listening port                     | PostgreSQL, storage, and private `clamd` client |
+
+Only host ports `3001` and loopback-only `55432` are permitted for this local
+stack. ClamAV must not publish either a host or container TCP port.
 
 ClamAV publishes no host/container TCP port and has `TCPSocket`/`TCPAddr`
 disabled. Local Compose shares a dedicated Unix-socket runtime volume only
@@ -187,6 +190,13 @@ children on Windows, macOS, and Linux and leave any interrupted durable lease
 recoverable. A stopped worker must not leave the browser permanently pending;
 after restart, expired leases are reclaimed.
 
+For isolated debugging, `docker compose up --build postgres clamav cv-worker`
+is the supported CV-worker command. Do not run the worker directly on a Windows
+or macOS host and replace the Unix socket with TCP. Compose supplies the Linux
+storage bind mount, container-native database URL, shared numeric socket group,
+and `/run/clamav/clamd.sock`. In production, supervise the worker beside `clamd`
+in the same host/pod and preserve graceful lease recovery.
+
 ## 6. Happy-Path Walkthrough
 
 Use only a synthetic or purpose-built test CV. Do not upload a real person's CV
@@ -226,21 +236,27 @@ local/session storage, persisted query cache, or service-worker cache.
 
 ## 7. Required Failure Walkthroughs
 
-| Fixture/condition                                                                                         | Expected terminal or recovery behavior                                                           |
-| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Empty, >5,000,000 bytes, wrong extension/type, mismatched length                                          | Request rejected safely; no accessible partial artifact                                          |
-| Bounded leading magic disagrees with declaration                                                          | `VALIDATION_FAILED`; never scanned/extracted; replace/manual/delete actions                       |
-| EICAR test file                                                                                           | `INFECTED`; never extracted/parsed; cleanup due within 24 hours                                  |
-| `clamd` unavailable or definitions >24h                                                                   | Fail closed; bounded retries, then `SCAN_FAILED` with retry/manual path                          |
-| Post-clean structure mismatch, password/encrypted/active PDF, or >20 pages                               | `EXTRACTION_FAILED`; explicit safe reason/action; no deep parser ran before `CLEAN`              |
-| DOCX traversal, duplicate entry, macro/OLE/ActiveX, external relation, >1,000 entries or >25 MiB expanded | `EXTRACTION_FAILED`; no Mammoth execution before checks pass                                     |
-| Image-only/empty extraction                                                                               | `EXTRACTION_FAILED`; manual Profile entry offered; no OCR                                        |
-| Extractor >15s or >192 MiB                                                                                | Child terminated; partial output destroyed; worker survives                                      |
-| Parser unknown field, invalid date/URL, excessive array, unknown segment, >256/128 KiB                    | Whole result rejected; no truncated/partial draft                                                |
-| Parser times out/fails all automatic attempts                                                             | `PARSE_FAILED`; up to two candidate retries, replacement, and manual entry immediately available |
-| Candidate retry cap exhausted                                                                             | Stable terminal state with replacement/manual/delete; no hidden admin wait                       |
+| Fixture/condition                                                                                         | Expected terminal or recovery behavior                                                                          |
+| --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Empty, >5,000,000 bytes, wrong extension/type, mismatched length                                          | Request rejected safely; no accessible partial artifact                                                         |
+| Bounded leading magic disagrees with declaration                                                          | `VALIDATION_FAILED`; never scanned/extracted; replace/manual/delete actions                                     |
+| EICAR test file                                                                                           | `INFECTED`; never extracted/parsed; cleanup due within 24 hours                                                 |
+| `clamd` unavailable or definitions >24h                                                                   | Fail closed; bounded retries, then `SCAN_FAILED` with retry/manual path                                         |
+| Post-clean structure mismatch, password/encrypted/active PDF, or >20 pages                                | `EXTRACTION_FAILED`; explicit safe reason/action; no deep parser ran before `CLEAN`                             |
+| DOCX traversal, duplicate entry, macro/OLE/ActiveX, external relation, >1,000 entries or >25 MiB expanded | `EXTRACTION_FAILED`; no Mammoth execution before checks pass                                                    |
+| Image-only/empty extraction                                                                               | `EXTRACTION_FAILED`; manual Profile entry offered; no OCR                                                       |
+| Extractor >15s or >192 MiB                                                                                | Child terminated; partial output destroyed; worker survives                                                     |
+| Parser unknown field, invalid date/URL, excessive array, unknown segment, >256/128 KiB                    | Whole result rejected; no truncated/partial draft                                                               |
+| Parser times out/fails all automatic attempts                                                             | `PARSE_FAILED`; up to two candidate retries, replacement, and manual entry immediately available                |
+| Candidate retry cap exhausted                                                                             | Stable terminal state with replacement/manual/delete; no hidden admin wait                                      |
 | Delete during processing                                                                                  | `CANCELLED` and inaccessible immediately; later result discarded; all content purged within 24h, then `DELETED` |
-| Expiry during review                                                                                      | Non-disclosing not-found/expired behavior; no confirmation                                       |
+| Expiry during review                                                                                      | Non-disclosing not-found/expired behavior; no confirmation                                                      |
+
+Retries are durable, capped, candidate-visible work records. There is no P0
+admin dead-letter queue, hidden admin retry, or admin-only resume dependency.
+When automatic and candidate retry caps are exhausted, keep the stable safe
+failure outcome and offer replacement, deletion, and the normal manual Profile
+editor.
 
 EICAR is used only through the curated test fixture and private local scanner;
 never send it to an unrelated service or commit generated private artifacts.
@@ -256,16 +272,21 @@ npm test
 npm run build
 ```
 
-Run database and Feature 004 suites (paths shown are the planned test layout):
+Run database and Feature 004 suites from the repository root. Controlled-clock
+tests require UTC and database tests require a unique disposable PostgreSQL
+database with both `DATABASE_URL` and `DIRECT_URL` overridden:
 
 ```powershell
 npm run db:verify
-npm run test --workspace @smarthire/web -- --run tests/backend/unit/cv-import
-npm run test --workspace @smarthire/web -- --run tests/backend/contract/cv-import
-npm run test --workspace @smarthire/web -- --run tests/backend/integration/cv-import
-npm run test --workspace @smarthire/web -- --run tests/architecture/cv-import-boundaries.test.ts
-npm run test:e2e --workspace @smarthire/web -- cv-import
+$env:TZ = "UTC"
+npm run test:cv-import -- --pool=forks --no-file-parallelism --maxWorkers=1
+npm run test:cv-import:e2e
 ```
+
+Do not point destructive fixture setup at the shared development database. Apply
+migrations from `web/` to the disposable database before the suite, stop any
+temporary Next/worker process afterward, and drop only the exact temporary
+database name created for that run.
 
 Required coverage groups:
 
@@ -289,6 +310,16 @@ Required coverage groups:
   failure/retry, quota release, and orphan reconciliation;
 - log/audit/metric canaries proving no PII/CV/token/locator content;
 - keyboard/focus/live-region/contrast/reduced-motion behavior and 320-pixel E2E.
+
+### Feature UI style ownership
+
+Use existing Tailwind utilities and shadcn-style primitives first. A component
+may add custom presentation only in an adjacent same-basename CSS Module, for
+example `cv-import-status.tsx` with `cv-import-status.module.css`. Only that
+matching owner may import the module. Do not add feature-level `styles/` or
+catch-all files, empty required modules, `:global`, cross-component module
+imports, or Feature 004 selectors/imports in global/shared stylesheets. Run both
+Feature 004 architecture tests through `npm run test:cv-import`.
 
 ## 9. Dependency and Supply-Chain Gate
 
@@ -347,6 +378,14 @@ Test grant, revocation before dispatch, revoked retry, provider/model/notice
 version mismatch, timeout, invalid output, and the manual recovery route. Do not
 enable automatic cross-provider fallback.
 
+The live synthetic smoke remains skipped unless
+`CV_OPENAI_LIVE_SYNTHETIC=1`. It additionally requires a reviewed
+non-production `OPENAI_PROJECT_ID`, process-injected API key, and
+`CV_OPENAI_SYNTHETIC_PROJECT_APPROVED=true`. It accepts only its hardcoded
+synthetic segments—there is no filename, text, or CV override. Run the focused
+compatibility test with the same single-worker Vitest flags; never place the
+secret in a committed file or captured command output.
+
 ## 12. Retention Verification With a Fake Clock
 
 Never wait real days in tests. Seed artifacts/drafts with an injected fake clock:
@@ -369,8 +408,8 @@ physical/database purge by the relevant maximum deadline.
 
 ## 13. Performance Evidence
 
-Use synthetic clean documents at representative sizes and controlled scanner/
-parser latency. Capture safe aggregate metrics only.
+Use synthetic clean documents at representative sizes and documented scanner/
+parser conditions. Capture safe aggregate metrics only.
 
 - P95 upload finalization/actionable pre-scan validation response <=5 seconds after the
   last byte;
@@ -386,11 +425,37 @@ document the observation unit, numerator, denominator, measurement window,
 deadline treatment, and what counts as manual intervention. The release run
 must reuse that definition rather than choosing it after seeing results.
 
+The committed harness fixes and emits that definition before aggregation and
+rejects unknown/content-bearing input fields. Validate instrumentation only:
+
+```powershell
+npm run perf:cv-import --workspace @smarthire/web -- --self-test
+```
+
+`SELF_TEST` is explicitly ineligible for release evidence. A measured run uses
+strict content-free observations captured from the documented synthetic
+workload:
+
+```powershell
+npm run perf:cv-import:collect --workspace @smarthire/web
+npm run perf:cv-import --workspace @smarthire/web -- --input .local/cv-import-performance-input.json
+```
+
+The collector requires `DATABASE_URL` and `DIRECT_URL` to point to the same
+unique migrated test database, `TZ=UTC`, a ready web server, and a ready CV
+worker/ClamAV boundary. Its optional `CV_PERF_*` variables predeclare journey,
+claim, concurrency, cleanup, RSS-ceiling, and output-path settings. Output is
+restricted to a JSON file below `web/.local`; defaults are 10 journeys, 20
+claim samples at concurrency 8, 100 cleanup units, and a 512 MiB local worker
+RSS ceiling.
+
 Evidence must state dataset size, sample size, test duration, file-size/format
 mix, machine/container resources, concurrency, parser mode, warmed/cold state,
 external-provider conditions, and percentile method. Report P50/P95/P99,
-maximum latency, and error rate. Reports contain only synthetic IDs, timings,
-byte buckets, and safe result codes.
+maximum latency, and error rate. Reports contain timings, aggregate counts,
+resource bytes/ceilings, controlled cleanup timestamps/classifications, and
+safe result codes, but no synthetic IDs or content dimensions. Local target
+success remains distinct from production release qualification.
 
 ## 14. Usability Evidence
 
@@ -403,6 +468,10 @@ counts and environment details; if the threshold is not verified, P0 release is
 blocked rather than inferred.
 
 ## 15. Safe Troubleshooting
+
+Troubleshoot only with the committed synthetic/curated fixtures. Never replay a
+real candidate CV into a local/shared environment, copy raw provider payloads,
+or add temporary content logging.
 
 - `AWAITING_CONTENT`: check reservation expiry and client request headers, not
   the file body.
@@ -418,4 +487,6 @@ blocked rather than inferred.
   fresh no-store response; do not force last-write-wins.
 
 If new upload/parser dispatch must be disabled, keep the CV cleanup worker
-running until every retained artifact and payload is reconciled.
+running until every retained artifact and payload is reconciled. Setting
+`CV_WORKER_ENABLED=false` disables new scan/extract/parse processing but must not
+disable cleanup/reconciliation ownership.

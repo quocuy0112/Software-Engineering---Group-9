@@ -1,0 +1,11 @@
+.notice {
+  padding: 1rem;
+  border: 1px solid currentColor;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, Canvas 94%, Highlight 6%);
+}
+
+.notice p {
+  margin-block: 0.5rem 0;
+  line-height: 1.55;
+}
