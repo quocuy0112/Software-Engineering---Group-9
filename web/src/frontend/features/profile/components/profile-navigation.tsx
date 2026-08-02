@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 
