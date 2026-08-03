@@ -6,6 +6,7 @@ import "@fontsource/be-vietnam-pro/700.css";
 import { serverEnvironment } from "@/backend/env/runtime";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { AppProviders } from "@/frontend/providers/app-providers";
 
 export const metadata: Metadata = {
   title: "SmartHire - A secure talent workspace",
@@ -19,13 +20,15 @@ export default function RootLayout({
   return (
     <html lang="en" data-app-environment={serverEnvironment.APP_ENV}>
       <body suppressHydrationWarning>
-        {children}
-        <Toaster
-          className="app-toaster"
-          position="top-right"
-          richColors
-          toastOptions={{ className: "app-toast" }}
-        />
+        <AppProviders>
+          {children}
+          <Toaster
+            className="app-toaster"
+            position="top-right"
+            richColors
+            toastOptions={{ className: "app-toast" }}
+          />
+        </AppProviders>
       </body>
     </html>
   );

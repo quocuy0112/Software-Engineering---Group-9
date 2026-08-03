@@ -35,6 +35,14 @@ export function DashboardView({
             "Quản lý giới thiệu, kinh nghiệm, học vấn và kỹ năng của bạn.",
           skills: "kỹ năng",
           experiences: "kinh nghiệm",
+          jobsTitle: "Cơ hội việc làm",
+          jobsCopy:
+            "Tìm kiếm và lọc các vị trí phù hợp, sau đó lưu hoặc ứng tuyển.",
+          browseJobs: "Tìm việc",
+          cvTitle: "Nhập CV thông minh",
+          cvCopy:
+            "Tải CV PDF hoặc DOCX, xem lại đề xuất rồi mới cập nhật hồ sơ.",
+          importCv: "Nhập CV",
           securityTitle: "Bảo mật tài khoản",
           securityCopy:
             "Kiểm soát mật khẩu, xác thực hai lớp và các phiên đăng nhập.",
@@ -83,6 +91,13 @@ export function DashboardView({
             "Manage your introduction, experience, education, and skills.",
           skills: "skills",
           experiences: "experiences",
+          jobsTitle: "Job opportunities",
+          jobsCopy: "Search and filter active roles, then save or apply when ready.",
+          browseJobs: "Browse jobs",
+          cvTitle: "Smart CV import",
+          cvCopy:
+            "Upload a PDF or DOCX, review every suggestion, then update your profile.",
+          importCv: "Import your CV",
           securityTitle: "Account security",
           securityCopy:
             "Control your password, two-factor authentication, and sessions.",
@@ -244,6 +259,25 @@ export function DashboardView({
             {copy.experiences}
           </span>
         </Link>
+        <Link className="feature-card dashboard-current-card" href="/jobs">
+          <div className="feature-icon" aria-hidden="true">
+            <DashboardIcon name="jobs" />
+          </div>
+          <h2>{copy.jobsTitle}</h2>
+          <p>{copy.jobsCopy}</p>
+          <Badge tone="info">{copy.browseJobs}</Badge>
+        </Link>
+        <Link
+          className="feature-card dashboard-current-card"
+          href="/profile/cv-imports"
+        >
+          <div className="feature-icon" aria-hidden="true">
+            <DashboardIcon name="cv" />
+          </div>
+          <h2>{copy.cvTitle}</h2>
+          <p>{copy.cvCopy}</p>
+          <Badge tone="success">{copy.importCv}</Badge>
+        </Link>
         <Link
           className="feature-card dashboard-current-card"
           href="/profile/security"
@@ -317,7 +351,9 @@ function DashboardIcon({
   name:
     | "arrow"
     | "check"
+    | "cv"
     | "device"
+    | "jobs"
     | "plus"
     | "preferences"
     | "profile"
@@ -328,10 +364,22 @@ function DashboardIcon({
   const paths: Record<typeof name, React.ReactNode> = {
     arrow: <path d="M5 12h14m-5-5 5 5-5 5" />,
     check: <path d="m5 12 4 4L19 6" />,
+    cv: (
+      <>
+        <path d="M6 2.5h6l3 3V17a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1Z" />
+        <path d="M12 2.5V6h3M7.5 9h5M7.5 12h5M7.5 15h3" />
+      </>
+    ),
     device: (
       <>
         <rect x="4" y="5" width="16" height="12" rx="2" />
         <path d="M9 20h6" />
+      </>
+    ),
+    jobs: (
+      <>
+        <rect x="3" y="7" width="14" height="10" rx="2" />
+        <path d="M7 7V5.5A2.5 2.5 0 0 1 9.5 3h1A2.5 2.5 0 0 1 13 5.5V7M3 11h14M8 11v1h4v-1" />
       </>
     ),
     plus: <path d="M12 5v14M5 12h14" />,

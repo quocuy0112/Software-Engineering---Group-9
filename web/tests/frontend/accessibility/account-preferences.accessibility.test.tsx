@@ -32,14 +32,15 @@ describe("account-preferences accessibility", () => {
         csrfProof="csrf-proof"
       />,
     );
-    expect(screen.getByLabelText("Ngôn ngữ giao diện")).toHaveValue("vi");
-    expect(screen.getByLabelText("Múi giờ")).toHaveValue("Asia/Ho_Chi_Minh");
-    expect(screen.getByLabelText("Cập nhật hồ sơ ứng tuyển")).toBeChecked();
-    expect(screen.getByLabelText("Gợi ý cơ hội nghề nghiệp")).toBeChecked();
-    const security = screen.getByLabelText("Bảo mật tài khoản");
+    expect(screen.getByLabelText("Interface language")).toHaveValue("en");
+    expect(screen.getByLabelText("Interface language")).toBeDisabled();
+    expect(screen.getByLabelText("Timezone")).toHaveValue("Asia/Ho_Chi_Minh");
+    expect(screen.getByLabelText("Application updates")).toBeChecked();
+    expect(screen.getByLabelText("Job recommendations")).toBeChecked();
+    const security = screen.getByLabelText("Account security");
     expect(security).toBeChecked();
     expect(security).toBeDisabled();
-    expect(screen.getByText(/luôn được bật/i)).toBeVisible();
+    expect(screen.getByText(/stay enabled/i)).toBeVisible();
   });
 
   it("provides a searchable IANA timezone list with current GMT offsets", async () => {
@@ -50,7 +51,7 @@ describe("account-preferences accessibility", () => {
       />,
     );
 
-    const timezone = screen.getByRole("combobox", { name: /Múi giờ/i });
+    const timezone = screen.getByRole("combobox", { name: /Timezone/i });
     expect(timezone).toHaveAttribute("list", "preference-timezones");
 
     await waitFor(() => {
@@ -89,9 +90,6 @@ describe("account-preferences accessibility", () => {
         csrfProof="csrf-proof"
       />,
     );
-    fireEvent.change(screen.getByLabelText("Ngôn ngữ giao diện"), {
-      target: { value: "en" },
-    });
     fireEvent.change(screen.getByLabelText("Timezone"), {
       target: { value: "UTC" },
     });
@@ -113,6 +111,7 @@ describe("account-preferences accessibility", () => {
       }),
     );
     expect(screen.getByLabelText("Interface language")).toHaveValue("en");
+    expect(screen.getByLabelText("Interface language")).toBeDisabled();
     expect(screen.getByLabelText("Timezone")).toHaveValue("UTC");
   });
 
@@ -133,14 +132,14 @@ describe("account-preferences accessibility", () => {
         csrfProof="csrf-proof"
       />,
     );
-    fireEvent.change(screen.getByLabelText("Múi giờ"), {
+    fireEvent.change(screen.getByLabelText("Timezone"), {
       target: { value: "Mars/Olympus" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Lưu tùy chọn" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save preferences" }));
     const alert = await screen.findByRole("alert");
-    expect(alert).toHaveTextContent("Hãy chọn múi giờ được hỗ trợ.");
+    expect(alert).toHaveTextContent("Choose a supported timezone.");
     await waitFor(() => expect(alert).toHaveFocus());
-    expect(screen.getByLabelText("Múi giờ")).toHaveValue("Mars/Olympus");
+    expect(screen.getByLabelText("Timezone")).toHaveValue("Mars/Olympus");
   });
 
   it("preserves and explains an unsupported stored timezone", () => {
@@ -154,8 +153,10 @@ describe("account-preferences accessibility", () => {
         csrfProof="csrf-proof"
       />,
     );
-    expect(screen.getByLabelText("Múi giờ")).toHaveValue("Legacy/Removed_Zone");
-    expect(screen.getByText(/không còn được hỗ trợ/i)).toBeVisible();
+    expect(screen.getByLabelText("Timezone")).toHaveValue(
+      "Legacy/Removed_Zone",
+    );
+    expect(screen.getByText(/no longer supported/i)).toBeVisible();
   });
 
   it("ships keyboard focus, non-color cues, reduced motion, and 320px safety", () => {

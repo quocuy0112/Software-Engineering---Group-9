@@ -1,0 +1,61 @@
+.root {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.status,
+.error p,
+.error ul {
+  margin: 0;
+}
+
+.status {
+  font-weight: 600;
+}
+
+.error {
+  position: fixed;
+  z-index: 1000000000;
+  inset-block-start: var(--sh-space-4);
+  inset-inline-end: var(--sh-space-4);
+  display: grid;
+  inline-size: min(28rem, calc(100vw - 2rem));
+  gap: var(--sh-space-2);
+  padding: var(--sh-space-4);
+  border: 2px solid var(--color-error, #b91c1c);
+  border-radius: var(--sh-radius-md);
+  color: var(--color-error-text, #7f1d1d);
+  background: var(--color-error-surface, #fef2f2);
+  box-shadow: var(--sh-shadow-card);
+  animation: cv-review-error-enter 180ms ease-out;
+}
+
+.error ul {
+  display: grid;
+  gap: var(--sh-space-1);
+  padding-inline-start: var(--sh-space-5);
+  font-size: var(--sh-font-size-body-sm);
+}
+
+.error:focus-visible {
+  outline: 3px solid var(--color-focus, #1d4ed8);
+  outline-offset: 2px;
+}
+
+@keyframes cv-review-error-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .error {
+    animation: none;
+  }
+}

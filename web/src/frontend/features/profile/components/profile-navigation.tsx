@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 
@@ -9,6 +11,7 @@ export type ProfileNavigationDestination = {
 
 export const foundationProfileDestinations = [
   { href: "/profile", label: "Professional", key: "overview" },
+  { href: "/profile/cv-imports", label: "CV imports", key: "cv-imports" },
   { href: "/profile/account", label: "Account", key: "account" },
   { href: "/profile/preferences", label: "Preferences", key: "preferences" },
   { href: "/profile/security", label: "Security", key: "security" },
@@ -27,6 +30,7 @@ export function ProfileNavigation({
     locale === "vi"
       ? {
           overview: "Nghề nghiệp",
+          "cv-imports": "Nhập CV",
           account: "Tài khoản",
           preferences: "Tùy chọn",
           security: "Bảo mật",

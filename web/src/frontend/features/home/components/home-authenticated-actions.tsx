@@ -88,11 +88,11 @@ export function HomeAuthenticatedActions({
           story, and next steps clear—so you can focus on where you want to go.
         </p>
         <nav className="home-actions" aria-label="Workspace actions">
-          <Link className="home-action home-action--primary" href="/dashboard">
-            Dashboard
+          <Link className="home-action home-action--primary" href="/jobs">
+            Browse jobs
           </Link>
-          <Link className="home-action home-action--secondary" href="/profile">
-            Profile
+          <Link className="home-action home-action--secondary" href="/dashboard">
+            Dashboard
           </Link>
         </nav>
       </section>

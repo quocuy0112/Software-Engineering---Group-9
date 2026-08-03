@@ -168,3 +168,248 @@ export const OutboxStatus = {
 } as const
 
 export type OutboxStatus = (typeof OutboxStatus)[keyof typeof OutboxStatus]
+
+
+export const JobPostingStatus = {
+  DRAFT: 'DRAFT',
+  PENDING_REVIEW: 'PENDING_REVIEW',
+  ACTIVE: 'ACTIVE',
+  CLOSED: 'CLOSED',
+  EXPIRED: 'EXPIRED',
+  REJECTED: 'REJECTED',
+  REMOVED: 'REMOVED'
+} as const
+
+export type JobPostingStatus = (typeof JobPostingStatus)[keyof typeof JobPostingStatus]
+
+
+export const EmploymentType = {
+  FULL_TIME: 'FULL_TIME',
+  PART_TIME: 'PART_TIME',
+  CONTRACT: 'CONTRACT',
+  INTERNSHIP: 'INTERNSHIP',
+  TEMPORARY: 'TEMPORARY'
+} as const
+
+export type EmploymentType = (typeof EmploymentType)[keyof typeof EmploymentType]
+
+
+export const ExperienceLevel = {
+  ENTRY: 'ENTRY',
+  JUNIOR: 'JUNIOR',
+  MID: 'MID',
+  SENIOR: 'SENIOR',
+  LEAD: 'LEAD',
+  MANAGER: 'MANAGER'
+} as const
+
+export type ExperienceLevel = (typeof ExperienceLevel)[keyof typeof ExperienceLevel]
+
+
+export const WorkArrangement = {
+  ONSITE: 'ONSITE',
+  HYBRID: 'HYBRID',
+  REMOTE: 'REMOTE'
+} as const
+
+export type WorkArrangement = (typeof WorkArrangement)[keyof typeof WorkArrangement]
+
+
+export const SalaryPeriod = {
+  HOUR: 'HOUR',
+  MONTH: 'MONTH',
+  YEAR: 'YEAR'
+} as const
+
+export type SalaryPeriod = (typeof SalaryPeriod)[keyof typeof SalaryPeriod]
+
+
+export const ApplicationQuestionKind = {
+  TEXT: 'TEXT',
+  BOOLEAN: 'BOOLEAN',
+  SINGLE_CHOICE: 'SINGLE_CHOICE'
+} as const
+
+export type ApplicationQuestionKind = (typeof ApplicationQuestionKind)[keyof typeof ApplicationQuestionKind]
+
+
+export const JobReportReason = {
+  FRAUD: 'FRAUD',
+  MISLEADING: 'MISLEADING',
+  DUPLICATE: 'DUPLICATE',
+  DISCRIMINATORY: 'DISCRIMINATORY',
+  INAPPROPRIATE: 'INAPPROPRIATE',
+  OTHER: 'OTHER'
+} as const
+
+export type JobReportReason = (typeof JobReportReason)[keyof typeof JobReportReason]
+
+
+export const JobReportStatus = {
+  PENDING_REVIEW: 'PENDING_REVIEW',
+  RESOLVED: 'RESOLVED',
+  DISMISSED: 'DISMISSED'
+} as const
+
+export type JobReportStatus = (typeof JobReportStatus)[keyof typeof JobReportStatus]
+
+
+export const ApplicationStage = {
+  APPLIED: 'APPLIED',
+  VIEWED: 'VIEWED',
+  SHORTLISTED: 'SHORTLISTED',
+  INTERVIEWING: 'INTERVIEWING',
+  OFFERED: 'OFFERED',
+  HIRED: 'HIRED',
+  OFFER_DECLINED: 'OFFER_DECLINED',
+  REJECTED: 'REJECTED',
+  WAITLISTED: 'WAITLISTED'
+} as const
+
+export type ApplicationStage = (typeof ApplicationStage)[keyof typeof ApplicationStage]
+
+
+export const RecruitmentNotificationAudience = {
+  CANDIDATE: 'CANDIDATE',
+  COMPANY: 'COMPANY'
+} as const
+
+export type RecruitmentNotificationAudience = (typeof RecruitmentNotificationAudience)[keyof typeof RecruitmentNotificationAudience]
+
+
+export const RecruitmentNotificationKind = {
+  APPLICATION_SUBMITTED: 'APPLICATION_SUBMITTED',
+  APPLICATION_RECEIVED: 'APPLICATION_RECEIVED'
+} as const
+
+export type RecruitmentNotificationKind = (typeof RecruitmentNotificationKind)[keyof typeof RecruitmentNotificationKind]
+
+
+export const CvDocumentKind = {
+  PDF: 'PDF',
+  DOCX: 'DOCX'
+} as const
+
+export type CvDocumentKind = (typeof CvDocumentKind)[keyof typeof CvDocumentKind]
+
+
+export const CvParserClass = {
+  DETERMINISTIC_INTERNAL: 'DETERMINISTIC_INTERNAL',
+  EXTERNAL_OPENAI: 'EXTERNAL_OPENAI'
+} as const
+
+export type CvParserClass = (typeof CvParserClass)[keyof typeof CvParserClass]
+
+
+export const CvUploadStatus = {
+  AWAITING_CONTENT: 'AWAITING_CONTENT',
+  VALIDATION_QUEUED: 'VALIDATION_QUEUED',
+  SCAN_QUEUED: 'SCAN_QUEUED',
+  SCANNING: 'SCANNING',
+  EXTRACTION_QUEUED: 'EXTRACTION_QUEUED',
+  EXTRACTING: 'EXTRACTING',
+  AWAITING_CONSENT: 'AWAITING_CONSENT',
+  PARSE_QUEUED: 'PARSE_QUEUED',
+  PARSING: 'PARSING',
+  REVIEW_READY: 'REVIEW_READY',
+  VALIDATION_FAILED: 'VALIDATION_FAILED',
+  INFECTED: 'INFECTED',
+  SCAN_FAILED: 'SCAN_FAILED',
+  EXTRACTION_FAILED: 'EXTRACTION_FAILED',
+  PARSE_FAILED: 'PARSE_FAILED',
+  CONFIRMED: 'CONFIRMED',
+  CANCELLED: 'CANCELLED',
+  DELETED: 'DELETED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type CvUploadStatus = (typeof CvUploadStatus)[keyof typeof CvUploadStatus]
+
+
+export const CvArtifactKind = {
+  SOURCE_DOCUMENT: 'SOURCE_DOCUMENT',
+  EXTRACTED_TEXT: 'EXTRACTED_TEXT'
+} as const
+
+export type CvArtifactKind = (typeof CvArtifactKind)[keyof typeof CvArtifactKind]
+
+
+export const CvArtifactStatus = {
+  QUARANTINED: 'QUARANTINED',
+  AVAILABLE: 'AVAILABLE',
+  DELETE_PENDING: 'DELETE_PENDING',
+  DELETING: 'DELETING',
+  DELETED: 'DELETED',
+  DELETE_FAILED: 'DELETE_FAILED'
+} as const
+
+export type CvArtifactStatus = (typeof CvArtifactStatus)[keyof typeof CvArtifactStatus]
+
+
+export const CvScanStatus = {
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  CLEAN: 'CLEAN',
+  INFECTED: 'INFECTED',
+  INDETERMINATE: 'INDETERMINATE',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type CvScanStatus = (typeof CvScanStatus)[keyof typeof CvScanStatus]
+
+
+export const CvExtractionStatus = {
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type CvExtractionStatus = (typeof CvExtractionStatus)[keyof typeof CvExtractionStatus]
+
+
+export const CvParseStatus = {
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type CvParseStatus = (typeof CvParseStatus)[keyof typeof CvParseStatus]
+
+
+export const CvParseTrigger = {
+  INITIAL: 'INITIAL',
+  AUTOMATIC_RETRY: 'AUTOMATIC_RETRY',
+  CANDIDATE_RETRY: 'CANDIDATE_RETRY'
+} as const
+
+export type CvParseTrigger = (typeof CvParseTrigger)[keyof typeof CvParseTrigger]
+
+
+export const CvRetryStage = {
+  SCAN: 'SCAN',
+  PARSE: 'PARSE'
+} as const
+
+export type CvRetryStage = (typeof CvRetryStage)[keyof typeof CvRetryStage]
+
+
+export const CvDraftStatus = {
+  EDITABLE: 'EDITABLE',
+  CONFIRMED: 'CONFIRMED',
+  DELETED: 'DELETED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type CvDraftStatus = (typeof CvDraftStatus)[keyof typeof CvDraftStatus]
+
+
+export const CvConsentAction = {
+  GRANTED: 'GRANTED',
+  REVOKED: 'REVOKED'
+} as const
+
+export type CvConsentAction = (typeof CvConsentAction)[keyof typeof CvConsentAction]

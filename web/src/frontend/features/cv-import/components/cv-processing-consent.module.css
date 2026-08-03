@@ -1,0 +1,190 @@
+.root {
+  display: grid;
+  min-width: 0;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border, #94a3b8);
+  border-radius: 0.75rem;
+}
+
+.binding {
+  display: grid;
+  margin: 0;
+  gap: 0.65rem;
+}
+
+.binding div {
+  display: grid;
+  grid-template-columns: minmax(5rem, 0.3fr) minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.binding dt {
+  font-weight: 750;
+}
+
+.binding dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.grant,
+.granted {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.grant label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  line-height: 1.5;
+}
+
+.grant input {
+  flex: 0 0 auto;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.15rem;
+}
+
+.grant button,
+.granted button {
+  min-height: 2.75rem;
+  justify-self: start;
+  padding: 0.65rem 0.85rem;
+}
+
+.revokeButton {
+  display: inline-flex;
+  min-height: var(--sh-control-height);
+  align-items: center;
+  justify-content: center;
+  gap: var(--sh-space-2);
+  padding: 0 var(--sh-space-4) !important;
+  border: 1px solid color-mix(in srgb, var(--sh-color-error) 52%, transparent);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-error);
+  background: var(--sh-color-surface-card);
+  font-size: var(--sh-font-size-button);
+  font-weight: var(--sh-font-weight-semibold);
+  box-shadow: var(--sh-shadow-control);
+  cursor: pointer;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.revokeButton:hover:not(:disabled) {
+  border-color: var(--sh-color-error);
+  background: var(--sh-color-error-bg);
+  box-shadow: 0 6px 18px
+    color-mix(in srgb, var(--sh-color-error) 14%, transparent);
+  transform: translateY(-1px);
+}
+
+.revokeButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.revokeButton:disabled {
+  border-color: var(--sh-color-border-subtle);
+  color: var(--sh-color-disabled-text);
+  background: var(--sh-color-disabled-bg);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.revokeButton[aria-busy="true"]::before {
+  width: 14px;
+  height: 14px;
+  border: 2px solid color-mix(in srgb, currentcolor 28%, transparent);
+  border-top-color: currentcolor;
+  border-radius: var(--sh-radius-full);
+  content: "";
+  animation: cvConsentSpin 800ms linear infinite;
+}
+
+.grant :is(input, button):focus-visible,
+.granted button:focus-visible {
+  outline: 3px solid var(--color-focus, #1d4ed8);
+  outline-offset: 3px;
+}
+
+.caveat,
+.explanation,
+.status {
+  margin: 0;
+}
+
+.caveat {
+  padding-inline-start: 0.75rem;
+  border-inline-start: 0.3rem solid var(--color-warning, #a16207);
+}
+
+.explanation {
+  color: var(--color-muted-text, #475569);
+}
+
+.status {
+  min-height: 1.5rem;
+  padding: 0.65rem 0.75rem;
+  border-inline-start: 4px solid var(--sh-color-info);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-info);
+  background: var(--sh-color-info-bg);
+  font-weight: 650;
+  transition:
+    border-color 200ms ease,
+    color 200ms ease,
+    background-color 200ms ease;
+}
+
+.status[data-tone="pending"] {
+  border-color: var(--sh-color-warning);
+  color: var(--sh-color-warning);
+  background: var(--sh-color-warning-bg);
+}
+
+.status[data-tone="success"] {
+  border-color: var(--sh-color-success);
+  color: var(--sh-color-success);
+  background: var(--sh-color-success-bg);
+}
+
+.status[data-tone="error"] {
+  border-color: var(--sh-color-error);
+  color: var(--sh-color-error);
+  background: var(--sh-color-error-bg);
+}
+
+@keyframes cvConsentSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 32rem) {
+  .binding div {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+
+  .grant button,
+  .granted button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .root * {
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto;
+    transition-duration: 0.01ms !important;
+  }
+}

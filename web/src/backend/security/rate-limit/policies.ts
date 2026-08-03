@@ -20,6 +20,7 @@ export const rateLimitPolicies = {
     limit: 5,
     windowSeconds: 10 * 60,
   },
+  jobReport: { scope: "job-report", limit: 10, windowSeconds: 60 * 60 },
 } as const;
 
 export function safeRetryMetadata(decision: RateLimitDecision) {

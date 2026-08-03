@@ -1,0 +1,189 @@
+.root,
+.group,
+.card,
+.fields,
+.choices {
+  display: grid;
+  min-width: 0;
+  gap: var(--sh-space-4);
+}
+
+.root > h2 {
+  margin: var(--sh-space-3) 0 0;
+  font-size: var(--sh-font-size-h2);
+  line-height: var(--sh-line-height-h2);
+}
+
+.group {
+  padding-block-start: var(--sh-space-5);
+  border-block-start: 1px solid var(--sh-color-border-default);
+}
+
+.group > h3 {
+  margin: 0;
+  font-size: var(--sh-font-size-h3);
+  line-height: var(--sh-line-height-h3);
+}
+
+.groupControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sh-space-2);
+}
+
+.groupControls button {
+  min-height: var(--sh-control-height-sm);
+  padding: 0 var(--sh-space-4);
+  border: 1px solid var(--sh-color-border-default);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-text-secondary);
+  background: var(--sh-color-surface-card);
+  font-size: var(--sh-font-size-body-sm);
+  font-weight: var(--sh-font-weight-semibold);
+  box-shadow: var(--sh-shadow-control);
+}
+
+.groupControls button:hover {
+  border-color: var(--sh-color-brand-primary);
+  color: var(--sh-color-brand-primary-hover);
+  background: var(--sh-color-info-bg);
+}
+
+.card {
+  padding: var(--sh-space-5);
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-md);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-control);
+}
+
+.fields {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.fields label,
+.card > label,
+.target {
+  display: grid;
+  min-width: 0;
+  gap: var(--sh-space-2);
+  color: var(--sh-color-text-primary);
+  font-size: var(--sh-font-size-body-sm);
+  font-weight: var(--sh-font-weight-semibold);
+  text-transform: capitalize;
+}
+
+.fields input,
+.fields textarea,
+.card > label input,
+.target select {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: var(--sh-control-height);
+  padding: 11px var(--sh-space-3);
+  border: 1px solid var(--sh-color-border-default);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-text-primary);
+  background: var(--sh-color-surface-card);
+  font-weight: var(--sh-font-weight-regular);
+  text-transform: none;
+  box-shadow: var(--sh-shadow-control);
+}
+
+.fields textarea {
+  min-block-size: 7rem;
+  resize: vertical;
+}
+
+.fields :is(input, textarea)[aria-invalid="true"],
+.card > label input[aria-invalid="true"],
+.target select[aria-invalid="true"] {
+  border-color: var(--color-error, #b91c1c);
+  background: var(--color-error-surface, #fef2f2);
+  box-shadow: 0 0 0 1px var(--color-error, #b91c1c);
+}
+
+.fieldError {
+  color: var(--color-error-text, #7f1d1d);
+  font-size: var(--sh-font-size-caption);
+  font-weight: var(--sh-font-weight-semibold);
+  line-height: var(--sh-line-height-caption);
+  text-transform: none;
+}
+
+.fullWidth,
+.target {
+  grid-column: 1 / -1;
+}
+
+.checkbox {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+}
+
+.checkbox input {
+  inline-size: 20px;
+  min-block-size: 20px;
+  accent-color: var(--sh-color-brand-primary);
+}
+
+.choices {
+  grid-template-columns: repeat(3, minmax(0, max-content));
+  margin: 0;
+  padding: var(--sh-space-3) var(--sh-space-4);
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-color-surface-tinted);
+}
+
+.choices legend {
+  padding-inline: var(--sh-space-2);
+  font-size: var(--sh-font-size-body-sm);
+  font-weight: var(--sh-font-weight-semibold);
+}
+
+.choices label:not(.target) {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  gap: var(--sh-space-2);
+  padding-inline: var(--sh-space-2);
+  font-size: var(--sh-font-size-body-sm);
+  text-transform: capitalize;
+}
+
+.choices label:not(.target) input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--sh-color-brand-primary);
+}
+
+.card :is(button, input, select, textarea):focus-visible,
+.groupControls button:focus-visible {
+  outline: 3px solid var(--color-focus, #1d4ed8);
+  outline-offset: 2px;
+}
+
+@media (max-width: 32rem) {
+  .card {
+    padding: var(--sh-space-4);
+  }
+
+  .fields,
+  .choices {
+    grid-template-columns: 1fr;
+  }
+
+  .groupControls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root * {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,6 +1,12 @@
 import { forwardRef, type ButtonHTMLAttributes } from "react";
 
-export type ButtonVariant = "primary" | "secondary" | "danger" | "ghost";
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "danger"
+  | "ghost"
+  | "gradient"
+  | "glass";
 export type ButtonSize = "default" | "small" | "icon";
 
 export const Button = forwardRef<

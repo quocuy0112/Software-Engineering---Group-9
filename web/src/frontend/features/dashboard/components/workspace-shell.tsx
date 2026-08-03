@@ -11,6 +11,7 @@ import {
   ACCOUNT_NAME_UPDATED_EVENT,
   type AccountNameUpdatedDetail,
 } from "@/frontend/features/profile/client/account-identity-events";
+import { ThemeToggle } from "@/frontend/components/ui/theme-toggle";
 import { WorkspaceLocaleProvider } from "../client/workspace-locale";
 import { WorkspaceNavigation } from "./workspace-navigation";
 
@@ -149,32 +150,35 @@ export function WorkspaceShell({
                 <p className="workspace-topbar-kicker">{copy.workspace}</p>
                 <p className="workspace-topbar-title">{copy.greeting}</p>
               </div>
-              <Link
-                className="workspace-account-chip"
-                href="/profile"
-                aria-label={copy.openProfile}
-              >
-                <span className="workspace-account-avatar" aria-hidden="true">
-                  {avatar ? (
-                    <Image
-                      src={avatar}
-                      alt=""
-                      width={40}
-                      height={40}
-                      unoptimized
-                    />
-                  ) : (
-                    <svg viewBox="0 0 24 24">
-                      <circle cx="12" cy="8" r="3.2" />
-                      <path d="M5.5 19c.7-3.1 3-4.8 6.5-4.8s5.8 1.7 6.5 4.8" />
-                    </svg>
-                  )}
-                </span>
-                <span>
-                  <strong>{workspaceProfile.name}</strong>
-                  <small>{workspaceProfile.email || copy.manageProfile}</small>
-                </span>
-              </Link>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <ThemeToggle />
+                <Link
+                  className="workspace-account-chip"
+                  href="/profile"
+                  aria-label={copy.openProfile}
+                >
+                  <span className="workspace-account-avatar" aria-hidden="true">
+                    {avatar ? (
+                      <Image
+                        src={avatar}
+                        alt=""
+                        width={40}
+                        height={40}
+                        unoptimized
+                      />
+                    ) : (
+                      <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="8" r="3.2" />
+                        <path d="M5.5 19c.7-3.1 3-4.8 6.5-4.8s5.8 1.7 6.5 4.8" />
+                      </svg>
+                    )}
+                  </span>
+                  <span>
+                    <strong>{workspaceProfile.name}</strong>
+                    <small>{workspaceProfile.email || copy.manageProfile}</small>
+                  </span>
+                </Link>
+              </div>
             </header>
             <div className="workspace-status">
               <AuthStatus status={status} tone="error" />
