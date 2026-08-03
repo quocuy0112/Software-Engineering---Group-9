@@ -61,7 +61,7 @@
 ### Lưu Chí Hải
 * **Completed tasks:** 
     - Complete Diagram 5 for full operation.
-    - Update the Project Plan
+    - Update the Project Plan.
     - Write PA3 meeting minutes.
     - Write the AI Usage Report following the required format.
 * **To-do Tasks:** 
@@ -69,6 +69,7 @@
     - Research the C4 Model and Diagrams for PA4.
     - Complete the assigned diagrams (System Context, FE).
     - Write the AI Usage Report following the required format.
+    - Update Project Plan.
 * **Issues/Obstacles:** 
     - None
 
