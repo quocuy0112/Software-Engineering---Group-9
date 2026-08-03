@@ -2,8 +2,6 @@
 
 *Performed by: Lưu Chí Hải, Reviewed by: Nguyễn Gia Quốc Uy, Edited by: Lưu Chí Hải*
 
-> **Planning Baseline:** Sprint 2 and Sprint 3 information is based on the team's internal PA planning files and current task assignments. Exact Sprint 1, Sprint 4, and Sprint 5 dates and detailed assignments are team planning baselines created to address the PA2 feedback. They must remain synchronized with the team's Notion task tracker.
-
 ## 1. Introduction
 
 *Performed by: Lưu Chí Hải, Reviewed by: Nguyễn Gia Quốc Uy, Edited by: Lưu Chí Hải*
@@ -20,14 +18,14 @@ The platform serves candidates, company members involved in recruitment, and pla
 
 The project aims to:
 
-- provide a centralized recruitment workflow for candidates, company members, and platform administrators;
-- reduce fragmented recruitment work performed through disconnected emails and spreadsheets;
-- provide candidates with job discovery, application submission, application tracking, and notifications;
-- provide authorized company members with job-posting, applicant-review, candidate-scoring, and pipeline-management capabilities;
-- provide administrators with employer verification, job moderation, user management, and audit capabilities;
-- preserve human control over all candidate-progression and hiring decisions;
-- maintain traceability among the Vision Document, functional requirements, use cases, implementation tasks, and tests; and
-- deliver the required documents, software builds, reports, and evidence within the project schedule.
+- Provide a centralized recruitment workflow for candidates, company members, and platform administrators.
+- Reduce fragmented recruitment work performed through disconnected emails and spreadsheets.
+- Provide candidates with job discovery, application submission, application tracking, and notifications.
+- Provide authorized company members with job-posting, applicant-review, candidate-scoring, and pipeline-management capabilities.
+- Provide administrators with employer verification, job moderation, user management, and audit capabilities.
+- Preserve human control over all candidate-progression and hiring decisions.
+- Maintain traceability among the Vision Document, functional requirements, use cases, implementation tasks, and tests.
+- Deliver the required documents, software builds, reports, and evidence within the project schedule.
 
 ### 2.2. Scope
 
@@ -48,14 +46,14 @@ At a high level, SmartHire covers the following product areas:
 
 The current project release does not include:
 
-- AI-generated job descriptions;
-- AI resume rewriting or resume enhancement;
-- fully automated candidate rejection, progression, or hiring;
-- semantic AI job recommendations;
-- external calendar synchronization;
-- payroll;
-- employee onboarding; or
-- a complete human-resource management suite.
+- AI-generated job descriptions.
+- AI resume rewriting or resume enhancement.
+- Fully automated candidate rejection, progression, or hiring.
+- Semantic AI job recommendations.
+- External calendar synchronization.
+- Payroll.
+- Employee onboarding.
+- A complete human-resource management suite.
 
 ### 2.3. Delivery Form
 
@@ -76,7 +74,7 @@ SmartHire is delivered as a responsive web application supporting candidate, rec
 | CON-09 | Job matching is rule-based; semantic AI processing is limited to CV-to-job scoring and explanations. | Job-recommendation tasks must not be described as semantic AI recommendations. |
 | CON-10 | Supported CV formats are PDF and DOCX, with a maximum file size of 5 MB. | Upload, parsing, scanning, storage, and failure handling must follow these limits. |
 | CON-11 | Core operations must continue when the AI service or email service is temporarily unavailable. | Fallback, retry, timeout, logging, and failure handling must be specified and tested. |
-| CON-12 | P0 capabilities must be stabilized before P1 analytics and export capabilities. | P1 work may be deferred if P0 acceptance criteria are not satisfied. |
+| CON-12 | P0 capabilities must be stabilized before P1 analytics and export capabilities. | P1 work may be deferred only if the team formally removes or postpones it from the final approved scope and updates the Vision Document, Project Plan, requirements traceability, and demonstration plan consistently. |
 | CON-13 | Spec Kit implementation must preserve its specifications, clarifications, implementation plan, task breakdown, analysis or checklist when used, and source code. | These artifacts are required as implementation evidence. |
 
 ### 2.5. Assumptions and Dependencies
@@ -107,24 +105,25 @@ The project will produce the following deliverables:
 
 | ID | Deliverable | Related Tasks |
 |---|---|---|
-| DEL-01 | A responsive SmartHire web application and its source code. | S3-05, S4-01–S4-09, S5-01–S5-03, S5-06, S5-09 |
-| DEL-02 | A revised Project Plan that addresses PA2 feedback and remains consistent with Notion. | S3-10 |
+| DEL-01 | A responsive SmartHire web application and its source code. | S3-05, S4-02A–B, S4-03, S4-08A–B, S5-01, S5-06 |
+| DEL-02 | A revised and continuously maintained Project Plan that addresses previous feedback and remains consistent with the approved Notion task tracker and current assignment requirements. | S3-10, S4-15 |
 | DEL-03 | A revised Vision Document, with a high-level Product Overview and feature descriptions that include business rationale and primary beneficiaries. | S3-04 |
-| DEL-04 | One consolidated `changes.md` file containing separate records for Project Plan and Vision Document revisions. | S3-04, S3-10, S3-12 |
-| DEL-05 | Spec Kit and specification-driven development artifacts (`constitution.md`, generated Markdown artifacts, specifications, clarifications, implementation plans, task breakdowns, analysis/checklists, source code). | S2-01, S2-10, S3-05, S3-07 |
+| DEL-04 | One consolidated `Changes.md` file recording the material document and project changes introduced through PA4. | S3-04, S3-10, S3-12, S4-12 |
+| DEL-05 | Spec Kit and specification-driven development artifacts (`constitution.md`, generated Markdown artifacts, specifications, clarifications, implementation plans, task breakdowns, analysis/checklists, source code). | S2-01, S2-10, S3-05, S3-07, S4-02A–B, S4-03 |
 | DEL-06 | Mermaid use-case models covering the functional requirements in the revised Vision Document. | S3-01, S3-06, S3-08, S3-09 |
 | DEL-07 | Use-case specifications (IDs, actors, descriptions, preconditions, basic/alternative flows, postconditions). | S3-01, S3-06, S3-08, S3-09 |
 | DEL-08 | Prototype evidence for the basic and alternative flows of the documented use cases. | S3-01, S3-06, S3-08, S3-09 |
 | DEL-09 | One full-stack Authentication, Authorization, and Access Control functional group implemented through Spec Kit during Sprint 3. | S3-05, S3-07 |
-| DEL-10 | A test plan, test cases, test results, and defect records for the implemented system. | S4-10, S5-04, S5-05, S5-07 |
-| DEL-11 | Weekly Reports, Scrum Meeting records, and Notion task-tracker screenshots. | S1-05, S2-05, S2-15, S3-11, S4-12, S5-11 |
-| DEL-12 | Individual AI Usage Reports for all team members. | S2-11A–E, S3-03A–E, S4-13A–E, S5-12A–E |
-| DEL-13 | User and technical documentation (User Manual, Recruiter User Guide, Administrator Guide, Installation Guide, Deployment Guide, API Documentation, Database Schema Documentation, System Architecture Documentation). | S5-08 |
-| DEL-14 | Markdown and PDF versions of the required project documents. | S2-16A–C, S2-17, S3-02, S4-11, S5-10 |
-| DEL-15 | Git commit-history evidence and the final submission package. | S5-10 |
+| DEL-10 | A final test package containing the Test Plan, reviewed and refined test cases, execution results, test summary, and linked bug reports. | S5-02–S5-06 |
+| DEL-11 | Weekly Reports, Scrum Meeting records, and Notion task-tracker screenshots. | S1-05, S2-05, S2-15, S3-11, S4-06, S5-12 |
+| DEL-12 | Individual AI Usage Reports recorded for the members assigned in each sprint. | S2-11A–E, S3-03A–E, S4-13A–E, S5-10 |
+| DEL-13 | User, technical, and project documentation updated to reflect the final implemented system. | S5-09 |
+| DEL-14 | Markdown and PDF versions of the required project documents. | S2-16A–C, S2-17, S3-02, S4-09–S4-12, S4-15, S5-09, S5-11 |
+| DEL-15 | Git commit-history evidence and the final submission package. | S5-10, S5-11 |
 | DEL-16 | Build 1: full-stack Authentication, Authorization, and Access Control increment. | S3-05, S3-07 |
-| DEL-17 | Build 2: integrated candidate and recruiter recruitment workflows. | S4-01–S4-11 |
-| DEL-18 | Final Build and demonstration materials. | S5-01–S5-10 |
+| DEL-17 | PA4 system increment and architecture package, including two Spec Kit functional groups, system review and UI/UX improvements, C4 diagrams, technical documentation, change records, the updated Project Plan, AI Usage Reports, and demo evidence. | S4-01, S4-02A–B, S4-03–S4-06, S4-07A–B, S4-08A–B, S4-09–S4-15 |
+| DEL-18 | Final Build and demonstration materials. | S5-01, S5-06, S5-07, S5-11 |
+| DEL-19 | A Reflective Report covering team experience, Spec Kit experience, AI-tool usage, SDLC feedback, and individual member reflections. | S5-08 |
 
 Deliverable ownership, reviewers, dates, and acceptance criteria are managed in the sprint task lists rather than assigned globally in this section.
 
@@ -148,7 +147,7 @@ Deliverable ownership, reviewers, dates, and acceptance criteria are managed in 
 - Reviewers verify the expected output and acceptance criteria before a task is marked `Done`.
 - Every project task must be created and tracked in Notion before work begins.
 - Source code and document changes must follow the team Git workflow.
-- Scope, requirement, schedule, priority, architecture, or technology changes must be recorded in `changes.md`.
+- Scope, requirement, schedule, priority, architecture, or technology changes must be recorded in `Changes.md`.
 - Each member must record AI use on the date it occurs.
 
 ### 3.3. Risk Register
@@ -162,7 +161,7 @@ Deliverable ownership, reviewers, dates, and acceptance criteria are managed in 
 | R-05 | Email delivery failure | Medium | Medium | Nguyễn Quốc Thành | Separate recruitment transactions from email delivery, record failures, prevent duplicate delivery, and retry failed delivery at least three times with backoff. | Preserve in-app notifications and expose failed-delivery records for administrator troubleshooting. |
 | R-06 | Database migration or data loss | Low–Medium | Critical | Ngô Quốc Tuấn | Use ACID transactions, referential integrity, regular backups, documented migrations, a tested rollback procedure, RTO ≤ 60 minutes, and RPO ≤ 24 hours. | Stop deployment, roll back the migration, restore the latest verified backup, and investigate before retrying. |
 | R-07 | AI-service downtime or rate limits | Medium | High | Nguyễn Quốc Thành | Use asynchronous processing, visible scoring status, provider isolation, and rule-based fallback. | Temporarily disable semantic scoring while unrelated recruitment functions continue. |
-| R-08 | Scope creep or unstable P0 capabilities | High | High | Nguyễn Gia Quốc Uy | Prioritize P0 capabilities and defer P1 analytics and export until the core workflow is stable. | Remove P1 work from the active sprint and record the decision in `changes.md`. |
+| R-08 | Scope creep or unstable P0 capabilities | High | High | Nguyễn Gia Quốc Uy | Prioritize P0 capabilities and review P1 work against the final approved scope before committing it to a sprint. | Defer or remove P1 work only through an approved scope change, then update the Vision Document, Project Plan, requirements traceability, `Changes.md`, and demonstration plan consistently. |
 | R-09 | Notion task-tracker inconsistency | Medium | High | Nguyễn Gia Quốc Uy | Review Notion, the Project Plan, and approved team decisions at the end of each sprint. | Resolve the discrepancy with the team, then update Notion, the Project Plan, and the Weekly Report using the same approved task information. |
 | R-10 | Integration or regression failure | Medium | High | Nguyễn Minh Khôi | Require review, automated checks, integration checkpoints, and regression tests. | Revert the breaking change and restore the latest stable build. |
 | R-11 | Project Plan or Weekly Report inconsistency | Medium | High | Lưu Chí Hải | Update the Project Plan and Weekly Report whenever approved task information changes and cross-check them against Notion before submission. | Resolve the discrepancy with the Project Manager and update all affected records consistently. |
@@ -171,7 +170,7 @@ Deliverable ownership, reviewers, dates, and acceptance criteria are managed in 
 
 *Performed by: Lưu Chí Hải, Reviewed by: Nguyễn Gia Quốc Uy, Edited by: Lưu Chí Hải*
 
-The project follows Scrum and is divided into five sprints. Sprint dates, tasks, owners, reviewers, and statuses must be maintained consistently in this document and in Notion.
+The project follows Scrum and is divided into five sprints. Sprint dates, tasks, owners, reviewers, and acceptance criteria must be maintained consistently in this document and in Notion. Current task statuses are maintained in the Notion task tracker and summarized in the corresponding Weekly Report.
 
 ### 4.1. Schedule Summary
 
@@ -180,8 +179,8 @@ The project follows Scrum and is divided into five sprints. Sprint dates, tasks,
 | Sprint 1 — PA1 | 25-05-2026 to 07-06-2026 | Establish the team, tools, contract, proposal, and competitor survey. | PA1 project baseline |
 | Sprint 2 — PA2 | 09-06-2026 to 12-07-2026 | Create the Project Plan, Vision Document, Spec Kit initialization, and required reports. | PA2 documentation baseline |
 | Sprint 3 — PA3 | 17-07-2026 to 26-07-2026 | Revise PA2 documents, define use cases and prototypes, and implement Authentication through Spec Kit. | Build 1 and PA3 package |
-| Sprint 4 — PA4 | 27-07-2026 to 09-08-2026 | Implement and integrate the main candidate and recruiter recruitment workflows. | Build 2 |
-| Sprint 5 — PA5 | 10-08-2026 to 23-08-2026 | Complete administration, hardening, testing, documentation, final integration, and demonstration. | Final Build |
+| Sprint 4 — PA4 | 27-07-2026 to 09-08-2026 | Prepare Sprint 4 planning, implement two functional groups through Spec Kit, review and improve the existing system, and produce the required C4 architecture and PA4 submission artifacts. | PA4 system increment and architecture package |
+| Sprint 5 — PA5 | 10-08-2026 to 23-08-2026 | Complete all remaining functional groups, prepare and execute the final test plan, resolve defects, rehearse the final product demo, write the Reflective Report, update all PA documents, and consolidate the final submission package. | Tested final product, final demo, Reflective Report, and final submission package |
 
 ### 4.2. Sprint 1 Task List
 
@@ -246,50 +245,52 @@ The project follows Scrum and is divided into five sprints. Sprint dates, tasks,
 | S3-08 | Create Diagram 4, complete the use-case specifications, and prepare draft prototypes for all use cases assigned to Diagram 4. | Nguyễn Minh Khôi | Nguyễn Gia Quốc Uy | 20-07-2026 | 23-07-2026 | The diagram covers all assigned functional requirements; every use case has its ID, actors, preconditions, basic flow, alternative flows, postconditions, and prototype evidence. |
 | S3-09 | Create Diagram 5, complete the use-case specifications, and prepare draft prototypes for all use cases assigned to Diagram 5. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 20-07-2026 | 23-07-2026 | The diagram covers all assigned functional requirements; every use case has its ID, actors, preconditions, basic flow, alternative flows, postconditions, and prototype evidence. |
 | S3-10 | Revise the Project Plan. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 20-07-2026 | 24-07-2026 | The Project Plan addresses all PA2 feedback and includes updated constraints, deliverables, risk management, reviewer assignments, specific dates, detailed Sprint 2–5 task lists, Vision alignment, and deliverable-to-task traceability. |
-| S3-11 | Write the Weekly Report and capture screenshots of the Notion task tracker. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 20-07-2026 | 24-07-2026 | The Weekly Report records the Scrum Meeting attendance, individual status reports, completed and remaining tasks, issues, decisions, action items, and meeting summary; the screenshots clearly show the relevant Sprint 3 tasks, owners, dates, and statuses. |
-| S3-12 | Update and consolidate `changes.md` for the Project Plan and Vision Document. | Nguyễn Gia Quốc Uy | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi | 24-07-2026 | 25-07-2026 | A single `changes.md` file contains separate Project Plan and Vision Document sections. Each material revision identifies the changed section, revision objective, change summary, reason, responsible owner, reviewer or reviewers, revision date, and revised location. |
-### 4.5. Expected Sprint 4 Task List
+| S3-11 | Write the Weekly Report and capture screenshots of the Notion task tracker. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 19-07-2026 | 24-07-2026 | The Weekly Report summarizes work completed during Sprint 2 and records the tasks currently in progress or planned for Sprint 3, including attendance, individual status reports, issues, decisions, action items, and the meeting summary; the screenshots clearly show the relevant Sprint 3 tasks, owners, dates, and statuses. |
+| S3-12 | Update and consolidate `Changes.md` for the Project Plan and Vision Document. | Nguyễn Gia Quốc Uy | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi | 24-07-2026 | 25-07-2026 | A single `Changes.md` file contains separate Project Plan and Vision Document sections. Each material revision identifies the changed section, revision objective, change summary, reason, responsible owner, reviewer or reviewers, revision date, and revised location. |
+
+### 4.5. Sprint 4 Task List
 
 | ID | Task and Expected Output | Owner | Reviewer | Start | Due | Acceptance Criteria |
 |---|---|---|---|---|---|---|
-| S4-01 | Finalize the relational database schema and migrations. | Ngô Quốc Tuấn | Nguyễn Gia Quốc Uy | 27-07-2026 | 31-07-2026 | Schema and migrations support users, companies, memberships, jobs, applications, stages, files, notifications, scores, and audit records. |
-| S4-02 | Implement candidate profile, CV upload, parser status, and parsed-data confirmation backend functions. | Ngô Quốc Tuấn | Nguyễn Gia Quốc Uy | 29-07-2026 | 03-08-2026 | Supported files are validated, stored securely, preserved on failure, and available for candidate confirmation. |
-| S4-03 | Implement the candidate portal. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 27-07-2026 | 04-08-2026 | Candidates can manage profiles and CVs, discover jobs, apply, and track applications. |
-| S4-04 | Implement company-scoped job-posting management backend functions. | Ngô Quốc Tuấn | Nguyễn Gia Quốc Uy | 31-07-2026 | 05-08-2026 | Authorized company members can manage only their company's postings. |
-| S4-05 | Implement recruiter job-posting and applicant-review interfaces. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 01-08-2026 | 07-08-2026 | Recruiters can manage postings and review permitted applicant data. |
-| S4-06 | Implement backend pipeline transitions and stage history using the nine canonical stages. | Ngô Quốc Tuấn | Nguyễn Gia Quốc Uy | 02-08-2026 | 07-08-2026 | Transitions are transactional, audited, and restricted to the active company context. |
-| S4-07 | Implement the recruitment pipeline Kanban interface. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 03-08-2026 | 08-08-2026 | Authorized users can view and update stages with clear success and failure states. |
-| S4-08 | Implement hybrid candidate scoring and rule-based fallback. | Nguyễn Quốc Thành | Nguyễn Gia Quốc Uy | 28-07-2026 | 07-08-2026 | Scoring status is separate from pipeline status, explanations are displayed, and AI never changes recruitment decisions automatically. |
-| S4-09 | Implement email and in-app notifications. | Nguyễn Quốc Thành | Nguyễn Gia Quốc Uy | 01-08-2026 | 08-08-2026 | Recruitment actions complete independently of email delivery; failures are logged and retried. |
-| S4-10 | Execute Build 2 functional, integration, authorization, and regression tests. | Nguyễn Minh Khôi | Nguyễn Gia Quốc Uy | 03-08-2026 | 09-08-2026 | The test plan and test cases are documented before execution; test results and identified defects are recorded; and the core candidate and recruiter workflows pass with no unresolved critical security or data-integrity defect. |
-| S4-11 | Consolidate Build 2 documentation and conduct the Sprint Review. | Nguyễn Gia Quốc Uy | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi | 08-08-2026 | 09-08-2026 | Scope, evidence, known defects, deferred work, and Sprint Review decisions are recorded consistently, and all required Sprint 4 documents are available in both Markdown and rendered PDF formats. |
-| S4-12 | Write the Weekly Report and capture screenshots of the Notion task tracker. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 27-07-2026 | 09-08-2026 | The Weekly Report includes Sprint Planning, Scrum Meeting evidence, Sprint Review evidence, progress, issues, decisions, and action items; the screenshots clearly show the relevant Sprint 4 tasks, owners, dates, and statuses. |
-| S4-13A | Prepare the AI Usage Report according to the required format. | Nguyễn Gia Quốc Uy | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi | 27-07-2026 | 09-08-2026 | The report records the AI tool, version, usage date, prompts, purpose, generated content, verification, and individual contribution. |
-| S4-13B | Prepare the AI Usage Report according to the required format. | Nguyễn Quốc Thành | Nguyễn Gia Quốc Uy | 27-07-2026 | 09-08-2026 | The report records the AI tool, version, usage date, prompts, purpose, generated content, verification, and individual contribution. |
-| S4-13C | Prepare the AI Usage Report according to the required format. | Ngô Quốc Tuấn | Nguyễn Gia Quốc Uy | 27-07-2026 | 09-08-2026 | The report records the AI tool, version, usage date, prompts, purpose, generated content, verification, and individual contribution. |
-| S4-13D | Prepare the AI Usage Report according to the required format. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 27-07-2026 | 09-08-2026 | The report records the AI tool, version, usage date, prompts, purpose, generated content, verification, and individual contribution. |
-| S4-13E | Prepare the AI Usage Report according to the required format. | Nguyễn Minh Khôi | Nguyễn Gia Quốc Uy | 27-07-2026 | 09-08-2026 | The report records the AI tool, version, usage date, prompts, purpose, generated content, verification, and individual contribution. |
+| S4-01 | Prepare Sprint Planning for PA4. | Nguyễn Gia Quốc Uy | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi | 28-07-2026 | 29-07-2026 | The Sprint 4 scope, assigned work, dates, and expected outputs are recorded and communicated to the team. |
+| S4-02A | Lead the implementation of two functional groups using Spec Kit. | Nguyễn Quốc Thành | Nguyễn Gia Quốc Uy | 30-07-2026 | 03-08-2026 | The owner's assigned implementation work for the two functional groups follows the Spec Kit workflow, and the working code and corresponding Spec Kit artifacts are committed. |
+| S4-02B | Lead the implementation of two functional groups using Spec Kit. | Ngô Quốc Tuấn | Nguyễn Gia Quốc Uy | 30-07-2026 | 03-08-2026 | The owner's assigned implementation work for the two functional groups follows the Spec Kit workflow, and the working code and corresponding Spec Kit artifacts are committed. |
+| S4-03 | Support the development team for the two Spec Kit functional groups as UI Designer. | Nguyễn Gia Quốc Uy | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi | 30-07-2026 | 03-08-2026 | UI design and integration support is provided for both functional groups, and unresolved UI issues are documented for follow-up. |
+| S4-04 | Set up and run the existing system and study its current architecture. | Nguyễn Minh Khôi | Nguyễn Gia Quốc Uy | 30-07-2026 | 03-08-2026 | The existing system runs in the local environment, setup steps are recorded, and the current architecture is summarized. |
+| S4-05 | Divide frontend and backend responsibilities for the project. | Ngô Quốc Tuấn | Nguyễn Gia Quốc Uy | 30-07-2026 | 30-07-2026 | Frontend and backend responsibilities are documented and communicated to the development team. |
+| S4-06 | Set up and run the existing system, study its architecture, and write the Weekly Report. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 30-07-2026 | 03-08-2026 | The existing system is run successfully, architecture notes are recorded, and the Weekly Report summarizes work completed during Sprint 3 and records the tasks currently in progress or planned for Sprint 4, including issues, decisions, action items, and current Notion evidence. |
+| S4-07A | Research the C4 Model and the diagrams required for PA4. | Nguyễn Minh Khôi | Nguyễn Gia Quốc Uy | 30-07-2026 | 03-08-2026 | C4 Model conventions and the required PA4 diagram scope are documented, with the owner's diagram responsibilities identified. |
+| S4-07B | Research the C4 Model and the diagrams required for PA4. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 30-07-2026 | 03-08-2026 | C4 Model conventions and the required PA4 diagram scope are documented, with the owner's diagram responsibilities identified. |
+| S4-08A | Check the system, fix bugs, and improve the UI/UX. | Nguyễn Quốc Thành | Nguyễn Gia Quốc Uy | 04-08-2026 | 06-08-2026 | Assigned defects are fixed or documented, and the resulting UI/UX improvements are verified against the current build. |
+| S4-08B | Check the system, fix bugs, and improve the UI/UX. | Ngô Quốc Tuấn | Nguyễn Gia Quốc Uy | 04-08-2026 | 06-08-2026 | Assigned defects are fixed or documented, and the resulting UI/UX improvements are verified against the current build. |
+| S4-09 | Complete the assigned Container, Backend, and Deployment diagrams. | Nguyễn Minh Khôi | Nguyễn Gia Quốc Uy | 04-08-2026 | 06-08-2026 | The Container, Backend, and Deployment diagrams are completed, internally consistent, and render correctly. |
+| S4-10 | Complete the assigned System Context and Frontend diagrams. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 04-08-2026 | 06-08-2026 | The System Context and Frontend diagrams are completed, internally consistent, and render correctly. |
+| S4-11 | Write the Technology Stack section and review the five diagrams. | Nguyễn Gia Quốc Uy | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi | 04-08-2026 | 07-08-2026 | The Technology Stack section is complete, review comments for all five diagrams are recorded, and identified inconsistencies are resolved or assigned for correction. |
+| S4-12 | Write `Changes.md` and review the complete PA4 submission. | Nguyễn Gia Quốc Uy | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi | 04-08-2026 | 07-08-2026 | `Changes.md` records the material PA4 changes, and the submission package is reviewed for completeness and internal consistency. |
+| S4-13A | Prepare the AI Usage Report according to the required format. | Nguyễn Gia Quốc Uy | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi | 30-07-2026 | 07-08-2026 | The report records the AI tool, version, usage date, prompts, purpose, generated content, verification, and individual contribution. |
+| S4-13B | Prepare the AI Usage Report according to the required format. | Ngô Quốc Tuấn | Nguyễn Gia Quốc Uy | 30-07-2026 | 07-08-2026 | The report records the AI tool, version, usage date, prompts, purpose, generated content, verification, and individual contribution. |
+| S4-13C | Prepare the AI Usage Report according to the required format. | Nguyễn Quốc Thành | Nguyễn Gia Quốc Uy | 30-07-2026 | 07-08-2026 | The report records the AI tool, version, usage date, prompts, purpose, generated content, verification, and individual contribution. |
+| S4-13D | Prepare the AI Usage Report according to the required format. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 30-07-2026 | 07-08-2026 | The report records the AI tool, version, usage date, prompts, purpose, generated content, verification, and individual contribution. |
+| S4-13E | Prepare the AI Usage Report according to the required format. | Nguyễn Minh Khôi | Nguyễn Gia Quốc Uy | 30-07-2026 | 07-08-2026 | The report records the AI tool, version, usage date, prompts, purpose, generated content, verification, and individual contribution. |
+| S4-14 | Record and edit the PA4 demonstration video. | Ngô Quốc Tuấn | Nguyễn Gia Quốc Uy | 04-08-2026 | 07-08-2026 | The edited video clearly demonstrates the implemented work and is ready to be included in the PA4 submission package. |
+| S4-15 | Update the Project Plan. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 30-07-2026 | 03-08-2026 | The Project Plan is synchronized with the latest approved Sprint 4 task tracker, including task IDs, owners, dates, and acceptance criteria; the current task statuses are verified through Notion and the Weekly Report; the expected Sprint 5 plan is revised to align with the official PA5 requirements and is clearly identified as provisional until the team confirms its assignments; all affected deliverable references, schedule and build mappings, and Revision History entries are updated; and the required Markdown and rendered PDF versions are complete, readable, and internally consistent. |
 
 ### 4.6. Expected Sprint 5 Task List
 
 | ID | Task and Expected Output | Owner | Reviewer | Start | Due | Acceptance Criteria |
 |---|---|---|---|---|---|---|
-| S5-01 | Implement company verification, membership approval, role management, and membership lifecycle backend functions. | Ngô Quốc Tuấn | Nguyễn Gia Quốc Uy | 10-08-2026 | 15-08-2026 | Company access requires the approved membership workflow and all changes are audited. |
-| S5-02 | Implement administrator verification, moderation, user-management, and enforcement interfaces. | Nguyễn Minh Khôi | Nguyễn Gia Quốc Uy | 10-08-2026 | 16-08-2026 | Administrators can perform permitted actions with recorded decisions and reasons. |
-| S5-03 | Harden authentication sessions, secure-cookie handling, and company-scoped authorization. | Nguyễn Quốc Thành | Nguyễn Gia Quốc Uy | 10-08-2026 | 16-08-2026 | Protected requests verify authentication, platform role, membership, company scope, and ownership. |
-| S5-04 | Execute cross-tenant, CV-access, privacy, authentication, and authorization tests. | Nguyễn Minh Khôi | Nguyễn Gia Quốc Uy | 14-08-2026 | 19-08-2026 | Negative tests confirm that unauthorized requests do not expose protected data. |
-| S5-05 | Execute AI, parser, email, database, retry, timeout, and recovery tests. | Nguyễn Minh Khôi | Nguyễn Gia Quốc Uy | 15-08-2026 | 20-08-2026 | Core operations remain usable and stored data remains consistent during failures. |
-| S5-06 | Implement P1 recruitment analytics and authorized export after P0 readiness approval. | Ngô Quốc Tuấn | Nguyễn Gia Quốc Uy | 16-08-2026 | 20-08-2026 | The feature is delivered only if P0 is stable and exported data respects authorization. |
-| S5-07 | Execute performance, compatibility, accessibility, usability, regression, and end-to-end tests. | Nguyễn Minh Khôi | Nguyễn Gia Quốc Uy | 17-08-2026 | 22-08-2026 | Test evidence covers measurable Vision targets and all P0 workflows. |
-| S5-08 | Prepare user and technical documentation. | Nguyễn Gia Quốc Uy | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi | 12-08-2026 | 22-08-2026 | Manuals, guides, API, database, deployment, and architecture documents match the released system. |
-| S5-09 | Integrate final frontend and backend changes and resolve release-blocking defects. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 18-08-2026 | 22-08-2026 | The final build is reproducible and contains no unresolved critical defect. |
-| S5-10 | Consolidate the final submission and demonstration package. | Nguyễn Gia Quốc Uy | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi | 21-08-2026 | 23-08-2026 | Source code, documents, PDFs, tests, reports, Git evidence, `changes.md`, and demo materials are complete. |
-| S5-11 | Write the Weekly Report and capture screenshots of the Notion task tracker. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 10-08-2026 | 23-08-2026 | The Weekly Report includes Sprint Planning, Scrum Meeting evidence, Sprint Review and retrospective evidence, progress, issues, decisions, and action items; the screenshots clearly show the relevant Sprint 5 tasks, owners, dates, and statuses. |
-| S5-12A | Prepare the AI Usage Report according to the required format. | Nguyễn Gia Quốc Uy | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi | 10-08-2026 | 23-08-2026 | The report records the AI tool, version, usage date, prompts, purpose, generated content, verification, and individual contribution. |
-| S5-12B | Prepare the AI Usage Report according to the required format. | Nguyễn Quốc Thành | Nguyễn Gia Quốc Uy | 10-08-2026 | 23-08-2026 | The report records the AI tool, version, usage date, prompts, purpose, generated content, verification, and individual contribution. |
-| S5-12C | Prepare the AI Usage Report according to the required format. | Ngô Quốc Tuấn | Nguyễn Gia Quốc Uy | 10-08-2026 | 23-08-2026 | The report records the AI tool, version, usage date, prompts, purpose, generated content, verification, and individual contribution. |
-| S5-12D | Prepare the AI Usage Report according to the required format. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 10-08-2026 | 23-08-2026 | The report records the AI tool, version, usage date, prompts, purpose, generated content, verification, and individual contribution. |
-| S5-12E | Prepare the AI Usage Report according to the required format. | Nguyễn Minh Khôi | Nguyễn Gia Quốc Uy | 10-08-2026 | 23-08-2026 | The report records the AI tool, version, usage date, prompts, purpose, generated content, verification, and individual contribution. |
+| S5-01 | Review the implementation status of all functional groups and complete the remaining required features using the Spec Kit workflow. | Nguyễn Gia Quốc Uy | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi | 10-08-2026 | 16-08-2026 | Every functional group retained in the final approved project scope is fully implemented, integrated, and demonstrable; the corresponding source code and required Spec Kit artifacts are complete and committed; and any feature removed from the final scope is formally reflected in the Vision Document, Project Plan, and related traceability records. |
+| S5-02 | Prepare the final Test Plan. | Nguyễn Minh Khôi | Nguyễn Gia Quốc Uy | 10-08-2026 | 13-08-2026 | The Test Plan defines objectives, scope, features, environment, tools, schedule, responsibilities, and entry and exit criteria. |
+| S5-03 | Review and refine Spec Kit-generated test cases and complete the final functional test-case document. | Nguyễn Minh Khôi | Nguyễn Gia Quốc Uy | 11-08-2026 | 16-08-2026 | At least five use cases are covered by at least ten test cases each, for a total of at least 50 functional test cases; incorrect expected results are corrected, missing edge cases are added, and descriptions are clear. Where applicable, the final test set includes negative authorization, company-isolation, personal-data protection, advisory-AI, parser, email-delivery, timeout, retry, and service-failure scenarios. |
+| S5-04 | Execute all final test cases and record the results. | Nguyễn Minh Khôi | Nguyễn Gia Quốc Uy | 15-08-2026 | 19-08-2026 | Every test case records its ID, execution date, Pass or Fail status, and actual result when required. |
+| S5-05 | Prepare the Bug Report and test summary. | Nguyễn Minh Khôi | Nguyễn Gia Quốc Uy | 16-08-2026 | 20-08-2026 | Every failed test case is linked to at least one bug report; each bug report includes its bug ID, description, steps to reproduce, expected and actual results, severity, and status. A Bug Report section is included even if all final test cases pass, documenting defects discovered and fixed during testing. The test summary reports the number of features tested, total test cases, and passed and failed test cases for each feature. |
+| S5-06 | Coordinate defect fixing, rerun failed tests, and stabilize the final build with support from the assigned frontend and backend developers. | Nguyễn Quốc Thành | Nguyễn Gia Quốc Uy | 17-08-2026 | 22-08-2026 | Critical and release-blocking defects are assigned to the appropriate developers and resolved; affected test cases are rerun; the final build is stable; and remaining known issues are documented. |
+| S5-07 | Prepare and rehearse the final product demonstration. | Nguyễn Gia Quốc Uy | All other members | 18-08-2026 | 23-08-2026 | The approximately 15-minute demo includes a brief product introduction, two or three complete user workflows, a technical overview referencing the technology stack, C4 diagrams, and Spec Kit, and a speaking role for every team member. |
+| S5-08 | Write the Reflective Report. | Nguyễn Gia Quốc Uy | All other members | 17-08-2026 | 22-08-2026 | The report covers team experience, Spec Kit experience, AI-tool usage, constructive SDLC feedback, and a three-to-five-sentence reflection from every member. |
+| S5-09 | Review and update all PA1–PA5 documents and required technical documentation to reflect the final product. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 18-08-2026 | 22-08-2026 | All PA1–PA5 documents and required technical documents are consistent with the final implementation, use consistent terminology and traceability references, and are available in the required Markdown and rendered PDF formats. |
+| S5-10 | Coordinate the final AI Usage Reports and prepare Git commit-history evidence. | Nguyễn Gia Quốc Uy | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi | 10-08-2026 | 22-08-2026 | Every member completes the required individual AI Usage Report, and the repository commit history is exported or captured with readable author, date, and commit information. |
+| S5-11 | Consolidate and verify the final submission package. | Nguyễn Gia Quốc Uy | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi | 21-08-2026 | 23-08-2026 | The package contains updated PA1–PA5 documents, complete source code without dependency or generated build folders, all Spec Kit artifacts, the final test package, Reflective Report, AI Usage Reports, Markdown and PDF outputs, Git commit-history evidence, and all required demonstration materials; the package uses the required `PA5-Group09.zip` name. |
+| S5-12 | Write the Sprint 5 Weekly Report and capture the current Notion task tracker. | Lưu Chí Hải | Nguyễn Gia Quốc Uy | 10-08-2026 | 23-08-2026 | The report summarizes work completed during Sprint 4 and records work in progress or planned for Sprint 5, including attendance, status reports, issues, decisions, action items, and current task-tracker evidence. |
 
 ### 4.7. Build Plan
 
@@ -297,8 +298,8 @@ The project follows Scrum and is divided into five sprints. Sprint dates, tasks,
 |---|---|---|---|
 | PA2 Documentation Baseline | 12-07-2026 | Project Plan, Vision Document, Spec Kit initialization, workflows, NFRs, Weekly Report, and AI Usage Reports. | Required documents and evidence are complete and consistent with Notion. |
 | Build 1 | 26-07-2026 | Revised Vision and Project Plan, use-case models, specifications, prototypes, and full-stack Authentication implementation. | PA3 deliverables are reviewed and Authentication is demonstrable. |
-| Build 2 | 09-08-2026 | Candidate portal, recruiter job management, CV handling, application tracking, nine-stage pipeline, hybrid scoring, and notifications. | Main candidate and recruiter workflows are integrated with no critical access-control or data-integrity defect. |
-| Final Build | 23-08-2026 | Administration, company membership, moderation, security hardening, failure handling, approved P1 scope, testing, documentation, and demo package. | All P0 acceptance tests pass, release-blocking defects are resolved, and submission materials are complete. |
+| Build 2 | 09-08-2026 | Two functional groups implemented through Spec Kit, system setup and architecture review, frontend/backend work allocation, bug fixing and UI/UX improvements, five C4 diagrams, Technology Stack documentation, `Changes.md`, the updated Project Plan, AI Usage Reports, and a demonstration video. | The assigned functional-group work is demonstrable; the required diagrams, Project Plan, and supporting documents are complete and internally consistent; unresolved issues are documented; and the PA4 demo and submission evidence are ready. |
+| Final Build | 23-08-2026 | All remaining functional groups, final Test Plan, at least 50 reviewed functional test cases covering at least five use cases, test execution results, linked bug reports, defect resolution, final product demonstration, Reflective Report, updated PA1–PA5 documents, AI Usage Reports, Git evidence, and the final submission package. | All functional groups retained in the final approved scope are implemented; all test cases have documented results; failed cases are linked to bug reports; release-blocking defects are resolved; the final demo is ready with participation from every member; and all required submission materials are complete. |
 
 ### 4.8. Definition of Done
 
@@ -311,7 +312,7 @@ A task is considered complete only when:
 5. Required test, prototype, meeting, or report evidence is recorded.
 6. Related documents and traceability references are updated.
 7. Required Markdown and PDF outputs render correctly.
-8. Material scope, schedule, requirement, priority, or technology changes are recorded in `changes.md`.
+8. Material scope, schedule, requirement, priority, or technology changes are recorded in `Changes.md`.
 
 ## 5. Alignment with the Revised Vision
 
@@ -326,12 +327,12 @@ A task is considered complete only when:
 | AI resume rewriting is removed. | CV work is limited to upload, parsing, confirmation, reuse, and scoring input. |
 | The recruitment pipeline uses nine canonical stages. | Pipeline backend, Kanban, application tracking, specifications, and tests use the same stages. |
 | A base user retains candidate identity and receives company-scoped permissions through memberships. | Authentication and authorization tasks use the membership model rather than a separate recruiter account. |
-| Authentication tokens use HttpOnly, Secure, SameSite cookies. | Sprint 3 Authentication and Sprint 5 hardening tasks require secure-cookie handling. |
+| Authentication tokens use HttpOnly, Secure, SameSite cookies. | Sprint 3 implements secure-cookie authentication, while S5-01 and S5-06 require completion, defect correction, and stabilization of the final authentication implementation. |
 | Job matching is rule-based. | Semantic AI work is limited to CV scoring and explanations. |
 | AI scoring is advisory. | Constraints, risks, scoring tasks, and tests preserve recruiter override and prevent automated decisions. |
-| Analytics and export are P1. | Sprint 5 schedules them only after P0 readiness approval and permits deferral. |
-| Personal data and CVs require protection. | Constraints, risk mitigations, file-handling tasks, and security tests address protection. |
-| AI, email, parser, and database failures must be handled. | Sprint 4 and Sprint 5 include fallback, retry, timeout, logging, and recovery work. |
+| Analytics and export are P1. | S5-01 reviews the implementation status of every functional group retained in the final approved Vision. Because PA5 requires all defined functional groups to be implemented, analytics and export must be completed if they remain part of the final project scope; otherwise, the Vision Document and Project Plan must be formally revised before the final demo. |
+| Personal data and CVs require protection. | Constraints and risk mitigations define the protection requirements, while S5-03–S5-06 require security-related test coverage, execution, defect reporting, correction, and regression verification. |
+| AI, email, parser, and database failures must be handled. | S5-03 includes relevant edge and failure test cases; S5-04 executes them; S5-05 records resulting defects; and S5-06 fixes failures and reruns the affected tests. |
 
 ## 6. PA2 Feedback Traceability
 
@@ -361,6 +362,9 @@ A task is considered complete only when:
 | 25-07-2026 | Deliverables | Expanded software, documentation, testing, evidence, build, and guide deliverables. | Address incomplete deliverables. |
 | 25-07-2026 | Risk Register | Added the requested risks with mitigations and contingencies. | Address the PA2 risk feedback. |
 | 25-07-2026 | Vision Alignment | Added scope, authorization, AI, pipeline, security, and priority mappings. | Reflect confirmed changes in the revised Vision Document. |
-| 25-07-2026 | Deliverable Traceability | Corrected task references for `changes.md`, AI Usage Reports, Markdown/PDF outputs, and software builds. | Keep deliverable mappings consistent with the revised task IDs. |
+| 25-07-2026 | Deliverable Traceability | Corrected task references for `Changes.md`, AI Usage Reports, Markdown/PDF outputs, and software builds. | Keep deliverable mappings consistent with the revised task IDs. |
 | 25-07-2026 | Acceptance Criteria | Corrected the criteria for the Vision revision, Spec Kit implementation, document consolidation, and Sprint 3–5 reporting evidence. | Remove inconsistencies introduced by recent task updates. |
 | 25-07-2026 | Vision Feedback Traceability | Corrected the mapping of the Vision Product Overview and feature-description feedback to S3-04. | Ensure each PA2 Vision comment points to the actual Vision-revision task. |
+| 02-08-2026 | Sprint 4 Planning | Replaced the previous expected Sprint 4 feature backlog with the current Notion-assigned tasks, owners, dates, and statuses, and updated the related deliverable and Build 2 mappings. | Synchronize the Project Plan with the actual PA4 task tracker. |
+| 03-08-2026 | Project Plan Maintenance | Added S4-15 for updating the Project Plan, synchronized the Sprint 4 planning information with the latest approved task tracker, revised the provisional Sprint 5 baseline using the official PA5 requirements, and updated the related deliverable and Build Plan references. | Keep the Project Plan current, traceable, and consistent with the PA4 task tracker and official PA5 assignment. |
+| 03-08-2026 | Sprint 5 Planning | Replaced the previous provisional Sprint 5 implementation and testing backlog with a planning baseline aligned to the official PA5 requirements; added explicit Test Plan, test-case refinement, test execution, Bug Report, final demo, Reflective Report, document-update, AI-report, Weekly Report, and final-package tasks; and updated all related deliverable, schedule, Build Plan, and Vision-alignment references. | Align the Project Plan with the official PA5 assignment and preserve task traceability. |
