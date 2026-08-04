@@ -6,10 +6,16 @@ import { fileURLToPath } from "node:url";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { config as loadEnvironment } from "dotenv";
 import { z } from "zod";
-import { PrismaClient } from "../src/backend/generated/prisma/client";
+import { Prisma, PrismaClient } from "../src/backend/generated/prisma/client";
 
 const webRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaultCatalogPath = resolve(webRoot, "data/jobs/catalog.v1.json");
+const jobBatchSize = 50;
+const jobImportConcurrency = 4;
+const importTransactionOptions = {
+  maxWait: 30_000,
+  timeout: 60_000,
+} as const;
 loadEnvironment({ path: resolve(webRoot, ".env.local"), quiet: true });
 
 const normalize = (value: string) =>
@@ -183,19 +189,61 @@ function stableSkillId(normalizedName: string): string {
   return `catalog-skill-${digest}`;
 }
 
-async function importCatalog(prisma: PrismaClient, catalog: Catalog) {
+async function validateExistingBindings(
+  prisma: PrismaClient,
+  catalog: Catalog,
+): Promise<void> {
+  const expectedCompanyIdBySlug = new Map(
+    catalog.companies.map(({ id, slug }) => [slug, id] as const),
+  );
+  const expectedJobIdBySlug = new Map(
+    catalog.jobs.map(({ id, slug }) => [slug, id] as const),
+  );
+  const expectedJobIdByQuestionId = new Map(
+    catalog.jobs.flatMap((job) =>
+      job.questions.map(({ id }) => [id, job.id] as const),
+    ),
+  );
+  const [companies, jobs, questions] = await Promise.all([
+    prisma.company.findMany({
+      where: { slug: { in: [...expectedCompanyIdBySlug.keys()] } },
+      select: { id: true, slug: true },
+    }),
+    prisma.jobPosting.findMany({
+      where: { slug: { in: [...expectedJobIdBySlug.keys()] } },
+      select: { id: true, slug: true },
+    }),
+    prisma.applicationQuestion.findMany({
+      where: { id: { in: [...expectedJobIdByQuestionId.keys()] } },
+      select: { id: true, jobPostingId: true },
+    }),
+  ]);
+
+  for (const company of companies) {
+    if (expectedCompanyIdBySlug.get(company.slug) !== company.id) {
+      throw new Error(
+        `Company slug already belongs to another row: ${company.slug}`,
+      );
+    }
+  }
+  for (const job of jobs) {
+    if (expectedJobIdBySlug.get(job.slug) !== job.id) {
+      throw new Error(`Job slug already belongs to another row: ${job.slug}`);
+    }
+  }
+  for (const question of questions) {
+    if (expectedJobIdByQuestionId.get(question.id) !== question.jobPostingId) {
+      throw new Error(`Question ${question.id} belongs to another job.`);
+    }
+  }
+}
+
+async function importReferenceData(
+  prisma: PrismaClient,
+  catalog: Catalog,
+): Promise<Map<string, { id: string; name: string }>> {
   return prisma.$transaction(async (transaction) => {
     for (const company of catalog.companies) {
-      const conflictingSlug = await transaction.company.findUnique({
-        where: { slug: company.slug },
-        select: { id: true },
-      });
-      if (conflictingSlug && conflictingSlug.id !== company.id) {
-        throw new Error(
-          `Company slug already belongs to another row: ${company.slug}`,
-        );
-      }
-
       const data = {
         slug: company.slug,
         legalName: company.legalName,
@@ -213,9 +261,6 @@ async function importCatalog(prisma: PrismaClient, catalog: Catalog) {
       });
     }
 
-    const companyById = new Map(
-      catalog.companies.map((company) => [company.id, company] as const),
-    );
     const skillByName = new Map<string, { id: string; name: string }>();
     for (const job of catalog.jobs) {
       for (const skill of job.skills) {
@@ -234,128 +279,168 @@ async function importCatalog(prisma: PrismaClient, catalog: Catalog) {
       }
     }
 
-    for (const job of catalog.jobs) {
-      const company = companyById.get(job.companyId);
-      if (!company) throw new Error(`Unknown company for job ${job.id}.`);
-      const conflictingSlug = await transaction.jobPosting.findUnique({
-        where: { slug: job.slug },
-        select: { id: true },
-      });
-      if (conflictingSlug && conflictingSlug.id !== job.id) {
-        throw new Error(`Job slug already belongs to another row: ${job.slug}`);
-      }
+    return skillByName;
+  }, importTransactionOptions);
+}
 
-      const desiredSkills = job.skills.map((skill, position) => {
-        const saved = skillByName.get(normalize(skill.name));
-        if (!saved) throw new Error(`Missing imported skill ${skill.name}.`);
-        return {
-          jobPostingId: job.id,
-          skillId: saved.id,
-          displayName: skill.name,
-          required: skill.required,
-          position,
-        };
-      });
-      const searchDocumentNormalized = normalize(
-        [
-          job.title,
-          company.displayName,
-          job.location,
-          ...job.skills.map(({ name }) => name),
-          job.summary,
-          job.description,
-          job.responsibilities,
-          job.requirements,
-        ].join(" "),
-      );
-      const data = {
-        companyId: job.companyId,
-        slug: job.slug,
-        title: job.title,
-        normalizedTitle: normalize(job.title),
-        summary: job.summary,
-        description: job.description,
-        responsibilities: job.responsibilities,
-        requirements: job.requirements,
-        benefits: job.benefits,
-        location: job.location,
-        normalizedLocation: normalize(job.location),
-        employmentType: job.employmentType,
-        experienceLevel: job.experienceLevel,
-        workArrangement: job.workArrangement,
-        salaryMin: job.salary?.min ?? null,
-        salaryMax: job.salary?.max ?? null,
-        salaryCurrency: job.salary?.currency ?? null,
-        salaryPeriod: job.salary?.period ?? null,
-        searchDocumentNormalized,
-        status: "ACTIVE" as const,
-        approvedAt: new Date(job.publishedAt),
-        publishedAt: new Date(job.publishedAt),
-        applicationDeadline: job.applicationDeadline
-          ? new Date(job.applicationDeadline)
-          : null,
-        closedAt: null,
-        removedAt: null,
-      };
-      await transaction.jobPosting.upsert({
-        where: { id: job.id },
-        update: data,
-        create: { id: job.id, ...data },
-      });
+async function importJob(
+  transaction: Prisma.TransactionClient,
+  job: Catalog["jobs"][number],
+  companyById: ReadonlyMap<string, Catalog["companies"][number]>,
+  skillByName: ReadonlyMap<string, { id: string; name: string }>,
+): Promise<void> {
+  const company = companyById.get(job.companyId);
+  if (!company) throw new Error(`Unknown company for job ${job.id}.`);
 
-      await transaction.jobPostingSkill.deleteMany({
-        where: { jobPostingId: job.id },
-      });
-      if (desiredSkills.length > 0) {
-        await transaction.jobPostingSkill.createMany({ data: desiredSkills });
-      }
-
-      const desiredQuestionIds = job.questions.map(({ id }) => id);
-      await transaction.applicationQuestion.updateMany({
-        where: {
-          jobPostingId: job.id,
-          ...(desiredQuestionIds.length > 0
-            ? { id: { notIn: desiredQuestionIds } }
-            : {}),
-          active: true,
-        },
-        data: { active: false },
-      });
-      for (const [position, question] of job.questions.entries()) {
-        const existingQuestion =
-          await transaction.applicationQuestion.findUnique({
-            where: { id: question.id },
-            select: { jobPostingId: true },
-          });
-        if (existingQuestion && existingQuestion.jobPostingId !== job.id) {
-          throw new Error(`Question ${question.id} belongs to another job.`);
-        }
-        const questionData = {
-          prompt: question.prompt,
-          description: question.description,
-          kind: "TEXT" as const,
-          required: question.required,
-          position,
-          active: true,
-        };
-        await transaction.applicationQuestion.upsert({
-          where: { id: question.id },
-          update: questionData,
-          create: {
-            id: question.id,
-            jobPostingId: job.id,
-            ...questionData,
-          },
-        });
-      }
-    }
-
+  const desiredSkills = job.skills.map((skill, position) => {
+    const saved = skillByName.get(normalize(skill.name));
+    if (!saved) throw new Error(`Missing imported skill ${skill.name}.`);
     return {
-      companies: catalog.companies.length,
-      jobs: catalog.jobs.length,
-      skills: skillByName.size,
+      jobPostingId: job.id,
+      skillId: saved.id,
+      displayName: skill.name,
+      required: skill.required,
+      position,
     };
   });
+  const searchDocumentNormalized = normalize(
+    [
+      job.title,
+      company.displayName,
+      job.location,
+      ...job.skills.map(({ name }) => name),
+      job.summary,
+      job.description,
+      job.responsibilities,
+      job.requirements,
+    ].join(" "),
+  );
+  const data = {
+    companyId: job.companyId,
+    slug: job.slug,
+    title: job.title,
+    normalizedTitle: normalize(job.title),
+    summary: job.summary,
+    description: job.description,
+    responsibilities: job.responsibilities,
+    requirements: job.requirements,
+    benefits: job.benefits,
+    location: job.location,
+    normalizedLocation: normalize(job.location),
+    employmentType: job.employmentType,
+    experienceLevel: job.experienceLevel,
+    workArrangement: job.workArrangement,
+    salaryMin: job.salary?.min ?? null,
+    salaryMax: job.salary?.max ?? null,
+    salaryCurrency: job.salary?.currency ?? null,
+    salaryPeriod: job.salary?.period ?? null,
+    searchDocumentNormalized,
+    status: "ACTIVE" as const,
+    approvedAt: new Date(job.publishedAt),
+    publishedAt: new Date(job.publishedAt),
+    applicationDeadline: job.applicationDeadline
+      ? new Date(job.applicationDeadline)
+      : null,
+    closedAt: null,
+    removedAt: null,
+  };
+  await transaction.jobPosting.upsert({
+    where: { id: job.id },
+    update: data,
+    create: { id: job.id, ...data },
+  });
+
+  await transaction.jobPostingSkill.deleteMany({
+    where: { jobPostingId: job.id },
+  });
+  if (desiredSkills.length > 0) {
+    await transaction.jobPostingSkill.createMany({ data: desiredSkills });
+  }
+
+  const desiredQuestionIds = job.questions.map(({ id }) => id);
+  await transaction.applicationQuestion.updateMany({
+    where: {
+      jobPostingId: job.id,
+      ...(desiredQuestionIds.length > 0
+        ? { id: { notIn: desiredQuestionIds } }
+        : {}),
+      active: true,
+    },
+    data: { active: false },
+  });
+  for (const [position, question] of job.questions.entries()) {
+    const questionData = {
+      prompt: question.prompt,
+      description: question.description,
+      kind: "TEXT" as const,
+      required: question.required,
+      position,
+      active: true,
+    };
+    await transaction.applicationQuestion.upsert({
+      where: { id: question.id },
+      update: questionData,
+      create: {
+        id: question.id,
+        jobPostingId: job.id,
+        ...questionData,
+      },
+    });
+  }
+}
+
+async function importJobs(
+  prisma: PrismaClient,
+  catalog: Catalog,
+  skillByName: ReadonlyMap<string, { id: string; name: string }>,
+): Promise<void> {
+  const companyById = new Map(
+    catalog.companies.map((company) => [company.id, company] as const),
+  );
+  const batches: Array<typeof catalog.jobs> = [];
+  for (let index = 0; index < catalog.jobs.length; index += jobBatchSize) {
+    batches.push(catalog.jobs.slice(index, index + jobBatchSize));
+  }
+
+  let nextBatch = 0;
+  let importedJobs = 0;
+  const worker = async () => {
+    while (nextBatch < batches.length) {
+      const batch = batches[nextBatch];
+      nextBatch += 1;
+      if (!batch) return;
+
+      await prisma.$transaction(async (transaction) => {
+        for (const job of batch) {
+          await importJob(transaction, job, companyById, skillByName);
+        }
+      }, importTransactionOptions);
+
+      importedJobs += batch.length;
+      if (importedJobs % 1_000 === 0 || importedJobs === catalog.jobs.length) {
+        console.log(`Imported ${importedJobs}/${catalog.jobs.length} jobs...`);
+      }
+    }
+  };
+
+  await Promise.all(
+    Array.from(
+      { length: Math.min(jobImportConcurrency, batches.length) },
+      worker,
+    ),
+  );
+}
+
+async function importCatalog(prisma: PrismaClient, catalog: Catalog) {
+  await validateExistingBindings(prisma, catalog);
+  const skillByName = await importReferenceData(prisma, catalog);
+  await importJobs(prisma, catalog, skillByName);
+
+  return {
+    companies: catalog.companies.length,
+    jobs: catalog.jobs.length,
+    skills: skillByName.size,
+  };
 }
 
 async function main() {
