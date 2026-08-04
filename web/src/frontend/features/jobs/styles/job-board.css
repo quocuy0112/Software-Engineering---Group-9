@@ -740,26 +740,47 @@
 
 .job-inline-action {
   display: inline-flex;
+  inline-size: 12rem;
+  max-inline-size: 100%;
   flex-wrap: wrap;
   gap: var(--sh-space-2);
   align-items: center;
+  align-self: flex-start;
 }
 
 .job-inline-action [role="status"],
 .job-inline-action [role="alert"] {
+  inline-size: 100%;
   flex-basis: 100%;
   color: var(--sh-color-text-secondary);
   font-size: var(--sh-font-size-caption);
+  overflow-wrap: anywhere;
 }
 
 .job-inline-action [role="alert"] {
   color: var(--sh-color-error);
 }
 
+.job-inline-action button {
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.job-card-footer,
+.job-detail-actions {
+  align-items: flex-start;
+}
+
 .job-feedback {
   border-inline-start: 4px solid var(--sh-color-error);
   color: var(--sh-color-text-primary);
   background: var(--sh-color-error-bg);
+}
+
+.job-feedback-info {
+  border-inline-start-color: var(--sh-color-info);
+  color: var(--sh-color-info);
+  background: var(--sh-color-info-bg);
 }
 
 .job-feedback h3,

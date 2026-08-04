@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { postWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
+import { CsrfProofProvider } from "@/frontend/features/authentication/client/csrf-proof-context";
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
 import { SmartHireBrand } from "@/frontend/components/ui/smarthire-brand";
 import {
@@ -164,7 +165,11 @@ export function WorkspaceShell({
             <div className="workspace-status">
               <AuthStatus status={status} tone="error" />
             </div>
-            <section className="workspace-content">{children}</section>
+            <section className="workspace-content">
+              <CsrfProofProvider value={csrfProof}>
+                {children}
+              </CsrfProofProvider>
+            </section>
           </div>
         </div>
       </main>

@@ -79,9 +79,10 @@ function plainText(value: string | null, maximum: number, required = false) {
     .replace(/[^\S\n]+/gu, " ")
     .replace(/\n{3,}/gu, "\n\n")
     .trim();
-  if (required && !normalized) throw new Error("APPLICATION_ANSWER_REQUIRED");
+  if (required && !normalized)
+    throw new ApplicationRepositoryError("APPLICATION_ANSWER_REQUIRED");
   if (Array.from(normalized).length > maximum)
-    throw new Error("APPLICATION_TEXT_TOO_LONG");
+    throw new ApplicationRepositoryError("APPLICATION_TEXT_TOO_LONG");
   return normalized || null;
 }
 
@@ -99,7 +100,7 @@ export function prepareApplicationSubmission(
     !context.candidate.headline?.trim() ||
     !context.candidate.location?.trim()
   ) {
-    throw new Error("APPLICATION_PROFILE_INCOMPLETE");
+    throw new ApplicationRepositoryError("APPLICATION_PROFILE_INCOMPLETE");
   }
   const cv = context.cv;
   if (
@@ -115,19 +116,19 @@ export function prepareApplicationSubmission(
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ].includes(cv.mimeType)
   )
-    throw new Error("APPLICATION_CV_INELIGIBLE");
+    throw new ApplicationRepositoryError("APPLICATION_CV_INELIGIBLE");
   if (
     !command.consentAccepted ||
     command.consentVersion !== activeConsentVersion
   ) {
-    throw new Error("APPLICATION_CONSENT_STALE");
+    throw new ApplicationRepositoryError("APPLICATION_CONSENT_STALE");
   }
 
   const supplied = new Map(
     command.answers.map((answer) => [answer.questionId, answer.value]),
   );
   if (supplied.size !== command.answers.length)
-    throw new Error("APPLICATION_ANSWER_DUPLICATE");
+    throw new ApplicationRepositoryError("APPLICATION_ANSWER_DUPLICATE");
   if (
     command.answers.some(
       (answer) =>
@@ -136,29 +137,30 @@ export function prepareApplicationSubmission(
         ),
     )
   ) {
-    throw new Error("APPLICATION_ANSWER_UNKNOWN");
+    throw new ApplicationRepositoryError("APPLICATION_ANSWER_UNKNOWN");
   }
   const answers = context.questions.flatMap((question) => {
     const value = supplied.get(question.id);
     if (value === undefined) {
-      if (question.required) throw new Error("APPLICATION_ANSWER_REQUIRED");
+      if (question.required)
+        throw new ApplicationRepositoryError("APPLICATION_ANSWER_REQUIRED");
       return [];
     }
     let answer: string | boolean;
     if (question.kind === "BOOLEAN") {
       if (typeof value !== "boolean")
-        throw new Error("APPLICATION_ANSWER_INVALID");
+        throw new ApplicationRepositoryError("APPLICATION_ANSWER_INVALID");
       answer = value;
     } else {
       if (typeof value !== "string")
-        throw new Error("APPLICATION_ANSWER_INVALID");
+        throw new ApplicationRepositoryError("APPLICATION_ANSWER_INVALID");
       const normalized = plainText(value, 3000, question.required);
       if (normalized === null) return [];
       if (
         question.kind === "SINGLE_CHOICE" &&
         !question.options?.includes(normalized)
       ) {
-        throw new Error("APPLICATION_ANSWER_INVALID");
+        throw new ApplicationRepositoryError("APPLICATION_ANSWER_INVALID");
       }
       answer = normalized;
     }

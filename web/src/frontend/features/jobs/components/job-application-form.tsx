@@ -1,9 +1,15 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
+import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
+import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import type {
   ApplicationForm,
   ApplicationOutcome,
+} from "@/shared/contracts/jobs/actions";
+import {
+  applicationFormSchema,
+  applicationOutcomeSchema,
 } from "@/shared/contracts/jobs/actions";
 
 export function JobApplicationForm({
@@ -15,7 +21,9 @@ export function JobApplicationForm({
   onCancel: () => void;
   onSubmitted: (outcome: ApplicationOutcome) => void;
 }) {
+  const workspaceCsrfProof = useCsrfProof();
   const [pending, setPending] = useState(false);
+  const [selectedCvId, setSelectedCvId] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const key = useRef<string | null>(null);
@@ -37,31 +45,35 @@ export function JobApplicationForm({
       key.current ??=
         globalThis.crypto?.randomUUID?.() ??
         `application-${new Date().getTime()}-key`;
-      const response = await fetch(`/api/jobs/${form.jobId}/applications`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": form.csrfToken,
-          "Idempotency-Key": key.current,
+      const response = await mutateWithCurrentCsrf(
+        `/api/jobs/${form.jobId}/applications`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Idempotency-Key": key.current,
+          },
+          body: JSON.stringify({
+            cvId: selectedCvId,
+            answers,
+            coverLetter: String(data.get("coverLetter") ?? "") || null,
+            consentVersion: form.consentVersion,
+            consentAccepted: data.get("consentAccepted") === "on",
+          }),
         },
-        body: JSON.stringify({
-          cvId: data.get("cvId"),
-          answers,
-          coverLetter: String(data.get("coverLetter") ?? "") || null,
-          consentVersion: form.consentVersion,
-          consentAccepted: data.get("consentAccepted") === "on",
-        }),
-      });
-      const body = await response.json();
+        form.csrfToken || workspaceCsrfProof,
+      );
+      const body: unknown = await response.json();
       if (!response.ok) {
+        const problem = body as { message?: unknown };
         setError(
-          typeof body.message === "string"
-            ? body.message
+          typeof problem.message === "string"
+            ? problem.message
             : "Application could not be submitted.",
         );
         return;
       }
-      const outcome = body as ApplicationOutcome;
+      const outcome = applicationOutcomeSchema.parse(body);
       setMessage(outcome.message);
       onSubmitted(outcome);
     } catch {
@@ -76,6 +88,13 @@ export function JobApplicationForm({
       className="job-form-grid"
       aria-label={`Apply for ${form.jobTitle}`}
       onSubmit={submit}
+      onChange={() => {
+        // An idempotency key is bound to one exact submission. If the
+        // candidate edits the form after a failed attempt, the next payload
+        // must receive a fresh key instead of being rejected as a rebound.
+        key.current = null;
+        setError(null);
+      }}
     >
       {!form.profileReady ? (
         <div role="alert">
@@ -88,8 +107,12 @@ export function JobApplicationForm({
         <select
           name="cvId"
           required
-          disabled={pending || !form.profileReady}
-          defaultValue=""
+          disabled={pending || !form.profileReady || form.cvs.length === 0}
+          aria-describedby={
+            form.cvs.length === 0 ? "application-cv-requirement" : undefined
+          }
+          value={selectedCvId}
+          onChange={(event) => setSelectedCvId(event.currentTarget.value)}
         >
           <option value="" disabled>
             Choose a confirmed CV
@@ -102,7 +125,11 @@ export function JobApplicationForm({
         </select>
       </label>
       {form.cvs.length === 0 ? (
-        <div role="alert">A confirmed PDF or DOCX CV is required.</div>
+        <div id="application-cv-requirement" role="alert">
+          No retained application CV is available. CV Import can update your
+          profile, but its temporary source file cannot be attached to a job
+          application.
+        </div>
       ) : null}
       {form.questions.map((question) => (
         <label key={question.id}>
@@ -165,7 +192,12 @@ export function JobApplicationForm({
       <div className="job-actions">
         <button
           type="submit"
-          disabled={pending || !form.profileReady || form.cvs.length === 0}
+          disabled={
+            pending ||
+            !form.profileReady ||
+            form.cvs.length === 0 ||
+            !selectedCvId
+          }
         >
           {pending ? "Submitting…" : "Submit application"}
         </button>
@@ -195,7 +227,7 @@ export function JobApplicationAction({ jobId }: { jobId: string }) {
         setError(body.message ?? "Application form could not be loaded.");
         return;
       }
-      setForm(body);
+      setForm(applicationFormSchema.parse(body));
       setOpen(true);
     } catch {
       setError("Application form could not be loaded.");

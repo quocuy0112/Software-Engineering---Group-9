@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { prepareApplicationSubmission } from "@/backend/services/jobs/application-policy";
+import {
+  ApplicationRepositoryError,
+  prepareApplicationSubmission,
+} from "@/backend/services/jobs/application-policy";
 
 const now = new Date("2026-08-01T08:00:00.000Z");
 const context = {
@@ -152,5 +155,17 @@ describe("application submission policy", () => {
         now,
       ),
     ).toThrow("APPLICATION_CV_INELIGIBLE");
+
+    try {
+      prepareApplicationSubmission(
+        { ...context, cv: { ...context.cv, confirmedAt: null } },
+        command,
+        "2026-08-01",
+        now,
+      );
+      throw new Error("Expected an ineligible CV rejection.");
+    } catch (error) {
+      expect(error).toBeInstanceOf(ApplicationRepositoryError);
+    }
   });
 });

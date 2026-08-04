@@ -379,13 +379,10 @@ describe("identity navigation shells", () => {
       expect(navigation.replace).toHaveBeenCalledWith("/login"),
     );
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenCalledWith(
-      "/api/identity/logout",
-      expect.objectContaining({
-        method: "POST",
-        headers: { "x-csrf-token": "proof" },
-      }),
-    );
+    const [path, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(path).toBe("/api/identity/logout");
+    expect(init.method).toBe("POST");
+    expect(new Headers(init.headers).get("x-csrf-token")).toBe("proof");
     fetchMock.mockRestore();
   });
 
@@ -423,27 +420,21 @@ describe("identity navigation shells", () => {
     fireEvent.click(signOut);
     fireEvent.click(signOut);
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
-    expect(fetchMock).toHaveBeenNthCalledWith(
-      1,
-      "/api/identity/logout",
-      expect.objectContaining({
-        method: "POST",
-        headers: { "x-csrf-token": "proof" },
-      }),
-    );
+    const firstInit = fetchMock.mock.calls[0]?.[1] as RequestInit;
+    expect(fetchMock.mock.calls[0]?.[0]).toBe("/api/identity/logout");
+    expect(firstInit.method).toBe("POST");
+    expect(new Headers(firstInit.headers).get("x-csrf-token")).toBe("proof");
     expect(screen.getByRole("button", { name: /Signing out/ })).toBeDisabled();
     release();
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
     expect(fetchMock).toHaveBeenNthCalledWith(2, "/api/identity/sessions", {
       cache: "no-store",
     });
-    expect(fetchMock).toHaveBeenNthCalledWith(
-      3,
-      "/api/identity/logout",
-      expect.objectContaining({
-        method: "POST",
-        headers: { "x-csrf-token": "rotated-proof" },
-      }),
+    const retryInit = fetchMock.mock.calls[2]?.[1] as RequestInit;
+    expect(fetchMock.mock.calls[2]?.[0]).toBe("/api/identity/logout");
+    expect(retryInit.method).toBe("POST");
+    expect(new Headers(retryInit.headers).get("x-csrf-token")).toBe(
+      "rotated-proof",
     );
     await waitFor(() =>
       expect(screen.getByRole("alert")).toHaveTextContent(

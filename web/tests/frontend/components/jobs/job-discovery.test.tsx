@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { JobCardView } from "@/frontend/features/jobs/components/job-card";
 import { JobSearchForm } from "@/frontend/features/jobs/components/job-search-form";
+import JobsLoading from "@/app/jobs/loading";
 
 const job = {
   id: "job-1",
@@ -55,6 +56,13 @@ describe("job discovery presentation", () => {
     expect(screen.getByRole("link", { name: /clear all/i })).toHaveAttribute(
       "href",
       "/jobs",
+    );
+  });
+
+  it("presents the loading state with the informational blue tone", () => {
+    render(<JobsLoading />);
+    expect(screen.getByRole("status", { name: "" })).toHaveClass(
+      "job-feedback-info",
     );
   });
 });
