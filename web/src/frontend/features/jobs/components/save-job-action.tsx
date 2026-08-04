@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { currentCsrfProof } from "@/frontend/features/authentication/client/current-csrf-proof";
+import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
+import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { savedJobOutcomeSchema } from "@/shared/contracts/jobs/actions";
 
 export function SaveJobAction({
@@ -11,6 +12,7 @@ export function SaveJobAction({
   jobId: string;
   initialSaved: boolean;
 }) {
+  const csrfProof = useCsrfProof();
   const [saved, setSaved] = useState(initialSaved);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
@@ -21,13 +23,12 @@ export function SaveJobAction({
     setMessage("");
     setError("");
     try {
-      const proof = await currentCsrfProof("");
-      const response = await fetch(
+      const response = await mutateWithCurrentCsrf(
         `/api/saved-jobs/${encodeURIComponent(jobId)}`,
         {
           method: saved ? "DELETE" : "PUT",
-          headers: { "X-CSRF-Token": proof },
         },
+        csrfProof,
       );
       const body: unknown = await response.json();
       if (!response.ok) {
@@ -57,11 +58,14 @@ export function SaveJobAction({
       <button
         type="button"
         aria-pressed={saved}
+        aria-busy={pending}
         disabled={pending}
         onClick={toggle}
       >
         {pending
-          ? "Updating saved job…"
+          ? saved
+            ? "Removing saved job…"
+            : "Saving job…"
           : saved
             ? "Remove saved job"
             : "Save job"}

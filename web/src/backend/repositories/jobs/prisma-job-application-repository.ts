@@ -67,7 +67,17 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
           user: { select: { name: true } },
           profile: { select: { headline: true, location: true } },
           cvs: {
-            where: { confirmedAt: { not: null }, archivedAt: null },
+            where: {
+              confirmedAt: { not: null },
+              archivedAt: null,
+              byteSize: { gte: 1, lte: 5_000_000 },
+              mimeType: {
+                in: [
+                  "application/pdf",
+                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ],
+              },
+            },
             orderBy: { confirmedAt: "desc" },
             select: {
               id: true,
