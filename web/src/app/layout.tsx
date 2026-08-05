@@ -4,6 +4,7 @@ import "@fontsource/be-vietnam-pro/500.css";
 import "@fontsource/be-vietnam-pro/600.css";
 import "@fontsource/be-vietnam-pro/700.css";
 import { serverEnvironment } from "@/backend/env/runtime";
+import { ThemeProvider } from "@/frontend/providers/theme-provider";
 import "./globals.css";
 import { Toaster } from "sonner";
 
@@ -17,15 +18,21 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" data-app-environment={serverEnvironment.APP_ENV}>
+    <html
+      lang="en"
+      data-app-environment={serverEnvironment.APP_ENV}
+      data-theme="light"
+    >
       <body suppressHydrationWarning>
-        {children}
-        <Toaster
-          className="app-toaster"
-          position="top-right"
-          richColors
-          toastOptions={{ className: "app-toast" }}
-        />
+        <ThemeProvider>
+          {children}
+          <Toaster
+            className="app-toaster"
+            position="top-right"
+            richColors
+            toastOptions={{ className: "app-toast" }}
+          />
+        </ThemeProvider>
       </body>
     </html>
   );

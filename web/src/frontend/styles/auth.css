@@ -205,6 +205,12 @@
   width: min(100%, 520px);
 }
 
+.auth-panel-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--sh-space-3);
+}
+
 .auth-card {
   min-width: 0;
   padding: clamp(24px, 4vw, 40px);

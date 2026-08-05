@@ -17,7 +17,7 @@ export function WorkspaceNavigation({
     dashboard: "Dashboard",
     jobs: "Jobs",
     profile: "Profile",
-    workspace: "Workspace",
+    workspace: "Candidate workspace",
     openMenu: "Open workspace menu",
     closeMenu: "Close workspace menu",
     signOut: "Sign out",
