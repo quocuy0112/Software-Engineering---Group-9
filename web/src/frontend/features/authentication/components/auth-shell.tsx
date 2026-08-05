@@ -2,6 +2,7 @@ import { AuthMotion } from "./auth-motion";
 import AuthFooter from "./AuthFooter";
 import Link from "next/link";
 import { SmartHireBrand } from "@/frontend/components/ui/smarthire-brand";
+import { ThemeToggle } from "@/frontend/components/ui/theme-toggle";
 
 export function AuthShell({ children }: { children: React.ReactNode }) {
   return (
@@ -44,6 +45,9 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
 
       <section className="auth-panel">
         <div className="auth-panel-inner">
+          <div className="auth-panel-toolbar">
+            <ThemeToggle compact />
+          </div>
           <section className="auth-card">
             <nav className="auth-navigation" aria-label="Authentication">
               <Link href="/login">Sign in</Link>

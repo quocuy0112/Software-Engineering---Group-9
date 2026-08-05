@@ -33,6 +33,18 @@
   margin-bottom: clamp(48px, 8vh, 80px);
 }
 
+.home-visitor-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sh-space-4);
+  margin-bottom: clamp(48px, 8vh, 80px);
+}
+
+.home-visitor-topbar .home-brand {
+  margin-bottom: 0;
+}
+
 .home-visitor h1,
 .home-authenticated-hero h1 {
   max-width: 720px;
@@ -294,6 +306,13 @@
   margin-bottom: 0;
 }
 
+.home-header-actions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--sh-space-3);
+}
+
 .home-account {
   display: flex;
   min-width: 0;
@@ -405,6 +424,14 @@
 
   .home-brand {
     margin-bottom: var(--sh-space-12);
+  }
+
+  .home-visitor-topbar {
+    margin-bottom: var(--sh-space-12);
+  }
+
+  .home-visitor-topbar .home-brand {
+    margin-bottom: 0;
   }
 
   .home-visitor h1,

@@ -300,6 +300,13 @@
   backdrop-filter: blur(14px);
 }
 
+.workspace-header-actions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--sh-space-3);
+}
+
 .workspace-topbar-kicker,
 .workspace-topbar-title {
   margin: 0;
@@ -971,6 +978,10 @@
   .workspace-header {
     position: static;
     padding-inline: var(--sh-space-4);
+  }
+
+  .workspace-header-actions {
+    gap: var(--sh-space-2);
   }
 
   .workspace-status,

@@ -8,6 +8,7 @@ import { postWithCurrentCsrf } from "@/frontend/features/authentication/client/c
 import { CsrfProofProvider } from "@/frontend/features/authentication/client/csrf-proof-context";
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
 import { SmartHireBrand } from "@/frontend/components/ui/smarthire-brand";
+import { ThemeToggle } from "@/frontend/components/ui/theme-toggle";
 import {
   ACCOUNT_NAME_UPDATED_EVENT,
   type AccountNameUpdatedDetail,
@@ -63,7 +64,7 @@ export function WorkspaceShell({
     expand: "Expand workspace sidebar",
     collapse: "Collapse workspace sidebar",
     workspace: "Candidate workspace",
-    greeting: "Good to see you",
+    greeting: "Welcome back",
     openProfile: `Open profile for ${workspaceProfile.name}`,
     manageProfile: "Manage your profile",
     signOutError: "Unable to sign out. Please try again.",
@@ -135,32 +136,37 @@ export function WorkspaceShell({
                 <p className="workspace-topbar-kicker">{copy.workspace}</p>
                 <p className="workspace-topbar-title">{copy.greeting}</p>
               </div>
-              <Link
-                className="workspace-account-chip"
-                href="/profile"
-                aria-label={copy.openProfile}
-              >
-                <span className="workspace-account-avatar" aria-hidden="true">
-                  {avatar ? (
-                    <Image
-                      src={avatar}
-                      alt=""
-                      width={40}
-                      height={40}
-                      unoptimized
-                    />
-                  ) : (
-                    <svg viewBox="0 0 24 24">
-                      <circle cx="12" cy="8" r="3.2" />
-                      <path d="M5.5 19c.7-3.1 3-4.8 6.5-4.8s5.8 1.7 6.5 4.8" />
-                    </svg>
-                  )}
-                </span>
-                <span>
-                  <strong>{workspaceProfile.name}</strong>
-                  <small>{workspaceProfile.email || copy.manageProfile}</small>
-                </span>
-              </Link>
+              <div className="workspace-header-actions">
+                <ThemeToggle compact />
+                <Link
+                  className="workspace-account-chip"
+                  href="/profile"
+                  aria-label={copy.openProfile}
+                >
+                  <span className="workspace-account-avatar" aria-hidden="true">
+                    {avatar ? (
+                      <Image
+                        src={avatar}
+                        alt=""
+                        width={40}
+                        height={40}
+                        unoptimized
+                      />
+                    ) : (
+                      <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="8" r="3.2" />
+                        <path d="M5.5 19c.7-3.1 3-4.8 6.5-4.8s5.8 1.7 6.5 4.8" />
+                      </svg>
+                    )}
+                  </span>
+                  <span>
+                    <strong>{workspaceProfile.name}</strong>
+                    <small>
+                      {workspaceProfile.email || copy.manageProfile}
+                    </small>
+                  </span>
+                </Link>
+              </div>
             </header>
             <div className="workspace-status">
               <AuthStatus status={status} tone="error" />

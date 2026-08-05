@@ -4,6 +4,7 @@ import {
   SmartHireBrand,
   SmartHireMark,
 } from "@/frontend/components/ui/smarthire-brand";
+import { ThemeToggle } from "@/frontend/components/ui/theme-toggle";
 
 type HomePageViewProps = {
   context: {
@@ -28,7 +29,10 @@ export function HomePageView({ context }: HomePageViewProps) {
     <main className="home-page">
       <section className="home-visitor" aria-labelledby="home-title">
         <div className="home-visitor-copy">
-          <SmartHireBrand className="home-brand" />
+          <div className="home-visitor-topbar">
+            <SmartHireBrand className="home-brand" />
+            <ThemeToggle compact />
+          </div>
           <p className="home-eyebrow">BUILD YOUR NEXT CHAPTER</p>
           <h1 id="home-title">
             Your talent deserves
@@ -49,7 +53,10 @@ export function HomePageView({ context }: HomePageViewProps) {
             >
               Sign in
             </Link>
-            <Link className="home-action home-action--secondary" href="/register">
+            <Link
+              className="home-action home-action--secondary"
+              href="/register"
+            >
               Create account
             </Link>
           </nav>
