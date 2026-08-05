@@ -20,9 +20,10 @@ install -d -o clamav -g clamav -m 0770 "${RUNTIME_DIR}"
 install -d -o clamav -g clamav -m 0750 "${DATABASE_DIR}"
 rm -f "${SOCKET_PATH}"
 
-if ! find "${DATABASE_DIR}" -maxdepth 1 -type f \( -name 'main.c[vl]d' -o -name 'daily.c[vl]d' \) | grep -q .; then
-  freshclam --stdout --user=clamav --config-file="${FRESHCLAM_CONFIG}"
-fi
+# clamd refuses to start when the mounted database is older than the
+# FailIfCvdOlderThan threshold. Always complete one foreground update before
+# starting clamd so a stale persisted volume cannot race the scanner startup.
+freshclam --stdout --user=clamav --config-file="${FRESHCLAM_CONFIG}"
 
 freshclam \
   --daemon \

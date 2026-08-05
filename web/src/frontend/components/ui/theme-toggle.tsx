@@ -1,34 +1,25 @@
 "use client";
 
-import { useTheme, type Theme } from "@/frontend/providers/theme-provider";
+import { useTheme } from "@/frontend/providers/theme-provider";
 
 export function ThemeToggle({ className = "" }: { className?: string }) {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const label = isDark ? "Switch to light mode" : "Switch to dark mode";
 
-  const cycleTheme = () => {
-    const nextTheme: Record<Theme, Theme> = {
-      light: "dark",
-      dark: "system",
-      system: "light",
-    };
-    setTheme(nextTheme[theme]);
-  };
-
-  const getLabel = () => {
-    if (theme === "light") return "Theme: Light (Click for Dark)";
-    if (theme === "dark") return "Theme: Dark (Click for System)";
-    return "Theme: System (Click for Light)";
-  };
+  const toggleTheme = () => setTheme(isDark ? "light" : "dark");
 
   return (
     <button
       type="button"
       className={["sh-theme-toggle", className].filter(Boolean).join(" ")}
-      onClick={cycleTheme}
-      title={getLabel()}
-      aria-label={getLabel()}
+      onClick={toggleTheme}
+      title={label}
+      aria-label={label}
+      aria-pressed={isDark}
+      data-theme={resolvedTheme}
     >
-      {theme === "light" && (
+      {!isDark && (
         <svg
           aria-hidden="true"
           viewBox="0 0 24 24"
@@ -50,7 +41,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
           <path d="m19.07 4.93-1.41 1.41" />
         </svg>
       )}
-      {theme === "dark" && (
+      {isDark && (
         <svg
           aria-hidden="true"
           viewBox="0 0 24 24"
@@ -62,22 +53,6 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
           className="sh-theme-icon"
         >
           <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-        </svg>
-      )}
-      {theme === "system" && (
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="sh-theme-icon"
-        >
-          <rect width="20" height="14" x="2" y="3" rx="2" />
-          <line x1="8" x2="16" y1="21" y2="21" />
-          <line x1="12" x2="12" y1="17" y2="21" />
         </svg>
       )}
     </button>

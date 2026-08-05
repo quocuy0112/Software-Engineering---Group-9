@@ -27,7 +27,7 @@
   padding: 0 var(--sh-space-4);
   border: 1px solid var(--sh-color-brand-primary);
   border-radius: var(--sh-radius-sm);
-  color: var(--sh-color-text-inverse);
+  color: var(--sh-color-text-on-brand);
   background: var(--sh-color-brand-primary);
   font-size: var(--sh-font-size-button);
   font-weight: var(--sh-font-weight-semibold);
@@ -160,7 +160,7 @@
   gap: 0.42rem;
   width: fit-content;
   margin-top: 0.45rem;
-  color: #9a5b08;
+  color: var(--sh-color-warning);
   font-size: 0.78rem;
   font-weight: var(--sh-font-weight-semibold);
   letter-spacing: 0.02em;
@@ -170,8 +170,9 @@
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 999px;
-  background: #e69a26;
-  box-shadow: 0 0 0 0.22rem rgb(230 154 38 / 14%);
+  background: var(--sh-color-warning);
+  box-shadow: 0 0 0 0.22rem
+    color-mix(in srgb, var(--sh-color-warning) 20%, transparent);
 }
 
 .professional-profile-fields {
@@ -330,7 +331,7 @@
   flex: 0 0 auto;
   place-items: center;
   border-radius: 10px;
-  color: var(--sh-color-text-inverse);
+  color: var(--sh-color-sidebar-text);
   background: var(--sh-color-brand-primary);
   font-size: var(--sh-font-size-body-sm);
   font-weight: var(--sh-font-weight-bold);
@@ -409,7 +410,7 @@
 }
 
 .social-link-preview:hover {
-  color: var(--sh-color-text-inverse);
+  color: var(--sh-color-text-on-brand);
   background: var(--sh-color-brand-primary);
 }
 

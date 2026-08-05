@@ -13,6 +13,7 @@ import { WorkspaceShell } from "@/frontend/features/dashboard/components/workspa
 import { DashboardView } from "@/frontend/features/dashboard/components/dashboard-view";
 import { ProfileNavigation } from "@/frontend/features/profile/components/profile-navigation";
 import { ProfileAccountView } from "@/frontend/features/profile/components/profile-account-view";
+import { WORKSPACE_LOCALE_UPDATED_EVENT } from "@/frontend/features/dashboard/client/workspace-locale";
 
 const navigation = vi.hoisted(() => ({ replace: vi.fn(), refresh: vi.fn() }));
 vi.mock("next/navigation", () => ({
@@ -96,6 +97,57 @@ describe("identity navigation shells", () => {
       "href",
       "/profile",
     );
+  });
+
+  it("renders the workspace in Vietnamese when the account preference is Vietnamese", () => {
+    render(
+      <WorkspaceShell
+        csrfProof="proof"
+        profile={{
+          name: "Thao Nguyen",
+          email: "thao@example.test",
+          locale: "vi",
+        }}
+      >
+        <ProfileNavigation active="overview" />
+      </WorkspaceShell>,
+    );
+
+    expect(screen.getByRole("link", { name: "Tổng quan" })).toHaveAttribute(
+      "href",
+      "/dashboard",
+    );
+    expect(screen.getByRole("link", { name: "Việc làm" })).toHaveAttribute(
+      "href",
+      "/jobs",
+    );
+    expect(screen.getByRole("button", { name: "Đăng xuất" })).toBeVisible();
+    expect(screen.getByRole("link", { name: "Nghề nghiệp" })).toHaveAttribute(
+      "href",
+      "/profile",
+    );
+  });
+
+  it("updates the shell language immediately after a preference is saved", async () => {
+    render(
+      <WorkspaceShell
+        csrfProof="proof"
+        profile={{ name: "Thao Nguyen", email: "thao@example.test" }}
+      >
+        <ProfileNavigation active="overview" />
+      </WorkspaceShell>,
+    );
+
+    window.dispatchEvent(
+      new CustomEvent(WORKSPACE_LOCALE_UPDATED_EVENT, {
+        detail: { locale: "vi" },
+      }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("link", { name: "Tổng quan" })).toBeVisible();
+      expect(screen.getByRole("button", { name: "Đăng xuất" })).toBeVisible();
+    });
   });
 
   it("marks the active workspace destination and controls the mobile menu", () => {

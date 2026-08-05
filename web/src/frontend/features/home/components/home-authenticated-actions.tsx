@@ -7,6 +7,7 @@ import { useState, useTransition } from "react";
 import { postWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
 import { SmartHireBrand } from "@/frontend/components/ui/smarthire-brand";
+import { ThemeToggle } from "@/frontend/components/ui/theme-toggle";
 
 export function HomeAuthenticatedActions({
   profile,
@@ -49,6 +50,7 @@ export function HomeAuthenticatedActions({
       <header className="home-header">
         <SmartHireBrand className="home-brand" />
         <div className="home-account">
+          <ThemeToggle />
           <Link
             className="home-profile-link"
             href="/profile"
@@ -91,7 +93,10 @@ export function HomeAuthenticatedActions({
           <Link className="home-action home-action--primary" href="/jobs">
             Browse jobs
           </Link>
-          <Link className="home-action home-action--secondary" href="/dashboard">
+          <Link
+            className="home-action home-action--secondary"
+            href="/dashboard"
+          >
             Dashboard
           </Link>
         </nav>

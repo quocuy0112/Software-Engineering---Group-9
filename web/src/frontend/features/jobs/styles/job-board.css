@@ -1,14 +1,14 @@
 .job-board-layout {
   min-height: 100vh;
-  background: var(--color-background, #f7f9f8);
+  background: var(--sh-color-surface-page);
 }
 
 .job-board-header {
   position: sticky;
   top: 0;
   z-index: 40;
-  border-bottom: 1px solid rgb(20 37 29 / 10%);
-  background: rgb(255 255 255 / 94%);
+  border-bottom: 1px solid var(--sh-color-border-subtle);
+  background: color-mix(in srgb, var(--sh-color-surface-card) 94%, transparent);
   backdrop-filter: blur(16px);
 }
 
@@ -20,6 +20,14 @@
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
+}
+
+.job-board-header-actions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sh-space-3);
 }
 
 .job-board-brand {
@@ -49,12 +57,12 @@
 
 .job-board-navigation .job-board-navigation-primary {
   padding-inline: 0.9rem;
-  background: #147a4a;
-  color: #fff;
+  background: var(--sh-color-brand-primary);
+  color: var(--sh-color-text-on-brand);
 }
 
 .job-board-navigation :focus-visible {
-  outline: 3px solid #147a4a;
+  outline: 3px solid var(--sh-color-border-focus);
   outline-offset: 3px;
 }
 
@@ -63,11 +71,11 @@
   background:
     radial-gradient(
       circle at 10% 10%,
-      rgb(44 190 120 / 10%),
+      color-mix(in srgb, var(--sh-color-success) 10%, transparent),
       transparent 28rem
     ),
-    var(--color-background, #f7f9f8);
-  color: var(--color-foreground, #14251d);
+    var(--sh-color-surface-page);
+  color: var(--sh-color-text-primary);
 }
 
 .jobs-container {
@@ -85,10 +93,10 @@
 
 .job-panel,
 .job-card {
-  border: 1px solid rgb(20 37 29 / 12%);
+  border: 1px solid var(--sh-color-border-subtle);
   border-radius: 1rem;
-  background: rgb(255 255 255 / 96%);
-  box-shadow: 0 1rem 3rem rgb(20 37 29 / 7%);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-card);
 }
 
 .job-panel {
@@ -117,7 +125,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 1rem;
-  color: var(--color-muted-foreground, #52635a);
+  color: var(--sh-color-text-secondary);
 }
 
 .job-state {
@@ -135,7 +143,7 @@
 }
 
 .job-card-timing {
-  color: var(--color-muted-foreground, #52635a);
+  color: var(--sh-color-text-secondary);
   font-size: 0.9rem;
 }
 
@@ -156,17 +164,17 @@
 .job-form-grid select,
 .job-form-grid textarea {
   width: 100%;
-  border: 1px solid rgb(20 37 29 / 25%);
+  border: 1px solid var(--sh-color-border-default);
   border-radius: 0.65rem;
   padding: 0.7rem 0.8rem;
-  background: #fff;
-  color: inherit;
+  background: var(--sh-color-surface-card);
+  color: var(--sh-color-text-primary);
 }
 
 .job-form-grid :focus-visible,
 .job-actions :focus-visible,
 .job-card a:focus-visible {
-  outline: 3px solid #147a4a;
+  outline: 3px solid var(--sh-color-border-focus);
   outline-offset: 3px;
 }
 
@@ -177,7 +185,7 @@
   display: grid;
   place-items: center;
   padding: 1rem;
-  background: rgb(7 20 13 / 65%);
+  background: color-mix(in srgb, var(--sh-color-text-primary) 65%, transparent);
 }
 
 .job-dialog {
@@ -185,9 +193,9 @@
   max-height: min(90vh, 52rem);
   overflow: auto;
   border-radius: 1rem;
-  background: #fff;
+  background: var(--sh-color-surface-card);
   padding: 1.25rem;
-  color: #14251d;
+  color: var(--sh-color-text-primary);
 }
 
 @media (max-width: 720px) {
@@ -200,6 +208,10 @@
 
   .job-board-brand {
     width: 8.25rem;
+  }
+
+  .job-board-header-actions {
+    flex-wrap: wrap;
   }
 
   .job-board-navigation {
@@ -228,8 +240,14 @@
   }
 
   .job-board-navigation {
-    width: 100%;
+    flex: 1;
+    width: auto;
     justify-content: flex-start;
+  }
+
+  .job-board-header-actions {
+    width: 100%;
+    justify-content: space-between;
   }
 }
 
@@ -250,7 +268,7 @@
 .job-board-header {
   border-color: var(--sh-color-border-subtle);
   background: color-mix(in srgb, var(--sh-color-surface-card) 94%, transparent);
-  box-shadow: 0 1px 0 rgb(15 23 42 / 2%);
+  box-shadow: var(--sh-shadow-control);
 }
 
 .job-board-header-inner {
@@ -276,7 +294,7 @@
 }
 
 .job-board-navigation .job-board-navigation-primary {
-  color: var(--sh-color-text-inverse);
+  color: var(--sh-color-text-on-brand);
   background: var(--sh-color-brand-primary);
 }
 
@@ -541,7 +559,7 @@
   padding: 0 var(--sh-space-4);
   border: 1px solid var(--sh-color-brand-primary);
   border-radius: var(--sh-radius-sm);
-  color: var(--sh-color-text-inverse);
+  color: var(--sh-color-text-on-brand);
   background: var(--sh-color-brand-primary);
   box-shadow: var(--sh-shadow-control);
   font-size: var(--sh-font-size-button);
@@ -867,7 +885,7 @@
   display: grid;
   place-items: center;
   padding: var(--sh-space-4);
-  background: rgb(3 12 28 / 68%);
+  background: color-mix(in srgb, var(--sh-color-text-primary) 68%, transparent);
   backdrop-filter: blur(4px);
 }
 

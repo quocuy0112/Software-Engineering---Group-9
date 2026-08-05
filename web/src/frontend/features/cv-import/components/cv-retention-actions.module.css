@@ -86,7 +86,7 @@
 }
 
 .dialogActions button:first-child {
-  color: #fff;
+  color: var(--sh-color-text-on-brand);
   background: var(--color-error, #b91c1c);
 }
 

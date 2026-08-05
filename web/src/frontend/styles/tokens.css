@@ -6,6 +6,7 @@
   --sh-color-brand-primary-pressed: #1e3a8a;
   --sh-color-brand-accent: #3b82f6;
   --sh-color-brand-soft: #dbeafe;
+  --sh-color-text-on-brand: #ffffff;
   --sh-color-surface-page: #f8fafc;
   --sh-color-surface-card: #ffffff;
   --sh-color-surface-subtle: #f1f5f9;
@@ -14,7 +15,7 @@
   --sh-color-text-secondary: #475569;
   --sh-color-text-muted: #64748b;
   --sh-color-text-inverse: #ffffff;
-  --sh-color-border-default: #cbd5e1;
+  --sh-color-border-default: #64748b;
   --sh-color-border-subtle: #e2e8f0;
   --sh-color-border-strong: #475569;
   --sh-color-border-focus: #2563eb;
@@ -40,47 +41,60 @@
   --sh-glass-border: rgba(255, 255, 255, 0.4);
   --sh-glass-backdrop-blur: 16px;
   --sh-gradient-brand: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
-  --sh-gradient-hero: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
+  --sh-gradient-hero: linear-gradient(
+    135deg,
+    #1e40af 0%,
+    #3b82f6 50%,
+    #60a5fa 100%
+  );
   --sh-gradient-accent: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-  --sh-gradient-glow: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15), transparent 70%);
+  --sh-gradient-glow: radial-gradient(
+    circle at 50% 0%,
+    rgba(59, 130, 246, 0.15),
+    transparent 70%
+  );
 
   --sh-shadow-control: 0 1px 2px rgb(15 23 42 / 6%);
-  --sh-shadow-card: 0 1px 3px rgb(15 23 42 / 6%), 0 10px 28px -4px rgb(15 23 42 / 5%);
-  --sh-shadow-card-hover: 0 4px 12px rgb(15 23 42 / 8%), 0 20px 40px -8px rgb(15 23 42 / 12%);
-  --sh-shadow-floating: 0 12px 32px -4px rgb(15 23 42 / 14%), 0 32px 64px -12px rgb(15 23 42 / 20%);
+  --sh-shadow-card:
+    0 1px 3px rgb(15 23 42 / 6%), 0 10px 28px -4px rgb(15 23 42 / 5%);
+  --sh-shadow-card-hover:
+    0 4px 12px rgb(15 23 42 / 8%), 0 20px 40px -8px rgb(15 23 42 / 12%);
+  --sh-shadow-floating:
+    0 12px 32px -4px rgb(15 23 42 / 14%), 0 32px 64px -12px rgb(15 23 42 / 20%);
 }
 
 [data-theme="dark"],
 html.dark {
   color-scheme: dark;
   --sh-color-brand-primary: #3b82f6;
-  --sh-color-brand-primary-hover: #60a5fa;
+  --sh-color-brand-primary-hover: #93c5fd;
   --sh-color-brand-primary-pressed: #1d4ed8;
-  --sh-color-brand-accent: #60a5fa;
-  --sh-color-brand-soft: rgba(59, 130, 246, 0.18);
+  --sh-color-brand-accent: #93c5fd;
+  --sh-color-brand-soft: rgba(96, 165, 250, 0.2);
+  --sh-color-text-on-brand: #07111f;
   --sh-color-surface-page: #0b0f19;
   --sh-color-surface-card: #131b2e;
   --sh-color-surface-subtle: #1a233a;
   --sh-color-surface-tinted: #172036;
   --sh-color-text-primary: #f8fafc;
-  --sh-color-text-secondary: #cbd5e1;
-  --sh-color-text-muted: #94a3b8;
+  --sh-color-text-secondary: #d7e0ec;
+  --sh-color-text-muted: #a8b5c8;
   --sh-color-text-inverse: #0f172a;
-  --sh-color-border-default: #334155;
-  --sh-color-border-subtle: #1e293b;
-  --sh-color-border-strong: #475569;
-  --sh-color-border-focus: #60a5fa;
-  --sh-color-focus-ring-bg: rgba(59, 130, 246, 0.25);
-  --sh-color-success: #4ade80;
-  --sh-color-success-bg: rgba(34, 197, 94, 0.12);
-  --sh-color-warning: #facc15;
-  --sh-color-warning-bg: rgba(234, 179, 8, 0.12);
-  --sh-color-error: #f87171;
-  --sh-color-error-bg: rgba(239, 68, 68, 0.12);
-  --sh-color-info: #60a5fa;
-  --sh-color-info-bg: rgba(59, 130, 246, 0.12);
+  --sh-color-border-default: #64748b;
+  --sh-color-border-subtle: #2b3952;
+  --sh-color-border-strong: #94a3b8;
+  --sh-color-border-focus: #93c5fd;
+  --sh-color-focus-ring-bg: rgba(96, 165, 250, 0.28);
+  --sh-color-success: #86efac;
+  --sh-color-success-bg: rgba(34, 197, 94, 0.16);
+  --sh-color-warning: #fde68a;
+  --sh-color-warning-bg: rgba(234, 179, 8, 0.16);
+  --sh-color-error: #fca5a5;
+  --sh-color-error-bg: rgba(239, 68, 68, 0.16);
+  --sh-color-info: #93c5fd;
+  --sh-color-info-bg: rgba(96, 165, 250, 0.16);
   --sh-color-disabled-bg: #1e293b;
-  --sh-color-disabled-text: #64748b;
+  --sh-color-disabled-text: #a8b5c8;
   --sh-color-sidebar-background: #070a12;
   --sh-color-sidebar-surface: #111827;
   --sh-color-sidebar-active: #2563eb;
@@ -92,17 +106,50 @@ html.dark {
   --sh-glass-border: rgba(255, 255, 255, 0.08);
   --sh-glass-backdrop-blur: 16px;
   --sh-gradient-brand: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-  --sh-gradient-hero: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 50%, #818cf8 100%);
+  --sh-gradient-hero: linear-gradient(
+    135deg,
+    #1d4ed8 0%,
+    #3b82f6 50%,
+    #818cf8 100%
+  );
   --sh-gradient-accent: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
-  --sh-gradient-glow: radial-gradient(circle at 50% 0%, rgba(96, 165, 250, 0.18), transparent 70%);
+  --sh-gradient-glow: radial-gradient(
+    circle at 50% 0%,
+    rgba(96, 165, 250, 0.18),
+    transparent 70%
+  );
 
   --sh-shadow-control: 0 1px 2px rgb(0 0 0 / 40%);
-  --sh-shadow-card: 0 2px 8px rgb(0 0 0 / 35%), 0 12px 32px -4px rgb(0 0 0 / 45%);
-  --sh-shadow-card-hover: 0 6px 16px rgb(0 0 0 / 50%), 0 24px 48px -6px rgb(0 0 0 / 60%);
-  --sh-shadow-floating: 0 16px 40px -4px rgb(0 0 0 / 60%), 0 40px 80px -12px rgb(0 0 0 / 75%);
+  --sh-shadow-card:
+    0 2px 8px rgb(0 0 0 / 35%), 0 12px 32px -4px rgb(0 0 0 / 45%);
+  --sh-shadow-card-hover:
+    0 6px 16px rgb(0 0 0 / 50%), 0 24px 48px -6px rgb(0 0 0 / 60%);
+  --sh-shadow-floating:
+    0 16px 40px -4px rgb(0 0 0 / 60%), 0 40px 80px -12px rgb(0 0 0 / 75%);
 }
 
 :root {
+  /* Compatibility aliases for older feature styles. They intentionally point
+     to semantic tokens so CV and job-board states follow the active theme. */
+  --color-background: var(--sh-color-surface-page);
+  --color-foreground: var(--sh-color-text-primary);
+  --color-muted-foreground: var(--sh-color-text-secondary);
+  --color-muted-text: var(--sh-color-text-muted);
+  --color-text: var(--sh-color-text-primary);
+  --color-text-muted: var(--sh-color-text-muted);
+  --color-surface: var(--sh-color-surface-card);
+  --color-border: var(--sh-color-border-default);
+  --color-focus: var(--sh-color-border-focus);
+  --color-error: var(--sh-color-error);
+  --color-error-surface: var(--sh-color-error-bg);
+  --color-error-text: var(--sh-color-error);
+  --color-success: var(--sh-color-success);
+  --color-success-surface: var(--sh-color-success-bg);
+  --color-success-text: var(--sh-color-success);
+  --color-warning: var(--sh-color-warning);
+  --color-warning-text: var(--sh-color-warning);
+  --sh-color-focus-ring: var(--sh-color-border-focus);
+
   --sh-space-1: 4px;
   --sh-space-2: 8px;
   --sh-space-3: 12px;

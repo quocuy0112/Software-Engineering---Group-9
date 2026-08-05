@@ -6,6 +6,7 @@ import {
   getTimezoneOptions,
   type TimezoneOption,
 } from "../client/timezone-options";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 import { NotificationPreferences } from "./notification-preferences";
 
 function supportsTimezone(timezone: string): boolean {
@@ -30,6 +31,7 @@ export function AccountPreferencesForm({
   onChange: (preferences: AccountPreferences) => void;
   onSave: () => Promise<boolean>;
 }) {
+  const locale = useWorkspaceLocale();
   const [timezoneOptions, setTimezoneOptions] = useState<TimezoneOption[]>([]);
   const initialTimezone = useRef(preferences.timezone);
 
@@ -37,17 +39,31 @@ export function AccountPreferencesForm({
     setTimezoneOptions(getTimezoneOptions([initialTimezone.current]));
   }, []);
 
-  const copy = {
-    language: "Interface language",
-    languageHint: "English is the system interface language.",
-    timezone: "Timezone",
-    timezoneHint: "Use a supported IANA timezone identifier.",
-    timezoneWarning:
-      "This stored timezone is no longer supported. Keep it unchanged or choose a supported replacement.",
-    saving: "Saving preferences…",
-    save: "Save preferences",
-  };
-  const timezoneListHint = `Search by GMT offset, region, or city. The list includes ${timezoneOptions.length || "the"} IANA timezones supported by this device; GMT reflects the current time and adjusts for DST.`;
+  const copy =
+    locale === "vi"
+      ? {
+          language: "Ngôn ngữ giao diện",
+          languageHint:
+            "Chọn ngôn ngữ được sử dụng trên toàn bộ không gian làm việc.",
+          timezone: "Múi giờ",
+          timezoneHint: "Sử dụng mã múi giờ IANA được hỗ trợ.",
+          timezoneWarning:
+            "Múi giờ đã lưu không còn được hỗ trợ. Bạn có thể giữ nguyên hoặc chọn múi giờ thay thế.",
+          saving: "Đang lưu tùy chọn…",
+          save: "Lưu tùy chọn",
+          timezoneListHint: `Tìm theo độ lệch GMT, khu vực hoặc thành phố. Danh sách gồm ${timezoneOptions.length || "các"} múi giờ IANA được thiết bị hỗ trợ; GMT phản ánh thời gian hiện tại và tự điều chỉnh theo giờ mùa hè.`,
+        }
+      : {
+          language: "Interface language",
+          languageHint: "Choose the language used throughout the workspace.",
+          timezone: "Timezone",
+          timezoneHint: "Use a supported IANA timezone identifier.",
+          timezoneWarning:
+            "This stored timezone is no longer supported. Keep it unchanged or choose a supported replacement.",
+          saving: "Saving preferences…",
+          save: "Save preferences",
+          timezoneListHint: `Search by GMT offset, region, or city. The list includes ${timezoneOptions.length || "the"} IANA timezones supported by this device; GMT reflects the current time and adjusts for DST.`,
+        };
   return (
     <form
       className="account-preferences-form"
@@ -60,11 +76,17 @@ export function AccountPreferencesForm({
         <label htmlFor="preference-language">{copy.language}</label>
         <select
           id="preference-language"
-          value="en"
+          value={preferences.language}
           aria-describedby="interface-language-guidance"
-          disabled
+          onChange={(event) =>
+            onChange({
+              ...preferences,
+              language: event.target.value === "vi" ? "vi" : "en",
+            })
+          }
         >
           <option value="en">English</option>
+          <option value="vi">Tiếng Việt</option>
         </select>
         <p id="interface-language-guidance" className="preference-guidance">
           {copy.languageHint}
@@ -102,7 +124,7 @@ export function AccountPreferencesForm({
           ))}
         </datalist>
         <p id="timezone-list-guidance" className="preference-guidance">
-          {timezoneListHint}
+          {copy.timezoneListHint}
         </p>
         {preferences.timezoneSupported ? (
           <p id="timezone-guidance" className="preference-guidance">

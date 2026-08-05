@@ -41,7 +41,7 @@
 }
 
 .auth-visual .smart-hire-brand {
-  color: var(--sh-color-text-inverse);
+  color: var(--sh-color-sidebar-text);
 }
 
 .auth-visual-copy {
@@ -70,7 +70,7 @@
 
 .auth-visual-copy h2 {
   margin: var(--sh-space-4) 0 var(--sh-space-5);
-  color: var(--sh-color-text-inverse);
+  color: var(--sh-color-sidebar-text);
   font-size: var(--sh-font-size-display);
   font-weight: var(--sh-font-weight-bold);
   line-height: var(--sh-line-height-display);
@@ -156,7 +156,7 @@
 }
 
 .visual-profile-row strong {
-  color: var(--sh-color-text-inverse);
+  color: var(--sh-color-sidebar-text);
   font-size: var(--sh-font-size-body-sm);
 }
 
@@ -203,6 +203,12 @@
 
 .auth-panel-inner {
   width: min(100%, 520px);
+}
+
+.auth-panel-tools {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--sh-space-3);
 }
 
 .auth-card {

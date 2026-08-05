@@ -36,7 +36,7 @@ export const getWorkspaceContext = cache(async () => {
   });
   if (!account) return null;
   const locale: "vi" | "en" =
-    account.preferences?.language === "EN" ? "en" : "vi";
+    account.preferences?.language === "VI" ? "vi" : "en";
 
   return {
     userId: current.userId,

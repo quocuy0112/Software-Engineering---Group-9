@@ -19,15 +19,35 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 const THEME_STORAGE_KEY = "smarthire_theme";
+const SYSTEM_THEME_QUERY = "(prefers-color-scheme: dark)";
+
+function isTheme(value: string | null): value is Theme {
+  return value === "light" || value === "dark" || value === "system";
+}
+
+function getSystemTheme(): "light" | "dark" {
+  if (
+    typeof window === "undefined" ||
+    typeof window.matchMedia !== "function"
+  ) {
+    return "light";
+  }
+
+  return window.matchMedia(SYSTEM_THEME_QUERY).matches ? "dark" : "light";
+}
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("system");
+  // Keep the server and first client render identical. The root layout's
+  // initializer handles the background before hydration; this state catches
+  // up immediately in the effect below.
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
+  const [preferenceLoaded, setPreferenceLoaded] = useState(false);
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
-      if (stored && ["light", "dark", "system"].includes(stored)) {
+      const stored = localStorage.getItem(THEME_STORAGE_KEY);
+      if (isTheme(stored)) {
         // Persisted preferences are hydrated after the client mounts.
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setThemeState(stored);
@@ -35,37 +55,37 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } catch {
       // Ignore storage errors
     }
+    // The inline root initializer has already selected the correct visual
+    // theme; wait until the stored preference is known before reapplying it.
+    setPreferenceLoaded(true);
   }, []);
 
   useEffect(() => {
+    if (!preferenceLoaded) return;
+
     const root = document.documentElement;
+    const mediaQuery =
+      theme === "system" && typeof window.matchMedia === "function"
+        ? window.matchMedia(SYSTEM_THEME_QUERY)
+        : null;
 
     const applyTheme = () => {
       const activeTheme: "light" | "dark" =
-        theme === "system"
-          ? window.matchMedia("(prefers-color-scheme: dark)").matches
-            ? "dark"
-            : "light"
-          : theme;
+        theme === "system" ? getSystemTheme() : theme;
 
       setResolvedTheme(activeTheme);
-      root.setAttribute("data-theme", activeTheme);
-      if (activeTheme === "dark") {
-        root.classList.add("dark");
-      } else {
-        root.classList.remove("dark");
-      }
+      root.dataset.theme = activeTheme;
+      root.classList.toggle("dark", activeTheme === "dark");
     };
 
     applyTheme();
 
-    if (theme === "system") {
-      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-      const handleChange = () => applyTheme();
-      mediaQuery.addEventListener("change", handleChange);
-      return () => mediaQuery.removeEventListener("change", handleChange);
-    }
-  }, [theme]);
+    if (!mediaQuery) return;
+
+    const handleChange = () => applyTheme();
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, [preferenceLoaded, theme]);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);

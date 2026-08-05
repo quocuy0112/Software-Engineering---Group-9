@@ -242,7 +242,7 @@
 
 .actions button {
   border: 1px solid transparent;
-  color: var(--sh-color-text-inverse);
+  color: var(--sh-color-text-on-brand);
   background: var(--sh-color-brand-primary);
   box-shadow: var(--sh-shadow-control);
 }

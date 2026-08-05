@@ -12,7 +12,12 @@ import {
   type AccountNameUpdatedDetail,
 } from "@/frontend/features/profile/client/account-identity-events";
 import { ThemeToggle } from "@/frontend/components/ui/theme-toggle";
-import { WorkspaceLocaleProvider } from "../client/workspace-locale";
+import {
+  WORKSPACE_LOCALE_UPDATED_EVENT,
+  type WorkspaceLocale,
+  type WorkspaceLocaleUpdatedDetail,
+  WorkspaceLocaleProvider,
+} from "../client/workspace-locale";
 import { WorkspaceNavigation } from "./workspace-navigation";
 
 export function WorkspaceShell({
@@ -35,6 +40,9 @@ export function WorkspaceShell({
   const [status, setStatus] = useState("");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [nameOverride, setNameOverride] = useState<string | null>(null);
+  const [localeOverride, setLocaleOverride] = useState<WorkspaceLocale | null>(
+    null,
+  );
 
   useEffect(() => {
     const synchronizeName = (event: Event) => {
@@ -44,9 +52,22 @@ export function WorkspaceShell({
       setNameOverride(name);
       router.refresh();
     };
+    const synchronizeLocale = (event: Event) => {
+      const locale = (event as CustomEvent<WorkspaceLocaleUpdatedDetail>).detail
+        ?.locale;
+      if (locale !== "vi" && locale !== "en") return;
+      setLocaleOverride(locale);
+      router.refresh();
+    };
     window.addEventListener(ACCOUNT_NAME_UPDATED_EVENT, synchronizeName);
-    return () =>
+    window.addEventListener(WORKSPACE_LOCALE_UPDATED_EVENT, synchronizeLocale);
+    return () => {
       window.removeEventListener(ACCOUNT_NAME_UPDATED_EVENT, synchronizeName);
+      window.removeEventListener(
+        WORKSPACE_LOCALE_UPDATED_EVENT,
+        synchronizeLocale,
+      );
+    };
   }, [router]);
 
   const workspaceProfile = nameOverride
@@ -58,7 +79,7 @@ export function WorkspaceShell({
   )
     ? workspaceProfile.image
     : null;
-  const locale = workspaceProfile.locale ?? "en";
+  const locale = localeOverride ?? workspaceProfile.locale ?? "en";
   const copy =
     locale === "vi"
       ? {
@@ -150,7 +171,7 @@ export function WorkspaceShell({
                 <p className="workspace-topbar-kicker">{copy.workspace}</p>
                 <p className="workspace-topbar-title">{copy.greeting}</p>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <div className="workspace-header-actions">
                 <ThemeToggle />
                 <Link
                   className="workspace-account-chip"
@@ -175,7 +196,9 @@ export function WorkspaceShell({
                   </span>
                   <span>
                     <strong>{workspaceProfile.name}</strong>
-                    <small>{workspaceProfile.email || copy.manageProfile}</small>
+                    <small>
+                      {workspaceProfile.email || copy.manageProfile}
+                    </small>
                   </span>
                 </Link>
               </div>

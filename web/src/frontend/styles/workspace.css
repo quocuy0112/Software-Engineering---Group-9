@@ -53,10 +53,11 @@
 }
 
 .workspace-sidebar .smart-hire-brand {
-  color: var(--sh-color-text-inverse);
+  color: var(--sh-color-sidebar-text);
 }
 
 .workspace-sidebar .brand-mark {
+  color: var(--sh-color-sidebar-text);
   background: var(--sh-color-sidebar-active);
 }
 
@@ -88,7 +89,7 @@
 }
 
 .workspace-sidebar-toggle:hover {
-  color: var(--sh-color-text-inverse);
+  color: var(--sh-color-sidebar-text);
   background: var(--sh-color-sidebar-surface);
   border-color: color-mix(
     in srgb,
@@ -187,7 +188,7 @@
 
 .workspace-navigation a:hover,
 .workspace-navigation button:hover:not(:disabled) {
-  color: var(--sh-color-text-inverse);
+  color: var(--sh-color-sidebar-text);
   background: var(--sh-color-sidebar-surface);
   border-color: color-mix(
     in srgb,
@@ -197,7 +198,7 @@
 }
 
 .workspace-navigation a[aria-current="page"] {
-  color: var(--sh-color-text-inverse);
+  color: var(--sh-color-sidebar-text);
   background: var(--sh-color-sidebar-active);
   border-color: color-mix(
     in srgb,
@@ -298,6 +299,13 @@
   background: color-mix(in srgb, var(--sh-color-surface-card) 94%, transparent);
   box-shadow: 0 1px 0 rgb(15 23 42 / 2%);
   backdrop-filter: blur(14px);
+}
+
+.workspace-header-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--sh-space-3);
 }
 
 .workspace-topbar-kicker,
@@ -497,7 +505,7 @@
   margin-top: var(--sh-space-5);
   padding: 0 var(--sh-space-4);
   border-radius: var(--sh-radius-sm);
-  color: var(--sh-color-text-inverse);
+  color: var(--sh-color-text-on-brand);
   background: var(--sh-color-brand-primary);
   box-shadow: var(--sh-shadow-control);
   font-size: var(--sh-font-size-button);

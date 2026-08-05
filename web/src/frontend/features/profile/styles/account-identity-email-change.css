@@ -73,7 +73,7 @@
   padding: 0 var(--sh-space-4);
   border: 1px solid var(--sh-color-brand-primary);
   border-radius: var(--sh-radius-sm);
-  color: var(--sh-color-text-inverse);
+  color: var(--sh-color-text-on-brand);
   background: var(--sh-color-brand-primary);
   font: inherit;
   font-size: var(--sh-font-size-button);

@@ -7,7 +7,7 @@
 html {
   min-width: 320px;
   min-height: 100%;
-  background: var(--sh-color-surface-page);
+  background-color: var(--sh-color-surface-page);
   scroll-behavior: smooth;
 }
 
@@ -23,7 +23,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  transition: background-color var(--sh-motion-standard) ease, color var(--sh-motion-standard) ease;
+  transition:
+    background-color var(--sh-motion-standard) ease,
+    color var(--sh-motion-standard) ease;
 }
 
 button,
@@ -189,6 +191,7 @@ textarea {
   display: inline-flex;
   width: 40px;
   height: 40px;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   padding: 0;
@@ -197,6 +200,10 @@ textarea {
   color: var(--sh-color-text-secondary);
   background: var(--sh-color-surface-card);
   box-shadow: var(--sh-shadow-control);
+}
+
+.sh-theme-toggle[data-theme="dark"] {
+  color: var(--sh-color-brand-accent);
 }
 
 .sh-theme-toggle:hover {
@@ -229,7 +236,7 @@ textarea {
   padding: 0 var(--sh-space-5);
   border: 1px solid transparent;
   border-radius: var(--sh-radius-sm);
-  color: #ffffff;
+  color: var(--sh-color-text-on-brand);
   background: var(--sh-color-brand-primary);
   font-size: var(--sh-font-size-button);
   font-weight: var(--sh-font-weight-semibold);
@@ -266,7 +273,7 @@ textarea {
 }
 
 .sh-button--gradient {
-  color: #ffffff;
+  color: var(--sh-color-text-on-brand);
   background: var(--sh-gradient-brand);
   border: none;
 }
@@ -303,7 +310,7 @@ textarea {
 
 .sh-button--danger:hover:not(:disabled),
 .security-panel .danger-action:hover:not(:disabled) {
-  color: #ffffff;
+  color: var(--sh-color-text-on-brand);
   background: var(--sh-color-error);
 }
 
@@ -605,7 +612,8 @@ textarea {
   border-radius: var(--sh-radius-md);
   background: var(--sh-color-surface-card);
   box-shadow: var(--sh-shadow-floating);
-  animation: modal-scale-up var(--sh-motion-standard) cubic-bezier(0.16, 1, 0.3, 1);
+  animation: modal-scale-up var(--sh-motion-standard)
+    cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes modal-scale-up {
@@ -706,7 +714,7 @@ textarea {
   border: 1px solid
     color-mix(in srgb, var(--sh-color-text-inverse) 22%, transparent);
   border-radius: var(--sh-radius-sm);
-  color: #ffffff;
+  color: var(--sh-color-text-on-brand);
   background: var(--sh-color-brand-primary);
   box-shadow:
     0 1px 2px rgb(15 23 42 / 14%),
