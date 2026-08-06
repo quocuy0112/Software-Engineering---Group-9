@@ -16,6 +16,7 @@ type CandidateApplicationForm = {
   job: { id: string; title: string; company: { displayName: string } };
   profileReady: boolean;
   missingProfileFields: string[];
+  contact?: ApplicationForm["contact"];
   cvs: Array<
     Omit<ApplicationForm["cvs"][number], "confirmedAt"> & { confirmedAt: Date }
   >;
@@ -43,7 +44,14 @@ export type ApplicationRepositoryPort = {
 };
 
 const outcome = (
-  row: { id: string; jobPostingId: string; stage: string; submittedAt: Date },
+  row: {
+    id: string;
+    jobPostingId: string;
+    stage: string;
+    submittedAt: Date;
+    aiAnalysisConsent?: boolean;
+    aiMatchScore?: number | null;
+  },
   created: boolean,
 ): ApplicationOutcome => ({
   applicationId: row.id,
@@ -54,6 +62,8 @@ const outcome = (
   message: created
     ? "Application submitted."
     : "Your application was already submitted.",
+  aiAnalysisConsent: row.aiAnalysisConsent,
+  aiMatchScore: row.aiMatchScore,
 });
 
 export class PrismaJobApplicationRepository implements ApplicationRepositoryPort {
@@ -64,8 +74,8 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
       this.db.candidateIdentity.findFirst({
         where: { userId, user: { state: "ACTIVE" } },
         include: {
-          user: { select: { name: true } },
-          profile: { select: { headline: true, location: true } },
+          user: { select: { name: true, email: true } },
+          profile: { select: { headline: true, location: true, phone: true } },
           cvs: {
             where: {
               confirmedAt: { not: null },
@@ -74,6 +84,7 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
               mimeType: {
                 in: [
                   "application/pdf",
+                  "application/msword",
                   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 ],
               },
@@ -141,11 +152,17 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
       job,
       profileReady: missingProfileFields.length === 0,
       missingProfileFields,
+      contact: {
+        fullName: candidate.user.name,
+        email: candidate.user.email,
+        phone: candidate.profile?.phone ?? "",
+      },
       cvs: candidate.cvs.flatMap((cv) => {
         if (
           !cv.confirmedAt ||
           ![
             "application/pdf",
+            "application/msword",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           ].includes(cv.mimeType)
         )
@@ -309,11 +326,22 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
             input.activeConsentVersion,
             input.occurredAt,
           );
+          const cvFileRef =
+            input.command.cvFileRef &&
+            input.command.cvFileRef !== input.command.cvId
+              ? input.command.cvFileRef
+              : prepared.cvSnapshot.storageKey;
           const created = await tx.jobApplication.create({
             data: {
               candidateUserId: input.candidateUserId,
               jobPostingId: input.jobId,
               selectedCvId: input.command.cvId,
+              cvFileRef,
+              contactSnapshot: input.command.contactSnapshot
+                ? (input.command.contactSnapshot as Prisma.InputJsonValue)
+                : undefined,
+              aiAnalysisConsent: input.command.aiAnalysisConsent ?? false,
+              aiMatchScore: input.command.aiAnalysisConsent ? 82 : null,
               stage: "APPLIED",
               coverLetter: prepared.coverLetter,
               profileSnapshot:

@@ -4,6 +4,7 @@ import "@/frontend/features/jobs/styles/job-board.css";
 import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
 import { WorkspaceShell } from "@/frontend/features/dashboard/components/workspace-shell";
 import { JobBoardHeader } from "@/frontend/features/jobs/components/job-board-header";
+import { JobInteractionProvider } from "@/frontend/features/jobs/components/job-interaction-provider";
 
 export default async function JobsLayout({
   children,
@@ -18,7 +19,7 @@ export default async function JobsLayout({
         initialLocale={context.initialLocale}
         contentMode="job-board"
       >
-        {children}
+        <JobInteractionProvider>{children}</JobInteractionProvider>
       </WorkspaceShell>
     );
   }
@@ -26,7 +27,9 @@ export default async function JobsLayout({
   return (
     <div className="job-board-layout">
       <JobBoardHeader authenticated={false} />
-      <main className="job-board-public-main">{children}</main>
+      <main className="job-board-public-main">
+        <JobInteractionProvider>{children}</JobInteractionProvider>
+      </main>
     </div>
   );
 }

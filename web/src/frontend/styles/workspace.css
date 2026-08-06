@@ -2,7 +2,8 @@
 .workspace-page {
   height: 100dvh;
   min-height: 100dvh;
-  overflow: hidden;
+  /* This frame clips its children; .workspace-main owns vertical scrolling. */
+  overflow: clip;
   background: var(--sh-color-surface-page);
 }
 
@@ -13,7 +14,7 @@
   height: 100%;
   min-height: 0;
   grid-template-columns: var(--sh-sidebar-current-width) minmax(0, 1fr);
-  overflow: hidden;
+  overflow: clip;
   transition: grid-template-columns var(--sh-motion-standard) ease;
 }
 

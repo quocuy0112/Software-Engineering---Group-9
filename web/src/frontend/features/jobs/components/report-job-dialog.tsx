@@ -18,7 +18,13 @@ const reasons = [
 
 const detailsRequired = new Set(["OTHER", "MISLEADING", "DISCRIMINATORY"]);
 
-export function ReportJobDialog({ jobId }: { jobId: string }) {
+export function ReportJobDialog({
+  jobId,
+  className,
+}: {
+  jobId: string;
+  className?: string;
+}) {
   const trigger = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
@@ -86,6 +92,7 @@ export function ReportJobDialog({ jobId }: { jobId: string }) {
   return (
     <>
       <button
+        className={className}
         ref={trigger}
         type="button"
         onClick={() => {

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { JobDetailView } from "@/frontend/features/jobs/components/job-detail";
 import type { JobDetail } from "@/shared/contracts/jobs/discovery";
@@ -49,8 +49,16 @@ describe("job detail accessibility", () => {
     expect(screen.getByText("Active")).toHaveAccessibleName(
       /job status: active/i,
     );
+    const tabs = screen.getAllByRole("tab");
+    expect(tabs).toHaveLength(3);
+    const requirementsTab = screen.getByRole("tab", {
+      name: /requirements/i,
+    });
+    fireEvent.click(requirementsTab);
+    expect(requirementsTab).toHaveAttribute("aria-selected", "true");
     expect(
-      screen.getByRole("heading", { name: /requirements/i }),
+      screen.getByRole("heading", { name: /must-have requirements/i }),
     ).toBeVisible();
+    expect(screen.getAllByRole("tabpanel")).toHaveLength(1);
   });
 });
