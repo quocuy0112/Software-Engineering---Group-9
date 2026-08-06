@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smarthire.local/schemas/job-search-intent-v1.json",
+  "title": "Validated image-derived job search intent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "language", "proposals", "warnings"],
+  "properties": {
+    "schemaVersion": {
+      "const": "job-search-intent-v1"
+    },
+    "language": {
+      "enum": ["VI", "EN", "BILINGUAL", "UNKNOWN"]
+    },
+    "proposals": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "$ref": "#/$defs/proposal"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "CONTRADICTORY_CRITERIA_REMOVED",
+          "EXCESS_CRITERIA_REMOVED",
+          "LOW_CONFIDENCE_CRITERIA_REMOVED",
+          "MANUAL_VALUE_PRESERVED",
+          "UNSUPPORTED_CRITERIA_REMOVED",
+          "UNVERIFIED_EVIDENCE_REMOVED"
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "evidenceRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["startCodePoint", "endCodePoint", "text"],
+      "properties": {
+        "startCodePoint": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 32768
+        },
+        "endCodePoint": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32768
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        }
+      }
+    },
+    "proposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "field",
+        "stringValue",
+        "numberValue",
+        "stringValues",
+        "confidence",
+        "basis",
+        "evidence",
+        "selected",
+        "selectionReason"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,80}$"
+        },
+        "field": {
+          "enum": [
+            "q",
+            "location",
+            "employmentType",
+            "experienceLevel",
+            "workArrangement",
+            "skills",
+            "salaryMin",
+            "salaryMax",
+            "salaryCurrency",
+            "salaryPeriod",
+            "postedWithinDays"
+          ]
+        },
+        "stringValue": {
+          "type": ["string", "null"],
+          "maxLength": 200
+        },
+        "numberValue": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1000000000000
+        },
+        "stringValues": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "basis": {
+          "enum": ["EXPLICIT", "NORMALIZED", "INFERRED"]
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/evidenceRange"
+          }
+        },
+        "selected": {
+          "type": "boolean"
+        },
+        "selectionReason": {
+          "enum": [
+            "AUTO_EXPLICIT",
+            "AUTO_NORMALIZED",
+            "USER_SELECTION_REQUIRED",
+            "MANUAL_VALUE_CONFLICT"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "field": {
+                "enum": ["salaryMin", "salaryMax", "postedWithinDays"]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "stringValue": { "type": "null" },
+              "numberValue": { "type": "number" },
+              "stringValues": { "maxItems": 0 }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "field": {
+                "enum": [
+                  "employmentType",
+                  "experienceLevel",
+                  "workArrangement",
+                  "skills"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "stringValue": { "type": "null" },
+              "numberValue": { "type": "null" },
+              "stringValues": { "minItems": 1 }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "field": {
+                "enum": ["q", "location", "salaryCurrency", "salaryPeriod"]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "stringValue": { "type": "string", "minLength": 1 },
+              "numberValue": { "type": "null" },
+              "stringValues": { "maxItems": 0 }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "selected": { "const": true }
+            }
+          },
+          "then": {
+            "properties": {
+              "basis": { "enum": ["EXPLICIT", "NORMALIZED"] },
+              "confidence": { "minimum": 0.9 },
+              "selectionReason": {
+                "enum": ["AUTO_EXPLICIT", "AUTO_NORMALIZED"]
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

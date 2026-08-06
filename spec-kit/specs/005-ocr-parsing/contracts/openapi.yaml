@@ -1,0 +1,607 @@
+openapi: 3.1.0
+info:
+  title: SmartHire Image-Assisted Public Job Search API
+  version: 1.0.0
+  description: >-
+    Browser API for one ephemeral PNG/JPEG job-search query. It creates no job
+    search result or ranking; the final validated criteria use the existing
+    Feature 003 /jobs and GET /api/jobs contracts.
+servers:
+  - url: /api
+paths:
+  /jobs/image-searches:
+    post:
+      operationId: createImageSearch
+      description: >-
+        Admit one bounded query before content upload. Authenticated requests use
+        the existing Better Auth session and CSRF proof. Visitors receive a
+        one-query capability that must remain in current browser memory.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/CsrfToken"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateImageSearchRequest"
+      responses:
+        "201":
+          description: Query admitted and awaiting raw content
+          headers:
+            Cache-Control:
+              schema: { const: no-store }
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateImageSearchResponse"
+        "200":
+          description: Identical idempotent reservation replay
+          headers:
+            Cache-Control:
+              schema: { const: no-store }
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateImageSearchResponse"
+        "400":
+          $ref: "#/components/responses/ApiError"
+        "403":
+          $ref: "#/components/responses/ApiError"
+        "409":
+          $ref: "#/components/responses/ApiError"
+        "429":
+          description: Applicable rolling-hour subject is exhausted
+          headers:
+            Cache-Control:
+              schema: { const: no-store }
+            Retry-After:
+              schema: { type: integer, minimum: 1 }
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /jobs/image-searches/{queryId}:
+    parameters:
+      - $ref: "#/components/parameters/QueryId"
+      - $ref: "#/components/parameters/VisitorCapability"
+    get:
+      operationId: getImageSearchStatus
+      responses:
+        "200":
+          description: Content-free current lifecycle projection
+          headers:
+            Cache-Control:
+              schema: { const: no-store }
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageSearchStatusResponse"
+        "404":
+          $ref: "#/components/responses/ApiError"
+    delete:
+      operationId: cancelImageSearch
+      parameters:
+        - $ref: "#/components/parameters/CsrfToken"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "204":
+          description: Cancelled or already inaccessible; no response body
+          headers:
+            Cache-Control:
+              schema: { const: no-store }
+        "404":
+          $ref: "#/components/responses/ApiError"
+        "409":
+          $ref: "#/components/responses/ApiError"
+  /jobs/image-searches/{queryId}/content:
+    parameters:
+      - $ref: "#/components/parameters/QueryId"
+      - $ref: "#/components/parameters/VisitorCapability"
+      - $ref: "#/components/parameters/CsrfToken"
+      - $ref: "#/components/parameters/IdempotencyKey"
+    put:
+      operationId: uploadImageSearchContent
+      description: >-
+        Streams the exact raw body into encrypted quarantine. Content-Type and
+        Content-Length must equal reservation metadata. No multipart body.
+      requestBody:
+        required: true
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+              maxLength: 5000000
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+              maxLength: 5000000
+      responses:
+        "202":
+          description: Content finalized and safety scan queued
+          headers:
+            Cache-Control:
+              schema: { const: no-store }
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageSearchStatusResponse"
+        "400":
+          $ref: "#/components/responses/ApiError"
+        "404":
+          $ref: "#/components/responses/ApiError"
+        "409":
+          $ref: "#/components/responses/ApiError"
+        "413":
+          $ref: "#/components/responses/ApiError"
+        "415":
+          $ref: "#/components/responses/ApiError"
+  /jobs/image-searches/{queryId}/consent:
+    parameters:
+      - $ref: "#/components/parameters/QueryId"
+      - $ref: "#/components/parameters/VisitorCapability"
+      - $ref: "#/components/parameters/CsrfToken"
+      - $ref: "#/components/parameters/IdempotencyKey"
+    post:
+      operationId: changeImageSearchConsent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchConsentRequest"
+      responses:
+        "200":
+          description: Append-only consent event accepted
+          headers:
+            Cache-Control:
+              schema: { const: no-store }
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchConsentResponse"
+        "400":
+          $ref: "#/components/responses/ApiError"
+        "404":
+          $ref: "#/components/responses/ApiError"
+        "409":
+          $ref: "#/components/responses/ApiError"
+  /jobs/image-searches/{queryId}/result:
+    parameters:
+      - $ref: "#/components/parameters/QueryId"
+      - $ref: "#/components/parameters/VisitorCapability"
+      - $ref: "#/components/parameters/CsrfToken"
+      - $ref: "#/components/parameters/IdempotencyKey"
+    post:
+      operationId: consumeImageSearchResult
+      description: >-
+        Returns the bounded result once and atomically makes every server
+        content artifact inaccessible and due for deletion. The browser may keep
+        the response in current component memory only. The current visible
+        Feature 003 criteria are validated and used only to prevent silent
+        overwrite during final delivery; they are not persisted by this route.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [currentCriteria]
+              properties:
+                currentCriteria:
+                  $ref: "#/components/schemas/ManualSearchContext"
+      responses:
+        "200":
+          description: One-time validated intent or OCR-text fallback
+          headers:
+            Cache-Control:
+              schema: { const: no-store }
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/ValidatedIntentResult"
+                  - $ref: "#/components/schemas/OcrFallbackResult"
+                discriminator:
+                  propertyName: kind
+        "404":
+          $ref: "#/components/responses/ApiError"
+        "409":
+          $ref: "#/components/responses/ApiError"
+        "410":
+          $ref: "#/components/responses/ApiError"
+components:
+  parameters:
+    QueryId:
+      name: queryId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: "^[A-Za-z0-9_-]{10,80}$"
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 16
+        maxLength: 128
+        pattern: "^[\\x21-\\x7E]+$"
+    CsrfToken:
+      name: X-CSRF-Token
+      in: header
+      required: false
+      description: Required for authenticated mutations; visitors use same-origin enforcement.
+      schema:
+        type: string
+        minLength: 16
+        maxLength: 2048
+    VisitorCapability:
+      name: X-Image-Search-Capability
+      in: header
+      required: false
+      description: Required for visitor queries; forbidden from URLs, cookies, and persistent browser storage.
+      schema:
+        type: string
+        minLength: 43
+        maxLength: 128
+        pattern: "^[A-Za-z0-9_-]+$"
+  responses:
+    ApiError:
+      description: Safe non-content error
+      headers:
+        Cache-Control:
+          schema: { const: no-store }
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+  schemas:
+    CreateImageSearchRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - extension
+        - mediaType
+        - bytes
+        - interpreterClass
+        - consent
+      properties:
+        extension:
+          enum: [png, jpg, jpeg]
+        mediaType:
+          enum: [image/png, image/jpeg]
+        bytes:
+          type: integer
+          minimum: 1
+          maximum: 5000000
+        interpreterClass:
+          enum: [DETERMINISTIC_INTERNAL, EXTERNAL_OPENAI]
+        consent:
+          oneOf:
+            - type: "null"
+            - $ref: "#/components/schemas/SearchConsentGrant"
+    SearchConsentGrant:
+      type: object
+      additionalProperties: false
+      required:
+        - provider
+        - model
+        - purposeVersion
+        - noticeVersion
+        - consentTextVersion
+        - retentionDisclosureVersion
+      properties:
+        provider:
+          const: openai
+        model:
+          const: gpt-5.4-mini-2026-03-17
+        purposeVersion:
+          const: job-image-search-purpose-v1
+        noticeVersion:
+          type: string
+          minLength: 1
+          maxLength: 80
+        consentTextVersion:
+          type: string
+          minLength: 1
+          maxLength: 80
+        retentionDisclosureVersion:
+          type: string
+          minLength: 1
+          maxLength: 80
+    CreateImageSearchResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - queryId
+        - actorClass
+        - capability
+        - status
+        - admittedAt
+        - expiresAt
+        - upload
+      properties:
+        queryId:
+          type: string
+          pattern: "^[A-Za-z0-9_-]{10,80}$"
+        actorClass:
+          enum: [VISITOR, AUTHENTICATED]
+        capability:
+          type: [string, "null"]
+          minLength: 43
+          maxLength: 128
+        status:
+          const: AWAITING_CONTENT
+        admittedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        upload:
+          type: object
+          additionalProperties: false
+          required: [method, path, mediaType, bytes]
+          properties:
+            method: { const: PUT }
+            path:
+              type: string
+              pattern: "^/api/jobs/image-searches/[A-Za-z0-9_-]{10,80}/content$"
+            mediaType:
+              enum: [image/png, image/jpeg]
+            bytes:
+              type: integer
+              minimum: 1
+              maximum: 5000000
+    ImageSearchStatusResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - queryId
+        - state
+        - stage
+        - availableActions
+        - admittedAt
+        - expiresAt
+        - retryAt
+        - failureCode
+      properties:
+        queryId:
+          type: string
+          pattern: "^[A-Za-z0-9_-]{10,80}$"
+        state:
+          $ref: "#/components/schemas/SearchImageStatus"
+        stage:
+          enum:
+            [UPLOAD, SCAN, DECODE, OCR, CONSENT, INTERPRET, RESULT, TERMINAL]
+        availableActions:
+          type: array
+          maxItems: 5
+          uniqueItems: true
+          items:
+            enum:
+              [
+                UPLOAD_CONTENT,
+                GRANT_CONSENT,
+                REVOKE_CONSENT,
+                CONSUME_RESULT,
+                CANCEL,
+              ]
+        admittedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        retryAt:
+          type: [string, "null"]
+          format: date-time
+        failureCode:
+          type: [string, "null"]
+          enum:
+            - null
+            - VALIDATION_FAILED
+            - MALWARE_DETECTED
+            - SCANNER_UNAVAILABLE
+            - SCANNER_DEFINITIONS_STALE
+            - UNSUPPORTED_IMAGE
+            - IMAGE_LIMIT_EXCEEDED
+            - IMAGE_DECODE_FAILED
+            - OCR_UNAVAILABLE
+            - OCR_LOW_CONFIDENCE
+            - OCR_OUTPUT_TOO_LARGE
+            - CONSENT_REQUIRED
+            - INTERPRETER_UNAVAILABLE
+            - INTERPRETER_INVALID_OUTPUT
+            - QUERY_EXPIRED
+    SearchImageStatus:
+      enum:
+        - AWAITING_CONTENT
+        - SCAN_QUEUED
+        - SCANNING
+        - DECODE_QUEUED
+        - DECODING
+        - OCR_QUEUED
+        - OCR_PROCESSING
+        - AWAITING_CONSENT
+        - INTERPRET_QUEUED
+        - INTERPRETING
+        - RESULT_READY
+        - FALLBACK_READY
+        - VALIDATION_FAILED
+        - INFECTED
+        - SCAN_FAILED
+        - DECODE_FAILED
+        - OCR_FAILED
+        - INTERPRET_FAILED
+        - CONSUMED
+        - CANCELLED
+        - EXPIRED
+        - DELETED
+    SearchConsentRequest:
+      oneOf:
+        - type: object
+          additionalProperties: false
+          required: [action, grant]
+          properties:
+            action: { const: GRANTED }
+            grant:
+              $ref: "#/components/schemas/SearchConsentGrant"
+        - type: object
+          additionalProperties: false
+          required: [action, grant]
+          properties:
+            action: { const: REVOKED }
+            grant: { type: "null" }
+    SearchConsentResponse:
+      type: object
+      additionalProperties: false
+      required: [action, occurredAt, state]
+      properties:
+        action:
+          enum: [GRANTED, REVOKED]
+        occurredAt:
+          type: string
+          format: date-time
+        state:
+          $ref: "#/components/schemas/SearchImageStatus"
+    ManualSearchContext:
+      type: object
+      additionalProperties: false
+      required:
+        - q
+        - location
+        - employmentType
+        - experienceLevel
+        - workArrangement
+        - skills
+        - salaryMin
+        - salaryMax
+        - salaryCurrency
+        - salaryPeriod
+        - postedWithinDays
+        - sort
+      properties:
+        q: { type: string, maxLength: 200 }
+        location: { type: string, maxLength: 160 }
+        employmentType:
+          type: array
+          maxItems: 5
+          uniqueItems: true
+          items:
+            enum: [FULL_TIME, PART_TIME, CONTRACT, INTERNSHIP, TEMPORARY]
+        experienceLevel:
+          type: array
+          maxItems: 6
+          uniqueItems: true
+          items:
+            enum: [ENTRY, JUNIOR, MID, SENIOR, LEAD, MANAGER]
+        workArrangement:
+          type: array
+          maxItems: 3
+          uniqueItems: true
+          items:
+            enum: [ONSITE, HYBRID, REMOTE]
+        skills:
+          type: array
+          maxItems: 20
+          uniqueItems: true
+          items: { type: string, minLength: 1, maxLength: 80 }
+        salaryMin: { type: [number, "null"], minimum: 0 }
+        salaryMax: { type: [number, "null"], minimum: 0 }
+        salaryCurrency: { type: string, pattern: "^[A-Z]{3}$" }
+        salaryPeriod: { enum: [HOUR, MONTH, YEAR] }
+        postedWithinDays:
+          type: [integer, "null"]
+          enum: [null, 1, 3, 7, 14, 30]
+        sort: { enum: [RELEVANCE, NEWEST, SALARY_DESC] }
+    ValidatedIntentResult:
+      type: object
+      additionalProperties: false
+      required: [kind, queryId, intent]
+      properties:
+        kind: { const: VALIDATED_INTENT }
+        queryId:
+          type: string
+          pattern: "^[A-Za-z0-9_-]{10,80}$"
+        intent:
+          $ref: "./search-intent.schema.json"
+    OcrFallbackResult:
+      type: object
+      additionalProperties: false
+      required: [kind, queryId, text, language, warnings]
+      properties:
+        kind: { const: OCR_TEXT_FALLBACK }
+        queryId:
+          type: string
+          pattern: "^[A-Za-z0-9_-]{10,80}$"
+        text:
+          type: string
+          minLength: 1
+          maxLength: 32768
+        language:
+          enum: [VI, EN, BILINGUAL, UNKNOWN]
+        warnings:
+          type: array
+          maxItems: 10
+          uniqueItems: true
+          items:
+            enum:
+              [
+                LOW_CONFIDENCE,
+                INTERPRETER_UNAVAILABLE,
+                INTERPRETER_INVALID_OUTPUT,
+              ]
+    ApiError:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message, requestId, retryAt, fieldErrors]
+          properties:
+            code:
+              enum:
+                - VALIDATION_ERROR
+                - FORBIDDEN
+                - CSRF_REJECTED
+                - IMAGE_SEARCH_NOT_FOUND
+                - IDEMPOTENCY_KEY_REUSED
+                - QUERY_STATE_CONFLICT
+                - PAYLOAD_TOO_LARGE
+                - UNSUPPORTED_MEDIA_TYPE
+                - IMAGE_QUERY_RATE_LIMITED
+                - CONSENT_REQUIRED
+                - RESULT_NOT_READY
+                - RESULT_ALREADY_CONSUMED
+                - QUERY_EXPIRED
+                - IMAGE_PROCESSING_UNAVAILABLE
+            message:
+              type: string
+              minLength: 1
+              maxLength: 300
+            requestId:
+              type: string
+              minLength: 1
+              maxLength: 100
+            retryAt:
+              type: [string, "null"]
+              format: date-time
+            fieldErrors:
+              type: array
+              maxItems: 20
+              items:
+                type: object
+                additionalProperties: false
+                required: [path, code, message]
+                properties:
+                  path: { type: string, minLength: 1, maxLength: 120 }
+                  code: { type: string, minLength: 1, maxLength: 80 }
+                  message: { type: string, minLength: 1, maxLength: 240 }
