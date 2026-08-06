@@ -5,8 +5,8 @@
 This document maps the flows in the Use Case Specifications to their corresponding Prototype Evidence (screenshots), ensuring compliance with the project's Traceability Validation Rules.
 
 > **Principle Note:**
-> - 1 Use Case ≠ 1 unique screen. Base screens are reused across multiple Use Cases and alternative flows by changing minor states or components.     
-> - To enhance the evaluation and demonstration of this diagram, an interactive HTML prototype (`Hai-Prototype.html`) containing live states and role switching for all Diagram 5 use cases has been included in the folder same with this file.
+> - 1 Use Case ≠ 1 unique screen. Base screens are reused across multiple Use Cases and alternative flows by changing minor states or components.
+> - To enhance the evaluation and demonstration of this diagram, an interactive HTML prototype (`Hai-Prototype.html`) containing live states and role switching for all Diagram 5 use cases is included in the same folder as this file.
 
 ## Diagram 5 Scope: Supporting Services and Analytics
 

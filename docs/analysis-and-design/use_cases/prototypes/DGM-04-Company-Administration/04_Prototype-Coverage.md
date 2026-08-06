@@ -1,6 +1,7 @@
-**Author:** Nguyễn Minh Khôi<br>
-**Student ID:** 24127066<br>
+**Author:** Nguyễn Minh Khôi
+**Student ID:** 24127066
 **Reviewer:** Nguyễn Gia Quốc Uy
+**Version:** V1.3 (06/08/2026)
 # Prototype Coverage & Traceability – Diagram 4
 ## Company Management and Platform Administration
 
@@ -30,27 +31,29 @@
 | **Recruiter** | Specialized Actor (inherits CM) | Company member with recruitment permissions. |
 | **HR Manager** | Specialized Actor (inherits CM) | Company member with elevated HR permissions. |
 | **Company Owner** | Specialized Actor (inherits CM) | Company member with ownership and full management rights. |
-| **File Parsing Service** | External System | Scans uploaded business license documents for malware. |
+| **File Scanning Service** | External System | Scans uploaded business-license documents for malware before administrator review. |
 
 ### Relationship Summary
-- **Generalization**:  
-  - `Authenticated User` → `Candidate`, `Company Member`, `Platform Administrator`  
-  - `Company Member` → `Recruiter`, `HR Manager`, `Company Owner`
-- **Extend**:  
-  - `UC-USER-02` extends `UC-USER-01` (from account view to enforcement action)  
-  - `UC-MOD-02` extends `UC-MOD-01` (from review to decision)
+- **Generalization**:
+  - `Candidate`, `Company Member`, and `Platform Administrator` → `Authenticated User`
+  - `Recruiter`, `HR Manager`, and `Company Owner` → `Company Member`
+- **Related Use Cases and Entry Points:**
+  - `UC-USER-01` identifies an account; the administrator may then start `UC-USER-02`.
+  - `UC-MOD-01` reviews a posting; the administrator may then start `UC-MOD-02`.
+
+The arrows in the generalization summary point from the specialized actor to its parent. The two pairs above are separate goals and are not modeled as workflow relationships.
 
 ---
 
 ## 2. Coverage Matrix
 
-*Note:*  
-- **P0** = Must-have (core release)  
-- **P1** = Should-have (after P0 stable)  
-- **FR-01** = Authentication, Authorization & Access Control  
-- **FR-09** = Automated Notifications & In-App Alerts  
-- **FR-10** = Job Posting Moderation & Quality Assurance  
-- **FR-11** = User Management & Employer Verification  
+*Note:*
+- **P0** = Must-have (core release)
+- **P1** = Should-have (after P0 stable)
+- **FR-01** = Authentication, Authorization & Access Control
+- **FR-09** = Automated Notifications & In-App Alerts
+- **FR-10** = Job Posting Moderation & Quality Assurance
+- **FR-11** = User Management & Employer Verification
 
 | Use Case ID | Use Case Name | Priority (Vision) | Covered Requirements | Prototype Evidence Exists? | UI Mockup References (from UseCases.md) |
 |-------------|---------------|-------------------|----------------------|----------------------------|------------------------------------------|
@@ -66,5 +69,3 @@
 | UC-MOD-03 | Investigate Job Report | P0 (Must) | FR-01, FR-09, FR-10 | ✅ Yes | UC-MOD-03-UI_01.png, UI_02.png, UI_03.png, UI_04.png, UI_05.png |
 
 ---
-
-
