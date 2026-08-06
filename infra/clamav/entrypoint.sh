@@ -20,9 +20,13 @@ install -d -o clamav -g clamav -m 0770 "${RUNTIME_DIR}"
 install -d -o clamav -g clamav -m 0750 "${DATABASE_DIR}"
 rm -f "${SOCKET_PATH}"
 
-if ! find "${DATABASE_DIR}" -maxdepth 1 -type f \( -name 'main.c[vl]d' -o -name 'daily.c[vl]d' \) | grep -q .; then
-  freshclam --stdout --user=clamav --config-file="${FRESHCLAM_CONFIG}"
-fi
+# A persistent volume can contain a complete but stale database. Always finish
+# one successful foreground refresh before starting either long-running
+# process. With `set -e`, an update failure stops the container fail-closed.
+freshclam \
+  --stdout \
+  --user=clamav \
+  --config-file="${FRESHCLAM_CONFIG}"
 
 freshclam \
   --daemon \
@@ -37,8 +41,14 @@ clamd --foreground --config-file="${CLAMD_CONFIG}" &
 clamd_pid=$!
 
 shutdown() {
-  kill -TERM "${clamd_pid}" "${freshclam_pid}" 2>/dev/null || true
-  wait "${clamd_pid}" "${freshclam_pid}" 2>/dev/null || true
+  if [ -n "${clamd_pid}" ]; then
+    kill -TERM "${clamd_pid}" 2>/dev/null || true
+    wait "${clamd_pid}" 2>/dev/null || true
+  fi
+  if [ -n "${freshclam_pid}" ]; then
+    kill -TERM "${freshclam_pid}" 2>/dev/null || true
+    wait "${freshclam_pid}" 2>/dev/null || true
+  fi
 }
 trap shutdown INT TERM EXIT
 
