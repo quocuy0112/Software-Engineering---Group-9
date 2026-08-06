@@ -1,529 +1,514 @@
-# Use Case Specification – Diagram 3 (Recruiter Operations)
-
-**Domains covered:** Job Posting Management · Applicant Screening & Ranking · Recruitment Pipeline
-
----
-# Student Information
-
-**Student Name:** Ngô Quốc Tuấn  
-**Student ID:** 24127581  
-**Group:** 09   
-**Class:** 24C11   
-**Course/Project:** Software Engineering   
-**Review:** Nguyễn Gia Quốc Uy
----
-
-## Use Case Diagram
-
-```mermaid
----
-config:
-  theme: neutral
-  flowchart:
-    defaultRenderer: elk
----
-flowchart TB
-    %% Actors
-    ai["System / AI Service"]
-    cm["Company Member\n(Authenticated)"]
-    rec["Recruiter\n(Authorized)"]
-    hrm["HR Manager\n(Authorized)"]
-    own["Company Owner\n(Authorized)"]
-
-    %% Actor Generalization
-    cm --> rec
-    cm --> hrm
-    cm --> own
-
-    %% ================= DOMAIN 1 =================
-    subgraph subGraph0["Job Posting Management"]
-        direction TB
-        UC_POST_01("UC-POST-01: Create and Manage Job Draft")
-        UC_POST_02("UC-POST-02: Preview and Submit Job Posting")
-        UC_POST_03("UC-POST-03: Manage Job-Posting Lifecycle")
-        UC_POST_04("UC-POST-04: View Company Job Postings")
-    end
-
-    %% ================= DOMAIN 2 =================
-    subgraph subGraph1["Applicant Screening and Ranking"]
-        direction TB
-        UC_SCR_01("UC-SCR-01: Execute Hybrid Candidate Screening\n(ref. Diagram 5)")
-        UC_SCR_03("UC-SCR-03: Review and Rank Applicants")
-    end
-
-    %% ================= DOMAIN 3 =================
-    subgraph subGraph2["Recruitment Pipeline"]
-        direction TB
-        UC_PIPE_01("UC-PIPE-01: View Recruitment Pipeline Kanban Board")
-        UC_PIPE_02("UC-PIPE-02: Update Candidate Recruitment Stage")
-        UC_PIPE_03("UC-PIPE-03: View Application Stage History")
-    end
-
-    %% Actor to Use Case Relationships
-    rec --- UC_POST_01
-    rec --- UC_POST_02
-    rec --- UC_POST_03
-    rec --- UC_POST_04
-
-    hrm --- UC_POST_01
-    hrm --- UC_POST_02
-    hrm --- UC_POST_03
-    hrm --- UC_POST_04
-
-    own --- UC_POST_03
-    own --- UC_POST_04
-
-    ai --- UC_SCR_01
-
-    rec --- UC_SCR_03
-    hrm --- UC_SCR_03
-
-    rec --- UC_PIPE_01
-    rec --- UC_PIPE_02
-    rec --- UC_PIPE_03
-
-    hrm --- UC_PIPE_01
-    hrm --- UC_PIPE_02
-    hrm --- UC_PIPE_03
-
-    own --- UC_PIPE_01
-    own --- UC_PIPE_03
-
-    %% Use Case to Use Case Relationships
-    UC_POST_02 -. "«extend»" .-> UC_POST_01
-    UC_POST_03 -. "«extend»" .-> UC_POST_02
-
-    UC_SCR_03 -. "«include»" .-> UC_SCR_01
-
-    UC_PIPE_02 -. "«extend»" .-> UC_PIPE_01
-    UC_PIPE_03 -. "«include»" .-> UC_PIPE_02
-```
-
-### Summary Table (Use Case ↔ Requirement Traceability Anchor)
+# DGM-03 — Use-Case Specification: Recruiter Operations
 
-> This table is the primary junction between **Part C (Use Case Diagram)** and the **Traceability Matrix**. Each row links a Use Case ID to the actor(s) allowed to trigger it and the Functional Requirement(s) it realizes.
+*Performed by: Ngô Quốc Tuấn | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Group 9*
+**Version:** V1.3 (06/08/2026) — UML relationships, flow wording, and prototype placement revised
 
-| Use Case ID | Use Case Name | Actor(s) | Covered Requirements |
-| :--- | :--- | :--- | :--- |
-| UC-POST-01 | Create and Manage Job Draft | Recruiter, HR Manager | FR-POST-01, FR-POST-02 |
-| UC-POST-02 | Preview and Submit Job Posting | Recruiter, HR Manager | FR-POST-03, FR-POST-04 |
-| UC-POST-03 | Manage Job-Posting Lifecycle | Recruiter, HR Manager, Company Owner | FR-POST-05, FR-POST-06 |
-| UC-POST-04 | View Company Job Postings | Recruiter, HR Manager, Company Owner | FR-POST-07 |
-| UC-SCR-01 *(ref. Diagram 5)* | Execute Hybrid Candidate Screening | System / AI Service | FR-SCR-01 |
-| UC-SCR-03 | Review and Rank Applicants | Recruiter, HR Manager | FR-SCR-02, FR-SCR-03 |
-| UC-PIPE-01 | View Recruitment Pipeline Kanban Board | Recruiter, HR Manager, Company Owner | FR-PIPE-01 |
-| UC-PIPE-02 | Update Candidate Recruitment Stage | Recruiter, HR Manager | FR-PIPE-02 |
-| UC-PIPE-03 | View Application Stage History | Recruiter, HR Manager, Company Owner | FR-PIPE-03 |
+## 1. Scope and Diagram
 
----
+![DGM-03 — Recruiter Operations](../diagrams/rendered_diagrams/diagram_03.png)
 
-## Part D – Use Case Specification & Prototype Evidence
+The Mermaid source is maintained in [diagram_03.md](../diagrams/diagram_03.md). Recruiter, HR Manager, and Company Owner generalize Company Member. The posting, screening, and pipeline use cases are separate goals; navigation between them is recorded as Related Use Cases and Entry Points.
 
-> **Note on writing style:**
-> - The **Basic Flow** describes only the single successful path (no error handling), with actor and system steps alternating.
-> - Each **Alternative Flow** is derived by challenging every Basic Flow step against: missing/invalid input, duplicate data, insufficient permission, deleted/closed resource, expired token, external service failure, actor cancellation, concurrent update, and database save failure.
+## 2. Actor and Traceability Summary
 
----
+| Actor | Type | Responsibility |
+|---|---|---|
+| Company Member | Parent human actor | Authenticated company-scoped account. |
+| Recruiter | Specialized human actor | Creates postings, reviews applicants, and updates recruitment stages. |
+| HR Manager | Specialized human actor | Performs recruiter operations with the permitted HR scope. |
+| Company Owner | Specialized human actor | Manages company-level posting visibility and views pipeline information. |
+| System / AI Service | Supporting system actor | Executes asynchronous candidate screening. |
 
-### Domain 1: Job Posting Management
+| Use Case ID | Use Case Name | Primary Actor(s) | Prototype Evidence |
+|---|---|---|---|
+| UC-POST-01 | Create and Manage Job Draft | Recruiter, HR Manager | Draft form and validation state |
+| UC-POST-02 | Preview and Submit Job Posting | Recruiter, HR Manager | Preview and duplicate-title warning |
+| UC-POST-03 | Manage Job-Posting Lifecycle | Recruiter, HR Manager, Company Owner | Actions menu and status-filter states |
+| UC-POST-04 | View Company Job Postings | Recruiter, HR Manager, Company Owner | Company posting list |
+| UC-SCR-01 | Execute Hybrid Candidate Screening | System / AI Service | Processing and failed-scoring states |
+| UC-SCR-03 | Review and Rank Applicants | Recruiter, HR Manager | Ranked candidates and decision states |
+| UC-PIPE-01 | View Recruitment Pipeline Kanban Board | Recruiter, HR Manager, Company Owner | Editable and owner read-only boards |
+| UC-PIPE-02 | Update Candidate Recruitment Stage | Recruiter, HR Manager | Drag state and success state |
+| UC-PIPE-03 | View Application Stage History | Recruiter, HR Manager, Company Owner | Stage-history timeline |
 
-![Job Posting Management prototype overview](../prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_01_Create_Job_Draft.png)
+## 3. Use-Case Specifications
 
-*Figure 1 — Domain overview: the Job Draft base screen, the shell reused across UC-POST-01 to UC-POST-04. Each use case below has its own specific screen(s) placed directly under its "Screens" subsection.*
+### 3.1. UC-POST-01 — Create and Manage Job Draft
 
-#### UC-POST-01: Create and Manage Job Draft
+#### Use-Case Information
 
-| Field | Description |
-| :--- | :--- |
-| **Actors** | Recruiter (Authorized), HR Manager (Authorized) |
-| **Precondition** | The user is logged in and holds the `Recruiter` or `HR Manager` role within the company. |
-| **Postcondition** | The draft is saved with a `Draft` status, ready for UC-POST-02. |
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-POST-01 |
+| Primary Actor | Recruiter or HR Manager |
+| Supporting Actor | None |
+| Trigger | The actor selects **Create job posting** or opens an existing draft. |
 
-**Basic Flow**
+#### Brief Description
 
-| Step | Actor | System |
-| :---: | :--- | :--- |
-| 1 | Recruiter opens "Create Job Posting" and fills in job information (title, department, location, description, etc.). | — |
-| 2 | — | System validates the form fields in real time. |
-| 3 | Recruiter clicks "Save as Draft." | — |
-| 4 | — | System persists the posting with status `Draft` and displays it in the postings list. |
+The actor creates, edits, or deletes a job-posting draft before submitting it for review.
 
-**Alternative Flows**
+#### Preconditions
 
-| ID | Trigger Condition | Flow |
-| :--- | :--- | :--- |
-| AF-1 | Required field is missing or data format is invalid | System blocks the save action, outlines the invalid field(s) in red, and displays a validation message. Recruiter corrects the data and retries. |
-| AF-2 | Recruiter reopens a previously saved draft | System loads the saved draft data into the form for continued editing. |
-| AF-3 | Recruiter deletes an unpublished draft | System prompts a confirmation dialog before permanently deleting the draft. |
-| AF-4 | Database save fails (e.g., connection timeout) | System displays an error toast and keeps the form data intact so the recruiter can retry without data loss. |
+1. The actor has an active authenticated session.
+2. The actor has Recruiter or HR Manager permissions for the company.
 
-**Prototype Evidence**
+#### Basic Flow
 
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: Create a job posting draft | `UC_POST_01_Create_Job_Draft.png` | Job draft base screen, new-entry form, `Draft` badge |
-| AF-1: Invalid input data | `UC_POST_01_Validate_Error.png` | (Reuse `UC_POST_01_Create_Job_Draft.png`) + red-outlined invalid field & validation message |
+1. The actor opens the job-posting workspace.
+2. The System displays a new form or the selected existing draft.
+3. The actor enters or edits the title, department, location, description, requirements, salary range, and application settings.
+4. The System validates the fields and displays the current draft state.
+5. The actor selects **Save draft**.
+6. The System stores the validated draft with status `Draft` and records the update time.
+7. The System displays a confirmation and keeps the draft available for later actions.
 
-**Screens**
+#### Alternative and Error Flows
 
-![BF: Create a job posting draft](../prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_01_Create_Job_Draft.png)
-*BF — Job draft base screen with the new-entry form and `Draft` badge.*
+- **AF-01 — Invalid Input:** The System highlights invalid fields, preserves valid input, and returns the actor to the editing state.
+- **AF-02 — Reopen Existing Draft:** The actor selects a saved draft and continues editing it.
+- **AF-03 — Delete Draft:** The actor selects **Delete**, confirms the action, and the System removes the unpublished draft.
+- **EF-01 — Save Fails:** The System does not display success, preserves the last authoritative draft, and shows a retry message.
 
-![AF-1: Invalid input data](../prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_01_Validate_Error.png)
-*AF-1 — Same form with a red-outlined invalid field and validation message.*
+#### Postconditions
 
----
+- A valid draft is stored with status `Draft`, or an explicitly confirmed deletion is recorded.
+- No posting is visible to candidates until a later submission and moderation process succeeds.
 
-#### UC-POST-02: Preview and Submit Job Posting
+#### Prototype Evidence
 
-| Field | Description |
-| :--- | :--- |
-| **Actors** | Recruiter (Authorized), HR Manager (Authorized) |
-| **Relationship** | «extend» UC-POST-01 (extends from the draft-saving step) |
-| **Precondition** | A job posting exists with status `Draft`. |
-| **Postcondition** | The posting's status changes to `Pending Review`, awaiting processing in UC-POST-03. |
+![UC-POST-01 — Basic Flow: create a job draft](<../prototypes/DGM-03-Recruiter-Operations/Domain 1/UC_POST_01_Create_Job_Draft.png>)
 
-**Basic Flow**
+*Figure 3.1 — UC-POST-01 basic-flow draft form; conceptual prototype evidence for entering and saving a `Draft` posting.*
 
-| Step | Actor | System |
-| :---: | :--- | :--- |
-| 1 | Recruiter opens a `Draft` posting and clicks "Preview." | — |
-| 2 | — | System renders the posting exactly as candidates will see it. |
-| 3 | Recruiter reviews the content and clicks "Submit for approval." | — |
-| 4 | — | System validates required fields and changes the status to `Pending Review`. |
+![UC-POST-01 — Alternative Flow: validation error](<../prototypes/DGM-03-Recruiter-Operations/Domain 1/UC_POST_01_Validate_Error.png>)
 
-**Alternative Flows**
+*Figure 3.2 — UC-POST-01 AF-01; invalid fields remain visible while validation feedback is shown.*
 
-| ID | Trigger Condition | Flow |
-| :--- | :--- | :--- |
-| AF-1 | A required field is missing (e.g., salary range, application deadline) | System blocks the submission and displays an inline error listing the missing fields. |
-| AF-2 | Posting title duplicates an existing posting title in the same company | System displays a warning banner on the preview screen, allowing the recruiter to proceed or rename the title. |
-| AF-3 | Recruiter cancels before submitting | System returns to the draft screen without changing the posting's status. |
-| AF-4 | Recruiter's session/token expires during submission | System redirects to the login screen; unsaved preview state is discarded. |
+#### Related Use Cases and Entry Points
 
-**Prototype Evidence**
+After a draft is complete, the actor may start UC-POST-02 from the draft actions. This is a separate goal and not a mandatory sub-behavior of UC-POST-01.
 
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: Preview & submit for approval | `UC_POST_02_Preview_And_Submit.png` | Preview base screen + "Submit for approval" button |
-| AF-2: Duplicate job posting title warning | `UC_POST_02_Preview_Duplicate_Title_Warning.png` | (Reuse the Preview screen) + banner warning of a title duplicate |
+### 3.2. UC-POST-02 — Preview and Submit Job Posting
 
-**Screens**
+#### Use-Case Information
 
-![BF: Preview & submit for approval](../prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_02_Preview_And_Submit.png)
-*BF — Candidate-facing preview with the "Submit for approval" button.*
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-POST-02 |
+| Primary Actor | Recruiter or HR Manager |
+| Supporting Actor | None |
+| Trigger | The actor opens a saved draft and selects **Preview**. |
 
-![AF-2: Duplicate job posting title warning](../prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_02_Preview_Duplicate_Title_Warning.png)
-*AF-2 — Same preview screen with a duplicate-title warning banner.*
+#### Brief Description
 
----
+The actor previews a completed draft as candidates will see it and submits the posting for review.
 
-#### UC-POST-03: Manage Job-Posting Lifecycle
+#### Preconditions
 
-| Field | Description |
-| :--- | :--- |
-| **Actors** | Recruiter, HR Manager, Company Owner (all Authorized) |
-| **Relationship** | «extend» UC-POST-02 |
-| **Precondition** | A posting exists with status `Pending Review`, `Published`, or `Paused`. |
-| **Postcondition** | The posting's status accurately reflects its current lifecycle state (`Draft` / `Pending Review` / `Published` / `Archived` / `Rejected`). |
+1. A draft exists and is owned by the actor's company.
+2. Required posting fields are complete.
 
-**Basic Flow**
+#### Basic Flow
 
-| Step | Actor | System |
-| :---: | :--- | :--- |
-| 1 | HR Manager/Owner opens the postings list and filters by `Pending Review`. | System displays matching postings. |
-| 2 | User opens the actions menu (⋮) on a posting. | — |
-| 3 | User selects "Approve." | — |
-| 4 | — | System changes the posting's status to `Published`. |
+1. The actor opens a completed draft.
+2. The System validates the draft and renders the candidate-facing preview.
+3. The actor reviews the content and selects **Submit for approval**.
+4. The System performs the final submission validation.
+5. The System changes the posting status to `Pending Review` and records the submitting actor.
+6. The System displays the submitted state.
 
-**Alternative Flows**
+#### Alternative and Error Flows
 
-| ID | Trigger Condition | Flow |
-| :--- | :--- | :--- |
-| AF-1 | User selects "Reject" instead of "Approve" | System requires a rejection reason, then reverts the posting to `Draft` status. |
-| AF-2 | User selects "Close/Archive" on a fully staffed or expired posting | System changes the posting's status to `Archived`. |
-| AF-3 | User does not have the required role (e.g., a plain Recruiter attempting Owner-only action) | System hides or disables the restricted action and shows a permission-denied message if attempted directly. |
-| AF-4 | Two managers act on the same posting concurrently | System detects the stale state on the second submit and prompts the user to refresh before retrying. |
+- **AF-01 — Required Field Missing:** The System identifies the missing field and returns the actor to the draft editor.
+- **AF-02 — Duplicate Title Warning:** The System shows a warning about a similar posting; the actor may revise the title or explicitly continue if policy permits.
+- **AF-03 — Actor Cancels Preview:** The actor returns to the draft without changing its status.
+- **EF-01 — Submission Fails:** The System retains the `Draft` state and reports a retryable failure.
 
-**Prototype Evidence**
+#### Postconditions
 
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: Open the actions menu (approve/reject/close/pause) | `UC_POST_03_Actions_Menu.png` | List row + actions menu (⋮) on a posting |
-| State: List filtered by `Draft` | `UC_POST_03_Filter_List_Draft.png` | Postings list + `Draft` filter selected |
-| State: List filtered by `Pending Review` | `UC_POST_03_Filter_List_Pending_Review.png` | Postings list + `Pending Review` filter selected |
-| State: List filtered by `Published` | `UC_POST_03_Filter_List_Published.png` | Postings list + `Published` filter selected |
-| State: List filtered by `Paused` | `UC_POST_03_Filter_List_Paused.png` | Postings list + `Paused` filter selected |
-| State: List filtered by `Closed` | `UC_POST_03_Filter_List_Closed.png` | Postings list + `Closed` filter selected |
+- On success, the posting is `Pending Review` and is available to the configured review process.
+- On cancellation or failure, the last valid draft remains available.
 
-**Screens**
+#### Prototype Evidence
 
-![BF: Open the actions menu](../prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_03_Actions_Menu.png)
-*BF — Posting list row with the actions menu (⋮) open (approve/reject/close/pause).*
+![UC-POST-02 — Basic Flow: preview and submit](<../prototypes/DGM-03-Recruiter-Operations/Domain 1/UC_POST_02_Preview_And_Submit.png>)
 
-![State: Draft filter](../prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_03_Filter_List_Draft.png)
-*State — List filtered by `Draft` status.*
+*Figure 3.3 — UC-POST-02 basic flow; preview and submission action for a completed draft.*
 
-![State: Pending Review filter](../prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_03_Filter_List_Pending_Review.png)
-*State — List filtered by `Pending Review` status.*
+![UC-POST-02 — Alternative Flow: duplicate title warning](<../prototypes/DGM-03-Recruiter-Operations/Domain 1/UC_POST_02_Preview_Duplicate_Title_Warning.png>)
 
-![State: Published filter](../prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_03_Filter_List_Published.png)
-*State — List filtered by `Published` status.*
+*Figure 3.4 — UC-POST-02 AF-02; duplicate-title warning is displayed before the actor decides whether to continue.*
 
-![State: Paused filter](../prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_03_Filter_List_Paused.png)
-*State — List filtered by `Paused` status.*
+#### Related Use Cases and Entry Points
 
-![State: Closed filter](../prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_03_Filter_List_Closed.png)
-*State — List filtered by `Closed` status.*
+UC-POST-02 starts from a draft created by UC-POST-01. A submitted posting may later be handled by UC-POST-03 or by the moderation use cases in DGM-04.
 
----
+### 3.3. UC-POST-03 — Manage Job-Posting Lifecycle
 
-#### UC-POST-04: View Company Job Postings
+#### Use-Case Information
 
-| Field | Description |
-| :--- | :--- |
-| **Actors** | Recruiter, HR Manager, Company Owner |
-| **Precondition** | The user belongs to the company. |
-| **Postcondition** | The list accurately reflects the current status of every posting in the company. |
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-POST-03 |
+| Primary Actor | Recruiter, HR Manager, or Company Owner |
+| Supporting Actor | None |
+| Trigger | The actor opens the company's posting list and chooses a lifecycle action or filter. |
 
-**Basic Flow**
+#### Brief Description
 
-| Step | Actor | System |
-| :---: | :--- | :--- |
-| 1 | User navigates to "Job Postings." | — |
-| 2 | — | System fetches and displays the full list of postings with status badges. |
+The actor views and manages permitted lifecycle actions for company postings, including publish, pause, close, or archive operations.
 
-**Alternative Flows**
+#### Preconditions
 
-| ID | Trigger Condition | Flow |
-| :--- | :--- | :--- |
-| AF-1 | Company has no job postings yet | System displays an empty state with a call-to-action to create a new posting. |
-| AF-2 | List-fetch fails (external/database error) | System displays a retry prompt instead of a blank list. |
+1. The actor is authenticated and has the required company permission.
+2. The selected posting belongs to the active company context.
 
-**Prototype Evidence**
+#### Basic Flow
 
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: View the company's job postings list | `UC_POST_04_View_Company_Job_Postings.png` | Full list, unfiltered, multiple statuses interleaved |
+1. The actor opens the company posting list.
+2. The System displays postings and their statuses.
+3. The actor opens the action menu for a posting.
+4. The System displays only actions permitted for the current status and role.
+5. The actor selects an action and confirms it when required.
+6. The System validates the transition, updates the status, records the actor and reason, and refreshes the list.
 
-**Screens**
+#### Alternative and Error Flows
 
-![BF: View the company's job postings list](../prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_04_View_Company_Job_Postings.png)
-*BF — Full, unfiltered postings list with multiple statuses interleaved.*
+- **AF-01 — Filter by Status:** The actor selects `Draft`, `Pending Review`, `Published`, `Paused`, or `Closed`; the System shows matching postings.
+- **AF-02 — Close or Archive:** The actor confirms that a staffed, expired, or no-longer-needed posting should be closed or archived.
+- **AF-03 — Transition Not Allowed:** The System explains why the requested status transition is unavailable and leaves the posting unchanged.
+- **EF-01 — Update Fails:** The System keeps the authoritative status and displays a retry message.
 
----
+#### Postconditions
 
-### Domain 2: Applicant Screening & Ranking
+The posting status and audit record accurately reflect the permitted lifecycle action, or no state changes on failure.
 
-![Applicant Screening prototype overview](../prototypes/DGM-03-Recruiter-Operations/Domain%202/UC_SCR_01_AI_Scanning.png)
+#### Prototype Evidence
 
-*Figure 2 — Domain overview: the Screening/Evaluation base screen showing the AI scoring state (UC-SCR-01), extended into the ranked-candidates view for UC-SCR-03. Specific screens per flow are placed under each use case's "Screens" subsection.*
+![UC-POST-03 — lifecycle actions](<../prototypes/DGM-03-Recruiter-Operations/Domain 1/UC_POST_03_Actions_Menu.png>)
 
-#### UC-SCR-01: Execute Hybrid Candidate Screening *(ref. Diagram 5)*
+*Figure 3.5 — UC-POST-03 basic flow; lifecycle action menu for a posting.*
 
-> This use case belongs to the scope of **Diagram 5 (Supporting Services and Analytics)**. It is included by UC-SCR-03. Only its interface touchpoints relevant to the Recruiter's workflow are summarized here; the full flow and screenshots (`UI_01_*`) are documented in the Diagram 5 specification.
+![UC-POST-03 — filtered posting list](<../prototypes/DGM-03-Recruiter-Operations/Domain 1/UC_POST_03_Filter_List_Published.png>)
 
-| Field | Description |
-| :--- | :--- |
-| **Actors** | System / AI Service |
-| **Precondition** | An applicant has submitted a résumé against a `Published` job posting. |
-| **Postcondition** | A screening score is generated for the candidate and made available to UC-SCR-03. |
+*Figure 3.6 — UC-POST-03 AF-01/state; the list is filtered to `Published` postings. The Draft, Pending Review, Paused, and Closed screenshots represent the corresponding states.*
 
-**Prototype Evidence (referenced, owned by Diagram 5)**
+#### Related Use Cases and Entry Points
 
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: The AI system is scoring | `UC_SCR_01_AI_Scanning.png` | Evaluation base screen + loading/scanning indicator |
-| AF: Scoring failed | `UC_SCR_01_Scoring_Failed.png` | Evaluation base screen + scoring-failure message |
+The actor may open UC-POST-04 to view the company list. A posting in `Pending Review` may be handled by the moderation process in DGM-04.
 
-**Screens**
+### 3.4. UC-POST-04 — View Company Job Postings
 
-![BF: The AI system is scoring](../prototypes/DGM-03-Recruiter-Operations/Domain%202/UC_SCR_01_AI_Scanning.png)
-*BF — Evaluation base screen with the loading/scanning indicator.*
+#### Use-Case Information
 
-![AF: Scoring failed](../prototypes/DGM-03-Recruiter-Operations/Domain%202/UC_SCR_01_Scoring_Failed.png)
-*AF — Evaluation base screen with the scoring-failure message.*
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-POST-04 |
+| Primary Actor | Recruiter, HR Manager, or Company Owner |
+| Supporting Actor | None |
+| Trigger | The actor opens **Company job postings**. |
 
----
+#### Brief Description
 
-#### UC-SCR-03: Review and Rank Applicants
+The actor views the company's job-posting list and current statuses.
 
-| Field | Description |
-| :--- | :--- |
-| **Actors** | Recruiter (Authorized), HR Manager (Authorized) |
-| **Relationship** | «include» UC-SCR-01: Execute Hybrid Candidate Screening (ref. Diagram 5) |
-| **Precondition** | UC-SCR-01 has executed successfully and returned a score for the candidate. |
-| **Postcondition** | The ranked list (whether overridden or not) is used as input for the Recruitment Pipeline. |
+#### Preconditions
 
-**Basic Flow**
+1. The actor has an active authenticated session.
+2. The actor belongs to the selected company context.
 
-| Step | Actor | System |
-| :---: | :--- | :--- |
-| 1 | Recruiter opens the "Candidates" tab for a job posting. | — |
-| 2 | — | System includes UC-SCR-01 to retrieve AI scores, then displays candidates sorted by score (descending) with a résumé summary. |
-| 3 | Recruiter reviews the ranked list. | — |
+#### Basic Flow
 
-**Alternative Flows**
+1. The actor opens the company posting list.
+2. The System verifies the company scope.
+3. The System retrieves the company's postings.
+4. The System displays each posting with its status and permitted actions.
 
-| ID | Trigger Condition | Flow |
-| :--- | :--- | :--- |
-| AF-1 | Recruiter disagrees with the AI-suggested order | Recruiter manually re-prioritizes a candidate; system saves the manual override and marks the entry as "manually ranked." |
-| AF-2 | Recruiter advances a top candidate directly to the Offer stage | System moves the candidate's pipeline stage to `Offer` and logs the transition (feeds UC-PIPE-03). |
-| AF-3 | Recruiter rejects a candidate from the ranked list | System requires a rejection reason and moves the candidate to `Rejected`. |
-| AF-4 | UC-SCR-01 has not yet returned a score for a candidate | System shows the candidate in a "Pending screening" state instead of a numeric rank. |
+#### Alternative and Error Flows
 
-**Prototype Evidence**
+- **AF-01 — No Postings:** The System displays an empty state and a permitted create-posting action.
+- **AF-02 — Filter Requested:** The actor filters the list by status and the System refreshes the results.
+- **EF-01 — List Cannot Be Loaded:** The System shows a retry message without presenting stale data as current.
 
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: List of ranked candidates | `UC_SCR_03_Ranked_Candidates.png` | Candidate list sorted by AI score in descending order |
-| State: Results ready to review | `UC_SCR_03_Ready.png` | (Reuse `UC_SCR_03_Ranked_Candidates.png`) + "Ready to review" badge |
-| AF-2: Move a candidate to the Offer stage | `UC_SCR_03_Advanced_To_Offer.png` | Rank row + "Advance to Offer" action |
-| AF-3: Reject a candidate | `UC_SCR_03_Reject.png` | Rank row + "Reject" action |
+#### Postconditions
 
-**Screens**
+The actor has a read-only view of the current company posting list and may start a related posting action.
 
-![BF: List of ranked candidates](../prototypes/DGM-03-Recruiter-Operations/Domain%202/UC_SCR_03_Ranked_Candidates.png)
-*BF — Candidate list sorted by AI score, descending, with résumé summary.*
+#### Prototype Evidence
 
-![State: Results ready to review](../prototypes/DGM-03-Recruiter-Operations/Domain%202/UC_SCR_03_Ready.png)
-*State — Ranked list with the "Ready to review" badge.*
+![UC-POST-04 — company posting list](<../prototypes/DGM-03-Recruiter-Operations/Domain 1/UC_POST_04_View_Company_Job_Postings.png>)
 
-![AF-2: Advance to Offer](../prototypes/DGM-03-Recruiter-Operations/Domain%202/UC_SCR_03_Advanced_To_Offer.png)
-*AF-2 — Rank row with the "Advance to Offer" action.*
+*Figure 3.7 — UC-POST-04 basic flow; company postings with their current statuses.*
 
-![AF-3: Reject a candidate](../prototypes/DGM-03-Recruiter-Operations/Domain%202/UC_SCR_03_Reject.png)
-*AF-3 — Rank row with the "Reject" action.*
+#### Related Use Cases and Entry Points
 
----
+The actor may start UC-POST-01, UC-POST-02, or UC-POST-03 from an appropriate row action; each remains a separate goal.
 
-### Domain 3: Recruitment Pipeline
+### 3.5. UC-SCR-01 — Execute Hybrid Candidate Screening
 
-![Recruitment Pipeline prototype overview](../prototypes/DGM-03-Recruiter-Operations/Domain%203/UC_PIPE_01_Kanban_Board.png)
+#### Use-Case Information
 
-*Figure 3 — Domain overview: the Kanban board base screen shared across UC-PIPE-01 (view), UC-PIPE-02 (drag-and-drop update), and the entry point into UC-PIPE-03 (stage history). Specific screens per flow are placed under each use case's "Screens" subsection.*
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-SCR-01 |
+| Primary Actor | System / AI Service |
+| Supporting Actor | AI Service |
+| Trigger | A valid candidate application is submitted and normalized CV data is available. |
 
-#### UC-PIPE-01: View Recruitment Pipeline Kanban Board
+#### Brief Description
 
-| Field | Description |
-| :--- | :--- |
-| **Actors** | Recruiter, HR Manager, Company Owner |
-| **Precondition** | At least one candidate has an active application. |
-| **Postcondition** | The board accurately reflects the current stage of every active candidate for the selected posting(s). |
+The System asynchronously calculates a deterministic and semantic screening result. The complete service specification and cross-domain evidence are maintained in DGM-05; this section records the recruiter-facing state.
 
-**Basic Flow**
+#### Preconditions
 
-| Step | Actor | System |
-| :---: | :--- | :--- |
-| 1 | User navigates to "Pipeline." | — |
-| 2 | — | System displays stage columns (Applied → Screening → Interview → Offer → Hired) with candidate cards. |
+1. A valid application has been submitted.
+2. Required job and candidate data are available.
 
-**Alternative Flows**
+#### Basic Flow
 
-| ID | Trigger Condition | Flow |
-| :--- | :--- | :--- |
-| AF-1 | User filters the board by a specific job posting | System re-renders the board scoped to that posting only. |
-| AF-2 | Actor is a Company Owner | System displays the board in read-only mode, hiding drag-and-drop actions. |
+1. The System detects the submitted application.
+2. The System changes screening status to `Processing`.
+3. The System calculates deterministic matches.
+4. The AI Service calculates semantic evaluation and returns an explanation.
+5. The System stores the blended score and changes status to `Completed`.
 
-**Prototype Evidence**
+#### Alternative and Error Flows
 
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: Kanban board by stage | `UC_PIPE_01_Kanban_Board.png` | All stage columns shown, with full action permissions |
-| AF-2: Company Owner viewing in read-only mode | `UC_PIPE_01_Kanban_Board_Owner_View_Only.png` | (Reuse `UC_PIPE_01_Kanban_Board.png`) + drag-and-drop actions hidden |
+- **EF-01 — Screening Fails:** The System changes status to `Failed`, records a retryable error, and does not expose a partial score as final.
 
-**Screens**
+#### Postconditions
 
-![BF: Kanban board by stage](../prototypes/DGM-03-Recruiter-Operations/Domain%203/UC_PIPE_01_Kanban_Board.png)
-*BF — All stage columns (Applied → Screening → Interview → Offer → Hired) with full action permissions.*
+The application has a completed score or a durable `Failed` state. UC-SCR-03 can be started only when a usable result exists.
 
-![AF-2: Owner read-only view](../prototypes/DGM-03-Recruiter-Operations/Domain%203/UC_PIPE_01_Kanban_Board_Owner_View_Only.png)
-*AF-2 — Same board with drag-and-drop actions hidden for the Company Owner.*
+#### Prototype Evidence
 
----
+![UC-SCR-01 — screening in progress](<../prototypes/DGM-03-Recruiter-Operations/Domain 2/UC_SCR_01_AI_Scanning.png>)
 
-#### UC-PIPE-02: Update Candidate Recruitment Stage
+*Figure 3.8 — UC-SCR-01 basic-flow processing state; the full screening-service evidence is also documented in DGM-05.*
 
-| Field | Description |
-| :--- | :--- |
-| **Actors** | Recruiter (Authorized), HR Manager (Authorized) |
-| **Relationship** | «extend» UC-PIPE-01 |
-| **Precondition** | The candidate's card is visible on the kanban board. |
-| **Postcondition** | The new stage is saved, and a history record is created (input for UC-PIPE-03). |
+![UC-SCR-01 — screening failed](<../prototypes/DGM-03-Recruiter-Operations/Domain 2/UC_SCR_01_Scoring_Failed.png>)
 
-**Basic Flow**
+*Figure 3.9 — UC-SCR-01 EF-01; a failed result is clearly separated from a completed score.*
 
-| Step | Actor | System |
-| :---: | :--- | :--- |
-| 1 | Recruiter drags a candidate's card from the current column to the next stage column. | — |
-| 2 | — | System validates the transition and updates the candidate's stage. |
-| 3 | — | System logs the change and displays a confirmation toast. |
+#### Related Use Cases and Entry Points
 
-**Alternative Flows**
+After a completed result is available, the recruiter may start UC-SCR-03. The screening process is asynchronous and is not a mandatory sub-step of opening the ranked list.
 
-| ID | Trigger Condition | Flow |
-| :--- | :--- | :--- |
-| AF-1 | Recruiter drops the card onto the `Rejected` column | System requires a rejection reason before confirming the move. |
-| AF-2 | Recruiter cancels the drag mid-action (drops back on the original column) | System discards the action; no stage change or history record is created. |
-| AF-3 | Two recruiters move the same card at the same time | System applies the first successful update and notifies the second user that the card has already moved, refreshing their board. |
-| AF-4 | Database save of the stage change fails | System reverts the card to its original column and displays an error toast. |
+### 3.6. UC-SCR-03 — Review and Rank Applicants
 
-**Prototype Evidence**
+#### Use-Case Information
 
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: Drag and drop a candidate's card to another column | `UC_PIPE_02_Drag_And_Drop_Card.png` | Candidate card shown mid-drag (dragging state) |
-| BF: Confirm the stage update | `UC_PIPE_02_Move_Stage.png` | Toast/confirmation message that the stage change succeeded |
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-SCR-03 |
+| Primary Actor | Recruiter or HR Manager |
+| Supporting Actor | None |
+| Trigger | The actor opens the ranked-applicant view for a job posting. |
 
-**Screens**
+#### Brief Description
 
-![BF: Drag and drop a candidate's card](../prototypes/DGM-03-Recruiter-Operations/Domain%203/UC_PIPE_02_Drag_And_Drop_Card.png)
-*BF — Candidate card shown mid-drag toward the next stage column.*
+The actor reviews candidates whose screening results are already available and may record a recruitment decision.
 
-![BF: Confirm the stage update](../prototypes/DGM-03-Recruiter-Operations/Domain%203/UC_PIPE_02_Move_Stage.png)
-*BF — Toast/confirmation message that the stage change succeeded.*
+#### Preconditions
 
----
+1. A completed screening result is available for the selected application.
+2. The actor has permission to view the company's applicants.
 
-#### UC-PIPE-03: View Application Stage History
+#### Basic Flow
 
-| Field | Description |
-| :--- | :--- |
-| **Actors** | Recruiter, HR Manager, Company Owner |
-| **Relationship** | «include» UC-PIPE-02 (each stage update creates a history record) |
-| **Precondition** | At least one stage transition has occurred for the selected application. |
-| **Postcondition** | The full, ordered history of stage transitions is visible for the selected application. |
+1. The actor opens the ranked-applicant view.
+2. The System retrieves completed scores and permitted candidate summaries.
+3. The System sorts candidates by the configured ranking.
+4. The actor reviews the score, permitted explanation, and candidate summary.
+5. The actor may select an applicant action.
+6. The System records the decision or ranking adjustment.
 
-**Basic Flow**
+#### Alternative and Error Flows
 
-| Step | Actor | System |
-| :---: | :--- | :--- |
-| 1 | User opens a candidate's application and selects "History." | — |
-| 2 | — | System displays a chronological timeline: stage, transition time, and the actor who performed the update. |
+- **AF-01 — Result Not Ready:** The System shows a `Processing` or `Failed` status and does not display an incomplete result as final.
+- **AF-02 — Manual Override:** The actor changes the ranking or advances a candidate, and the System records the actor and reason when required.
+- **AF-03 — Reject Candidate:** The actor records a rejection reason and the System updates the candidate's recruitment state.
+- **EF-01 — Results Cannot Be Loaded:** The System shows a retry message and retains the last authoritative ranking.
 
-**Alternative Flows**
+#### Postconditions
 
-| ID | Trigger Condition | Flow |
-| :--- | :--- | :--- |
-| AF-1 | No stage transitions have occurred yet | System displays an empty timeline with the application's initial `Applied` state only. |
+The actor has reviewed the available applicants and any manual decision is auditable. The resulting application may be handled by the pipeline use cases.
 
-**Prototype Evidence**
+#### Prototype Evidence
 
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: Application history log | `UC_PIPE_03_Stage_History.png` | Timeline of stage changes in chronological order |
+![UC-SCR-03 — ranked candidates](<../prototypes/DGM-03-Recruiter-Operations/Domain 2/UC_SCR_03_Ranked_Candidates.png>)
 
-**Screens**
+*Figure 3.10 — UC-SCR-03 basic flow; candidates are listed in ranked order.*
 
-![BF: Application history log](../prototypes/DGM-03-Recruiter-Operations/Domain%203/UC_PIPE_03_Stage_History.png)
-*BF — Chronological timeline of stage changes, transition time, and the acting user.*
+![UC-SCR-03 — ready state](<../prototypes/DGM-03-Recruiter-Operations/Domain 2/UC_SCR_03_Ready.png>)
 
----
+*Figure 3.11 — UC-SCR-03 state; results are ready for review.*
 
-## Traceability Summary (per Domain)
+![UC-SCR-03 — decision states](<../prototypes/DGM-03-Recruiter-Operations/Domain 2/UC_SCR_03_Advanced_To_Offer.png>)
 
-| Domain | Use Cases | Evidence Files | Reused Base Screens |
-| :--- | :--- | :--- | :--- |
-| Job Posting Management | UC-POST-01 → 04 | 11 | 2 (Draft form, Preview shell) |
-| Applicant Screening & Ranking | UC-SCR-03 (incl. UC-SCR-01 ref.) | 6 | 1 (Ranked candidates list) |
-| Recruitment Pipeline | UC-PIPE-01 → 03 | 5 | 1 (Kanban board) |
+*Figure 3.12 — UC-SCR-03 AF-02; the actor advances a candidate to the Offer stage. The Reject screenshot represents AF-03.*
+
+#### Related Use Cases and Entry Points
+
+UC-SCR-03 consumes a result produced by UC-SCR-01. A reviewed application may be opened in UC-PIPE-01 or updated with UC-PIPE-02.
+
+### 3.7. UC-PIPE-01 — View Recruitment Pipeline Kanban Board
+
+#### Use-Case Information
+
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-PIPE-01 |
+| Primary Actor | Recruiter, HR Manager, or Company Owner |
+| Supporting Actor | None |
+| Trigger | The actor opens the recruitment pipeline for a selected job or company. |
+
+#### Brief Description
+
+The actor views applications grouped by recruitment stage on a Kanban board.
+
+#### Preconditions
+
+1. The actor is authenticated and has access to the company context.
+2. The selected job or company has accessible applications.
+
+#### Basic Flow
+
+1. The actor opens the pipeline.
+2. The System retrieves applications and their current stages.
+3. The System displays stage columns and candidate cards.
+4. The actor filters by job when needed.
+
+#### Alternative and Error Flows
+
+- **AF-01 — Company Owner View:** The System displays a read-only board and hides stage-changing controls.
+- **AF-02 — Filter by Job:** The actor selects a job and the System refreshes the board.
+- **EF-01 — Pipeline Cannot Be Loaded:** The System reports the failure and does not present an incomplete board as current.
+
+#### Postconditions
+
+The actor can see the current authorized pipeline state.
+
+#### Prototype Evidence
+
+![UC-PIPE-01 — editable Kanban board](<../prototypes/DGM-03-Recruiter-Operations/Domain 3/UC_PIPE_01_Kanban_Board.png>)
+
+*Figure 3.13 — UC-PIPE-01 basic flow; stage columns and candidate cards are visible.*
+
+![UC-PIPE-01 — owner read-only board](<../prototypes/DGM-03-Recruiter-Operations/Domain 3/UC_PIPE_01_Kanban_Board_Owner_View_Only.png>)
+
+*Figure 3.14 — UC-PIPE-01 AF-01; Company Owner sees the board without stage-changing controls.*
+
+#### Related Use Cases and Entry Points
+
+The actor may start UC-PIPE-02 from an editable card or UC-PIPE-03 from an application's history action. These are separate goals.
+
+### 3.8. UC-PIPE-02 — Update Candidate Recruitment Stage
+
+#### Use-Case Information
+
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-PIPE-02 |
+| Primary Actor | Recruiter or HR Manager |
+| Supporting Actor | None |
+| Trigger | The actor selects a candidate card and chooses a permitted destination stage. |
+
+#### Brief Description
+
+The actor changes an application's recruitment stage. The stage update and its history event are committed atomically.
+
+#### Preconditions
+
+1. The actor has permission to change the selected application's stage.
+2. The application and target stage are still current.
+
+#### Basic Flow
+
+1. The actor selects a candidate card.
+2. The actor drags the card or chooses **Change stage**.
+3. The System validates the transition and any required reason.
+4. The actor confirms the destination stage.
+5. The System updates the stage and creates exactly one history event in the same transaction.
+6. The System refreshes the board and confirms the change.
+
+#### Alternative and Error Flows
+
+- **AF-01 — Move to Rejected:** The System requests a rejection reason before committing the transition.
+- **AF-02 — Stale Card:** The System detects a concurrent change, reloads the current application, and asks the actor to retry.
+- **AF-03 — Actor Cancels:** The System restores the card to its original stage and creates no history event.
+- **EF-01 — Transaction Fails:** The System rolls back both the stage update and its history event and displays a retry message.
+
+#### Postconditions
+
+On success, the new stage and exactly one corresponding history event are stored atomically. UC-PIPE-03 can later read that event; it is not executed as part of this use case.
+
+#### Prototype Evidence
+
+![UC-PIPE-02 — drag and drop](<../prototypes/DGM-03-Recruiter-Operations/Domain 3/UC_PIPE_02_Drag_And_Drop_Card.png>)
+
+*Figure 3.15 — UC-PIPE-02 basic flow; the card is being moved to a new stage.*
+
+![UC-PIPE-02 — stage update confirmation](<../prototypes/DGM-03-Recruiter-Operations/Domain 3/UC_PIPE_02_Move_Stage.png>)
+
+*Figure 3.16 — UC-PIPE-02 postcondition evidence; the stage update succeeds and the board confirms it.*
+
+#### Related Use Cases and Entry Points
+
+UC-PIPE-02 may be started from UC-PIPE-01. The resulting history data is available to UC-PIPE-03.
+
+### 3.9. UC-PIPE-03 — View Application Stage History
+
+#### Use-Case Information
+
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-PIPE-03 |
+| Primary Actor | Recruiter, HR Manager, or Company Owner |
+| Supporting Actor | None |
+| Trigger | The actor opens **Stage history** for an application. |
+
+#### Brief Description
+
+The actor views the immutable timeline of stage changes for an application.
+
+#### Preconditions
+
+1. The actor can access the selected application.
+2. The application history is available, including an empty history when no transition has occurred.
+
+#### Basic Flow
+
+1. The actor selects an application and opens **Stage history**.
+2. The System verifies authorization and retrieves history records.
+3. The System displays stage, transition time, actor, and permitted reason for each event in chronological order.
+4. The actor reviews the timeline.
+
+#### Alternative and Error Flows
+
+- **AF-01 — No History Yet:** The System displays the current stage and an empty-history message.
+- **AF-02 — History Is Paginated:** The actor requests another page and the System loads older records.
+- **EF-01 — History Cannot Be Loaded:** The System shows a retry message and does not fabricate or reorder records.
+
+#### Postconditions
+
+The actor has a read-only view of the authorized application-stage history. No stage update is performed by this use case.
+
+#### Prototype Evidence
+
+![UC-PIPE-03 — stage-history timeline](<../prototypes/DGM-03-Recruiter-Operations/Domain 3/UC_PIPE_03_Stage_History.png>)
+
+*Figure 3.17 — UC-PIPE-03 basic flow; stage transitions are shown in chronological order.*
+
+#### Related Use Cases and Entry Points
+
+UC-PIPE-03 reads history events created by UC-PIPE-02. The actor may open it from UC-PIPE-01 or an application-detail view.
+
+## 4. Relationship and Prototype Rules Applied
+
+- The actor hierarchy is represented as Recruiter / HR Manager / Company Owner → Company Member.
+- POST-01 → POST-02 → POST-03 is documented as a sequence of separate goals and entry points.
+- Screening is asynchronous: UC-SCR-03 requires a completed result and does not start scoring implicitly.
+- UC-PIPE-02 writes one stage event atomically; UC-PIPE-03 only reads that data.
+- Each use case contains its own prototype evidence with a flow/state caption. The coverage file remains an index, and the HTML prototype is supplementary demo material.

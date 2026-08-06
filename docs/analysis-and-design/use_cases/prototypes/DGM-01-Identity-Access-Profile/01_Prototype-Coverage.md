@@ -1,6 +1,6 @@
 # DGM-01 — Identity, Access, and Profile Prototype Coverage
 
-*Performed by: Nguyen Gia Quoc Uy | Reviewed by: Group 9 | Edited by: Nguyen Gia Quoc Uy*  
+*Performed by: Nguyen Gia Quoc Uy | Reviewed by: Group 9 | Edited by: Nguyen Gia Quoc Uy*
 **Version:** V1.1 (25/7/2026) — Reconciled with the implemented PA3 identity feature
 
 ## 1. Scope
@@ -17,6 +17,8 @@ This document summarizes the desktop-web prototypes and implementation evidence 
 | **Planned — conceptual prototype** | Approved future SmartHire behavior outside the selected PA3 implementation group. The image is not evidence that the feature has been implemented. |
 
 Raw captures containing personal email addresses, live TOTP values, backup codes, or other authentication material must not be submitted. PA3 application captures must use seeded test data, be sanitized, and be cropped to the relevant application interface.
+
+The detailed UC specification embeds the corresponding evidence directly under every UC. This file is an index and status-classification appendix, not the only location where prototype evidence appears.
 
 ## 2. Prototype Coverage
 

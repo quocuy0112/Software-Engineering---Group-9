@@ -2,12 +2,12 @@
 
 ## Use-Case Specifications
 
-*Performed by: Nguyen Gia Quoc Uy | Reviewed by: Group 9 | Edited by: Nguyen Gia Quoc Uy*   
-**Version:** 
+*Performed by: Nguyen Gia Quoc Uy | Reviewed by: Group 9 | Edited by: Nguyen Gia Quoc Uy*
+**Version:** V1.4 (25/07/2026) — Reconciled with PA3 implementation; added 2FA, owned-session management, and full account recovery
+**Version History:**
 - V1.1 (20/7/2026) - First initialization (UC1 --> 3)
 - V1.2 (22/7/2026) - Second initialization (UC3 --> 7)
 - V1.3 (23/7/2026) - Third initialization (UC7 --> 12)
-- V1.4 (25/7/2026) - Reconciled with PA3 implementation; added 2FA, owned-session management, and full account recovery (UC-AUTH-08 --> UC-AUTH-11)
 
 # 1. UC-AUTH-01 — Register Account
 
@@ -33,13 +33,13 @@ This use case allows a visitor to create a standard SmartHire account by providi
 1. The Visitor selects **Create account**.
 2. The System displays the registration form.
 3. The Visitor enters full name, email address, password, and password confirmation.
-4. The System will check the valid password whether it contains upper_case letter, lower_case letter, number and special character.
-5. The Visitor accepts the Terms of Service and submits the form
+4. The System validates that the password contains at least one uppercase letter, one lowercase letter, one number, and one special character.
+5. The Visitor accepts the Terms of Service and submits the form.
 6. The System validates the submitted information.
 7. The System verifies that the email address is not already associated with an account.
 8. The System securely hashes the password.
 9. The System creates an account with the PENDING_VERIFICATION status.
-10. The System creates an a single-use email-verification token. 
+10. The System creates a single-use email-verification token.
 11. The Email Delivery Service sends a verification message.
 12. The System displays the verification-pending page.
 13. Account activation continues through **UC-AUTH-02 — Verify Email Address**.
@@ -52,9 +52,9 @@ At Step 6, if a required field is missing:
 2. The System preserves valid entered information.
 3. The use case resumes at Step 3.
 
-### 1.5.2. AF-02 — Email Format is Invalid
+### 1.5.2. AF-02 — Email Format Is Invalid
 At Step 5, if the email format is invalid:
-1. The System displays an email-format-validation message
+1. The System displays an email-format-validation message.
 2. The use case resumes at Step 3.
 
 ### 1.5.3. AF-03 — Password Does Not Satisfy the Rule
@@ -64,7 +64,7 @@ At Step 4, if the password does not match the rule:
 3. The use case resumes at Step 3.
 
 ### 1.5.4. AF-04 — Password Confirmation Does Not Match
-At Step 5, if the two password values do nat match:
+At Step 5, if the two password values do not match:
 1. The System displays a password-mismatch message.
 2. The use case resumes at Step 3.
 
@@ -108,9 +108,19 @@ At Step 9, if the account cannot be saved:
 - Verification tokens must be single-use, securely generated, and time-limited.
 - Sensitive values must not appear in logs or URLs other than the required opaque token.
 
-## 1.8 Extension Points
-### Email Verification 
-After the pending account is created, account activation proceeds through UC-AUTH-02.
+## Prototype Evidence
+
+![UC-AUTH-01 — registration form](../prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-01/UC-AUTH-01-BF-Registration-Form.png)
+
+*Figure 1.1 — UC-AUTH-01 basic flow; the Visitor enters registration data.*
+
+![UC-AUTH-01 — validation states](../prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-01/UC-AUTH-01-AF-Validation-States.png)
+
+*Figure 1.2 — UC-AUTH-01 alternative-flow evidence; validation feedback is shown without creating an account.*
+
+## Related Use Cases and Entry Points
+### Email Verification
+After the pending account is created, the Visitor may start UC-AUTH-02 to activate it. Email verification is a separate goal, not a mandatory sub-flow of registration.
 
 ---
 # 2. UC-AUTH-02 — Verify Email Address
@@ -126,7 +136,7 @@ After the pending account is created, account activation proceeds through UC-AUT
 | **Trigger** | The Visitor opens an email-verification link. |
 
 ## 2.2. Brief Description
-This use case confirms that the Visitor controls the registered email address and activates the correspoding pending account
+This use case confirms that the Visitor controls the registered email address and activates the corresponding pending account.
 
 ## 2.3. Preconditions
 1. A pending account exists.
@@ -165,7 +175,7 @@ At Step 4, if the account is already active, the System displays the verificatio
 ### 2.5.6. AF-06 — Resend Is Rate-Limited
 If fewer than 60 seconds have passed since the previous request, or the hourly limit is exceeded, the System displays the remaining cooldown time.
 
-### 2.5.7.EF-01 — Activation Cannot Be Saved
+### 2.5.7. EF-01 — Activation Cannot Be Saved
 If Steps 5–7 cannot be committed atomically, the System rolls back the operation, records the failure, and displays a retry message.
 
 ## 2.6. Postconditions
@@ -178,6 +188,16 @@ If Steps 5–7 cannot be committed atomically, the System rolls back the operati
 - Invalid-token attempts must be rate-limited.
 - Account activation and token invalidation must be atomic.
 - Resend responses must prevent account enumeration.
+
+## Prototype Evidence
+
+![UC-AUTH-02 — verification success](../prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-02/UC-AUTH-02-BF-Verification-Success.png)
+
+*Figure 2.1 — UC-AUTH-02 basic flow; the verification link activates the pending account.*
+
+![UC-AUTH-02 — resend cooldown](../prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-02/UC-AUTH-02-AF-Resend-Cooldown.png)
+
+*Figure 2.2 — UC-AUTH-02 AF-06; resend is rate-limited with a visible cooldown.*
 
 ---
 # 3. UC-AUTH-03 — Log In
@@ -252,7 +272,7 @@ At Step 9, if two-factor authentication is enabled:
 ### 3.5.10. AF-09 — Full Account Recovery Is Required
 If the Visitor has lost the password, TOTP access, and every backup code, the Visitor may initiate **UC-AUTH-11 — Recover Account After Loss of All Factors**. The System does not disable 2FA through ordinary login support or ordinary password reset.
 
-## 3.6. Postconditions 
+## 3.6. Postconditions
 - On success without 2FA, a valid authenticated session exists.
 - When 2FA is enabled, only a restricted challenge exists until **UC-AUTH-09** succeeds.
 - On failure, no session is created.
@@ -264,11 +284,21 @@ If the Visitor has lost the password, TOTP access, and every backup code, the Vi
 - Session identifiers must be regenerated after authentication.
 - Authentication cookies must be secure and inaccessible to client-side scripts.
 
-## 3.8. Extension Points
-- **Forgot Password**: At the login form, the Visitor may initiate **UC-AUTH-05**.
-- **Two-Factor Challenge**: When 2FA is enabled, login is extended by **UC-AUTH-09**.
-- **Loss of All Factors**: A Visitor who cannot use the password, TOTP, or any backup code may initiate **UC-AUTH-11**.
-- **Protected Page Authentication**: This use case extends **UC-AUTH-07** when no valid session exists.
+## Prototype Evidence
+
+![UC-AUTH-03 — login form](../prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-03/UC-AUTH-03-BF-Login.png)
+
+*Figure 3.1 — UC-AUTH-03 basic flow; the Visitor submits primary credentials.*
+
+![UC-AUTH-03 — successful redirect](../prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-03/UC-AUTH-03-BF-Successful-Redirect.png)
+
+*Figure 3.2 — UC-AUTH-03 postcondition; a successful login redirects to the protected workspace.*
+
+## 3.8. Related Use Cases and Entry Points
+- **Forgot Password:** At the login form, the Visitor may start **UC-AUTH-05 — Reset Forgotten Password**.
+- **Two-Factor Challenge:** When 2FA is enabled, **UC-AUTH-09 — Complete Two-Factor Verification** is inserted at the explicit extension point after primary credentials are validated and before a full session is created.
+- **Loss of All Factors:** A Visitor who cannot use the password, TOTP, or any backup code may start **UC-AUTH-11 — Recover Account After Loss of All Factors**.
+- **Protected Page Authentication:** When **UC-AUTH-07 — Access Protected Account Page** finds no valid session, it directs the person to this login goal. The page-access goal is not modeled as an extension of login.
 
 ---
 
@@ -319,6 +349,12 @@ The System clears any remaining local authentication data and redirects the Visi
 - Logout must be idempotent.
 - Failure to write an audit record must not prevent session invalidation.
 - Cached protected content must not remain available after logout.
+
+## Prototype Evidence
+
+![UC-AUTH-04 — logged-out state](../prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-04/UC-AUTH-04-BF-Logged-Out.png)
+
+*Figure 4.1 — UC-AUTH-04 basic flow; the current session has ended and protected content is no longer displayed.*
 
 ---
 
@@ -398,6 +434,16 @@ The System preserves the old password, keeps the reset operation consistent, and
 - Recovery requests must be rate-limited and audited.
 - A normal password reset must preserve TOTP and unused backup codes; loss of every factor is handled only by **UC-AUTH-11**.
 
+## Prototype Evidence
+
+![UC-AUTH-05 — recovery request](../prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-05/UC-AUTH-05-BF-Recovery-Request.png)
+
+*Figure 5.1 — UC-AUTH-05 basic flow; the Visitor requests a normal password reset.*
+
+![UC-AUTH-05 — reset password](../prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-05/UC-AUTH-05-BF-Reset-Password.png)
+
+*Figure 5.2 — UC-AUTH-05 completion state; the new password is set without creating a session automatically.*
+
 ---
 
 # 6. UC-AUTH-06 — Change Password
@@ -459,10 +505,20 @@ The System keeps the existing password, records the failure, and displays a retr
 - Other active sessions are invalidated.
 - On failure, the existing password remains unchanged.
 
-## 6.7 Special Requirements
+## 6.7. Special Requirements
 - Password values must never be logged.
 - The current password must be reverified before the change.
 - The update and session invalidation must be performed consistently.
+
+## Prototype Evidence
+
+![UC-AUTH-06 — change password](../prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-06/UC-AUTH-06-BF-Change-Password.png)
+
+*Figure 6.1 — UC-AUTH-06 basic flow; the authenticated user submits a password change.*
+
+![UC-AUTH-06 — validation states](../prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-06/UC-AUTH-06-AF-Validation-States.png)
+
+*Figure 6.2 — UC-AUTH-06 alternative-flow evidence; invalid password input is rejected.*
 
 ---
 
@@ -522,6 +578,16 @@ The System denies access by default and displays a temporary-error page.
 - Authorization must be checked server-side.
 - The system must deny access by default when authorization cannot be determined.
 - Resource existence must not be disclosed to unauthorized users.
+
+## Prototype Evidence
+
+![UC-AUTH-07 — protected-page denial](../prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-07/UC-AUTH-07-BF-Protected-Page.png)
+
+*Figure 7.1 — UC-AUTH-07 alternative-flow evidence; an unauthenticated or unauthorized request is denied safely.*
+
+![UC-AUTH-07 — protected dashboard](../prototypes/DGM-01-Identity-Access-Profile/shared/S-APP-DASHBOARD.png)
+
+*Figure 7.2 — UC-AUTH-07 basic-flow evidence; the protected dashboard is shown after authorization succeeds.*
 
 ---
 
@@ -586,12 +652,22 @@ The System preserves the previous account information and displays a retry messa
 - An email change does not become verified until verification succeeds.
 
 ## 8.7. Special Requirements
-- Only explicity editable fields may be changed.
+- Only explicitly editable fields may be changed.
 - Sensitive changes must be audited.
 - Concurrent updates must not silently overwrite newer information.
 
-## 8.8. Extension Points
-- **Verify Changed Email Address**: Email verification is initiated when the user changes the account email address.
+## 8.8. Related Use Cases and Entry Points
+- **Verify Changed Email Address:** Email verification may be started when the user changes the account email address.
+
+## Prototype Evidence
+
+![UC-ACC-01 — account information](../prototypes/DGM-01-Identity-Access-Profile/UC-ACC-01/UC-ACC-01-BF-Account-Information.png)
+
+*Figure 8.1 — UC-ACC-01 basic flow; current account information is displayed.*
+
+![UC-ACC-01 — edit account](../prototypes/DGM-01-Identity-Access-Profile/UC-ACC-01/UC-ACC-01-BF-Edit-Account.png)
+
+*Figure 8.2 — UC-ACC-01 editing state; permitted account information can be updated.*
 
 ---
 
@@ -625,7 +701,7 @@ This use case allows an Authenticated User to configure supported account, langu
 
 ## 9.5. Alternative Flows
 
-### 9.5.1. AF-01 — Unsupported Preference Value 
+### 9.5.1. AF-01 — Unsupported Preference Value
 The System identifies the unsupported value and restores the nearest valid option.
 
 ### 9.5.2. AF-02 — User Restores Default Preferences
@@ -651,6 +727,16 @@ The System retains the previous values and displays a retry message.
 - Mandatory security notifications cannot be disabled.
 - Preference changes must apply consistently across supported devices.
 - Privacy-related preferences must comply with applicable policy.
+
+## Prototype Evidence
+
+![UC-ACC-02 — account preferences](../prototypes/DGM-01-Identity-Access-Profile/UC-ACC-02/S-ACC-PREFERENCES.png)
+
+*Figure 9.1 — UC-ACC-02 basic flow; the authenticated user manages account preferences.*
+
+![UC-ACC-02 — restore defaults](../prototypes/DGM-01-Identity-Access-Profile/UC-ACC-02/UC-ACC-02-AF-Restore-Defaults.png)
+
+*Figure 9.2 — UC-ACC-02 AF-02; the user can review and confirm restoration of default values.*
 
 ---
 
@@ -722,8 +808,18 @@ The System retains the previous profile and displays a retry message.
 - Profile fields must enforce documented length and format limits.
 - Profile changes relevant to screening should be versioned or audited.
 
-## 10.8. Extension Points
-- **Upload CV**: At the profile-editing page, the Candidate may initiate **UC-PROF-02**.
+## 10.8. Related Use Cases and Entry Points
+- **Upload CV:** At the profile-editing page, the Candidate may start **UC-PROF-02 — Upload and Parse CV**.
+
+## Prototype Evidence
+
+![UC-PROF-01 — profile view](../prototypes/DGM-01-Identity-Access-Profile/UC-PROF-01/UC-PROF-01-BF-Profile-View.png)
+
+*Figure 10.1 — UC-PROF-01 basic flow; the Candidate views profile information and completion status.*
+
+![UC-PROF-01 — profile editor](../prototypes/DGM-01-Identity-Access-Profile/UC-PROF-01/UC-PROF-01-BF-Profile-Editor.png)
+
+*Figure 10.2 — UC-PROF-01 editing state; profile fields are available for update.*
 
 ---
 
@@ -800,8 +896,22 @@ The System does not report a successful upload and displays a retry message.
 - The file must not be publicly addressable.
 - Parsing failures must be retryable without producing duplicate confirmed data.
 
-## 11.8. Extension Points
-- **Review Parsed Information**: After successful parsing, the System invokes **UC-PROF-03**.
+## 11.8. Related Use Cases and Entry Points
+- **Review Parsed Information:** After successful parsing, the Candidate may start **UC-PROF-03 — Review and Confirm Parsed CV**. Review is a separate user-controlled goal; parsed data remains unconfirmed until that goal succeeds.
+
+## Prototype Evidence
+
+![UC-PROF-02 — CV upload](../prototypes/DGM-01-Identity-Access-Profile/UC-PROF-02/UC-PROF-02-BF-CV-Upload.png)
+
+*Figure 11.1 — UC-PROF-02 basic flow; the Candidate selects a supported CV file.*
+
+![UC-PROF-02 — parsing progress](../prototypes/DGM-01-Identity-Access-Profile/UC-PROF-02/UC-PROF-02-BF-Parsing-Progress.png)
+
+*Figure 11.2 — UC-PROF-02 processing state; the CV Parsing Service is processing the upload.*
+
+![UC-PROF-02 — parsing failure](../prototypes/DGM-01-Identity-Access-Profile/UC-PROF-02/UC-PROF-02-EF-Parsing-Failure.png)
+
+*Figure 11.3 — UC-PROF-02 EF-01; a parsing-service failure is shown without confirming profile data.*
 
 ---
 
@@ -875,6 +985,20 @@ The System keeps the parsing result unconfirmed, preserves the previous profile,
 - Low-confidence fields must be visually distinguishable.
 - Confirmation and profile update must be performed atomically.
 - Only the owning Candidate may review the parsing result.
+
+## Prototype Evidence
+
+![UC-PROF-03 — parsed CV review](../prototypes/DGM-01-Identity-Access-Profile/UC-PROF-03/UC-PROF-03-BF-Parsed-CV-Review.png)
+
+*Figure 12.1 — UC-PROF-03 basic flow; parsed information is reviewed before it becomes confirmed profile data.*
+
+![UC-PROF-03 — low-confidence fields](../prototypes/DGM-01-Identity-Access-Profile/UC-PROF-03/UC-PROF-03-AF-Low-Confidence-Fields.png)
+
+*Figure 12.2 — UC-PROF-03 AF-01; low-confidence fields require Candidate attention.*
+
+![UC-PROF-03 — confirmation success](../prototypes/DGM-01-Identity-Access-Profile/UC-PROF-03/UC-PROF-03-BF-Confirmation-Success.png)
+
+*Figure 12.3 — UC-PROF-03 postcondition; confirmed values are saved to the candidate profile.*
 
 ---
 
@@ -965,15 +1089,11 @@ The System reports no success, keeps the prior authoritative 2FA state, and eith
 - Opening the Security page while 2FA is enabled must never silently start enrollment or replace the stored secret.
 - Password, TOTP, backup-code, and session-replacement values must not appear in audit events, URLs, analytics, or client persistence.
 
-## 13.8. Required Prototype Evidence
-- Disabled 2FA state and enable action.
-- Current-password proof.
-- QR code and manual setup key.
-- Initial TOTP verification and invalid-code state.
-- One-time backup-code display.
-- Enabled management state.
-- Regeneration confirmation and replacement-code result.
-- Disable confirmation, invalid-proof state, and success result.
+## 13.8. Prototype Evidence
+
+![UC-AUTH-08 — enable and manage 2FA](../prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-08/UC-AUTH-08-BF-Enable-Manage-2FA.jpg)
+
+*Figure 13.1 — UC-AUTH-08 basic and alternative states; the security page shows enrollment, proof, backup-code management, and disablement states.*
 
 ---
 
@@ -990,7 +1110,7 @@ The System reports no success, keeps the prior authoritative 2FA state, and eith
 | **Trigger** | Correct primary credentials are submitted for an active account with 2FA enabled. |
 
 ## 14.2. Brief Description
-This use case extends **UC-AUTH-03 — Log In** when 2FA is enabled. The Visitor completes a restricted pre-authentication challenge with a valid TOTP or an unused backup code before the System creates a full authenticated session.
+This use case is the conditional second-factor stage associated with **UC-AUTH-03 — Log In** when 2FA is enabled. The Visitor completes a restricted pre-authentication challenge with a valid TOTP or an unused backup code before the System creates a full authenticated session.
 
 ## 14.3. Preconditions
 1. Primary email-and-password validation succeeded.
@@ -1052,13 +1172,11 @@ The System creates no full session, reports a temporary failure, and preserves n
 - A backup code must have one atomic winner under concurrent use.
 - The page must support keyboard focus, password-manager-safe field purposes, and approved internal navigation only.
 
-## 14.8. Required Prototype Evidence
-- Authenticator-code mode.
-- Backup-code mode.
-- Invalid or expired code.
-- Expired challenge and restart-login action.
-- Rate-limited state.
-- Successful completion and Dashboard redirect.
+## 14.8. Prototype Evidence
+
+![UC-AUTH-09 — complete 2FA](../prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-09/UC-AUTH-09-BF-Complete-2FA.jpg)
+
+*Figure 14.1 — UC-AUTH-09 basic and alternative states; authenticator and backup-code verification are shown before the Dashboard redirect.*
 
 ---
 
@@ -1132,13 +1250,11 @@ The System does not claim success, keeps the target session visible until author
 - Revocation and rejected reuse must be auditable using non-sensitive references.
 - The Sessions page must clearly distinguish the current session and remain keyboard accessible.
 
-## 15.8. Required Prototype Evidence
-- Current-session-only state.
-- Multiple owned sessions with a current-session marker.
-- Revoke action and confirmation dialog.
-- Successful revocation with refreshed list.
-- Already-revoked or expired state.
-- Revocation failure and revoked-session access rejection.
+## 15.8. Prototype Evidence
+
+![UC-AUTH-10 — review sessions](../prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-10/UC-AUTH-10-BF-Review-Session.jpg)
+
+*Figure 15.1 — UC-AUTH-10 basic and alternative states; the current session, other sessions, and revocation flow are represented.*
 
 ---
 
@@ -1241,13 +1357,8 @@ The System does not report success. It retains a durable fail-closed operation t
 - Audit records and notifications must be durable and idempotent and must exclude passwords, TOTP values, backup codes, cookies, raw session identifiers, and plaintext proofs.
 - The interface must clearly state that verified-email-only recovery is lower assurance.
 
-## 16.8. Required Prototype Evidence
-- Recovery request and eligibility feedback.
-- Check-email state.
-- Invalid, expired, and reused confirmation link.
-- Security-hold status and login-blocked state.
-- Cancellation confirmation and terminal cancelled state.
-- Too-early completion state.
-- New-password completion form and validation.
-- Successful completion with required normal-login action.
-- Provider or mandatory-step failure without false success.
+## 16.8. Prototype Evidence
+
+![UC-AUTH-11 — recover account after loss of all factors](../prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-11/UC-AUTH-11-BF-Recovery-Account-All.jpg)
+
+*Figure 16.1 — UC-AUTH-11 basic and alternative states; request, security hold, cancellation, completion, and fail-closed recovery outcomes are represented.*

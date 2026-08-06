@@ -2,9 +2,9 @@
 
 ## Use-Case Specifications
 
-*Performed by: Nguyen Gia Quoc Uy | Reviewed by: Group 9 | Edited by: Nguyen Gia Quoc Uy*   
-**Version:** 
-- V1.1 (24/07/2026) - First initialization
+*Performed by: Nguyen Gia Quoc Uy | Reviewed by: Group 9 | Edited by: Nguyen Gia Quoc Uy*
+**Version:** V1.1 (24/07/2026) — First initialization
+**Version History:**
 
 # 1. UC-JOB-01 — Browse, Search, and Filter Jobs
 
@@ -38,7 +38,7 @@ This use case allows a Visitor or Authenticated User to discover active job post
 9. The System applies the selected filters and sorting option.
 10. The System displays the matching job postings and total result information.
 11. The Actor reviews the displayed results.
-12. The Actor may select a job, extending this use case through **UC-JOB-02 — View Job Details**.
+12. The Actor may select a job and start **UC-JOB-02 — View Job Details**.
 
 ## 1.5. Alternative Flows
 
@@ -96,19 +96,25 @@ At Step 8:
 - No private or inactive job information is disclosed.
 - No account or job data is modified.
 
-## 1.7. Special requirements
+## 1.7. Special Requirements
 - Search criteria must be safely validated and encoded.
 - Results should be returned within two seconds under normal supported load.
 - Search results must support pagination or controlled incremental loading.
 - Filters and sorting must be keyboard accessible.
 - Public results must not include internal moderation or recruiter-only fields.
 
-## 1.8. Extension Points
-- **Job Selected**: At Step 12, selecting a jobs invokes **UC-JOB-02 — View Job Details**.
+## Prototype Evidence
+
+![UC-JOB-01 — browse, search, and filter](<../prototypes/DGM-02-Candidate-Job-Journey/UC-JOB-01/UC-JOB-01-Browse, Search, and Filter Jobs.png>)
+
+*Figure 1.1 — UC-JOB-01 basic flow; public job discovery, search, and filtering are represented.*
+
+## 1.8. Related Use Cases and Entry Points
+- **Job Selected:** At Step 12, selecting a job starts **UC-JOB-02 — View Job Details**. This is a separate navigation goal.
 
 ---
 
-# 2. UC-JOB-02 — View Job Details 
+# 2. UC-JOB-02 — View Job Details
 
 ## 2.1. Use-Case Information
 | Field | Value |
@@ -148,7 +154,7 @@ At Step 5:
 4. Saving, removing, or sharing remains available when permitted.
 
 ### 2.5.2. AF-02 — Job Was Removed or Is Not Public
-At Step 4: 
+At Step 4:
 1. The System displays a neutral unavailable-job page.
 2. The System does not disclose moderation or removal details.
 3. The use case ends.
@@ -188,7 +194,13 @@ The System displays only the company information approved for public visibility 
 - The canonical public URL must be stable and safe to share.
 - The page must clearly distinguish active, closed, expired, and unavailable states.
 
-## 2.8. Extension Points
+## Prototype Evidence
+
+![UC-JOB-02 — view job details](<../prototypes/DGM-02-Candidate-Job-Journey/UC-JOB-02/UC-JOB-02-View Job Details.png>)
+
+*Figure 2.1 — UC-JOB-02 basic flow; public job details and available actions are displayed.*
+
+## 2.8. Related Use Cases and Entry Points
 - **Save or Remove Job**: The Actor may invoke **UC-JOB-03**.
 - **Share Job**: The Actor may invoke **UC-JOB-04**.
 - **Report Job Posting**: An Authenticated User may invoke **UC-JOB-05**.
@@ -286,7 +298,13 @@ The System performs the requested operation idempotently and displays the final 
 - The UI must not display success before the stored state is confirmed.
 - Concurrent requests must not create duplicate saved-job records.
 
-## 3.8. Extension Points
+## Prototype Evidence
+
+![UC-JOB-03 — save and remove states](<../prototypes/DGM-02-Candidate-Job-Journey/UC-JOB-03/UC-JOB-03 Save Remove States.png>)
+
+*Figure 3.1 — UC-JOB-03 basic and alternative states; the authenticated user can save or remove a job.*
+
+## 3.8. Related Use Cases and Entry Points
 - **Remove Saved Job**: The remove path may be initiated from the job-detail page or saved-job list.
 
 ---
@@ -345,7 +363,7 @@ At Step 3:
 2. The System does not generate a new public sharing action.
 3. The use case ends.
 
-### 4.5.6. EF-01 — Clipboard or External Application Fails
+### 4.5.5. EF-01 — Clipboard or External Application Fails
 1. The System displays a share-failure message.
 2. The System preserves the job-detail page.
 3. The Actor may retry or manually copy the visible link.
@@ -356,9 +374,15 @@ At Step 3:
 
 ## 4.7. Special Requirements
 - Shared URLs must not contain session credentials or private tracking data.
-- The URL must reference only publicly visible job informations.
+- The URL must reference only publicly visible job information.
 - Sharing must not imply that the external application is endorsed by SmartHire.
 - The Actor must remain in control of the final external sharing action.
+
+## Prototype Evidence
+
+![UC-JOB-04 — share action sheet](<../prototypes/DGM-02-Candidate-Job-Journey/UC-JOB-04/UC-JOB-04 Share Job Action Sheet.png>)
+
+*Figure 4.1 — UC-JOB-04 basic flow; the actor chooses an external sharing destination or copies the public link.*
 
 ---
 
@@ -460,6 +484,12 @@ Before Step 10:
 - Report text must be validated and safely rendered.
 - Abuse-control limits must be applied.
 - Reporting actions must be audited.
+
+## Prototype Evidence
+
+![UC-JOB-05 — report job modal](<../prototypes/DGM-02-Candidate-Job-Journey/UC-JOB-05/UC-JOB-05 Report Job Modal.png>)
+
+*Figure 5.1 — UC-JOB-05 basic flow; the authenticated user selects a report reason and submits the report.*
 
 ---
 
@@ -602,6 +632,16 @@ At Step 19:
 - Notification failure must not roll back a successfully submitted application.
 - The System must record the consent version accepted by the Candidate.
 
+## Prototype Evidence
+
+![UC-APP-01 — application form](../prototypes/DGM-02-Candidate-Job-Journey/UC-APP-01/S-APP-FORM.png)
+
+*Figure 6.1 — UC-APP-01 basic flow; the Candidate completes the application form.*
+
+![UC-APP-01 — application success](../prototypes/DGM-02-Candidate-Job-Journey/UC-APP-01/S-APP-SUCCESS.png)
+
+*Figure 6.2 — UC-APP-01 postcondition; successful submission is confirmed.*
+
 ---
 
 # 7. UC-APP-02 — Track Job Applications
@@ -682,6 +722,16 @@ The System redirects the Candidate to login and does not display application inf
 - Removed job postings must not remove legitimate application-history records.
 - Application lists should support pagination when required.
 
+## Prototype Evidence
+
+![UC-APP-02 — applications list](../prototypes/DGM-02-Candidate-Job-Journey/UC-APP-02/S-APPLICATIONS.png)
+
+*Figure 7.1 — UC-APP-02 basic flow; the Candidate views submitted applications and their statuses.*
+
+![UC-APP-02 — application detail](../prototypes/DGM-02-Candidate-Job-Journey/UC-APP-02/S-APPLICATION-DETAIL.png)
+
+*Figure 7.2 — UC-APP-02 detail state; candidate-visible application information is shown without recruiter-only notes.*
+
 ---
 
 # 8. UC-APP-03 — View Saved Jobs
@@ -711,11 +761,11 @@ This use case allows an Authenticated User to view saved jobs, identify postings
 5. The System displays the saved-job list with job title, company, location, saved date, and availability status.
 6. The Authenticated User reviews the saved jobs.
 7. The Authenticated User selects an available saved job.
-8. The System invokes UC-JOB-02 — View Job Details.
+8. The Actor may start UC-JOB-02 — View Job Details.
 
 ## 8.5. Alternative Flows
 
-### 8.5.2. AF-01 — No Saved Jobs Exist
+### 8.5.1. AF-01 — No Saved Jobs Exist
 At Step 3:
 1. The System displays an empty-saved-jobs state.
 2. The System provides a Browse jobs action.
@@ -729,7 +779,7 @@ The System displays a neutral unavailable state when historical display is permi
 
 ### 8.5.4. AF-04 — User Removes a Saved Job
 1. The Authenticated User selects Remove.
-2. The System invokes the removal behavior of UC-JOB-03.
+2. The User may start UC-JOB-03 — Save or Remove Job.
 3. The System updates the saved-job list.
 
 ### 8.5.5. AF-05 — User Applies Filters or Sorting
@@ -756,9 +806,15 @@ The System redirects the user to login and does not display saved-job informatio
 - Job removal must be idempotent.
 - Saved-job lists must not expose private job-posting data.
 
-## 8.8. Extension Points
-- **Saved Job Selected**: Selecting a saved job invokes UC-JOB-02.
-- **Remove Saved Job**: Removing a saved job invokes UC-JOB-03.
+## Prototype Evidence
+
+![UC-APP-03 — saved jobs](../prototypes/DGM-02-Candidate-Job-Journey/UC-APP-03/S-SAVED-JOBS.png)
+
+*Figure 8.1 — UC-APP-03 basic flow; the authenticated user views the saved-job collection.*
+
+## 8.8. Related Use Cases and Entry Points
+- **Saved Job Selected:** Selecting a saved job starts UC-JOB-02.
+- **Remove Saved Job:** Removing a saved job starts UC-JOB-03.
 
 ---
 
@@ -793,7 +849,7 @@ This use case allows a Candidate to view active job postings recommended using c
 7. The System displays recommended jobs and supported relevance explanations.
 8. The Candidate reviews the recommendations.
 9. The Candidate selects a recommended job.
-10. The System invokes UC-JOB-02 — View Job Details.
+10. The Candidate may start UC-JOB-02 — View Job Details.
 
 ## 9.5. Alternative Flows
 
@@ -845,5 +901,11 @@ The System redirects the Candidate to login and does not display personalized re
 - Personalization preferences must be respected.
 - Recommendation data must not be exposed to another user.
 
-## 9.8. Extension Points
-- **Recommendation Selected**: Selecting a recommendation invokes UC-JOB-02 — View Job Details.
+## Prototype Evidence
+
+![UC-APP-04 — recommended jobs](../prototypes/DGM-02-Candidate-Job-Journey/UC-APP-04/S-RECOMMENDED-JOBS.png)
+
+*Figure 9.1 — UC-APP-04 basic flow; the Candidate views personalized job recommendations.*
+
+## 9.8. Related Use Cases and Entry Points
+- **Recommendation Selected:** Selecting a recommendation starts UC-JOB-02 — View Job Details.

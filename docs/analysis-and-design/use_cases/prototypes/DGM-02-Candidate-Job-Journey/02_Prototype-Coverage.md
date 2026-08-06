@@ -1,11 +1,13 @@
 # DGM-02 — Candidate Job Journey Prototype Coverage
 
-*Performed by: Nguyen Gia Quoc Uy | Reviewed by: Group 9 | Edited by: Nguyen Gia Quoc Uy*  
+*Performed by: Nguyen Gia Quoc Uy | Reviewed by: Group 9 | Edited by: Nguyen Gia Quoc Uy*
 **Version:** V1.0 (25/7/2026) — Initial prototype coverage
 
 ## 1. Scope
 
 This document summarizes the desktop-web prototypes for Diagram 2. The prototypes cover the main user flow and representative interaction states for each use case.
+
+The detailed UC specification embeds the corresponding images directly under every UC. This file remains a traceability index and reuse appendix.
 
 ## 2. Prototype Coverage
 
