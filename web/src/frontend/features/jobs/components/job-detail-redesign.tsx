@@ -173,10 +173,7 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
 
       <div className="job-detail-layout job-detail-layout--redesign job-detail-layout--board">
         <main className="job-detail-main job-detail-main--redesign job-detail-main--board">
-          <header
-            className="job-detail-hero job-detail-hero--redesign job-detail-header-sticky"
-            data-job-detail-sticky-header
-          >
+          <header className="job-detail-hero job-detail-hero--redesign">
             <div className="job-detail-header-topline">
               <Link className="job-detail-back" href="/jobs">
                 <span aria-hidden="true">←</span> Back to jobs
