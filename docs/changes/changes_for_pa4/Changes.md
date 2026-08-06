@@ -1,6 +1,9 @@
 # Changes for PA4 — UC Model, Diagrams, and Specifications
 
 **Scope:** `docs/analysis-and-design`  
+**Author:** Nguyễn Gia Quốc Uy
+**Student ID:** 24127261   
+**Reviewers:** Nguyễn Quốc Thành, Ngô Quốc Tuấn  
 **Purpose:** Record all changes made to address the instructor's feedback on the UC Model, the five UC Diagrams, and the UC Specifications.  
 **Last updated:** 2026-08-06
 
