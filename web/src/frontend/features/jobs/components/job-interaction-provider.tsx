@@ -12,9 +12,10 @@ import { toast } from "sonner";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import { savedJobOutcomeSchema } from "@/shared/contracts/jobs/actions";
-import type {
-  AppliedJobState,
-  UserJobState,
+import {
+  userJobStateViewSchema,
+  type AppliedJobState,
+  type UserJobState,
 } from "@/shared/contracts/jobs/catalog";
 
 export type JobInteractionSeed = {
@@ -29,6 +30,12 @@ export type JobInteractionRecord = JobInteractionSeed & {
 };
 
 type FilterPreset = UserJobState["savedFilterPresets"][number];
+type UserJobStateMutation =
+  | { action: "save"; jobId: string }
+  | { action: "unsave"; jobId: string }
+  | { action: "hide"; jobId: string }
+  | { action: "unhide"; jobId: string }
+  | { action: "apply"; jobId: string; appliedJob: AppliedJobState };
 
 type JobInteractionContextValue = {
   records: Record<string, JobInteractionRecord>;
@@ -45,6 +52,36 @@ const JobInteractionContext = createContext<JobInteractionContextValue | null>(
   null,
 );
 
+function syncUserJobState(
+  csrfProof: string,
+  mutation: UserJobStateMutation,
+): Promise<void> {
+  return mutateWithCurrentCsrf(
+    "/api/jobs/user-state",
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(mutation),
+    },
+    csrfProof,
+  ).then(async (response) => {
+    if (!response.ok) return;
+    userJobStateViewSchema.parse(await response.json());
+  });
+}
+
+async function readUserJobStateView() {
+  try {
+    const response = await fetch("/api/jobs/user-state", {
+      cache: "no-store",
+    });
+    if (!response.ok) return null;
+    return userJobStateViewSchema.parse(await response.json());
+  } catch {
+    return null;
+  }
+}
+
 export function JobInteractionProvider({
   children,
 }: {
@@ -57,6 +94,38 @@ export function JobInteractionProvider({
   const [savedFilterPresets, setSavedFilterPresets] = useState<FilterPreset[]>(
     [],
   );
+
+  useEffect(() => {
+    let active = true;
+    void readUserJobStateView().then((view) => {
+      if (!active || !view) return;
+      setRecords((current) => {
+        const next = { ...current };
+        const ids = new Set([
+          ...view.savedJobIds,
+          ...view.hiddenJobIds,
+          ...view.appliedJobIds,
+        ]);
+        for (const jobId of ids) {
+          const existing = next[jobId] ?? {
+            saved: false,
+            applied: false,
+            hidden: false,
+          };
+          next[jobId] = {
+            ...existing,
+            saved: existing.saved || view.savedJobIds.includes(jobId),
+            applied: existing.applied || view.appliedJobIds.includes(jobId),
+            hidden: existing.hidden || view.hiddenJobIds.includes(jobId),
+          };
+        }
+        return next;
+      });
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const registerJob = useCallback((jobId: string, seed: JobInteractionSeed) => {
     setRecords((current) => {
@@ -100,6 +169,10 @@ export function JobInteractionProvider({
           hidden: state[jobId]?.hidden ?? false,
         },
       }));
+      void syncUserJobState(csrfProof, {
+        action: outcome.saved ? "save" : "unsave",
+        jobId,
+      }).catch(() => undefined);
       toast(outcome.saved ? "Saved to Saved Jobs" : "Removed from Saved Jobs");
       return outcome.saved;
     },
@@ -117,21 +190,34 @@ export function JobInteractionProvider({
           hidden: state[jobId]?.hidden ?? false,
         },
       }));
+      if (appliedJob) {
+        void syncUserJobState(csrfProof, {
+          action: "apply",
+          jobId,
+          appliedJob,
+        }).catch(() => undefined);
+      }
     },
-    [],
+    [csrfProof],
   );
 
-  const undoHide = useCallback((jobId: string) => {
-    setRecords((state) => ({
-      ...state,
-      [jobId]: {
-        saved: state[jobId]?.saved ?? false,
-        applied: state[jobId]?.applied ?? false,
-        appliedJob: state[jobId]?.appliedJob,
-        hidden: false,
-      },
-    }));
-  }, []);
+  const undoHide = useCallback(
+    (jobId: string) => {
+      setRecords((state) => ({
+        ...state,
+        [jobId]: {
+          saved: state[jobId]?.saved ?? false,
+          applied: state[jobId]?.applied ?? false,
+          appliedJob: state[jobId]?.appliedJob,
+          hidden: false,
+        },
+      }));
+      void syncUserJobState(csrfProof, { action: "unhide", jobId }).catch(
+        () => undefined,
+      );
+    },
+    [csrfProof],
+  );
 
   const hideJob = useCallback(
     (jobId: string) => {
@@ -144,6 +230,9 @@ export function JobInteractionProvider({
           hidden: true,
         },
       }));
+      void syncUserJobState(csrfProof, { action: "hide", jobId }).catch(
+        () => undefined,
+      );
       toast("Job hidden from your list", {
         description: "You can undo this for the next 5 seconds.",
         duration: 5000,
@@ -153,7 +242,7 @@ export function JobInteractionProvider({
         },
       });
     },
-    [undoHide],
+    [csrfProof, undoHide],
   );
 
   const saveFilterPreset = useCallback(
@@ -167,7 +256,7 @@ export function JobInteractionProvider({
       };
       setSavedFilterPresets((current) => [preset, ...current].slice(0, 100));
       toast("Filter saved", {
-        description: "“" + preset.name + "” is ready to reuse.",
+        description: "\u201c" + preset.name + "\u201d is ready to reuse.",
       });
     },
     [],

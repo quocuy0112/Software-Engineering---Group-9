@@ -136,6 +136,13 @@ export const userJobStateSchema = z
   })
   .strict();
 
+export const userJobStateViewSchema = z
+  .object({
+    savedJobIds: z.array(z.string().min(1).max(128)).max(10_000),
+    hiddenJobIds: z.array(z.string().min(1).max(128)).max(10_000),
+    appliedJobIds: z.array(z.string().min(1).max(128)).max(10_000),
+  })
+  .strict();
 export type JobCatalogItem = z.infer<typeof jobCatalogSchema>;
 export type CompanyCatalogItem = z.infer<typeof companyCatalogSchema>;
 export type UserJobState = z.infer<typeof userJobStateSchema>;
