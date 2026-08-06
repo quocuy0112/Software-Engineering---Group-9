@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { JobCard } from "@/shared/contracts/jobs/discovery";
 import { JobApplicationAction } from "./job-application-form";
+import { CompanyAvatar } from "./company-avatar";
 import { JobOverflowMenu } from "./job-overflow-menu";
 import { SaveJobAction } from "./save-job-action";
 
@@ -66,9 +67,12 @@ export function JobCardView({
     >
       <header className="job-redesign-card-header">
         <div className="job-card-identity">
-          <span className="job-company-monogram" aria-hidden="true">
-            {job.company.displayName.slice(0, 1).toUpperCase()}
-          </span>
+          <CompanyAvatar
+            name={job.company.displayName}
+            imageUrl={job.company.logoUrl}
+            size="md"
+            className="job-company-monogram"
+          />
           <div>
             <p className="job-company-name">{job.company.displayName}</p>
             <h2 id={"job-" + job.id}>

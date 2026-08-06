@@ -1,9 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { useState, type ReactNode } from "react";
 import type { JobDetail } from "@/shared/contracts/jobs/discovery";
 import {
   jobCategories,
   jobBenefits,
-  jobExpertise,
   jobMustHaveRequirements,
   jobNiceToHaveRequirements,
   jobOverview,
@@ -114,6 +116,65 @@ function SectionHeading({
   );
 }
 
+function AccordionSection({
+  id,
+  eyebrow,
+  title,
+  copy,
+  defaultOpen = false,
+  children,
+}: {
+  id: JobDetailSectionId;
+  eyebrow: string;
+  title: string;
+  copy: string;
+  defaultOpen?: boolean;
+  children: ReactNode;
+}) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const headingId = id + "-heading";
+  const contentId = id + "-content";
+
+  return (
+    <section
+      id={id}
+      className={
+        "job-detail-section-card job-detail-accordion-item" +
+        (isOpen ? " is-open" : "")
+      }
+      aria-labelledby={headingId}
+    >
+      <h2 className="job-detail-accordion-heading" id={headingId}>
+        <button
+          className="job-detail-accordion-trigger"
+          type="button"
+          aria-expanded={isOpen}
+          aria-controls={contentId}
+          onClick={() => setIsOpen((current) => !current)}
+        >
+          <span className="job-detail-accordion-trigger-copy">
+            <span className="panel-kicker">{eyebrow}</span>
+            <span className="job-detail-accordion-title">{title}</span>
+            <span className="job-detail-accordion-summary">{copy}</span>
+          </span>
+          <span className="job-detail-accordion-chevron" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </span>
+        </button>
+      </h2>
+      <div
+        id={contentId}
+        className="job-detail-accordion-content"
+        hidden={!isOpen}
+      >
+        {children}
+      </div>
+    </section>
+  );
+}
+
 export function JobDetailOverview({ job }: { job: JobDetail }) {
   const facts = [
     {
@@ -125,16 +186,14 @@ export function JobDetailOverview({ job }: { job: JobDetail }) {
     },
     {
       label: "Age",
-      value: "Not listed",
+      value: job.age?.trim() || "Not listed",
     },
     {
       label: "Education level",
-      value: job.education ?? "Not listed",
+      value: job.education?.trim() || "Not listed",
     },
   ];
-  const specialization = [...jobCategories(job), ...jobExpertise(job)].filter(
-    (item, index, items) => items.indexOf(item) === index,
-  );
+  const specialization = jobCategories(job);
 
   return (
     <section
@@ -187,17 +246,13 @@ export function JobDetailOverview({ job }: { job: JobDetail }) {
 
 function DescriptionSection({ job }: { job: JobDetail }) {
   return (
-    <section
+    <AccordionSection
       id="description"
-      className="job-detail-section-card"
-      aria-labelledby="description-heading"
+      eyebrow="01 / THE ROLE"
+      title="Job description"
+      copy="A clear view of the work, expectations, and impact you can make."
+      defaultOpen
     >
-      <SectionHeading
-        headingId="description-heading"
-        eyebrow="01 / THE ROLE"
-        title="Job description"
-        copy="A clear view of the work, expectations, and impact you can make."
-      />
       <div className="job-detail-section-copy">
         <p>{jobOverview(job)}</p>
       </div>
@@ -210,7 +265,7 @@ function DescriptionSection({ job }: { job: JobDetail }) {
         <h3 id="responsibilities-heading">Key responsibilities</h3>
         <BulletList items={jobResponsibilities(job)} />
       </div>
-    </section>
+    </AccordionSection>
   );
 }
 
@@ -219,17 +274,16 @@ function RequirementsSection({ job }: { job: JobDetail }) {
   const niceToHave = jobNiceToHaveRequirements(job);
 
   return (
-    <section
+    <AccordionSection
       id="requirements"
-      className="job-detail-section-card"
-      aria-labelledby="requirements-heading"
+      eyebrow="02 / YOUR EDGE"
+      title="Requirements"
+      copy="The signals that will help you do well in this role."
     >
-      <SectionHeading
-        headingId="requirements-heading"
-        eyebrow="02 / YOUR EDGE"
-        title="Candidate requirements"
-        copy="The signals that will help you do well in this role."
-      />
+      <div className="job-detail-accordion-intro">
+        <h3>Candidate requirements</h3>
+        <p>The signals that will help you do well in this role.</p>
+      </div>
       <InlineChips
         items={jobSkills(job)}
         label="Required skills"
@@ -251,7 +305,7 @@ function RequirementsSection({ job }: { job: JobDetail }) {
           )}
         </div>
       </div>
-    </section>
+    </AccordionSection>
   );
 }
 
@@ -259,17 +313,12 @@ function BenefitsSection({ job }: { job: JobDetail }) {
   const benefits = jobBenefits(job);
 
   return (
-    <section
+    <AccordionSection
       id="benefits"
-      className="job-detail-section-card"
-      aria-labelledby="benefits-heading"
+      eyebrow="03 / THE PACKAGE"
+      title="Benefits"
+      copy="The full package, kept together so you can compare with confidence."
     >
-      <SectionHeading
-        headingId="benefits-heading"
-        eyebrow="03 / THE PACKAGE"
-        title="Benefits"
-        copy="The full package, kept together so you can compare with confidence."
-      />
       {benefits.length ? (
         <ul className="job-benefit-grid" aria-label="Job benefits">
           {benefits.map((benefit, index) => (
@@ -286,10 +335,9 @@ function BenefitsSection({ job }: { job: JobDetail }) {
           Benefits details will be shared during the interview process.
         </p>
       )}
-    </section>
+    </AccordionSection>
   );
 }
-
 export function JobDetailSections({
   job,
   includeOverview = true,

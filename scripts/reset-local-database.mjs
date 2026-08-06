@@ -36,7 +36,7 @@ run(docker, ["compose", "up", "-d", "--wait", "postgres"]);
 console.log("Applying available migrations...");
 runNpm(["run", "db:deploy"]);
 
-console.log("Importing the versioned local job catalog...");
+console.log("Importing the split local company and job fixtures...");
 runNpm(["run", "db:seed:jobs"]);
 
 console.log("Local database reset completed with demo job data.");

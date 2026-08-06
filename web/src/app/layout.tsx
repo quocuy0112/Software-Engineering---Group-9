@@ -13,6 +13,24 @@ export const metadata: Metadata = {
   description:
     "A secure talent workspace designed to help candidates and hiring teams make meaningful connections.",
 };
+const themeBootstrapScript = [
+  "(function () {",
+  "  try {",
+  '    var stored = window.localStorage.getItem("smarthire-theme");',
+  "    var theme =",
+  '      stored === "dark" || stored === "light"',
+  "        ? stored",
+  "        : window.matchMedia &&",
+  '            window.matchMedia("(prefers-color-scheme: dark)").matches',
+  '          ? "dark"',
+  '          : "light";',
+  "    document.documentElement.dataset.theme = theme;",
+  "    document.documentElement.style.colorScheme = theme;",
+  "  } catch (error) {",
+  '    document.documentElement.dataset.theme = "light";',
+  "  }",
+  "})();",
+].join("\n");
 
 export default function RootLayout({
   children,
@@ -22,7 +40,11 @@ export default function RootLayout({
       lang="en"
       data-app-environment={serverEnvironment.APP_ENV}
       data-theme="light"
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
+      </head>
       <body suppressHydrationWarning>
         <ThemeProvider>
           {children}

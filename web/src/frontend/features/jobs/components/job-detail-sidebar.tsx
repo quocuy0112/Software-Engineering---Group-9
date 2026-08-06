@@ -3,8 +3,9 @@
 import Link from "next/link";
 import type { JobCard, JobDetail } from "@/shared/contracts/jobs/discovery";
 
-import { useState } from "react";
 import companyCatalog from "../../../../../data/jobs/companies.json";
+import { CompanyAvatar } from "./company-avatar";
+import { ReportJobDialog } from "./report-job-dialog";
 
 const valueLabel: Record<string, string> = {
   FULL_TIME: "Full time",
@@ -26,9 +27,6 @@ const valueLabel: Record<string, string> = {
 export type CompanyWithMeta = JobDetail["company"] & {
   logo?: string | null;
   rating?: { score: number; reviewCount?: number };
-  photoUrl?: string | null;
-  photo?: string | null;
-  coverImage?: string | null;
 };
 
 function companyWithMeta(company: JobDetail["company"]): CompanyWithMeta {
@@ -64,13 +62,6 @@ function companyFixtureFor(
 
 function resolveSidebarCompany(company: CompanyWithMeta): CompanyWithMeta {
   const fixture = companyFixtureFor(company);
-  const fixtureWithMedia = fixture as
-    | (CompanyFixture & {
-        photoUrl?: string | null;
-        photo?: string | null;
-        coverImage?: string | null;
-      })
-    | undefined;
 
   return {
     ...company,
@@ -94,14 +85,6 @@ function resolveSidebarCompany(company: CompanyWithMeta): CompanyWithMeta {
     address:
       nonEmpty(company.address) ?? nonEmpty(fixture?.address) ?? undefined,
     rating: company.rating ?? fixture?.rating,
-    photoUrl:
-      nonEmpty(company.photoUrl) ??
-      nonEmpty(company.photo) ??
-      nonEmpty(company.coverImage) ??
-      nonEmpty(fixtureWithMedia?.photoUrl) ??
-      nonEmpty(fixtureWithMedia?.photo) ??
-      nonEmpty(fixtureWithMedia?.coverImage) ??
-      null,
   };
 }
 
@@ -113,28 +96,16 @@ function SidebarCompanyLogo({
   large?: boolean;
 }) {
   const data = resolveSidebarCompany(company);
-  const [failedLogoUrl, setFailedLogoUrl] = useState<string | null>(null);
-  const logoUrl = nonEmpty(data.logoUrl) ?? nonEmpty(data.logo);
-  const showLogo = Boolean(logoUrl && logoUrl !== failedLogoUrl);
-
   return (
-    <span className={"job-sidebar-company-logo" + (large ? " is-large" : "")}>
-      {showLogo ? (
-        <img
-          src={logoUrl ?? undefined}
-          alt=""
-          loading={large ? "eager" : "lazy"}
-          onError={() => setFailedLogoUrl(logoUrl)}
-        />
-      ) : (
-        <span aria-hidden="true">
-          {data.displayName.slice(0, 1).toUpperCase()}
-        </span>
-      )}
-    </span>
+    <CompanyAvatar
+      name={data.displayName}
+      imageUrl={data.logoUrl ?? data.logo}
+      size={large ? "lg" : "md"}
+      className={"job-sidebar-company-logo" + (large ? " is-large" : "")}
+      loading={large ? "eager" : "lazy"}
+    />
   );
 }
-
 export function CompanyLogo({
   company,
   large = false,
@@ -143,21 +114,16 @@ export function CompanyLogo({
   large?: boolean;
 }) {
   const data = companyWithMeta(company);
-  const logoUrl = data.logoUrl ?? data.logo ?? null;
-
   return (
-    <span className={"job-company-logo" + (large ? " is-large" : "")}>
-      {logoUrl ? (
-        <img src={logoUrl} alt="" loading={large ? "eager" : "lazy"} />
-      ) : (
-        <span aria-hidden="true">
-          {data.displayName.slice(0, 1).toUpperCase()}
-        </span>
-      )}
-    </span>
+    <CompanyAvatar
+      name={data.displayName}
+      imageUrl={data.logoUrl ?? data.logo}
+      size={large ? "lg" : "md"}
+      className={"job-company-logo" + (large ? " is-large" : "")}
+      loading={large ? "eager" : "lazy"}
+    />
   );
 }
-
 function displayValue(value: string | null | undefined) {
   return value?.trim() ? value : "Not listed";
 }
@@ -192,113 +158,98 @@ export function CompanyCard({ job }: { job: JobDetail }) {
   const companyPageHref = company.websiteUrl ?? "#company";
 
   return (
-    <section
+    <details
       id="company"
-      className="job-sidebar-card job-company-card job-sidebar-card--redesign"
+      className="job-sidebar-card job-company-card job-sidebar-card--redesign job-company-accordion"
       aria-labelledby="company-card-heading"
-      data-job-sidebar-company="true"
     >
-      <div className="job-sidebar-card-heading job-sidebar-company-heading">
-        <SidebarCompanyLogo company={company} large />
-        <div>
-          <p className="panel-kicker">THE COMPANY</p>
-          <h2 id="company-card-heading">{company.displayName}</h2>
-          {job.isVerified ? (
-            <span className="job-verified-inline">
-              <span aria-hidden="true">✓</span> Verified SmartHire employer
+      <summary className="job-company-accordion-summary">
+        <span className="job-sidebar-company-heading">
+          <SidebarCompanyLogo company={company} large />
+          <span className="job-company-accordion-copy">
+            <span className="panel-kicker">THE COMPANY</span>
+            <span
+              id="company-card-heading"
+              className="job-company-accordion-title"
+              role="heading"
+              aria-level={2}
+            >
+              Company info
             </span>
-          ) : null}
-          {rating ? (
-            <span className="job-company-rating">
-              <span aria-hidden="true">★</span>
-              <span>{rating.score.toFixed(1)} / 5</span>
-              {rating.reviewCount !== undefined ? (
-                <small>· {rating.reviewCount} reviews</small>
-              ) : null}
+            <span className="job-company-accordion-name">
+              {company.displayName}
             </span>
-          ) : null}
-        </div>
+            {job.isVerified ? (
+              <span className="job-verified-inline">
+                <span aria-hidden="true">✓</span> Verified SmartHire employer
+              </span>
+            ) : null}
+          </span>
+        </span>
+        <span className="job-accordion-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </span>
+      </summary>
+
+      <div className="job-company-accordion-content">
+        {rating ? (
+          <span className="job-company-rating">
+            <span aria-hidden="true">★</span>
+            <span>{rating.score.toFixed(1)} / 5</span>
+            {rating.reviewCount !== undefined ? (
+              <small>· {rating.reviewCount} reviews</small>
+            ) : null}
+          </span>
+        ) : null}
+
+        <p className="job-sidebar-company-copy">
+          {displayValue(company.publicDescription)}
+        </p>
+
+        <dl className="job-sidebar-company-facts">
+          <div>
+            <dt>
+              <span className="job-sidebar-fact-icon" aria-hidden="true">
+                S
+              </span>
+              Scale
+            </dt>
+            <dd>{displayValue(company.size)}</dd>
+          </div>
+          <div>
+            <dt>
+              <span className="job-sidebar-fact-icon" aria-hidden="true">
+                I
+              </span>
+              Industry
+            </dt>
+            <dd>{displayValue(company.industry)}</dd>
+          </div>
+          <div>
+            <dt>
+              <span className="job-sidebar-fact-icon" aria-hidden="true">
+                A
+              </span>
+              Address
+            </dt>
+            <dd>{displayValue(company.address ?? company.publicLocation)}</dd>
+          </div>
+        </dl>
+
+        <a
+          className="job-company-profile-button"
+          href={companyPageHref}
+          target={company.websiteUrl ? "_blank" : undefined}
+          rel={company.websiteUrl ? "noreferrer" : undefined}
+        >
+          View company page <span aria-hidden="true">→</span>
+        </a>
       </div>
-
-      <div className="job-sidebar-company-lockup">
-        <SidebarCompanyLogo company={company} large />
-        <div className="job-sidebar-company-signal">
-          <p>{displayValue(company.industry)}</p>
-        </div>
-      </div>
-
-      <p className="job-sidebar-company-copy">
-        {displayValue(company.publicDescription)}
-      </p>
-
-      <dl className="job-sidebar-company-facts">
-        <div>
-          <dt>
-            <span className="job-sidebar-fact-icon" aria-hidden="true">
-              S
-            </span>
-            Scale
-          </dt>
-          <dd>{displayValue(company.size)}</dd>
-        </div>
-        <div>
-          <dt>
-            <span className="job-sidebar-fact-icon" aria-hidden="true">
-              I
-            </span>
-            Industry
-          </dt>
-          <dd>{displayValue(company.industry)}</dd>
-        </div>
-        <div>
-          <dt>
-            <span className="job-sidebar-fact-icon" aria-hidden="true">
-              A
-            </span>
-            Address
-          </dt>
-          <dd>{displayValue(company.address ?? company.publicLocation)}</dd>
-        </div>
-      </dl>
-
-      <a
-        className="job-company-profile-button"
-        href={companyPageHref}
-        target={company.websiteUrl ? "_blank" : undefined}
-        rel={company.websiteUrl ? "noreferrer" : undefined}
-      >
-        View company page <span aria-hidden="true">→</span>
-      </a>
-    </section>
+    </details>
   );
 }
-
-export function CompanyPhotoCard({ job }: { job: JobDetail }) {
-  const company = resolveSidebarCompany(job.company);
-  const fallback = "/company-cover-placeholder.svg";
-  const [photoSrc, setPhotoSrc] = useState(company.photoUrl ?? fallback);
-  const [photoFailed, setPhotoFailed] = useState(false);
-
-  return (
-    <section
-      className="job-sidebar-card job-sidebar-card--redesign job-company-photo-card"
-      aria-label={company.displayName + " workplace"}
-    >
-      <img
-        src={photoSrc}
-        alt={company.displayName + " workplace"}
-        loading="lazy"
-        onError={() => {
-          if (!photoFailed) {
-            setPhotoFailed(true);
-            setPhotoSrc(fallback);
-          }
-        }}
-      />
-    </section>
-  );
-}
-
 function InfoRow({
   icon,
   label,
@@ -354,15 +305,15 @@ export function GeneralInfoCard({ job }: { job: JobDetail }) {
         <InfoRow
           icon="◇"
           label="Education"
-          value={job.education ?? "Not listed"}
+          value={job.education?.trim() || "Not listed"}
         />
         <InfoRow
           icon="◉"
           label="Number of hires"
           value={
-            job.headcount === undefined
+            job.numberOfHires === undefined || job.numberOfHires === null
               ? "Not listed"
-              : `${job.headcount} opening${job.headcount === 1 ? "" : "s"}`
+              : `${job.numberOfHires} position${job.numberOfHires === 1 ? "" : "s"}`
           }
         />
         <InfoRow
@@ -380,85 +331,92 @@ export function GeneralInfoCard({ job }: { job: JobDetail }) {
   );
 }
 
-function RecommendationRow({ job }: { job: JobCard }) {
+function formatJobSalary(salary: JobCard["salary"]) {
+  if (!salary) return "Salary not disclosed";
+  const formatter = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: salary.currency,
+    maximumFractionDigits: 0,
+  });
+  return (
+    formatter.format(salary.minimum) + " - " + formatter.format(salary.maximum)
+  );
+}
+
+function SimilarJobRow({ job }: { job: JobCard }) {
   const company = resolveSidebarCompany(job.company);
 
   return (
-    <Link
-      className="job-recommendation job-recommendation--redesign"
-      href={`/jobs/${job.slug}`}
-    >
+    <Link className="job-sidebar-similar-job" href={"/jobs/" + job.slug}>
       <SidebarCompanyLogo company={company} />
-      <span className="job-recommendation-title">{job.title}</span>
-      <strong>
-        {job.matchScore !== undefined ? `${job.matchScore}%` : "—"}
-      </strong>
-      <span className="job-recommendation-company">{company.displayName}</span>
+      <span className="job-sidebar-similar-copy">
+        <strong>{job.title}</strong>
+        <small>{company.displayName}</small>
+        <small>
+          {formatJobSalary(job.salary)} · {job.location}
+        </small>
+      </span>
     </Link>
   );
 }
 
-export function RecommendedJobsCard({ job }: { job: JobDetail }) {
-  const recommendations = [
-    ...(job.recommendedJobs?.length
-      ? job.recommendedJobs
-      : (job.relatedJobs ?? [])),
-  ]
-    .sort((left, right) => (right.matchScore ?? -1) - (left.matchScore ?? -1))
-    .slice(0, 3);
+export function SimilarJobsCard({ job }: { job: JobDetail }) {
+  const similarJobs = [
+    ...(job.relatedJobs?.length
+      ? job.relatedJobs
+      : (job.recommendedJobs ?? [])),
+  ].slice(0, 5);
 
   return (
     <section
-      className="job-sidebar-card job-sidebar-card--redesign"
-      aria-labelledby="recommended-jobs-heading"
+      className="job-sidebar-card job-sidebar-card--redesign job-similar-jobs-card"
+      aria-labelledby="similar-jobs-heading"
     >
       <SidebarCardHeading
-        eyebrow="PROFILE SIGNAL"
-        title="Recommended matching jobs"
-        mark="✦"
-        headingId="recommended-jobs-heading"
+        eyebrow="EXPLORE MORE"
+        title="Similar jobs"
+        mark="↗"
+        headingId="similar-jobs-heading"
       />
-      <p className="job-sidebar-copy">
-        Ranked by the same deterministic signals as related jobs, then compared
-        with your profile when available.
-      </p>
-      {recommendations.length ? (
-        <div className="job-recommendation-list">
-          {recommendations.map((item) => (
-            <RecommendationRow key={item.id} job={item} />
+      {similarJobs.length ? (
+        <div className="job-sidebar-similar-list">
+          {similarJobs.map((item) => (
+            <SimilarJobRow key={item.id} job={item} />
           ))}
         </div>
       ) : (
         <p className="job-section-muted">
-          Matching jobs will appear here as more profile signals become
-          available.
+          Similar jobs will appear here as more roles become available.
         </p>
       )}
+      <Link className="job-similar-more-link" href="/jobs">
+        Xem thêm <span aria-hidden="true">→</span>
+      </Link>
     </section>
   );
 }
-
-function SidebarFooter() {
+export function ReportJobWidget({ job }: { job: JobDetail }) {
   return (
-    <div className="job-sidebar-footer">
-      <aside className="job-safety-banner">
-        <span aria-hidden="true">!</span>
-        <div>
-          <strong>Stay scam-aware</strong>
-          <p>Never pay to apply or share passwords with a recruiter.</p>
-        </div>
-      </aside>
-      <Link className="job-tax-banner" href="/jobs?tool=salary-tax-calculator">
-        <span aria-hidden="true">↗</span>
-        <span>
-          <strong>Salary &amp; tax calculator</strong>
-          <small>Estimate take-home pay quietly</small>
+    <section
+      className="job-sidebar-card job-sidebar-card--redesign job-report-widget"
+      aria-labelledby="report-this-job-heading"
+    >
+      <div className="job-report-widget-heading">
+        <span className="job-report-widget-icon" aria-hidden="true">
+          !
         </span>
-      </Link>
-    </div>
+        <div>
+          <p className="panel-kicker">SAFETY CHECK</p>
+          <h2 id="report-this-job-heading">Report this job</h2>
+        </div>
+      </div>
+      <p>
+        This job seems off or suspicious? Let our team know so we can review it.
+      </p>
+      <ReportJobDialog jobId={job.id} className="job-report-widget-button" />
+    </section>
   );
 }
-
 export function JobDetailSidebar({ job }: { job: JobDetail }) {
   return (
     <aside
@@ -467,9 +425,9 @@ export function JobDetailSidebar({ job }: { job: JobDetail }) {
       data-job-detail-sidebar="true"
     >
       <CompanyCard job={job} />
-      <CompanyPhotoCard job={job} />
       <GeneralInfoCard job={job} />
-      <SidebarFooter />
+      <SimilarJobsCard job={job} />
+      <ReportJobWidget job={job} />
     </aside>
   );
 }

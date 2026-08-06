@@ -8,9 +8,7 @@ import { CompanyLogo, JobDetailSidebar } from "./job-detail-sidebar";
 import { JobDetailOverview, JobDetailSections } from "./job-detail-sections";
 import { QuickSkillChips } from "./quick-skill-chips";
 import { RelatedJobsCarousel } from "./related-jobs-carousel";
-import { ReportJobDialog } from "./report-job-dialog";
 import { SaveJobAction } from "./save-job-action";
-import { StickyMiniNav } from "./sticky-mini-nav";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
 import { WhyJoinUsSection } from "./why-join-us-section";
 
@@ -162,10 +160,6 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
     }
   }
 
-  const canOpenApplication =
-    job.state === "ACTIVE" && job.actions.canApply && !applied;
-  const returnTo = encodeURIComponent("/jobs/" + job.slug);
-
   return (
     <article className="jobs-detail-page job-redesign-detail job-detail-board-page">
       <nav className="job-detail-breadcrumb" aria-label="Breadcrumb">
@@ -211,6 +205,50 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
 
             <p className="job-detail-eyebrow">A ROLE WORTH YOUR NEXT MOVE</p>
             <h1>{job.title}</h1>
+            <div
+              className="job-detail-quick-info"
+              aria-label="Key job information"
+            >
+              <div className="job-detail-quick-info-item">
+                <span className="job-detail-quick-info-icon" aria-hidden="true">
+                  ⌖
+                </span>
+                <span>
+                  <span className="job-detail-quick-info-label">Location</span>
+                  <strong>{job.location}</strong>
+                </span>
+              </div>
+              <div className="job-detail-quick-info-item">
+                <span className="job-detail-quick-info-icon" aria-hidden="true">
+                  ✦
+                </span>
+                <span>
+                  <span className="job-detail-quick-info-label">
+                    Experience
+                  </span>
+                  <strong>
+                    {job.experienceMinYears !== undefined
+                      ? job.experienceMinYears + "+ years"
+                      : "No experience required"}
+                  </strong>
+                </span>
+              </div>
+              <div className="job-detail-quick-info-item">
+                <span className="job-detail-quick-info-icon" aria-hidden="true">
+                  ◷
+                </span>
+                <span>
+                  <span className="job-detail-quick-info-label">
+                    Application deadline
+                  </span>
+                  <strong>
+                    {job.applicationDeadline
+                      ? jobDate.format(new Date(job.applicationDeadline))
+                      : "Open until filled"}
+                  </strong>
+                </span>
+              </div>
+            </div>
             <p className="job-detail-summary">{job.summary}</p>
 
             <div className="job-detail-salary-line">
@@ -220,28 +258,6 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
               </Link>
             </div>
 
-            <div className="job-detail-key-meta" aria-label="Job overview">
-              <span>
-                <span aria-hidden="true">◈</span> {formatSalary(job)}
-              </span>
-              <span>
-                <span aria-hidden="true">⌖</span> {job.location}
-              </span>
-              <span>
-                <span aria-hidden="true">◷</span>{" "}
-                {job.applicationDeadline
-                  ? "Apply by " +
-                    jobDate.format(new Date(job.applicationDeadline))
-                  : "Open until filled"}
-              </span>
-              <span>
-                <span aria-hidden="true">EXP</span>{" "}
-                {job.experienceMinYears !== undefined
-                  ? job.experienceMinYears + "+ years experience"
-                  : "Experience not listed"}
-              </span>
-            </div>
-
             <div className="job-detail-action-row" aria-label="Job actions">
               <DetailActionButtons
                 job={job}
@@ -249,29 +265,12 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
                 applyOpen={applyOpen}
                 onApply={() => setApplyVisibility(!applyOpen)}
               />
-              {job.actions.authenticated && job.actions.canReport ? (
-                <ReportJobDialog jobId={job.id} />
-              ) : null}
             </div>
           </header>
 
           <JobDetailOverview job={job} />
           <QuickSkillChips job={job} />
           <WhyJoinUsSection job={job} />
-          <StickyMiniNav
-            onApply={
-              canOpenApplication
-                ? () => setApplyVisibility(!applyOpen)
-                : undefined
-            }
-            applyHref={
-              !job.actions.authenticated && canOpenApplication
-                ? "/login?returnTo=" + returnTo
-                : undefined
-            }
-            applyOpen={applyOpen}
-            applyDisabled={!canOpenApplication}
-          />
           <JobDetailSections job={job} includeOverview={false} />
 
           <ApplyFormSection

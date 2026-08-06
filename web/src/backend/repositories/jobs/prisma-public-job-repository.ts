@@ -17,6 +17,9 @@ const publicInclude = (actorUserId: string | null) =>
         websiteUrl: true,
         publicDescription: true,
         publicLocation: true,
+        size: true,
+        industry: true,
+        address: true,
       },
     },
     skills: {

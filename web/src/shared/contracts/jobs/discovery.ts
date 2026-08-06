@@ -140,6 +140,9 @@ export const jobCardSchema = z
     workArrangement: workArrangementSchema,
     salary: salarySchema,
     summary: z.string().min(1).max(500),
+    education: z.string().max(200).optional(),
+    numberOfHires: z.number().int().positive().optional(),
+    age: z.string().max(80).optional(),
     skills: z.array(z.string().min(1).max(80)).max(50),
     requirementHighlights: z
       .array(z.string().min(1).max(2000))
@@ -188,8 +191,7 @@ export const jobDetailSchema = jobCardSchema
     requirements: z.string().min(1).max(12_000),
     benefits: z.string().max(8_000).nullable(),
     canonicalUrl: z.string().url(),
-    education: z.string().max(200).optional(),
-    headcount: z.number().int().positive().optional(),
+
     workOnSaturday: z.boolean().optional(),
     relatedJobs: z.array(jobCardSchema).max(6).optional(),
     recommendedJobs: z.array(jobCardSchema).max(3).optional(),

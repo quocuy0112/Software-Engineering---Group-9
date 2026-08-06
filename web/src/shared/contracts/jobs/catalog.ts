@@ -41,7 +41,7 @@ export const jobCatalogSchema = z
     workArrangement: z.string().min(1).max(80),
     workOnSaturday: z.boolean(),
     education: z.string().min(1).max(200),
-    headcount: z.number().int().positive(),
+    numberOfHires: z.number().int().positive(),
     status: z.enum(["open", "closed", "expired"]),
     isUrgent: z.boolean(),
     isVerified: z.boolean(),

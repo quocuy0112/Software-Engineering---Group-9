@@ -59,11 +59,6 @@ export function jobSkills(job: JobLike) {
   return unique(value?.length ? value : job.skills);
 }
 
-export function jobExpertise(job: JobLike) {
-  const value = signals(job).skillTags;
-  return unique(value?.length ? value : job.skills).slice(0, 8);
-}
-
 export function jobCategories(job: JobLike) {
   const value = signals(job);
   const categories = value.categoryIds?.length

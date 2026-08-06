@@ -10,6 +10,9 @@ import { JobDetailView } from "@/frontend/features/jobs/components/job-detail";
 
 type Props = { params: Promise<{ slug: string }> };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function load(slug: string) {
   const actor = await optionalJobActor(await headers());
   return new JobDiscoveryService().detail(
