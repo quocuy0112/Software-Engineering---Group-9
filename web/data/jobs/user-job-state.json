@@ -1,7 +1,11 @@
 {
   "userId": "user-abc123",
-  "savedJobIds": ["job-000001", "job-000045"],
-  "hiddenJobIds": ["job-000099"],
+  "savedJobIds": [
+    "job-000222"
+  ],
+  "hiddenJobIds": [
+    "job-000099"
+  ],
   "appliedJobs": [
     {
       "jobId": "job-000001",
@@ -17,6 +21,20 @@
       "aiMatchScore": 82
     }
   ],
+  "jobPreferences": {
+    "gender": "undisclosed",
+    "professionalPositions": [
+      "r04-accounting"
+    ],
+    "customPositions": [],
+    "skills": [],
+    "experienceLevel": "under_1_year",
+    "desiredSalaryMin": 15000000,
+    "workLocations": [],
+    "openToRelocation": true,
+    "aiAnalysisConsent": true,
+    "jobUpdateNotificationConsent": true
+  },
   "savedFilterPresets": [
     {
       "id": "preset-1",

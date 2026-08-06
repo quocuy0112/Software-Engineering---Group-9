@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 import {
   userJobStateSchema,
   type AppliedJobState,
+  type JobPreferences,
   type UserJobState,
 } from "@/shared/contracts/jobs/catalog";
 
@@ -22,6 +23,7 @@ export type UserJobStateMutation =
   | { action: "unsave"; jobId: string }
   | { action: "hide"; jobId: string }
   | { action: "unhide"; jobId: string }
+  | { action: "update-preferences"; jobPreferences: JobPreferences }
   | { action: "apply"; jobId: string; appliedJob: AppliedJobState };
 
 export function userJobStateFileEnabled() {
@@ -77,6 +79,12 @@ export function updateUserJobState(mutation: UserJobStateMutation) {
           hiddenJobIds: current.hiddenJobIds.filter(
             (jobId) => jobId !== mutation.jobId,
           ),
+        };
+        break;
+      case "update-preferences":
+        next = {
+          ...current,
+          jobPreferences: mutation.jobPreferences,
         };
         break;
       case "apply":

@@ -42,6 +42,18 @@ export function WorkspaceNavigation({
     { href: "/jobs", label: copy.jobs, icon: "jobs" },
     { href: "/profile", label: copy.profile, icon: "profile" },
   ] as const;
+  const jobsSubnav = [
+    { href: "/jobs/saved", label: "Vi\u1ec7c l\u00e0m \u0111\u00e3 l\u01b0u" },
+    {
+      href: "/jobs/applied",
+      label: "Vi\u1ec7c l\u00e0m \u0111\u00e3 \u1ee9ng tuy\u1ec3n",
+    },
+    { href: "/jobs/matches", label: "Vi\u1ec7c l\u00e0m ph\u00f9 h\u1ee3p" },
+    {
+      href: "/jobs/settings",
+      label: "C\u00e0i \u0111\u1eb7t g\u1ee3i \u00fd vi\u1ec7c l\u00e0m",
+    },
+  ] as const;
   const pathname = usePathname() ?? "/";
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -109,19 +121,38 @@ export function WorkspaceNavigation({
               (destination.href !== "/dashboard" &&
                 pathname.startsWith(destination.href));
             return (
-              <Link
-                key={destination.href}
-                href={destination.href}
-                aria-current={active ? "page" : undefined}
-                aria-label={destination.label}
-                title={collapsed ? destination.label : undefined}
-                onClick={() => setMenuOpen(false)}
-              >
-                <NavIcon name={destination.icon} />
-                <span className="workspace-navigation-label">
-                  {destination.label}
-                </span>
-              </Link>
+              <div key={destination.href} className="workspace-navigation-item">
+                <Link
+                  href={destination.href}
+                  aria-current={active ? "page" : undefined}
+                  aria-label={destination.label}
+                  title={collapsed ? destination.label : undefined}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <NavIcon name={destination.icon} />
+                  <span className="workspace-navigation-label">
+                    {destination.label}
+                  </span>
+                </Link>
+                {destination.href === "/jobs" && active ? (
+                  <div className="workspace-navigation-subnav">
+                    {jobsSubnav.map((subnav) => {
+                      const subnavActive = pathname === subnav.href;
+                      return (
+                        <Link
+                          key={subnav.href}
+                          href={subnav.href}
+                          aria-current={subnavActive ? "page" : undefined}
+                          title={collapsed ? subnav.label : undefined}
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          <span>{subnav.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
             );
           })}
         </div>
