@@ -13,7 +13,11 @@ export default async function WorkspaceLayout({
   if (!context) redirect("/login?returnTo=%2Fdashboard");
 
   return (
-    <WorkspaceShell csrfProof={context.csrfProof} profile={context.account}>
+    <WorkspaceShell
+      csrfProof={context.csrfProof}
+      profile={context.account}
+      initialLocale={context.initialLocale}
+    >
       {children}
     </WorkspaceShell>
   );

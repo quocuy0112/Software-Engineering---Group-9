@@ -13,6 +13,8 @@ import {
   type CvApiError,
 } from "@/shared/contracts/cv-import/common";
 import { cvConfirmationReceiptSchema } from "@/shared/contracts/cv-import/review";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { cvFieldLabel, cvKnownError } from "../i18n/cv-import-copy";
 
 type Receipt = z.infer<typeof cvConfirmationReceiptSchema>;
 type ConflictLatest = z.infer<typeof cvConflictLatestSchema>;
@@ -27,32 +29,9 @@ type SafeApiError = Readonly<{
   }>;
 }>;
 
-const fieldLabels: Readonly<Record<string, string>> = {
-  company: "Company",
-  degree: "Degree",
-  description: "Description",
-  endDate: "End date",
-  field: "Field of study",
-  headline: "Headline",
-  institution: "Institution",
-  location: "Location",
-  phone: "Phone number",
-  startDate: "Start date",
-  summary: "Summary",
-  title: "Job title",
-  url: "Social link",
-  value: "Value",
-};
-
-function fieldLabel(path: string) {
-  if (path.includes(".skills.")) return "Skill";
-  if (path.includes(".socialLinks.")) return "Social link";
-  const segment = path.split(".").at(-1) ?? "value";
-  return fieldLabels[segment] ?? segment.replace(/([a-z])([A-Z])/gu, "$1 $2");
-}
-
 export function presentCvReviewFieldError(
   fieldError: CvReviewFieldError,
+  locale: "vi" | "en" = "en",
 ): CvReviewFieldError {
   const genericMessage = [
     "Enter a valid value.",
@@ -60,21 +39,52 @@ export function presentCvReviewFieldError(
     "This value is invalid.",
   ].includes(fieldError.message);
   if (!genericMessage) return fieldError;
-  const label = fieldLabel(fieldError.path);
+  const label = cvFieldLabel(locale, fieldError.path);
   const message =
     {
-      CURRENT_HAS_END: `${label} must be empty for a current entry.`,
-      DATE: `${label} must be a valid date.`,
-      DATE_RANGE: `${label} must be after the start date and cannot be in the future.`,
-      DUPLICATE: `${label} duplicates another proposed value.`,
-      FORMAT: `${label} has an invalid format.`,
-      FUTURE: `${label} cannot be in the future.`,
-      INCOMPLETE: `${label} must include a complete profile URL.`,
-      LENGTH: `${label} has an invalid length.`,
+      CURRENT_HAS_END:
+        locale === "vi"
+          ? `${label} phải để trống khi đây là mục hiện tại.`
+          : `${label} must be empty for a current entry.`,
+      DATE:
+        locale === "vi"
+          ? `${label} phải là ngày hợp lệ.`
+          : `${label} must be a valid date.`,
+      DATE_RANGE:
+        locale === "vi"
+          ? `${label} phải sau ngày bắt đầu và không thể ở tương lai.`
+          : `${label} must be after the start date and cannot be in the future.`,
+      DUPLICATE:
+        locale === "vi"
+          ? `${label} trùng với một giá trị đề xuất khác.`
+          : `${label} duplicates another proposed value.`,
+      FORMAT:
+        locale === "vi"
+          ? `${label} có định dạng không hợp lệ.`
+          : `${label} has an invalid format.`,
+      FUTURE:
+        locale === "vi"
+          ? `${label} không thể ở tương lai.`
+          : `${label} cannot be in the future.`,
+      INCOMPLETE:
+        locale === "vi"
+          ? `${label} phải bao gồm URL hồ sơ đầy đủ.`
+          : `${label} must include a complete profile URL.`,
+      LENGTH:
+        locale === "vi"
+          ? `${label} có độ dài không hợp lệ.`
+          : `${label} has an invalid length.`,
       REQUIRED: fieldError.path.endsWith("endDate")
-        ? `${label} is required unless the entry is current.`
-        : `${label} is required.`,
-      URL: `${label} must be a valid http or https URL.`,
+        ? locale === "vi"
+          ? `${label} là bắt buộc trừ khi mục này đang hiện tại.`
+          : `${label} is required unless the entry is current.`
+        : locale === "vi"
+          ? `${label} là bắt buộc.`
+          : `${label} is required.`,
+      URL:
+        locale === "vi"
+          ? `${label} phải là URL http hoặc https hợp lệ.`
+          : `${label} must be a valid http or https URL.`,
     }[fieldError.code] ?? fieldError.message;
   return { ...fieldError, message };
 }
@@ -82,12 +92,15 @@ export function presentCvReviewFieldError(
 function saveErrorSummary(
   message: string,
   fieldErrors: readonly CvReviewFieldError[],
+  locale: "vi" | "en",
 ) {
   if (!fieldErrors.length) return message;
   const first = fieldErrors[0]?.message ?? message;
   return fieldErrors.length === 1
     ? first
-    : `${first} Check ${fieldErrors.length} highlighted fields.`;
+    : locale === "vi"
+      ? `${first} Hãy kiểm tra ${fieldErrors.length} trường được đánh dấu.`
+      : `${first} Check ${fieldErrors.length} highlighted fields.`;
 }
 
 export type CvReviewConflict = Readonly<{
@@ -112,6 +125,7 @@ export function useCvDraftReview(input: {
   initial: CvDraftComparison;
   csrfProof: string;
 }) {
+  const locale = useWorkspaceLocale();
   const [authoritative, setAuthoritative] = useState(input.initial);
   const [proposals, setProposals] = useState<CvEditableProposals>(
     input.initial.proposals,
@@ -187,9 +201,14 @@ export function useCvDraftReview(input: {
       `/api/account/cv-drafts/${authoritative.draftId}`,
       { cache: "no-store", credentials: "same-origin" },
     );
-    if (!response.ok) throw new Error("The latest review could not be loaded.");
+    if (!response.ok)
+      throw new Error(
+        locale === "vi"
+          ? "Không thể tải bản xem xét mới nhất."
+          : "The latest review could not be loaded.",
+      );
     return (await response.json()) as CvDraftComparison;
-  }, [authoritative.draftId]);
+  }, [authoritative.draftId, locale]);
 
   const clearFieldErrors = useCallback((paths: readonly string[]) => {
     if (!paths.length) return;
@@ -236,18 +255,25 @@ export function useCvDraftReview(input: {
             code,
             message:
               failure.error?.message ??
-              "The review changed in another session.",
+              (locale === "vi"
+                ? "Bản xem xét đã thay đổi trong một phiên khác."
+                : "The review changed in another session."),
             latest: failure.error?.latest ?? null,
           });
           setLatestComparison(null);
           return false;
         }
         const nextFieldErrors = (failure.error?.fieldErrors ?? []).map(
-          presentCvReviewFieldError,
+          (fieldError) => presentCvReviewFieldError(fieldError, locale),
         );
         const summary = saveErrorSummary(
-          failure.error?.message ?? "The review could not be saved.",
+          failure.error?.message
+            ? cvKnownError(locale, failure.error.message, code)
+            : locale === "vi"
+              ? "Không thể lưu bản xem xét."
+              : "The review could not be saved.",
           nextFieldErrors,
+          locale,
         );
         setFieldErrors(nextFieldErrors);
         setError(summary);
@@ -256,13 +282,15 @@ export function useCvDraftReview(input: {
       const next = await loadLatest();
       applyAuthoritative(next);
       confirmationKey.current = newRequestKey();
-      setMessage("Review saved.");
+      setMessage(locale === "vi" ? "Đã lưu bản xem xét." : "Review saved.");
       return true;
     } catch (caught) {
       const summary =
         caught instanceof Error
           ? caught.message
-          : "The review could not be saved.";
+          : locale === "vi"
+            ? "Không thể lưu bản xem xét."
+            : "The review could not be saved.";
       setError(summary);
       setFieldErrors([]);
       return false;
@@ -279,6 +307,7 @@ export function useCvDraftReview(input: {
     decisions,
     input.csrfProof,
     loadLatest,
+    locale,
     proposals,
   ]);
 
@@ -324,25 +353,37 @@ export function useCvDraftReview(input: {
             code,
             message:
               failure.error?.message ??
-              "The review changed before confirmation.",
+              (locale === "vi"
+                ? "Bản xem xét đã thay đổi trước khi xác nhận."
+                : "The review changed before confirmation."),
             latest: failure.error?.latest ?? null,
           });
           setLatestComparison(null);
           return null;
         }
         throw new Error(
-          failure.error?.message ?? "The profile could not be updated.",
+          failure.error?.message
+            ? cvKnownError(locale, failure.error.message, code)
+            : locale === "vi"
+              ? "Không thể cập nhật hồ sơ."
+              : "The profile could not be updated.",
         );
       }
       const next = cvConfirmationReceiptSchema.parse(await response.json());
       setReceipt(next);
-      setMessage("CV changes were confirmed and applied to your profile.");
+      setMessage(
+        locale === "vi"
+          ? "Đã xác nhận và áp dụng thay đổi CV vào hồ sơ của bạn."
+          : "CV changes were confirmed and applied to your profile.",
+      );
       return next;
     } catch (caught) {
       setError(
         caught instanceof Error
-          ? caught.message
-          : "The profile could not be updated.",
+          ? cvKnownError(locale, caught.message)
+          : locale === "vi"
+            ? "Không thể cập nhật hồ sơ."
+            : "The profile could not be updated.",
       );
       return null;
     } finally {
@@ -355,6 +396,7 @@ export function useCvDraftReview(input: {
     decisions.reviewComplete,
     dirty,
     input.csrfProof,
+    locale,
   ]);
 
   const compareLatest = useCallback(async () => {
@@ -379,17 +421,25 @@ export function useCvDraftReview(input: {
           : null,
       );
       setMessage(
-        "Latest saved review loaded for comparison; your edits remain in memory.",
+        locale === "vi"
+          ? "Đã tải bản xem xét mới nhất để so sánh; các chỉnh sửa của bạn vẫn còn trong bộ nhớ."
+          : "Latest saved review loaded for comparison; your edits remain in memory.",
       );
       return next;
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Reload failed.");
+      setError(
+        caught instanceof Error
+          ? cvKnownError(locale, caught.message)
+          : locale === "vi"
+            ? "Tải lại không thành công."
+            : "Reload failed.",
+      );
       return null;
     } finally {
       activeOperation.current = null;
       setPending(null);
     }
-  }, [loadLatest]);
+  }, [loadLatest, locale]);
 
   const reapplyLatest = useCallback(() => {
     if (activeOperation.current || !conflict || !latestComparison) return false;
@@ -399,11 +449,13 @@ export function useCvDraftReview(input: {
     setDirty(true);
     setError(null);
     setMessage(
-      "Your in-memory edits are ready to save against the latest review.",
+      locale === "vi"
+        ? "Các chỉnh sửa trong bộ nhớ đã sẵn sàng để lưu vào bản xem xét mới nhất."
+        : "Your in-memory edits are ready to save against the latest review.",
     );
     confirmationKey.current = newRequestKey();
     return true;
-  }, [conflict, latestComparison]);
+  }, [conflict, latestComparison, locale]);
 
   const discardAndReload = useCallback(async () => {
     if (activeOperation.current) return false;
@@ -412,17 +464,27 @@ export function useCvDraftReview(input: {
     try {
       const next = await loadLatest();
       applyAuthoritative(next);
-      setMessage("Latest saved review loaded.");
+      setMessage(
+        locale === "vi"
+          ? "Đã tải bản xem xét mới nhất."
+          : "Latest saved review loaded.",
+      );
       confirmationKey.current = newRequestKey();
       return true;
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Reload failed.");
+      setError(
+        caught instanceof Error
+          ? cvKnownError(locale, caught.message)
+          : locale === "vi"
+            ? "Tải lại không thành công."
+            : "Reload failed.",
+      );
       return false;
     } finally {
       activeOperation.current = null;
       setPending(null);
     }
-  }, [applyAuthoritative, loadLatest]);
+  }, [applyAuthoritative, loadLatest, locale]);
 
   return useMemo(
     () => ({

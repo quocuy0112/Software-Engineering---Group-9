@@ -422,7 +422,7 @@
   </section>
 
   <!-- ============================================================ -->
-  <!-- SCREEN: SCREENING & RANKING (UC-SCR-01 include UC-SCR-03)     -->
+  <!-- SCREEN: SCREENING & RANKING (UC-SCR-03; screening result required) -->
   <!-- ============================================================ -->
   <section class="screen" data-screen="screening" id="screen-screening">
     <div class="screen-header">
@@ -615,7 +615,7 @@
 
       <!-- STEP 2: PREVIEW & SUBMIT -->
       <div class="state-block" data-wpanel="preview">
-        <p class="eyebrow" style="margin-bottom:14px;">UC-POST-02 · Preview and Submit Job Posting <span class="uc-tag">«extend» UC-POST-01</span></p>
+        <p class="eyebrow" style="margin-bottom:14px;">UC-POST-02 · Preview and Submit Job Posting <span class="uc-tag">separate goal; draft may exist</span></p>
 
         <div class="demo-box">
           <span class="demo-label">Preview state</span>
@@ -665,7 +665,7 @@
 </div>
 
 <!-- ============================================================ -->
-<!-- MODAL: Stage History — UC-PIPE-03 (includes UC-PIPE-02)       -->
+<!-- MODAL: Stage History — UC-PIPE-03 (read-only history query)   -->
 <!-- ============================================================ -->
 <div class="modal-backdrop" id="historyModalBackdrop">
   <div class="modal">
@@ -1079,7 +1079,7 @@
       renderPreview();
       setWizardStep('preview');
     } else {
-      // Submit — UC-POST-02 extends UC-POST-01
+      // Submit — UC-POST-02 is a separate goal after draft preparation
       syncEditingFromForm();
       if(!jobs.some(function(j){return j.id===editingJob.id;})){ jobs.unshift(editingJob); }
       editingJob.status = 'pending';

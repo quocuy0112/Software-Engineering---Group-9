@@ -7,6 +7,8 @@ import {
   cvDeletionOutcomeSchema,
   type CvDeletionOutcome,
 } from "@/shared/contracts/cv-import/consent-retention";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { cvCopy, cvFormatDate, type CvLocale } from "../i18n/cv-import-copy";
 import styles from "./cv-retention-actions.module.css";
 
 export type CvRetentionActionResource = Readonly<{
@@ -18,25 +20,29 @@ export type CvRetentionActionResource = Readonly<{
   deletedAt: string | null;
 }>;
 
-function shortDate(value: string | null): string | null {
+function shortDate(locale: CvLocale, value: string | null): string | null {
   if (!value) return null;
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime())
-    ? null
-    : parsed.toISOString().replace("T", " ");
+  return cvFormatDate(locale, value, {
+    dateStyle: "medium",
+    timeZone: "UTC",
+  });
 }
 
-function outcomeMessage(resource: CvRetentionActionResource): string {
+function outcomeMessage(
+  locale: CvLocale,
+  resource: CvRetentionActionResource,
+): string {
+  const copy = cvCopy(locale).retention;
   if (resource.status === "CANCELLED") {
-    return `Deletion accepted. Content access is disabled immediately; protected cleanup is pending and must finish by ${shortDate(resource.deleteAfter) ?? "the 24-hour deadline"}.`;
+    return `${copy.cancelled} ${shortDate(locale, resource.deleteAfter) ?? (locale === "vi" ? "hạn 24 giờ" : "the 24-hour deadline")}.`;
   }
   if (resource.status === "DELETED") {
-    return "Deletion complete. Temporary import content has been removed; minimized non-content evidence may be retained.";
+    return copy.deleted;
   }
   if (resource.status === "EXPIRED") {
-    return `This import expired. Content and retry access are disabled; deadline-driven cleanup continues through ${shortDate(resource.deleteAfter) ?? "its retention deadline"}.`;
+    return `${copy.expired} ${shortDate(locale, resource.deleteAfter) ?? (locale === "vi" ? "hạn lưu giữ" : "its retention deadline")}.`;
   }
-  return "Temporary CV content remains protected and subject to the deadlines shown below.";
+  return copy.temporary;
 }
 
 export function CvRetentionActions({
@@ -48,6 +54,8 @@ export function CvRetentionActions({
   canDelete: boolean;
   onDelete: () => Promise<unknown>;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = cvCopy(locale).retention;
   const trigger = useRef<HTMLButtonElement>(null);
   const dialog = useRef<HTMLElement>(null);
   const confirm = useRef<HTMLButtonElement>(null);
@@ -126,7 +134,9 @@ export function CvRetentionActions({
       setErrorState({
         uploadId: resource.uploadId,
         message:
-          "Deletion could not be accepted. This import remains unchanged.",
+          locale === "vi"
+            ? "Không thể chấp nhận yêu cầu xóa. Lần nhập vẫn được giữ nguyên."
+            : "Deletion could not be accepted. This import remains unchanged.",
       });
       setOpen(false);
       window.setTimeout(() => trigger.current?.focus(), 0);
@@ -146,8 +156,8 @@ export function CvRetentionActions({
         deletedAt: localOutcome.deletedAt,
       }
     : resource;
-  const expiry = shortDate(current.expiresAt);
-  const cleanup = shortDate(current.deleteAfter);
+  const expiry = shortDate(locale, current.expiresAt);
+  const cleanup = shortDate(locale, current.deleteAfter);
 
   return (
     <section
@@ -157,17 +167,17 @@ export function CvRetentionActions({
       data-reduced-motion-safe="true"
       aria-labelledby="cv-retention-heading"
     >
-      <h2 id="cv-retention-heading">Retention and deletion</h2>
+      <h2 id="cv-retention-heading">{copy.heading}</h2>
       <dl className={styles.deadlines}>
         {expiry ? (
           <div>
-            <dt>Import expiry</dt>
+            <dt>{copy.expiry}</dt>
             <dd>{expiry}</dd>
           </div>
         ) : null}
         {cleanup ? (
           <div>
-            <dt>Content cleanup deadline</dt>
+            <dt>{copy.cleanup}</dt>
             <dd>{cleanup}</dd>
           </div>
         ) : null}
@@ -178,16 +188,16 @@ export function CvRetentionActions({
         aria-live="polite"
         aria-atomic="true"
       >
-        {error ?? outcomeMessage(current)}
+        {error ?? outcomeMessage(locale, current)}
       </p>
       <div className={styles.actions}>
         {canDelete &&
         !["CANCELLED", "DELETED", "EXPIRED"].includes(current.status) ? (
           <button ref={trigger} type="button" onClick={() => setOpen(true)}>
-            Cancel and delete this CV import
+            {copy.cancelDelete}
           </button>
         ) : null}
-        <Link href="/profile">Open Candidate Profile</Link>
+        <Link href="/profile">{cvCopy(locale).common.openProfile}</Link>
       </div>
 
       {open ? (
@@ -206,15 +216,8 @@ export function CvRetentionActions({
             aria-describedby="cv-retention-dialog-description"
             aria-busy={busy}
           >
-            <h2 id="cv-retention-dialog-heading">
-              Permanently delete temporary CV data?
-            </h2>
-            <p id="cv-retention-dialog-description">
-              Access ends immediately. SmartHire cancels queued processing and
-              removes source, extracted, draft, and provenance content within 24
-              hours. Your Candidate Profile remains available and is not changed
-              by this deletion.
-            </p>
+            <h2 id="cv-retention-dialog-heading">{copy.deleteDialog}</h2>
+            <p id="cv-retention-dialog-description">{copy.deleteDescription}</p>
             <div className={styles.dialogActions}>
               <button
                 ref={confirm}
@@ -223,10 +226,10 @@ export function CvRetentionActions({
                 aria-busy={busy}
                 onClick={() => void remove()}
               >
-                Confirm cancel and delete
+                {copy.confirmDelete}
               </button>
               <button type="button" disabled={busy} onClick={close}>
-                Keep import
+                {copy.keep}
               </button>
             </div>
           </section>

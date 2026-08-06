@@ -82,6 +82,33 @@ describe("identity navigation shells", () => {
     );
   });
 
+  it("hydrates and renders the saved Vietnamese workspace locale", async () => {
+    render(
+      <WorkspaceShell
+        csrfProof="proof"
+        initialLocale="vi"
+        profile={{
+          name: "Thao Nguyen",
+          email: "thao@example.test",
+        }}
+      >
+        <h1>Hồ sơ</h1>
+      </WorkspaceShell>,
+    );
+
+    expect(screen.getByRole("main")).toHaveAttribute("lang", "vi");
+    await waitFor(() =>
+      expect(document.documentElement).toHaveAttribute("lang", "vi"),
+    );
+    expect(
+      screen.getByRole("navigation", { name: /không gian ứng viên/i }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: /bảng điều khiển/i }),
+    ).toHaveAttribute("href", "/dashboard");
+    expect(screen.getByRole("button", { name: /đăng xuất/i })).toBeVisible();
+  });
+
   it("marks the active workspace destination and controls the mobile menu", () => {
     render(
       <WorkspaceShell
@@ -219,7 +246,9 @@ describe("identity navigation shells", () => {
     const toggle = screen.getByRole("button", {
       name: "Collapse workspace sidebar",
     });
-    const navigation = screen.getByRole("navigation", { name: "Workspace" });
+    const navigation = screen.getByRole("navigation", {
+      name: /candidate workspace/i,
+    });
     const signOut = screen.getByRole("button", { name: "Sign out" });
 
     expect(toggle).toHaveAttribute("aria-expanded", "true");

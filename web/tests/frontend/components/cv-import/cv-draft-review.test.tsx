@@ -40,7 +40,7 @@ describe("CV draft review", () => {
       screen.getAllByText("Source context unavailable.").length,
     ).toBeGreaterThan(0);
 
-    fireEvent.change(screen.getByLabelText("Proposed headline"), {
+    fireEvent.change(screen.getByLabelText(/Proposed headline/i), {
       target: { value: "Edited platform engineer" },
     });
     expect(screen.getByText("Unsaved review changes.")).toBeVisible();
@@ -57,7 +57,7 @@ describe("CV draft review", () => {
       .closest("article");
     expect(skillCard).not.toBeNull();
     expect(
-      within(skillCard as HTMLElement).getByRole("radio", { name: "add" }),
+      within(skillCard as HTMLElement).getByRole("radio", { name: /add/i }),
     ).toBeChecked();
     expect(localStorage.length).toBe(0);
     expect(sessionStorage.length).toBe(0);
@@ -97,7 +97,7 @@ describe("CV draft review", () => {
     render(
       <CvDraftReview initial={cvDraftReviewFixture} csrfProof="csrf_test" />,
     );
-    fireEvent.change(screen.getByLabelText("Proposed headline"), {
+    fireEvent.change(screen.getByLabelText(/Proposed headline/i), {
       target: { value: "Edited platform engineer" },
     });
     const save = screen.getByRole("button", { name: "Save review" });
@@ -121,7 +121,7 @@ describe("CV draft review", () => {
       <CvDraftReview initial={cvDraftReviewFixture} csrfProof="csrf_test" />,
     );
 
-    const headline = screen.getByLabelText("Proposed headline");
+    const headline = screen.getByLabelText(/Proposed headline/i);
     fireEvent.change(headline, { target: { value: "   " } });
     fireEvent.click(screen.getByRole("button", { name: "Save review" }));
 
@@ -155,15 +155,15 @@ describe("CV draft review", () => {
     render(<CvDraftReview initial={invalidInitial} csrfProof="csrf_test" />);
 
     const scalarDecision = screen.getByRole("group", {
-      name: "Decision for headline",
+      name: /Decision for headline/i,
     });
     expect(
-      within(scalarDecision).queryByRole("radio", { name: "add" }),
+      within(scalarDecision).queryByRole("radio", { name: /add/i }),
     ).not.toBeInTheDocument();
     expect(
-      within(scalarDecision).getByRole("radio", { name: "replace" }),
+      within(scalarDecision).getByRole("radio", { name: /replace/i }),
     ).toBeVisible();
-    fireEvent.change(screen.getByLabelText("Proposed headline"), {
+    fireEvent.change(screen.getByLabelText(/Proposed headline/i), {
       target: { value: "Edited headline" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Save review" }));
@@ -208,7 +208,7 @@ describe("CV draft review", () => {
       <CvDraftReview initial={cvDraftReviewFixture} csrfProof="csrf_test" />,
     );
 
-    fireEvent.change(screen.getByLabelText("Proposed headline"), {
+    fireEvent.change(screen.getByLabelText(/Proposed headline/i), {
       target: { value: "Edited headline" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Save review" }));

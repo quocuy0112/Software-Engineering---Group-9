@@ -193,7 +193,7 @@ describe("CV external consent and retention controls", () => {
         onDelete={onDelete}
       />,
     );
-    expect(screen.getByText(/2026-09-01/)).toBeVisible();
+    expect(screen.getByText(/Sep 1, 2026/)).toBeVisible();
     const trigger = screen.getByRole("button", {
       name: /cancel and delete this cv import/i,
     });
@@ -209,7 +209,7 @@ describe("CV external consent and retention controls", () => {
     );
     await waitFor(() => expect(onDelete).toHaveBeenCalledOnce());
     expect(screen.getByRole("status")).toHaveTextContent(
-      /deletion accepted[\s\S]*cleanup[\s\S]*2026-08-03/i,
+      /deletion accepted[\s\S]*cleanup[\s\S]*Aug 3, 2026/i,
     );
   });
 

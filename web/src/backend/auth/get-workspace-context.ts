@@ -25,6 +25,9 @@ export const getWorkspaceContext = cache(async () => {
       image: true,
       createdAt: true,
       twoFactorEnabled: true,
+      preferences: {
+        select: { language: true },
+      },
       fullAccountRecoveryOperations: {
         where: { status: "COMPLETED" },
         orderBy: { completedAt: "desc" },
@@ -46,6 +49,10 @@ export const getWorkspaceContext = cache(async () => {
       createdAt: account.createdAt,
       twoFactorEnabled: account.twoFactorEnabled,
     },
+    initialLocale:
+      account.preferences?.language === "VI"
+        ? ("vi" as const)
+        : ("en" as const),
     recoveryCompleted: account.fullAccountRecoveryOperations.length > 0,
   };
 });

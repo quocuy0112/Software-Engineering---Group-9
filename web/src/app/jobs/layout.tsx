@@ -13,7 +13,12 @@ export default async function JobsLayout({
 
   if (context) {
     return (
-      <WorkspaceShell csrfProof={context.csrfProof} profile={context.account}>
+      <WorkspaceShell
+        csrfProof={context.csrfProof}
+        profile={context.account}
+        initialLocale={context.initialLocale}
+        contentMode="job-board"
+      >
         <JobInteractionProvider>{children}</JobInteractionProvider>
       </WorkspaceShell>
     );
