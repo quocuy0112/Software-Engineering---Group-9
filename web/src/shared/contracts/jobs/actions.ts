@@ -60,11 +60,31 @@ export const candidateCvOptionSchema = z
     fileName: z.string().min(1).max(255),
     mimeType: z.enum([
       "application/pdf",
+      "application/msword",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ]),
     byteSize: z.number().int().min(1).max(5_000_000),
     version: z.number().int().positive(),
     confirmedAt: z.string().datetime(),
+  })
+  .strict();
+
+export const applicationContactSnapshotSchema = z
+  .object({
+    fullName: z.string().trim().min(1).max(150),
+    email: z.string().trim().email().max(254),
+    phone: z
+      .string()
+      .trim()
+      .regex(/^(?:0|\+84)(?:3|5|7|8|9)\d{8}$/u),
+  })
+  .strict();
+
+export const applicationContactFormSchema = z
+  .object({
+    fullName: z.string().max(150),
+    email: z.string().max(254),
+    phone: z.string().max(20),
   })
   .strict();
 
@@ -88,6 +108,7 @@ export const applicationFormSchema = z
     profileReady: z.boolean(),
     missingProfileFields: z.array(z.string().min(1).max(80)).max(20),
     cvs: z.array(candidateCvOptionSchema).max(50),
+    contact: applicationContactFormSchema.optional(),
     questions: z.array(applicationQuestionSchema).max(20),
     consentVersion: z.string().min(1).max(64),
     csrfToken: z.string().min(1).max(256),
@@ -104,10 +125,13 @@ export const applicationAnswerInputSchema = z
 export const applicationSubmissionSchema = z
   .object({
     cvId: z.string().min(1).max(128),
+    cvFileRef: z.string().min(1).max(256).nullable().optional(),
+    contactSnapshot: applicationContactSnapshotSchema.optional(),
     answers: z.array(applicationAnswerInputSchema).max(20),
     coverLetter: z.string().trim().max(5000).nullable(),
     consentVersion: z.string().min(1).max(64),
     consentAccepted: z.literal(true),
+    aiAnalysisConsent: z.boolean().optional(),
   })
   .strict()
   .superRefine((value, context) => {
@@ -121,6 +145,20 @@ export const applicationSubmissionSchema = z
     }
   });
 
+export const localApplicationStateSchema = z
+  .object({
+    jobTitle: z.string().trim().min(1).max(200),
+    cvFileRef: z.string().min(1).max(256),
+    contactSnapshot: applicationContactSnapshotSchema,
+    answers: z.array(applicationAnswerInputSchema).max(20),
+    coverLetter: z.string().trim().max(5000).nullable(),
+    aiAnalysisConsent: z.boolean(),
+    fileName: z.string().trim().min(1).max(255),
+    fileSize: z.number().int().min(1).max(5_000_000),
+    fileType: z.string().trim().max(128),
+  })
+  .strict();
+
 export const applicationOutcomeSchema = z
   .object({
     applicationId: z.string().min(1).max(128),
@@ -129,6 +167,8 @@ export const applicationOutcomeSchema = z
     submittedAt: z.string().datetime(),
     created: z.boolean(),
     message: z.string().min(1).max(300),
+    aiAnalysisConsent: z.boolean().optional(),
+    aiMatchScore: z.number().int().min(0).max(100).nullable().optional(),
   })
   .strict();
 
@@ -136,6 +176,10 @@ export const idempotencyKeySchema = z.string().min(16).max(128);
 
 export type JobProblem = z.infer<typeof jobProblemSchema>;
 export type JobReportInput = z.infer<typeof jobReportInputSchema>;
+export type ApplicationContactSnapshot = z.infer<
+  typeof applicationContactSnapshotSchema
+>;
 export type ApplicationForm = z.infer<typeof applicationFormSchema>;
 export type ApplicationSubmission = z.infer<typeof applicationSubmissionSchema>;
+export type LocalApplicationState = z.infer<typeof localApplicationStateSchema>;
 export type ApplicationOutcome = z.infer<typeof applicationOutcomeSchema>;

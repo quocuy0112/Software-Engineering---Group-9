@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { JobDetailView } from "@/frontend/features/jobs/components/job-detail";
 import type { JobDetail } from "@/shared/contracts/jobs/discovery";
@@ -47,9 +47,24 @@ describe("job detail presentation", () => {
     expect(
       screen.getByRole("heading", { name: /responsibilities/i }),
     ).toBeVisible();
+    const requirementsAnchor = screen.getByRole("button", {
+      name: /requirements/i,
+    });
+    fireEvent.click(requirementsAnchor);
     expect(
-      screen.getByRole("link", { name: /sign in to apply/i }),
-    ).toHaveAttribute("href", "/login?returnTo=%2Fjobs%2Flap-trinh-vien");
+      screen.getByRole("heading", { name: /candidate requirements/i }),
+    ).toBeVisible();
+    expect(screen.getByRole("heading", { name: /benefits/i })).toBeVisible();
+    const signInLinks = screen.getAllByRole("link", {
+      name: /sign in to apply/i,
+    });
+    expect(signInLinks).toHaveLength(2);
+    for (const link of signInLinks) {
+      expect(link).toHaveAttribute(
+        "href",
+        "/login?returnTo=%2Fjobs%2Flap-trinh-vien",
+      );
+    }
   });
 
   it("shows a textual closed state and removes apply", () => {

@@ -940,6 +940,10 @@ model JobApplication {
   candidateUserId         String
   jobPostingId            String
   selectedCvId            String
+  cvFileRef               String?
+  contactSnapshot         Json?
+  aiAnalysisConsent       Boolean                       @default(false)
+  aiMatchScore            Int?
   stage                   ApplicationStage              @default(APPLIED)
   coverLetter             String?
   profileSnapshot         Json
@@ -962,6 +966,7 @@ model JobApplication {
   @@unique([candidateUserId, idempotencyKey])
   @@index([jobPostingId, stage, submittedAt])
   @@index([candidateUserId, submittedAt(sort: Desc)])
+  @@index([candidateUserId, aiAnalysisConsent])
 }
 
 model ApplicationAnswer {

@@ -1074,14 +1074,6 @@ export type EnumCvUploadStatusFieldUpdateOperationsInput = {
   set?: $Enums.CvUploadStatus
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type NullableBytesFieldUpdateOperationsInput = {
   set?: runtime.Bytes | null
 }

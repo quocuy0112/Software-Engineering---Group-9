@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { JobDetailView } from "@/frontend/features/jobs/components/job-detail";
 import type { JobDetail } from "@/shared/contracts/jobs/discovery";
@@ -49,8 +49,13 @@ describe("job detail accessibility", () => {
     expect(screen.getByText("Active")).toHaveAccessibleName(
       /job status: active/i,
     );
+    const requirementsAnchor = screen.getByRole("button", {
+      name: /requirements/i,
+    });
+    fireEvent.click(requirementsAnchor);
     expect(
-      screen.getByRole("heading", { name: /requirements/i }),
+      screen.getByRole("heading", { name: /candidate requirements/i }),
     ).toBeVisible();
+    expect(screen.getByRole("heading", { name: /benefits/i })).toBeVisible();
   });
 });

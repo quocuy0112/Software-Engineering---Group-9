@@ -18,6 +18,7 @@ export const experienceLevelSchema = z.enum([
 export const workArrangementSchema = z.enum(["ONSITE", "HYBRID", "REMOTE"]);
 export const salaryPeriodSchema = z.enum(["HOUR", "MONTH", "YEAR"]);
 export const jobSortSchema = z.enum(["RELEVANCE", "NEWEST", "SALARY_DESC"]);
+export const jobSearchBySchema = z.enum(["TITLE", "COMPANY", "BOTH"]);
 
 const omitEmptyControlValue = (value: unknown) =>
   value === "" || value === null ? undefined : value;
@@ -45,6 +46,7 @@ const optionalNumber = (schema: z.ZodNumber) =>
 export const jobSearchQuerySchema = z
   .object({
     q: z.string().trim().max(200).default(""),
+    searchBy: jobSearchBySchema.default("BOTH"),
     location: z.string().trim().max(160).default(""),
     employmentType: stringArray(employmentTypeSchema, 5).default([]),
     experienceLevel: stringArray(experienceLevelSchema, 6).default([]),
@@ -98,6 +100,9 @@ export const publicCompanySchema = z
     websiteUrl: z.string().url().nullable(),
     publicDescription: z.string().max(3000).nullable(),
     publicLocation: z.string().max(160).nullable(),
+    size: z.string().max(80).optional(),
+    industry: z.string().max(160).optional(),
+    address: z.string().max(300).optional(),
   })
   .strict();
 
@@ -136,8 +141,32 @@ export const jobCardSchema = z
     salary: salarySchema,
     summary: z.string().min(1).max(500),
     skills: z.array(z.string().min(1).max(80)).max(50),
+    requirementHighlights: z
+      .array(z.string().min(1).max(2000))
+      .max(20)
+      .optional(),
+    benefitHighlights: z.array(z.string().min(1).max(2000)).max(20).optional(),
+    benefitItems: z
+      .array(
+        z
+          .object({
+            icon: z.string().min(1).max(80),
+            label: z.string().min(1).max(300),
+          })
+          .strict(),
+      )
+      .max(50)
+      .optional(),
     publishedAt: z.string().datetime(),
+    updatedAt: z.string().datetime().optional(),
     applicationDeadline: z.string().datetime().nullable(),
+    isUrgent: z.boolean().optional(),
+    workOnSaturday: z.boolean().optional(),
+    isVerified: z.boolean().optional(),
+    categoryIds: z.array(z.string().min(1).max(128)).max(20).optional(),
+    categoryFamily: z.string().max(80).optional(),
+    experienceMinYears: z.number().int().nonnegative().optional(),
+    matchScore: z.number().int().min(0).max(100).optional(),
     actions: publicJobActionsSchema,
   })
   .strict();
@@ -159,6 +188,11 @@ export const jobDetailSchema = jobCardSchema
     requirements: z.string().min(1).max(12_000),
     benefits: z.string().max(8_000).nullable(),
     canonicalUrl: z.string().url(),
+    education: z.string().max(200).optional(),
+    headcount: z.number().int().positive().optional(),
+    workOnSaturday: z.boolean().optional(),
+    relatedJobs: z.array(jobCardSchema).max(6).optional(),
+    recommendedJobs: z.array(jobCardSchema).max(3).optional(),
   })
   .strict();
 

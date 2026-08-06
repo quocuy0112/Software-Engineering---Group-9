@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
@@ -7,10 +8,8 @@ import type {
   ApplicationForm,
   ApplicationOutcome,
 } from "@/shared/contracts/jobs/actions";
-import {
-  applicationFormSchema,
-  applicationOutcomeSchema,
-} from "@/shared/contracts/jobs/actions";
+import { applicationOutcomeSchema } from "@/shared/contracts/jobs/actions";
+import { useOptionalJobInteraction } from "./job-interaction-provider";
 
 export function JobApplicationForm({
   form,
@@ -209,64 +208,34 @@ export function JobApplicationForm({
   );
 }
 
-export function JobApplicationAction({ jobId }: { jobId: string }) {
-  const [form, setForm] = useState<ApplicationForm | null>(null);
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [outcome, setOutcome] = useState<ApplicationOutcome | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  async function start() {
-    setError(null);
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/jobs/${jobId}/application-form`, {
-        cache: "no-store",
-      });
-      const body = await response.json();
-      if (!response.ok) {
-        setError(body.message ?? "Application form could not be loaded.");
-        return;
-      }
-      setForm(applicationFormSchema.parse(body));
-      setOpen(true);
-    } catch {
-      setError("Application form could not be loaded.");
-    } finally {
-      setLoading(false);
-    }
+export function JobApplicationAction({
+  jobId,
+  jobSlug,
+  initialApplied = false,
+  onActivate,
+}: {
+  jobId: string;
+  jobSlug?: string;
+  initialApplied?: boolean;
+  onActivate?: () => void;
+}) {
+  const shared = useOptionalJobInteraction();
+  const applied = initialApplied || Boolean(shared?.records[jobId]?.applied);
+  if (applied) {
+    return (
+      <span role="status" className="job-applied-state">
+        ✓ Applied
+      </span>
+    );
   }
   return (
-    <>
-      {outcome ? (
-        <span role="status" className="job-feedback">
-          {outcome.message}
-        </span>
-      ) : (
-        <button type="button" onClick={() => void start()} disabled={loading}>
-          {loading ? "Loading…" : "Apply now"}
-        </button>
-      )}
-      {error ? <span role="alert">{error}</span> : null}
-      {open && form ? (
-        <div className="job-dialog-backdrop">
-          <div
-            className="job-dialog"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="application-dialog-title"
-          >
-            <h2 id="application-dialog-title">Apply for {form.jobTitle}</h2>
-            <JobApplicationForm
-              form={form}
-              onCancel={() => setOpen(false)}
-              onSubmitted={(submitted) => {
-                setOutcome(submitted);
-                setOpen(false);
-              }}
-            />
-          </div>
-        </div>
-      ) : null}
-    </>
+    <Link
+      className="sh-button job-card-apply-button"
+      href={"/jobs/" + (jobSlug ?? jobId) + "?openApply=true#apply"}
+      aria-label="Apply now"
+      onClick={onActivate}
+    >
+      Apply now
+    </Link>
   );
 }
