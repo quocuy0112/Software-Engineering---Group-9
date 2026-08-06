@@ -1,0 +1,38 @@
+FROM node:24.18.0-alpine3.23@sha256:595398b0081eacda8e1c4c5b97b76cd1020e4d58a8ebcb4843b9bca1e79e7436 AS dependencies
+
+WORKDIR /app
+COPY package.json package-lock.json ./
+COPY web/package.json ./web/package.json
+RUN npm ci --ignore-scripts && npm prune --omit=dev --ignore-scripts
+
+FROM node:24.18.0-alpine3.23@sha256:595398b0081eacda8e1c4c5b97b76cd1020e4d58a8ebcb4843b9bca1e79e7436 AS runtime
+
+ENV NODE_ENV=development \
+    IMAGE_SEARCH_STORAGE_LOCAL_ROOT=/app/.local/image-search-storage \
+    CV_CLAMD_SOCKET_PATH=/run/clamav/clamd.sock \
+    OCR_ENGINE_SOCKET_PATH=/run/smarthire-ocr/ocr.sock
+
+RUN rm -rf \
+    /usr/local/lib/node_modules/npm \
+    /usr/local/lib/node_modules/corepack \
+    /usr/local/bin/npm \
+    /usr/local/bin/npx \
+    /usr/local/bin/corepack \
+    /usr/local/bin/pnpm \
+    /usr/local/bin/pnpx \
+    /usr/local/bin/yarn \
+    /usr/local/bin/yarnpkg \
+    && install -d -o node -g node -m 0700 /app/.local/image-search-storage
+
+WORKDIR /app/web
+COPY --from=dependencies --chown=node:node /app/node_modules /app/node_modules
+COPY --from=dependencies --chown=node:node /app/web/node_modules /app/web/node_modules
+COPY --chown=node:node package.json /app/package.json
+COPY --chown=node:node web/package.json web/tsconfig.json web/prisma.config.ts ./
+COPY --chown=node:node web/prisma ./prisma
+COPY --chown=node:node web/scripts ./scripts
+COPY --chown=node:node web/src ./src
+
+USER node
+CMD ["node", "--conditions=react-server", "--import", "tsx", "scripts/run-image-search-worker.mjs"]
+

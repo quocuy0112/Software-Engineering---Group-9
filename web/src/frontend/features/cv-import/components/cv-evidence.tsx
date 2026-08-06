@@ -12,7 +12,11 @@ export function CvEvidence({ evidence }: { evidence: Evidence }) {
     <div
       className={styles.root}
       role="note"
-      aria-label="Verified parser evidence"
+      aria-label={
+        evidence.reviewRequired
+          ? "Parser evidence requiring review"
+          : "Verified parser evidence"
+      }
     >
       <strong>Parser evidence</strong>
       {unavailable ? (
@@ -42,6 +46,24 @@ export function CvEvidence({ evidence }: { evidence: Evidence }) {
           ? evidence.context
           : "Source context unavailable."}
       </p>
+      {evidence.sourceLocations?.length ? (
+        <p>Source: {evidence.sourceLocations.join(", ")}</p>
+      ) : null}
+      {evidence.sourceMethods?.length ? (
+        <p>Extraction: {evidence.sourceMethods.join(", ")}</p>
+      ) : null}
+      {evidence.reviewRequired ? (
+        <div role="alert" aria-label="OCR evidence requires review">
+          <strong>Review this OCR evidence</strong>
+          <p>
+            {evidence.warnings?.length
+              ? evidence.warnings
+                  .map((warning) => warning.replaceAll("_", " ").toLowerCase())
+                  .join(", ")
+              : "Recognition confidence requires confirmation."}
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }

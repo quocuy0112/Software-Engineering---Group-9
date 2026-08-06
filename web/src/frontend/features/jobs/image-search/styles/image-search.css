@@ -1,0 +1,108 @@
+.global-image-search {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 50;
+  width: min(32rem, calc(100vw - 2rem));
+  color: var(--sh-color-text-primary, #15233c);
+}
+
+.global-image-search > details {
+  border: 1px solid var(--sh-color-border-subtle, #cbd5e1);
+  border-radius: 0.9rem;
+  background: var(--sh-color-surface-card, white);
+  box-shadow: 0 1rem 3rem rgb(15 23 42 / 20%);
+}
+
+.global-image-search summary {
+  min-height: 2.75rem;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.global-image-search-panel {
+  max-height: min(75dvh, 42rem);
+  overflow: auto;
+  padding: 0 1rem 1rem;
+}
+
+.global-image-search button,
+.global-image-search input,
+.global-image-search textarea {
+  min-height: 2.75rem;
+  font: inherit;
+}
+
+.global-image-search input:not([type="checkbox"]),
+.global-image-search textarea,
+.global-image-search progress {
+  width: 100%;
+}
+
+.image-search-input,
+.image-search-progress,
+.image-search-recovery,
+.image-search-privacy {
+  margin-top: 0.75rem;
+}
+
+.image-search-input p,
+.image-search-privacy p,
+.image-search-recovery p {
+  margin: 0.35rem 0;
+  font-size: 0.875rem;
+}
+
+.image-search-proposals {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.image-search-proposals li {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.75rem;
+  border: 1px solid var(--sh-color-border-subtle, #cbd5e1);
+  border-radius: 0.6rem;
+}
+
+.image-confidence {
+  font-weight: 600;
+}
+
+.image-confidence-high::before {
+  content: "✓ ";
+}
+
+.image-confidence-review::before {
+  content: "! ";
+}
+
+.image-search-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .global-image-search * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 320px) {
+  .global-image-search {
+    right: 0.5rem;
+    bottom: 0.5rem;
+    width: calc(100vw - 1rem);
+  }
+
+  .image-search-actions,
+  .image-search-actions button {
+    width: 100%;
+  }
+}

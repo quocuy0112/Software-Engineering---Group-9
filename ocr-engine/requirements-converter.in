@@ -1,0 +1,4 @@
+paddlepaddle==3.0.0
+paddle2onnx==2.1.0
+packaging==26.3
+setuptools==83.0.0

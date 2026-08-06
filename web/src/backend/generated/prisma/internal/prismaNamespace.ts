@@ -439,7 +439,17 @@ export const ModelName = {
   CvRetryRequest: 'CvRetryRequest',
   CvDraft: 'CvDraft',
   CvProcessingConsent: 'CvProcessingConsent',
-  CvImportConfirmation: 'CvImportConfirmation'
+  CvImportConfirmation: 'CvImportConfirmation',
+  OcrProcessingAttempt: 'OcrProcessingAttempt',
+  OcrUnitOutcome: 'OcrUnitOutcome',
+  SearchImageQuery: 'SearchImageQuery',
+  SearchStoredArtifact: 'SearchStoredArtifact',
+  SearchScanAssessment: 'SearchScanAssessment',
+  SearchImageDecodeAttempt: 'SearchImageDecodeAttempt',
+  SearchIntentAttempt: 'SearchIntentAttempt',
+  SearchProcessingConsent: 'SearchProcessingConsent',
+  ImageSearchAdmissionEvent: 'ImageSearchAdmissionEvent',
+  ImageSearchOperationalEvidence: 'ImageSearchOperationalEvidence'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -455,7 +465,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "auditEvent" | "company" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation"
+    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "auditEvent" | "company" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3641,6 +3651,746 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    OcrProcessingAttempt: {
+      payload: Prisma.$OcrProcessingAttemptPayload<ExtArgs>
+      fields: Prisma.OcrProcessingAttemptFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.OcrProcessingAttemptFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrProcessingAttemptPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.OcrProcessingAttemptFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrProcessingAttemptPayload>
+        }
+        findFirst: {
+          args: Prisma.OcrProcessingAttemptFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrProcessingAttemptPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.OcrProcessingAttemptFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrProcessingAttemptPayload>
+        }
+        findMany: {
+          args: Prisma.OcrProcessingAttemptFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrProcessingAttemptPayload>[]
+        }
+        create: {
+          args: Prisma.OcrProcessingAttemptCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrProcessingAttemptPayload>
+        }
+        createMany: {
+          args: Prisma.OcrProcessingAttemptCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.OcrProcessingAttemptCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrProcessingAttemptPayload>[]
+        }
+        delete: {
+          args: Prisma.OcrProcessingAttemptDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrProcessingAttemptPayload>
+        }
+        update: {
+          args: Prisma.OcrProcessingAttemptUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrProcessingAttemptPayload>
+        }
+        deleteMany: {
+          args: Prisma.OcrProcessingAttemptDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.OcrProcessingAttemptUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.OcrProcessingAttemptUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrProcessingAttemptPayload>[]
+        }
+        upsert: {
+          args: Prisma.OcrProcessingAttemptUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrProcessingAttemptPayload>
+        }
+        aggregate: {
+          args: Prisma.OcrProcessingAttemptAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOcrProcessingAttempt>
+        }
+        groupBy: {
+          args: Prisma.OcrProcessingAttemptGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OcrProcessingAttemptGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.OcrProcessingAttemptCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OcrProcessingAttemptCountAggregateOutputType> | number
+        }
+      }
+    }
+    OcrUnitOutcome: {
+      payload: Prisma.$OcrUnitOutcomePayload<ExtArgs>
+      fields: Prisma.OcrUnitOutcomeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.OcrUnitOutcomeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrUnitOutcomePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.OcrUnitOutcomeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrUnitOutcomePayload>
+        }
+        findFirst: {
+          args: Prisma.OcrUnitOutcomeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrUnitOutcomePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.OcrUnitOutcomeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrUnitOutcomePayload>
+        }
+        findMany: {
+          args: Prisma.OcrUnitOutcomeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrUnitOutcomePayload>[]
+        }
+        create: {
+          args: Prisma.OcrUnitOutcomeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrUnitOutcomePayload>
+        }
+        createMany: {
+          args: Prisma.OcrUnitOutcomeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.OcrUnitOutcomeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrUnitOutcomePayload>[]
+        }
+        delete: {
+          args: Prisma.OcrUnitOutcomeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrUnitOutcomePayload>
+        }
+        update: {
+          args: Prisma.OcrUnitOutcomeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrUnitOutcomePayload>
+        }
+        deleteMany: {
+          args: Prisma.OcrUnitOutcomeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.OcrUnitOutcomeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.OcrUnitOutcomeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrUnitOutcomePayload>[]
+        }
+        upsert: {
+          args: Prisma.OcrUnitOutcomeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OcrUnitOutcomePayload>
+        }
+        aggregate: {
+          args: Prisma.OcrUnitOutcomeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOcrUnitOutcome>
+        }
+        groupBy: {
+          args: Prisma.OcrUnitOutcomeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OcrUnitOutcomeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.OcrUnitOutcomeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OcrUnitOutcomeCountAggregateOutputType> | number
+        }
+      }
+    }
+    SearchImageQuery: {
+      payload: Prisma.$SearchImageQueryPayload<ExtArgs>
+      fields: Prisma.SearchImageQueryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SearchImageQueryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageQueryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SearchImageQueryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageQueryPayload>
+        }
+        findFirst: {
+          args: Prisma.SearchImageQueryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageQueryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SearchImageQueryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageQueryPayload>
+        }
+        findMany: {
+          args: Prisma.SearchImageQueryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageQueryPayload>[]
+        }
+        create: {
+          args: Prisma.SearchImageQueryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageQueryPayload>
+        }
+        createMany: {
+          args: Prisma.SearchImageQueryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SearchImageQueryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageQueryPayload>[]
+        }
+        delete: {
+          args: Prisma.SearchImageQueryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageQueryPayload>
+        }
+        update: {
+          args: Prisma.SearchImageQueryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageQueryPayload>
+        }
+        deleteMany: {
+          args: Prisma.SearchImageQueryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SearchImageQueryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SearchImageQueryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageQueryPayload>[]
+        }
+        upsert: {
+          args: Prisma.SearchImageQueryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageQueryPayload>
+        }
+        aggregate: {
+          args: Prisma.SearchImageQueryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSearchImageQuery>
+        }
+        groupBy: {
+          args: Prisma.SearchImageQueryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SearchImageQueryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SearchImageQueryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SearchImageQueryCountAggregateOutputType> | number
+        }
+      }
+    }
+    SearchStoredArtifact: {
+      payload: Prisma.$SearchStoredArtifactPayload<ExtArgs>
+      fields: Prisma.SearchStoredArtifactFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SearchStoredArtifactFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchStoredArtifactPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SearchStoredArtifactFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchStoredArtifactPayload>
+        }
+        findFirst: {
+          args: Prisma.SearchStoredArtifactFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchStoredArtifactPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SearchStoredArtifactFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchStoredArtifactPayload>
+        }
+        findMany: {
+          args: Prisma.SearchStoredArtifactFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchStoredArtifactPayload>[]
+        }
+        create: {
+          args: Prisma.SearchStoredArtifactCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchStoredArtifactPayload>
+        }
+        createMany: {
+          args: Prisma.SearchStoredArtifactCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SearchStoredArtifactCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchStoredArtifactPayload>[]
+        }
+        delete: {
+          args: Prisma.SearchStoredArtifactDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchStoredArtifactPayload>
+        }
+        update: {
+          args: Prisma.SearchStoredArtifactUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchStoredArtifactPayload>
+        }
+        deleteMany: {
+          args: Prisma.SearchStoredArtifactDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SearchStoredArtifactUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SearchStoredArtifactUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchStoredArtifactPayload>[]
+        }
+        upsert: {
+          args: Prisma.SearchStoredArtifactUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchStoredArtifactPayload>
+        }
+        aggregate: {
+          args: Prisma.SearchStoredArtifactAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSearchStoredArtifact>
+        }
+        groupBy: {
+          args: Prisma.SearchStoredArtifactGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SearchStoredArtifactGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SearchStoredArtifactCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SearchStoredArtifactCountAggregateOutputType> | number
+        }
+      }
+    }
+    SearchScanAssessment: {
+      payload: Prisma.$SearchScanAssessmentPayload<ExtArgs>
+      fields: Prisma.SearchScanAssessmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SearchScanAssessmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchScanAssessmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SearchScanAssessmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchScanAssessmentPayload>
+        }
+        findFirst: {
+          args: Prisma.SearchScanAssessmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchScanAssessmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SearchScanAssessmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchScanAssessmentPayload>
+        }
+        findMany: {
+          args: Prisma.SearchScanAssessmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchScanAssessmentPayload>[]
+        }
+        create: {
+          args: Prisma.SearchScanAssessmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchScanAssessmentPayload>
+        }
+        createMany: {
+          args: Prisma.SearchScanAssessmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SearchScanAssessmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchScanAssessmentPayload>[]
+        }
+        delete: {
+          args: Prisma.SearchScanAssessmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchScanAssessmentPayload>
+        }
+        update: {
+          args: Prisma.SearchScanAssessmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchScanAssessmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.SearchScanAssessmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SearchScanAssessmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SearchScanAssessmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchScanAssessmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.SearchScanAssessmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchScanAssessmentPayload>
+        }
+        aggregate: {
+          args: Prisma.SearchScanAssessmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSearchScanAssessment>
+        }
+        groupBy: {
+          args: Prisma.SearchScanAssessmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SearchScanAssessmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SearchScanAssessmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SearchScanAssessmentCountAggregateOutputType> | number
+        }
+      }
+    }
+    SearchImageDecodeAttempt: {
+      payload: Prisma.$SearchImageDecodeAttemptPayload<ExtArgs>
+      fields: Prisma.SearchImageDecodeAttemptFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SearchImageDecodeAttemptFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageDecodeAttemptPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SearchImageDecodeAttemptFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageDecodeAttemptPayload>
+        }
+        findFirst: {
+          args: Prisma.SearchImageDecodeAttemptFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageDecodeAttemptPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SearchImageDecodeAttemptFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageDecodeAttemptPayload>
+        }
+        findMany: {
+          args: Prisma.SearchImageDecodeAttemptFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageDecodeAttemptPayload>[]
+        }
+        create: {
+          args: Prisma.SearchImageDecodeAttemptCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageDecodeAttemptPayload>
+        }
+        createMany: {
+          args: Prisma.SearchImageDecodeAttemptCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SearchImageDecodeAttemptCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageDecodeAttemptPayload>[]
+        }
+        delete: {
+          args: Prisma.SearchImageDecodeAttemptDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageDecodeAttemptPayload>
+        }
+        update: {
+          args: Prisma.SearchImageDecodeAttemptUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageDecodeAttemptPayload>
+        }
+        deleteMany: {
+          args: Prisma.SearchImageDecodeAttemptDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SearchImageDecodeAttemptUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SearchImageDecodeAttemptUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageDecodeAttemptPayload>[]
+        }
+        upsert: {
+          args: Prisma.SearchImageDecodeAttemptUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchImageDecodeAttemptPayload>
+        }
+        aggregate: {
+          args: Prisma.SearchImageDecodeAttemptAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSearchImageDecodeAttempt>
+        }
+        groupBy: {
+          args: Prisma.SearchImageDecodeAttemptGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SearchImageDecodeAttemptGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SearchImageDecodeAttemptCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SearchImageDecodeAttemptCountAggregateOutputType> | number
+        }
+      }
+    }
+    SearchIntentAttempt: {
+      payload: Prisma.$SearchIntentAttemptPayload<ExtArgs>
+      fields: Prisma.SearchIntentAttemptFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SearchIntentAttemptFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchIntentAttemptPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SearchIntentAttemptFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchIntentAttemptPayload>
+        }
+        findFirst: {
+          args: Prisma.SearchIntentAttemptFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchIntentAttemptPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SearchIntentAttemptFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchIntentAttemptPayload>
+        }
+        findMany: {
+          args: Prisma.SearchIntentAttemptFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchIntentAttemptPayload>[]
+        }
+        create: {
+          args: Prisma.SearchIntentAttemptCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchIntentAttemptPayload>
+        }
+        createMany: {
+          args: Prisma.SearchIntentAttemptCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SearchIntentAttemptCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchIntentAttemptPayload>[]
+        }
+        delete: {
+          args: Prisma.SearchIntentAttemptDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchIntentAttemptPayload>
+        }
+        update: {
+          args: Prisma.SearchIntentAttemptUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchIntentAttemptPayload>
+        }
+        deleteMany: {
+          args: Prisma.SearchIntentAttemptDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SearchIntentAttemptUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SearchIntentAttemptUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchIntentAttemptPayload>[]
+        }
+        upsert: {
+          args: Prisma.SearchIntentAttemptUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchIntentAttemptPayload>
+        }
+        aggregate: {
+          args: Prisma.SearchIntentAttemptAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSearchIntentAttempt>
+        }
+        groupBy: {
+          args: Prisma.SearchIntentAttemptGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SearchIntentAttemptGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SearchIntentAttemptCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SearchIntentAttemptCountAggregateOutputType> | number
+        }
+      }
+    }
+    SearchProcessingConsent: {
+      payload: Prisma.$SearchProcessingConsentPayload<ExtArgs>
+      fields: Prisma.SearchProcessingConsentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SearchProcessingConsentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchProcessingConsentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SearchProcessingConsentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchProcessingConsentPayload>
+        }
+        findFirst: {
+          args: Prisma.SearchProcessingConsentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchProcessingConsentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SearchProcessingConsentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchProcessingConsentPayload>
+        }
+        findMany: {
+          args: Prisma.SearchProcessingConsentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchProcessingConsentPayload>[]
+        }
+        create: {
+          args: Prisma.SearchProcessingConsentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchProcessingConsentPayload>
+        }
+        createMany: {
+          args: Prisma.SearchProcessingConsentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SearchProcessingConsentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchProcessingConsentPayload>[]
+        }
+        delete: {
+          args: Prisma.SearchProcessingConsentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchProcessingConsentPayload>
+        }
+        update: {
+          args: Prisma.SearchProcessingConsentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchProcessingConsentPayload>
+        }
+        deleteMany: {
+          args: Prisma.SearchProcessingConsentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SearchProcessingConsentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SearchProcessingConsentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchProcessingConsentPayload>[]
+        }
+        upsert: {
+          args: Prisma.SearchProcessingConsentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SearchProcessingConsentPayload>
+        }
+        aggregate: {
+          args: Prisma.SearchProcessingConsentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSearchProcessingConsent>
+        }
+        groupBy: {
+          args: Prisma.SearchProcessingConsentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SearchProcessingConsentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SearchProcessingConsentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SearchProcessingConsentCountAggregateOutputType> | number
+        }
+      }
+    }
+    ImageSearchAdmissionEvent: {
+      payload: Prisma.$ImageSearchAdmissionEventPayload<ExtArgs>
+      fields: Prisma.ImageSearchAdmissionEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ImageSearchAdmissionEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchAdmissionEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ImageSearchAdmissionEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchAdmissionEventPayload>
+        }
+        findFirst: {
+          args: Prisma.ImageSearchAdmissionEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchAdmissionEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ImageSearchAdmissionEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchAdmissionEventPayload>
+        }
+        findMany: {
+          args: Prisma.ImageSearchAdmissionEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchAdmissionEventPayload>[]
+        }
+        create: {
+          args: Prisma.ImageSearchAdmissionEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchAdmissionEventPayload>
+        }
+        createMany: {
+          args: Prisma.ImageSearchAdmissionEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ImageSearchAdmissionEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchAdmissionEventPayload>[]
+        }
+        delete: {
+          args: Prisma.ImageSearchAdmissionEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchAdmissionEventPayload>
+        }
+        update: {
+          args: Prisma.ImageSearchAdmissionEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchAdmissionEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.ImageSearchAdmissionEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ImageSearchAdmissionEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ImageSearchAdmissionEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchAdmissionEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.ImageSearchAdmissionEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchAdmissionEventPayload>
+        }
+        aggregate: {
+          args: Prisma.ImageSearchAdmissionEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateImageSearchAdmissionEvent>
+        }
+        groupBy: {
+          args: Prisma.ImageSearchAdmissionEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImageSearchAdmissionEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ImageSearchAdmissionEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImageSearchAdmissionEventCountAggregateOutputType> | number
+        }
+      }
+    }
+    ImageSearchOperationalEvidence: {
+      payload: Prisma.$ImageSearchOperationalEvidencePayload<ExtArgs>
+      fields: Prisma.ImageSearchOperationalEvidenceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ImageSearchOperationalEvidenceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchOperationalEvidencePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ImageSearchOperationalEvidenceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchOperationalEvidencePayload>
+        }
+        findFirst: {
+          args: Prisma.ImageSearchOperationalEvidenceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchOperationalEvidencePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ImageSearchOperationalEvidenceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchOperationalEvidencePayload>
+        }
+        findMany: {
+          args: Prisma.ImageSearchOperationalEvidenceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchOperationalEvidencePayload>[]
+        }
+        create: {
+          args: Prisma.ImageSearchOperationalEvidenceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchOperationalEvidencePayload>
+        }
+        createMany: {
+          args: Prisma.ImageSearchOperationalEvidenceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ImageSearchOperationalEvidenceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchOperationalEvidencePayload>[]
+        }
+        delete: {
+          args: Prisma.ImageSearchOperationalEvidenceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchOperationalEvidencePayload>
+        }
+        update: {
+          args: Prisma.ImageSearchOperationalEvidenceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchOperationalEvidencePayload>
+        }
+        deleteMany: {
+          args: Prisma.ImageSearchOperationalEvidenceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ImageSearchOperationalEvidenceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ImageSearchOperationalEvidenceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchOperationalEvidencePayload>[]
+        }
+        upsert: {
+          args: Prisma.ImageSearchOperationalEvidenceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageSearchOperationalEvidencePayload>
+        }
+        aggregate: {
+          args: Prisma.ImageSearchOperationalEvidenceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateImageSearchOperationalEvidence>
+        }
+        groupBy: {
+          args: Prisma.ImageSearchOperationalEvidenceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImageSearchOperationalEvidenceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ImageSearchOperationalEvidenceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImageSearchOperationalEvidenceCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -4388,6 +5138,15 @@ export const CvExtractionScalarFieldEnum = {
   expandedBytes: 'expandedBytes',
   segmentCount: 'segmentCount',
   extractedUtf8Bytes: 'extractedUtf8Bytes',
+  segmentSchemaVersion: 'segmentSchemaVersion',
+  eligibilityPolicyVersion: 'eligibilityPolicyVersion',
+  deduplicationPolicyVersion: 'deduplicationPolicyVersion',
+  confidencePolicyVersion: 'confidencePolicyVersion',
+  nativeSegmentCount: 'nativeSegmentCount',
+  ocrSegmentCount: 'ocrSegmentCount',
+  accountedUnitCount: 'accountedUnitCount',
+  lowConfidenceUnitCount: 'lowConfidenceUnitCount',
+  conflictUnitCount: 'conflictUnitCount',
   failureCode: 'failureCode',
   leaseOwner: 'leaseOwner',
   leaseExpiresAt: 'leaseExpiresAt',
@@ -4516,6 +5275,254 @@ export const CvImportConfirmationScalarFieldEnum = {
 } as const
 
 export type CvImportConfirmationScalarFieldEnum = (typeof CvImportConfirmationScalarFieldEnum)[keyof typeof CvImportConfirmationScalarFieldEnum]
+
+
+export const OcrProcessingAttemptScalarFieldEnum = {
+  id: 'id',
+  purpose: 'purpose',
+  cvExtractionId: 'cvExtractionId',
+  searchQueryId: 'searchQueryId',
+  status: 'status',
+  engineName: 'engineName',
+  engineVersion: 'engineVersion',
+  modelName: 'modelName',
+  modelSha256: 'modelSha256',
+  runtimeName: 'runtimeName',
+  runtimeVersion: 'runtimeVersion',
+  eligibilityPolicyVersion: 'eligibilityPolicyVersion',
+  confidencePolicyVersion: 'confidencePolicyVersion',
+  inputUnitCount: 'inputUnitCount',
+  succeededUnitCount: 'succeededUnitCount',
+  reviewUnitCount: 'reviewUnitCount',
+  failedUnitCount: 'failedUnitCount',
+  outputLineCount: 'outputLineCount',
+  outputUtf8Bytes: 'outputUtf8Bytes',
+  failureCode: 'failureCode',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type OcrProcessingAttemptScalarFieldEnum = (typeof OcrProcessingAttemptScalarFieldEnum)[keyof typeof OcrProcessingAttemptScalarFieldEnum]
+
+
+export const OcrUnitOutcomeScalarFieldEnum = {
+  id: 'id',
+  attemptId: 'attemptId',
+  unitKey: 'unitKey',
+  ordinal: 'ordinal',
+  kind: 'kind',
+  status: 'status',
+  sourceMethod: 'sourceMethod',
+  pageNumber: 'pageNumber',
+  bodyOrdinal: 'bodyOrdinal',
+  imageOrdinal: 'imageOrdinal',
+  anchorQuality: 'anchorQuality',
+  averageConfidence: 'averageConfidence',
+  minimumConfidence: 'minimumConfidence',
+  recognizedCharacterCount: 'recognizedCharacterCount',
+  segmentCount: 'segmentCount',
+  deduplicatedSegmentCount: 'deduplicatedSegmentCount',
+  materialConflict: 'materialConflict',
+  failureCode: 'failureCode',
+  createdAt: 'createdAt'
+} as const
+
+export type OcrUnitOutcomeScalarFieldEnum = (typeof OcrUnitOutcomeScalarFieldEnum)[keyof typeof OcrUnitOutcomeScalarFieldEnum]
+
+
+export const SearchImageQueryScalarFieldEnum = {
+  id: 'id',
+  actorClass: 'actorClass',
+  accountId: 'accountId',
+  visitorSubjectDigest: 'visitorSubjectDigest',
+  visitorCapabilityDigest: 'visitorCapabilityDigest',
+  capabilityKeyVersion: 'capabilityKeyVersion',
+  status: 'status',
+  interpreterClass: 'interpreterClass',
+  declaredExtension: 'declaredExtension',
+  declaredMediaType: 'declaredMediaType',
+  declaredBytes: 'declaredBytes',
+  actualBytes: 'actualBytes',
+  sourceSha256: 'sourceSha256',
+  idempotencyDigest: 'idempotencyDigest',
+  createBindingDigest: 'createBindingDigest',
+  failureCode: 'failureCode',
+  resultKind: 'resultKind',
+  admittedAt: 'admittedAt',
+  contentReceivedAt: 'contentReceivedAt',
+  resultReadyAt: 'resultReadyAt',
+  resultConsumedAt: 'resultConsumedAt',
+  contentInaccessibleAt: 'contentInaccessibleAt',
+  expiresAt: 'expiresAt',
+  deleteBy: 'deleteBy',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SearchImageQueryScalarFieldEnum = (typeof SearchImageQueryScalarFieldEnum)[keyof typeof SearchImageQueryScalarFieldEnum]
+
+
+export const SearchStoredArtifactScalarFieldEnum = {
+  id: 'id',
+  queryId: 'queryId',
+  kind: 'kind',
+  status: 'status',
+  storageAdapter: 'storageAdapter',
+  storageLocator: 'storageLocator',
+  encryptionKeyVersion: 'encryptionKeyVersion',
+  encryptionIv: 'encryptionIv',
+  authenticationTag: 'authenticationTag',
+  plaintextBytes: 'plaintextBytes',
+  ciphertextBytes: 'ciphertextBytes',
+  plaintextSha256: 'plaintextSha256',
+  availableAt: 'availableAt',
+  contentInaccessibleAt: 'contentInaccessibleAt',
+  deleteAfter: 'deleteAfter',
+  deleteBy: 'deleteBy',
+  deleteLeaseOwner: 'deleteLeaseOwner',
+  deleteLeaseExpiresAt: 'deleteLeaseExpiresAt',
+  deleteAttempts: 'deleteAttempts',
+  deleteFailureCode: 'deleteFailureCode',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SearchStoredArtifactScalarFieldEnum = (typeof SearchStoredArtifactScalarFieldEnum)[keyof typeof SearchStoredArtifactScalarFieldEnum]
+
+
+export const SearchScanAssessmentScalarFieldEnum = {
+  id: 'id',
+  queryId: 'queryId',
+  sourceArtifactId: 'sourceArtifactId',
+  attemptNumber: 'attemptNumber',
+  status: 'status',
+  engineName: 'engineName',
+  engineVersion: 'engineVersion',
+  signatureVersion: 'signatureVersion',
+  signaturePublishedAt: 'signaturePublishedAt',
+  failureCode: 'failureCode',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type SearchScanAssessmentScalarFieldEnum = (typeof SearchScanAssessmentScalarFieldEnum)[keyof typeof SearchScanAssessmentScalarFieldEnum]
+
+
+export const SearchImageDecodeAttemptScalarFieldEnum = {
+  id: 'id',
+  queryId: 'queryId',
+  sourceArtifactId: 'sourceArtifactId',
+  scanAssessmentId: 'scanAssessmentId',
+  normalizedArtifactId: 'normalizedArtifactId',
+  attemptNumber: 'attemptNumber',
+  status: 'status',
+  normalizerName: 'normalizerName',
+  normalizerVersion: 'normalizerVersion',
+  rulesVersion: 'rulesVersion',
+  detectedFormat: 'detectedFormat',
+  width: 'width',
+  height: 'height',
+  decodedPixels: 'decodedPixels',
+  frameCount: 'frameCount',
+  metadataRemoved: 'metadataRemoved',
+  failureCode: 'failureCode',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type SearchImageDecodeAttemptScalarFieldEnum = (typeof SearchImageDecodeAttemptScalarFieldEnum)[keyof typeof SearchImageDecodeAttemptScalarFieldEnum]
+
+
+export const SearchIntentAttemptScalarFieldEnum = {
+  id: 'id',
+  queryId: 'queryId',
+  ocrAttemptId: 'ocrAttemptId',
+  ocrTextArtifactId: 'ocrTextArtifactId',
+  resultArtifactId: 'resultArtifactId',
+  consentEventId: 'consentEventId',
+  attemptNumber: 'attemptNumber',
+  status: 'status',
+  interpreterClass: 'interpreterClass',
+  provider: 'provider',
+  model: 'model',
+  purposeVersion: 'purposeVersion',
+  inputVersion: 'inputVersion',
+  instructionVersion: 'instructionVersion',
+  schemaVersion: 'schemaVersion',
+  selectionPolicyVersion: 'selectionPolicyVersion',
+  proposalCount: 'proposalCount',
+  autoSelectedCount: 'autoSelectedCount',
+  suggestedCount: 'suggestedCount',
+  discardedCount: 'discardedCount',
+  providerRequestIdHmac: 'providerRequestIdHmac',
+  failureCode: 'failureCode',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type SearchIntentAttemptScalarFieldEnum = (typeof SearchIntentAttemptScalarFieldEnum)[keyof typeof SearchIntentAttemptScalarFieldEnum]
+
+
+export const SearchProcessingConsentScalarFieldEnum = {
+  id: 'id',
+  queryId: 'queryId',
+  accountId: 'accountId',
+  actorClass: 'actorClass',
+  action: 'action',
+  supersedesConsentId: 'supersedesConsentId',
+  provider: 'provider',
+  interpreterClass: 'interpreterClass',
+  model: 'model',
+  purposeVersion: 'purposeVersion',
+  noticeVersion: 'noticeVersion',
+  consentTextVersion: 'consentTextVersion',
+  retentionDisclosureVersion: 'retentionDisclosureVersion',
+  idempotencyDigest: 'idempotencyDigest',
+  occurredAt: 'occurredAt',
+  createdAt: 'createdAt'
+} as const
+
+export type SearchProcessingConsentScalarFieldEnum = (typeof SearchProcessingConsentScalarFieldEnum)[keyof typeof SearchProcessingConsentScalarFieldEnum]
+
+
+export const ImageSearchAdmissionEventScalarFieldEnum = {
+  id: 'id',
+  queryId: 'queryId',
+  subjectKind: 'subjectKind',
+  subjectDigest: 'subjectDigest',
+  keyVersion: 'keyVersion',
+  admittedAt: 'admittedAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ImageSearchAdmissionEventScalarFieldEnum = (typeof ImageSearchAdmissionEventScalarFieldEnum)[keyof typeof ImageSearchAdmissionEventScalarFieldEnum]
+
+
+export const ImageSearchOperationalEvidenceScalarFieldEnum = {
+  component: 'component',
+  evidenceVersion: 'evidenceVersion',
+  evidenceDigest: 'evidenceDigest',
+  succeededAt: 'succeededAt',
+  validUntil: 'validUntil',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ImageSearchOperationalEvidenceScalarFieldEnum = (typeof ImageSearchOperationalEvidenceScalarFieldEnum)[keyof typeof ImageSearchOperationalEvidenceScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -5210,6 +6217,244 @@ export type ListEnumCvConsentActionFieldRefInput<$PrismaModel> = FieldRefInputTy
 
 
 /**
+ * Reference to a field of type 'OcrProcessingPurpose'
+ */
+export type EnumOcrProcessingPurposeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OcrProcessingPurpose'>
+    
+
+
+/**
+ * Reference to a field of type 'OcrProcessingPurpose[]'
+ */
+export type ListEnumOcrProcessingPurposeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OcrProcessingPurpose[]'>
+    
+
+
+/**
+ * Reference to a field of type 'OcrAttemptStatus'
+ */
+export type EnumOcrAttemptStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OcrAttemptStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'OcrAttemptStatus[]'
+ */
+export type ListEnumOcrAttemptStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OcrAttemptStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'OcrUnitKind'
+ */
+export type EnumOcrUnitKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OcrUnitKind'>
+    
+
+
+/**
+ * Reference to a field of type 'OcrUnitKind[]'
+ */
+export type ListEnumOcrUnitKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OcrUnitKind[]'>
+    
+
+
+/**
+ * Reference to a field of type 'OcrUnitStatus'
+ */
+export type EnumOcrUnitStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OcrUnitStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'OcrUnitStatus[]'
+ */
+export type ListEnumOcrUnitStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OcrUnitStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'OcrSourceMethod'
+ */
+export type EnumOcrSourceMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OcrSourceMethod'>
+    
+
+
+/**
+ * Reference to a field of type 'OcrSourceMethod[]'
+ */
+export type ListEnumOcrSourceMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OcrSourceMethod[]'>
+    
+
+
+/**
+ * Reference to a field of type 'OcrAnchorQuality'
+ */
+export type EnumOcrAnchorQualityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OcrAnchorQuality'>
+    
+
+
+/**
+ * Reference to a field of type 'OcrAnchorQuality[]'
+ */
+export type ListEnumOcrAnchorQualityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OcrAnchorQuality[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchActorClass'
+ */
+export type EnumSearchActorClassFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchActorClass'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchActorClass[]'
+ */
+export type ListEnumSearchActorClassFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchActorClass[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchImageStatus'
+ */
+export type EnumSearchImageStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchImageStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchImageStatus[]'
+ */
+export type ListEnumSearchImageStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchImageStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchInterpreterClass'
+ */
+export type EnumSearchInterpreterClassFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchInterpreterClass'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchInterpreterClass[]'
+ */
+export type ListEnumSearchInterpreterClassFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchInterpreterClass[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchResultKind'
+ */
+export type EnumSearchResultKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchResultKind'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchResultKind[]'
+ */
+export type ListEnumSearchResultKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchResultKind[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchArtifactKind'
+ */
+export type EnumSearchArtifactKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchArtifactKind'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchArtifactKind[]'
+ */
+export type ListEnumSearchArtifactKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchArtifactKind[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchArtifactStatus'
+ */
+export type EnumSearchArtifactStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchArtifactStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchArtifactStatus[]'
+ */
+export type ListEnumSearchArtifactStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchArtifactStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchScanStatus'
+ */
+export type EnumSearchScanStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchScanStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchScanStatus[]'
+ */
+export type ListEnumSearchScanStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchScanStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchDecodeStatus'
+ */
+export type EnumSearchDecodeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchDecodeStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchDecodeStatus[]'
+ */
+export type ListEnumSearchDecodeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchDecodeStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchIntentStatus'
+ */
+export type EnumSearchIntentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchIntentStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchIntentStatus[]'
+ */
+export type ListEnumSearchIntentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchIntentStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchConsentAction'
+ */
+export type EnumSearchConsentActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchConsentAction'>
+    
+
+
+/**
+ * Reference to a field of type 'SearchConsentAction[]'
+ */
+export type ListEnumSearchConsentActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SearchConsentAction[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ImageSearchAdmissionSubject'
+ */
+export type EnumImageSearchAdmissionSubjectFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ImageSearchAdmissionSubject'>
+    
+
+
+/**
+ * Reference to a field of type 'ImageSearchAdmissionSubject[]'
+ */
+export type ListEnumImageSearchAdmissionSubjectFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ImageSearchAdmissionSubject[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -5416,6 +6661,16 @@ export type GlobalOmitConfig = {
   cvDraft?: Prisma.CvDraftOmit
   cvProcessingConsent?: Prisma.CvProcessingConsentOmit
   cvImportConfirmation?: Prisma.CvImportConfirmationOmit
+  ocrProcessingAttempt?: Prisma.OcrProcessingAttemptOmit
+  ocrUnitOutcome?: Prisma.OcrUnitOutcomeOmit
+  searchImageQuery?: Prisma.SearchImageQueryOmit
+  searchStoredArtifact?: Prisma.SearchStoredArtifactOmit
+  searchScanAssessment?: Prisma.SearchScanAssessmentOmit
+  searchImageDecodeAttempt?: Prisma.SearchImageDecodeAttemptOmit
+  searchIntentAttempt?: Prisma.SearchIntentAttemptOmit
+  searchProcessingConsent?: Prisma.SearchProcessingConsentOmit
+  imageSearchAdmissionEvent?: Prisma.ImageSearchAdmissionEventOmit
+  imageSearchOperationalEvidence?: Prisma.ImageSearchOperationalEvidenceOmit
 }
 
 /* Types for Logging */

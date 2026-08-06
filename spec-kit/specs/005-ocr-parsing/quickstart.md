@@ -406,8 +406,7 @@ Coverage groups:
 Run the committed corpus evaluator:
 
 ```powershell
-npm run evaluate:ocr-corpus
-npm run evaluate:search-intent-corpus
+npm run ocr:corpus:evaluate
 ```
 
 The corpus manifest fixes fixture license/source class, purpose, language group,
@@ -475,8 +474,10 @@ is gone after reload, navigation, cancel, newer query, or component teardown.
 Warm the exact model first and report cold startup separately:
 
 ```powershell
-npm run perf:ocr:collect --workspace @smarthire/web
-npm run perf:ocr --workspace @smarthire/web -- --input .local/ocr-performance-input.json
+npm run perf:image-search -- --self-test
+npm run perf:image-search -- --input .local/image-search-performance-input.json
+npm run perf:cv-import:collect --workspace @smarthire/web
+npm run perf:cv-import --workspace @smarthire/web -- --input .local/cv-import-performance-input.json
 ```
 
 `--self-test` may validate the harness but is ineligible for release evidence.

@@ -1,5 +1,12 @@
 import "server-only";
 
+import { isAbsolute, relative, resolve } from "node:path";
+
+import {
+  cvExtractionManifestSchema,
+  type CvExtractionManifest,
+} from "@/shared/contracts/ocr/cv-extraction";
+import { PrivateRasterWorkspace } from "./private-raster-workspace";
 import { runExtractionChild } from "./runner";
 
 export const CV_EXTRACTION_LIMITS = Object.freeze({
@@ -28,6 +35,8 @@ export type ExtractionChildResult = Readonly<{
   pageCount: number | null;
   entryCount: number | null;
   expandedBytes: number;
+  manifest?: CvExtractionManifest;
+  privateRasterWorkspacePath?: string | null;
 }>;
 
 export class DocumentExtractionError extends Error {
@@ -87,12 +96,29 @@ export class IsolatedDocumentExtractor {
     if (input.scanStatus !== "CLEAN")
       throw new DocumentExtractionError("CV_EXTRACTION_REQUIRES_CLEAN_SCAN");
     const source = await boundedSource(input.source);
+    let childResult: ExtractionChildResult | undefined;
     try {
       const result = await this.dependencies.runChild({
         kind: input.kind,
         source,
         limits: this.limits,
       });
+      childResult = result;
+      const manifest = result.manifest
+        ? cvExtractionManifestSchema.parse(result.manifest)
+        : undefined;
+      if (manifest) {
+        const workspace = result.privateRasterWorkspacePath;
+        if (!workspace || !isAbsolute(workspace))
+          throw new DocumentExtractionError("CV_RASTER_PATH_INVALID");
+        for (const unit of manifest.units) {
+          const path = unit.privateNormalizedPngPath;
+          if (!path) continue;
+          const child = relative(resolve(workspace), resolve(path));
+          if (!child || child.startsWith("..") || isAbsolute(child))
+            throw new DocumentExtractionError("CV_RASTER_PATH_INVALID");
+        }
+      }
       const ids = new Set<string>();
       let outputBytes = 0;
       const segments = result.segments.map((segment) => {
@@ -106,11 +132,20 @@ export class IsolatedDocumentExtractor {
         outputBytes += Buffer.byteLength(text, "utf8");
         return Object.freeze({ ...segment, text });
       });
-      if (!segments.length) throw new DocumentExtractionError("EMPTY_TEXT");
+      if (!segments.length && !manifest)
+        throw new DocumentExtractionError("EMPTY_TEXT");
       if (outputBytes > this.limits.maximumOutputBytes)
         throw new DocumentExtractionError("OUTPUT_LIMIT");
-      return Object.freeze({ ...result, segments: Object.freeze(segments) });
+      return Object.freeze({
+        ...result,
+        segments: Object.freeze(segments),
+        manifest,
+      });
     } catch (error) {
+      if (childResult?.privateRasterWorkspacePath)
+        await PrivateRasterWorkspace.disposeOwned(
+          childResult.privateRasterWorkspacePath,
+        );
       if (error instanceof DocumentExtractionError) throw error;
       if (
         error instanceof Error &&

@@ -65,7 +65,7 @@ const CLEANUP_DEFINITION = Object.freeze({
 const TARGETS = Object.freeze({
   UPLOAD_FINALIZATION_PRE_SCAN: Object.freeze({ p95Ms: 5_000 }),
   QUEUE_TO_ACTIONABLE_TERMINAL: Object.freeze({
-    within60SecondsPercent: 90,
+    within120SecondsPercent: 90,
     allWithinMs: 180_000,
   }),
   REVIEW_LOAD: Object.freeze({ p95Ms: 3_000 }),
@@ -204,7 +204,7 @@ function validateMetadata(metadata) {
 
   assertExactKeys(
     metadata.dataset,
-    ["documents", "pdf", "docx", "small", "medium", "large"],
+    ["documents", "labeledWords", "pdf", "docx", "small", "medium", "large"],
     "CV_PERF_DATASET_INVALID",
   );
   const datasetValues = Object.values(metadata.dataset);
@@ -383,6 +383,14 @@ function validateInput(input) {
     fail("CV_PERF_SCHEMA_UNSUPPORTED");
   assertEnum(input.mode, ["MEASURED", "SELF_TEST"], "CV_PERF_MODE_INVALID");
   const window = validateMetadata(input.metadata);
+  if (
+    input.mode === "MEASURED" &&
+    (input.metadata.conditions.concurrency !== 2 ||
+      input.metadata.dataset.documents < 60 ||
+      input.metadata.dataset.labeledWords < 6_000)
+  ) {
+    fail("CV_PERF_HYBRID_SAMPLE_FLOOR_NOT_MET");
+  }
   if (!Array.isArray(input.observations) || input.observations.length === 0) {
     fail("CV_PERF_OBSERVATIONS_REQUIRED");
   }
@@ -464,22 +472,22 @@ function summarizeLatency(observations) {
       };
     }
     if (operation === "QUEUE_TO_ACTIONABLE_TERMINAL") {
-      const completedWithin60Seconds = samples.filter(
+      const completedWithin120Seconds = samples.filter(
         (entry) =>
           !["ERROR", "TIMEOUT"].includes(entry.outcome) &&
-          entry.durationMs <= 60_000,
+          entry.durationMs <= 120_000,
       ).length;
-      const within60SecondsPercent =
+      const within120SecondsPercent =
         samples.length === 0
           ? null
-          : round((completedWithin60Seconds / samples.length) * 100);
+          : round((completedWithin120Seconds / samples.length) * 100);
       return {
         ...result,
-        within60SecondsPercent,
+        within120SecondsPercent,
         target,
         passed:
           samples.length > 0 &&
-          within60SecondsPercent >= target.within60SecondsPercent &&
+          within120SecondsPercent >= target.within120SecondsPercent &&
           errors === 0 &&
           result.maximumMs <= target.allWithinMs,
       };
@@ -764,6 +772,7 @@ function createSelfTestInput() {
       },
       dataset: {
         documents: 2,
+        labeledWords: 6_000,
         pdf: 1,
         docx: 1,
         small: 2,

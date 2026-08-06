@@ -1,0 +1,19 @@
+from __future__ import annotations
+
+MAX_INPUT_BYTES = 26_214_400
+MAX_DECODED_PIXELS = 20_000_000
+MAX_LINES = 2_000
+MAX_LINE_CHARACTERS = 4_096
+MAX_OUTPUT_UTF8_BYTES = 65_536
+MAX_ATTEMPT_ID_CHARACTERS = 80
+
+PURPOSES = ("CV_IMPORT", "JOB_IMAGE_SEARCH")
+SEARCH_MAX_OUTPUT_UTF8_BYTES = 32_768
+
+
+def output_limit_for(purpose: str) -> int:
+    if purpose == "JOB_IMAGE_SEARCH":
+        return SEARCH_MAX_OUTPUT_UTF8_BYTES
+    if purpose == "CV_IMPORT":
+        return MAX_OUTPUT_UTF8_BYTES
+    raise ValueError("INVALID_REQUEST")

@@ -93,7 +93,17 @@ export const ModelName = {
   CvRetryRequest: 'CvRetryRequest',
   CvDraft: 'CvDraft',
   CvProcessingConsent: 'CvProcessingConsent',
-  CvImportConfirmation: 'CvImportConfirmation'
+  CvImportConfirmation: 'CvImportConfirmation',
+  OcrProcessingAttempt: 'OcrProcessingAttempt',
+  OcrUnitOutcome: 'OcrUnitOutcome',
+  SearchImageQuery: 'SearchImageQuery',
+  SearchStoredArtifact: 'SearchStoredArtifact',
+  SearchScanAssessment: 'SearchScanAssessment',
+  SearchImageDecodeAttempt: 'SearchImageDecodeAttempt',
+  SearchIntentAttempt: 'SearchIntentAttempt',
+  SearchProcessingConsent: 'SearchProcessingConsent',
+  ImageSearchAdmissionEvent: 'ImageSearchAdmissionEvent',
+  ImageSearchOperationalEvidence: 'ImageSearchOperationalEvidence'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -820,6 +830,15 @@ export const CvExtractionScalarFieldEnum = {
   expandedBytes: 'expandedBytes',
   segmentCount: 'segmentCount',
   extractedUtf8Bytes: 'extractedUtf8Bytes',
+  segmentSchemaVersion: 'segmentSchemaVersion',
+  eligibilityPolicyVersion: 'eligibilityPolicyVersion',
+  deduplicationPolicyVersion: 'deduplicationPolicyVersion',
+  confidencePolicyVersion: 'confidencePolicyVersion',
+  nativeSegmentCount: 'nativeSegmentCount',
+  ocrSegmentCount: 'ocrSegmentCount',
+  accountedUnitCount: 'accountedUnitCount',
+  lowConfidenceUnitCount: 'lowConfidenceUnitCount',
+  conflictUnitCount: 'conflictUnitCount',
   failureCode: 'failureCode',
   leaseOwner: 'leaseOwner',
   leaseExpiresAt: 'leaseExpiresAt',
@@ -948,6 +967,254 @@ export const CvImportConfirmationScalarFieldEnum = {
 } as const
 
 export type CvImportConfirmationScalarFieldEnum = (typeof CvImportConfirmationScalarFieldEnum)[keyof typeof CvImportConfirmationScalarFieldEnum]
+
+
+export const OcrProcessingAttemptScalarFieldEnum = {
+  id: 'id',
+  purpose: 'purpose',
+  cvExtractionId: 'cvExtractionId',
+  searchQueryId: 'searchQueryId',
+  status: 'status',
+  engineName: 'engineName',
+  engineVersion: 'engineVersion',
+  modelName: 'modelName',
+  modelSha256: 'modelSha256',
+  runtimeName: 'runtimeName',
+  runtimeVersion: 'runtimeVersion',
+  eligibilityPolicyVersion: 'eligibilityPolicyVersion',
+  confidencePolicyVersion: 'confidencePolicyVersion',
+  inputUnitCount: 'inputUnitCount',
+  succeededUnitCount: 'succeededUnitCount',
+  reviewUnitCount: 'reviewUnitCount',
+  failedUnitCount: 'failedUnitCount',
+  outputLineCount: 'outputLineCount',
+  outputUtf8Bytes: 'outputUtf8Bytes',
+  failureCode: 'failureCode',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type OcrProcessingAttemptScalarFieldEnum = (typeof OcrProcessingAttemptScalarFieldEnum)[keyof typeof OcrProcessingAttemptScalarFieldEnum]
+
+
+export const OcrUnitOutcomeScalarFieldEnum = {
+  id: 'id',
+  attemptId: 'attemptId',
+  unitKey: 'unitKey',
+  ordinal: 'ordinal',
+  kind: 'kind',
+  status: 'status',
+  sourceMethod: 'sourceMethod',
+  pageNumber: 'pageNumber',
+  bodyOrdinal: 'bodyOrdinal',
+  imageOrdinal: 'imageOrdinal',
+  anchorQuality: 'anchorQuality',
+  averageConfidence: 'averageConfidence',
+  minimumConfidence: 'minimumConfidence',
+  recognizedCharacterCount: 'recognizedCharacterCount',
+  segmentCount: 'segmentCount',
+  deduplicatedSegmentCount: 'deduplicatedSegmentCount',
+  materialConflict: 'materialConflict',
+  failureCode: 'failureCode',
+  createdAt: 'createdAt'
+} as const
+
+export type OcrUnitOutcomeScalarFieldEnum = (typeof OcrUnitOutcomeScalarFieldEnum)[keyof typeof OcrUnitOutcomeScalarFieldEnum]
+
+
+export const SearchImageQueryScalarFieldEnum = {
+  id: 'id',
+  actorClass: 'actorClass',
+  accountId: 'accountId',
+  visitorSubjectDigest: 'visitorSubjectDigest',
+  visitorCapabilityDigest: 'visitorCapabilityDigest',
+  capabilityKeyVersion: 'capabilityKeyVersion',
+  status: 'status',
+  interpreterClass: 'interpreterClass',
+  declaredExtension: 'declaredExtension',
+  declaredMediaType: 'declaredMediaType',
+  declaredBytes: 'declaredBytes',
+  actualBytes: 'actualBytes',
+  sourceSha256: 'sourceSha256',
+  idempotencyDigest: 'idempotencyDigest',
+  createBindingDigest: 'createBindingDigest',
+  failureCode: 'failureCode',
+  resultKind: 'resultKind',
+  admittedAt: 'admittedAt',
+  contentReceivedAt: 'contentReceivedAt',
+  resultReadyAt: 'resultReadyAt',
+  resultConsumedAt: 'resultConsumedAt',
+  contentInaccessibleAt: 'contentInaccessibleAt',
+  expiresAt: 'expiresAt',
+  deleteBy: 'deleteBy',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SearchImageQueryScalarFieldEnum = (typeof SearchImageQueryScalarFieldEnum)[keyof typeof SearchImageQueryScalarFieldEnum]
+
+
+export const SearchStoredArtifactScalarFieldEnum = {
+  id: 'id',
+  queryId: 'queryId',
+  kind: 'kind',
+  status: 'status',
+  storageAdapter: 'storageAdapter',
+  storageLocator: 'storageLocator',
+  encryptionKeyVersion: 'encryptionKeyVersion',
+  encryptionIv: 'encryptionIv',
+  authenticationTag: 'authenticationTag',
+  plaintextBytes: 'plaintextBytes',
+  ciphertextBytes: 'ciphertextBytes',
+  plaintextSha256: 'plaintextSha256',
+  availableAt: 'availableAt',
+  contentInaccessibleAt: 'contentInaccessibleAt',
+  deleteAfter: 'deleteAfter',
+  deleteBy: 'deleteBy',
+  deleteLeaseOwner: 'deleteLeaseOwner',
+  deleteLeaseExpiresAt: 'deleteLeaseExpiresAt',
+  deleteAttempts: 'deleteAttempts',
+  deleteFailureCode: 'deleteFailureCode',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SearchStoredArtifactScalarFieldEnum = (typeof SearchStoredArtifactScalarFieldEnum)[keyof typeof SearchStoredArtifactScalarFieldEnum]
+
+
+export const SearchScanAssessmentScalarFieldEnum = {
+  id: 'id',
+  queryId: 'queryId',
+  sourceArtifactId: 'sourceArtifactId',
+  attemptNumber: 'attemptNumber',
+  status: 'status',
+  engineName: 'engineName',
+  engineVersion: 'engineVersion',
+  signatureVersion: 'signatureVersion',
+  signaturePublishedAt: 'signaturePublishedAt',
+  failureCode: 'failureCode',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type SearchScanAssessmentScalarFieldEnum = (typeof SearchScanAssessmentScalarFieldEnum)[keyof typeof SearchScanAssessmentScalarFieldEnum]
+
+
+export const SearchImageDecodeAttemptScalarFieldEnum = {
+  id: 'id',
+  queryId: 'queryId',
+  sourceArtifactId: 'sourceArtifactId',
+  scanAssessmentId: 'scanAssessmentId',
+  normalizedArtifactId: 'normalizedArtifactId',
+  attemptNumber: 'attemptNumber',
+  status: 'status',
+  normalizerName: 'normalizerName',
+  normalizerVersion: 'normalizerVersion',
+  rulesVersion: 'rulesVersion',
+  detectedFormat: 'detectedFormat',
+  width: 'width',
+  height: 'height',
+  decodedPixels: 'decodedPixels',
+  frameCount: 'frameCount',
+  metadataRemoved: 'metadataRemoved',
+  failureCode: 'failureCode',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type SearchImageDecodeAttemptScalarFieldEnum = (typeof SearchImageDecodeAttemptScalarFieldEnum)[keyof typeof SearchImageDecodeAttemptScalarFieldEnum]
+
+
+export const SearchIntentAttemptScalarFieldEnum = {
+  id: 'id',
+  queryId: 'queryId',
+  ocrAttemptId: 'ocrAttemptId',
+  ocrTextArtifactId: 'ocrTextArtifactId',
+  resultArtifactId: 'resultArtifactId',
+  consentEventId: 'consentEventId',
+  attemptNumber: 'attemptNumber',
+  status: 'status',
+  interpreterClass: 'interpreterClass',
+  provider: 'provider',
+  model: 'model',
+  purposeVersion: 'purposeVersion',
+  inputVersion: 'inputVersion',
+  instructionVersion: 'instructionVersion',
+  schemaVersion: 'schemaVersion',
+  selectionPolicyVersion: 'selectionPolicyVersion',
+  proposalCount: 'proposalCount',
+  autoSelectedCount: 'autoSelectedCount',
+  suggestedCount: 'suggestedCount',
+  discardedCount: 'discardedCount',
+  providerRequestIdHmac: 'providerRequestIdHmac',
+  failureCode: 'failureCode',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type SearchIntentAttemptScalarFieldEnum = (typeof SearchIntentAttemptScalarFieldEnum)[keyof typeof SearchIntentAttemptScalarFieldEnum]
+
+
+export const SearchProcessingConsentScalarFieldEnum = {
+  id: 'id',
+  queryId: 'queryId',
+  accountId: 'accountId',
+  actorClass: 'actorClass',
+  action: 'action',
+  supersedesConsentId: 'supersedesConsentId',
+  provider: 'provider',
+  interpreterClass: 'interpreterClass',
+  model: 'model',
+  purposeVersion: 'purposeVersion',
+  noticeVersion: 'noticeVersion',
+  consentTextVersion: 'consentTextVersion',
+  retentionDisclosureVersion: 'retentionDisclosureVersion',
+  idempotencyDigest: 'idempotencyDigest',
+  occurredAt: 'occurredAt',
+  createdAt: 'createdAt'
+} as const
+
+export type SearchProcessingConsentScalarFieldEnum = (typeof SearchProcessingConsentScalarFieldEnum)[keyof typeof SearchProcessingConsentScalarFieldEnum]
+
+
+export const ImageSearchAdmissionEventScalarFieldEnum = {
+  id: 'id',
+  queryId: 'queryId',
+  subjectKind: 'subjectKind',
+  subjectDigest: 'subjectDigest',
+  keyVersion: 'keyVersion',
+  admittedAt: 'admittedAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ImageSearchAdmissionEventScalarFieldEnum = (typeof ImageSearchAdmissionEventScalarFieldEnum)[keyof typeof ImageSearchAdmissionEventScalarFieldEnum]
+
+
+export const ImageSearchOperationalEvidenceScalarFieldEnum = {
+  component: 'component',
+  evidenceVersion: 'evidenceVersion',
+  evidenceDigest: 'evidenceDigest',
+  succeededAt: 'succeededAt',
+  validUntil: 'validUntil',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ImageSearchOperationalEvidenceScalarFieldEnum = (typeof ImageSearchOperationalEvidenceScalarFieldEnum)[keyof typeof ImageSearchOperationalEvidenceScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -37,6 +37,7 @@ export const CV_IMPORT_STAGES = [
   "VALIDATE",
   "SCAN",
   "EXTRACT",
+  "OCR",
   "CONSENT",
   "PARSE",
   "REVIEW",

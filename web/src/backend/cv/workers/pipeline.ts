@@ -184,13 +184,14 @@ export async function materializePendingDeterministicParseJob() {
           where: { status: "SUCCEEDED", outputArtifactId: { not: null } },
           orderBy: { attemptNumber: "desc" },
           take: 1,
-          select: { id: true },
+          select: { id: true, segmentSchemaVersion: true },
         },
       },
     });
     for (const upload of candidates) {
       const extraction = upload.extractions[0];
       if (!extraction) continue;
+      const hybrid = extraction.segmentSchemaVersion === "cv-segments-v2";
       const active = await transaction.cvParseJob.findFirst({
         where: {
           accountId: upload.accountId,
@@ -211,9 +212,9 @@ export async function materializePendingDeterministicParseJob() {
           provider: "smarthire",
           model: "deterministic-v1",
           purposeVersion: "cv-draft-purpose-v1",
-          inputVersion: "cv-segments-v1",
-          instructionVersion: "cv-extract-v1",
-          schemaVersion: "cv-draft-v1",
+          inputVersion: hybrid ? "cv-segments-v2" : "cv-segments-v1",
+          instructionVersion: hybrid ? "cv-extract-v2" : "cv-extract-v1",
+          schemaVersion: hybrid ? "cv-draft-v2" : "cv-draft-v1",
         },
       });
     }

@@ -22,6 +22,13 @@ export const CV_RETRYABLE_PARSE_FAILURE_CODES = [
   "PARSER_OUTPUT_LIMIT_EXCEEDED",
 ] as const;
 
+export const CV_RETRYABLE_OCR_FAILURE_CODES = [
+  "OCR_UNAVAILABLE",
+  "OCR_TIMEOUT",
+  "OCR_OUTPUT_INVALID",
+  "OCR_LOW_CONFIDENCE",
+] as const;
+
 export const cvRetryRequestSchema = z.object({}).strict();
 
 export const cvRetryIdempotencyKeySchema = z
@@ -91,7 +98,7 @@ export function projectCvRetryRemainingCounts(
 
 const cvRetryTerminalStateSchema = z
   .object({
-    status: z.enum(["SCAN_FAILED", "PARSE_FAILED"]),
+    status: z.enum(["SCAN_FAILED", "EXTRACTION_FAILED", "PARSE_FAILED"]),
     failureCode: z.enum(CV_SAFE_FAILURE_CODES).nullable(),
     scanRetriesRemaining:
       cvRetryRemainingCountsSchema.shape.scanRetriesRemaining,
@@ -104,6 +111,7 @@ const retryableScanFailures = new Set<string>(CV_RETRYABLE_SCAN_FAILURE_CODES);
 const retryableParseFailures = new Set<string>(
   CV_RETRYABLE_PARSE_FAILURE_CODES,
 );
+const retryableOcrFailures = new Set<string>(CV_RETRYABLE_OCR_FAILURE_CODES);
 
 export function isCvCandidateRetryAvailable(
   input: z.input<typeof cvRetryTerminalStateSchema>,
@@ -114,6 +122,13 @@ export function isCvCandidateRetryAvailable(
       state.scanRetriesRemaining > 0 &&
       state.failureCode !== null &&
       retryableScanFailures.has(state.failureCode)
+    );
+  }
+  if (state.status === "EXTRACTION_FAILED") {
+    return (
+      state.scanRetriesRemaining > 0 &&
+      state.failureCode !== null &&
+      retryableOcrFailures.has(state.failureCode)
     );
   }
   return (

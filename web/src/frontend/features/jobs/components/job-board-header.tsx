@@ -8,6 +8,7 @@ export function JobBoardHeader({ authenticated }: { authenticated: boolean }) {
         <SmartHireBrand className="job-board-brand" />
         <nav className="job-board-navigation" aria-label="Job board">
           <Link href="/jobs">Browse jobs</Link>
+          <Link href="#global-image-search">Image search</Link>
           {authenticated ? (
             <>
               <Link href="/dashboard">Dashboard</Link>

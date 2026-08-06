@@ -1,6 +1,7 @@
 import "server-only";
 import { z } from "zod";
 import { isAbsolute } from "node:path";
+import { loadImageSearchConfiguration } from "@/backend/image-search/config";
 const booleanString = z
   .enum(["true", "false"])
   .transform((value) => value === "true");
@@ -105,6 +106,41 @@ const schema = z
     CV_UNCONFIRMED_RETENTION_DAYS: z.literal("30").transform(Number),
     CV_CONFIRMED_RETENTION_DAYS: z.literal("7").transform(Number),
     CV_CANDIDATE_DELETE_RETENTION_HOURS: z.literal("24").transform(Number),
+    OCR_ENGINE_ENABLED: booleanString.optional(),
+    OCR_ENGINE_SOCKET_PATH: z.string().optional(),
+    OCR_ENGINE_NAME: z.string().optional(),
+    OCR_ENGINE_VERSION: z.string().optional(),
+    OCR_MODEL_NAME: z.string().optional(),
+    OCR_MODEL_SHA256: z.string().optional(),
+    OCR_POLICY_VERSION: z.string().optional(),
+    OCR_CV_UNIT_TIMEOUT_SECONDS: z.string().optional(),
+    CV_HYBRID_DEADLINE_SECONDS: z.string().optional(),
+    OCR_SEARCH_TIMEOUT_SECONDS: z.string().optional(),
+    IMAGE_SEARCH_WORKER_ENABLED: booleanString.optional(),
+    IMAGE_SEARCH_CLEANUP_ENABLED: booleanString.optional(),
+    IMAGE_SEARCH_STORAGE_ADAPTER: z.enum(["filesystem", "s3"]).optional(),
+    IMAGE_SEARCH_STORAGE_LOCAL_ROOT: z.string().optional(),
+    IMAGE_SEARCH_ARTIFACT_ACTIVE_KEY_VERSION: z.string().optional(),
+    IMAGE_SEARCH_ARTIFACT_KEY_V1: base64Key.optional(),
+    IMAGE_SEARCH_RATE_HMAC_KEY_V1: base64Key.optional(),
+    IMAGE_SEARCH_CAPABILITY_HMAC_KEY_V1: base64Key.optional(),
+    IMAGE_SEARCH_S3_BUCKET: z.string().optional(),
+    IMAGE_SEARCH_S3_REGION: z.string().optional(),
+    IMAGE_SEARCH_S3_PREFIX: z.string().optional(),
+    IMAGE_SEARCH_S3_KMS_KEY_ID: z.string().optional(),
+    IMAGE_SEARCH_S3_WORKER_ROLE_ARN: z.string().optional(),
+    IMAGE_SEARCH_INTERPRETER: z.enum(["deterministic", "openai"]).optional(),
+    IMAGE_SEARCH_OPENAI_ENABLED: booleanString.optional(),
+    IMAGE_SEARCH_OPENAI_MODEL: z.string().optional(),
+    IMAGE_SEARCH_OPENAI_DPA_APPROVED: booleanString.optional(),
+    IMAGE_SEARCH_OPENAI_PRIVACY_APPROVED: booleanString.optional(),
+    IMAGE_SEARCH_OPENAI_CROSS_BORDER_APPROVED: booleanString.optional(),
+    IMAGE_SEARCH_OPENAI_ZDR_APPROVED: booleanString.optional(),
+    IMAGE_SEARCH_SOURCE_MAX_BYTES: z.string().optional(),
+    IMAGE_SEARCH_MAX_DECODED_PIXELS: z.string().optional(),
+    IMAGE_SEARCH_VISITOR_LIMIT_PER_HOUR: z.string().optional(),
+    IMAGE_SEARCH_ACCOUNT_LIMIT_PER_HOUR: z.string().optional(),
+    IMAGE_SEARCH_RETENTION_MINUTES: z.string().optional(),
   })
   .superRefine((env, ctx) => {
     const production = env.APP_ENV === "production";
@@ -268,7 +304,10 @@ export function parseServerEnvironment(
   const forbiddenKeys = Object.keys(input).filter(
     (key) =>
       key.startsWith("NEXT_PUBLIC_CV_") ||
+      (key.startsWith("NEXT_PUBLIC_") &&
+        /(?:OCR|IMAGE_SEARCH|OPENAI)/u.test(key)) ||
       /^CV_CLAMD_(?:HOST|PORT|TCP|ADDR|ADDRESS)$/iu.test(key) ||
+      /^OCR_ENGINE_(?:URL|HOST|PORT|TCP|ADDR|ADDRESS)$/iu.test(key) ||
       /^(?:CV_OPENAI_(?:BASE_URL|ENDPOINT)|OPENAI_BASE_URL)$/iu.test(key) ||
       (key === "CV_S3_VERSIONING_ENABLED" && input[key] !== "false") ||
       (key === "CV_S3_PUBLIC_ACCESS_ENABLED" && input[key] !== "false"),
@@ -277,6 +316,9 @@ export function parseServerEnvironment(
     throw new Error(
       `Invalid server environment fields: ${forbiddenKeys.join(", ")}`,
     );
+  }
+  if (input.OCR_ENGINE_ENABLED !== undefined) {
+    loadImageSearchConfiguration(input);
   }
   const result = schema.safeParse(input);
   if (!result.success) {

@@ -39,6 +39,7 @@ type StatusResource = Readonly<{
   scanRetriesRemaining?: number;
   parseRetriesRemaining?: number;
   failure?: CvImportResource["failure"];
+  ocr?: CvImportResource["ocr"];
   consent?: CvConsentNotice | null;
   expiresAt?: string | null;
   contentInaccessibleAt?: string | null;
@@ -70,6 +71,7 @@ const stageLabels = {
   VALIDATE: "Validate",
   SCAN: "Virus scan",
   EXTRACT: "Extract text",
+  OCR: "Recognize document images",
   CONSENT: "Consent",
   PARSE: "Parse",
   REVIEW: "Review",
@@ -380,8 +382,25 @@ export function CvImportStatus({
   const aiStatus = aiPresentation(current);
   const stages = (
     current.parserClass === "EXTERNAL_OPENAI"
-      ? ["UPLOAD", "VALIDATE", "SCAN", "EXTRACT", "CONSENT", "PARSE", "REVIEW"]
-      : ["UPLOAD", "VALIDATE", "SCAN", "EXTRACT", "PARSE", "REVIEW"]
+      ? [
+          "UPLOAD",
+          "VALIDATE",
+          "SCAN",
+          "EXTRACT",
+          ...(current.ocr ? (["OCR"] as const) : []),
+          "CONSENT",
+          "PARSE",
+          "REVIEW",
+        ]
+      : [
+          "UPLOAD",
+          "VALIDATE",
+          "SCAN",
+          "EXTRACT",
+          ...(current.ocr ? (["OCR"] as const) : []),
+          "PARSE",
+          "REVIEW",
+        ]
   ) as readonly (keyof typeof stageLabels)[];
   const activeStage = visualStage(current);
   const activeStageIndex = Math.max(0, stages.indexOf(activeStage));
