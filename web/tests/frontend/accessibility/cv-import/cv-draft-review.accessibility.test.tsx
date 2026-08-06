@@ -15,7 +15,7 @@ describe("CV draft review accessibility", () => {
     expect(root).toHaveAttribute("data-narrow-layout", "320");
     expect(root).toHaveAttribute("data-reduced-motion-safe", "true");
     expect(screen.getByRole("status")).toHaveAttribute("aria-live", "polite");
-    expect(screen.getByLabelText("Proposed headline")).toBeVisible();
+    expect(screen.getByLabelText(/Proposed headline/i)).toBeVisible();
     expect(screen.getAllByRole("group").length).toBeGreaterThan(0);
 
     fireEvent.click(

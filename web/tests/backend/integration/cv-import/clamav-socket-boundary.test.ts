@@ -47,7 +47,7 @@ describe("ClamAV Unix-socket boundary", () => {
     );
     expect(entrypoint).not.toContain("if ! freshclam");
     expect(entrypoint).toMatch(
-      /set -eu[\s\S]*?freshclam \\\n  --stdout[\s\S]*?freshclam \\\n  --daemon/u,
+      /set -eu[\s\S]*?freshclam \\\n {2}--stdout[\s\S]*?freshclam \\\n {2}--daemon/u,
     );
     expect(clamdConfiguration).toMatch(/^FailIfCvdOlderThan 1$/mu);
   });

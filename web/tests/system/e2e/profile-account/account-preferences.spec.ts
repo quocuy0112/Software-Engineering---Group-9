@@ -77,27 +77,30 @@ test("reads defaults, validates and persists a complete owner-scoped preference 
   const owner = await registerVerifyAndLogin(browser, "preferences-owner");
   await owner.page.goto("/profile/preferences");
   await expect(
-    owner.page.getByRole("heading", { name: "Preferences", exact: true }),
+    owner.page.getByRole("heading", { name: /Preferences|Tùy chọn/ }),
   ).toBeVisible();
-  await expect(owner.page.getByLabel("Language")).toHaveValue("en");
-  await expect(owner.page.getByLabel("Language")).toBeDisabled();
-  await expect(owner.page.getByLabel("Timezone")).toHaveValue(
-    "Asia/Ho_Chi_Minh",
-  );
-  const security = owner.page.getByLabel("Account security");
+  const language = owner.page.locator("#preference-language");
+  const timezone = owner.page.locator("#preference-timezone");
+  await expect(language).toHaveValue("vi");
+  await expect(language).not.toBeDisabled();
+  await expect(timezone).toHaveValue("Asia/Ho_Chi_Minh");
+  const security = owner.page.getByLabel(/Account security|Bảo mật tài khoản/);
   await expect(security).toBeChecked();
   await expect(security).toBeDisabled();
 
-  await owner.page.getByLabel("Timezone").fill("Mars/Olympus");
-  await owner.page.getByRole("button", { name: "Save preferences" }).click();
+  await language.selectOption("en");
+  await timezone.fill("Mars/Olympus");
+  await owner.page
+    .getByRole("button", { name: /Save preferences|Lưu tùy chọn/ })
+    .click();
   await expect(
     owner.page
       .getByRole("region", { name: "Account preferences" })
       .getByRole("alert"),
   ).toContainText(/supported timezone/i);
-  await expect(owner.page.getByLabel("Timezone")).toHaveValue("Mars/Olympus");
+  await expect(timezone).toHaveValue("Mars/Olympus");
 
-  await owner.page.getByLabel("Timezone").fill("UTC");
+  await timezone.fill("UTC");
   await owner.page.getByLabel("Application updates").uncheck();
   await owner.page.getByLabel("Job recommendations").uncheck();
   await owner.page.getByRole("button", { name: "Save preferences" }).click();
@@ -105,20 +108,22 @@ test("reads defaults, validates and persists a complete owner-scoped preference 
 
   const second = await signInSecond(browser, owner.email);
   await second.page.goto("/profile/preferences");
-  await expect(second.page.getByLabel("Language")).toHaveValue("en");
-  await expect(second.page.getByLabel("Timezone")).toHaveValue("UTC");
+  await expect(second.page.locator("#preference-language")).toHaveValue("en");
+  await expect(second.page.locator("#preference-timezone")).toHaveValue("UTC");
   await expect(second.page.getByLabel("Application updates")).not.toBeChecked();
   await expect(second.page.getByLabel("Job recommendations")).not.toBeChecked();
   await expect(second.page.getByLabel("Account security")).toBeChecked();
 
   const other = await registerVerifyAndLogin(browser, "preferences-other");
   await other.page.goto("/profile/preferences");
-  await expect(other.page.getByLabel("Language")).toHaveValue("en");
-  await other.page.getByLabel("Timezone").fill("Europe/Paris");
-  await other.page.getByRole("button", { name: "Save preferences" }).click();
-  await expect(other.page.getByRole("status")).toContainText(/saved/i);
+  await expect(other.page.locator("#preference-language")).toHaveValue("vi");
+  await other.page.locator("#preference-timezone").fill("Europe/Paris");
+  await other.page
+    .getByRole("button", { name: /Save preferences|Lưu tùy chọn/ })
+    .click();
+  await expect(other.page.getByRole("status")).toContainText(/saved|lưu/i);
   await owner.page.reload();
-  await expect(owner.page.getByLabel("Timezone")).toHaveValue("UTC");
+  await expect(owner.page.locator("#preference-timezone")).toHaveValue("UTC");
 
   await second.context.close();
   await other.context.close();

@@ -32,8 +32,8 @@ describe("account-preferences accessibility", () => {
         csrfProof="csrf-proof"
       />,
     );
-    expect(screen.getByLabelText("Interface language")).toHaveValue("en");
-    expect(screen.getByLabelText("Interface language")).toBeDisabled();
+    expect(screen.getByLabelText("Interface language")).toHaveValue("vi");
+    expect(screen.getByLabelText("Interface language")).not.toBeDisabled();
     expect(screen.getByLabelText("Timezone")).toHaveValue("Asia/Ho_Chi_Minh");
     expect(screen.getByLabelText("Application updates")).toBeChecked();
     expect(screen.getByLabelText("Job recommendations")).toBeChecked();
@@ -93,6 +93,9 @@ describe("account-preferences accessibility", () => {
     fireEvent.change(screen.getByLabelText("Timezone"), {
       target: { value: "UTC" },
     });
+    fireEvent.change(screen.getByLabelText("Interface language"), {
+      target: { value: "en" },
+    });
     fireEvent.click(screen.getByLabelText("Application updates"));
     const submit = screen.getByRole("button", { name: "Save preferences" });
     fireEvent.click(submit);
@@ -111,7 +114,7 @@ describe("account-preferences accessibility", () => {
       }),
     );
     expect(screen.getByLabelText("Interface language")).toHaveValue("en");
-    expect(screen.getByLabelText("Interface language")).toBeDisabled();
+    expect(screen.getByLabelText("Interface language")).not.toBeDisabled();
     expect(screen.getByLabelText("Timezone")).toHaveValue("UTC");
   });
 
@@ -137,7 +140,7 @@ describe("account-preferences accessibility", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Save preferences" }));
     const alert = await screen.findByRole("alert");
-    expect(alert).toHaveTextContent("Choose a supported timezone.");
+    expect(alert).toHaveTextContent(/múi giờ được hỗ trợ/i);
     await waitFor(() => expect(alert).toHaveFocus());
     expect(screen.getByLabelText("Timezone")).toHaveValue("Mars/Olympus");
   });

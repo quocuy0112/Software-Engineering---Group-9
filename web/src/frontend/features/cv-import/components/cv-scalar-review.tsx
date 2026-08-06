@@ -4,6 +4,8 @@ import type {
   CvReviewDecisions,
 } from "@/shared/contracts/cv-import/review";
 import { CvEvidence } from "./cv-evidence";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { cvActionLabel, cvCopy, cvFieldLabel } from "../i18n/cv-import-copy";
 import styles from "./cv-scalar-review.module.css";
 
 type ScalarProposal = CvEditableProposals["scalars"][number];
@@ -26,6 +28,8 @@ export function CvScalarReview({
     action: CvReviewDecisions["scalars"][number]["action"],
   ) => void;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = cvCopy(locale).review;
   const decisionsById = new Map(
     decisions.map((decision) => [decision.proposalId, decision]),
   );
@@ -35,7 +39,7 @@ export function CvScalarReview({
       {proposals.map((proposal: ScalarProposal, index) => {
         const currentValue = currentProfile[proposal.field];
         const hasCurrentValue = currentValue !== null;
-        const current = currentValue ?? "Not set";
+        const current = currentValue ?? copy.notSet;
         const fieldId = `cv-scalar-${proposal.proposalId}`;
         const fieldPath = `proposals.scalars.${index}.value`;
         const fieldError = fieldErrors[fieldPath];
@@ -51,14 +55,16 @@ export function CvScalarReview({
           : (["ADD", "SKIP"] as const);
         return (
           <article className={styles.card} key={proposal.proposalId}>
-            <h3>{proposal.field}</h3>
+            <h3>{cvFieldLabel(locale, proposal.field)}</h3>
             <div className={styles.comparison}>
               <div>
-                <strong>Current profile</strong>
+                <strong>{copy.currentProfile}</strong>
                 <p>{current}</p>
               </div>
               <div>
-                <label htmlFor={fieldId}>Proposed {proposal.field}</label>
+                <label htmlFor={fieldId}>
+                  {copy.proposed} {cvFieldLabel(locale, proposal.field)}
+                </label>
                 {proposal.field === "summary" ? (
                   <textarea
                     id={fieldId}
@@ -104,11 +110,11 @@ export function CvScalarReview({
               aria-describedby={decisionError ? decisionErrorId : undefined}
               tabIndex={decisionError ? -1 : undefined}
             >
-              <legend>Decision for {proposal.field}</legend>
+              <legend>
+                {copy.decisionFor} {cvFieldLabel(locale, proposal.field)}
+              </legend>
               <p className={styles.decisionHint}>
-                {hasCurrentValue
-                  ? "This field already has a Profile value. Replace it or keep the current value."
-                  : "This field is empty on the Profile. Add it or skip the proposal."}
+                {hasCurrentValue ? copy.alreadyValue : copy.emptyValue}
               </p>
               {availableActions.map((action) => (
                 <label key={action}>
@@ -123,7 +129,7 @@ export function CvScalarReview({
                       onDecisionChange(proposal.proposalId, action)
                     }
                   />
-                  {action.toLowerCase()}
+                  {cvActionLabel(locale, action)}
                 </label>
               ))}
               {decisionError ? (

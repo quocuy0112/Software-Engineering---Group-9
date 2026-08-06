@@ -33,7 +33,7 @@ function conflictResponse(
 }
 
 function editEveryProposal() {
-  fireEvent.change(screen.getByLabelText("Proposed headline"), {
+  fireEvent.change(screen.getByLabelText(/Proposed headline/i), {
     target: { value: "Unsaved stale headline" },
   });
   fireEvent.change(screen.getByLabelText("Job title"), {
@@ -42,7 +42,7 @@ function editEveryProposal() {
   fireEvent.change(screen.getByLabelText("Company"), {
     target: { value: "Unsaved stale company" },
   });
-  fireEvent.change(screen.getByLabelText("Proposed skill"), {
+  fireEvent.change(screen.getByLabelText(/Proposed skill/i), {
     target: { value: "Unsaved stale skill" },
   });
 }
@@ -214,7 +214,7 @@ describe("CV review conflict recovery", () => {
     ).toBeVisible();
     expect(screen.getByText(/Profile revision 3/i)).toBeVisible();
     expect(screen.getByText(/Profile updated/i)).toHaveTextContent(
-      "2026-08-01",
+      "Aug 1, 2026",
     );
     expect(screen.getByDisplayValue("Unsaved stale headline")).toBeVisible();
 

@@ -9,6 +9,7 @@ import {
   UnsavedChangesIndicator,
   useUnsavedChangesGuard,
 } from "../client/unsaved-changes";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 
 export function ProfilePreferencesView({
   initialPreferences,
@@ -17,14 +18,25 @@ export function ProfilePreferencesView({
   initialPreferences: AccountPreferences;
   csrfProof: string;
 }) {
-  const copy = {
-    kicker: "YOUR EXPERIENCE",
-    title: "Preferences",
-    subtitle:
-      "Keep timezone and notification settings consistent across every signed-in device.",
-    panel: "ACCOUNT DEFAULTS",
-    panelTitle: "Account preferences",
-  };
+  const locale = useWorkspaceLocale();
+  const copy =
+    locale === "vi"
+      ? {
+          kicker: "TRẢI NGHIỆM CỦA BẠN",
+          title: "Tùy chọn",
+          subtitle:
+            "Giữ múi giờ và thông báo nhất quán trên mọi thiết bị đã đăng nhập.",
+          panel: "MẶC ĐỊNH TÀI KHOẢN",
+          panelTitle: "Tùy chọn tài khoản",
+        }
+      : {
+          kicker: "YOUR EXPERIENCE",
+          title: "Preferences",
+          subtitle:
+            "Keep timezone and notification settings consistent across every signed-in device.",
+          panel: "ACCOUNT DEFAULTS",
+          panelTitle: "Account preferences",
+        };
   const state = useAccountPreferences(initialPreferences, csrfProof);
   useUnsavedChangesGuard(state.dirty);
   const feedbackRef = useRef<HTMLDivElement>(null);
