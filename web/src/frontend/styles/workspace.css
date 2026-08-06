@@ -975,6 +975,12 @@
     overflow: visible;
   }
 
+  .workspace-main[data-content-mode="job-board"] {
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+
   .workspace-header {
     position: static;
     padding-inline: var(--sh-space-4);
@@ -992,6 +998,12 @@
   .workspace-content {
     padding-top: var(--sh-space-6);
     padding-bottom: var(--sh-space-10);
+  }
+
+  .workspace-content[data-content-mode="job-board"] {
+    display: block;
+    height: auto;
+    overflow: visible;
   }
 
   .dashboard-hero {

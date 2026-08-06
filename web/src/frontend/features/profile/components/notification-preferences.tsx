@@ -1,6 +1,7 @@
 "use client";
 
 import type { AccountPreferences } from "@/shared/contracts/account/preferences";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 
 type Notifications = AccountPreferences["emailNotifications"];
 
@@ -11,16 +12,29 @@ export function NotificationPreferences({
   value: Notifications;
   onChange: (value: Notifications) => void;
 }) {
-  const copy = {
-    legend: "Email notifications",
-    application: "Application updates",
-    applicationHint: "Status changes for applications and interviews.",
-    jobs: "Job recommendations",
-    jobsHint: "Relevant opportunity suggestions.",
-    security: "Account security",
-    securityHint:
-      "Required security notices stay enabled and cannot be disabled.",
-  };
+  const locale = useWorkspaceLocale();
+  const copy =
+    locale === "vi"
+      ? {
+          legend: "Thông báo email",
+          application: "Cập nhật đơn ứng tuyển",
+          applicationHint: "Thay đổi trạng thái đơn ứng tuyển và phỏng vấn.",
+          jobs: "Gợi ý việc làm",
+          jobsHint: "Gợi ý các cơ hội phù hợp.",
+          security: "Bảo mật tài khoản",
+          securityHint:
+            "Thông báo bảo mật bắt buộc luôn được bật và không thể tắt.",
+        }
+      : {
+          legend: "Email notifications",
+          application: "Application updates",
+          applicationHint: "Status changes for applications and interviews.",
+          jobs: "Job recommendations",
+          jobsHint: "Relevant opportunity suggestions.",
+          security: "Account security",
+          securityHint:
+            "Required security notices stay enabled and cannot be disabled.",
+        };
   return (
     <fieldset className="notification-preferences">
       <legend>{copy.legend}</legend>

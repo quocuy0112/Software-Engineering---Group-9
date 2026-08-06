@@ -30,6 +30,7 @@ export function ProfileNavigation({
     locale === "vi"
       ? {
           overview: "Nghề nghiệp",
+          "cv-imports": "Nhập CV",
           account: "Tài khoản",
           preferences: "Tùy chọn",
           security: "Bảo mật",

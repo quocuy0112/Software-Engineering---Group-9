@@ -3,6 +3,8 @@ import type {
   CvEditableProposals,
   CvReviewDecisions,
 } from "@/shared/contracts/cv-import/review";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { cvActionLabel, cvCopy, cvFieldLabel } from "../i18n/cv-import-copy";
 import { CvEvidence } from "./cv-evidence";
 import styles from "./cv-collection-review.module.css";
 
@@ -47,9 +49,13 @@ function DecisionControls({
   allowReplace?: boolean;
   onChange: (action: EntryAction, targetId: string | null) => void;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = cvCopy(locale).review;
   return (
     <fieldset className={styles.choices}>
-      <legend>Decision for {label}</legend>
+      <legend>
+        {copy.decisionFor} {label}
+      </legend>
       {(
         [
           "ADD",
@@ -71,12 +77,12 @@ function DecisionControls({
               )
             }
           />
-          {candidate.toLowerCase()}
+          {cvActionLabel(locale, candidate)}
         </label>
       ))}
       {action === "REPLACE" ? (
         <label className={styles.target}>
-          Replace current item
+          {copy.replaceCurrent}
           <select
             {...(fieldPath
               ? reviewFieldProps(
@@ -91,7 +97,7 @@ function DecisionControls({
               onChange("REPLACE", event.target.value || null)
             }
           >
-            <option value="">Choose an owned profile item</option>
+            <option value="">{copy.chooseOwned}</option>
             {targets.map((target) => (
               <option key={target.id} value={target.id}>
                 {target.label}
@@ -135,6 +141,8 @@ export function CvCollectionReview({
   ) => void;
   onSetGroupAction: (group: CollectionGroup, action: "ADD" | "SKIP") => void;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = cvCopy(locale).review;
   const entryDecision = (group: CollectionGroup, proposalId: string) => {
     const values = decisions[group] as readonly {
       proposalId: string;
@@ -150,22 +158,25 @@ export function CvCollectionReview({
     );
   };
   const groupControls = (group: CollectionGroup, label: string) => (
-    <div className={styles.groupControls} aria-label={`${label} bulk controls`}>
+    <div
+      className={styles.groupControls}
+      aria-label={`${label} ${locale === "vi" ? "thao tác hàng loạt" : "bulk controls"}`}
+    >
       <button type="button" onClick={() => onSetGroupAction(group, "ADD")}>
-        Add all proposed {label}
+        {copy.addAll} {label}
       </button>
       <button type="button" onClick={() => onSetGroupAction(group, "SKIP")}>
-        Skip all proposed {label}
+        {copy.skipAll} {label}
       </button>
     </div>
   );
   return (
     <section className={styles.root} aria-labelledby="cv-collections-heading">
-      <h2 id="cv-collections-heading">Experience, education, and links</h2>
+      <h2 id="cv-collections-heading">{copy.collections}</h2>
 
       <section className={styles.group} aria-labelledby="cv-experience-heading">
-        <h3 id="cv-experience-heading">Experience</h3>
-        {groupControls("experiences", "experience")}
+        <h3 id="cv-experience-heading">{copy.experience}</h3>
+        {groupControls("experiences", copy.experienceGroup)}
         {proposals.experiences.map((proposal, index) => {
           const decision = entryDecision("experiences", proposal.proposalId);
           const decisionIndex = decisions.experiences.findIndex(
@@ -180,7 +191,7 @@ export function CvCollectionReview({
             <article className={styles.card} key={proposal.proposalId}>
               <div className={styles.fields}>
                 <label>
-                  Job title
+                  {cvFieldLabel(locale, "title")}
                   <input
                     {...reviewFieldProps(
                       fieldPath("title"),
@@ -204,7 +215,7 @@ export function CvCollectionReview({
                   />
                 </label>
                 <label>
-                  Company
+                  {cvFieldLabel(locale, "company")}
                   <input
                     {...reviewFieldProps(
                       fieldPath("company"),
@@ -228,7 +239,7 @@ export function CvCollectionReview({
                   />
                 </label>
                 <label>
-                  Start date
+                  {cvFieldLabel(locale, "startDate")}
                   <input
                     {...reviewFieldProps(
                       fieldPath("startDate"),
@@ -252,7 +263,7 @@ export function CvCollectionReview({
                   />
                 </label>
                 <label>
-                  End date
+                  {cvFieldLabel(locale, "endDate")}
                   <input
                     {...reviewFieldProps(
                       fieldPath("endDate"),
@@ -289,10 +300,10 @@ export function CvCollectionReview({
                       )
                     }
                   />
-                  Current role
+                  {copy.currentRole}
                 </label>
                 <label className={styles.fullWidth}>
-                  Description
+                  {cvFieldLabel(locale, "description")}
                   <textarea
                     {...reviewFieldProps(
                       fieldPath("description"),
@@ -353,8 +364,8 @@ export function CvCollectionReview({
       </section>
 
       <section className={styles.group} aria-labelledby="cv-education-heading">
-        <h3 id="cv-education-heading">Education</h3>
-        {groupControls("education", "education")}
+        <h3 id="cv-education-heading">{copy.education}</h3>
+        {groupControls("education", copy.educationGroup)}
         {proposals.education.map((proposal, index) => {
           const decision = entryDecision("education", proposal.proposalId);
           const decisionIndex = decisions.education.findIndex(
@@ -374,7 +385,7 @@ export function CvCollectionReview({
                   const error = fieldError(field);
                   return (
                     <label key={field}>
-                      {field}
+                      {cvFieldLabel(locale, field)}
                       <input
                         {...reviewFieldProps(path, error, id)}
                         value={proposal.value[field] ?? ""}
@@ -394,7 +405,7 @@ export function CvCollectionReview({
                   );
                 })}
                 <label>
-                  Start date
+                  {cvFieldLabel(locale, "startDate")}
                   <input
                     {...reviewFieldProps(
                       fieldPath("startDate"),
@@ -418,7 +429,7 @@ export function CvCollectionReview({
                   />
                 </label>
                 <label>
-                  End date
+                  {cvFieldLabel(locale, "endDate")}
                   <input
                     {...reviewFieldProps(
                       fieldPath("endDate"),
@@ -455,7 +466,7 @@ export function CvCollectionReview({
                       )
                     }
                   />
-                  Current study
+                  {copy.currentStudy}
                 </label>
               </div>
               <DecisionControls
@@ -495,8 +506,8 @@ export function CvCollectionReview({
       </section>
 
       <section className={styles.group} aria-labelledby="cv-skills-heading">
-        <h3 id="cv-skills-heading">Skills</h3>
-        {groupControls("skills", "skills")}
+        <h3 id="cv-skills-heading">{copy.skills}</h3>
+        {groupControls("skills", copy.skillsGroup)}
         {proposals.skills.map((proposal, index) => {
           const decision = entryDecision("skills", proposal.proposalId);
           const fieldPath = `proposals.skills.${index}.value`;
@@ -505,7 +516,7 @@ export function CvCollectionReview({
           return (
             <article className={styles.card} key={proposal.proposalId}>
               <label>
-                Proposed skill
+                {locale === "vi" ? "Kỹ năng đề xuất" : "Proposed skill"}
                 <input
                   {...reviewFieldProps(fieldPath, fieldError, fieldId)}
                   value={proposal.value}
@@ -522,7 +533,7 @@ export function CvCollectionReview({
                 <ReviewFieldError id={fieldId} error={fieldError} />
               </label>
               {proposal.duplicate ? (
-                <p role="note">A matching skill is already on the profile.</p>
+                <p role="note">{copy.matchingSkill}</p>
               ) : null}
               <DecisionControls
                 proposalId={proposal.proposalId}
@@ -541,8 +552,8 @@ export function CvCollectionReview({
       </section>
 
       <section className={styles.group} aria-labelledby="cv-links-heading">
-        <h3 id="cv-links-heading">Social links</h3>
-        {groupControls("socialLinks", "links")}
+        <h3 id="cv-links-heading">{copy.socialLinks}</h3>
+        {groupControls("socialLinks", copy.links)}
         {proposals.socialLinks.map((proposal, index) => {
           const decision = entryDecision("socialLinks", proposal.proposalId);
           const decisionIndex = decisions.socialLinks.findIndex(
@@ -554,7 +565,7 @@ export function CvCollectionReview({
           return (
             <article className={styles.card} key={proposal.proposalId}>
               <label>
-                Proposed URL
+                {locale === "vi" ? "URL đề xuất" : "Proposed URL"}
                 <input
                   {...reviewFieldProps(fieldPath, fieldError, fieldId)}
                   type="url"

@@ -240,6 +240,7 @@ export type CvApiError = z.infer<typeof cvApiErrorSchema>;
 export type CvDocumentKind = z.infer<typeof cvDocumentKindSchema>;
 export type CvParserClass = z.infer<typeof cvParserClassSchema>;
 export type CvUploadStatus = z.infer<typeof cvUploadStatusSchema>;
+export type CvImportStage = z.infer<typeof cvImportStageSchema>;
 export type CvReviewAction = z.infer<typeof cvReviewActionSchema>;
 export type CvUploadId = z.infer<typeof cvUploadIdSchema>;
 export type CvDraftId = z.infer<typeof cvDraftIdSchema>;

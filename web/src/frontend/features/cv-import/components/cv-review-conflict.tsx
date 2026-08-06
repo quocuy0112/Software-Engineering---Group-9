@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 
 import type { CvReviewConflict } from "../client/use-cv-draft-review";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { cvCopy, cvFormatDate, cvKnownError } from "../i18n/cv-import-copy";
 import styles from "./cv-review-conflict.module.css";
 
 export function CvReviewConflictPanel({
@@ -22,6 +24,8 @@ export function CvReviewConflictPanel({
   onReapplyLatest: () => void;
   onDiscardAndReload: () => void;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = cvCopy(locale).review;
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => heading.current?.focus(), []);
   return (
@@ -31,18 +35,23 @@ export function CvReviewConflictPanel({
       aria-live="assertive"
     >
       <h2 id="cv-conflict-heading" ref={heading} tabIndex={-1}>
-        Review conflict needs your choice
+        {copy.conflict}
       </h2>
-      <p role="alert">{conflict.message}</p>
-      <p>{unsavedSummary} Your in-memory edits have not been overwritten.</p>
+      <p role="alert">
+        {cvKnownError(locale, conflict.message, conflict.code)}
+      </p>
+      <p>
+        {unsavedSummary}{" "}
+        {locale === "vi"
+          ? "Các chỉnh sửa trong bộ nhớ của bạn chưa bị ghi đè."
+          : "Your in-memory edits have not been overwritten."}
+      </p>
       {unsavedPreview.length ? (
         <section
           className={styles.preview}
           aria-labelledby="cv-unsaved-preview-heading"
         >
-          <h3 id="cv-unsaved-preview-heading">
-            Unsaved values kept in this browser memory
-          </h3>
+          <h3 id="cv-unsaved-preview-heading">{copy.unsavedKept}</h3>
           <dl>
             {unsavedPreview.map((item) => (
               <div key={item.id}>
@@ -56,23 +65,33 @@ export function CvReviewConflictPanel({
       {conflict.latest ? (
         <div className={styles.metadata}>
           <p>
-            Latest saved draft revision {conflict.latest.draftRevision}; Profile
-            revision {conflict.latest.profileRevision}.
+            {locale === "vi"
+              ? "Bản nháp đã lưu mới nhất"
+              : "Latest saved draft revision"}{" "}
+            {conflict.latest.draftRevision};{" "}
+            {locale === "vi" ? "phiên bản hồ sơ" : "Profile revision"}{" "}
+            {conflict.latest.profileRevision}.
           </p>
           {conflict.latest.draftUpdatedAt ? (
             <p>
-              Draft updated{" "}
+              {locale === "vi" ? "Bản nháp cập nhật" : "Draft updated"}{" "}
               <time dateTime={conflict.latest.draftUpdatedAt}>
-                {conflict.latest.draftUpdatedAt}
+                {cvFormatDate(locale, conflict.latest.draftUpdatedAt, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
               </time>
               .
             </p>
           ) : null}
           {conflict.latest.profileUpdatedAt ? (
             <p>
-              Profile updated{" "}
+              {locale === "vi" ? "Hồ sơ cập nhật" : "Profile updated"}{" "}
               <time dateTime={conflict.latest.profileUpdatedAt}>
-                {conflict.latest.profileUpdatedAt}
+                {cvFormatDate(locale, conflict.latest.profileUpdatedAt, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
               </time>
               .
             </p>
@@ -81,17 +100,17 @@ export function CvReviewConflictPanel({
       ) : null}
       <div className={styles.actions}>
         <button type="button" disabled={pending} onClick={onCompareLatest}>
-          Compare with latest saved review
+          {copy.compare}
         </button>
         <button
           type="button"
           disabled={pending || !latestCompared}
           onClick={onReapplyLatest}
         >
-          Reapply my edits to latest
+          {copy.reapply}
         </button>
         <button type="button" disabled={pending} onClick={onDiscardAndReload}>
-          Discard my edits and reload latest
+          {copy.discard}
         </button>
       </div>
     </section>

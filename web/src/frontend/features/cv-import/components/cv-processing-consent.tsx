@@ -8,6 +8,8 @@ import {
   type CvConsentNotice,
 } from "@/shared/contracts/cv-import/consent-retention";
 import { CV_PROCESSING_NOTICES } from "@/shared/contracts/cv-import/upload";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { cvCopy, cvProcessingNoticeText } from "../i18n/cv-import-copy";
 import styles from "./cv-processing-consent.module.css";
 
 type ConsentAction = "grant" | "revoke";
@@ -25,6 +27,9 @@ export function CvProcessingConsent({
   onGrant: (request: CvConsentGrantRequest) => Promise<void>;
   onRevoke: () => Promise<void>;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = cvCopy(locale).consent;
+  const noticeText = cvProcessingNoticeText(locale, "EXTERNAL_OPENAI");
   const heading = useRef<HTMLHeadingElement>(null);
   const activeAction = useRef<ConsentAction | null>(null);
   const [acceptance, setAcceptance] = useState({
@@ -39,9 +44,7 @@ export function CvProcessingConsent({
   >(notice.granted ? "success" : "neutral");
   const [sessionExpired, setSessionExpired] = useState(false);
   const [message, setMessage] = useState(
-    notice.granted
-      ? "External processing consent is active."
-      : "External processing remains blocked until you explicitly grant consent.",
+    notice.granted ? copy.grantedActive : copy.blocked,
   );
 
   const grant = async () => {
@@ -50,7 +53,7 @@ export function CvProcessingConsent({
     activeAction.current = "grant";
     setBusy("grant");
     setFeedbackTone("pending");
-    setMessage("Granting external processing consent…");
+    setMessage(copy.granting);
     try {
       await onGrant({
         accepted: true,
@@ -60,19 +63,13 @@ export function CvProcessingConsent({
         challenge: notice.consentChallenge,
         accepted: false,
       });
-      setMessage(
-        "Consent granted. Approved external processing may now continue.",
-      );
+      setMessage(copy.granted);
       setFeedbackTone("success");
     } catch (cause) {
       const expired =
         cause instanceof Error && cause.message === "CV_SESSION_EXPIRED";
       setSessionExpired(expired);
-      setMessage(
-        expired
-          ? "Your session expired. Sign in again before granting consent."
-          : "Consent could not be granted. External processing remains blocked.",
-      );
+      setMessage(expired ? copy.expired : copy.grantError);
       setFeedbackTone("error");
       heading.current?.focus();
     } finally {
@@ -86,20 +83,16 @@ export function CvProcessingConsent({
     activeAction.current = "revoke";
     setBusy("revoke");
     setFeedbackTone("pending");
-    setMessage("Revoking consent for future processing…");
+    setMessage(copy.revoking);
     try {
       await onRevoke();
-      setMessage("Consent revoked. Future external processing is blocked.");
+      setMessage(copy.revoked);
       setFeedbackTone("success");
     } catch (cause) {
       const expired =
         cause instanceof Error && cause.message === "CV_SESSION_EXPIRED";
       setSessionExpired(expired);
-      setMessage(
-        expired
-          ? "Your session expired. Sign in again before changing consent."
-          : "Consent could not be revoked. Refresh the status before continuing.",
-      );
+      setMessage(expired ? copy.expired : copy.revokeError);
       setFeedbackTone("error");
       heading.current?.focus();
     } finally {
@@ -117,21 +110,27 @@ export function CvProcessingConsent({
       aria-labelledby="cv-processing-consent-heading"
     >
       <h2 id="cv-processing-consent-heading" ref={heading} tabIndex={-1}>
-        External processing consent
+        {copy.heading}
       </h2>
       <dl className={styles.binding}>
         <div>
-          <dt>Provider</dt>
+          <dt>{copy.provider}</dt>
           <dd>{notice.providerDisplayName}</dd>
         </div>
         <div>
-          <dt>Purpose</dt>
-          <dd>{notice.processingPurpose}</dd>
+          <dt>{copy.purpose}</dt>
+          <dd>
+            {locale === "vi"
+              ? "Tạo bản nháp xem xét CV riêng bằng cách trích xuất dữ kiện nghề nghiệp"
+              : notice.processingPurpose}
+          </dd>
         </div>
         <div>
-          <dt>Versions</dt>
+          <dt>{copy.versions}</dt>
           <dd>
-            Consent {CV_EXTERNAL_CONSENT_TEXT_VERSION}; processing notice{" "}
+            {locale === "vi" ? "Đồng ý" : "Consent"}{" "}
+            {CV_EXTERNAL_CONSENT_TEXT_VERSION};{" "}
+            {locale === "vi" ? "thông báo xử lý" : "processing notice"}{" "}
             {CV_PROCESSING_NOTICES.EXTERNAL_OPENAI.noticeVersion}
           </dd>
         </div>
@@ -139,7 +138,7 @@ export function CvProcessingConsent({
 
       {notice.granted ? (
         <div className={styles.granted}>
-          <p>{notice.noticeText}</p>
+          <p>{noticeText || notice.noticeText}</p>
           <button
             className={styles.revokeButton}
             type="button"
@@ -148,14 +147,13 @@ export function CvProcessingConsent({
             onClick={() => void revoke()}
           >
             {busy === "revoke"
-              ? "Revoking consent..."
-              : "Revoke consent for future processing"}
+              ? copy.revoking
+              : locale === "vi"
+                ? "Thu hồi quyền xử lý trong tương lai"
+                : "Revoke consent for future processing"}
           </button>
           {!canRevoke ? (
-            <p className={styles.explanation}>
-              No future external transmission is currently eligible for
-              revocation.
-            </p>
+            <p className={styles.explanation}>{copy.noRevocation}</p>
           ) : null}
         </div>
       ) : (
@@ -172,7 +170,7 @@ export function CvProcessingConsent({
                 })
               }
             />
-            <span>{notice.noticeText}</span>
+            <span>{locale === "vi" ? copy.agree : notice.noticeText}</span>
           </label>
           <button
             type="button"
@@ -181,22 +179,18 @@ export function CvProcessingConsent({
             onClick={() => void grant()}
           >
             {busy === "grant"
-              ? "Granting consent..."
-              : "Grant external processing consent"}
+              ? copy.granting
+              : locale === "vi"
+                ? "Cấp quyền xử lý bên ngoài"
+                : "Grant external processing consent"}
           </button>
           {!canGrant ? (
-            <p className={styles.explanation}>
-              Consent is unavailable in the current import state. External
-              processing stays blocked.
-            </p>
+            <p className={styles.explanation}>{copy.unavailable}</p>
           ) : null}
         </div>
       )}
 
-      <p className={styles.caveat}>
-        Revocation blocks future requests, but it cannot recall processing
-        already transmitted to the approved provider.
-      </p>
+      <p className={styles.caveat}>{copy.caveat}</p>
       <p
         className={styles.status}
         data-tone={feedbackTone}

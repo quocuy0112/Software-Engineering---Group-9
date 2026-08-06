@@ -34,6 +34,14 @@
   gap: 0.5rem 1rem;
 }
 
+.job-board-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
 .job-board-navigation a {
   border-radius: 0.65rem;
   padding: 0.55rem 0.2rem;
@@ -54,6 +62,11 @@
 }
 
 .job-board-navigation :focus-visible {
+  outline: 3px solid #147a4a;
+  outline-offset: 3px;
+}
+
+.job-board-header-actions :focus-visible {
   outline: 3px solid #147a4a;
   outline-offset: 3px;
 }
@@ -207,6 +220,10 @@
     font-size: 0.9rem;
   }
 
+  .job-board-header-actions {
+    gap: 0.5rem;
+  }
+
   .jobs-container {
     width: min(100% - 1rem, 76rem);
     padding-top: 1rem;
@@ -231,6 +248,11 @@
     width: 100%;
     justify-content: flex-start;
   }
+
+  .job-board-header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 /* Profile-aligned Job Board */
@@ -239,6 +261,83 @@
   min-height: 100dvh;
   color: var(--sh-color-text-primary);
   background: var(--sh-color-surface-page);
+}
+
+@media (min-width: 981px) {
+  .job-board-layout {
+    display: flex;
+    height: 100dvh;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .job-board-header {
+    flex: 0 0 auto;
+  }
+
+  .job-board-public-main {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
+
+  .job-board-public-main .jobs-page {
+    display: grid;
+    height: 100%;
+    min-height: 0;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .workspace-main[data-content-mode="job-board"] {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .workspace-main[data-content-mode="job-board"] .workspace-header {
+    position: static;
+    flex: 0 0 auto;
+  }
+
+  .workspace-content[data-content-mode="job-board"] {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .workspace-content[data-content-mode="job-board"] > .jobs-page {
+    display: grid;
+    height: 100%;
+    min-height: 0;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .jobs-fixed-region {
+    min-height: 0;
+  }
+
+  .jobs-grid {
+    min-height: 0;
+    height: 100%;
+    align-items: stretch;
+  }
+
+  .job-filter-column,
+  .job-results {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-gutter: stable;
+  }
+
+  .job-filter-column {
+    position: static;
+  }
 }
 
 .job-board-public-main .jobs-page {
@@ -915,12 +1014,39 @@
 }
 
 @media (max-width: 980px) {
+  .job-board-layout,
+  .job-board-public-main {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .job-board-layout {
+    display: block;
+  }
+
+  .job-board-public-main {
+    display: block;
+  }
+
+  .job-board-public-main .jobs-page,
+  .workspace-content[data-content-mode="job-board"] > .jobs-page {
+    display: block;
+    height: auto;
+    min-height: 0;
+  }
+
   .jobs-grid {
+    height: auto;
+    min-height: 0;
     grid-template-columns: 1fr;
   }
 
-  .job-filter-column {
-    position: static;
+  .job-filter-column,
+  .job-results {
+    max-height: none;
+    overflow: visible;
+    overscroll-behavior: auto;
   }
 
   .job-filter-fields {
@@ -1000,5 +1126,63 @@
 
   .job-detail-card {
     padding: 0;
+  }
+}
+
+/* Contained desktop Jobs layout: header, filters, and results are separate regions. */
+@media (min-width: 981px) {
+  .job-board-public-main,
+  .workspace-main[data-content-mode="job-board"],
+  .workspace-content[data-content-mode="job-board"] {
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .workspace-main[data-content-mode="job-board"] {
+    height: 100%;
+  }
+
+  .job-board-public-main .jobs-page,
+  .workspace-content[data-content-mode="job-board"] > .jobs-page {
+    display: grid;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    flex: 1 1 auto;
+    overflow: hidden;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .jobs-grid {
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+    align-items: stretch;
+  }
+
+  .job-filter-column,
+  .job-results {
+    position: static;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    max-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+
+  .workspace-layout[data-sidebar-collapsed="true"]
+    .workspace-main[data-content-mode="job-board"]
+    > .workspace-status,
+  .workspace-layout[data-sidebar-collapsed="true"]
+    .workspace-content[data-content-mode="job-board"] {
+    width: min(100%, 100rem);
+    margin-inline: auto;
+    padding-inline: var(--sh-space-5);
   }
 }
