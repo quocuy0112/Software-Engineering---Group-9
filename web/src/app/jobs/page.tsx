@@ -3,7 +3,7 @@ import Link from "next/link";
 import { JobDiscoveryService } from "@/backend/services/jobs/job-discovery-service";
 import { JobServiceError } from "@/backend/services/jobs/job-types";
 import { optionalJobActor } from "@/backend/security/job-request-boundary";
-import { JobCardView } from "@/frontend/features/jobs/components/job-card";
+import { JobResultsList } from "@/frontend/features/jobs/components/job-results-list";
 import { JobSearchForm } from "@/frontend/features/jobs/components/job-search-form";
 
 type PageProps = {
@@ -164,13 +164,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
             </div>
           ) : result && result.items.length ? (
             <>
-              <ol className="job-list">
-                {result.items.map((job) => (
-                  <li key={job.id}>
-                    <JobCardView job={job} />
-                  </li>
-                ))}
-              </ol>
+              <JobResultsList jobs={result.items} />
               {result.nextCursor ? (
                 <div className="job-pagination">
                   <Link href={`/jobs?${next.toString()}`}>Load more jobs</Link>
