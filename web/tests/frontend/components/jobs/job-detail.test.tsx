@@ -50,14 +50,25 @@ describe("job detail presentation", () => {
     expect(
       screen.getByRole("heading", { name: /responsibilities/i }),
     ).toBeVisible();
-    const requirementsAnchor = screen.getByRole("button", {
+    const requirementsTab = screen.getByRole("tab", {
       name: /requirements/i,
     });
-    fireEvent.click(requirementsAnchor);
+    expect(requirementsTab).toHaveAttribute("aria-selected", "false");
+    fireEvent.click(requirementsTab);
+    expect(requirementsTab).toHaveAttribute("aria-selected", "true");
     expect(
-      screen.getByRole("heading", { name: /candidate requirements/i }),
+      screen.getByRole("heading", { name: /must-have requirements/i }),
     ).toBeVisible();
-    expect(screen.getByRole("heading", { name: /benefits/i })).toBeVisible();
+    expect(
+      screen.queryByRole("heading", { name: /key responsibilities/i }),
+    ).toBeNull();
+
+    const benefitsTab = screen.getByRole("tab", { name: /benefits/i });
+    fireEvent.click(benefitsTab);
+    expect(benefitsTab).toHaveAttribute("aria-selected", "true");
+    expect(
+      screen.queryByRole("heading", { name: /must-have requirements/i }),
+    ).toBeNull();
     const signInLinks = screen.getAllByRole("link", {
       name: /sign in to apply/i,
     });

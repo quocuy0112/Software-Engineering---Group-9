@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  computeDiscoveryJobs,
   computeMatchScore,
   computeRelatedJobs,
 } from "@/shared/utils/jobs/similarity";
@@ -14,6 +15,9 @@ const current = {
   salaryMin: 18_000_000,
   salaryMax: 25_000_000,
   experienceMinYears: 5,
+  industry: "Construction",
+  companyId: "company-current",
+  title: "Project Manager",
 };
 
 describe("job similarity", () => {
@@ -61,5 +65,49 @@ describe("job similarity", () => {
 
     expect(related.map((job) => job.id)).toEqual(["job-top", "job-older"]);
     expect(related.every((job) => job.matchScore === 100)).toBe(true);
+  });
+
+  it("keeps discovery recommendations broad and excludes direct matches", () => {
+    const discovery = computeDiscoveryJobs(
+      current,
+      [
+        {
+          ...current,
+          id: "job-direct-match",
+          companyId: "company-direct",
+          postedAt: "2026-08-05T00:00:00.000Z",
+        },
+        {
+          id: "job-discovery",
+          status: "open" as const,
+          categoryFamily: "r1080",
+          industry: "Construction",
+          companyId: "company-discovery",
+          title: "Operations Manager",
+          skillTags: ["People leadership"],
+          city: "Da Nang",
+          salaryMin: 16_000_000,
+          salaryMax: 23_000_000,
+          experienceMinYears: 4,
+          postedAt: "2026-08-03T00:00:00.000Z",
+        },
+        {
+          id: "job-closed-discovery",
+          status: "closed" as const,
+          industry: "Construction",
+          companyId: "company-closed",
+          title: "Site Manager",
+        },
+      ],
+      new Set(["job-direct-match"]),
+      5,
+    );
+
+    expect(discovery.map((job) => job.id)).toContain("job-discovery");
+    expect(discovery.map((job) => job.id)).not.toContain("job-direct-match");
+    expect(discovery.map((job) => job.id)).not.toContain(
+      "job-closed-discovery",
+    );
+    expect(discovery).toHaveLength(1);
   });
 });

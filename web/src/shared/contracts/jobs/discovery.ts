@@ -194,7 +194,7 @@ export const jobDetailSchema = jobCardSchema
 
     workOnSaturday: z.boolean().optional(),
     relatedJobs: z.array(jobCardSchema).max(6).optional(),
-    recommendedJobs: z.array(jobCardSchema).max(3).optional(),
+    recommendedJobs: z.array(jobCardSchema).max(5).optional(),
   })
   .strict();
 

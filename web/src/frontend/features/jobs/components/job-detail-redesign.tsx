@@ -118,7 +118,6 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
       hidden: shared.records[job.id]?.hidden,
     });
   }, [job.actions.applied, job.actions.saved, job.id, shared]);
-
   useEffect(() => {
     function syncApplyState() {
       const params = new URLSearchParams(window.location.search);

@@ -4340,64 +4340,7 @@
   }
 }
 
-/* Job Detail accordion and list refinements */
-.job-detail-board-page .job-detail-accordion-item {
-  padding: 0;
-  overflow: hidden;
-}
-
-.job-detail-board-page .job-detail-accordion-heading {
-  margin: 0;
-}
-
-.job-detail-board-page .job-detail-accordion-trigger {
-  display: grid;
-  width: 100%;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--sh-space-4);
-  align-items: center;
-  padding: var(--sh-space-5) var(--sh-space-6);
-  border: 0;
-  border-radius: inherit;
-  color: var(--sh-color-text-primary);
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
-}
-
-.job-detail-board-page .job-detail-accordion-trigger:hover {
-  background: var(--sh-color-surface-tinted);
-}
-
-.job-detail-board-page .job-detail-accordion-trigger:focus-visible,
-.job-detail-board-page .job-company-accordion-summary:focus-visible {
-  position: relative;
-  z-index: 1;
-  outline: 3px solid var(--sh-color-border-focus);
-  outline-offset: -3px;
-}
-
-.job-detail-board-page .job-detail-accordion-trigger-copy {
-  display: grid;
-  min-width: 0;
-  gap: var(--sh-space-1);
-}
-
-.job-detail-board-page .job-detail-accordion-title {
-  font-size: var(--sh-font-size-h2);
-  font-weight: var(--sh-font-weight-bold);
-  line-height: 1.25;
-}
-
-.job-detail-board-page .job-detail-accordion-summary {
-  max-width: 68ch;
-  color: var(--sh-color-text-secondary);
-  font-size: var(--sh-font-size-body-sm);
-  font-weight: var(--sh-font-weight-regular);
-  line-height: 1.5;
-}
-
-.job-detail-board-page .job-detail-accordion-chevron,
+/* Job Detail list refinements */
 .job-detail-board-page .job-accordion-chevron {
   display: inline-grid;
   width: 40px;
@@ -4410,7 +4353,6 @@
   background: var(--job-detail-accent-soft);
 }
 
-.job-detail-board-page .job-detail-accordion-chevron svg,
 .job-detail-board-page .job-accordion-chevron svg {
   width: 20px;
   height: 20px;
@@ -4422,37 +4364,8 @@
   transition: transform var(--sh-motion-standard) ease;
 }
 
-.job-detail-board-page
-  .job-detail-accordion-item.is-open
-  .job-detail-accordion-chevron
-  svg,
 .job-detail-board-page .job-company-accordion[open] .job-accordion-chevron svg {
   transform: rotate(180deg);
-}
-
-.job-detail-board-page .job-detail-accordion-content {
-  padding: 0 var(--sh-space-6) var(--sh-space-6);
-  border-top: 1px solid var(--sh-color-border-subtle);
-}
-
-.job-detail-board-page .job-detail-accordion-content[hidden] {
-  display: none;
-}
-
-.job-detail-board-page .job-detail-accordion-intro {
-  padding-top: var(--sh-space-5);
-}
-
-.job-detail-board-page .job-detail-accordion-intro h3 {
-  margin: 0 0 var(--sh-space-1);
-  font-size: var(--sh-font-size-body);
-}
-
-.job-detail-board-page .job-detail-accordion-intro p {
-  margin: 0;
-  color: var(--sh-color-text-secondary);
-  font-size: var(--sh-font-size-body-sm);
-  line-height: 1.6;
 }
 
 .job-detail-board-page .job-company-accordion {
@@ -4734,15 +4647,6 @@
 }
 
 @media (max-width: 720px) {
-  .job-detail-board-page .job-detail-accordion-trigger {
-    padding: var(--sh-space-4);
-  }
-
-  .job-detail-board-page .job-detail-accordion-content {
-    padding-inline: var(--sh-space-4);
-    padding-bottom: var(--sh-space-4);
-  }
-
   .job-detail-board-page .job-company-accordion-summary {
     padding: var(--sh-space-4);
   }
@@ -4750,14 +4654,6 @@
   .job-detail-board-page .job-company-accordion-content {
     padding-inline: var(--sh-space-4);
     padding-bottom: var(--sh-space-4);
-  }
-
-  .job-detail-board-page .job-detail-accordion-title {
-    font-size: var(--sh-font-size-h3);
-  }
-
-  .job-detail-board-page .job-detail-accordion-summary {
-    font-size: var(--sh-font-size-caption);
   }
 
   .job-detail-board-page .job-related-list-item {
@@ -4874,7 +4770,6 @@
 }
 
 .job-detail-board-page .job-detail-summary,
-.job-detail-board-page .job-detail-accordion-content,
 .job-detail-board-page .job-detail-bullet-list,
 .job-detail-board-page .job-sidebar-company-copy,
 .job-detail-board-page .job-section-muted {
@@ -5242,5 +5137,176 @@
   .job-detail-board-page *::after {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
+  }
+}
+
+/* Sticky Job Detail header and single tab panel */
+.job-detail-board-page .job-detail-hero--redesign {
+  position: sticky;
+  top: calc(var(--sh-topbar-height) + var(--sh-space-3));
+  z-index: 20;
+}
+
+.job-detail-board-page .job-detail-tab-card {
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.job-detail-board-page .job-detail-tab-list {
+  display: flex;
+  min-width: 0;
+  gap: var(--sh-space-1);
+  overflow-x: auto;
+  border-bottom: 1px solid var(--sh-color-border-subtle);
+  scrollbar-width: none;
+  overscroll-behavior-inline: contain;
+}
+
+.job-detail-board-page .job-detail-tab-list::-webkit-scrollbar {
+  display: none;
+}
+
+.job-detail-board-page .job-detail-tab {
+  position: relative;
+  display: inline-flex;
+  min-height: 56px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--sh-space-5);
+  border: 0;
+  color: var(--sh-color-text-secondary);
+  background: transparent;
+  font-size: var(--sh-font-size-body-sm);
+  font-weight: var(--sh-font-weight-semibold);
+  white-space: nowrap;
+}
+
+.job-detail-board-page .job-detail-tab::after {
+  position: absolute;
+  right: var(--sh-space-5);
+  bottom: -1px;
+  left: var(--sh-space-5);
+  height: 3px;
+  border-radius: var(--sh-radius-full) var(--sh-radius-full) 0 0;
+  background: transparent;
+  content: "";
+}
+
+.job-detail-board-page .job-detail-tab:hover {
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-surface-tinted);
+}
+
+.job-detail-board-page .job-detail-tab.is-active {
+  color: var(--sh-color-brand-primary);
+  font-weight: var(--sh-font-weight-bold);
+}
+
+.job-detail-board-page .job-detail-tab.is-active::after {
+  background: var(--sh-color-brand-primary);
+}
+
+.job-detail-board-page .job-detail-tab:focus-visible {
+  z-index: 1;
+  outline: 3px solid var(--sh-color-border-focus);
+  outline-offset: -3px;
+}
+
+.job-detail-board-page .job-detail-tab-description {
+  margin: 0;
+  padding: var(--sh-space-5) var(--sh-space-6) 0;
+  color: var(--sh-color-text-secondary);
+  font-size: var(--sh-font-size-body-sm);
+  line-height: 1.55;
+}
+
+.job-detail-board-page .job-detail-tab-panel {
+  min-width: 0;
+  padding: var(--sh-space-5) var(--sh-space-6) var(--sh-space-6);
+  animation: job-detail-tab-fade var(--sh-motion-standard) ease both;
+}
+
+@keyframes job-detail-tab-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.job-detail-sidebar--board {
+  position: sticky;
+  top: calc(var(--sh-topbar-height) + var(--sh-space-3));
+  z-index: 19;
+  align-self: start;
+  height: max-content;
+  max-height: calc(100dvh - var(--sh-topbar-height) - var(--sh-space-6));
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--sh-color-border-default) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+.job-detail-sidebar--board::-webkit-scrollbar {
+  width: 8px;
+}
+
+.job-detail-sidebar--board::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: var(--sh-radius-full);
+  background: var(--sh-color-border-default);
+  background-clip: padding-box;
+}
+
+.job-detail-sidebar--board::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (max-width: 1023px) {
+  .job-detail-board-page .job-detail-hero--redesign {
+    top: calc(var(--sh-topbar-height) + var(--sh-space-2));
+  }
+
+  .job-detail-sidebar--board {
+    position: static;
+    top: auto;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    scrollbar-gutter: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .job-detail-board-page .job-detail-tab {
+    min-height: 52px;
+    padding-inline: var(--sh-space-4);
+  }
+
+  .job-detail-board-page .job-detail-tab::after {
+    right: var(--sh-space-4);
+    left: var(--sh-space-4);
+  }
+
+  .job-detail-board-page .job-detail-tab-description {
+    padding: var(--sh-space-4) var(--sh-space-4) 0;
+  }
+
+  .job-detail-board-page .job-detail-tab-panel {
+    padding: var(--sh-space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .job-detail-board-page .job-detail-tab-panel {
+    animation: none;
   }
 }

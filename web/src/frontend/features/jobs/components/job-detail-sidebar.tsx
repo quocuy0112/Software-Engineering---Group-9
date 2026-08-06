@@ -361,11 +361,10 @@ function SimilarJobRow({ job }: { job: JobCard }) {
 }
 
 export function SimilarJobsCard({ job }: { job: JobDetail }) {
-  const similarJobs = [
-    ...(job.relatedJobs?.length
-      ? job.relatedJobs
-      : (job.recommendedJobs ?? [])),
-  ].slice(0, 5);
+  const relatedJobIds = new Set((job.relatedJobs ?? []).map((item) => item.id));
+  const similarJobs = (job.recommendedJobs ?? [])
+    .filter((item) => !relatedJobIds.has(item.id))
+    .slice(0, 5);
 
   return (
     <section

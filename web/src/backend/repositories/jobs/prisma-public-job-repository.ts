@@ -73,6 +73,11 @@ export interface PublicJobRepository {
     actorUserId: string | null,
     now: Date,
   ): Promise<PublicJobRow[]>;
+  findPublicDiscoveryCandidates?(
+    jobId: string,
+    actorUserId: string | null,
+    now: Date,
+  ): Promise<PublicJobRow[]>;
   findPublicActionTarget(
     jobId: string,
     now: Date,
@@ -281,6 +286,30 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
     });
     return rows.map((row) => ({ ...row, score: 0 }) as PublicJobRow);
   }
+  async findPublicDiscoveryCandidates(
+    jobId: string,
+    actorUserId: string | null,
+    now: Date,
+  ) {
+    const rows = await prisma.jobPosting.findMany({
+      where: {
+        id: { not: jobId },
+        status: "ACTIVE",
+        approvedAt: { not: null },
+        publishedAt: { not: null, lte: now },
+        OR: [
+          { applicationDeadline: null },
+          { applicationDeadline: { gt: now } },
+        ],
+        company: { verifiedAt: { not: null } },
+      },
+      orderBy: [{ publishedAt: "desc" }, { id: "asc" }],
+      take: 160,
+      include: publicInclude(actorUserId),
+    });
+    return rows.map((row) => ({ ...row, score: 0 }) as PublicJobRow);
+  }
+
   async findPublicActionTarget(jobId: string, now: Date) {
     const row = await prisma.jobPosting.findFirst({
       where: {

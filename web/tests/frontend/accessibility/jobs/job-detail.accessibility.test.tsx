@@ -49,13 +49,16 @@ describe("job detail accessibility", () => {
     expect(screen.getByText("Active")).toHaveAccessibleName(
       /job status: active/i,
     );
-    const requirementsAnchor = screen.getByRole("button", {
+    const tabs = screen.getAllByRole("tab");
+    expect(tabs).toHaveLength(3);
+    const requirementsTab = screen.getByRole("tab", {
       name: /requirements/i,
     });
-    fireEvent.click(requirementsAnchor);
+    fireEvent.click(requirementsTab);
+    expect(requirementsTab).toHaveAttribute("aria-selected", "true");
     expect(
-      screen.getByRole("heading", { name: /candidate requirements/i }),
+      screen.getByRole("heading", { name: /must-have requirements/i }),
     ).toBeVisible();
-    expect(screen.getByRole("heading", { name: /benefits/i })).toBeVisible();
+    expect(screen.getAllByRole("tabpanel")).toHaveLength(1);
   });
 });

@@ -17,6 +17,7 @@ import {
   type JobCard,
 } from "@/shared/contracts/jobs/discovery";
 import {
+  computeDiscoveryJobs,
   computeMatchScore,
   computeRelatedJobs,
   type CandidateJobProfile,
@@ -172,6 +173,9 @@ function similarityInput(row: PublicJobRow): JobSimilarityInput {
 
   return {
     id: row.id,
+    title: row.title,
+    companyId: row.companyId,
+    industry: row.company.industry ?? undefined,
     status: row.status === "ACTIVE" ? "open" : row.status.toLowerCase(),
     categoryIds: Array.isArray(signals.categoryIds)
       ? signals.categoryIds.filter(
@@ -364,41 +368,69 @@ export class JobDiscoveryService {
       now,
     );
     const summary = card(row, actor, now);
-    const candidateRows = repository.findPublicRelatedCandidates
+    const relatedCandidateRows = repository.findPublicRelatedCandidates
       ? await repository.findPublicRelatedCandidates(
           row.id,
           actor.kind === "user" ? actor.userId : null,
           now,
         )
       : [];
-    const candidateSignals: CandidateSignal[] = candidateRows.map(
+    const discoveryCandidateRows = repository.findPublicDiscoveryCandidates
+      ? await repository.findPublicDiscoveryCandidates(
+          row.id,
+          actor.kind === "user" ? actor.userId : null,
+          now,
+        )
+      : relatedCandidateRows;
+    const candidateSignals: CandidateSignal[] = relatedCandidateRows.map(
       (candidate) => ({
         ...similarityInput(candidate),
         row: candidate,
       }),
     );
+    const discoveryCandidateSignals: CandidateSignal[] =
+      discoveryCandidateRows.map((candidate) => ({
+        ...similarityInput(candidate),
+        row: candidate,
+      }));
+    const currentSignals = similarityInput(row);
     const relatedJobs = computeRelatedJobs(
-      similarityInput(row),
+      currentSignals,
       candidateSignals,
       6,
     ).map(({ row: candidate, matchScore }) =>
       card(candidate, actor, now, matchScore),
     );
-    let recommendedJobs = relatedJobs.slice(0, 3);
+    const relatedJobIds = new Set(relatedJobs.map((item) => item.id));
+    const discoveryRanked = computeDiscoveryJobs(
+      currentSignals,
+      discoveryCandidateSignals,
+      relatedJobIds,
+      5,
+    );
+    let recommendedJobs = discoveryRanked.map(
+      ({ row: candidate, matchScore }) =>
+        card(candidate, actor, now, matchScore),
+    );
     if (actor.kind === "user") {
       try {
         const profile = await this.profileService.execute(actor.userId);
-        recommendedJobs = rankForCandidateProfile(
+        const personalized = rankForCandidateProfile(
           profile,
-          candidateSignals,
+          discoveryCandidateSignals.filter(
+            (candidate) => !relatedJobIds.has(candidate.id),
+          ),
           now,
-          3,
-        ).map(({ candidate, matchScore }) =>
-          card(candidate.row, actor, now, matchScore),
+          5,
         );
+        if (personalized.length) {
+          recommendedJobs = personalized.map(({ candidate, matchScore }) =>
+            card(candidate.row, actor, now, matchScore),
+          );
+        }
       } catch {
-        // A missing or temporarily unavailable profile should never make a
-        // public job detail page fail; related jobs remain the fallback.
+        // A missing or temporarily unavailable profile should not break the
+        // detail page; broad discovery recommendations remain available.
       }
     }
 

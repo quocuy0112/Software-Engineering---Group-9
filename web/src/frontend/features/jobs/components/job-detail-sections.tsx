@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { JobDetail } from "@/shared/contracts/jobs/discovery";
 import {
   jobCategories,
@@ -116,65 +116,6 @@ function SectionHeading({
   );
 }
 
-function AccordionSection({
-  id,
-  eyebrow,
-  title,
-  copy,
-  defaultOpen = false,
-  children,
-}: {
-  id: JobDetailSectionId;
-  eyebrow: string;
-  title: string;
-  copy: string;
-  defaultOpen?: boolean;
-  children: ReactNode;
-}) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-  const headingId = id + "-heading";
-  const contentId = id + "-content";
-
-  return (
-    <section
-      id={id}
-      className={
-        "job-detail-section-card job-detail-accordion-item" +
-        (isOpen ? " is-open" : "")
-      }
-      aria-labelledby={headingId}
-    >
-      <h2 className="job-detail-accordion-heading" id={headingId}>
-        <button
-          className="job-detail-accordion-trigger"
-          type="button"
-          aria-expanded={isOpen}
-          aria-controls={contentId}
-          onClick={() => setIsOpen((current) => !current)}
-        >
-          <span className="job-detail-accordion-trigger-copy">
-            <span className="panel-kicker">{eyebrow}</span>
-            <span className="job-detail-accordion-title">{title}</span>
-            <span className="job-detail-accordion-summary">{copy}</span>
-          </span>
-          <span className="job-detail-accordion-chevron" aria-hidden="true">
-            <svg viewBox="0 0 24 24" focusable="false">
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-          </span>
-        </button>
-      </h2>
-      <div
-        id={contentId}
-        className="job-detail-accordion-content"
-        hidden={!isOpen}
-      >
-        {children}
-      </div>
-    </section>
-  );
-}
-
 export function JobDetailOverview({ job }: { job: JobDetail }) {
   const facts = [
     {
@@ -244,15 +185,35 @@ export function JobDetailOverview({ job }: { job: JobDetail }) {
   );
 }
 
-function DescriptionSection({ job }: { job: JobDetail }) {
+type TabId = "description" | "requirements" | "benefits";
+
+const detailTabs: readonly {
+  id: TabId;
+  label: string;
+  description: string;
+}[] = [
+  {
+    id: "description",
+    label: "Job description",
+    description:
+      "A clear view of the work, expectations, and impact you can make.",
+  },
+  {
+    id: "requirements",
+    label: "Requirements",
+    description: "The signals that will help you do well in this role.",
+  },
+  {
+    id: "benefits",
+    label: "Benefits",
+    description:
+      "The full package, kept together so you can compare with confidence.",
+  },
+];
+
+function DescriptionContent({ job }: { job: JobDetail }) {
   return (
-    <AccordionSection
-      id="description"
-      eyebrow="01 / THE ROLE"
-      title="Job description"
-      copy="A clear view of the work, expectations, and impact you can make."
-      defaultOpen
-    >
+    <>
       <div className="job-detail-section-copy">
         <p>{jobOverview(job)}</p>
       </div>
@@ -265,25 +226,16 @@ function DescriptionSection({ job }: { job: JobDetail }) {
         <h3 id="responsibilities-heading">Key responsibilities</h3>
         <BulletList items={jobResponsibilities(job)} />
       </div>
-    </AccordionSection>
+    </>
   );
 }
 
-function RequirementsSection({ job }: { job: JobDetail }) {
+function RequirementsContent({ job }: { job: JobDetail }) {
   const mustHave = jobMustHaveRequirements(job);
   const niceToHave = jobNiceToHaveRequirements(job);
 
   return (
-    <AccordionSection
-      id="requirements"
-      eyebrow="02 / YOUR EDGE"
-      title="Requirements"
-      copy="The signals that will help you do well in this role."
-    >
-      <div className="job-detail-accordion-intro">
-        <h3>Candidate requirements</h3>
-        <p>The signals that will help you do well in this role.</p>
-      </div>
+    <>
       <InlineChips
         items={jobSkills(job)}
         label="Required skills"
@@ -305,39 +257,37 @@ function RequirementsSection({ job }: { job: JobDetail }) {
           )}
         </div>
       </div>
-    </AccordionSection>
+    </>
   );
 }
 
-function BenefitsSection({ job }: { job: JobDetail }) {
+function BenefitsContent({ job }: { job: JobDetail }) {
   const benefits = jobBenefits(job);
 
-  return (
-    <AccordionSection
-      id="benefits"
-      eyebrow="03 / THE PACKAGE"
-      title="Benefits"
-      copy="The full package, kept together so you can compare with confidence."
-    >
-      {benefits.length ? (
-        <ul className="job-benefit-grid" aria-label="Job benefits">
-          {benefits.map((benefit, index) => (
-            <li key={benefit.label + "-" + index}>
-              <span className="job-benefit-icon" aria-hidden="true">
-                {benefitIcon[benefit.icon.toLowerCase()] ?? "✦"}
-              </span>
-              <span>{benefit.label}</span>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="job-section-muted">
-          Benefits details will be shared during the interview process.
-        </p>
-      )}
-    </AccordionSection>
+  return benefits.length ? (
+    <ul className="job-benefit-grid" aria-label="Job benefits">
+      {benefits.map((benefit, index) => (
+        <li key={benefit.label + "-" + index}>
+          <span className="job-benefit-icon" aria-hidden="true">
+            {benefitIcon[benefit.icon.toLowerCase()] ?? "*"}
+          </span>
+          <span>{benefit.label}</span>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p className="job-section-muted">
+      Benefits details will be shared during the interview process.
+    </p>
   );
 }
+
+function TabContent({ activeTab, job }: { activeTab: TabId; job: JobDetail }) {
+  if (activeTab === "requirements") return <RequirementsContent job={job} />;
+  if (activeTab === "benefits") return <BenefitsContent job={job} />;
+  return <DescriptionContent job={job} />;
+}
+
 export function JobDetailSections({
   job,
   includeOverview = true,
@@ -346,12 +296,59 @@ export function JobDetailSections({
   section?: JobDetailSectionId;
   includeOverview?: boolean;
 }) {
+  const [activeTab, setActiveTab] = useState<TabId>("description");
+  const activeTabConfig =
+    detailTabs.find((tab) => tab.id === activeTab) ?? detailTabs[0];
+
   return (
     <div className="job-detail-sections" aria-label="Job details">
       {includeOverview ? <JobDetailOverview job={job} /> : null}
-      <DescriptionSection job={job} />
-      <RequirementsSection job={job} />
-      <BenefitsSection job={job} />
+      <section
+        id="job-details-tabs"
+        className="job-detail-section-card job-detail-tab-card"
+        aria-labelledby="job-details-tabs-heading"
+      >
+        <h2 id="job-details-tabs-heading" className="sr-only">
+          Job details
+        </h2>
+        <div
+          className="job-detail-tab-list"
+          role="tablist"
+          aria-label="Job detail sections"
+        >
+          {detailTabs.map((tab) => {
+            const selected = tab.id === activeTab;
+            return (
+              <button
+                key={tab.id}
+                id={"job-detail-tab-" + tab.id}
+                className={"job-detail-tab" + (selected ? " is-active" : "")}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                aria-controls="job-detail-tab-panel"
+                tabIndex={selected ? 0 : -1}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+        <p className="job-detail-tab-description">
+          {activeTabConfig.description}
+        </p>
+        <div
+          id="job-detail-tab-panel"
+          className="job-detail-tab-panel"
+          role="tabpanel"
+          aria-labelledby={"job-detail-tab-" + activeTab}
+          tabIndex={0}
+          key={activeTab}
+        >
+          <TabContent activeTab={activeTab} job={job} />
+        </div>
+      </section>
     </div>
   );
 }
