@@ -1,11 +1,76 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { StrictMode, useEffect } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CsrfProofProvider } from "@/frontend/features/authentication/client/csrf-proof-context";
+import {
+  JobInteractionProvider,
+  useOptionalJobInteraction,
+} from "@/frontend/features/jobs/components/job-interaction-provider";
 import { SaveJobAction } from "@/frontend/features/jobs/components/save-job-action";
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
+
+function ProviderUpdateProbe() {
+  const interaction = useOptionalJobInteraction();
+  const presetCount = interaction?.savedFilterPresets.length ?? 0;
+  const saveFilterPreset = interaction?.saveFilterPreset;
+
+  useEffect(() => {
+    if (!saveFilterPreset || presetCount >= 4) return;
+    saveFilterPreset("Preset " + presetCount, {});
+  }, [presetCount, saveFilterPreset]);
+
+  return <output data-testid="preset-count">{presetCount}</output>;
+}
 
 describe("save job action", () => {
+  it("registers a page of jobs without entering a provider update loop", async () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          savedJobIds: ["job-1"],
+          hiddenJobIds: [],
+          appliedJobIds: [],
+        }),
+      }),
+    );
+
+    render(
+      <StrictMode>
+        <CsrfProofProvider value="csrf-proof">
+          <JobInteractionProvider>
+            <ProviderUpdateProbe />
+            {Array.from({ length: 20 }, (_, index) => (
+              <SaveJobAction
+                key={index}
+                jobId={"job-" + (index + 1)}
+                initialSaved={false}
+              />
+            ))}
+          </JobInteractionProvider>
+        </CsrfProofProvider>
+      </StrictMode>,
+    );
+
+    await waitFor(() =>
+      expect(screen.getAllByRole("button")[0]).toHaveAttribute(
+        "aria-pressed",
+        "true",
+      ),
+    );
+    expect(screen.getByTestId("preset-count")).toHaveTextContent("4");
+    expect(consoleError).not.toHaveBeenCalled();
+  });
+
   it("uses the rendered CSRF proof and reconciles to the server state", async () => {
     const fetchMock = vi.fn().mockResolvedValueOnce({
       ok: true,
