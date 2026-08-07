@@ -101,6 +101,7 @@ export function JobInteractionProvider({
       if (!active || !view) return;
       setRecords((current) => {
         const next = { ...current };
+        let changed = false;
         const ids = new Set([
           ...view.savedJobIds,
           ...view.hiddenJobIds,
@@ -112,14 +113,23 @@ export function JobInteractionProvider({
             applied: false,
             hidden: false,
           };
-          next[jobId] = {
+          const updated = {
             ...existing,
             saved: existing.saved || view.savedJobIds.includes(jobId),
             applied: existing.applied || view.appliedJobIds.includes(jobId),
             hidden: existing.hidden || view.hiddenJobIds.includes(jobId),
           };
+          if (
+            updated.saved === existing.saved &&
+            updated.applied === existing.applied &&
+            updated.hidden === existing.hidden
+          ) {
+            continue;
+          }
+          next[jobId] = updated;
+          changed = true;
         }
-        return next;
+        return changed ? next : current;
       });
     });
     return () => {
@@ -308,9 +318,22 @@ export function useJobInteraction(
     );
   }
 
+  const registerJob = context.registerJob;
   useEffect(() => {
-    context.registerJob(jobId, seed);
-  }, [context, jobId, seed]);
+    registerJob(jobId, {
+      saved: seed.saved,
+      applied: seed.applied,
+      appliedJob: seed.appliedJob,
+      hidden: seed.hidden,
+    });
+  }, [
+    jobId,
+    registerJob,
+    seed.applied,
+    seed.appliedJob,
+    seed.hidden,
+    seed.saved,
+  ]);
 
   const record = context.records[jobId] ?? {
     saved: seed.saved,

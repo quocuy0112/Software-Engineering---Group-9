@@ -95,14 +95,14 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
     job.actions.applied ||
     submittedHere ||
     Boolean(shared?.records[job.id]?.applied);
+  const registerJob = shared?.registerJob;
 
   useEffect(() => {
-    shared?.registerJob(job.id, {
+    registerJob?.(job.id, {
       saved: job.actions.saved,
       applied: job.actions.applied,
-      hidden: shared.records[job.id]?.hidden,
     });
-  }, [job.actions.applied, job.actions.saved, job.id, shared]);
+  }, [job.actions.applied, job.actions.saved, job.id, registerJob]);
   useEffect(() => {
     function syncApplyState() {
       const params = new URLSearchParams(window.location.search);
