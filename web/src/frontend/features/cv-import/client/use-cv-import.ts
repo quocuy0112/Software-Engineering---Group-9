@@ -347,6 +347,26 @@ export function useCvImport(input: { csrfProof: string }) {
     [loadStatus, locale],
   );
 
+  const resume = useCallback(
+    async (uploadId: string) => {
+      stop();
+      setProgress((current) => ({
+        ...current,
+        state: "PROCESSING",
+        percentage: Math.max(current.percentage, 15),
+        title:
+          locale === "vi" ? "Đang tiếp tục nhập CV" : "Resuming CV import",
+        message:
+          locale === "vi"
+            ? "Đang làm mới trạng thái nhập CV…"
+            : "Refreshing the CV import status…",
+        uploadId,
+      }));
+      await poll(uploadId);
+    },
+    [locale, poll, stop],
+  );
+
   const upload = useCallback(
     async (file: File, parserClass: CreateCvImportRequest["parserClass"]) => {
       stop();
@@ -464,5 +484,11 @@ export function useCvImport(input: { csrfProof: string }) {
     [input.csrfProof, locale, poll, stop],
   );
 
-  return Object.freeze({ progress, upload, cancel: stop, loadStatus });
+  return Object.freeze({
+    progress,
+    upload,
+    resume,
+    cancel: stop,
+    loadStatus,
+  });
 }

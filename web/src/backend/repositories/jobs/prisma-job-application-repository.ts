@@ -6,6 +6,7 @@ import {
   ApplicationRepositoryError,
   prepareApplicationSubmission,
 } from "@/backend/services/jobs/application-policy";
+import { ensureCandidateCvLibrary } from "@/backend/services/profile/candidate-cv-library";
 import type {
   ApplicationForm,
   ApplicationSubmission,
@@ -13,9 +14,16 @@ import type {
 } from "@/shared/contracts/jobs/actions";
 
 type CandidateApplicationForm = {
-  job: { id: string; title: string; company: { displayName: string } };
+  job: {
+    id: string;
+    title: string;
+    location: string;
+    company: { displayName: string };
+  };
   profileReady: boolean;
   missingProfileFields: string[];
+  profileRevision: number;
+  profileBasics: ApplicationForm["profileBasics"];
   contact?: ApplicationForm["contact"];
   cvs: Array<
     Omit<ApplicationForm["cvs"][number], "confirmedAt"> & { confirmedAt: Date }
@@ -70,12 +78,21 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
   constructor(private readonly db: typeof prisma = prisma) {}
 
   async getCandidateForm(userId: string, jobId: string, now: Date) {
+    await ensureCandidateCvLibrary(userId, this.db);
     const [candidate, job, existingApplication] = await Promise.all([
       this.db.candidateIdentity.findFirst({
         where: { userId, user: { state: "ACTIVE" } },
         include: {
           user: { select: { name: true, email: true } },
-          profile: { select: { headline: true, location: true, phone: true } },
+          profile: {
+            select: {
+              headline: true,
+              summary: true,
+              location: true,
+              phone: true,
+              revision: true,
+            },
+          },
           cvs: {
             where: {
               confirmedAt: { not: null },
@@ -117,6 +134,7 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
         select: {
           id: true,
           title: true,
+          location: true,
           company: { select: { displayName: true } },
           questions: {
             where: { active: true },
@@ -152,6 +170,13 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
       job,
       profileReady: missingProfileFields.length === 0,
       missingProfileFields,
+      profileRevision: candidate.profile?.revision ?? 0,
+      profileBasics: {
+        headline: candidate.profile?.headline ?? null,
+        summary: candidate.profile?.summary ?? null,
+        phone: candidate.profile?.phone ?? null,
+        location: candidate.profile?.location ?? null,
+      },
       contact: {
         fullName: candidate.user.name,
         email: candidate.user.email,

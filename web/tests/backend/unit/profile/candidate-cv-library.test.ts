@@ -1,0 +1,102 @@
+import { describe, expect, it, vi } from "vitest";
+import {
+  archiveCandidateCv,
+  ensureCandidateCvLibrary,
+  renameCandidateCv,
+} from "@/backend/services/profile/candidate-cv-library";
+
+describe("candidate CV library", () => {
+  it("projects confirmed deterministic and OpenAI imports into retained CV options", async () => {
+    const upsert = vi.fn().mockResolvedValue({});
+    const candidateFindMany = vi.fn().mockResolvedValue([]);
+    const findMany = vi.fn().mockResolvedValue([
+      {
+        id: "upload-openai-1",
+        declaredMediaType: "application/pdf",
+        actualBytes: 2048,
+        sourceSha256: Uint8Array.from({ length: 32 }, (_, index) => index),
+        confirmedAt: new Date("2026-08-07T00:00:00.000Z"),
+      },
+    ]);
+    const db = {
+      cvUpload: { findMany },
+      candidateCv: { findMany: candidateFindMany, upsert },
+    } as never;
+
+    await ensureCandidateCvLibrary("user-1", db);
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          accountId: "user-1",
+          parserClass: {
+            in: ["DETERMINISTIC_INTERNAL", "EXTERNAL_OPENAI"],
+          },
+          status: "CONFIRMED",
+        }),
+      }),
+    );
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { storageKey: "candidate-cv-upload-openai-1" },
+        create: expect.objectContaining({
+          id: "candidate-cv-upload-openai-1",
+          candidateUserId: "user-1",
+          displayName: "imported-cv-upload-openai-1.pdf",
+          confirmedAt: new Date("2026-08-07T00:00:00.000Z"),
+        }),
+      }),
+    );
+  });
+
+  it("renames the display label and archives without touching the storage metadata", async () => {
+    const confirmedAt = new Date("2026-08-07T00:00:00.000Z");
+    const archivedAt = new Date("2026-08-07T01:00:00.000Z");
+    const findFirst = vi
+      .fn()
+      .mockResolvedValueOnce({
+        id: "candidate-cv-1",
+        displayName: "resume.pdf",
+        fileName: "imported-cv-upload-1.pdf",
+        mimeType: "application/pdf",
+        byteSize: 2048,
+        version: 1,
+        confirmedAt,
+      })
+      .mockResolvedValueOnce({ id: "candidate-cv-1" });
+    const update = vi
+      .fn()
+      .mockResolvedValueOnce({
+        id: "candidate-cv-1",
+        displayName: "Tuấn CV - Community Manager",
+        fileName: "imported-cv-upload-1.pdf",
+        mimeType: "application/pdf",
+        byteSize: 2048,
+        version: 1,
+        confirmedAt,
+      })
+      .mockResolvedValueOnce({ id: "candidate-cv-1", archivedAt });
+    const db = { candidateCv: { findFirst, update } } as never;
+
+    const renamed = await renameCandidateCv(
+      "user-1",
+      "candidate-cv-1",
+      { displayName: "Tuấn CV - Community Manager" },
+      db,
+    );
+    expect(renamed.displayName).toBe("Tuấn CV - Community Manager");
+    expect(update.mock.calls[0]?.[0]).toMatchObject({
+      where: { id: "candidate-cv-1" },
+      data: { displayName: "Tuấn CV - Community Manager" },
+    });
+
+    const deleted = await archiveCandidateCv("user-1", "candidate-cv-1", db);
+    expect(deleted).toEqual({
+      id: "candidate-cv-1",
+      archivedAt: archivedAt.toISOString(),
+    });
+    expect(update.mock.calls[1]?.[0]).toMatchObject({
+      data: { archivedAt: expect.any(Date) },
+    });
+  });
+});

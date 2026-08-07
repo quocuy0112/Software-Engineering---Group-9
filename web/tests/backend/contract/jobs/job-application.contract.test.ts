@@ -12,10 +12,18 @@ describe("application form and submission contracts", () => {
         job: {
           id: "job-1",
           title: "Engineer",
+          location: "TP Hồ Chí Minh",
           company: { displayName: "Company" },
         },
         profileReady: true,
         missingProfileFields: [],
+        profileRevision: 1,
+        profileBasics: {
+          headline: "Engineer",
+          summary: null,
+          phone: null,
+          location: "TP Hồ Chí Minh",
+        },
         cvs: [
           {
             id: "cv-1",

@@ -24,6 +24,7 @@ type SafeApiError = Readonly<{
   error?: Readonly<{
     code?: string;
     message?: string;
+    requestId?: string;
     fieldErrors?: CvReviewFieldError[];
     latest?: ConflictLatest | null;
   }>;
@@ -101,6 +102,13 @@ function saveErrorSummary(
     : locale === "vi"
       ? `${first} Hãy kiểm tra ${fieldErrors.length} trường được đánh dấu.`
       : `${first} Check ${fieldErrors.length} highlighted fields.`;
+}
+
+function requestReference(requestId: string | undefined, locale: "vi" | "en") {
+  if (!requestId) return "";
+  return locale === "vi"
+    ? ` Mã tham chiếu: ${requestId}.`
+    : ` Reference ID: ${requestId}.`;
 }
 
 export type CvReviewConflict = Readonly<{
@@ -361,12 +369,18 @@ export function useCvDraftReview(input: {
           setLatestComparison(null);
           return null;
         }
+        setFieldErrors(
+          (failure.error?.fieldErrors ?? []).map((fieldError) =>
+            presentCvReviewFieldError(fieldError, locale),
+          ),
+        );
         throw new Error(
-          failure.error?.message
+          (failure.error?.message
             ? cvKnownError(locale, failure.error.message, code)
             : locale === "vi"
               ? "Không thể cập nhật hồ sơ."
-              : "The profile could not be updated.",
+              : "The profile could not be updated.") +
+            requestReference(failure.error?.requestId, locale),
         );
       }
       const next = cvConfirmationReceiptSchema.parse(await response.json());

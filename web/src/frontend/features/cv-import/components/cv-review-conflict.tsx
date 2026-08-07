@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef } from "react";
 
 import type { CvReviewConflict } from "../client/use-cv-draft-review";

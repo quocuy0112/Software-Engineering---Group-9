@@ -43,7 +43,7 @@ function metadataCryptor() {
   });
 }
 
-function safeFilename(
+export function safeFilename(
   encrypted: string | null,
   context: { accountId: string; uploadId: string },
 ): string | null {

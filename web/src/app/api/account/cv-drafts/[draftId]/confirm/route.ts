@@ -19,9 +19,11 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ draftId: string }> },
 ) {
+  let draftId: string | undefined;
   try {
     const id = cvDraftIdSchema.safeParse((await params).draftId);
     if (!id.success) throw new CvImportServiceError("CV_DRAFT_NOT_FOUND");
+    draftId = id.data;
     const key = cvIdempotencyKeySchema.safeParse(
       request.headers.get("idempotency-key"),
     );
@@ -51,6 +53,7 @@ export async function POST(
     return cvHttpErrorResponse(
       error,
       request.headers.get("x-request-id") ?? undefined,
+      { operation: "cv-draft.confirm", draftId: draftId ?? "unparsed" },
     );
   }
 }

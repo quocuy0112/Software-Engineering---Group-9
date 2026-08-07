@@ -5,9 +5,17 @@ import { JobApplicationForm } from "@/frontend/features/jobs/components/job-appl
 const form = {
   jobId: "job-1",
   jobTitle: "Engineer",
+  jobLocation: "TP Hồ Chí Minh",
   companyName: "Company",
   profileReady: true,
   missingProfileFields: [],
+  profileRevision: 1,
+  profileBasics: {
+    headline: "Engineer",
+    summary: null,
+    phone: null,
+    location: "TP Hồ Chí Minh",
+  },
   cvs: [
     {
       id: "cv-1",

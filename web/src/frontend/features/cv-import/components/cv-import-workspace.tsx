@@ -4,8 +4,10 @@ import Link from "next/link";
 
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 import { useCvImport } from "../client/use-cv-import";
+import type { CandidateCvSummary } from "@/shared/contracts/cv-import/candidate-cv";
 import type { CvImportSummary } from "@/shared/contracts/cv-import/upload";
 import { cvCopy } from "../i18n/cv-import-copy";
+import { CandidateCvLibrary } from "./candidate-cv-library";
 import { CvImportList } from "./cv-import-list";
 import { CvUploadForm } from "./cv-upload-form";
 import styles from "./cv-import-workspace.module.css";
@@ -13,10 +15,12 @@ import styles from "./cv-import-workspace.module.css";
 export function CvImportWorkspace({
   csrfProof,
   initialItems,
+  initialCandidateCvs = [],
   parserAvailability,
 }: {
   csrfProof: string;
   initialItems: readonly CvImportSummary[];
+  initialCandidateCvs?: readonly CandidateCvSummary[];
   parserAvailability: Readonly<{
     deterministic: boolean;
     external: boolean;
@@ -83,6 +87,11 @@ export function CvImportWorkspace({
           </Link>
         ) : null}
       </div>
+
+      <CandidateCvLibrary
+        csrfProof={csrfProof}
+        initialItems={initialCandidateCvs}
+      />
 
       <section
         className={styles.historyPanel}

@@ -206,6 +206,10 @@ export async function cleanupReviewAccounts(
       `SELECT set_config('smarthire.cv_retention_mode', 'on', true)`,
     );
     await client.query(
+      `DELETE FROM "CandidateCv" WHERE "candidateUserId" = ANY($1::text[])`,
+      [accountIds],
+    );
+    await client.query(
       `DELETE FROM "CandidateIdentity" WHERE "userId" = ANY($1::text[])`,
       [accountIds],
     );

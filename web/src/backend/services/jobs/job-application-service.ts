@@ -24,6 +24,27 @@ function binding(command: ApplicationSubmission) {
     .digest("hex");
 }
 
+function applicationFailureMessage(code: string) {
+  switch (code) {
+    case "APPLICATION_PROFILE_INCOMPLETE":
+      return "Complete your profile headline and location before applying.";
+    case "APPLICATION_CV_INELIGIBLE":
+      return "Select a confirmed CV. If you just imported a CV, confirm its review and reopen Apply.";
+    case "APPLICATION_ANSWER_REQUIRED":
+      return "Answer all required employer questions before applying.";
+    case "APPLICATION_ANSWER_INVALID":
+    case "APPLICATION_ANSWER_UNKNOWN":
+    case "APPLICATION_ANSWER_DUPLICATE":
+      return "Review the answers in this application before applying.";
+    case "APPLICATION_CONSENT_STALE":
+      return "Accept the application consent before applying.";
+    case "APPLICATION_TEXT_TOO_LONG":
+      return "Shorten the application text before applying.";
+    default:
+      return "Complete the required profile, CV, answers, and consent before applying.";
+  }
+}
+
 export class JobApplicationService {
   constructor(
     private readonly repository?: ApplicationRepositoryPort,
@@ -65,9 +86,12 @@ export class JobApplicationService {
     return {
       jobId: result.job.id,
       jobTitle: result.job.title,
+      jobLocation: result.job.location,
       companyName: result.job.company.displayName,
       profileReady: result.profileReady,
       missingProfileFields: result.missingProfileFields,
+      profileRevision: result.profileRevision,
+      profileBasics: result.profileBasics,
       contact: result.contact,
       cvs: result.cvs.map((cv) => ({
         ...cv,
@@ -113,7 +137,7 @@ export class JobApplicationService {
           code: error.code,
           message: conflict
             ? "The application could not be submitted in its current state."
-            : "Complete the required profile, CV, answers, and consent before applying.",
+            : applicationFailureMessage(error.code),
         });
       }
       throw error;

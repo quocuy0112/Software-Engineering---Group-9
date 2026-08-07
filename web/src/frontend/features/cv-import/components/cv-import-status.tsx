@@ -48,6 +48,7 @@ type StatusResource = Readonly<{
   parseRetriesRemaining?: number;
   failure?: CvImportResource["failure"];
   ocr?: CvImportResource["ocr"];
+  draft?: CvImportResource["draft"];
   consent?: CvConsentNotice | null;
   expiresAt?: string | null;
   contentInaccessibleAt?: string | null;
@@ -262,13 +263,15 @@ export function CvImportStatus({
     };
   }, [current.pollingAfterMs, locale, refreshStatus]);
 
+  const reviewUrl =
+    current.status === "REVIEW_READY" ? (current.draft?.reviewUrl ?? null) : null;
+
   useEffect(() => {
-    if (current.status !== "REVIEW_READY") return;
-    const reviewUrl = `/profile/cv-imports/${current.uploadId}/review`;
+    if (!reviewUrl) return;
     router.prefetch(reviewUrl);
     const redirect = setTimeout(() => router.replace(reviewUrl), 320);
     return () => clearTimeout(redirect);
-  }, [current.status, current.uploadId, router]);
+  }, [reviewUrl, router]);
 
   const requestRetry = useCallback(async () => {
     if (!csrfProof)

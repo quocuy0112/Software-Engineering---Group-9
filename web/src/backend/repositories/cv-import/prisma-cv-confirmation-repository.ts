@@ -7,6 +7,7 @@ import { CvImportServiceError } from "@/backend/services/cv-import/cv-http-error
 import {
   normalizeSkillName,
   normalizeSocialUrl,
+  ProfileValidationError,
 } from "@/backend/services/profile/profile-validation";
 import { canonicalJson } from "@/shared/contracts/cv-import/common";
 import {
@@ -201,6 +202,24 @@ function isRetryableTransactionConflict(error: unknown) {
     (typeof candidate.message === "string" &&
       /write conflict|deadlock|serialization failure/u.test(candidate.message))
   );
+}
+
+function reviewValidationError(
+  path: string,
+  error: unknown,
+): CvImportServiceError {
+  if (error instanceof ProfileValidationError) {
+    return new CvImportServiceError("VALIDATION_ERROR", {
+      fieldErrors: [
+        {
+          path,
+          code: error.code,
+          message: "Enter a valid value.",
+        },
+      ],
+    });
+  }
+  throw error;
 }
 
 export class PrismaCvConfirmationRepository {
@@ -587,7 +606,15 @@ export class PrismaCvConfirmationRepository {
           for (const proposal of proposals.skills) {
             const decision = skillDecisions.get(proposal.proposalId);
             if (!decision || decision.action === "SKIP") continue;
-            const normalized = normalizeSkillName(proposal.value);
+            let normalized: ReturnType<typeof normalizeSkillName>;
+            try {
+              normalized = normalizeSkillName(proposal.value);
+            } catch (error) {
+              throw reviewValidationError(
+                `proposals.skills.${proposals.skills.indexOf(proposal)}.value`,
+                error,
+              );
+            }
             if (skillNames.has(normalized.normalizedName)) continue;
             if (skillPosition >= 50)
               throw new CvImportServiceError("VALIDATION_ERROR");
@@ -618,12 +645,41 @@ export class PrismaCvConfirmationRepository {
             where: { profileId: lock.profileId },
             orderBy: { position: "asc" },
           });
-          let linkCount = existingLinks.length;
+          let linkCount = existingLinks.reduce(
+            (next, link) => Math.max(next, link.position + 1),
+            0,
+          );
+          const existingLinkByUrl = new Map<string, string>();
+          const existingLinkById = new Map(
+            existingLinks.map((link) => [link.id, link]),
+          );
+          for (const link of existingLinks) {
+            try {
+              existingLinkByUrl.set(normalizeSocialUrl(link.url), link.id);
+            } catch {
+              // Keep legacy invalid data untouched; submitted values are
+              // still validated before they are written.
+            }
+          }
           for (const proposal of proposals.socialLinks) {
             const decision = linkDecisions.get(proposal.proposalId);
             if (!decision || decision.action === "SKIP") continue;
-            const value = normalizeSocialUrl(proposal.value);
+            let value: string;
+            try {
+              value = normalizeSocialUrl(proposal.value);
+            } catch (error) {
+              throw reviewValidationError(
+                `proposals.socialLinks.${proposals.socialLinks.indexOf(proposal)}.value`,
+                error,
+              );
+            }
+            if (decision.action === "REPLACE" && !decision.targetId)
+              throw new CvImportServiceError("VALIDATION_ERROR");
             if (decision.action === "REPLACE" && decision.targetId) {
+              const target = existingLinkById.get(decision.targetId);
+              const duplicateId = existingLinkByUrl.get(value);
+              if (duplicateId && duplicateId !== decision.targetId)
+                throw new CvImportServiceError("VALIDATION_ERROR");
               const changed = await transaction.socialLink.updateMany({
                 where: { id: decision.targetId, profileId: lock.profileId },
                 data: { url: value, normalizedUrl: value },
@@ -632,12 +688,25 @@ export class PrismaCvConfirmationRepository {
                 throw new CvImportServiceError("PROFILE_REVISION_CONFLICT", {
                   latest,
                 });
+              if (target) {
+                try {
+                  const previousValue = normalizeSocialUrl(target.url);
+                  if (existingLinkByUrl.get(previousValue) === target.id)
+                    existingLinkByUrl.delete(previousValue);
+                } catch {
+                  // The replacement value has already passed validation.
+                }
+              }
+              existingLinkByUrl.set(value, decision.targetId);
             } else {
+              // ADD is idempotent when the link is already in the Profile.
+              if (existingLinkByUrl.has(value)) continue;
               if (linkCount >= 10)
                 throw new CvImportServiceError("VALIDATION_ERROR");
+              const socialLinkId = randomUUID();
               await transaction.socialLink.create({
                 data: {
-                  id: randomUUID(),
+                  id: socialLinkId,
                   profileId: lock.profileId,
                   url: value,
                   normalizedUrl: value,
@@ -645,6 +714,7 @@ export class PrismaCvConfirmationRepository {
                 },
               });
               linkCount += 1;
+              existingLinkByUrl.set(value, socialLinkId);
             }
             counts.socialLinks += 1;
           }
