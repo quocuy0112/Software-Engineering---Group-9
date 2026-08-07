@@ -1,0 +1,6 @@
+paddleocr==3.7.0
+onnxruntime==1.27.0
+fastapi==0.139.2
+uvicorn==0.51.0
+pydantic==2.13.4
+Pillow==12.1.1

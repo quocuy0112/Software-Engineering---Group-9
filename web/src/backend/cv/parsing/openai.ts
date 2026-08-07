@@ -14,11 +14,17 @@ import {
 import {
   CV_DRAFT_MAX_BYTES,
   canonicalParserOutputBytes,
+  cvParserAnyOutputSchema,
   cvParserOutputSchema,
+  cvParserOutputV2Schema,
   validateParserEvidenceMembership,
 } from "@/shared/contracts/cv-import/parser-output";
 import { CV_EXTRACTED_TEXT_MAX_BYTES } from "@/shared/contracts/cv-import/common";
-import type { CvParser, CvParserInput } from "./cv-parser";
+import {
+  cvParserInputVersion,
+  type CvParser,
+  type CvParserInput,
+} from "./cv-parser";
 
 export const CV_OPENAI_ADAPTER_TIMEOUT_MS = 50_000;
 export const CV_OPENAI_PIPELINE_TIMEOUT_MS = 60_000;
@@ -77,11 +83,26 @@ function validateSafetyIdentifier(value: string | undefined): string {
 
 function serializedSegments(input: CvParserInput): string {
   if (!input.segments.length) safeError("PARSER_OUTPUT_INVALID");
+  const proposalSegments = input.segments.filter(
+    (segment) =>
+      !("confidence" in segment) ||
+      segment.confidence.level !== "LOW" ||
+      ("source" in segment &&
+        ["NATIVE", "NATIVE_AND_OCR"].includes(segment.source.method)),
+  );
+  if (!proposalSegments.length) safeError("PARSER_OUTPUT_INVALID");
   const value = JSON.stringify({
-    segments: input.segments.map((segment) => ({
+    segments: proposalSegments.map((segment) => ({
       id: segment.id,
       kind: segment.kind,
       text: segment.text,
+      ...("source" in segment
+        ? {
+            source: segment.source,
+            confidence: segment.confidence,
+            warnings: segment.warnings,
+          }
+        : {}),
     })),
   });
   const bytes = new TextEncoder().encode(value).byteLength;
@@ -169,28 +190,62 @@ export class OpenAiCvParser implements CvParser {
       } catch {
         safeError("PARSER_OUTPUT_INVALID");
       }
-      const output = cvParserOutputSchema.safeParse(value);
-      if (!output.success) safeError("PARSER_OUTPUT_INVALID");
-      if (canonicalParserOutputBytes(output.data) > CV_DRAFT_MAX_BYTES)
+      const parsedV1 = cvParserOutputSchema.safeParse(value);
+      if (!parsedV1.success) safeError("PARSER_OUTPUT_INVALID");
+      const inputVersion = cvParserInputVersion(input);
+      const output =
+        inputVersion === "cv-segments-v2"
+          ? cvParserOutputV2Schema.parse({
+              ...parsedV1.data,
+              schemaVersion: "cv-draft-v2",
+              segmentEvidence: input.segments.flatMap((segment) => {
+                if (!("source" in segment) || !("confidence" in segment))
+                  return [];
+                return [
+                  {
+                    segmentId: segment.id,
+                    sourceMethod: segment.source.method,
+                    sourceLocation:
+                      segment.source.unitKind === "PDF_PAGE"
+                        ? `PDF page ${segment.source.pageNumber}`
+                        : `DOCX body ${segment.source.bodyOrdinal}, image ${
+                            (segment.source.imageOrdinal ?? 0) + 1
+                          }`,
+                    confidenceLevel: segment.confidence.level,
+                    warnings: segment.warnings,
+                  },
+                ];
+              }),
+            })
+          : parsedV1.data;
+      if (!cvParserAnyOutputSchema.safeParse(output).success)
+        safeError("PARSER_OUTPUT_INVALID");
+      if (canonicalParserOutputBytes(output) > CV_DRAFT_MAX_BYTES)
         safeError("PARSER_OUTPUT_LIMIT_EXCEEDED");
       if (
         !validateParserEvidenceMembership(
-          output.data,
+          output,
           new Set(input.segments.map((segment) => segment.id)),
         )
       ) {
         safeError("PARSER_OUTPUT_INVALID");
       }
       return Object.freeze({
-        output: output.data,
+        output,
         providerRequestId: response.id,
         dispatch: Object.freeze({
           parserClass: this.parserClass,
           provider: "openai",
           model: CV_APPROVED_OPENAI_MODEL,
-          inputVersion: "cv-segments-v1" as const,
-          instructionVersion: "cv-extract-v1" as const,
-          schemaVersion: "cv-draft-v1" as const,
+          inputVersion,
+          instructionVersion:
+            inputVersion === "cv-segments-v2"
+              ? ("cv-extract-v2" as const)
+              : ("cv-extract-v1" as const),
+          schemaVersion:
+            inputVersion === "cv-segments-v2"
+              ? ("cv-draft-v2" as const)
+              : ("cv-draft-v1" as const),
         }),
       });
     } catch (error) {

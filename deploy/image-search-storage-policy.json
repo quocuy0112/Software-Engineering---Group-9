@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "image-search-storage-policy-v1",
+  "description": "Allowlist used by the live Feature 005 production-storage preflight.",
+  "workerPolicy": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "ListOnlyImageSearchPrefix",
+        "Effect": "Allow",
+        "Action": ["s3:ListBucket"],
+        "Resource": ["arn:aws:s3:::${IMAGE_SEARCH_S3_BUCKET}"],
+        "Condition": {
+          "StringLike": {
+            "s3:prefix": ["${IMAGE_SEARCH_S3_PREFIX}*"]
+          }
+        }
+      },
+      {
+        "Sid": "ManageOnlyImageSearchObjects",
+        "Effect": "Allow",
+        "Action": [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:AbortMultipartUpload"
+        ],
+        "Resource": [
+          "arn:aws:s3:::${IMAGE_SEARCH_S3_BUCKET}/${IMAGE_SEARCH_S3_PREFIX}*"
+        ]
+      },
+      {
+        "Sid": "UseOnlyImageSearchKmsKey",
+        "Effect": "Allow",
+        "Action": ["kms:Decrypt", "kms:Encrypt", "kms:GenerateDataKey"],
+        "Resource": ["${IMAGE_SEARCH_S3_KMS_KEY_ID}"]
+      }
+    ]
+  },
+  "requiredBucketControls": {
+    "blockPublicAccess": {
+      "BlockPublicAcls": true,
+      "IgnorePublicAcls": true,
+      "BlockPublicPolicy": true,
+      "RestrictPublicBuckets": true
+    },
+    "defaultEncryption": {
+      "SSEAlgorithm": "aws:kms",
+      "BucketKeyEnabled": true
+    },
+    "lifecycle": {
+      "status": "Enabled",
+      "expirationDays": 1,
+      "noncurrentExpirationDays": 1,
+      "abortIncompleteMultipartUploadDays": 1
+    }
+  }
+}

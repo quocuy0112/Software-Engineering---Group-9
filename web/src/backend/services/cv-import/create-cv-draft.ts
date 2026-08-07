@@ -2,7 +2,7 @@ import "server-only";
 
 import { randomUUID } from "node:crypto";
 
-import type { ExtractedSegment } from "@/backend/cv/extraction/document-extractor";
+import type { StoredCvSegment } from "@/backend/cv/extraction/extracted-segment-store";
 import { prisma } from "@/backend/database/prisma";
 import type { Prisma } from "@/backend/generated/prisma/client";
 import {
@@ -19,9 +19,10 @@ import {
 import { canonicalJsonBytes } from "@/shared/contracts/cv-import/common";
 import {
   assertParserOutputWithinLimits,
-  cvParserOutputSchema,
+  cvParserAnyOutputSchema,
   validateParserEvidenceMembership,
-  type CvParserOutput,
+  type CvParserAnyOutput,
+  type CvParserOutputV2,
 } from "@/shared/contracts/cv-import/parser-output";
 
 export class CvDraftCreationError extends Error {
@@ -44,7 +45,7 @@ type DraftWrite = Readonly<{
   uploadId: string;
   parseJobId: string;
   profileId: string;
-  schemaVersion: "cv-draft-v1";
+  schemaVersion: "cv-draft-v1" | "cv-draft-v2";
   revision: 0;
   sourceProfileRevision: number;
   reviewedProfileRevision: number;
@@ -91,19 +92,44 @@ function text(
   return normalized;
 }
 
-function evidence(proposal: {
-  confidence: number | null;
-  sourceSegmentIds: string[];
-}) {
-  return {
+function evidence(
+  proposal: {
+    confidence: number | null;
+    sourceSegmentIds: string[];
+  },
+  segmentEvidence?: ReadonlyMap<
+    string,
+    CvParserOutputV2["segmentEvidence"][number]
+  >,
+) {
+  const sources = proposal.sourceSegmentIds.flatMap((id) => {
+    const value = segmentEvidence?.get(id);
+    return value ? [value] : [];
+  });
+  const base = {
     confidence: proposal.confidence,
     locations: proposal.sourceSegmentIds,
     contextAvailable: false,
     context: null,
   };
+  if (!segmentEvidence) return base;
+  const warnings = [...new Set(sources.flatMap((source) => source.warnings))];
+  return {
+    ...base,
+    sourceMethods: [...new Set(sources.map((source) => source.sourceMethod))],
+    sourceLocations: [
+      ...new Set(sources.map((source) => source.sourceLocation)),
+    ],
+    warnings,
+    reviewRequired:
+      warnings.length > 0 ||
+      sources.some((source) =>
+        ["REVIEW", "LOW"].includes(source.confidenceLevel),
+      ),
+  };
 }
 
-function validateDates(output: CvParserOutput) {
+function validateDates(output: CvParserAnyOutput) {
   for (const [group, values] of [
     ["experiences", output.experiences],
     ["education", output.education],
@@ -123,7 +149,11 @@ function validateDates(output: CvParserOutput) {
   }
 }
 
-function buildPayload(output: CvParserOutput, newId: () => string) {
+function buildPayload(output: CvParserAnyOutput, newId: () => string) {
+  const segmentEvidence =
+    output.schemaVersion === "cv-draft-v2"
+      ? new Map(output.segmentEvidence.map((value) => [value.segmentId, value]))
+      : undefined;
   const provenance: Record<string, ReturnType<typeof evidence>> = {};
   const all: Array<Readonly<{ id: string }>> = [];
   const assign = <
@@ -134,7 +164,7 @@ function buildPayload(output: CvParserOutput, newId: () => string) {
     const proposalId = `proposal_${newId().replaceAll("-", "")}`;
     const item = { id: proposalId };
     all.push(item);
-    provenance[proposalId] = evidence(value);
+    provenance[proposalId] = evidence(value, segmentEvidence);
     return proposalId;
   };
   const scalars = Object.entries(output.scalars).flatMap(
@@ -346,13 +376,13 @@ export class CreateCvDraftService {
     profileId: string;
     sourceProfileRevision: number;
     output: unknown;
-    segments: readonly ExtractedSegment[];
+    segments: readonly StoredCvSegment[];
     expiresAt: Date;
     commitGuard?: DraftCommitGuard;
     dispatchEvidence?: DraftDispatchEvidence;
   }): Promise<DraftWrite> {
     try {
-      const output = cvParserOutputSchema.parse(input.output);
+      const output = cvParserAnyOutputSchema.parse(input.output);
       const available = new Set(input.segments.map((segment) => segment.id));
       if (!validateParserEvidenceMembership(output, available))
         throw new CvDraftCreationError("PARSER_OUTPUT_INVALID");
@@ -367,7 +397,7 @@ export class CreateCvDraftService {
         uploadId: input.uploadId,
         parseJobId: input.parseJobId,
         profileId: input.profileId,
-        schemaVersion: "cv-draft-v1" as const,
+        schemaVersion: output.schemaVersion,
         revision: 0 as const,
         sourceProfileRevision: input.sourceProfileRevision,
         reviewedProfileRevision: input.sourceProfileRevision,

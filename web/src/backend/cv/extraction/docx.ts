@@ -106,6 +106,7 @@ function inspectXml(filename: string, xml: Buffer) {
 export async function extractDocx(
   source: Uint8Array,
   limits: Limits,
+  options: Readonly<{ allowEmptyText?: boolean }> = {},
 ): Promise<ExtractionChildResult> {
   if (source[0] !== 0x50 || source[1] !== 0x4b)
     throw new DocumentExtractionError("MALFORMED_ZIP");
@@ -178,7 +179,8 @@ export async function extractDocx(
     .split(/\r?\n+/u)
     .map((value) => value.replace(/\s+/gu, " ").trim())
     .filter(Boolean);
-  if (!paragraphs.length) throw new DocumentExtractionError("EMPTY_TEXT");
+  if (!paragraphs.length && !options.allowEmptyText)
+    throw new DocumentExtractionError("EMPTY_TEXT");
   let outputBytes = 0;
   const segments = paragraphs.map((text, index) => {
     outputBytes += Buffer.byteLength(text, "utf8");

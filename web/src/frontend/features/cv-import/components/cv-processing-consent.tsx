@@ -32,12 +32,10 @@ export function CvProcessingConsent({
   const noticeText = cvProcessingNoticeText(locale, "EXTERNAL_OPENAI");
   const heading = useRef<HTMLHeadingElement>(null);
   const activeAction = useRef<ConsentAction | null>(null);
-  const [acceptance, setAcceptance] = useState({
-    challenge: notice.consentChallenge,
-    accepted: false,
-  });
-  const accepted =
-    acceptance.challenge === notice.consentChallenge && acceptance.accepted;
+  // Status polling refreshes the short-lived signed challenge. That refresh
+  // must not undo the Candidate's visible checkbox choice; grant() still sends
+  // the newest challenge received from the server.
+  const [accepted, setAccepted] = useState(false);
   const [busy, setBusy] = useState<ConsentAction | null>(null);
   const [feedbackTone, setFeedbackTone] = useState<
     "neutral" | "pending" | "success" | "error"
@@ -59,13 +57,11 @@ export function CvProcessingConsent({
         accepted: true,
         consentChallenge: notice.consentChallenge,
       });
-      setAcceptance({
-        challenge: notice.consentChallenge,
-        accepted: false,
-      });
+
+      setAccepted(false);
       setMessage(copy.granted);
       setFeedbackTone("success");
-    } catch (cause) {
+  } catch (cause) { {
       const expired =
         cause instanceof Error && cause.message === "CV_SESSION_EXPIRED";
       setSessionExpired(expired);
@@ -163,16 +159,12 @@ export function CvProcessingConsent({
               type="checkbox"
               checked={accepted}
               disabled={!canGrant || Boolean(busy) || sessionExpired}
-              onChange={(event) =>
-                setAcceptance({
-                  challenge: notice.consentChallenge,
-                  accepted: event.currentTarget.checked,
-                })
-              }
+              onChange={(event) => setAccepted(event.currentTarget.checked)}
             />
             <span>{locale === "vi" ? copy.agree : notice.noticeText}</span>
           </label>
           <button
+            className={styles.grantButton}
             type="button"
             disabled={!canGrant || !accepted || Boolean(busy) || sessionExpired}
             aria-busy={busy === "grant"}

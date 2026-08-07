@@ -9,7 +9,7 @@ if (!npmCli) throw new Error("npm_execpath is required");
 const children = new Map();
 let shutdownPromise;
 
-function startProcess(name, executable, args) {
+function startProcess(name, executable, args, fatal = true) {
   const child = spawn(executable, args, {
     stdio: "inherit",
     windowsHide: true,
@@ -20,10 +20,20 @@ function startProcess(name, executable, args) {
     console.error(
       `[dev] ${name} failed to start: ${error.code ?? "PROCESS_START_FAILED"}`,
     );
-    void shutdown(1, `${name} failed to start`);
+    if (fatal) void shutdown(1, `${name} failed to start`);
+    else
+      console.error(
+        `[dev] ${name} is unavailable; native CV import and ordinary search remain active`,
+      );
   });
   child.once("exit", (code, signal) => {
     if (!shutdownPromise) {
+      if (!fatal) {
+        console.error(
+          `[dev] ${name} stopped (${signal ?? `code ${code ?? "unknown"}`}); continuing with reduced OCR/image-search capability`,
+        );
+        return;
+      }
       const exitCode = typeof code === "number" && code !== 0 ? code : 1;
       console.error(
         `[dev] ${name} exited unexpectedly (${signal ?? `code ${code ?? "unknown"}`})`,
@@ -85,7 +95,14 @@ async function shutdown(exitCode, reason) {
     console.log(`[dev] shutting down (${reason})`);
     const composeStop = spawn(
       "docker",
-      ["compose", "stop", "cv-worker", "clamav"],
+      [
+        "compose",
+        "stop",
+        "cv-worker",
+        "image-search-worker",
+        "ocr-engine",
+        "clamav",
+      ],
       { stdio: "inherit", windowsHide: true },
     );
     await waitForExit(composeStop);
@@ -121,5 +138,11 @@ startProcess("CV worker and scanner", "docker", [
   "clamav",
   "cv-worker",
 ]);
+startProcess(
+  "OCR and image-search workers",
+  "docker",
+  ["compose", "up", "--build", "ocr-engine", "image-search-worker"],
+  false,
+);
 start("web", "dev:web");
 start("email worker", "email:worker");

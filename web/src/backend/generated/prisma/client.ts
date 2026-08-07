@@ -256,3 +256,55 @@ export type CvProcessingConsent = Prisma.CvProcessingConsentModel
  * 
  */
 export type CvImportConfirmation = Prisma.CvImportConfirmationModel
+/**
+ * Model OcrProcessingAttempt
+ * 
+ */
+export type OcrProcessingAttempt = Prisma.OcrProcessingAttemptModel
+/**
+ * Model OcrUnitOutcome
+ * 
+ */
+export type OcrUnitOutcome = Prisma.OcrUnitOutcomeModel
+/**
+ * Model SearchImageQuery
+ * 
+ */
+export type SearchImageQuery = Prisma.SearchImageQueryModel
+/**
+ * Model SearchStoredArtifact
+ * 
+ */
+export type SearchStoredArtifact = Prisma.SearchStoredArtifactModel
+/**
+ * Model SearchScanAssessment
+ * 
+ */
+export type SearchScanAssessment = Prisma.SearchScanAssessmentModel
+/**
+ * Model SearchImageDecodeAttempt
+ * 
+ */
+export type SearchImageDecodeAttempt = Prisma.SearchImageDecodeAttemptModel
+/**
+ * Model SearchIntentAttempt
+ * 
+ */
+export type SearchIntentAttempt = Prisma.SearchIntentAttemptModel
+/**
+ * Model SearchProcessingConsent
+ * 
+ */
+export type SearchProcessingConsent = Prisma.SearchProcessingConsentModel
+/**
+ * Model ImageSearchAdmissionEvent
+ * 
+ */
+export type ImageSearchAdmissionEvent = Prisma.ImageSearchAdmissionEventModel
+/**
+ * Model ImageSearchOperationalEvidence
+ * Content-free, cross-process readiness evidence. Web admission reads these
+ * rows; only cleanup, reconciliation, and the production preflight writer may
+ * refresh their respective component.
+ */
+export type ImageSearchOperationalEvidence = Prisma.ImageSearchOperationalEvidenceModel

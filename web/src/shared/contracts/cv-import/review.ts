@@ -33,6 +33,24 @@ export const cvEvidenceSchema = z
       .refine((values) => new Set(values).size === values.length),
     contextAvailable: z.boolean(),
     context: z.string().max(500).nullable(),
+    sourceMethods: z
+      .array(z.enum(["NATIVE", "OCR", "NATIVE_AND_OCR"]))
+      .max(3)
+      .optional(),
+    sourceLocations: z.array(z.string().min(1).max(160)).max(20).optional(),
+    warnings: z
+      .array(
+        z.enum([
+          "LOW_CONFIDENCE",
+          "MATERIAL_NATIVE_OCR_CONFLICT",
+          "APPROXIMATE_ANCHOR",
+          "PARTIAL_UNIT_TEXT",
+          "DEDUPLICATED_WITH_NATIVE",
+        ]),
+      )
+      .max(8)
+      .optional(),
+    reviewRequired: z.boolean().optional(),
   })
   .strict()
   .superRefine((value, context) => {

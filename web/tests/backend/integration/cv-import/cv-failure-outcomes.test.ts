@@ -345,7 +345,17 @@ describe.sequential("CV terminal failure outcomes", () => {
         parserClass: "DETERMINISTIC_INTERNAL" as const,
         parse: vi.fn(async () => {
           if (failureAt === "parser") throw new Error(expectedCode);
-          return { output: {}, dispatch: {} };
+          return {
+            output: {},
+            dispatch: {
+              parserClass: "DETERMINISTIC_INTERNAL" as const,
+              provider: "smarthire",
+              model: "deterministic-v1",
+              inputVersion: "cv-segments-v1" as const,
+              instructionVersion: "cv-extract-v1" as const,
+              schemaVersion: "cv-draft-v1" as const,
+            },
+          };
         }),
       };
       const drafts = {

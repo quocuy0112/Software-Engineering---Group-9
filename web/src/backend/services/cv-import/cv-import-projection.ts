@@ -58,12 +58,14 @@ function safeFilename(
   }
 }
 
-function stage(status: CvUploadStatus) {
+function stage(status: CvUploadStatus, ocrStatus?: string) {
   if (status === "AWAITING_CONTENT") return "UPLOAD" as const;
   if (status === "VALIDATION_QUEUED") return "VALIDATE" as const;
   if (status === "SCAN_QUEUED" || status === "SCANNING") return "SCAN" as const;
   if (status === "EXTRACTION_QUEUED" || status === "EXTRACTING")
-    return "EXTRACT" as const;
+    return ["QUEUED", "PROCESSING"].includes(ocrStatus ?? "")
+      ? ("OCR" as const)
+      : ("EXTRACT" as const);
   if (status === "AWAITING_CONSENT") return "CONSENT" as const;
   if (status === "PARSE_QUEUED" || status === "PARSING")
     return "PARSE" as const;
@@ -130,7 +132,9 @@ function failureFor(
   const code = stored && isSafeFailureCode(stored) ? stored : fallback[status];
   if (!code) return null;
   const retryState =
-    status === "SCAN_FAILED" || status === "PARSE_FAILED"
+    status === "SCAN_FAILED" ||
+    status === "EXTRACTION_FAILED" ||
+    status === "PARSE_FAILED"
       ? {
           status,
           failureCode: code,
@@ -207,6 +211,24 @@ export async function getCvImportResource(accountId: string, uploadId: string) {
       deleteAfter: true,
       deletedAt: true,
       draft: { select: { id: true, revision: true, accountId: true } },
+      extractions: {
+        orderBy: { attemptNumber: "desc" },
+        take: 1,
+        select: {
+          ocrAttempt: {
+            select: {
+              status: true,
+              inputUnitCount: true,
+              succeededUnitCount: true,
+              reviewUnitCount: true,
+              failedUnitCount: true,
+              units: {
+                select: { status: true, materialConflict: true },
+              },
+            },
+          },
+        },
+      },
       confirmation: {
         select: {
           id: true,
@@ -253,6 +275,7 @@ export async function getCvImportResource(accountId: string, uploadId: string) {
     parseRetriesRemaining,
   });
   const confirmation = row.confirmation;
+  const ocr = row.extractions[0]?.ocrAttempt ?? null;
   return cvImportResourceSchema.parse({
     uploadId: row.id,
     displayFilename: safeFilename(row.displayFilenameCiphertext, {
@@ -262,7 +285,7 @@ export async function getCvImportResource(accountId: string, uploadId: string) {
     documentKind: row.documentKind,
     parserClass: row.parserClass,
     status: row.status,
-    stage: stage(row.status),
+    stage: stage(row.status, ocr?.status),
     availableActions: actions({
       status: row.status,
       retryAvailable: failure?.retryable ?? false,
@@ -277,6 +300,18 @@ export async function getCvImportResource(accountId: string, uploadId: string) {
           draftId: row.draft.id,
           revision: row.draft.revision,
           reviewUrl: `/profile/cv-imports/${row.id}/review`,
+        }
+      : null,
+    ocr: ocr
+      ? {
+          status: ocr.status,
+          accountedUnitCount: ocr.units.length,
+          totalUnitCount: ocr.inputUnitCount,
+          lowConfidenceUnitCount: ocr.units.filter(
+            (unit) => unit.status === "LOW_CONFIDENCE",
+          ).length,
+          conflictUnitCount: ocr.units.filter((unit) => unit.materialConflict)
+            .length,
         }
       : null,
     processingNotice: cvProcessingNotice(row.parserClass),

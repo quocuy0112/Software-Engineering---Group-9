@@ -1,8 +1,13 @@
 import { extractDocx } from "./docx";
+import { createDocxOcrManifest } from "./docx-ocr-manifest";
 import { extractPdf } from "./pdf";
+import { createPdfOcrManifest } from "./pdf-ocr-manifest";
+import { PrivateRasterWorkspace } from "./private-raster-workspace";
 import type { ExtractionChildRequest } from "./document-extractor";
 
 async function main(): Promise<void> {
+  let workspace: PrivateRasterWorkspace | undefined;
+  let keepWorkspace = false;
   try {
     const chunks: Buffer[] = [];
     for await (const chunk of process.stdin) chunks.push(Buffer.from(chunk));
@@ -14,10 +19,45 @@ async function main(): Promise<void> {
     const source = Buffer.from(raw.source, "base64");
     if (source.byteLength > 5_000_000)
       throw Object.assign(new Error(), { code: "OUTPUT_LIMIT" });
-    const value =
-      raw.kind === "PDF"
-        ? await extractPdf(source, raw.limits)
-        : await extractDocx(source, raw.limits);
+    workspace = await PrivateRasterWorkspace.create();
+    let value;
+    if (raw.kind === "PDF") {
+      const manifest = await createPdfOcrManifest({ source, workspace });
+      const hybrid = manifest.eligibleImageCount > 0;
+      if (hybrid) {
+        keepWorkspace = true;
+        value = {
+          segments: manifest.units.flatMap((unit) => unit.nativeSegments),
+          pageCount: manifest.pageCount,
+          entryCount: null,
+          expandedBytes: manifest.expandedBytes,
+          manifest,
+          privateRasterWorkspacePath: workspace.path,
+        };
+      } else {
+        value = await extractPdf(source, raw.limits);
+      }
+    } else {
+      const built = await createDocxOcrManifest({
+        source,
+        workspace,
+        limits: raw.limits,
+      });
+      const hybrid = built.manifest.eligibleImageCount > 0;
+      if (hybrid) {
+        keepWorkspace = true;
+        value = {
+          segments: built.nativeSegments,
+          pageCount: null,
+          entryCount: built.manifest.entryCount,
+          expandedBytes: built.manifest.expandedBytes,
+          manifest: built.manifest,
+          privateRasterWorkspacePath: workspace.path,
+        };
+      } else {
+        value = await extractDocx(source, raw.limits);
+      }
+    }
     process.stdout.write(JSON.stringify({ ok: true, value }));
   } catch (error) {
     const code =
@@ -28,6 +68,8 @@ async function main(): Promise<void> {
         : "EXTRACTION_FAILED";
     process.stdout.write(JSON.stringify({ ok: false, code }));
     process.exitCode = 1;
+  } finally {
+    if (!keepWorkspace) await workspace?.dispose();
   }
 }
 

@@ -12,6 +12,9 @@
 *.prisma text eol=lf
 *.sh text eol=lf
 
+# Prisma's checked-in generator emits JSDoc padding spaces; preserve generated output.
+web/src/backend/generated/prisma/** whitespace=-trailing-space
+
 *.ps1 text eol=crlf
 *.bat text eol=crlf
 *.cmd text eol=crlf

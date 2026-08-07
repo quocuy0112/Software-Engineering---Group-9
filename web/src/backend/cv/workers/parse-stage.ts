@@ -341,6 +341,13 @@ export class ParseStageProcessor {
         }),
         context.signal,
       );
+      if (
+        result.dispatch.parserClass !== work.parserClass ||
+        result.dispatch.provider !== work.provider ||
+        result.dispatch.model !== work.model ||
+        result.dispatch.schemaVersion !== work.schemaVersion
+      )
+        throw new Error("PARSER_OUTPUT_INVALID");
       await this.assertResultCommitAllowed(claim, context);
       await this.dependencies.drafts.execute({
         accountId: work.accountId,

@@ -33,6 +33,11 @@ export type CvExtractionAvgAggregateOutputType = {
   expandedBytes: number | null
   segmentCount: number | null
   extractedUtf8Bytes: number | null
+  nativeSegmentCount: number | null
+  ocrSegmentCount: number | null
+  accountedUnitCount: number | null
+  lowConfidenceUnitCount: number | null
+  conflictUnitCount: number | null
 }
 
 export type CvExtractionSumAggregateOutputType = {
@@ -42,6 +47,11 @@ export type CvExtractionSumAggregateOutputType = {
   expandedBytes: number | null
   segmentCount: number | null
   extractedUtf8Bytes: number | null
+  nativeSegmentCount: number | null
+  ocrSegmentCount: number | null
+  accountedUnitCount: number | null
+  lowConfidenceUnitCount: number | null
+  conflictUnitCount: number | null
 }
 
 export type CvExtractionMinAggregateOutputType = {
@@ -61,6 +71,15 @@ export type CvExtractionMinAggregateOutputType = {
   expandedBytes: number | null
   segmentCount: number | null
   extractedUtf8Bytes: number | null
+  segmentSchemaVersion: string | null
+  eligibilityPolicyVersion: string | null
+  deduplicationPolicyVersion: string | null
+  confidencePolicyVersion: string | null
+  nativeSegmentCount: number | null
+  ocrSegmentCount: number | null
+  accountedUnitCount: number | null
+  lowConfidenceUnitCount: number | null
+  conflictUnitCount: number | null
   failureCode: string | null
   leaseOwner: string | null
   leaseExpiresAt: Date | null
@@ -86,6 +105,15 @@ export type CvExtractionMaxAggregateOutputType = {
   expandedBytes: number | null
   segmentCount: number | null
   extractedUtf8Bytes: number | null
+  segmentSchemaVersion: string | null
+  eligibilityPolicyVersion: string | null
+  deduplicationPolicyVersion: string | null
+  confidencePolicyVersion: string | null
+  nativeSegmentCount: number | null
+  ocrSegmentCount: number | null
+  accountedUnitCount: number | null
+  lowConfidenceUnitCount: number | null
+  conflictUnitCount: number | null
   failureCode: string | null
   leaseOwner: string | null
   leaseExpiresAt: Date | null
@@ -111,6 +139,15 @@ export type CvExtractionCountAggregateOutputType = {
   expandedBytes: number
   segmentCount: number
   extractedUtf8Bytes: number
+  segmentSchemaVersion: number
+  eligibilityPolicyVersion: number
+  deduplicationPolicyVersion: number
+  confidencePolicyVersion: number
+  nativeSegmentCount: number
+  ocrSegmentCount: number
+  accountedUnitCount: number
+  lowConfidenceUnitCount: number
+  conflictUnitCount: number
   failureCode: number
   leaseOwner: number
   leaseExpiresAt: number
@@ -128,6 +165,11 @@ export type CvExtractionAvgAggregateInputType = {
   expandedBytes?: true
   segmentCount?: true
   extractedUtf8Bytes?: true
+  nativeSegmentCount?: true
+  ocrSegmentCount?: true
+  accountedUnitCount?: true
+  lowConfidenceUnitCount?: true
+  conflictUnitCount?: true
 }
 
 export type CvExtractionSumAggregateInputType = {
@@ -137,6 +179,11 @@ export type CvExtractionSumAggregateInputType = {
   expandedBytes?: true
   segmentCount?: true
   extractedUtf8Bytes?: true
+  nativeSegmentCount?: true
+  ocrSegmentCount?: true
+  accountedUnitCount?: true
+  lowConfidenceUnitCount?: true
+  conflictUnitCount?: true
 }
 
 export type CvExtractionMinAggregateInputType = {
@@ -156,6 +203,15 @@ export type CvExtractionMinAggregateInputType = {
   expandedBytes?: true
   segmentCount?: true
   extractedUtf8Bytes?: true
+  segmentSchemaVersion?: true
+  eligibilityPolicyVersion?: true
+  deduplicationPolicyVersion?: true
+  confidencePolicyVersion?: true
+  nativeSegmentCount?: true
+  ocrSegmentCount?: true
+  accountedUnitCount?: true
+  lowConfidenceUnitCount?: true
+  conflictUnitCount?: true
   failureCode?: true
   leaseOwner?: true
   leaseExpiresAt?: true
@@ -181,6 +237,15 @@ export type CvExtractionMaxAggregateInputType = {
   expandedBytes?: true
   segmentCount?: true
   extractedUtf8Bytes?: true
+  segmentSchemaVersion?: true
+  eligibilityPolicyVersion?: true
+  deduplicationPolicyVersion?: true
+  confidencePolicyVersion?: true
+  nativeSegmentCount?: true
+  ocrSegmentCount?: true
+  accountedUnitCount?: true
+  lowConfidenceUnitCount?: true
+  conflictUnitCount?: true
   failureCode?: true
   leaseOwner?: true
   leaseExpiresAt?: true
@@ -206,6 +271,15 @@ export type CvExtractionCountAggregateInputType = {
   expandedBytes?: true
   segmentCount?: true
   extractedUtf8Bytes?: true
+  segmentSchemaVersion?: true
+  eligibilityPolicyVersion?: true
+  deduplicationPolicyVersion?: true
+  confidencePolicyVersion?: true
+  nativeSegmentCount?: true
+  ocrSegmentCount?: true
+  accountedUnitCount?: true
+  lowConfidenceUnitCount?: true
+  conflictUnitCount?: true
   failureCode?: true
   leaseOwner?: true
   leaseExpiresAt?: true
@@ -318,6 +392,15 @@ export type CvExtractionGroupByOutputType = {
   expandedBytes: number | null
   segmentCount: number | null
   extractedUtf8Bytes: number | null
+  segmentSchemaVersion: string | null
+  eligibilityPolicyVersion: string | null
+  deduplicationPolicyVersion: string | null
+  confidencePolicyVersion: string | null
+  nativeSegmentCount: number | null
+  ocrSegmentCount: number | null
+  accountedUnitCount: number | null
+  lowConfidenceUnitCount: number | null
+  conflictUnitCount: number | null
   failureCode: string | null
   leaseOwner: string | null
   leaseExpiresAt: Date | null
@@ -366,6 +449,15 @@ export type CvExtractionWhereInput = {
   expandedBytes?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
   segmentCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
   extractedUtf8Bytes?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
+  segmentSchemaVersion?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
+  eligibilityPolicyVersion?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
+  deduplicationPolicyVersion?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
+  confidencePolicyVersion?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
+  nativeSegmentCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
+  ocrSegmentCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
+  accountedUnitCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
+  lowConfidenceUnitCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
+  conflictUnitCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
   failureCode?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
   leaseOwner?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
   leaseExpiresAt?: Prisma.DateTimeNullableFilter<"CvExtraction"> | Date | string | null
@@ -378,6 +470,7 @@ export type CvExtractionWhereInput = {
   account?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   outputArtifact?: Prisma.XOR<Prisma.CvStoredArtifactNullableScalarRelationFilter, Prisma.CvStoredArtifactWhereInput> | null
   parseJobs?: Prisma.CvParseJobListRelationFilter
+  ocrAttempt?: Prisma.XOR<Prisma.OcrProcessingAttemptNullableScalarRelationFilter, Prisma.OcrProcessingAttemptWhereInput> | null
 }
 
 export type CvExtractionOrderByWithRelationInput = {
@@ -397,6 +490,15 @@ export type CvExtractionOrderByWithRelationInput = {
   expandedBytes?: Prisma.SortOrderInput | Prisma.SortOrder
   segmentCount?: Prisma.SortOrderInput | Prisma.SortOrder
   extractedUtf8Bytes?: Prisma.SortOrderInput | Prisma.SortOrder
+  segmentSchemaVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  eligibilityPolicyVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  deduplicationPolicyVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  confidencePolicyVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  nativeSegmentCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  ocrSegmentCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  accountedUnitCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  lowConfidenceUnitCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  conflictUnitCount?: Prisma.SortOrderInput | Prisma.SortOrder
   failureCode?: Prisma.SortOrderInput | Prisma.SortOrder
   leaseOwner?: Prisma.SortOrderInput | Prisma.SortOrder
   leaseExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -409,6 +511,7 @@ export type CvExtractionOrderByWithRelationInput = {
   account?: Prisma.UserAccountOrderByWithRelationInput
   outputArtifact?: Prisma.CvStoredArtifactOrderByWithRelationInput
   parseJobs?: Prisma.CvParseJobOrderByRelationAggregateInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptOrderByWithRelationInput
 }
 
 export type CvExtractionWhereUniqueInput = Prisma.AtLeast<{
@@ -432,6 +535,15 @@ export type CvExtractionWhereUniqueInput = Prisma.AtLeast<{
   expandedBytes?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
   segmentCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
   extractedUtf8Bytes?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
+  segmentSchemaVersion?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
+  eligibilityPolicyVersion?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
+  deduplicationPolicyVersion?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
+  confidencePolicyVersion?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
+  nativeSegmentCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
+  ocrSegmentCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
+  accountedUnitCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
+  lowConfidenceUnitCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
+  conflictUnitCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
   failureCode?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
   leaseOwner?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
   leaseExpiresAt?: Prisma.DateTimeNullableFilter<"CvExtraction"> | Date | string | null
@@ -444,6 +556,7 @@ export type CvExtractionWhereUniqueInput = Prisma.AtLeast<{
   account?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   outputArtifact?: Prisma.XOR<Prisma.CvStoredArtifactNullableScalarRelationFilter, Prisma.CvStoredArtifactWhereInput> | null
   parseJobs?: Prisma.CvParseJobListRelationFilter
+  ocrAttempt?: Prisma.XOR<Prisma.OcrProcessingAttemptNullableScalarRelationFilter, Prisma.OcrProcessingAttemptWhereInput> | null
 }, "id" | "outputArtifactId" | "uploadId_attemptNumber">
 
 export type CvExtractionOrderByWithAggregationInput = {
@@ -463,6 +576,15 @@ export type CvExtractionOrderByWithAggregationInput = {
   expandedBytes?: Prisma.SortOrderInput | Prisma.SortOrder
   segmentCount?: Prisma.SortOrderInput | Prisma.SortOrder
   extractedUtf8Bytes?: Prisma.SortOrderInput | Prisma.SortOrder
+  segmentSchemaVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  eligibilityPolicyVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  deduplicationPolicyVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  confidencePolicyVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  nativeSegmentCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  ocrSegmentCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  accountedUnitCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  lowConfidenceUnitCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  conflictUnitCount?: Prisma.SortOrderInput | Prisma.SortOrder
   failureCode?: Prisma.SortOrderInput | Prisma.SortOrder
   leaseOwner?: Prisma.SortOrderInput | Prisma.SortOrder
   leaseExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -496,6 +618,15 @@ export type CvExtractionScalarWhereWithAggregatesInput = {
   expandedBytes?: Prisma.IntNullableWithAggregatesFilter<"CvExtraction"> | number | null
   segmentCount?: Prisma.IntNullableWithAggregatesFilter<"CvExtraction"> | number | null
   extractedUtf8Bytes?: Prisma.IntNullableWithAggregatesFilter<"CvExtraction"> | number | null
+  segmentSchemaVersion?: Prisma.StringNullableWithAggregatesFilter<"CvExtraction"> | string | null
+  eligibilityPolicyVersion?: Prisma.StringNullableWithAggregatesFilter<"CvExtraction"> | string | null
+  deduplicationPolicyVersion?: Prisma.StringNullableWithAggregatesFilter<"CvExtraction"> | string | null
+  confidencePolicyVersion?: Prisma.StringNullableWithAggregatesFilter<"CvExtraction"> | string | null
+  nativeSegmentCount?: Prisma.IntNullableWithAggregatesFilter<"CvExtraction"> | number | null
+  ocrSegmentCount?: Prisma.IntNullableWithAggregatesFilter<"CvExtraction"> | number | null
+  accountedUnitCount?: Prisma.IntNullableWithAggregatesFilter<"CvExtraction"> | number | null
+  lowConfidenceUnitCount?: Prisma.IntNullableWithAggregatesFilter<"CvExtraction"> | number | null
+  conflictUnitCount?: Prisma.IntNullableWithAggregatesFilter<"CvExtraction"> | number | null
   failureCode?: Prisma.StringNullableWithAggregatesFilter<"CvExtraction"> | string | null
   leaseOwner?: Prisma.StringNullableWithAggregatesFilter<"CvExtraction"> | string | null
   leaseExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"CvExtraction"> | Date | string | null
@@ -516,6 +647,15 @@ export type CvExtractionCreateInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -528,6 +668,7 @@ export type CvExtractionCreateInput = {
   account: Prisma.UserAccountCreateNestedOneWithoutCvExtractionsInput
   outputArtifact?: Prisma.CvStoredArtifactCreateNestedOneWithoutExtractionOutputInput
   parseJobs?: Prisma.CvParseJobCreateNestedManyWithoutExtractionInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptCreateNestedOneWithoutCvExtractionInput
 }
 
 export type CvExtractionUncheckedCreateInput = {
@@ -547,6 +688,15 @@ export type CvExtractionUncheckedCreateInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -554,6 +704,7 @@ export type CvExtractionUncheckedCreateInput = {
   completedAt?: Date | string | null
   createdAt?: Date | string
   parseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutExtractionInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUncheckedCreateNestedOneWithoutCvExtractionInput
 }
 
 export type CvExtractionUpdateInput = {
@@ -568,6 +719,15 @@ export type CvExtractionUpdateInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -580,6 +740,7 @@ export type CvExtractionUpdateInput = {
   account?: Prisma.UserAccountUpdateOneRequiredWithoutCvExtractionsNestedInput
   outputArtifact?: Prisma.CvStoredArtifactUpdateOneWithoutExtractionOutputNestedInput
   parseJobs?: Prisma.CvParseJobUpdateManyWithoutExtractionNestedInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUpdateOneWithoutCvExtractionNestedInput
 }
 
 export type CvExtractionUncheckedUpdateInput = {
@@ -599,6 +760,15 @@ export type CvExtractionUncheckedUpdateInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -606,6 +776,7 @@ export type CvExtractionUncheckedUpdateInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   parseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutExtractionNestedInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUncheckedUpdateOneWithoutCvExtractionNestedInput
 }
 
 export type CvExtractionCreateManyInput = {
@@ -625,6 +796,15 @@ export type CvExtractionCreateManyInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -645,6 +825,15 @@ export type CvExtractionUpdateManyMutationInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -670,6 +859,15 @@ export type CvExtractionUncheckedUpdateManyInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -715,6 +913,15 @@ export type CvExtractionCountOrderByAggregateInput = {
   expandedBytes?: Prisma.SortOrder
   segmentCount?: Prisma.SortOrder
   extractedUtf8Bytes?: Prisma.SortOrder
+  segmentSchemaVersion?: Prisma.SortOrder
+  eligibilityPolicyVersion?: Prisma.SortOrder
+  deduplicationPolicyVersion?: Prisma.SortOrder
+  confidencePolicyVersion?: Prisma.SortOrder
+  nativeSegmentCount?: Prisma.SortOrder
+  ocrSegmentCount?: Prisma.SortOrder
+  accountedUnitCount?: Prisma.SortOrder
+  lowConfidenceUnitCount?: Prisma.SortOrder
+  conflictUnitCount?: Prisma.SortOrder
   failureCode?: Prisma.SortOrder
   leaseOwner?: Prisma.SortOrder
   leaseExpiresAt?: Prisma.SortOrder
@@ -730,6 +937,11 @@ export type CvExtractionAvgOrderByAggregateInput = {
   expandedBytes?: Prisma.SortOrder
   segmentCount?: Prisma.SortOrder
   extractedUtf8Bytes?: Prisma.SortOrder
+  nativeSegmentCount?: Prisma.SortOrder
+  ocrSegmentCount?: Prisma.SortOrder
+  accountedUnitCount?: Prisma.SortOrder
+  lowConfidenceUnitCount?: Prisma.SortOrder
+  conflictUnitCount?: Prisma.SortOrder
 }
 
 export type CvExtractionMaxOrderByAggregateInput = {
@@ -749,6 +961,15 @@ export type CvExtractionMaxOrderByAggregateInput = {
   expandedBytes?: Prisma.SortOrder
   segmentCount?: Prisma.SortOrder
   extractedUtf8Bytes?: Prisma.SortOrder
+  segmentSchemaVersion?: Prisma.SortOrder
+  eligibilityPolicyVersion?: Prisma.SortOrder
+  deduplicationPolicyVersion?: Prisma.SortOrder
+  confidencePolicyVersion?: Prisma.SortOrder
+  nativeSegmentCount?: Prisma.SortOrder
+  ocrSegmentCount?: Prisma.SortOrder
+  accountedUnitCount?: Prisma.SortOrder
+  lowConfidenceUnitCount?: Prisma.SortOrder
+  conflictUnitCount?: Prisma.SortOrder
   failureCode?: Prisma.SortOrder
   leaseOwner?: Prisma.SortOrder
   leaseExpiresAt?: Prisma.SortOrder
@@ -774,6 +995,15 @@ export type CvExtractionMinOrderByAggregateInput = {
   expandedBytes?: Prisma.SortOrder
   segmentCount?: Prisma.SortOrder
   extractedUtf8Bytes?: Prisma.SortOrder
+  segmentSchemaVersion?: Prisma.SortOrder
+  eligibilityPolicyVersion?: Prisma.SortOrder
+  deduplicationPolicyVersion?: Prisma.SortOrder
+  confidencePolicyVersion?: Prisma.SortOrder
+  nativeSegmentCount?: Prisma.SortOrder
+  ocrSegmentCount?: Prisma.SortOrder
+  accountedUnitCount?: Prisma.SortOrder
+  lowConfidenceUnitCount?: Prisma.SortOrder
+  conflictUnitCount?: Prisma.SortOrder
   failureCode?: Prisma.SortOrder
   leaseOwner?: Prisma.SortOrder
   leaseExpiresAt?: Prisma.SortOrder
@@ -789,6 +1019,11 @@ export type CvExtractionSumOrderByAggregateInput = {
   expandedBytes?: Prisma.SortOrder
   segmentCount?: Prisma.SortOrder
   extractedUtf8Bytes?: Prisma.SortOrder
+  nativeSegmentCount?: Prisma.SortOrder
+  ocrSegmentCount?: Prisma.SortOrder
+  accountedUnitCount?: Prisma.SortOrder
+  lowConfidenceUnitCount?: Prisma.SortOrder
+  conflictUnitCount?: Prisma.SortOrder
 }
 
 export type CvExtractionScalarRelationFilter = {
@@ -1014,6 +1249,22 @@ export type CvExtractionUpdateOneRequiredWithoutParseJobsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CvExtractionUpdateToOneWithWhereWithoutParseJobsInput, Prisma.CvExtractionUpdateWithoutParseJobsInput>, Prisma.CvExtractionUncheckedUpdateWithoutParseJobsInput>
 }
 
+export type CvExtractionCreateNestedOneWithoutOcrAttemptInput = {
+  create?: Prisma.XOR<Prisma.CvExtractionCreateWithoutOcrAttemptInput, Prisma.CvExtractionUncheckedCreateWithoutOcrAttemptInput>
+  connectOrCreate?: Prisma.CvExtractionCreateOrConnectWithoutOcrAttemptInput
+  connect?: Prisma.CvExtractionWhereUniqueInput
+}
+
+export type CvExtractionUpdateOneWithoutOcrAttemptNestedInput = {
+  create?: Prisma.XOR<Prisma.CvExtractionCreateWithoutOcrAttemptInput, Prisma.CvExtractionUncheckedCreateWithoutOcrAttemptInput>
+  connectOrCreate?: Prisma.CvExtractionCreateOrConnectWithoutOcrAttemptInput
+  upsert?: Prisma.CvExtractionUpsertWithoutOcrAttemptInput
+  disconnect?: Prisma.CvExtractionWhereInput | boolean
+  delete?: Prisma.CvExtractionWhereInput | boolean
+  connect?: Prisma.CvExtractionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CvExtractionUpdateToOneWithWhereWithoutOcrAttemptInput, Prisma.CvExtractionUpdateWithoutOcrAttemptInput>, Prisma.CvExtractionUncheckedUpdateWithoutOcrAttemptInput>
+}
+
 export type CvExtractionCreateWithoutAccountInput = {
   id?: string
   attemptNumber: number
@@ -1026,6 +1277,15 @@ export type CvExtractionCreateWithoutAccountInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -1037,6 +1297,7 @@ export type CvExtractionCreateWithoutAccountInput = {
   scanAssessment: Prisma.CvScanAssessmentCreateNestedOneWithoutExtractionsInput
   outputArtifact?: Prisma.CvStoredArtifactCreateNestedOneWithoutExtractionOutputInput
   parseJobs?: Prisma.CvParseJobCreateNestedManyWithoutExtractionInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptCreateNestedOneWithoutCvExtractionInput
 }
 
 export type CvExtractionUncheckedCreateWithoutAccountInput = {
@@ -1055,6 +1316,15 @@ export type CvExtractionUncheckedCreateWithoutAccountInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -1062,6 +1332,7 @@ export type CvExtractionUncheckedCreateWithoutAccountInput = {
   completedAt?: Date | string | null
   createdAt?: Date | string
   parseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutExtractionInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUncheckedCreateNestedOneWithoutCvExtractionInput
 }
 
 export type CvExtractionCreateOrConnectWithoutAccountInput = {
@@ -1110,6 +1381,15 @@ export type CvExtractionScalarWhereInput = {
   expandedBytes?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
   segmentCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
   extractedUtf8Bytes?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
+  segmentSchemaVersion?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
+  eligibilityPolicyVersion?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
+  deduplicationPolicyVersion?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
+  confidencePolicyVersion?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
+  nativeSegmentCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
+  ocrSegmentCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
+  accountedUnitCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
+  lowConfidenceUnitCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
+  conflictUnitCount?: Prisma.IntNullableFilter<"CvExtraction"> | number | null
   failureCode?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
   leaseOwner?: Prisma.StringNullableFilter<"CvExtraction"> | string | null
   leaseExpiresAt?: Prisma.DateTimeNullableFilter<"CvExtraction"> | Date | string | null
@@ -1130,6 +1410,15 @@ export type CvExtractionCreateWithoutUploadInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -1141,6 +1430,7 @@ export type CvExtractionCreateWithoutUploadInput = {
   account: Prisma.UserAccountCreateNestedOneWithoutCvExtractionsInput
   outputArtifact?: Prisma.CvStoredArtifactCreateNestedOneWithoutExtractionOutputInput
   parseJobs?: Prisma.CvParseJobCreateNestedManyWithoutExtractionInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptCreateNestedOneWithoutCvExtractionInput
 }
 
 export type CvExtractionUncheckedCreateWithoutUploadInput = {
@@ -1159,6 +1449,15 @@ export type CvExtractionUncheckedCreateWithoutUploadInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -1166,6 +1465,7 @@ export type CvExtractionUncheckedCreateWithoutUploadInput = {
   completedAt?: Date | string | null
   createdAt?: Date | string
   parseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutExtractionInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUncheckedCreateNestedOneWithoutCvExtractionInput
 }
 
 export type CvExtractionCreateOrConnectWithoutUploadInput = {
@@ -1206,6 +1506,15 @@ export type CvExtractionCreateWithoutSourceArtifactInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -1217,6 +1526,7 @@ export type CvExtractionCreateWithoutSourceArtifactInput = {
   account: Prisma.UserAccountCreateNestedOneWithoutCvExtractionsInput
   outputArtifact?: Prisma.CvStoredArtifactCreateNestedOneWithoutExtractionOutputInput
   parseJobs?: Prisma.CvParseJobCreateNestedManyWithoutExtractionInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptCreateNestedOneWithoutCvExtractionInput
 }
 
 export type CvExtractionUncheckedCreateWithoutSourceArtifactInput = {
@@ -1235,6 +1545,15 @@ export type CvExtractionUncheckedCreateWithoutSourceArtifactInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -1242,6 +1561,7 @@ export type CvExtractionUncheckedCreateWithoutSourceArtifactInput = {
   completedAt?: Date | string | null
   createdAt?: Date | string
   parseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutExtractionInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUncheckedCreateNestedOneWithoutCvExtractionInput
 }
 
 export type CvExtractionCreateOrConnectWithoutSourceArtifactInput = {
@@ -1266,6 +1586,15 @@ export type CvExtractionCreateWithoutOutputArtifactInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -1277,6 +1606,7 @@ export type CvExtractionCreateWithoutOutputArtifactInput = {
   scanAssessment: Prisma.CvScanAssessmentCreateNestedOneWithoutExtractionsInput
   account: Prisma.UserAccountCreateNestedOneWithoutCvExtractionsInput
   parseJobs?: Prisma.CvParseJobCreateNestedManyWithoutExtractionInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptCreateNestedOneWithoutCvExtractionInput
 }
 
 export type CvExtractionUncheckedCreateWithoutOutputArtifactInput = {
@@ -1295,6 +1625,15 @@ export type CvExtractionUncheckedCreateWithoutOutputArtifactInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -1302,6 +1641,7 @@ export type CvExtractionUncheckedCreateWithoutOutputArtifactInput = {
   completedAt?: Date | string | null
   createdAt?: Date | string
   parseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutExtractionInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUncheckedCreateNestedOneWithoutCvExtractionInput
 }
 
 export type CvExtractionCreateOrConnectWithoutOutputArtifactInput = {
@@ -1348,6 +1688,15 @@ export type CvExtractionUpdateWithoutOutputArtifactInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1359,6 +1708,7 @@ export type CvExtractionUpdateWithoutOutputArtifactInput = {
   scanAssessment?: Prisma.CvScanAssessmentUpdateOneRequiredWithoutExtractionsNestedInput
   account?: Prisma.UserAccountUpdateOneRequiredWithoutCvExtractionsNestedInput
   parseJobs?: Prisma.CvParseJobUpdateManyWithoutExtractionNestedInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUpdateOneWithoutCvExtractionNestedInput
 }
 
 export type CvExtractionUncheckedUpdateWithoutOutputArtifactInput = {
@@ -1377,6 +1727,15 @@ export type CvExtractionUncheckedUpdateWithoutOutputArtifactInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1384,6 +1743,7 @@ export type CvExtractionUncheckedUpdateWithoutOutputArtifactInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   parseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutExtractionNestedInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUncheckedUpdateOneWithoutCvExtractionNestedInput
 }
 
 export type CvExtractionCreateWithoutScanAssessmentInput = {
@@ -1398,6 +1758,15 @@ export type CvExtractionCreateWithoutScanAssessmentInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -1409,6 +1778,7 @@ export type CvExtractionCreateWithoutScanAssessmentInput = {
   account: Prisma.UserAccountCreateNestedOneWithoutCvExtractionsInput
   outputArtifact?: Prisma.CvStoredArtifactCreateNestedOneWithoutExtractionOutputInput
   parseJobs?: Prisma.CvParseJobCreateNestedManyWithoutExtractionInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptCreateNestedOneWithoutCvExtractionInput
 }
 
 export type CvExtractionUncheckedCreateWithoutScanAssessmentInput = {
@@ -1427,6 +1797,15 @@ export type CvExtractionUncheckedCreateWithoutScanAssessmentInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -1434,6 +1813,7 @@ export type CvExtractionUncheckedCreateWithoutScanAssessmentInput = {
   completedAt?: Date | string | null
   createdAt?: Date | string
   parseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutExtractionInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUncheckedCreateNestedOneWithoutCvExtractionInput
 }
 
 export type CvExtractionCreateOrConnectWithoutScanAssessmentInput = {
@@ -1474,6 +1854,15 @@ export type CvExtractionCreateWithoutParseJobsInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -1485,6 +1874,7 @@ export type CvExtractionCreateWithoutParseJobsInput = {
   scanAssessment: Prisma.CvScanAssessmentCreateNestedOneWithoutExtractionsInput
   account: Prisma.UserAccountCreateNestedOneWithoutCvExtractionsInput
   outputArtifact?: Prisma.CvStoredArtifactCreateNestedOneWithoutExtractionOutputInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptCreateNestedOneWithoutCvExtractionInput
 }
 
 export type CvExtractionUncheckedCreateWithoutParseJobsInput = {
@@ -1504,12 +1894,22 @@ export type CvExtractionUncheckedCreateWithoutParseJobsInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
+  ocrAttempt?: Prisma.OcrProcessingAttemptUncheckedCreateNestedOneWithoutCvExtractionInput
 }
 
 export type CvExtractionCreateOrConnectWithoutParseJobsInput = {
@@ -1540,6 +1940,15 @@ export type CvExtractionUpdateWithoutParseJobsInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1551,6 +1960,7 @@ export type CvExtractionUpdateWithoutParseJobsInput = {
   scanAssessment?: Prisma.CvScanAssessmentUpdateOneRequiredWithoutExtractionsNestedInput
   account?: Prisma.UserAccountUpdateOneRequiredWithoutCvExtractionsNestedInput
   outputArtifact?: Prisma.CvStoredArtifactUpdateOneWithoutExtractionOutputNestedInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUpdateOneWithoutCvExtractionNestedInput
 }
 
 export type CvExtractionUncheckedUpdateWithoutParseJobsInput = {
@@ -1570,12 +1980,178 @@ export type CvExtractionUncheckedUpdateWithoutParseJobsInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ocrAttempt?: Prisma.OcrProcessingAttemptUncheckedUpdateOneWithoutCvExtractionNestedInput
+}
+
+export type CvExtractionCreateWithoutOcrAttemptInput = {
+  id?: string
+  attemptNumber: number
+  status?: $Enums.CvExtractionStatus
+  extractorName?: string | null
+  extractorVersion?: string | null
+  rulesVersion?: string | null
+  pageCount?: number | null
+  entryCount?: number | null
+  expandedBytes?: number | null
+  segmentCount?: number | null
+  extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
+  failureCode?: string | null
+  leaseOwner?: string | null
+  leaseExpiresAt?: Date | string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  upload: Prisma.CvUploadCreateNestedOneWithoutExtractionsInput
+  sourceArtifact: Prisma.CvStoredArtifactCreateNestedOneWithoutExtractionInputsInput
+  scanAssessment: Prisma.CvScanAssessmentCreateNestedOneWithoutExtractionsInput
+  account: Prisma.UserAccountCreateNestedOneWithoutCvExtractionsInput
+  outputArtifact?: Prisma.CvStoredArtifactCreateNestedOneWithoutExtractionOutputInput
+  parseJobs?: Prisma.CvParseJobCreateNestedManyWithoutExtractionInput
+}
+
+export type CvExtractionUncheckedCreateWithoutOcrAttemptInput = {
+  id?: string
+  uploadId: string
+  sourceArtifactId: string
+  scanAssessmentId: string
+  accountId: string
+  outputArtifactId?: string | null
+  attemptNumber: number
+  status?: $Enums.CvExtractionStatus
+  extractorName?: string | null
+  extractorVersion?: string | null
+  rulesVersion?: string | null
+  pageCount?: number | null
+  entryCount?: number | null
+  expandedBytes?: number | null
+  segmentCount?: number | null
+  extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
+  failureCode?: string | null
+  leaseOwner?: string | null
+  leaseExpiresAt?: Date | string | null
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  createdAt?: Date | string
+  parseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutExtractionInput
+}
+
+export type CvExtractionCreateOrConnectWithoutOcrAttemptInput = {
+  where: Prisma.CvExtractionWhereUniqueInput
+  create: Prisma.XOR<Prisma.CvExtractionCreateWithoutOcrAttemptInput, Prisma.CvExtractionUncheckedCreateWithoutOcrAttemptInput>
+}
+
+export type CvExtractionUpsertWithoutOcrAttemptInput = {
+  update: Prisma.XOR<Prisma.CvExtractionUpdateWithoutOcrAttemptInput, Prisma.CvExtractionUncheckedUpdateWithoutOcrAttemptInput>
+  create: Prisma.XOR<Prisma.CvExtractionCreateWithoutOcrAttemptInput, Prisma.CvExtractionUncheckedCreateWithoutOcrAttemptInput>
+  where?: Prisma.CvExtractionWhereInput
+}
+
+export type CvExtractionUpdateToOneWithWhereWithoutOcrAttemptInput = {
+  where?: Prisma.CvExtractionWhereInput
+  data: Prisma.XOR<Prisma.CvExtractionUpdateWithoutOcrAttemptInput, Prisma.CvExtractionUncheckedUpdateWithoutOcrAttemptInput>
+}
+
+export type CvExtractionUpdateWithoutOcrAttemptInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumCvExtractionStatusFieldUpdateOperationsInput | $Enums.CvExtractionStatus
+  extractorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  extractorVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rulesVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  upload?: Prisma.CvUploadUpdateOneRequiredWithoutExtractionsNestedInput
+  sourceArtifact?: Prisma.CvStoredArtifactUpdateOneRequiredWithoutExtractionInputsNestedInput
+  scanAssessment?: Prisma.CvScanAssessmentUpdateOneRequiredWithoutExtractionsNestedInput
+  account?: Prisma.UserAccountUpdateOneRequiredWithoutCvExtractionsNestedInput
+  outputArtifact?: Prisma.CvStoredArtifactUpdateOneWithoutExtractionOutputNestedInput
+  parseJobs?: Prisma.CvParseJobUpdateManyWithoutExtractionNestedInput
+}
+
+export type CvExtractionUncheckedUpdateWithoutOcrAttemptInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  uploadId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceArtifactId?: Prisma.StringFieldUpdateOperationsInput | string
+  scanAssessmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  outputArtifactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attemptNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumCvExtractionStatusFieldUpdateOperationsInput | $Enums.CvExtractionStatus
+  extractorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  extractorVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rulesVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  parseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutExtractionNestedInput
 }
 
 export type CvExtractionCreateManyAccountInput = {
@@ -1594,6 +2170,15 @@ export type CvExtractionCreateManyAccountInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -1614,6 +2199,15 @@ export type CvExtractionUpdateWithoutAccountInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1625,6 +2219,7 @@ export type CvExtractionUpdateWithoutAccountInput = {
   scanAssessment?: Prisma.CvScanAssessmentUpdateOneRequiredWithoutExtractionsNestedInput
   outputArtifact?: Prisma.CvStoredArtifactUpdateOneWithoutExtractionOutputNestedInput
   parseJobs?: Prisma.CvParseJobUpdateManyWithoutExtractionNestedInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUpdateOneWithoutCvExtractionNestedInput
 }
 
 export type CvExtractionUncheckedUpdateWithoutAccountInput = {
@@ -1643,6 +2238,15 @@ export type CvExtractionUncheckedUpdateWithoutAccountInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1650,6 +2254,7 @@ export type CvExtractionUncheckedUpdateWithoutAccountInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   parseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutExtractionNestedInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUncheckedUpdateOneWithoutCvExtractionNestedInput
 }
 
 export type CvExtractionUncheckedUpdateManyWithoutAccountInput = {
@@ -1668,6 +2273,15 @@ export type CvExtractionUncheckedUpdateManyWithoutAccountInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1692,6 +2306,15 @@ export type CvExtractionCreateManyUploadInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -1712,6 +2335,15 @@ export type CvExtractionUpdateWithoutUploadInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1723,6 +2355,7 @@ export type CvExtractionUpdateWithoutUploadInput = {
   account?: Prisma.UserAccountUpdateOneRequiredWithoutCvExtractionsNestedInput
   outputArtifact?: Prisma.CvStoredArtifactUpdateOneWithoutExtractionOutputNestedInput
   parseJobs?: Prisma.CvParseJobUpdateManyWithoutExtractionNestedInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUpdateOneWithoutCvExtractionNestedInput
 }
 
 export type CvExtractionUncheckedUpdateWithoutUploadInput = {
@@ -1741,6 +2374,15 @@ export type CvExtractionUncheckedUpdateWithoutUploadInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1748,6 +2390,7 @@ export type CvExtractionUncheckedUpdateWithoutUploadInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   parseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutExtractionNestedInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUncheckedUpdateOneWithoutCvExtractionNestedInput
 }
 
 export type CvExtractionUncheckedUpdateManyWithoutUploadInput = {
@@ -1766,6 +2409,15 @@ export type CvExtractionUncheckedUpdateManyWithoutUploadInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1790,6 +2442,15 @@ export type CvExtractionCreateManySourceArtifactInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -1810,6 +2471,15 @@ export type CvExtractionUpdateWithoutSourceArtifactInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1821,6 +2491,7 @@ export type CvExtractionUpdateWithoutSourceArtifactInput = {
   account?: Prisma.UserAccountUpdateOneRequiredWithoutCvExtractionsNestedInput
   outputArtifact?: Prisma.CvStoredArtifactUpdateOneWithoutExtractionOutputNestedInput
   parseJobs?: Prisma.CvParseJobUpdateManyWithoutExtractionNestedInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUpdateOneWithoutCvExtractionNestedInput
 }
 
 export type CvExtractionUncheckedUpdateWithoutSourceArtifactInput = {
@@ -1839,6 +2510,15 @@ export type CvExtractionUncheckedUpdateWithoutSourceArtifactInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1846,6 +2526,7 @@ export type CvExtractionUncheckedUpdateWithoutSourceArtifactInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   parseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutExtractionNestedInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUncheckedUpdateOneWithoutCvExtractionNestedInput
 }
 
 export type CvExtractionUncheckedUpdateManyWithoutSourceArtifactInput = {
@@ -1864,6 +2545,15 @@ export type CvExtractionUncheckedUpdateManyWithoutSourceArtifactInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1888,6 +2578,15 @@ export type CvExtractionCreateManyScanAssessmentInput = {
   expandedBytes?: number | null
   segmentCount?: number | null
   extractedUtf8Bytes?: number | null
+  segmentSchemaVersion?: string | null
+  eligibilityPolicyVersion?: string | null
+  deduplicationPolicyVersion?: string | null
+  confidencePolicyVersion?: string | null
+  nativeSegmentCount?: number | null
+  ocrSegmentCount?: number | null
+  accountedUnitCount?: number | null
+  lowConfidenceUnitCount?: number | null
+  conflictUnitCount?: number | null
   failureCode?: string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
@@ -1908,6 +2607,15 @@ export type CvExtractionUpdateWithoutScanAssessmentInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1919,6 +2627,7 @@ export type CvExtractionUpdateWithoutScanAssessmentInput = {
   account?: Prisma.UserAccountUpdateOneRequiredWithoutCvExtractionsNestedInput
   outputArtifact?: Prisma.CvStoredArtifactUpdateOneWithoutExtractionOutputNestedInput
   parseJobs?: Prisma.CvParseJobUpdateManyWithoutExtractionNestedInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUpdateOneWithoutCvExtractionNestedInput
 }
 
 export type CvExtractionUncheckedUpdateWithoutScanAssessmentInput = {
@@ -1937,6 +2646,15 @@ export type CvExtractionUncheckedUpdateWithoutScanAssessmentInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1944,6 +2662,7 @@ export type CvExtractionUncheckedUpdateWithoutScanAssessmentInput = {
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   parseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutExtractionNestedInput
+  ocrAttempt?: Prisma.OcrProcessingAttemptUncheckedUpdateOneWithoutCvExtractionNestedInput
 }
 
 export type CvExtractionUncheckedUpdateManyWithoutScanAssessmentInput = {
@@ -1962,6 +2681,15 @@ export type CvExtractionUncheckedUpdateManyWithoutScanAssessmentInput = {
   expandedBytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   segmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedUtf8Bytes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  segmentSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eligibilityPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deduplicationPolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidencePolicyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nativeSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ocrSegmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  accountedUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lowConfidenceUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  conflictUnitCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2018,6 +2746,15 @@ export type CvExtractionSelect<ExtArgs extends runtime.Types.Extensions.Internal
   expandedBytes?: boolean
   segmentCount?: boolean
   extractedUtf8Bytes?: boolean
+  segmentSchemaVersion?: boolean
+  eligibilityPolicyVersion?: boolean
+  deduplicationPolicyVersion?: boolean
+  confidencePolicyVersion?: boolean
+  nativeSegmentCount?: boolean
+  ocrSegmentCount?: boolean
+  accountedUnitCount?: boolean
+  lowConfidenceUnitCount?: boolean
+  conflictUnitCount?: boolean
   failureCode?: boolean
   leaseOwner?: boolean
   leaseExpiresAt?: boolean
@@ -2030,6 +2767,7 @@ export type CvExtractionSelect<ExtArgs extends runtime.Types.Extensions.Internal
   account?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   outputArtifact?: boolean | Prisma.CvExtraction$outputArtifactArgs<ExtArgs>
   parseJobs?: boolean | Prisma.CvExtraction$parseJobsArgs<ExtArgs>
+  ocrAttempt?: boolean | Prisma.CvExtraction$ocrAttemptArgs<ExtArgs>
   _count?: boolean | Prisma.CvExtractionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["cvExtraction"]>
 
@@ -2050,6 +2788,15 @@ export type CvExtractionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   expandedBytes?: boolean
   segmentCount?: boolean
   extractedUtf8Bytes?: boolean
+  segmentSchemaVersion?: boolean
+  eligibilityPolicyVersion?: boolean
+  deduplicationPolicyVersion?: boolean
+  confidencePolicyVersion?: boolean
+  nativeSegmentCount?: boolean
+  ocrSegmentCount?: boolean
+  accountedUnitCount?: boolean
+  lowConfidenceUnitCount?: boolean
+  conflictUnitCount?: boolean
   failureCode?: boolean
   leaseOwner?: boolean
   leaseExpiresAt?: boolean
@@ -2080,6 +2827,15 @@ export type CvExtractionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   expandedBytes?: boolean
   segmentCount?: boolean
   extractedUtf8Bytes?: boolean
+  segmentSchemaVersion?: boolean
+  eligibilityPolicyVersion?: boolean
+  deduplicationPolicyVersion?: boolean
+  confidencePolicyVersion?: boolean
+  nativeSegmentCount?: boolean
+  ocrSegmentCount?: boolean
+  accountedUnitCount?: boolean
+  lowConfidenceUnitCount?: boolean
+  conflictUnitCount?: boolean
   failureCode?: boolean
   leaseOwner?: boolean
   leaseExpiresAt?: boolean
@@ -2110,6 +2866,15 @@ export type CvExtractionSelectScalar = {
   expandedBytes?: boolean
   segmentCount?: boolean
   extractedUtf8Bytes?: boolean
+  segmentSchemaVersion?: boolean
+  eligibilityPolicyVersion?: boolean
+  deduplicationPolicyVersion?: boolean
+  confidencePolicyVersion?: boolean
+  nativeSegmentCount?: boolean
+  ocrSegmentCount?: boolean
+  accountedUnitCount?: boolean
+  lowConfidenceUnitCount?: boolean
+  conflictUnitCount?: boolean
   failureCode?: boolean
   leaseOwner?: boolean
   leaseExpiresAt?: boolean
@@ -2118,7 +2883,7 @@ export type CvExtractionSelectScalar = {
   createdAt?: boolean
 }
 
-export type CvExtractionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "uploadId" | "sourceArtifactId" | "scanAssessmentId" | "accountId" | "outputArtifactId" | "attemptNumber" | "status" | "extractorName" | "extractorVersion" | "rulesVersion" | "pageCount" | "entryCount" | "expandedBytes" | "segmentCount" | "extractedUtf8Bytes" | "failureCode" | "leaseOwner" | "leaseExpiresAt" | "startedAt" | "completedAt" | "createdAt", ExtArgs["result"]["cvExtraction"]>
+export type CvExtractionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "uploadId" | "sourceArtifactId" | "scanAssessmentId" | "accountId" | "outputArtifactId" | "attemptNumber" | "status" | "extractorName" | "extractorVersion" | "rulesVersion" | "pageCount" | "entryCount" | "expandedBytes" | "segmentCount" | "extractedUtf8Bytes" | "segmentSchemaVersion" | "eligibilityPolicyVersion" | "deduplicationPolicyVersion" | "confidencePolicyVersion" | "nativeSegmentCount" | "ocrSegmentCount" | "accountedUnitCount" | "lowConfidenceUnitCount" | "conflictUnitCount" | "failureCode" | "leaseOwner" | "leaseExpiresAt" | "startedAt" | "completedAt" | "createdAt", ExtArgs["result"]["cvExtraction"]>
 export type CvExtractionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   upload?: boolean | Prisma.CvUploadDefaultArgs<ExtArgs>
   sourceArtifact?: boolean | Prisma.CvStoredArtifactDefaultArgs<ExtArgs>
@@ -2126,6 +2891,7 @@ export type CvExtractionInclude<ExtArgs extends runtime.Types.Extensions.Interna
   account?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   outputArtifact?: boolean | Prisma.CvExtraction$outputArtifactArgs<ExtArgs>
   parseJobs?: boolean | Prisma.CvExtraction$parseJobsArgs<ExtArgs>
+  ocrAttempt?: boolean | Prisma.CvExtraction$ocrAttemptArgs<ExtArgs>
   _count?: boolean | Prisma.CvExtractionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CvExtractionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2152,6 +2918,7 @@ export type $CvExtractionPayload<ExtArgs extends runtime.Types.Extensions.Intern
     account: Prisma.$UserAccountPayload<ExtArgs>
     outputArtifact: Prisma.$CvStoredArtifactPayload<ExtArgs> | null
     parseJobs: Prisma.$CvParseJobPayload<ExtArgs>[]
+    ocrAttempt: Prisma.$OcrProcessingAttemptPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2170,6 +2937,15 @@ export type $CvExtractionPayload<ExtArgs extends runtime.Types.Extensions.Intern
     expandedBytes: number | null
     segmentCount: number | null
     extractedUtf8Bytes: number | null
+    segmentSchemaVersion: string | null
+    eligibilityPolicyVersion: string | null
+    deduplicationPolicyVersion: string | null
+    confidencePolicyVersion: string | null
+    nativeSegmentCount: number | null
+    ocrSegmentCount: number | null
+    accountedUnitCount: number | null
+    lowConfidenceUnitCount: number | null
+    conflictUnitCount: number | null
     failureCode: string | null
     leaseOwner: string | null
     leaseExpiresAt: Date | null
@@ -2576,6 +3352,7 @@ export interface Prisma__CvExtractionClient<T, Null = never, ExtArgs extends run
   account<T extends Prisma.UserAccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccountDefaultArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   outputArtifact<T extends Prisma.CvExtraction$outputArtifactArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CvExtraction$outputArtifactArgs<ExtArgs>>): Prisma.Prisma__CvStoredArtifactClient<runtime.Types.Result.GetResult<Prisma.$CvStoredArtifactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   parseJobs<T extends Prisma.CvExtraction$parseJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CvExtraction$parseJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CvParseJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  ocrAttempt<T extends Prisma.CvExtraction$ocrAttemptArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CvExtraction$ocrAttemptArgs<ExtArgs>>): Prisma.Prisma__OcrProcessingAttemptClient<runtime.Types.Result.GetResult<Prisma.$OcrProcessingAttemptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2621,6 +3398,15 @@ export interface CvExtractionFieldRefs {
   readonly expandedBytes: Prisma.FieldRef<"CvExtraction", 'Int'>
   readonly segmentCount: Prisma.FieldRef<"CvExtraction", 'Int'>
   readonly extractedUtf8Bytes: Prisma.FieldRef<"CvExtraction", 'Int'>
+  readonly segmentSchemaVersion: Prisma.FieldRef<"CvExtraction", 'String'>
+  readonly eligibilityPolicyVersion: Prisma.FieldRef<"CvExtraction", 'String'>
+  readonly deduplicationPolicyVersion: Prisma.FieldRef<"CvExtraction", 'String'>
+  readonly confidencePolicyVersion: Prisma.FieldRef<"CvExtraction", 'String'>
+  readonly nativeSegmentCount: Prisma.FieldRef<"CvExtraction", 'Int'>
+  readonly ocrSegmentCount: Prisma.FieldRef<"CvExtraction", 'Int'>
+  readonly accountedUnitCount: Prisma.FieldRef<"CvExtraction", 'Int'>
+  readonly lowConfidenceUnitCount: Prisma.FieldRef<"CvExtraction", 'Int'>
+  readonly conflictUnitCount: Prisma.FieldRef<"CvExtraction", 'Int'>
   readonly failureCode: Prisma.FieldRef<"CvExtraction", 'String'>
   readonly leaseOwner: Prisma.FieldRef<"CvExtraction", 'String'>
   readonly leaseExpiresAt: Prisma.FieldRef<"CvExtraction", 'DateTime'>
@@ -3068,6 +3854,25 @@ export type CvExtraction$parseJobsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.CvParseJobScalarFieldEnum | Prisma.CvParseJobScalarFieldEnum[]
+}
+
+/**
+ * CvExtraction.ocrAttempt
+ */
+export type CvExtraction$ocrAttemptArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the OcrProcessingAttempt
+   */
+  select?: Prisma.OcrProcessingAttemptSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the OcrProcessingAttempt
+   */
+  omit?: Prisma.OcrProcessingAttemptOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OcrProcessingAttemptInclude<ExtArgs> | null
+  where?: Prisma.OcrProcessingAttemptWhereInput
 }
 
 /**

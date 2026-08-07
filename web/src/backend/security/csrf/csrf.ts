@@ -15,6 +15,23 @@ export function validateSameOrigin(request: Request, trustedOrigin: string) {
   );
 }
 
+/**
+ * Authorizes a read-only browser fetch without requiring an Origin header.
+ * Browsers commonly omit Origin on same-origin GET requests, while
+ * Sec-Fetch-Site remains protected browser metadata.
+ */
+export function validateSameOriginRead(
+  request: Request,
+  trustedOrigin: string,
+) {
+  const expectedOrigin = new URL(trustedOrigin).origin;
+  const origin = request.headers.get("origin");
+  return (
+    request.headers.get("sec-fetch-site") === "same-origin" &&
+    (origin === null || origin === expectedOrigin)
+  );
+}
+
 export function validateCsrfRequest(
   request: Request,
   trustedOrigin: string,

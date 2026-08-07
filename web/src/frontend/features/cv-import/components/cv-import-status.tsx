@@ -47,6 +47,7 @@ type StatusResource = Readonly<{
   scanRetriesRemaining?: number;
   parseRetriesRemaining?: number;
   failure?: CvImportResource["failure"];
+  ocr?: CvImportResource["ocr"];
   consent?: CvConsentNotice | null;
   expiresAt?: string | null;
   contentInaccessibleAt?: string | null;
@@ -78,10 +79,26 @@ const stageKeys = [
   "VALIDATE",
   "SCAN",
   "EXTRACT",
+  "OCR",
   "CONSENT",
   "PARSE",
   "REVIEW",
 ] as const;
+
+type TimelineStage = (typeof stageKeys)[number];
+
+function visualStage(resource: StatusResource): TimelineStage {
+  if (resource.status === "VALIDATION_FAILED") return "VALIDATE";
+  if (resource.status === "INFECTED" || resource.status === "SCAN_FAILED")
+    return "SCAN";
+  if (resource.status === "EXTRACTION_FAILED") return "EXTRACT";
+  if (resource.status === "PARSE_FAILED") return "PARSE";
+  if (resource.status === "REVIEW_READY" || resource.status === "CONFIRMED")
+    return "REVIEW";
+
+  const stage = resource.stage as TimelineStage | undefined;
+  return stage && stageKeys.includes(stage) ? stage : "UPLOAD";
+}
 
 function visualStage(resource: StatusResource): (typeof stageKeys)[number] {
   if (resource.status === "VALIDATION_FAILED") return "VALIDATE";
@@ -411,9 +428,31 @@ export function CvImportStatus({
   const aiStatus = aiPresentation(locale, current);
   const stages = (
     current.parserClass === "EXTERNAL_OPENAI"
-      ? ["UPLOAD", "VALIDATE", "SCAN", "EXTRACT", "CONSENT", "PARSE", "REVIEW"]
-      : ["UPLOAD", "VALIDATE", "SCAN", "EXTRACT", "PARSE", "REVIEW"]
-  ) as readonly (typeof stageKeys)[number][];
+  const optionalOcrStages: readonly TimelineStage[] = current.ocr
+    ? ["OCR"]
+    : [];
+
+  const stages: readonly TimelineStage[] =
+    current.parserClass === "EXTERNAL_OPENAI"
+      ? [
+          "UPLOAD",
+          "VALIDATE",
+          "SCAN",
+          "EXTRACT",
+          ...optionalOcrStages,
+          "CONSENT",
+          "PARSE",
+          "REVIEW",
+        ]
+      : [
+          "UPLOAD",
+          "VALIDATE",
+          "SCAN",
+          "EXTRACT",
+          ...optionalOcrStages,
+          "PARSE",
+          "REVIEW",
+        ];
   const activeStage = visualStage(current);
   const activeStageIndex = Math.max(0, stages.indexOf(activeStage));
   const failed =

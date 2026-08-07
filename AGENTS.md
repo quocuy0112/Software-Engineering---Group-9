@@ -1,5 +1,7 @@
 ﻿<!-- SPECKIT START -->
 
-For active context about technologies, project structure, shell commands, and implementation constraints, read spec-kit/specs/003-job-board-and-advanced-search/plan.md. For Candidate Profile and temporary CV-import boundaries, also consult spec-kit/specs/002-candidate-profile-account-management/plan.md and spec-kit/specs/004-cv-upload-parse-review/plan.md.
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+at spec-kit/specs/005-ocr-parsing/plan.md
 
 <!-- SPECKIT END -->

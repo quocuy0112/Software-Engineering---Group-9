@@ -299,6 +299,145 @@ enum CvConsentAction {
   REVOKED
 }
 
+enum OcrProcessingPurpose {
+  CV_IMPORT
+  JOB_IMAGE_SEARCH
+}
+
+enum OcrAttemptStatus {
+  QUEUED
+  PROCESSING
+  SUCCEEDED
+  PARTIAL_REVIEW_REQUIRED
+  FAILED
+  CANCELLED
+}
+
+enum OcrUnitKind {
+  PDF_PAGE
+  DOCX_BODY_IMAGE
+  SEARCH_IMAGE
+}
+
+enum OcrUnitStatus {
+  NATIVE_SUFFICIENT
+  OCR_SUCCEEDED
+  NON_TEXT
+  LOW_CONFIDENCE
+  CONFLICT
+  DEDUPLICATED
+  EXCLUDED
+  UNSUPPORTED
+  FAILED
+}
+
+enum OcrSourceMethod {
+  NATIVE
+  OCR
+  NATIVE_AND_OCR
+  NONE
+}
+
+enum OcrAnchorQuality {
+  EXACT
+  APPROXIMATE
+  PAGE_ONLY
+  NOT_APPLICABLE
+}
+
+enum SearchActorClass {
+  VISITOR
+  AUTHENTICATED
+}
+
+enum SearchImageStatus {
+  AWAITING_CONTENT
+  SCAN_QUEUED
+  SCANNING
+  DECODE_QUEUED
+  DECODING
+  OCR_QUEUED
+  OCR_PROCESSING
+  AWAITING_CONSENT
+  INTERPRET_QUEUED
+  INTERPRETING
+  RESULT_READY
+  FALLBACK_READY
+  VALIDATION_FAILED
+  INFECTED
+  SCAN_FAILED
+  DECODE_FAILED
+  OCR_FAILED
+  INTERPRET_FAILED
+  CONSUMED
+  CANCELLED
+  EXPIRED
+  DELETED
+}
+
+enum SearchArtifactKind {
+  SOURCE_IMAGE
+  NORMALIZED_IMAGE
+  OCR_TEXT
+  VALIDATED_INTENT
+}
+
+enum SearchArtifactStatus {
+  QUARANTINED
+  AVAILABLE
+  DELETE_PENDING
+  DELETING
+  DELETED
+  DELETE_FAILED
+}
+
+enum SearchScanStatus {
+  QUEUED
+  PROCESSING
+  CLEAN
+  INFECTED
+  INDETERMINATE
+  CANCELLED
+}
+
+enum SearchDecodeStatus {
+  QUEUED
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+
+enum SearchInterpreterClass {
+  DETERMINISTIC_INTERNAL
+  EXTERNAL_OPENAI
+}
+
+enum SearchIntentStatus {
+  QUEUED
+  PROCESSING
+  SUCCEEDED
+  FALLBACK_READY
+  FAILED
+  CANCELLED
+}
+
+enum SearchResultKind {
+  VALIDATED_INTENT
+  OCR_TEXT_FALLBACK
+}
+
+enum SearchConsentAction {
+  GRANTED
+  REVOKED
+}
+
+enum ImageSearchAdmissionSubject {
+  SOURCE_IP
+  BROWSER
+  ACCOUNT
+}
+
 model UserAccount {
   id                            String                         @id
   name                          String
@@ -338,6 +477,8 @@ model UserAccount {
   cvDrafts                      CvDraft[]
   cvConsentEvents               CvProcessingConsent[]
   cvConfirmations               CvImportConfirmation[]
+  imageSearchQueries            SearchImageQuery[]
+  imageSearchConsents           SearchProcessingConsent[]
 
   @@index([state, id])
   @@map("user")
@@ -1133,34 +1274,44 @@ model CvScanAssessment {
 }
 
 model CvExtraction {
-  id                 String             @id @default(cuid())
-  uploadId           String
-  sourceArtifactId   String
-  scanAssessmentId   String
-  accountId          String
-  outputArtifactId   String?            @unique
-  attemptNumber      Int
-  status             CvExtractionStatus @default(QUEUED)
-  extractorName      String?
-  extractorVersion   String?
-  rulesVersion       String?
-  pageCount          Int?
-  entryCount         Int?
-  expandedBytes      Int?
-  segmentCount       Int?
-  extractedUtf8Bytes Int?
-  failureCode        String?
-  leaseOwner         String?
-  leaseExpiresAt     DateTime?
-  startedAt          DateTime?
-  completedAt        DateTime?
-  createdAt          DateTime           @default(now())
-  upload             CvUpload           @relation(fields: [uploadId], references: [id], onDelete: Cascade)
-  sourceArtifact     CvStoredArtifact   @relation("CvExtractionSourceArtifact", fields: [sourceArtifactId], references: [id], onDelete: Cascade)
-  scanAssessment     CvScanAssessment   @relation(fields: [scanAssessmentId], references: [id], onDelete: Cascade)
-  account            UserAccount        @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  outputArtifact     CvStoredArtifact?  @relation("CvExtractionOutputArtifact", fields: [outputArtifactId], references: [id], onDelete: SetNull)
-  parseJobs          CvParseJob[]
+  id                         String                @id @default(cuid())
+  uploadId                   String
+  sourceArtifactId           String
+  scanAssessmentId           String
+  accountId                  String
+  outputArtifactId           String?               @unique
+  attemptNumber              Int
+  status                     CvExtractionStatus    @default(QUEUED)
+  extractorName              String?
+  extractorVersion           String?
+  rulesVersion               String?
+  pageCount                  Int?
+  entryCount                 Int?
+  expandedBytes              Int?
+  segmentCount               Int?
+  extractedUtf8Bytes         Int?
+  segmentSchemaVersion       String?
+  eligibilityPolicyVersion   String?
+  deduplicationPolicyVersion String?
+  confidencePolicyVersion    String?
+  nativeSegmentCount         Int?
+  ocrSegmentCount            Int?
+  accountedUnitCount         Int?
+  lowConfidenceUnitCount     Int?
+  conflictUnitCount          Int?
+  failureCode                String?
+  leaseOwner                 String?
+  leaseExpiresAt             DateTime?
+  startedAt                  DateTime?
+  completedAt                DateTime?
+  createdAt                  DateTime              @default(now())
+  upload                     CvUpload              @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  sourceArtifact             CvStoredArtifact      @relation("CvExtractionSourceArtifact", fields: [sourceArtifactId], references: [id], onDelete: Cascade)
+  scanAssessment             CvScanAssessment      @relation(fields: [scanAssessmentId], references: [id], onDelete: Cascade)
+  account                    UserAccount           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  outputArtifact             CvStoredArtifact?     @relation("CvExtractionOutputArtifact", fields: [outputArtifactId], references: [id], onDelete: SetNull)
+  parseJobs                  CvParseJob[]
+  ocrAttempt                 OcrProcessingAttempt?
 
   @@unique([uploadId, attemptNumber])
   @@index([status, leaseExpiresAt, createdAt], map: "CvExtraction_claim_idx")
@@ -1317,4 +1468,296 @@ model CvImportConfirmation {
 
   @@unique([accountId, idempotencyDigest])
   @@index([profileId, confirmedAt(sort: Desc)])
+}
+
+model OcrProcessingAttempt {
+  id                       String               @id @default(cuid())
+  purpose                  OcrProcessingPurpose
+  cvExtractionId           String?              @unique
+  searchQueryId            String?              @unique
+  status                   OcrAttemptStatus     @default(QUEUED)
+  engineName               String
+  engineVersion            String
+  modelName                String
+  modelSha256              Bytes
+  runtimeName              String
+  runtimeVersion           String
+  eligibilityPolicyVersion String?
+  confidencePolicyVersion  String
+  inputUnitCount           Int
+  succeededUnitCount       Int                  @default(0)
+  reviewUnitCount          Int                  @default(0)
+  failedUnitCount          Int                  @default(0)
+  outputLineCount          Int?
+  outputUtf8Bytes          Int?
+  failureCode              String?
+  leaseOwner               String?
+  leaseExpiresAt           DateTime?
+  startedAt                DateTime?
+  completedAt              DateTime?
+  createdAt                DateTime             @default(now())
+  cvExtraction             CvExtraction?        @relation(fields: [cvExtractionId], references: [id], onDelete: Cascade)
+  searchQuery              SearchImageQuery?    @relation(fields: [searchQueryId], references: [id], onDelete: Cascade)
+  units                    OcrUnitOutcome[]
+  intentAttempt            SearchIntentAttempt?
+
+  @@index([status, leaseExpiresAt, createdAt], map: "OcrProcessingAttempt_claim_idx")
+  @@index([purpose, createdAt])
+}
+
+model OcrUnitOutcome {
+  id                       String               @id @default(cuid())
+  attemptId                String
+  unitKey                  String
+  ordinal                  Int
+  kind                     OcrUnitKind
+  status                   OcrUnitStatus
+  sourceMethod             OcrSourceMethod
+  pageNumber               Int?
+  bodyOrdinal              Int?
+  imageOrdinal             Int?
+  anchorQuality            OcrAnchorQuality
+  averageConfidence        Decimal?             @db.Decimal(5, 4)
+  minimumConfidence        Decimal?             @db.Decimal(5, 4)
+  recognizedCharacterCount Int                  @default(0)
+  segmentCount             Int                  @default(0)
+  deduplicatedSegmentCount Int                  @default(0)
+  materialConflict         Boolean              @default(false)
+  failureCode              String?
+  createdAt                DateTime             @default(now())
+  attempt                  OcrProcessingAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@unique([attemptId, unitKey])
+  @@unique([attemptId, ordinal])
+  @@index([attemptId, status, ordinal])
+}
+
+model SearchImageQuery {
+  id                      String                      @id @default(cuid())
+  actorClass              SearchActorClass
+  accountId               String?
+  visitorSubjectDigest    Bytes?
+  visitorCapabilityDigest Bytes?
+  capabilityKeyVersion    Int?
+  status                  SearchImageStatus           @default(AWAITING_CONTENT)
+  interpreterClass        SearchInterpreterClass
+  declaredExtension       String
+  declaredMediaType       String
+  declaredBytes           Int
+  actualBytes             Int?
+  sourceSha256            Bytes?
+  idempotencyDigest       Bytes
+  createBindingDigest     Bytes
+  failureCode             String?
+  resultKind              SearchResultKind?
+  admittedAt              DateTime
+  contentReceivedAt       DateTime?
+  resultReadyAt           DateTime?
+  resultConsumedAt        DateTime?
+  contentInaccessibleAt   DateTime?
+  expiresAt               DateTime
+  deleteBy                DateTime
+  deletedAt               DateTime?
+  createdAt               DateTime
+  updatedAt               DateTime                    @updatedAt
+  account                 UserAccount?                @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  artifacts               SearchStoredArtifact[]
+  scanAssessments         SearchScanAssessment[]
+  decodeAttempts          SearchImageDecodeAttempt[]
+  ocrAttempt              OcrProcessingAttempt?
+  intentAttempts          SearchIntentAttempt[]
+  consentEvents           SearchProcessingConsent[]
+  admissionEvents         ImageSearchAdmissionEvent[]
+
+  @@index([status, deleteBy, id], map: "SearchImageQuery_work_idx")
+  @@index([accountId, createdAt(sort: Desc)])
+  @@index([contentInaccessibleAt, deletedAt], map: "SearchImageQuery_reconcile_idx")
+}
+
+model SearchStoredArtifact {
+  id                    String                     @id @default(cuid())
+  queryId               String
+  kind                  SearchArtifactKind
+  status                SearchArtifactStatus       @default(QUARANTINED)
+  storageAdapter        String
+  storageLocator        String?
+  encryptionKeyVersion  Int?
+  encryptionIv          Bytes?
+  authenticationTag     Bytes?
+  plaintextBytes        Int
+  ciphertextBytes       Int
+  plaintextSha256       Bytes
+  availableAt           DateTime?
+  contentInaccessibleAt DateTime?
+  deleteAfter           DateTime?
+  deleteBy              DateTime
+  deleteLeaseOwner      String?
+  deleteLeaseExpiresAt  DateTime?
+  deleteAttempts        Int                        @default(0)
+  deleteFailureCode     String?
+  deletedAt             DateTime?
+  createdAt             DateTime                   @default(now())
+  updatedAt             DateTime                   @updatedAt
+  query                 SearchImageQuery           @relation(fields: [queryId], references: [id], onDelete: Cascade)
+  scanSources           SearchScanAssessment[]     @relation("SearchScanSource")
+  decodeSources         SearchImageDecodeAttempt[] @relation("SearchDecodeSource")
+  normalizedDecode      SearchImageDecodeAttempt?  @relation("SearchDecodeNormalized")
+  ocrTextIntentAttempts SearchIntentAttempt[]      @relation("SearchIntentOcrText")
+  intentResultAttempt   SearchIntentAttempt?       @relation("SearchIntentResult")
+
+  @@unique([queryId, kind])
+  @@index([status, deleteAfter, deleteBy, deleteLeaseExpiresAt], map: "SearchStoredArtifact_delete_claim_idx")
+}
+
+model SearchScanAssessment {
+  id                   String                     @id @default(cuid())
+  queryId              String
+  sourceArtifactId     String
+  attemptNumber        Int
+  status               SearchScanStatus           @default(QUEUED)
+  engineName           String?
+  engineVersion        String?
+  signatureVersion     String?
+  signaturePublishedAt DateTime?
+  failureCode          String?
+  leaseOwner           String?
+  leaseExpiresAt       DateTime?
+  startedAt            DateTime?
+  completedAt          DateTime?
+  createdAt            DateTime                   @default(now())
+  query                SearchImageQuery           @relation(fields: [queryId], references: [id], onDelete: Cascade)
+  sourceArtifact       SearchStoredArtifact       @relation("SearchScanSource", fields: [sourceArtifactId], references: [id], onDelete: Cascade)
+  decodeAttempts       SearchImageDecodeAttempt[]
+
+  @@unique([queryId, attemptNumber])
+  @@index([status, leaseExpiresAt, createdAt], map: "SearchScanAssessment_claim_idx")
+}
+
+model SearchImageDecodeAttempt {
+  id                   String                @id @default(cuid())
+  queryId              String
+  sourceArtifactId     String
+  scanAssessmentId     String
+  normalizedArtifactId String?               @unique
+  attemptNumber        Int
+  status               SearchDecodeStatus    @default(QUEUED)
+  normalizerName       String?
+  normalizerVersion    String?
+  rulesVersion         String?
+  detectedFormat       String?
+  width                Int?
+  height               Int?
+  decodedPixels        Int?
+  frameCount           Int?
+  metadataRemoved      Boolean?
+  failureCode          String?
+  leaseOwner           String?
+  leaseExpiresAt       DateTime?
+  startedAt            DateTime?
+  completedAt          DateTime?
+  createdAt            DateTime              @default(now())
+  query                SearchImageQuery      @relation(fields: [queryId], references: [id], onDelete: Cascade)
+  sourceArtifact       SearchStoredArtifact  @relation("SearchDecodeSource", fields: [sourceArtifactId], references: [id], onDelete: Cascade)
+  scanAssessment       SearchScanAssessment  @relation(fields: [scanAssessmentId], references: [id], onDelete: Cascade)
+  normalizedArtifact   SearchStoredArtifact? @relation("SearchDecodeNormalized", fields: [normalizedArtifactId], references: [id], onDelete: SetNull)
+
+  @@unique([queryId, attemptNumber])
+  @@index([status, leaseExpiresAt, createdAt], map: "SearchImageDecodeAttempt_claim_idx")
+}
+
+model SearchIntentAttempt {
+  id                     String                   @id @default(cuid())
+  queryId                String
+  ocrAttemptId           String                   @unique
+  ocrTextArtifactId      String
+  resultArtifactId       String?                  @unique
+  consentEventId         String?
+  attemptNumber          Int
+  status                 SearchIntentStatus       @default(QUEUED)
+  interpreterClass       SearchInterpreterClass
+  provider               String
+  model                  String
+  purposeVersion         String
+  inputVersion           String
+  instructionVersion     String
+  schemaVersion          String
+  selectionPolicyVersion String
+  proposalCount          Int?
+  autoSelectedCount      Int?
+  suggestedCount         Int?
+  discardedCount         Int?
+  providerRequestIdHmac  Bytes?
+  failureCode            String?
+  leaseOwner             String?
+  leaseExpiresAt         DateTime?
+  startedAt              DateTime?
+  completedAt            DateTime?
+  createdAt              DateTime                 @default(now())
+  query                  SearchImageQuery         @relation(fields: [queryId], references: [id], onDelete: Cascade)
+  ocrAttempt             OcrProcessingAttempt     @relation(fields: [ocrAttemptId], references: [id], onDelete: Cascade)
+  ocrTextArtifact        SearchStoredArtifact     @relation("SearchIntentOcrText", fields: [ocrTextArtifactId], references: [id], onDelete: Cascade)
+  resultArtifact         SearchStoredArtifact?    @relation("SearchIntentResult", fields: [resultArtifactId], references: [id], onDelete: SetNull)
+  consentEvent           SearchProcessingConsent? @relation(fields: [consentEventId], references: [id], onDelete: SetNull)
+
+  @@unique([queryId, attemptNumber])
+  @@index([status, leaseExpiresAt, createdAt], map: "SearchIntentAttempt_claim_idx")
+}
+
+model SearchProcessingConsent {
+  id                         String                    @id @default(cuid())
+  queryId                    String
+  accountId                  String?
+  actorClass                 SearchActorClass
+  action                     SearchConsentAction
+  supersedesConsentId        String?
+  provider                   String
+  interpreterClass           SearchInterpreterClass
+  model                      String
+  purposeVersion             String
+  noticeVersion              String
+  consentTextVersion         String
+  retentionDisclosureVersion String
+  idempotencyDigest          Bytes?
+  occurredAt                 DateTime
+  createdAt                  DateTime                  @default(now())
+  query                      SearchImageQuery          @relation(fields: [queryId], references: [id], onDelete: Cascade)
+  account                    UserAccount?              @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  supersedesConsent          SearchProcessingConsent?  @relation("SearchConsentChain", fields: [supersedesConsentId], references: [id], onDelete: SetNull)
+  supersededBy               SearchProcessingConsent[] @relation("SearchConsentChain")
+  intentAttempts             SearchIntentAttempt[]
+
+  @@index([queryId, occurredAt(sort: Desc)])
+  @@unique([queryId, idempotencyDigest])
+  @@index([accountId, occurredAt(sort: Desc)])
+  @@index([supersedesConsentId])
+}
+
+model ImageSearchAdmissionEvent {
+  id            String                      @id @default(cuid())
+  queryId       String
+  subjectKind   ImageSearchAdmissionSubject
+  subjectDigest Bytes
+  keyVersion    Int
+  admittedAt    DateTime
+  expiresAt     DateTime
+  createdAt     DateTime                    @default(now())
+  query         SearchImageQuery            @relation(fields: [queryId], references: [id], onDelete: Cascade)
+
+  @@unique([queryId, subjectKind])
+  @@index([subjectKind, subjectDigest, admittedAt], map: "ImageSearchAdmissionEvent_subject_window_idx")
+  @@index([expiresAt])
+}
+
+/// Content-free, cross-process readiness evidence. Web admission reads these
+/// rows; only cleanup, reconciliation, and the production preflight writer may
+/// refresh their respective component.
+model ImageSearchOperationalEvidence {
+  component       String   @id
+  evidenceVersion String
+  evidenceDigest  Bytes?
+  succeededAt     DateTime
+  validUntil      DateTime
+  updatedAt       DateTime @updatedAt
+
+  @@index([validUntil])
 }

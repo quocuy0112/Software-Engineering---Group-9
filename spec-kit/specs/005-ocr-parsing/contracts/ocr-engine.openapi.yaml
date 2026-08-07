@@ -1,0 +1,294 @@
+openapi: 3.1.0
+info:
+  title: SmartHire Private OCR Engine
+  version: 1.0.0
+  description: >-
+    Internal normalized-PNG recognition contract. The server listens only on a
+    group-restricted Unix domain socket. It has no TCP listener, URL-fetch,
+    callback, database, storage, or tool capability.
+servers:
+  - url: http://localhost
+    description: Logical HTTP origin transported over the private Unix socket
+paths:
+  /health/live:
+    get:
+      operationId: ocrLiveness
+      responses:
+        "200":
+          description: Process is alive
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LiveResponse"
+  /health/ready:
+    get:
+      operationId: ocrReadiness
+      responses:
+        "200":
+          description: Pinned model is loaded and warmed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReadyResponse"
+        "503":
+          description: Engine or exact model is not ready
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SafeError"
+  /v1/recognitions:
+    post:
+      operationId: recognizeNormalizedPng
+      parameters:
+        - $ref: "#/components/parameters/AttemptId"
+        - $ref: "#/components/parameters/Purpose"
+        - $ref: "#/components/parameters/Deadline"
+        - $ref: "#/components/parameters/ModelManifest"
+      requestBody:
+        required: true
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+              maxLength: 26214400
+      responses:
+        "200":
+          description: Strict bounded OCR line result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecognitionResponse"
+        "400":
+          description: Invalid headers or non-normalized input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SafeError"
+        "413":
+          description: Byte, pixel, line, or output limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SafeError"
+        "422":
+          description: PNG could not be recognized under the strict contract
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SafeError"
+        "503":
+          description: Exact engine/model unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SafeError"
+components:
+  parameters:
+    AttemptId:
+      name: X-OCR-Attempt-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        pattern: "^[A-Za-z0-9_-]{10,80}$"
+    Purpose:
+      name: X-OCR-Purpose
+      in: header
+      required: true
+      schema:
+        type: string
+        enum: [CV_IMPORT, JOB_IMAGE_SEARCH]
+    Deadline:
+      name: X-OCR-Deadline
+      in: header
+      required: true
+      description: UTC deadline; engine stops instead of returning a late result.
+      schema:
+        type: string
+        format: date-time
+    ModelManifest:
+      name: X-OCR-Model-Manifest-SHA256
+      in: header
+      required: true
+      schema:
+        type: string
+        pattern: "^[a-f0-9]{64}$"
+  schemas:
+    LiveResponse:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status:
+          const: live
+    ReadyResponse:
+      type: object
+      additionalProperties: false
+      required: [status, engine, warmedAt]
+      properties:
+        status:
+          const: ready
+        engine:
+          $ref: "#/components/schemas/EngineManifest"
+        warmedAt:
+          type: string
+          format: date-time
+    EngineManifest:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - version
+        - runtimeName
+        - runtimeVersion
+        - modelName
+        - modelManifestSha256
+      properties:
+        name:
+          const: paddleocr-onnx
+        version:
+          type: string
+          minLength: 1
+          maxLength: 40
+        runtimeName:
+          const: onnxruntime
+        runtimeVersion:
+          const: 1.27.0
+        modelName:
+          const: PP-OCRv6-medium
+        modelManifestSha256:
+          type: string
+          pattern: "^[a-f0-9]{64}$"
+    RecognitionResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - schemaVersion
+        - attemptId
+        - purpose
+        - engine
+        - image
+        - lines
+        - summary
+      properties:
+        schemaVersion:
+          const: ocr-lines-v1
+        attemptId:
+          type: string
+          pattern: "^[A-Za-z0-9_-]{10,80}$"
+        purpose:
+          enum: [CV_IMPORT, JOB_IMAGE_SEARCH]
+        engine:
+          $ref: "#/components/schemas/EngineManifest"
+        image:
+          $ref: "#/components/schemas/ImageOutcome"
+        lines:
+          type: array
+          maxItems: 2000
+          items:
+            $ref: "#/components/schemas/OcrLine"
+        summary:
+          $ref: "#/components/schemas/RecognitionSummary"
+    ImageOutcome:
+      type: object
+      additionalProperties: false
+      required: [width, height, decodedPixels, detectedOrientationDegrees]
+      properties:
+        width:
+          type: integer
+          minimum: 1
+          maximum: 20000000
+        height:
+          type: integer
+          minimum: 1
+          maximum: 20000000
+        decodedPixels:
+          type: integer
+          minimum: 1
+          maximum: 20000000
+        detectedOrientationDegrees:
+          type: integer
+          enum: [0, 90, 180, 270]
+    OcrLine:
+      type: object
+      additionalProperties: false
+      required: [id, order, text, confidence, polygon]
+      properties:
+        id:
+          type: string
+          pattern: "^line-[0-9]{1,4}$"
+        order:
+          type: integer
+          minimum: 0
+          maximum: 1999
+        text:
+          type: string
+          minLength: 1
+          maxLength: 4096
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        polygon:
+          type: array
+          minItems: 4
+          maxItems: 4
+          items:
+            $ref: "#/components/schemas/Point"
+    Point:
+      type: object
+      additionalProperties: false
+      required: [x, y]
+      properties:
+        x:
+          type: number
+          minimum: 0
+          maximum: 20000000
+        y:
+          type: number
+          minimum: 0
+          maximum: 20000000
+    RecognitionSummary:
+      type: object
+      additionalProperties: false
+      required: [lineCount, utf8Bytes, averageConfidence, minimumConfidence]
+      properties:
+        lineCount:
+          type: integer
+          minimum: 0
+          maximum: 2000
+        utf8Bytes:
+          type: integer
+          minimum: 0
+          maximum: 65536
+        averageConfidence:
+          type: [number, "null"]
+          minimum: 0
+          maximum: 1
+        minimumConfidence:
+          type: [number, "null"]
+          minimum: 0
+          maximum: 1
+    SafeError:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, retryable]
+          properties:
+            code:
+              enum:
+                - INVALID_REQUEST
+                - INPUT_TOO_LARGE
+                - PIXEL_LIMIT_EXCEEDED
+                - OUTPUT_LIMIT_EXCEEDED
+                - DEADLINE_EXCEEDED
+                - MODEL_MISMATCH
+                - ENGINE_NOT_READY
+                - RECOGNITION_FAILED
+            retryable:
+              type: boolean

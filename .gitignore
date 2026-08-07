@@ -17,6 +17,13 @@ web/.env.local
 **/dist/
 **/build/
 
+# Python OCR engine
+**/__pycache__/
+**/*.py[cod]
+**/.venv/
+**/venv/
+**/*.egg-info/
+
 # Local application data
 **/.local/
 web/.local/mail/

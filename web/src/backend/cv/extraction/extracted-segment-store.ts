@@ -23,7 +23,13 @@ import {
   type CvStageResultCommitGuard,
 } from "@/backend/repositories/cv-import/prisma-cv-work-repository";
 import { CV_EXTRACTED_TEXT_MAX_BYTES } from "@/shared/contracts/cv-import/common";
+import {
+  cvSegmentV2Schema,
+  type CvSegmentV2,
+} from "@/shared/contracts/ocr/cv-segments-v2";
 import type { ExtractedSegment } from "./document-extractor";
+
+export type StoredCvSegment = ExtractedSegment | CvSegmentV2;
 
 type SegmentCommitGuard = Readonly<
   Omit<CvStageResultCommitGuard, "now"> & { currentTime(): Date }
@@ -87,7 +93,15 @@ export class ExtractedSegmentStore {
     accountId: string;
     uploadId: string;
     extractionId: string;
-    segments: AsyncIterable<ExtractedSegment> | Iterable<ExtractedSegment>;
+    segments: AsyncIterable<StoredCvSegment> | Iterable<StoredCvSegment>;
+    schemaVersion?: "cv-segments-v1" | "cv-segments-v2";
+    hybridMetrics?: Readonly<{
+      nativeSegmentCount: number;
+      ocrSegmentCount: number;
+      accountedUnitCount: number;
+      lowConfidenceUnitCount: number;
+      conflictUnitCount: number;
+    }>;
     commitGuard?: SegmentCommitGuard;
   }) {
     const directory = await mkdtemp(join(tmpdir(), "smarthire-cv-segments-"));
@@ -99,6 +113,8 @@ export class ExtractedSegmentStore {
     let count = 0;
     try {
       for await (const segment of input.segments) {
+        if (input.schemaVersion === "cv-segments-v2")
+          cvSegmentV2Schema.parse(segment);
         if (!/^[A-Za-z0-9_-]{1,100}$/u.test(segment.id) || ids.has(segment.id))
           throw new Error("CV_SEGMENT_ID_INVALID");
         ids.add(segment.id);
@@ -166,6 +182,23 @@ export class ExtractedSegmentStore {
               outputArtifactId: artifactId,
               segmentCount: count,
               extractedUtf8Bytes: bytes,
+              ...(input.schemaVersion === "cv-segments-v2"
+                ? {
+                    segmentSchemaVersion: "cv-segments-v2",
+                    eligibilityPolicyVersion: "cv-ocr-eligibility-v1",
+                    deduplicationPolicyVersion: "cv-segment-dedup-v1",
+                    confidencePolicyVersion: "ocr-confidence-v1",
+                    nativeSegmentCount:
+                      input.hybridMetrics?.nativeSegmentCount ?? 0,
+                    ocrSegmentCount: input.hybridMetrics?.ocrSegmentCount ?? 0,
+                    accountedUnitCount:
+                      input.hybridMetrics?.accountedUnitCount ?? 0,
+                    lowConfidenceUnitCount:
+                      input.hybridMetrics?.lowConfidenceUnitCount ?? 0,
+                    conflictUnitCount:
+                      input.hybridMetrics?.conflictUnitCount ?? 0,
+                  }
+                : {}),
             },
           });
           if (changed.count !== 1)
@@ -263,7 +296,7 @@ export class ExtractedSegmentStore {
     uploadId: string;
     artifactId: string;
     parseJobId: string;
-  }): Promise<readonly ExtractedSegment[]> {
+  }): Promise<readonly StoredCvSegment[]> {
     const rows = await prisma.$queryRaw<
       Array<{
         id: string;
@@ -274,6 +307,7 @@ export class ExtractedSegmentStore {
         encryptionKeyVersion: number;
         encryptionIvHex: string;
         authenticationTagHex: string;
+        segmentSchemaVersion: string | null;
       }>
     >`
       SELECT artifact."id",
@@ -284,6 +318,7 @@ export class ExtractedSegmentStore {
              artifact."encryptionKeyVersion",
              encode(artifact."encryptionIv", 'hex') AS "encryptionIvHex",
              encode(artifact."authenticationTag", 'hex') AS "authenticationTagHex"
+             , extraction."segmentSchemaVersion" AS "segmentSchemaVersion"
         FROM "CvStoredArtifact" artifact
         JOIN "CvExtraction" extraction
           ON extraction."outputArtifactId" = artifact."id"
@@ -348,7 +383,11 @@ export class ExtractedSegmentStore {
           .split("\n")
           .filter(Boolean)
           .map((line) => {
-            const value = JSON.parse(line) as ExtractedSegment;
+            const raw = JSON.parse(line) as unknown;
+            const value =
+              row.segmentSchemaVersion === "cv-segments-v2"
+                ? cvSegmentV2Schema.parse(raw)
+                : (raw as ExtractedSegment);
             if (ids.has(value.id))
               throw new Error("CV_SEGMENT_MEMBERSHIP_INVALID");
             ids.add(value.id);

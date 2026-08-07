@@ -1,5 +1,5 @@
 const SECRET_KEY =
-  /(password|cookie|token|secret|otp|backup.?code|authorization|jwt|proof|verification.?link|recipient|csrf|session|raw.?headers?|forwarded.?for|remote.?address|profile|request.?body|response.?body|provider.?error|database.?error|error|stack|cause)/i;
+  /(password|cookie|token|secret|otp|backup.?code|authorization|jwt|proof|verification.?link|recipient|csrf|session|raw.?headers?|forwarded.?for|remote.?address|(?:client|remote|raw).?ip|ip.?address|nonce|profile|request.?body|response.?body|provider.?error|database.?error|error|stack|cause|image|pixel|ocr.?text|native.?text|proposal|filter|evidence|prompt|filename|storage.?locator|encryption|capability|idempotency|provider.?request|account.?id|email|company)/i;
 const URL_SECRET =
   /([?&#](?:token|code|secret|password|proof|csrf|session)=)[^&#\s]+/gi;
 
