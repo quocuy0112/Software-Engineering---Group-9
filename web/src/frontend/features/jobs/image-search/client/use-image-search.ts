@@ -48,6 +48,45 @@ const initialState: State = {
   retryAt: null,
 };
 
+const admissionReadinessRetryDelaysMs = [750, 1_500, 3_000] as const;
+
+function waitForAdmissionReadiness(milliseconds: number, signal: AbortSignal) {
+  return new Promise<void>((resolve, reject) => {
+    if (signal.aborted) {
+      reject(signal.reason ?? new DOMException("Aborted", "AbortError"));
+      return;
+    }
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(signal.reason ?? new DOMException("Aborted", "AbortError"));
+    };
+    const timer = setTimeout(() => {
+      signal.removeEventListener("abort", onAbort);
+      resolve();
+    }, milliseconds);
+    signal.addEventListener("abort", onAbort, { once: true });
+  });
+}
+
+async function reserveWhenAdmissionIsReady(
+  input: Parameters<typeof reserveImageSearch>[0],
+) {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await reserveImageSearch(input);
+    } catch (error) {
+      const retryDelay = admissionReadinessRetryDelaysMs[attempt];
+      if (
+        retryDelay === undefined ||
+        (error as { code?: unknown }).code !== "IMAGE_PROCESSING_UNAVAILABLE"
+      ) {
+        throw error;
+      }
+      await waitForAdmissionReadiness(retryDelay, input.signal);
+    }
+  }
+}
+
 export function useImageSearch(input: {
   currentCriteria: ManualSearchContext;
   csrfProof: string;
@@ -101,7 +140,7 @@ export function useImageSearch(input: {
       };
       try {
         setState({ ...initialState, phase: "UPLOADING", progress: 10 });
-        const reservation = await reserveImageSearch({
+        const reservation = await reserveWhenAdmissionIsReady({
           request: {
             extension: file.type === "image/png" ? "png" : "jpg",
             mediaType: file.type as "image/png" | "image/jpeg",

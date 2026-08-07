@@ -397,17 +397,9 @@ export function CvDraftReview({
   );
   const hadConflict = useRef(false);
   useEffect(() => {
-    if (review.conflict) {
-      hadConflict.current = true;
-      return;
-    }
-    if (hadConflict.current) {
-      hadConflict.current = false;
-      reviewHeading.current?.focus();
-    }
-  }, [review.conflict]);
-  useEffect(() => {
     if (
+      !review.conflict &&
+      !hadConflict.current &&
       showValidation &&
       (issues.length || !acknowledged) &&
       validation.fieldErrors.length === 0 &&
@@ -417,10 +409,21 @@ export function CvDraftReview({
   }, [
     acknowledged,
     issues.length,
+    review.conflict,
     review.fieldErrors.length,
     showValidation,
     validation.fieldErrors.length,
   ]);
+  useEffect(() => {
+    if (review.conflict) {
+      hadConflict.current = true;
+      return;
+    }
+    if (hadConflict.current) {
+      hadConflict.current = false;
+      reviewHeading.current?.focus();
+    }
+  }, [review.conflict]);
   const serverErrorSignature = review.fieldErrors
     .map((fieldError) => `${fieldError.path}:${fieldError.code}`)
     .join("|");

@@ -2,11 +2,7 @@ import Link from "next/link";
 import { SmartHireBrand } from "@/frontend/components/ui/smarthire-brand";
 import { ThemeToggle } from "@/frontend/components/ui/theme-toggle";
 
-export function JobBoardHeader({
-  authenticated,
-}: {
-  authenticated: boolean;
-}) {
+export function JobBoardHeader({ authenticated }: { authenticated: boolean }) {
   return (
     <header className="job-board-header">
       <div className="job-board-header-inner">
@@ -25,10 +21,7 @@ export function JobBoardHeader({
             ) : (
               <>
                 <Link href="/login?returnTo=%2Fjobs">Sign in</Link>
-                <Link
-                  className="job-board-navigation-primary"
-                  href="/register"
-                >
+                <Link className="job-board-navigation-primary" href="/register">
                   Create account
                 </Link>
               </>

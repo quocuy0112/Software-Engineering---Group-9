@@ -176,4 +176,52 @@ describe("image-search client recovery races", () => {
       "Private recognized poster text",
     );
   });
+
+  it("retries a transient admission-readiness 503 without reselecting the image", async () => {
+    vi.useFakeTimers();
+    try {
+      api.reserveImageSearch
+        .mockRejectedValueOnce(
+          Object.assign(new Error("Image search is temporarily unavailable."), {
+            code: "IMAGE_PROCESSING_UNAVAILABLE",
+          }),
+        )
+        .mockResolvedValueOnce({
+          queryId: "startup-query",
+          capability: "startup-capability",
+        });
+      api.getImageSearchStatus.mockResolvedValue({ state: "FALLBACK_READY" });
+      api.consumeImageSearchResult.mockResolvedValue({
+        kind: "OCR_TEXT_FALLBACK",
+        queryId: "startup-query",
+        text: "Private recognized poster text",
+        language: "EN",
+        warnings: ["INTERPRETER_UNAVAILABLE"],
+      });
+      const { result } = renderHook(() =>
+        useImageSearch({
+          currentCriteria: criteria,
+          csrfProof: "csrf-proof",
+        }),
+      );
+
+      let start!: Promise<void>;
+      await act(async () => {
+        start = result.current.start(image("startup.png"));
+        await Promise.resolve();
+      });
+      expect(api.reserveImageSearch).toHaveBeenCalledTimes(1);
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(750);
+        await start;
+      });
+
+      expect(api.reserveImageSearch).toHaveBeenCalledTimes(2);
+      expect(result.current.phase).toBe("FALLBACK");
+      expect(result.current.fallbackReason).toBe("INTERPRETER_UNAVAILABLE");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

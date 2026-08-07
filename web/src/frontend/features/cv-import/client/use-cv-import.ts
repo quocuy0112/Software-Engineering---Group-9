@@ -79,6 +79,7 @@ function progressPercentage(resource: CvStatusResource): number {
       VALIDATE: 20,
       SCAN: 35,
       EXTRACT: 55,
+      OCR: 65,
       CONSENT: 65,
       PARSE: resource.status === "PARSING" ? 90 : 78,
       REVIEW: 100,
