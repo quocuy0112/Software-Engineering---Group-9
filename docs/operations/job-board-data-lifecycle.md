@@ -52,7 +52,7 @@ job details, saved jobs, reports, and candidate applications.
 ## Migration and rollback
 
 The feature is introduced by
-`web/prisma/migrations/008_job_board_advanced_search/migration.sql`. It creates
+`web/prisma/migrations/009_job_board_advanced_search/migration.sql`. It creates
 the `pg_trgm` extension, enums, tables, constraints, and indexes used by public
 search and protected actions.
 

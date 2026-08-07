@@ -42,7 +42,7 @@ Open `http://localhost:3001/jobs`. Focused Playwright setup creates and removes 
 ## Migration Gate
 
 1. Run `npm run db:verify` against an empty temporary database and a Feature 002-upgraded database.
-2. Confirm Feature 003 uses the single `008_job_board_advanced_search` migration and no previously merged Feature 001/002/004 migration was edited.
+2. Confirm Feature 003 uses the single `009_job_board_advanced_search` migration and no previously merged Feature 001/002/004 migration was edited.
 3. Confirm `pg_trgm`, normalized search indexes, status/time indexes, composite saved/application unique constraints, nullable unresolved-report uniqueness, and answer/question ordering constraints.
 4. Confirm salary both-or-neither/range constraints, CV PDF/DOCX/exact-5,000,000-byte checks, application initial-stage check, and notification idempotency.
 5. On the merged Feature 004 baseline, confirm Prisma proposes no deletion of `JobPosting_*_trgm_idx` and no Feature 004 temporary artifact is referenced by CandidateCv.

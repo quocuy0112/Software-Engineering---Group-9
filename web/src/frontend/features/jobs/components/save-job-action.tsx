@@ -25,13 +25,14 @@ export function SaveJobAction({
   const [error, setError] = useState("");
   const [pulsing, setPulsing] = useState(false);
   const saved = shared?.records[jobId]?.saved ?? localSaved;
+  const registerJob = shared?.registerJob;
 
   useEffect(() => {
-    shared?.registerJob(jobId, {
+    registerJob?.(jobId, {
       saved: initialSaved,
       applied: initialApplied,
     });
-  }, [initialApplied, initialSaved, jobId, shared]);
+  }, [initialApplied, initialSaved, jobId, registerJob]);
 
   async function toggle() {
     setPending(true);

@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smarthire.local/schemas/cv-segments-v2.json",
+  "title": "CV native and OCR extraction segment v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "order",
+    "kind",
+    "text",
+    "source",
+    "confidence",
+    "versions",
+    "warnings"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "cv-segments-v2" },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,100}$"
+    },
+    "order": { "type": "integer", "minimum": 0, "maximum": 10000 },
+    "kind": { "enum": ["heading", "paragraph", "list-item"] },
+    "text": { "type": "string", "minLength": 1, "maxLength": 65536 },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "unitKind",
+        "unitKey",
+        "pageNumber",
+        "bodyOrdinal",
+        "imageOrdinal",
+        "anchorQuality"
+      ],
+      "properties": {
+        "method": { "enum": ["NATIVE", "OCR", "NATIVE_AND_OCR"] },
+        "unitKind": { "enum": ["PDF_PAGE", "DOCX_BODY_IMAGE"] },
+        "unitKey": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,100}$"
+        },
+        "pageNumber": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "maximum": 20
+        },
+        "bodyOrdinal": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "imageOrdinal": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 19
+        },
+        "anchorQuality": {
+          "enum": ["EXACT", "APPROXIMATE", "PAGE_ONLY", "NOT_APPLICABLE"]
+        }
+      }
+    },
+    "confidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "average", "minimum"],
+      "properties": {
+        "level": { "enum": ["NATIVE", "HIGH", "REVIEW", "LOW"] },
+        "average": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "minimum": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+      }
+    },
+    "versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eligibilityPolicy",
+        "confidencePolicy",
+        "deduplicationPolicy",
+        "ocrEngine",
+        "ocrModel"
+      ],
+      "properties": {
+        "eligibilityPolicy": { "const": "cv-ocr-eligibility-v1" },
+        "confidencePolicy": { "const": "ocr-confidence-v1" },
+        "deduplicationPolicy": { "const": "cv-segment-dedup-v1" },
+        "ocrEngine": { "type": ["string", "null"], "maxLength": 100 },
+        "ocrModel": { "type": ["string", "null"], "maxLength": 160 }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "LOW_CONFIDENCE",
+          "MATERIAL_NATIVE_OCR_CONFLICT",
+          "APPROXIMATE_ANCHOR",
+          "PARTIAL_UNIT_TEXT",
+          "DEDUPLICATED_WITH_NATIVE"
+        ]
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "source": {
+            "properties": { "unitKind": { "const": "PDF_PAGE" } }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "source": {
+            "properties": {
+              "pageNumber": { "type": "integer" },
+              "bodyOrdinal": { "type": "null" },
+              "imageOrdinal": { "type": "null" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "source": {
+            "properties": { "unitKind": { "const": "DOCX_BODY_IMAGE" } }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "source": {
+            "properties": {
+              "pageNumber": { "type": "null" },
+              "bodyOrdinal": { "type": "integer" },
+              "imageOrdinal": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "source": { "properties": { "method": { "const": "NATIVE" } } }
+        }
+      },
+      "then": {
+        "properties": {
+          "confidence": {
+            "properties": {
+              "level": { "const": "NATIVE" },
+              "average": { "type": "null" },
+              "minimum": { "type": "null" }
+            }
+          },
+          "versions": {
+            "properties": {
+              "ocrEngine": { "type": "null" },
+              "ocrModel": { "type": "null" }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+FROM python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7 AS dependencies
+
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+WORKDIR /build
+COPY ocr-engine/requirements.txt ./requirements.txt
+RUN python -m pip install --prefix=/opt/python --no-cache-dir --require-hashes -r requirements.txt
+
+FROM dependencies AS test-dependencies
+
+COPY ocr-engine/requirements-dev.txt ./requirements-dev.txt
+RUN python -m pip install --prefix=/opt/python --no-cache-dir --require-hashes -r requirements-dev.txt
+
+FROM python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7 AS models
+
+WORKDIR /opt/models
+ADD --checksum=sha256:144d0621e059566e5086e228829171591c144c2deb07b2dad4962214fbabfcf7 \
+    https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv6_medium_det_infer.tar \
+    /tmp/PP-OCRv6_medium_det_infer.tar
+ADD --checksum=sha256:4eecc1c6a4623765042e6fc15446da0da110b7d875b6b72b2d351d2b2dbd4da6 \
+    https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv6_medium_rec_infer.tar \
+    /tmp/PP-OCRv6_medium_rec_infer.tar
+RUN tar -xf /tmp/PP-OCRv6_medium_det_infer.tar -C /opt/models \
+    && tar -xf /tmp/PP-OCRv6_medium_rec_infer.tar -C /opt/models \
+    && rm /tmp/PP-OCRv6_medium_det_infer.tar /tmp/PP-OCRv6_medium_rec_infer.tar
+
+FROM python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7 AS converted-models
+
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1
+
+COPY --from=models /opt/models /opt/models
+COPY ocr-engine/requirements-converter.txt /tmp/requirements-converter.txt
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends libgomp1 \
+    && rm -rf /var/lib/apt/lists/* \
+    && python -m pip install --no-cache-dir --require-hashes -r /tmp/requirements-converter.txt \
+    && paddle2onnx \
+      --model_dir /opt/models/PP-OCRv6_medium_det_infer \
+      --model_filename inference.json \
+      --params_filename inference.pdiparams \
+      --save_file /opt/models/PP-OCRv6_medium_det_infer/inference.onnx \
+      --opset_version 17 \
+      --optimize_tool None \
+    && paddle2onnx \
+      --model_dir /opt/models/PP-OCRv6_medium_rec_infer \
+      --model_filename inference.json \
+      --params_filename inference.pdiparams \
+      --save_file /opt/models/PP-OCRv6_medium_rec_infer/inference.onnx \
+      --opset_version 17 \
+      --optimize_tool None \
+    && test -s /opt/models/PP-OCRv6_medium_det_infer/inference.onnx \
+    && test -s /opt/models/PP-OCRv6_medium_rec_infer/inference.onnx
+
+FROM python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7 AS runtime
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app:/usr/local/lib/python3.12/site-packages \
+    HOME=/tmp \
+    XDG_CACHE_HOME=/tmp/.cache \
+    OCR_ENGINE_SOCKET_PATH=/run/smarthire-ocr/ocr.sock \
+    OCR_MODEL_MANIFEST_PATH=/app/model-manifest.json \
+    OCR_MODEL_ROOT=/opt/models \
+    PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True \
+    FLAGS_use_mkldnn=1
+
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --gid 102 smarthire-ocr \
+    && useradd --uid 10001 --gid 102 --no-create-home --shell /usr/sbin/nologin smarthire-ocr \
+    && install -d -o 10001 -g 102 -m 0750 /app /run/smarthire-ocr \
+    && rm -rf /usr/local/lib/python3.12/site-packages/pip* /usr/local/bin/pip*
+
+COPY --from=dependencies /opt/python/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=dependencies /opt/python/bin /usr/local/bin
+COPY --from=converted-models --chown=10001:102 /opt/models /opt/models
+COPY --chown=10001:102 ocr-engine/model-manifest.json /app/model-manifest.json
+COPY --chown=10001:102 ocr-engine/src /app/src
+
+WORKDIR /app
+USER 10001:102
+
+CMD ["python", "-m", "src.app"]
+
+FROM runtime AS test
+
+COPY --from=test-dependencies /opt/python/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=test-dependencies /opt/python/bin /usr/local/bin
+COPY --chown=10001:102 ocr-engine/tests /app/tests
+COPY --chown=10001:102 spec-kit/specs/005-ocr-parsing/contracts/ocr-engine.openapi.yaml /spec-kit/specs/005-ocr-parsing/contracts/ocr-engine.openapi.yaml
+
+CMD ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "/app/tests"]
+
+FROM runtime AS final

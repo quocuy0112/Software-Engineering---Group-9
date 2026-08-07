@@ -2,7 +2,10 @@
   "userId": "user-abc123",
   "savedJobIds": [
     "job-000222",
-    "job-001106"
+    "job-001106",
+    "job-000083",
+    "job-000423",
+    "job-000425"
   ],
   "hiddenJobIds": [
     "job-000099"

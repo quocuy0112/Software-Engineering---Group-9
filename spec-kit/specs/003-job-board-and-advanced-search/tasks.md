@@ -25,7 +25,7 @@
 **CRITICAL**: No user-story implementation starts until this phase passes its focused schema/contract checks.
 
 - [x] T004 Add job/company/CV/save/report/application/notification enums, models, relations, constraints, and indexes in `web/prisma/schema.prisma`
-- [x] T005 Add forward-only PostgreSQL SQL, `pg_trgm`, invariants, and clean/upgrade recovery notes in `web/prisma/migrations/008_job_board_advanced_search/migration.sql`
+- [x] T005 Add forward-only PostgreSQL SQL, `pg_trgm`, invariants, and clean/upgrade recovery notes in `web/prisma/migrations/009_job_board_advanced_search/migration.sql`
 - [x] T006 Regenerate the Prisma client under `web/src/backend/generated/prisma/` and validate `web/prisma/schema.prisma`
 - [x] T007 [P] Create strict shared job discovery/detail schemas in `web/src/shared/contracts/jobs/discovery.ts`
 - [x] T008 [P] Create strict save/report/application schemas and canonical problem outcomes in `web/src/shared/contracts/jobs/actions.ts`
@@ -176,7 +176,7 @@
 - [ ] T064 Run format, lint, typecheck, full tests, build, desktop/mobile accessibility, and performance gates and record results in `spec-kit/specs/003-job-board-and-advanced-search/checklists/release-results.md`
 - [ ] T065 Run the documented representative-user browse/filter/detail/apply study for SC-004 and record aggregate results in `spec-kit/specs/003-job-board-and-advanced-search/checklists/usability-results.md`
 - [x] T066 [P] Add post-merge regression tests for the decimal CV cap, Prisma trigram-index representation, and Feature 004 non-promotion boundary in `web/tests/backend/unit/jobs/application-policy.test.ts` and `web/tests/architecture/job-board-boundaries.test.ts`
-- [x] T067 Consolidate contract/schema hardening into the single Feature 003 migration in `web/src/shared/contracts/jobs/actions.ts`, `web/src/backend/services/jobs/application-policy.ts`, `web/prisma/schema.prisma`, `web/prisma/migrations/008_job_board_advanced_search/migration.sql`, and `spec-kit/specs/003-job-board-and-advanced-search/`
+- [x] T067 Consolidate contract/schema hardening into the single Feature 003 migration in `web/src/shared/contracts/jobs/actions.ts`, `web/src/backend/services/jobs/application-policy.ts`, `web/prisma/schema.prisma`, `web/prisma/migrations/009_job_board_advanced_search/migration.sql`, and `spec-kit/specs/003-job-board-and-advanced-search/`
 - [ ] T068 Run merged Feature 004 baseline validation and record aggregate non-sensitive evidence in `spec-kit/specs/003-job-board-and-advanced-search/checklists/integration-boundary-results.md`
 - [x] T069 [P] Consolidate independently testable US1-US5 behavior, failure, contract, source/test trace, and result evidence into `spec-kit/specs/003-job-board-and-advanced-search/checklists/us*-results.md`
 - [x] T070 [P] Record non-sensitive Foundation and US1-US5 focused test evidence in `spec-kit/specs/003-job-board-and-advanced-search/checklists/foundation-results.md` and `spec-kit/specs/003-job-board-and-advanced-search/checklists/us*-results.md`
