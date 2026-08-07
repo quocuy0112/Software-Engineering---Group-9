@@ -106,8 +106,8 @@
 
 ## Decision 14: Keep one Feature 003 migration before merge
 
-**Decision**: Keep all Feature 003 database work in `008_job_board_advanced_search` while the branch remains unmerged, including the exact decimal 5,000,000-byte CV constraint. Represent all three JobPosting trigram indexes in Prisma with raw GIN operator classes. Feature 004 retains its distinct `008_cv_upload_parse_review` directory.
+**Decision**: Keep all Feature 003 database work in `009_job_board_advanced_search`, including the exact decimal 5,000,000-byte CV constraint. Represent all three JobPosting trigram indexes in Prisma with raw GIN operator classes. Feature 004 retains the preceding `008_cv_upload_parse_review` directory.
 
-**Rationale**: A single feature migration is easier to review and matches the user's branch workflow. The two `008_*` directory names remain unique and deterministically ordered by their full names. Omitting unsupported/raw indexes from Prisma causes generated development migrations to propose destructive drops.
+**Rationale**: A single feature migration is easier to review and matches the user's branch workflow. Feature 004 occupies `008_cv_upload_parse_review`, and Feature 003 follows it as `009_job_board_advanced_search`, so the migration prefixes are sequential. Omitting unsupported/raw indexes from Prisma causes generated development migrations to propose destructive drops.
 
 **Alternatives considered**: Keep a second Job Board hardening migration, accept the generated index-drop migration, or retain the old 5 MiB cap. The first adds avoidable pre-merge history and the others create performance or constitutional problems.

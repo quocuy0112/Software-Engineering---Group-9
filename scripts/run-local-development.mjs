@@ -141,7 +141,14 @@ startProcess("CV worker and scanner", "docker", [
 startProcess(
   "OCR and image-search workers",
   "docker",
-  ["compose", "up", "--build", "ocr-engine", "image-search-worker"],
+  [
+    "compose",
+    "up",
+    "--build",
+    "--no-deps",
+    "ocr-engine",
+    "image-search-worker",
+  ],
   false,
 );
 start("web", "dev:web");

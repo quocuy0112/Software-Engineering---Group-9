@@ -198,7 +198,7 @@ describe.sequential("Feature 005 additive migration", () => {
     const migration = await readFile(
       resolve(
         process.cwd(),
-        "prisma/migrations/009_purpose_specific_ocr/migration.sql",
+        "prisma/migrations/010_purpose_specific_ocr/migration.sql",
       ),
       "utf8",
     );

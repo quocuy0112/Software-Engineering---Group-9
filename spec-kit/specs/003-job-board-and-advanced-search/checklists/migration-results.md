@@ -6,7 +6,7 @@
 ## Migration Shape
 
 - Feature 003 now owns exactly one reviewed migration directory:
-  `web/prisma/migrations/008_job_board_advanced_search/`.
+  `web/prisma/migrations/009_job_board_advanced_search/`.
 - The exact decimal retained-CV constraint (`1..5,000,000` bytes) and all Job
   Board tables/invariants/indexes are consolidated into that migration because
   Feature 003 has not yet been merged or applied outside disposable development.

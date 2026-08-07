@@ -116,7 +116,7 @@ UC-APP-01 consumes `CandidateCv`, a separately retained application document. It
 1. Add enums, public company/job structures, normalized search columns, skills/questions, confirmed retained-CV metadata, saved jobs, reports, applications, answers, and notification work without rewriting identity/profile rows.
 2. Enable `pg_trgm` if absent and add reviewed indexes after invariant checks.
 3. Do not seed production in the migration; tests and quickstart use isolated fixtures.
-4. Because Feature 003 is not yet merged, keep its schema in the single `008_job_board_advanced_search` migration, including the exact decimal 5,000,000-byte constraint and three trigram indexes. The separate Feature 004 migration remains `008_cv_upload_parse_review`; Prisma orders the distinct full directory names deterministically on the merged branch.
+4. Keep Feature 004 in `008_cv_upload_parse_review`, followed by Feature 003 in the single `009_job_board_advanced_search` migration, including the exact decimal 5,000,000-byte constraint and three trigram indexes. Later migrations continue with the sequential `010`–`013` prefixes.
 5. Never accept a generated migration that drops the reviewed trigram indexes. Verify clean, Feature 002-upgraded, and Feature 004-upgraded databases without editing migrations after this feature is merged or applied outside disposable development.
 6. Recover later changes by reviewed roll-forward migration; restore from tested backup if affected production data cannot be safely repaired.
 
@@ -144,7 +144,7 @@ spec-kit/specs/003-job-board-and-advanced-search/
 
 ```text
 web/
-├── prisma/{schema.prisma,migrations/008_job_board_advanced_search/migration.sql}
+├── prisma/{schema.prisma,migrations/009_job_board_advanced_search/migration.sql}
 ├── scripts/measure-job-board-performance.mjs
 ├── src/
 │   ├── app/jobs/{page.tsx,[slug]/page.tsx}

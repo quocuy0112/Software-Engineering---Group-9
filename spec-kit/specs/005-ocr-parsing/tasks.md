@@ -58,7 +58,7 @@
 ### Foundational Implementation
 
 - [x] T022 Extend `CvExtraction` and add all Feature 005 enums, OCR attempt/unit models, search query/artifact/scan/decode/intent/consent/admission models, relations, and mapped names in `web/prisma/schema.prisma`
-- [x] T023 Implement the additive tables, foreign keys, state/deadline checks, idempotency uniqueness, claim indexes, retention indexes, and immutable `deleteBy` enforcement in `web/prisma/migrations/009_purpose_specific_ocr/migration.sql`
+- [x] T023 Implement the additive tables, foreign keys, state/deadline checks, idempotency uniqueness, claim indexes, retention indexes, and immutable `deleteBy` enforcement in `web/prisma/migrations/010_purpose_specific_ocr/migration.sql`
 - [x] T024 Regenerate the checked-in Prisma client after T022-T023 and verify that only additive Feature 005 outputs change in `web/src/backend/generated/prisma/`
 - [x] T025 [P] Implement strict Zod/runtime contracts and version constants corresponding to the committed schemas in `web/src/shared/contracts/ocr/recognition.ts`, `web/src/shared/contracts/ocr/cv-segments-v2.ts`, and `web/src/shared/contracts/jobs/search-intent.ts`
 - [x] T026 [P] Implement bounded Pydantic request/result types, error envelopes, purpose profiles, image limits, and Unicode validation in `ocr-engine/src/contracts.py` and `ocr-engine/src/limits.py`
