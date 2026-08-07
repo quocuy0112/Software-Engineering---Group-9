@@ -1032,6 +1032,31 @@
 .job-filter-column {
   position: sticky;
   top: calc(var(--sh-topbar-height) + var(--sh-space-4));
+  max-height: calc(
+    100dvh - var(--sh-topbar-height) - var(--sh-space-8)
+  );
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-color: var(--sh-color-border-default) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+.job-filter-column::-webkit-scrollbar {
+  width: 6px;
+}
+
+.job-filter-column::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.job-filter-column::-webkit-scrollbar-thumb {
+  border-radius: var(--sh-radius-full);
+  background: var(--sh-color-border-default);
+}
+
+.job-filter-column::-webkit-scrollbar-thumb:hover {
+  background: var(--sh-color-text-muted);
 }
 
 .job-panel,
@@ -1579,6 +1604,7 @@
 
   .job-filter-column {
     position: static;
+    max-height: min(70dvh, 40rem);
   }
 
   .job-filter-fields {

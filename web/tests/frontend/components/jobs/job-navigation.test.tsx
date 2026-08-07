@@ -98,6 +98,21 @@ describe("job board navigation", () => {
     );
   });
 
+  it("bounds the Filters sidebar and gives it a subtle internal scrollbar", async () => {
+    const styles = await readFile(
+      resolve(process.cwd(), "src/frontend/features/jobs/styles/job-board.css"),
+      "utf8",
+    );
+
+    expect(styles).toContain(
+      "max-height: calc(\n    100dvh - var(--sh-topbar-height) - var(--sh-space-8)\n  );",
+    );
+    expect(styles).toContain("overflow-y: auto;");
+    expect(styles).toContain("scrollbar-width: thin;");
+    expect(styles).toContain(".job-filter-column::-webkit-scrollbar {");
+    expect(styles).toContain("max-height: min(70dvh, 40rem);");
+  });
+
   it("shows the Profile workspace bar and marks Jobs as active", () => {
     render(
       <WorkspaceShell
