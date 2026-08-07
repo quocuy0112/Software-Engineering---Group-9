@@ -100,18 +100,6 @@ function visualStage(resource: StatusResource): TimelineStage {
   return stage && stageKeys.includes(stage) ? stage : "UPLOAD";
 }
 
-function visualStage(resource: StatusResource): (typeof stageKeys)[number] {
-  if (resource.status === "VALIDATION_FAILED") return "VALIDATE";
-  if (resource.status === "INFECTED" || resource.status === "SCAN_FAILED")
-    return "SCAN";
-  if (resource.status === "EXTRACTION_FAILED") return "EXTRACT";
-  if (resource.status === "PARSE_FAILED") return "PARSE";
-  if (resource.status === "REVIEW_READY" || resource.status === "CONFIRMED")
-    return "REVIEW";
-  const stage = resource.stage as (typeof stageKeys)[number] | undefined;
-  return stage && stageKeys.includes(stage) ? stage : "UPLOAD";
-}
-
 function timelineState(input: {
   index: number;
   currentIndex: number;
@@ -426,8 +414,6 @@ export function CvImportStatus({
   const label = cvStatusLabel(locale, current.status);
   const availableActions = current.availableActions ?? [];
   const aiStatus = aiPresentation(locale, current);
-  const stages = (
-    current.parserClass === "EXTERNAL_OPENAI"
   const optionalOcrStages: readonly TimelineStage[] = current.ocr
     ? ["OCR"]
     : [];

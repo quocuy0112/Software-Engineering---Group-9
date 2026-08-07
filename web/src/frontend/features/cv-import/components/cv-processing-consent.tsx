@@ -61,7 +61,7 @@ export function CvProcessingConsent({
       setAccepted(false);
       setMessage(copy.granted);
       setFeedbackTone("success");
-  } catch (cause) { {
+    } catch (cause) {
       const expired =
         cause instanceof Error && cause.message === "CV_SESSION_EXPIRED";
       setSessionExpired(expired);
