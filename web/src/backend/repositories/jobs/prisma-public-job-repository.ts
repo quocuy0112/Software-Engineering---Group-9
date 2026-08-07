@@ -17,6 +17,9 @@ const publicInclude = (actorUserId: string | null) =>
         websiteUrl: true,
         publicDescription: true,
         publicLocation: true,
+        size: true,
+        industry: true,
+        address: true,
       },
     },
     skills: {
@@ -65,6 +68,16 @@ export interface PublicJobRepository {
     actorUserId: string | null,
     now: Date,
   ): Promise<PublicJobRow | null>;
+  findPublicRelatedCandidates?(
+    jobId: string,
+    actorUserId: string | null,
+    now: Date,
+  ): Promise<PublicJobRow[]>;
+  findPublicDiscoveryCandidates?(
+    jobId: string,
+    actorUserId: string | null,
+    now: Date,
+  ): Promise<PublicJobRow[]>;
   findPublicActionTarget(
     jobId: string,
     now: Date,
@@ -84,7 +97,19 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
     Prisma.sql`EXISTS (SELECT 1 FROM "Company" c WHERE c."id" = j."companyId" AND c."verifiedAt" IS NOT NULL)`,
   ];
   for (const token of input.normalizedQuery.split(" ").filter(Boolean)) {
-    clauses.push(Prisma.sql`j."searchDocumentNormalized" LIKE ${`%${token}%`}`);
+    if (input.searchBy === "TITLE") {
+      clauses.push(Prisma.sql`j."normalizedTitle" LIKE ${`%${token}%`}`);
+    } else if (input.searchBy === "COMPANY") {
+      clauses.push(Prisma.sql`EXISTS (
+        SELECT 1 FROM "Company" c
+        WHERE c."id" = j."companyId"
+          AND (lower(c."displayName") LIKE ${`%${token}%`} OR lower(c."legalName") LIKE ${`%${token}%`})
+      )`);
+    } else {
+      clauses.push(
+        Prisma.sql`j."searchDocumentNormalized" LIKE ${`%${token}%`}`,
+      );
+    }
   }
   if (input.normalizedLocation) {
     clauses.push(
@@ -237,6 +262,52 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
       include: publicInclude(actorUserId),
     });
     return row ? ({ ...row, score: 0 } as PublicJobRow) : null;
+  }
+
+  async findPublicRelatedCandidates(
+    jobId: string,
+    actorUserId: string | null,
+    now: Date,
+  ) {
+    const rows = await prisma.jobPosting.findMany({
+      where: {
+        id: { not: jobId },
+        status: "ACTIVE",
+        approvedAt: { not: null },
+        publishedAt: { not: null, lte: now },
+        OR: [
+          { applicationDeadline: null },
+          { applicationDeadline: { gt: now } },
+        ],
+        company: { verifiedAt: { not: null } },
+      },
+      take: 100,
+      include: publicInclude(actorUserId),
+    });
+    return rows.map((row) => ({ ...row, score: 0 }) as PublicJobRow);
+  }
+  async findPublicDiscoveryCandidates(
+    jobId: string,
+    actorUserId: string | null,
+    now: Date,
+  ) {
+    const rows = await prisma.jobPosting.findMany({
+      where: {
+        id: { not: jobId },
+        status: "ACTIVE",
+        approvedAt: { not: null },
+        publishedAt: { not: null, lte: now },
+        OR: [
+          { applicationDeadline: null },
+          { applicationDeadline: { gt: now } },
+        ],
+        company: { verifiedAt: { not: null } },
+      },
+      orderBy: [{ publishedAt: "desc" }, { id: "asc" }],
+      take: 160,
+      include: publicInclude(actorUserId),
+    });
+    return rows.map((row) => ({ ...row, score: 0 }) as PublicJobRow);
   }
 
   async findPublicActionTarget(jobId: string, now: Date) {

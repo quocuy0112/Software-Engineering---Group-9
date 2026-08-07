@@ -935,6 +935,9 @@ model Company {
   websiteUrl        String?
   publicDescription String?
   publicLocation    String?
+  size              String?
+  industry          String?
+  address           String?
   verifiedAt        DateTime?
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
@@ -954,6 +957,9 @@ model JobPosting {
   responsibilities         String
   requirements             String
   benefits                 String?
+  education                String?
+  numberOfHires            Int?
+  age                      String?
   location                 String
   normalizedLocation       String
   employmentType           EmploymentType
@@ -1081,6 +1087,10 @@ model JobApplication {
   candidateUserId         String
   jobPostingId            String
   selectedCvId            String
+  cvFileRef               String?
+  contactSnapshot         Json?
+  aiAnalysisConsent       Boolean                       @default(false)
+  aiMatchScore            Int?
   stage                   ApplicationStage              @default(APPLIED)
   coverLetter             String?
   profileSnapshot         Json
@@ -1103,6 +1113,7 @@ model JobApplication {
   @@unique([candidateUserId, idempotencyKey])
   @@index([jobPostingId, stage, submittedAt])
   @@index([candidateUserId, submittedAt(sort: Desc)])
+  @@index([candidateUserId, aiAnalysisConsent])
 }
 
 model ApplicationAnswer {

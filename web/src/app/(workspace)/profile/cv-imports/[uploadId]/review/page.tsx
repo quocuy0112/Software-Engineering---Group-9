@@ -7,6 +7,7 @@ import { CvImportServiceError } from "@/backend/services/cv-import/cv-http-error
 import { getCvImportResource } from "@/backend/services/cv-import/cv-import-projection";
 import { CvConfirmationReceipt } from "@/frontend/features/cv-import/components/cv-confirmation-receipt";
 import { CvDraftReview } from "@/frontend/features/cv-import/components/cv-draft-review";
+import { cvStatusLabel } from "@/frontend/features/cv-import/i18n/cv-import-copy";
 import { ProfileNavigation } from "@/frontend/features/profile/components/profile-navigation";
 import { cvUploadIdSchema } from "@/shared/contracts/cv-import/common";
 import type { CvDraftComparison } from "@/shared/contracts/cv-import/review";
@@ -64,6 +65,7 @@ export default async function CvDraftReviewPage({
     }
   }
 
+  const vi = context.initialLocale === "vi";
   return (
     <main className={styles.page}>
       <header className={styles.header}>
@@ -71,11 +73,18 @@ export default async function CvDraftReviewPage({
           className={styles.backLink}
           href={`/profile/cv-imports/${uploadId}`}
         >
-          <span aria-hidden="true">←</span> Back to import status
+          <span aria-hidden="true">←</span>{" "}
+          {vi ? "Quay lại trạng thái nhập" : "Back to import status"}
         </Link>
         <div className={styles.context}>
-          <p>HUMAN-REVIEWED IMPORT</p>
-          <strong>You remain in control of every profile change.</strong>
+          <p>
+            {vi ? "NHẬP CV DO NGƯỜI DÙNG XEM XÉT" : "HUMAN-REVIEWED IMPORT"}
+          </p>
+          <strong>
+            {vi
+              ? "Bạn vẫn kiểm soát mọi thay đổi hồ sơ."
+              : "You remain in control of every profile change."}
+          </strong>
         </div>
       </header>
       <ProfileNavigation active="cv-imports" />
@@ -92,10 +101,11 @@ export default async function CvDraftReviewPage({
             <span aria-hidden="true">i</span>
             <div>
               <h1 id="review-unavailable-heading">
-                CV review is not available
+                {vi ? "Không thể xem xét CV" : "CV review is not available"}
               </h1>
               <p role="status">
-                Current import status: {resource.status.toLowerCase()}.
+                {vi ? "Trạng thái nhập hiện tại: " : "Current import status: "}
+                {cvStatusLabel(context.initialLocale, resource.status)}.
               </p>
             </div>
           </section>

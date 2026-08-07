@@ -21,6 +21,14 @@ import {
   cvStatusPollingAfterMs,
   type CvImportResource,
 } from "@/shared/contracts/cv-import/upload";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import {
+  cvCopy,
+  cvKnownError,
+  cvParserLabel,
+  cvStageLabel,
+  cvStatusLabel,
+} from "../i18n/cv-import-copy";
 import {
   CvFailureRecovery,
   CvRecoveryActionError,
@@ -66,18 +74,20 @@ function tombstonePollingAfterMs(resource: StatusResource): number | null {
 
 type TimelineState = "complete" | "current" | "upcoming" | "error";
 
-const stageLabels = {
-  UPLOAD: "Upload",
-  VALIDATE: "Validate",
-  SCAN: "Virus scan",
-  EXTRACT: "Extract text",
-  OCR: "Recognize document images",
-  CONSENT: "Consent",
-  PARSE: "Parse",
-  REVIEW: "Review",
-} as const;
+const stageKeys = [
+  "UPLOAD",
+  "VALIDATE",
+  "SCAN",
+  "EXTRACT",
+  "OCR",
+  "CONSENT",
+  "PARSE",
+  "REVIEW",
+] as const;
 
-function visualStage(resource: StatusResource): keyof typeof stageLabels {
+type TimelineStage = (typeof stageKeys)[number];
+
+function visualStage(resource: StatusResource): TimelineStage {
   if (resource.status === "VALIDATION_FAILED") return "VALIDATE";
   if (resource.status === "INFECTED" || resource.status === "SCAN_FAILED")
     return "SCAN";
@@ -85,8 +95,21 @@ function visualStage(resource: StatusResource): keyof typeof stageLabels {
   if (resource.status === "PARSE_FAILED") return "PARSE";
   if (resource.status === "REVIEW_READY" || resource.status === "CONFIRMED")
     return "REVIEW";
-  const stage = resource.stage as keyof typeof stageLabels | undefined;
-  return stage && stage in stageLabels ? stage : "UPLOAD";
+
+  const stage = resource.stage as TimelineStage | undefined;
+  return stage && stageKeys.includes(stage) ? stage : "UPLOAD";
+}
+
+function visualStage(resource: StatusResource): (typeof stageKeys)[number] {
+  if (resource.status === "VALIDATION_FAILED") return "VALIDATE";
+  if (resource.status === "INFECTED" || resource.status === "SCAN_FAILED")
+    return "SCAN";
+  if (resource.status === "EXTRACTION_FAILED") return "EXTRACT";
+  if (resource.status === "PARSE_FAILED") return "PARSE";
+  if (resource.status === "REVIEW_READY" || resource.status === "CONFIRMED")
+    return "REVIEW";
+  const stage = resource.stage as (typeof stageKeys)[number] | undefined;
+  return stage && stageKeys.includes(stage) ? stage : "UPLOAD";
 }
 
 function timelineState(input: {
@@ -99,60 +122,65 @@ function timelineState(input: {
   return input.failed ? "error" : "current";
 }
 
-function aiPresentation(resource: StatusResource): Readonly<{
+function aiPresentation(
+  locale: "vi" | "en",
+  resource: StatusResource,
+): Readonly<{
   tone: "pending" | "processing" | "success" | "error" | "preparing";
   badge: string;
   title: string;
   message: string;
 }> | null {
+  const copy = cvCopy(locale).status;
   if (resource.parserClass !== "EXTERNAL_OPENAI") return null;
   if (resource.status === "AWAITING_CONSENT")
     return {
       tone: "pending",
-      badge: "Consent needed",
-      title: "OpenAI is waiting for your permission",
+      badge: copy.consentNeeded,
+      title: copy.openaiWaiting,
       message:
-        "No CV text has been sent to OpenAI. Review the consent notice below to continue.",
+        locale === "vi"
+          ? "Chưa có văn bản CV nào được gửi đến OpenAI. Hãy xem xét thông báo đồng ý bên dưới để tiếp tục."
+          : "No CV text has been sent to OpenAI. Review the consent notice below to continue.",
     };
   if (resource.status === "PARSE_QUEUED")
     return {
       tone: "pending",
-      badge: "Queued",
-      title: "OpenAI request is queued",
+      badge: copy.queued,
+      title: copy.openaiQueued,
       message:
-        "Consent is valid and the worker is preparing the request. This page refreshes automatically.",
+        locale === "vi"
+          ? "Quyền đồng ý hợp lệ và worker đang chuẩn bị yêu cầu. Trang này sẽ tự động làm mới."
+          : "Consent is valid and the worker is preparing the request. This page refreshes automatically.",
     };
   if (resource.status === "PARSING")
     return {
       tone: "processing",
-      badge: "API in progress",
-      title: "OpenAI is extracting profile fields",
-      message:
-        "The API request is running. SmartHire will only mark it successful after validating and saving the structured result.",
+      badge: copy.apiInProgress,
+      title: copy.openaiExtracting,
+      message: copy.openaiRunning,
     };
   if (resource.status === "REVIEW_READY" || resource.status === "CONFIRMED")
     return {
       tone: "success",
-      badge: "Success",
-      title: "OpenAI parsing completed",
-      message:
-        "A private draft is ready. Review every suggested field before applying it to your profile.",
+      badge: copy.success,
+      title: copy.openaiCompleted,
+      message: copy.draftReady,
     };
   if (resource.status === "PARSE_FAILED")
     return {
       tone: "error",
-      badge: resource.failure?.code ?? "API error",
-      title: "OpenAI parsing could not finish",
-      message:
-        resource.failure?.message ??
-        "The provider request failed safely. Retry or update your profile manually.",
+      badge: resource.failure?.code ?? copy.apiError,
+      title: copy.openaiFailed,
+      message: resource.failure
+        ? cvKnownError(locale, resource.failure.message, resource.failure.code)
+        : copy.providerFailed,
     };
   return {
     tone: "preparing",
-    badge: "Preparing",
-    title: "SmartHire is preparing the CV for OpenAI",
-    message:
-      "Virus scanning and local text extraction happen first. OpenAI has not been called at this stage.",
+    badge: copy.preparing,
+    title: copy.preparingOpenai,
+    message: copy.preparingMessage,
   };
 }
 
@@ -166,6 +194,8 @@ export function CvImportStatus({
   csrfProof?: string;
 }) {
   const router = useRouter();
+  const locale = useWorkspaceLocale();
+  const copy = cvCopy(locale);
   const [current, setCurrent] = useState(resource);
   const [pollError, setPollError] = useState<string | null>(null);
   const retryKey = useRef<string | null>(null);
@@ -229,7 +259,9 @@ export function CvImportStatus({
           .catch(() => {
             if (!active) return;
             setPollError(
-              "Status could not be refreshed. SmartHire will keep trying.",
+              locale === "vi"
+                ? "Không thể làm mới trạng thái. SmartHire sẽ tiếp tục thử lại."
+                : "Status could not be refreshed. SmartHire will keep trying.",
             );
             schedule(pollingAfterMs);
           });
@@ -240,7 +272,7 @@ export function CvImportStatus({
       active = false;
       if (timer) clearTimeout(timer);
     };
-  }, [current.pollingAfterMs, refreshStatus]);
+  }, [current.pollingAfterMs, locale, refreshStatus]);
 
   useEffect(() => {
     if (current.status !== "REVIEW_READY") return;
@@ -253,7 +285,9 @@ export function CvImportStatus({
   const requestRetry = useCallback(async () => {
     if (!csrfProof)
       throw new CvRecoveryActionError(
-        "Retry could not be queued. Refresh this page and try again.",
+        locale === "vi"
+          ? "Không thể xếp hàng thử lại. Hãy tải lại trang và thử lại."
+          : "Retry could not be queued. Refresh this page and try again.",
       );
     retryKey.current ??= newRetryKey();
     const response = await fetch(
@@ -274,30 +308,40 @@ export function CvImportStatus({
       const wait = retryAfterSeconds(response);
       throw new CvRecoveryActionError(
         wait
-          ? "Retry is temporarily unavailable. The countdown shows when to try again."
-          : "Retry could not be queued. Your failed import is unchanged.",
+          ? locale === "vi"
+            ? "Tạm thời không thể thử lại. Bộ đếm cho biết khi nào có thể thử."
+            : "Retry is temporarily unavailable. The countdown shows when to try again."
+          : locale === "vi"
+            ? "Không thể xếp hàng thử lại. Lần nhập thất bại vẫn được giữ nguyên."
+            : "Retry could not be queued. Your failed import is unchanged.",
         wait,
       );
     }
     const outcome = cvRetryAcceptedSchema.parse(await response.json());
     if (outcome.uploadId !== current.uploadId)
       throw new CvRecoveryActionError(
-        "Retry could not be verified. Your failed import is unchanged.",
+        locale === "vi"
+          ? "Không thể xác minh lần thử lại. Lần nhập thất bại vẫn được giữ nguyên."
+          : "Retry could not be verified. Your failed import is unchanged.",
       );
     await refreshStatus();
     retryKey.current = null;
-  }, [csrfProof, current.uploadId, refreshStatus]);
+  }, [csrfProof, current.uploadId, locale, refreshStatus]);
 
   const deleteImport = useCallback(
     async (confirmed = false): Promise<CvDeletionOutcome | false> => {
       if (!csrfProof)
         throw new CvRecoveryActionError(
-          "The import could not be deleted. Refresh this page and try again.",
+          locale === "vi"
+            ? "Không thể xóa lần nhập. Hãy tải lại trang và thử lại."
+            : "The import could not be deleted. Refresh this page and try again.",
         );
       if (
         !confirmed &&
         !window.confirm(
-          "Delete this CV import? Access ends immediately, and protected physical cleanup continues in the background.",
+          locale === "vi"
+            ? "Xóa lần nhập CV này? Quyền truy cập kết thúc ngay và quá trình dọn dẹp vật lý được bảo vệ sẽ tiếp tục ở chế độ nền."
+            : "Delete this CV import? Access ends immediately, and protected physical cleanup continues in the background.",
         )
       )
         return false;
@@ -312,7 +356,9 @@ export function CvImportStatus({
       );
       if (!response.ok)
         throw new CvRecoveryActionError(
-          "The import could not be deleted. It remains available in your history.",
+          locale === "vi"
+            ? "Không thể xóa lần nhập. Lần nhập vẫn có trong lịch sử của bạn."
+            : "The import could not be deleted. It remains available in your history.",
         );
       const outcome = cvDeletionOutcomeSchema.parse(await response.json());
       const tombstone = cvImportTombstoneSchema.parse({
@@ -332,7 +378,7 @@ export function CvImportStatus({
       retryKey.current = null;
       return outcome;
     },
-    [csrfProof, current.uploadId],
+    [csrfProof, current.uploadId, locale],
   );
 
   const grantConsent = useCallback(
@@ -377,17 +423,23 @@ export function CvImportStatus({
     await refreshStatus();
   }, [csrfProof, current.uploadId, refreshStatus]);
 
-  const label = current.status.replaceAll("_", " ").toLowerCase();
+  const label = cvStatusLabel(locale, current.status);
   const availableActions = current.availableActions ?? [];
-  const aiStatus = aiPresentation(current);
+  const aiStatus = aiPresentation(locale, current);
   const stages = (
+    current.parserClass === "EXTERNAL_OPENAI"
+  const optionalOcrStages: readonly TimelineStage[] = current.ocr
+    ? ["OCR"]
+    : [];
+
+  const stages: readonly TimelineStage[] =
     current.parserClass === "EXTERNAL_OPENAI"
       ? [
           "UPLOAD",
           "VALIDATE",
           "SCAN",
           "EXTRACT",
-          ...(current.ocr ? (["OCR"] as const) : []),
+          ...optionalOcrStages,
           "CONSENT",
           "PARSE",
           "REVIEW",
@@ -397,11 +449,10 @@ export function CvImportStatus({
           "VALIDATE",
           "SCAN",
           "EXTRACT",
-          ...(current.ocr ? (["OCR"] as const) : []),
+          ...optionalOcrStages,
           "PARSE",
           "REVIEW",
-        ]
-  ) as readonly (keyof typeof stageLabels)[];
+        ];
   const activeStage = visualStage(current);
   const activeStageIndex = Math.max(0, stages.indexOf(activeStage));
   const failed =
@@ -413,7 +464,7 @@ export function CvImportStatus({
   );
   return (
     <section className={styles.root} aria-labelledby="cv-status-heading">
-      <h2 id="cv-status-heading">CV processing status</h2>
+      <h2 id="cv-status-heading">{copy.status.heading}</h2>
       <p
         className={styles.state}
         role={
@@ -429,12 +480,8 @@ export function CvImportStatus({
       >
         <strong>{label}</strong>
         {current.stage
-          ? ` — ${
-              current.parserClass === "EXTERNAL_OPENAI"
-                ? "OpenAI parser"
-                : "SmartHire parser"
-            }, stage ${activeStage.toLowerCase()}.`
-          : ". Content is unavailable."}
+          ? ` — ${cvParserLabel(locale, current.parserClass ?? "DETERMINISTIC_INTERNAL")}, ${copy.status.stage} ${cvStageLabel(locale, activeStage)}.`
+          : `. ${copy.status.contentUnavailable}`}
       </p>
       {aiStatus ? (
         <div
@@ -449,7 +496,7 @@ export function CvImportStatus({
             <span />
           </span>
           <div className={styles.aiCopy}>
-            <small>EXTERNAL OPENAI PARSER</small>
+            <small>{copy.status.openaiExternal}</small>
             <strong>{aiStatus.title}</strong>
             <p>{aiStatus.message}</p>
           </div>
@@ -457,7 +504,10 @@ export function CvImportStatus({
         </div>
       ) : null}
       {current.stage ? (
-        <ol className={styles.timeline} aria-label="Processing timeline">
+        <ol
+          className={styles.timeline}
+          aria-label={copy.common.processingTimeline}
+        >
           {stages.map((stage, index) => {
             const state = timelineState({
               index,
@@ -476,9 +526,9 @@ export function CvImportStatus({
                   {state === "complete" ? "✓" : index + 1}
                 </span>
                 <span>
-                  {state === "current" ? "Current: " : ""}
-                  {state === "error" ? "Failed: " : ""}
-                  {stageLabels[stage]}
+                  {state === "current" ? copy.status.current : ""}
+                  {state === "error" ? copy.status.failed : ""}
+                  {cvStageLabel(locale, stage)}
                 </span>
               </li>
             );
@@ -509,15 +559,15 @@ export function CvImportStatus({
       ) : (
         <div className={styles.actions}>
           {availableActions.includes("RETRY") ? (
-            <button type="button">Retry</button>
+            <button type="button">{copy.status.retry}</button>
           ) : null}
           {availableActions.includes("REVIEW") ? (
             <a href={`/profile/cv-imports/${current.uploadId}/review`}>
-              Review draft
+              {copy.status.reviewDraft}
             </a>
           ) : null}
           {availableActions.includes("MANUAL_PROFILE") ? (
-            <a href="/profile">Manual profile</a>
+            <a href="/profile">{copy.common.manualProfile}</a>
           ) : null}
         </div>
       )}

@@ -10,6 +10,7 @@ function query(request: Request) {
   const value = (name: string) => params.get(name) ?? undefined;
   return {
     q: value("q"),
+    searchBy: value("searchBy"),
     location: value("location"),
     employmentType: params.getAll("employmentType"),
     experienceLevel: params.getAll("experienceLevel"),

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { JobDetailView } from "@/frontend/features/jobs/components/job-detail";
 import type { JobDetail } from "@/shared/contracts/jobs/discovery";
@@ -21,6 +21,9 @@ const detail: JobDetail = {
   workArrangement: "HYBRID",
   salary: null,
   summary: "Build accessible products.",
+  education: "Bachelor's degree or above",
+  numberOfHires: 3,
+  age: "23-26",
   skills: ["TypeScript"],
   publishedAt: "2026-07-20T00:00:00.000Z",
   applicationDeadline: null,
@@ -47,9 +50,47 @@ describe("job detail presentation", () => {
     expect(
       screen.getByRole("heading", { name: /responsibilities/i }),
     ).toBeVisible();
+    const requirementsTab = screen.getByRole("tab", {
+      name: /requirements/i,
+    });
+    expect(requirementsTab).toHaveAttribute("aria-selected", "false");
+    fireEvent.click(requirementsTab);
+    expect(requirementsTab).toHaveAttribute("aria-selected", "true");
     expect(
-      screen.getByRole("link", { name: /sign in to apply/i }),
-    ).toHaveAttribute("href", "/login?returnTo=%2Fjobs%2Flap-trinh-vien");
+      screen.getByRole("heading", { name: /must-have requirements/i }),
+    ).toBeVisible();
+    expect(
+      screen.queryByRole("heading", { name: /key responsibilities/i }),
+    ).toBeNull();
+
+    const benefitsTab = screen.getByRole("tab", { name: /benefits/i });
+    fireEvent.click(benefitsTab);
+    expect(benefitsTab).toHaveAttribute("aria-selected", "true");
+    expect(
+      screen.queryByRole("heading", { name: /must-have requirements/i }),
+    ).toBeNull();
+    const signInLinks = screen.getAllByRole("link", {
+      name: /sign in to apply/i,
+    });
+    expect(signInLinks).toHaveLength(1);
+    for (const link of signInLinks) {
+      expect(link).toHaveAttribute(
+        "href",
+        "/login?returnTo=%2Fjobs%2Flap-trinh-vien",
+      );
+    }
+  });
+
+  it("renders database-backed education and number of hires", () => {
+    render(<JobDetailView job={detail} />);
+    const generalInformation = screen.getByRole("region", {
+      name: /general information/i,
+    });
+    expect(
+      within(generalInformation).getByText("Bachelor's degree or above"),
+    ).toBeVisible();
+    expect(within(generalInformation).getByText("3 positions")).toBeVisible();
+    expect(screen.getByText("23-26")).toBeVisible();
   });
 
   it("shows a textual closed state and removes apply", () => {

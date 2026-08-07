@@ -3,7 +3,7 @@ import Link from "next/link";
 import { JobDiscoveryService } from "@/backend/services/jobs/job-discovery-service";
 import { JobServiceError } from "@/backend/services/jobs/job-types";
 import { optionalJobActor } from "@/backend/security/job-request-boundary";
-import { JobCardView } from "@/frontend/features/jobs/components/job-card";
+import { JobResultsList } from "@/frontend/features/jobs/components/job-results-list";
 import { JobSearchForm } from "@/frontend/features/jobs/components/job-search-form";
 
 type PageProps = {
@@ -82,37 +82,50 @@ export default async function JobsPage({ searchParams }: PageProps) {
   if (result?.nextCursor) next.set("cursor", result.nextCursor);
   return (
     <div className="jobs-page">
-      <header className="page-heading jobs-heading">
-        <div>
-          <p className="workspace-kicker">SMART HIRE OPPORTUNITIES</p>
-          <h1 id="workspace-page-title">Jobs</h1>
-          <p className="page-heading-copy">
-            Discover verified opportunities and find work that fits your next
-            career move.
-          </p>
-        </div>
-        {result ? (
-          <span className="job-count-badge" aria-label={`${result.total} jobs`}>
-            <strong>{result.total}</strong>
-            <span>open roles</span>
-          </span>
-        ) : null}
-      </header>
+      <div className="jobs-fixed-region">
+        <header className="page-heading jobs-heading">
+          <div>
+            <p className="workspace-kicker">SMART HIRE OPPORTUNITIES</p>
+            <h1 id="workspace-page-title">Jobs</h1>
+            <p className="page-heading-copy">
+              Discover verified opportunities and find work that fits your next
+              career move.
+            </p>
+          </div>
+          {result ? (
+            <span
+              className="job-count-badge"
+              aria-label={`${result.total} jobs`}
+            >
+              <strong>{result.total}</strong>
+              <span>open roles</span>
+            </span>
+          ) : null}
+        </header>
 
-      <nav className="job-board-tabs" aria-label="Job board">
-        <Link href="/jobs" aria-current="page">
-          Find jobs
-        </Link>
-        <span>Verified listings</span>
-        <span>Transparent details</span>
-      </nav>
+        <nav className="job-board-tabs" aria-label="Job board">
+          <Link href="/jobs" aria-current="page">
+            Find jobs
+          </Link>
+          <span>Verified listings</span>
+          <span>Transparent details</span>
+        </nav>
+      </div>
 
       <div className="jobs-grid">
-        <aside className="job-filter-column" aria-label="Job filters">
+        <aside
+          className="job-filter-column"
+          aria-label="Job filters"
+          tabIndex={0}
+        >
           <JobSearchForm criteria={raw} />
         </aside>
 
-        <section className="job-results" aria-labelledby="job-results-heading">
+        <section
+          className="job-results"
+          aria-labelledby="job-results-heading"
+          tabIndex={0}
+        >
           <header className="job-results-header">
             <div>
               <p className="panel-kicker">SEARCH RESULTS</p>
@@ -151,13 +164,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
             </div>
           ) : result && result.items.length ? (
             <>
-              <ol className="job-list">
-                {result.items.map((job) => (
-                  <li key={job.id}>
-                    <JobCardView job={job} />
-                  </li>
-                ))}
-              </ol>
+              <JobResultsList jobs={result.items} />
               {result.nextCursor ? (
                 <div className="job-pagination">
                   <Link href={`/jobs?${next.toString()}`}>Load more jobs</Link>

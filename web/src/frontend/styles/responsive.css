@@ -154,7 +154,7 @@
   body,
   .auth-page,
   .workspace-page {
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   .auth-panel {

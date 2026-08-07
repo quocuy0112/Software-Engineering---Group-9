@@ -16,6 +16,7 @@ export type PublicJobState = "ACTIVE" | "CLOSED" | "EXPIRED";
 
 export type NormalizedJobSearch = {
   normalizedQuery: string;
+  searchBy?: "TITLE" | "COMPANY" | "BOTH";
   normalizedLocation: string;
   normalizedSkills: string[];
   employmentType: Array<

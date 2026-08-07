@@ -14,7 +14,8 @@ html {
 body {
   min-height: 100dvh;
   margin: 0;
-  overflow-x: hidden;
+  /* Clip horizontal spill without creating an extra sticky scroll context. */
+  overflow-x: clip;
   color: var(--sh-color-text-primary);
   background: var(--sh-color-surface-page);
   font-family: var(--sh-font-family);

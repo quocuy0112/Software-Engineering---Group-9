@@ -68,6 +68,7 @@ export class JobApplicationService {
       companyName: result.job.company.displayName,
       profileReady: result.profileReady,
       missingProfileFields: result.missingProfileFields,
+      contact: result.contact,
       cvs: result.cvs.map((cv) => ({
         ...cv,
         confirmedAt: cv.confirmedAt.toISOString(),

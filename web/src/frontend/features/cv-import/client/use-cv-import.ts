@@ -2,11 +2,23 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type { CvParserClass } from "@/shared/contracts/cv-import/common";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import type {
+  CvImportStage,
+  CvParserClass,
+  CvUploadStatus,
+} from "@/shared/contracts/cv-import/common";
 import {
   cvImportStatusResponseSchema,
   type CreateCvImportRequest,
 } from "@/shared/contracts/cv-import/upload";
+import {
+  cvKnownError,
+  cvStageLabel,
+  cvStatusLabel,
+  cvCopy,
+  type CvLocale,
+} from "../i18n/cv-import-copy";
 
 export type CvUploadProgress = Readonly<{
   state:
@@ -32,13 +44,9 @@ function requestKey() {
   return `cv-${crypto.randomUUID()}`;
 }
 
-function statusLabel(value: string): string {
-  return value.replaceAll("_", " ").toLowerCase();
-}
-
 type CvStatusResource = Readonly<{
-  status: string;
-  stage?: string;
+  status: CvUploadStatus;
+  stage?: CvImportStage;
   parserClass?: CvParserClass;
   deleteAfter?: string | null;
   deletedAt?: string | null;
@@ -49,7 +57,7 @@ type CvStatusResource = Readonly<{
   }> | null;
 }>;
 
-const failureStatuses = new Set([
+const failureStatuses = new Set<CvUploadStatus>([
   "VALIDATION_FAILED",
   "INFECTED",
   "SCAN_FAILED",
@@ -65,7 +73,6 @@ function progressPercentage(resource: CvStatusResource): number {
     )
   )
     return 100;
-  const stage = "stage" in resource ? resource.stage : undefined;
   return (
     {
       UPLOAD: 10,
@@ -77,11 +84,12 @@ function progressPercentage(resource: CvStatusResource): number {
       REVIEW: 100,
       COMPLETE: 100,
       TERMINAL: 100,
-    }[stage ?? ""] ?? 15
+    }[resource.stage ?? "UPLOAD"] ?? 15
   );
 }
 
 function activeProgress(
+  locale: CvLocale,
   resource: CvStatusResource,
 ): Pick<
   CvUploadProgress,
@@ -89,13 +97,20 @@ function activeProgress(
 > {
   const external = resource.parserClass === "EXTERNAL_OPENAI";
   const percentage = progressPercentage(resource);
+  const copy = cvCopy(locale);
   if (resource.status === "REVIEW_READY" || resource.status === "CONFIRMED") {
     return {
       state: "SUCCESS",
       percentage,
-      title: external ? "OpenAI parsing completed" : "CV parsing completed",
+      title: external
+        ? copy.status.openaiCompleted
+        : locale === "vi"
+          ? "Đã hoàn tất phân tích CV"
+          : "CV parsing completed",
       message:
-        "Your private draft is ready. Review it before applying changes.",
+        locale === "vi"
+          ? "Bản nháp riêng đã sẵn sàng. Hãy xem xét trước khi áp dụng thay đổi."
+          : "Your private draft is ready. Review it before applying changes.",
       parserClass: resource.parserClass ?? null,
     };
   }
@@ -105,9 +120,13 @@ function activeProgress(
       percentage,
       title:
         external && resource.status === "PARSE_FAILED"
-          ? "OpenAI parsing failed"
-          : "CV processing stopped",
-      message: terminalMessage(resource),
+          ? locale === "vi"
+            ? "Phân tích bằng OpenAI không thành công"
+            : "OpenAI parsing failed"
+          : locale === "vi"
+            ? "Đã dừng xử lý CV"
+            : "CV processing stopped",
+      message: terminalMessage(locale, resource),
       parserClass: resource.parserClass ?? null,
     };
   }
@@ -115,9 +134,12 @@ function activeProgress(
     return {
       state: "AWAITING_CONSENT",
       percentage,
-      title: "Waiting for your consent",
+      title:
+        locale === "vi" ? "Đang chờ bạn cấp quyền" : "Waiting for your consent",
       message:
-        "OpenAI has not received any CV text. Open the import status to review and grant consent.",
+        locale === "vi"
+          ? "OpenAI chưa nhận bất kỳ văn bản CV nào. Mở trạng thái nhập để xem xét và cấp quyền."
+          : "OpenAI has not received any CV text. Open the import status to review and grant consent.",
       parserClass: resource.parserClass ?? null,
     };
   }
@@ -125,8 +147,14 @@ function activeProgress(
     return {
       state: "AI_PENDING",
       percentage,
-      title: "OpenAI request queued",
-      message: "Consent is valid. The worker is preparing the AI request.",
+      title:
+        locale === "vi"
+          ? "Yêu cầu OpenAI đã xếp hàng"
+          : "OpenAI request queued",
+      message:
+        locale === "vi"
+          ? "Quyền đồng ý hợp lệ. Worker đang chuẩn bị yêu cầu AI."
+          : "Consent is valid. The worker is preparing the AI request.",
       parserClass: resource.parserClass ?? null,
     };
   }
@@ -134,36 +162,66 @@ function activeProgress(
     return {
       state: "AI_PROCESSING",
       percentage,
-      title: "OpenAI is parsing your CV",
+      title:
+        locale === "vi"
+          ? "OpenAI đang phân tích CV"
+          : "OpenAI is parsing your CV",
       message:
-        "The API request is in progress. Keep this page open for live status.",
+        locale === "vi"
+          ? "Yêu cầu API đang được xử lý. Hãy giữ trang này mở để theo dõi trạng thái."
+          : "The API request is in progress. Keep this page open for live status.",
       parserClass: resource.parserClass ?? null,
     };
   }
+  const stage = resource.stage
+    ? cvStageLabel(locale, resource.stage)
+    : cvStatusLabel(locale, resource.status);
   return {
     state: "PROCESSING",
     percentage,
     title: external
-      ? "Preparing CV for OpenAI"
-      : "SmartHire is processing your CV",
+      ? copy.status.preparingOpenai
+      : locale === "vi"
+        ? "SmartHire đang xử lý CV"
+        : "SmartHire is processing your CV",
     message: external
-      ? `SmartHire is completing the ${statusLabel(resource.stage ?? resource.status)} stage. OpenAI has not been called yet.`
-      : `Current stage: ${statusLabel(resource.stage ?? resource.status)}.`,
+      ? locale === "vi"
+        ? `SmartHire đang hoàn tất giai đoạn ${stage}. OpenAI chưa được gọi.`
+        : `SmartHire is completing the ${stage} stage. OpenAI has not been called yet.`
+      : locale === "vi"
+        ? `Giai đoạn hiện tại: ${stage}.`
+        : `Current stage: ${stage}.`,
     parserClass: resource.parserClass ?? null,
   };
 }
 
-function terminalMessage(resource: CvStatusResource): string {
+function terminalMessage(locale: CvLocale, resource: CvStatusResource): string {
   const guidance: string[] = [];
   if (resource.failure?.suggestedActions.includes("REPLACE_DOCUMENT"))
-    guidance.push("Replace this CV with another PDF or DOCX.");
+    guidance.push(
+      locale === "vi"
+        ? "Hãy thay CV này bằng PDF hoặc DOCX khác."
+        : "Replace this CV with another PDF or DOCX.",
+    );
   if (resource.failure?.suggestedActions.includes("RETRY"))
-    guidance.push("Retry secure processing.");
+    guidance.push(
+      locale === "vi"
+        ? "Thử lại quá trình xử lý an toàn."
+        : "Retry secure processing.",
+    );
   if (resource.failure?.suggestedActions.includes("MANUAL_PROFILE"))
-    guidance.push("Or enter your profile manually.");
+    guidance.push(
+      locale === "vi"
+        ? "Hoặc nhập hồ sơ thủ công."
+        : "Or enter your profile manually.",
+    );
   return [
-    `CV processing status: ${statusLabel(resource.status)}.`,
-    resource.failure?.message,
+    locale === "vi"
+      ? `Trạng thái xử lý CV: ${cvStatusLabel(locale, resource.status)}.`
+      : `CV processing status: ${cvStatusLabel(locale, resource.status)}.`,
+    resource.failure
+      ? cvKnownError(locale, resource.failure.message, resource.failure.code)
+      : undefined,
     ...guidance,
   ]
     .filter(Boolean)
@@ -171,13 +229,19 @@ function terminalMessage(resource: CvStatusResource): string {
 }
 
 export function useCvImport(input: { csrfProof: string }) {
-  const [progress, setProgress] = useState<CvUploadProgress>({
-    state: "IDLE",
-    percentage: 0,
-    title: "CV import ready",
-    message: "Choose a PDF or DOCX CV to begin.",
-    uploadId: null,
-    parserClass: null,
+  const locale = useWorkspaceLocale();
+  const [progress, setProgress] = useState<CvUploadProgress>(() => {
+    return {
+      state: "IDLE",
+      percentage: 0,
+      title: locale === "vi" ? "Sẵn sàng nhập CV" : "CV import ready",
+      message:
+        locale === "vi"
+          ? "Chọn PDF hoặc DOCX để bắt đầu."
+          : "Choose a PDF or DOCX CV to begin.",
+      uploadId: null,
+      parserClass: null,
+    };
   });
   const activeRequest = useRef<XMLHttpRequest | null>(null);
   const pollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -209,9 +273,14 @@ export function useCvImport(input: { csrfProof: string }) {
         setProgress((current) => ({
           ...current,
           state: "STATUS_ERROR",
-          title: "Status API temporarily unavailable",
+          title:
+            locale === "vi"
+              ? "API trạng thái tạm thời không khả dụng"
+              : "Status API temporarily unavailable",
           message:
-            "SmartHire could not refresh this status. Background processing may still be running; retrying automatically.",
+            locale === "vi"
+              ? "SmartHire không thể làm mới trạng thái. Quá trình nền có thể vẫn đang chạy; hệ thống sẽ tự thử lại."
+              : "SmartHire could not refresh this status. Background processing may still be running; retrying automatically.",
           uploadId,
         }));
         pollTimer.current = setTimeout(() => void next(uploadId), 2_000);
@@ -238,15 +307,20 @@ export function useCvImport(input: { csrfProof: string }) {
           "EXPIRED",
         ].includes(resource.status) ||
         (resource.status === "CANCELLED" && !candidateCleanupPending);
-      const nextProgress = activeProgress(resource);
+      const nextProgress = activeProgress(locale, resource);
       setProgress(
         candidateCleanupPending
           ? {
               state: "PROCESSING",
               percentage: nextProgress.percentage,
-              title: "Protected deletion in progress",
+              title:
+                locale === "vi"
+                  ? "Đang xóa dữ liệu được bảo vệ"
+                  : "Protected deletion in progress",
               message:
-                "Content is unavailable while protected cleanup continues.",
+                locale === "vi"
+                  ? "Nội dung không khả dụng trong khi quá trình dọn dẹp được bảo vệ tiếp tục."
+                  : "Content is unavailable while protected cleanup continues.",
               uploadId,
               parserClass: nextProgress.parserClass,
             }
@@ -256,8 +330,11 @@ export function useCvImport(input: { csrfProof: string }) {
             ? {
                 state: "COMPLETE",
                 percentage: 100,
-                title: "CV import finished",
-                message: terminalMessage(resource),
+                title:
+                  locale === "vi"
+                    ? "Đã hoàn tất nhập CV"
+                    : "CV import finished",
+                message: terminalMessage(locale, resource),
                 uploadId,
                 parserClass: nextProgress.parserClass,
               }
@@ -266,7 +343,7 @@ export function useCvImport(input: { csrfProof: string }) {
       if (!terminal)
         pollTimer.current = setTimeout(() => void next(uploadId), 2_000);
     },
-    [loadStatus],
+    [loadStatus, locale],
   );
 
   const upload = useCallback(
@@ -277,10 +354,15 @@ export function useCvImport(input: { csrfProof: string }) {
         state: "RESERVING",
         percentage: 0,
         title:
-          parserClass === "EXTERNAL_OPENAI"
-            ? "Preparing an OpenAI import"
-            : "Preparing a SmartHire import",
-        message: "Reserving encrypted temporary storage...",
+          locale === "vi"
+            ? `Đang chuẩn bị lần nhập ${parserClass === "EXTERNAL_OPENAI" ? "OpenAI" : "SmartHire"}`
+            : parserClass === "EXTERNAL_OPENAI"
+              ? "Preparing an OpenAI import"
+              : "Preparing a SmartHire import",
+        message:
+          locale === "vi"
+            ? "Đang giữ chỗ lưu trữ tạm thời được mã hóa…"
+            : "Reserving encrypted temporary storage…",
         uploadId: null,
         parserClass,
       });
@@ -325,8 +407,14 @@ export function useCvImport(input: { csrfProof: string }) {
             setProgress({
               state: "UPLOADING",
               percentage,
-              title: "Uploading encrypted CV",
-              message: `Uploading CV: ${percentage}%.`,
+              title:
+                locale === "vi"
+                  ? "Đang tải CV được mã hóa"
+                  : "Uploading encrypted CV",
+              message:
+                locale === "vi"
+                  ? `Đang tải CV: ${percentage}%.`
+                  : `Uploading CV: ${percentage}%.`,
               uploadId: reservation.uploadId,
               parserClass,
             });
@@ -343,8 +431,11 @@ export function useCvImport(input: { csrfProof: string }) {
         setProgress({
           state: "PROCESSING",
           percentage: 15,
-          title: "Upload complete",
-          message: "SmartHire is validating and scanning the CV...",
+          title: locale === "vi" ? "Đã tải lên" : "Upload complete",
+          message:
+            locale === "vi"
+              ? "SmartHire đang kiểm tra và quét CV…"
+              : "SmartHire is validating and scanning the CV…",
           uploadId: reservation.uploadId,
           parserClass,
         });
@@ -353,18 +444,23 @@ export function useCvImport(input: { csrfProof: string }) {
         setProgress((current) => ({
           ...current,
           state: "ERROR",
-          title: "CV upload failed",
+          title:
+            locale === "vi" ? "Tải CV không thành công" : "CV upload failed",
           message:
             error instanceof Error && error.message === "CV_UPLOAD_ABORTED"
-              ? "CV upload cancelled."
+              ? locale === "vi"
+                ? "Đã hủy tải CV."
+                : "CV upload cancelled."
               : error instanceof Error && !error.message.startsWith("CV_")
                 ? error.message
-                : "CV upload could not be completed.",
+                : locale === "vi"
+                  ? "Không thể hoàn tất tải CV."
+                  : "CV upload could not be completed.",
         }));
         throw error;
       }
     },
-    [input.csrfProof, poll, stop],
+    [input.csrfProof, locale, poll, stop],
   );
 
   return Object.freeze({ progress, upload, cancel: stop, loadStatus });

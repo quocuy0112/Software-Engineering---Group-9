@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useWorkspaceLocale } from "../client/workspace-locale";
 
 export function WorkspaceNavigation({
   busy,
@@ -13,16 +14,29 @@ export function WorkspaceNavigation({
   collapsed: boolean;
   onSignOut: () => void;
 }) {
-  const copy = {
-    dashboard: "Dashboard",
-    jobs: "Jobs",
-    profile: "Profile",
-    workspace: "Candidate workspace",
-    openMenu: "Open workspace menu",
-    closeMenu: "Close workspace menu",
-    signOut: "Sign out",
-    signingOut: "Signing out…",
-  };
+  const locale = useWorkspaceLocale();
+  const copy =
+    locale === "vi"
+      ? {
+          dashboard: "Bảng điều khiển",
+          jobs: "Việc làm",
+          profile: "Hồ sơ",
+          workspace: "Không gian ứng viên",
+          openMenu: "Mở menu không gian",
+          closeMenu: "Đóng menu không gian",
+          signOut: "Đăng xuất",
+          signingOut: "Đang đăng xuất…",
+        }
+      : {
+          dashboard: "Dashboard",
+          jobs: "Jobs",
+          profile: "Profile",
+          workspace: "Candidate workspace",
+          openMenu: "Open workspace menu",
+          closeMenu: "Close workspace menu",
+          signOut: "Sign out",
+          signingOut: "Signing out…",
+        };
   const destinations = [
     { href: "/dashboard", label: copy.dashboard, icon: "dashboard" },
     { href: "/jobs", label: copy.jobs, icon: "jobs" },
@@ -84,7 +98,7 @@ export function WorkspaceNavigation({
         ref={navigationRef}
         id="workspace-navigation"
         className="workspace-navigation"
-        aria-label="Workspace"
+        aria-label={copy.workspace}
         data-open={menuOpen}
       >
         <p className="workspace-nav-label">{copy.workspace}</p>

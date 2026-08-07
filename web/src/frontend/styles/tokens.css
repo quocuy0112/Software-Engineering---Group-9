@@ -1,4 +1,26 @@
 :root {
+  /*
+   * Compatibility aliases for legacy page styles. Keeping these aliases
+   * token-based makes every surface/theme switch together.
+   */
+  --color-background: var(--sh-color-surface-page);
+  --color-foreground: var(--sh-color-text-primary);
+  --color-muted-foreground: var(--sh-color-text-muted);
+  --color-card: var(--sh-color-surface-card);
+  --color-border: var(--sh-color-border-subtle);
+  --color-surface: var(--sh-color-surface-card);
+  --color-text: var(--sh-color-text-primary);
+  --color-text-muted: var(--sh-color-text-muted);
+  --color-muted-text: var(--sh-color-text-muted);
+  --color-focus: var(--sh-color-border-focus);
+  --color-success: var(--sh-color-success);
+  --color-success-surface: var(--sh-color-success-bg);
+  --color-success-text: var(--sh-color-success);
+  --color-warning: var(--sh-color-warning);
+  --color-warning-text: var(--sh-color-warning);
+  --color-error: var(--sh-color-error);
+  --color-error-surface: var(--sh-color-error-bg);
+  --color-error-text: var(--sh-color-error);
   color-scheme: light;
   --sh-color-brand-primary: #1d4ed8;
   --sh-color-brand-primary-hover: #1e40af;

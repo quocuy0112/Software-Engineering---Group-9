@@ -113,6 +113,7 @@ export function prepareApplicationSubmission(
     cv.byteSize > 5_000_000 ||
     ![
       "application/pdf",
+      "application/msword",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ].includes(cv.mimeType)
   )

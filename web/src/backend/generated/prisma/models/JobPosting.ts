@@ -27,12 +27,14 @@ export type AggregateJobPosting = {
 }
 
 export type JobPostingAvgAggregateOutputType = {
+  numberOfHires: number | null
   salaryMin: runtime.Decimal | null
   salaryMax: runtime.Decimal | null
   version: number | null
 }
 
 export type JobPostingSumAggregateOutputType = {
+  numberOfHires: number | null
   salaryMin: runtime.Decimal | null
   salaryMax: runtime.Decimal | null
   version: number | null
@@ -49,6 +51,9 @@ export type JobPostingMinAggregateOutputType = {
   responsibilities: string | null
   requirements: string | null
   benefits: string | null
+  education: string | null
+  numberOfHires: number | null
+  age: string | null
   location: string | null
   normalizedLocation: string | null
   employmentType: $Enums.EmploymentType | null
@@ -81,6 +86,9 @@ export type JobPostingMaxAggregateOutputType = {
   responsibilities: string | null
   requirements: string | null
   benefits: string | null
+  education: string | null
+  numberOfHires: number | null
+  age: string | null
   location: string | null
   normalizedLocation: string | null
   employmentType: $Enums.EmploymentType | null
@@ -113,6 +121,9 @@ export type JobPostingCountAggregateOutputType = {
   responsibilities: number
   requirements: number
   benefits: number
+  education: number
+  numberOfHires: number
+  age: number
   location: number
   normalizedLocation: number
   employmentType: number
@@ -137,12 +148,14 @@ export type JobPostingCountAggregateOutputType = {
 
 
 export type JobPostingAvgAggregateInputType = {
+  numberOfHires?: true
   salaryMin?: true
   salaryMax?: true
   version?: true
 }
 
 export type JobPostingSumAggregateInputType = {
+  numberOfHires?: true
   salaryMin?: true
   salaryMax?: true
   version?: true
@@ -159,6 +172,9 @@ export type JobPostingMinAggregateInputType = {
   responsibilities?: true
   requirements?: true
   benefits?: true
+  education?: true
+  numberOfHires?: true
+  age?: true
   location?: true
   normalizedLocation?: true
   employmentType?: true
@@ -191,6 +207,9 @@ export type JobPostingMaxAggregateInputType = {
   responsibilities?: true
   requirements?: true
   benefits?: true
+  education?: true
+  numberOfHires?: true
+  age?: true
   location?: true
   normalizedLocation?: true
   employmentType?: true
@@ -223,6 +242,9 @@ export type JobPostingCountAggregateInputType = {
   responsibilities?: true
   requirements?: true
   benefits?: true
+  education?: true
+  numberOfHires?: true
+  age?: true
   location?: true
   normalizedLocation?: true
   employmentType?: true
@@ -342,6 +364,9 @@ export type JobPostingGroupByOutputType = {
   responsibilities: string
   requirements: string
   benefits: string | null
+  education: string | null
+  numberOfHires: number | null
+  age: string | null
   location: string
   normalizedLocation: string
   employmentType: $Enums.EmploymentType
@@ -397,6 +422,9 @@ export type JobPostingWhereInput = {
   responsibilities?: Prisma.StringFilter<"JobPosting"> | string
   requirements?: Prisma.StringFilter<"JobPosting"> | string
   benefits?: Prisma.StringNullableFilter<"JobPosting"> | string | null
+  education?: Prisma.StringNullableFilter<"JobPosting"> | string | null
+  numberOfHires?: Prisma.IntNullableFilter<"JobPosting"> | number | null
+  age?: Prisma.StringNullableFilter<"JobPosting"> | string | null
   location?: Prisma.StringFilter<"JobPosting"> | string
   normalizedLocation?: Prisma.StringFilter<"JobPosting"> | string
   employmentType?: Prisma.EnumEmploymentTypeFilter<"JobPosting"> | $Enums.EmploymentType
@@ -435,6 +463,9 @@ export type JobPostingOrderByWithRelationInput = {
   responsibilities?: Prisma.SortOrder
   requirements?: Prisma.SortOrder
   benefits?: Prisma.SortOrderInput | Prisma.SortOrder
+  education?: Prisma.SortOrderInput | Prisma.SortOrder
+  numberOfHires?: Prisma.SortOrderInput | Prisma.SortOrder
+  age?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrder
   normalizedLocation?: Prisma.SortOrder
   employmentType?: Prisma.SortOrder
@@ -476,6 +507,9 @@ export type JobPostingWhereUniqueInput = Prisma.AtLeast<{
   responsibilities?: Prisma.StringFilter<"JobPosting"> | string
   requirements?: Prisma.StringFilter<"JobPosting"> | string
   benefits?: Prisma.StringNullableFilter<"JobPosting"> | string | null
+  education?: Prisma.StringNullableFilter<"JobPosting"> | string | null
+  numberOfHires?: Prisma.IntNullableFilter<"JobPosting"> | number | null
+  age?: Prisma.StringNullableFilter<"JobPosting"> | string | null
   location?: Prisma.StringFilter<"JobPosting"> | string
   normalizedLocation?: Prisma.StringFilter<"JobPosting"> | string
   employmentType?: Prisma.EnumEmploymentTypeFilter<"JobPosting"> | $Enums.EmploymentType
@@ -514,6 +548,9 @@ export type JobPostingOrderByWithAggregationInput = {
   responsibilities?: Prisma.SortOrder
   requirements?: Prisma.SortOrder
   benefits?: Prisma.SortOrderInput | Prisma.SortOrder
+  education?: Prisma.SortOrderInput | Prisma.SortOrder
+  numberOfHires?: Prisma.SortOrderInput | Prisma.SortOrder
+  age?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrder
   normalizedLocation?: Prisma.SortOrder
   employmentType?: Prisma.SortOrder
@@ -554,6 +591,9 @@ export type JobPostingScalarWhereWithAggregatesInput = {
   responsibilities?: Prisma.StringWithAggregatesFilter<"JobPosting"> | string
   requirements?: Prisma.StringWithAggregatesFilter<"JobPosting"> | string
   benefits?: Prisma.StringNullableWithAggregatesFilter<"JobPosting"> | string | null
+  education?: Prisma.StringNullableWithAggregatesFilter<"JobPosting"> | string | null
+  numberOfHires?: Prisma.IntNullableWithAggregatesFilter<"JobPosting"> | number | null
+  age?: Prisma.StringNullableWithAggregatesFilter<"JobPosting"> | string | null
   location?: Prisma.StringWithAggregatesFilter<"JobPosting"> | string
   normalizedLocation?: Prisma.StringWithAggregatesFilter<"JobPosting"> | string
   employmentType?: Prisma.EnumEmploymentTypeWithAggregatesFilter<"JobPosting"> | $Enums.EmploymentType
@@ -585,6 +625,9 @@ export type JobPostingCreateInput = {
   responsibilities: string
   requirements: string
   benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
   location: string
   normalizedLocation: string
   employmentType: $Enums.EmploymentType
@@ -623,6 +666,9 @@ export type JobPostingUncheckedCreateInput = {
   responsibilities: string
   requirements: string
   benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
   location: string
   normalizedLocation: string
   employmentType: $Enums.EmploymentType
@@ -659,6 +705,9 @@ export type JobPostingUpdateInput = {
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
   benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
   employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
@@ -697,6 +746,9 @@ export type JobPostingUncheckedUpdateInput = {
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
   benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
   employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
@@ -734,6 +786,9 @@ export type JobPostingCreateManyInput = {
   responsibilities: string
   requirements: string
   benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
   location: string
   normalizedLocation: string
   employmentType: $Enums.EmploymentType
@@ -765,6 +820,9 @@ export type JobPostingUpdateManyMutationInput = {
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
   benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
   employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
@@ -797,6 +855,9 @@ export type JobPostingUncheckedUpdateManyInput = {
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
   benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
   employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
@@ -839,6 +900,9 @@ export type JobPostingCountOrderByAggregateInput = {
   responsibilities?: Prisma.SortOrder
   requirements?: Prisma.SortOrder
   benefits?: Prisma.SortOrder
+  education?: Prisma.SortOrder
+  numberOfHires?: Prisma.SortOrder
+  age?: Prisma.SortOrder
   location?: Prisma.SortOrder
   normalizedLocation?: Prisma.SortOrder
   employmentType?: Prisma.SortOrder
@@ -861,6 +925,7 @@ export type JobPostingCountOrderByAggregateInput = {
 }
 
 export type JobPostingAvgOrderByAggregateInput = {
+  numberOfHires?: Prisma.SortOrder
   salaryMin?: Prisma.SortOrder
   salaryMax?: Prisma.SortOrder
   version?: Prisma.SortOrder
@@ -877,6 +942,9 @@ export type JobPostingMaxOrderByAggregateInput = {
   responsibilities?: Prisma.SortOrder
   requirements?: Prisma.SortOrder
   benefits?: Prisma.SortOrder
+  education?: Prisma.SortOrder
+  numberOfHires?: Prisma.SortOrder
+  age?: Prisma.SortOrder
   location?: Prisma.SortOrder
   normalizedLocation?: Prisma.SortOrder
   employmentType?: Prisma.SortOrder
@@ -909,6 +977,9 @@ export type JobPostingMinOrderByAggregateInput = {
   responsibilities?: Prisma.SortOrder
   requirements?: Prisma.SortOrder
   benefits?: Prisma.SortOrder
+  education?: Prisma.SortOrder
+  numberOfHires?: Prisma.SortOrder
+  age?: Prisma.SortOrder
   location?: Prisma.SortOrder
   normalizedLocation?: Prisma.SortOrder
   employmentType?: Prisma.SortOrder
@@ -931,6 +1002,7 @@ export type JobPostingMinOrderByAggregateInput = {
 }
 
 export type JobPostingSumOrderByAggregateInput = {
+  numberOfHires?: Prisma.SortOrder
   salaryMin?: Prisma.SortOrder
   salaryMax?: Prisma.SortOrder
   version?: Prisma.SortOrder
@@ -981,6 +1053,14 @@ export type JobPostingUncheckedUpdateManyWithoutCompanyNestedInput = {
   update?: Prisma.JobPostingUpdateWithWhereUniqueWithoutCompanyInput | Prisma.JobPostingUpdateWithWhereUniqueWithoutCompanyInput[]
   updateMany?: Prisma.JobPostingUpdateManyWithWhereWithoutCompanyInput | Prisma.JobPostingUpdateManyWithWhereWithoutCompanyInput[]
   deleteMany?: Prisma.JobPostingScalarWhereInput | Prisma.JobPostingScalarWhereInput[]
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type EnumEmploymentTypeFieldUpdateOperationsInput = {
@@ -1091,6 +1171,9 @@ export type JobPostingCreateWithoutCompanyInput = {
   responsibilities: string
   requirements: string
   benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
   location: string
   normalizedLocation: string
   employmentType: $Enums.EmploymentType
@@ -1127,6 +1210,9 @@ export type JobPostingUncheckedCreateWithoutCompanyInput = {
   responsibilities: string
   requirements: string
   benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
   location: string
   normalizedLocation: string
   employmentType: $Enums.EmploymentType
@@ -1193,6 +1279,9 @@ export type JobPostingScalarWhereInput = {
   responsibilities?: Prisma.StringFilter<"JobPosting"> | string
   requirements?: Prisma.StringFilter<"JobPosting"> | string
   benefits?: Prisma.StringNullableFilter<"JobPosting"> | string | null
+  education?: Prisma.StringNullableFilter<"JobPosting"> | string | null
+  numberOfHires?: Prisma.IntNullableFilter<"JobPosting"> | number | null
+  age?: Prisma.StringNullableFilter<"JobPosting"> | string | null
   location?: Prisma.StringFilter<"JobPosting"> | string
   normalizedLocation?: Prisma.StringFilter<"JobPosting"> | string
   employmentType?: Prisma.EnumEmploymentTypeFilter<"JobPosting"> | $Enums.EmploymentType
@@ -1224,6 +1313,9 @@ export type JobPostingCreateWithoutSkillsInput = {
   responsibilities: string
   requirements: string
   benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
   location: string
   normalizedLocation: string
   employmentType: $Enums.EmploymentType
@@ -1261,6 +1353,9 @@ export type JobPostingUncheckedCreateWithoutSkillsInput = {
   responsibilities: string
   requirements: string
   benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
   location: string
   normalizedLocation: string
   employmentType: $Enums.EmploymentType
@@ -1312,6 +1407,9 @@ export type JobPostingUpdateWithoutSkillsInput = {
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
   benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
   employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
@@ -1349,6 +1447,9 @@ export type JobPostingUncheckedUpdateWithoutSkillsInput = {
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
   benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
   employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
@@ -1384,6 +1485,9 @@ export type JobPostingCreateWithoutQuestionsInput = {
   responsibilities: string
   requirements: string
   benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
   location: string
   normalizedLocation: string
   employmentType: $Enums.EmploymentType
@@ -1421,6 +1525,9 @@ export type JobPostingUncheckedCreateWithoutQuestionsInput = {
   responsibilities: string
   requirements: string
   benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
   location: string
   normalizedLocation: string
   employmentType: $Enums.EmploymentType
@@ -1472,6 +1579,9 @@ export type JobPostingUpdateWithoutQuestionsInput = {
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
   benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
   employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
@@ -1509,6 +1619,9 @@ export type JobPostingUncheckedUpdateWithoutQuestionsInput = {
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
   benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
   employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
@@ -1544,6 +1657,9 @@ export type JobPostingCreateWithoutSavedByInput = {
   responsibilities: string
   requirements: string
   benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
   location: string
   normalizedLocation: string
   employmentType: $Enums.EmploymentType
@@ -1581,6 +1697,9 @@ export type JobPostingUncheckedCreateWithoutSavedByInput = {
   responsibilities: string
   requirements: string
   benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
   location: string
   normalizedLocation: string
   employmentType: $Enums.EmploymentType
@@ -1632,6 +1751,9 @@ export type JobPostingUpdateWithoutSavedByInput = {
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
   benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
   employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
@@ -1669,6 +1791,9 @@ export type JobPostingUncheckedUpdateWithoutSavedByInput = {
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
   benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
   employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
@@ -1704,6 +1829,9 @@ export type JobPostingCreateWithoutReportsInput = {
   responsibilities: string
   requirements: string
   benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
   location: string
   normalizedLocation: string
   employmentType: $Enums.EmploymentType
@@ -1741,6 +1869,9 @@ export type JobPostingUncheckedCreateWithoutReportsInput = {
   responsibilities: string
   requirements: string
   benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
   location: string
   normalizedLocation: string
   employmentType: $Enums.EmploymentType
@@ -1792,6 +1923,9 @@ export type JobPostingUpdateWithoutReportsInput = {
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
   benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
   employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
@@ -1829,6 +1963,9 @@ export type JobPostingUncheckedUpdateWithoutReportsInput = {
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
   benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
   employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
@@ -1864,6 +2001,9 @@ export type JobPostingCreateWithoutApplicationsInput = {
   responsibilities: string
   requirements: string
   benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
   location: string
   normalizedLocation: string
   employmentType: $Enums.EmploymentType
@@ -1901,6 +2041,9 @@ export type JobPostingUncheckedCreateWithoutApplicationsInput = {
   responsibilities: string
   requirements: string
   benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
   location: string
   normalizedLocation: string
   employmentType: $Enums.EmploymentType
@@ -1952,6 +2095,9 @@ export type JobPostingUpdateWithoutApplicationsInput = {
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
   benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
   employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
@@ -1989,6 +2135,9 @@ export type JobPostingUncheckedUpdateWithoutApplicationsInput = {
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
   benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
   employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
@@ -2024,6 +2173,9 @@ export type JobPostingCreateManyCompanyInput = {
   responsibilities: string
   requirements: string
   benefits?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  age?: string | null
   location: string
   normalizedLocation: string
   employmentType: $Enums.EmploymentType
@@ -2055,6 +2207,9 @@ export type JobPostingUpdateWithoutCompanyInput = {
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
   benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
   employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
@@ -2091,6 +2246,9 @@ export type JobPostingUncheckedUpdateWithoutCompanyInput = {
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
   benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
   employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
@@ -2127,6 +2285,9 @@ export type JobPostingUncheckedUpdateManyWithoutCompanyInput = {
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
   benefits?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  education?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numberOfHires?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  age?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedLocation?: Prisma.StringFieldUpdateOperationsInput | string
   employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
@@ -2226,6 +2387,9 @@ export type JobPostingSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   responsibilities?: boolean
   requirements?: boolean
   benefits?: boolean
+  education?: boolean
+  numberOfHires?: boolean
+  age?: boolean
   location?: boolean
   normalizedLocation?: boolean
   employmentType?: boolean
@@ -2265,6 +2429,9 @@ export type JobPostingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   responsibilities?: boolean
   requirements?: boolean
   benefits?: boolean
+  education?: boolean
+  numberOfHires?: boolean
+  age?: boolean
   location?: boolean
   normalizedLocation?: boolean
   employmentType?: boolean
@@ -2298,6 +2465,9 @@ export type JobPostingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   responsibilities?: boolean
   requirements?: boolean
   benefits?: boolean
+  education?: boolean
+  numberOfHires?: boolean
+  age?: boolean
   location?: boolean
   normalizedLocation?: boolean
   employmentType?: boolean
@@ -2331,6 +2501,9 @@ export type JobPostingSelectScalar = {
   responsibilities?: boolean
   requirements?: boolean
   benefits?: boolean
+  education?: boolean
+  numberOfHires?: boolean
+  age?: boolean
   location?: boolean
   normalizedLocation?: boolean
   employmentType?: boolean
@@ -2352,7 +2525,7 @@ export type JobPostingSelectScalar = {
   updatedAt?: boolean
 }
 
-export type JobPostingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "slug" | "title" | "normalizedTitle" | "summary" | "description" | "responsibilities" | "requirements" | "benefits" | "location" | "normalizedLocation" | "employmentType" | "experienceLevel" | "workArrangement" | "salaryMin" | "salaryMax" | "salaryCurrency" | "salaryPeriod" | "searchDocumentNormalized" | "status" | "approvedAt" | "publishedAt" | "applicationDeadline" | "closedAt" | "removedAt" | "version" | "createdAt" | "updatedAt", ExtArgs["result"]["jobPosting"]>
+export type JobPostingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "slug" | "title" | "normalizedTitle" | "summary" | "description" | "responsibilities" | "requirements" | "benefits" | "education" | "numberOfHires" | "age" | "location" | "normalizedLocation" | "employmentType" | "experienceLevel" | "workArrangement" | "salaryMin" | "salaryMax" | "salaryCurrency" | "salaryPeriod" | "searchDocumentNormalized" | "status" | "approvedAt" | "publishedAt" | "applicationDeadline" | "closedAt" | "removedAt" | "version" | "createdAt" | "updatedAt", ExtArgs["result"]["jobPosting"]>
 export type JobPostingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   skills?: boolean | Prisma.JobPosting$skillsArgs<ExtArgs>
@@ -2390,6 +2563,9 @@ export type $JobPostingPayload<ExtArgs extends runtime.Types.Extensions.Internal
     responsibilities: string
     requirements: string
     benefits: string | null
+    education: string | null
+    numberOfHires: number | null
+    age: string | null
     location: string
     normalizedLocation: string
     employmentType: $Enums.EmploymentType
@@ -2848,6 +3024,9 @@ export interface JobPostingFieldRefs {
   readonly responsibilities: Prisma.FieldRef<"JobPosting", 'String'>
   readonly requirements: Prisma.FieldRef<"JobPosting", 'String'>
   readonly benefits: Prisma.FieldRef<"JobPosting", 'String'>
+  readonly education: Prisma.FieldRef<"JobPosting", 'String'>
+  readonly numberOfHires: Prisma.FieldRef<"JobPosting", 'Int'>
+  readonly age: Prisma.FieldRef<"JobPosting", 'String'>
   readonly location: Prisma.FieldRef<"JobPosting", 'String'>
   readonly normalizedLocation: Prisma.FieldRef<"JobPosting", 'String'>
   readonly employmentType: Prisma.FieldRef<"JobPosting", 'EmploymentType'>

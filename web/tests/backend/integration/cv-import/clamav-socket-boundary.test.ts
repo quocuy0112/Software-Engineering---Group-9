@@ -21,6 +21,37 @@ function docker(args: string[]) {
 }
 
 describe("ClamAV Unix-socket boundary", () => {
+  it("refreshes persisted signatures before clamd enforces freshness", async () => {
+    const entrypoint = await readFile(
+      resolve(repositoryRoot, "infra/clamav/entrypoint.sh"),
+      "utf8",
+    );
+    const clamdConfiguration = await readFile(
+      resolve(repositoryRoot, "infra/clamav/clamd.conf"),
+      "utf8",
+    );
+
+    const synchronousRefresh = entrypoint.indexOf(
+      "freshclam \\\n  --stdout \\",
+    );
+    const clamdStart = entrypoint.indexOf(
+      'clamd --foreground --config-file="${CLAMD_CONFIG}" &',
+    );
+    const daemonRefresh = entrypoint.indexOf("freshclam \\\n  --daemon \\");
+
+    expect(synchronousRefresh).toBeGreaterThan(-1);
+    expect(clamdStart).toBeGreaterThan(synchronousRefresh);
+    expect(daemonRefresh).toBeGreaterThan(synchronousRefresh);
+    expect(entrypoint).not.toMatch(
+      /if ! find [\s\S]*?then\s+freshclam[\s\S]*?fi/u,
+    );
+    expect(entrypoint).not.toContain("if ! freshclam");
+    expect(entrypoint).toMatch(
+      /set -eu[\s\S]*?freshclam \\\n {2}--stdout[\s\S]*?freshclam \\\n {2}--daemon/u,
+    );
+    expect(clamdConfiguration).toMatch(/^FailIfCvdOlderThan 1$/mu);
+  });
+
   it("keeps the Compose socket private to clamd and the CV worker", async () => {
     const source = await readFile(
       resolve(repositoryRoot, "compose.yaml"),

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 
 import {
   presentCvReviewFieldError,
@@ -20,6 +21,7 @@ import { CvReviewConflictPanel } from "./cv-review-conflict";
 import { CvReviewFeedback } from "./cv-review-feedback";
 import { CvScalarReview } from "./cv-scalar-review";
 import styles from "./cv-draft-review.module.css";
+import { cvFieldLabel } from "../i18n/cv-import-copy";
 
 type CollectionGroup = "experiences" | "education" | "skills" | "socialLinks";
 type UnsavedPreviewItem = Readonly<{
@@ -117,6 +119,7 @@ function validationIssues(input: {
   comparison: CvDraftComparison;
   proposals: CvEditableProposals;
   decisions: CvReviewDecisions;
+  locale: "vi" | "en";
 }) {
   const result = saveCvDraftRequestSchema.safeParse({
     baseDraftRevision: input.comparison.draftRevision,
@@ -128,23 +131,25 @@ function validationIssues(input: {
     ? []
     : result.error.issues.slice(0, 20).map((issue) => {
         const path = issue.path.join(".") || "request";
-        const label = path
-          .split(".")
-          .at(-1)
-          ?.replace(/([a-z])([A-Z])/gu, "$1 $2");
+        const label = cvFieldLabel(input.locale, path);
         const message =
           issue.code === "too_small"
-            ? `${label ?? "Value"} is required.`
+            ? input.locale === "vi"
+              ? `${label} là bắt buộc.`
+              : `${label} is required.`
             : issue.code === "too_big"
-              ? `${label ?? "Value"} is too long.`
+              ? input.locale === "vi"
+                ? `${label} quá dài.`
+                : `${label} is too long.`
               : issue.code === "invalid_format"
-                ? `${label ?? "Value"} has an invalid format.`
+                ? input.locale === "vi"
+                  ? `${label} có định dạng không hợp lệ.`
+                  : `${label} has an invalid format.`
                 : issue.message;
-        return presentCvReviewFieldError({
-          path,
-          code: issue.code,
-          message,
-        });
+        return presentCvReviewFieldError(
+          { path, code: issue.code, message },
+          input.locale,
+        );
       });
   const requiredErrors: CvReviewFieldError[] = [];
   input.proposals.scalars.forEach((proposal, index) => {
@@ -152,32 +157,41 @@ function validationIssues(input: {
       requiredErrors.push({
         path: `proposals.scalars.${index}.value`,
         code: "REQUIRED",
-        message: `${proposal.field.replace(/^./u, (value) => value.toUpperCase())} is required.`,
+        message:
+          input.locale === "vi"
+            ? `${cvFieldLabel(input.locale, proposal.field)} là bắt buộc.`
+            : `${cvFieldLabel(input.locale, proposal.field)} is required.`,
       });
   });
   input.proposals.experiences.forEach((proposal, index) => {
     for (const [field, label] of [
-      ["title", "Job title"],
-      ["company", "Company"],
+      ["title", cvFieldLabel(input.locale, "title")],
+      ["company", cvFieldLabel(input.locale, "company")],
     ] as const) {
       if (!proposal.value[field].trim())
         requiredErrors.push({
           path: `proposals.experiences.${index}.value.${field}`,
           code: "REQUIRED",
-          message: `${label} is required.`,
+          message:
+            input.locale === "vi"
+              ? `${label} là bắt buộc.`
+              : `${label} is required.`,
         });
     }
   });
   input.proposals.education.forEach((proposal, index) => {
     for (const [field, label] of [
-      ["institution", "Institution"],
-      ["degree", "Degree"],
+      ["institution", cvFieldLabel(input.locale, "institution")],
+      ["degree", cvFieldLabel(input.locale, "degree")],
     ] as const) {
       if (!proposal.value[field].trim())
         requiredErrors.push({
           path: `proposals.education.${index}.value.${field}`,
           code: "REQUIRED",
-          message: `${label} is required.`,
+          message:
+            input.locale === "vi"
+              ? `${label} là bắt buộc.`
+              : `${label} is required.`,
         });
     }
   });
@@ -186,7 +200,8 @@ function validationIssues(input: {
       requiredErrors.push({
         path: `proposals.skills.${index}.value`,
         code: "REQUIRED",
-        message: "Skill is required.",
+        message:
+          input.locale === "vi" ? "Kỹ năng là bắt buộc." : "Skill is required.",
       });
   });
   const decisionErrors: CvReviewFieldError[] = [];
@@ -199,36 +214,52 @@ function validationIssues(input: {
       decisionErrors.push({
         path: `reviewDecisions.scalars.${index}.action`,
         code: "ACTION_MISMATCH",
-        message: "Choose a valid action for this proposed profile field.",
+        message:
+          input.locale === "vi"
+            ? "Hãy chọn hành động hợp lệ cho trường hồ sơ được đề xuất này."
+            : "Choose a valid action for this proposed profile field.",
       });
       return;
     }
     const current = input.comparison.currentProfile[proposal.field];
-    const label = proposal.field.replace(/^./u, (value) => value.toUpperCase());
+    const label = cvFieldLabel(input.locale, proposal.field);
     if (decision.action === "ADD" && current !== null)
       decisionErrors.push({
         path: `reviewDecisions.scalars.${index}.action`,
         code: "ACTION_MISMATCH",
-        message: `${label} already has a Profile value. Choose replace or skip.`,
+        message:
+          input.locale === "vi"
+            ? `${label} đã có giá trị trong Hồ sơ. Hãy chọn thay thế hoặc bỏ qua.`
+            : `${label} already has a Profile value. Choose replace or skip.`,
       });
     if (decision.action === "REPLACE" && current === null)
       decisionErrors.push({
         path: `reviewDecisions.scalars.${index}.action`,
         code: "ACTION_MISMATCH",
-        message: `${label} is not set on the Profile. Choose add or skip.`,
+        message:
+          input.locale === "vi"
+            ? `${label} chưa được thiết lập trong Hồ sơ. Hãy chọn thêm hoặc bỏ qua.`
+            : `${label} is not set on the Profile. Choose add or skip.`,
       });
   });
   fieldErrors.unshift(...requiredErrors, ...decisionErrors);
   const issues: string[] = [];
   if (!input.decisions.reviewComplete)
-    issues.push("Mark the review as complete before confirmation.");
+    issues.push(
+      input.locale === "vi"
+        ? "Hãy đánh dấu bản xem xét là hoàn tất trước khi xác nhận."
+        : "Mark the review as complete before confirmation.",
+    );
   for (const group of ["experiences", "education", "socialLinks"] as const) {
     if (
       input.decisions[group].some(
         (decision) => decision.action === "REPLACE" && !decision.targetId,
       )
     ) {
-      const message = `Choose a current Profile target for each ${group} replacement.`;
+      const message =
+        input.locale === "vi"
+          ? `Hãy chọn mục Hồ sơ hiện tại cho từng lần thay thế ${group}.`
+          : `Choose a current Profile target for each ${group} replacement.`;
       issues.push(message);
       input.decisions[group].forEach((decision, index) => {
         if (decision.action === "REPLACE" && !decision.targetId)
@@ -321,6 +352,7 @@ export function CvDraftReview({
   initial: CvDraftComparison;
   csrfProof: string;
 }) {
+  const locale = useWorkspaceLocale();
   const review = useCvDraftReview({ initial, csrfProof });
   const [acknowledged, setAcknowledged] = useState(false);
   const [showValidation, setShowValidation] = useState(false);
@@ -333,8 +365,9 @@ export function CvDraftReview({
         comparison: review.authoritative,
         proposals: review.proposals,
         decisions: review.decisions,
+        locale,
       }),
-    [review.authoritative, review.decisions, review.proposals],
+    [locale, review.authoritative, review.decisions, review.proposals],
   );
   const issues = validation.issues;
   const visibleFieldErrors = useMemo(
@@ -580,16 +613,26 @@ export function CvDraftReview({
   const save = async () => {
     setShowValidation(true);
     const blockingIssues = issues.filter(
-      (issue) => !issue.startsWith("Mark the review"),
+      (issue) =>
+        !issue.startsWith(
+          locale === "vi" ? "Hãy đánh dấu bản xem xét" : "Mark the review",
+        ),
     );
     if (blockingIssues.length) {
-      toast.error("Review could not be saved.", {
-        id: "cv-review-save-error",
-        description:
-          blockingIssues.length === 1
-            ? blockingIssues[0]
-            : `${blockingIssues[0]} Check ${blockingIssues.length} highlighted fields.`,
-      });
+      toast.error(
+        locale === "vi"
+          ? "Không thể lưu bản xem xét."
+          : "Review could not be saved.",
+        {
+          id: "cv-review-save-error",
+          description:
+            blockingIssues.length === 1
+              ? blockingIssues[0]
+              : locale === "vi"
+                ? `${blockingIssues[0]} Hãy kiểm tra ${blockingIssues.length} trường được đánh dấu.`
+                : `${blockingIssues[0]} Check ${blockingIssues.length} highlighted fields.`,
+        },
+      );
       focusField(validation.fieldErrors[0]?.path);
       return;
     }
@@ -623,13 +666,19 @@ export function CvDraftReview({
       onSubmit={(event) => event.preventDefault()}
     >
       <header className={styles.header}>
-        <p>Review draft revision {review.authoritative.draftRevision}</p>
+        <p>
+          {locale === "vi"
+            ? "Phiên bản bản nháp xem xét"
+            : "Review draft revision"}{" "}
+          {review.authoritative.draftRevision}
+        </p>
         <h1 ref={reviewHeading} tabIndex={-1}>
-          Review CV proposals
+          {locale === "vi" ? "Xem xét đề xuất từ CV" : "Review CV proposals"}
         </h1>
         <p>
-          Parsed values are suggestions. Edit them and choose what reaches your
-          Candidate Profile.
+          {locale === "vi"
+            ? "Các giá trị được phân tích chỉ là đề xuất. Hãy chỉnh sửa và chọn nội dung được đưa vào Hồ sơ ứng viên."
+            : "Parsed values are suggestions. Edit them and choose what reaches your Candidate Profile."}
         </p>
       </header>
 
@@ -643,7 +692,11 @@ export function CvDraftReview({
         <CvReviewConflictPanel
           conflict={review.conflict}
           pending={Boolean(review.pending)}
-          unsavedSummary={`${selectedCount} proposed changes are selected.`}
+          unsavedSummary={
+            locale === "vi"
+              ? `Đã chọn ${selectedCount} thay đổi được đề xuất.`
+              : `${selectedCount} proposed changes are selected.`
+          }
           unsavedPreview={preview}
           latestCompared={Boolean(review.latestComparison)}
           onCompareLatest={() => void review.compareLatest()}
@@ -654,14 +707,18 @@ export function CvDraftReview({
       {showValidation && (issues.length || !acknowledged) ? (
         <section className={styles.validation} role="alert">
           <h2 ref={validationHeading} tabIndex={-1}>
-            Complete the review
+            {locale === "vi" ? "Hoàn tất bản xem xét" : "Complete the review"}
           </h2>
           <ul>
             {issues.map((issue) => (
               <li key={issue}>{issue}</li>
             ))}
             {!acknowledged ? (
-              <li>Acknowledge that confirmation updates your Profile.</li>
+              <li>
+                {locale === "vi"
+                  ? "Xác nhận rằng thao tác xác nhận sẽ cập nhật Hồ sơ của bạn."
+                  : "Acknowledge that confirmation updates your Profile."}
+              </li>
             ) : null}
           </ul>
         </section>
@@ -689,10 +746,13 @@ export function CvDraftReview({
         className={styles.completion}
         aria-labelledby="review-complete-heading"
       >
-        <h2 id="review-complete-heading">Save and confirm</h2>
+        <h2 id="review-complete-heading">
+          {locale === "vi" ? "Lưu và xác nhận" : "Save and confirm"}
+        </h2>
         <p>
-          {selectedCount} proposed changes selected; skipped items remain
-          unchanged.
+          {locale === "vi"
+            ? `Đã chọn ${selectedCount} thay đổi được đề xuất; các mục bỏ qua vẫn giữ nguyên.`
+            : `${selectedCount} proposed changes selected; skipped items remain unchanged.`}
         </p>
         <label>
           <input
@@ -705,7 +765,9 @@ export function CvDraftReview({
               }))
             }
           />
-          I have reviewed every proposal.
+          {locale === "vi"
+            ? "Tôi đã xem xét mọi đề xuất."
+            : "I have reviewed every proposal."}
         </label>
         <label>
           <input
@@ -713,8 +775,9 @@ export function CvDraftReview({
             checked={acknowledged}
             onChange={(event) => setAcknowledged(event.target.checked)}
           />
-          I understand that Confirm updates my Candidate Profile and makes this
-          draft read-only.
+          {locale === "vi"
+            ? "Tôi hiểu rằng Xác nhận sẽ cập nhật Hồ sơ ứng viên và chuyển bản nháp này thành chỉ đọc."
+            : "I understand that Confirm updates my Candidate Profile and makes this draft read-only."}
         </label>
         <div className={styles.actions}>
           <button
@@ -726,7 +789,13 @@ export function CvDraftReview({
             }
             onClick={() => void save()}
           >
-            {review.pending === "save" ? "Saving review..." : "Save review"}
+            {review.pending === "save"
+              ? locale === "vi"
+                ? "Đang lưu bản xem xét…"
+                : "Saving review…"
+              : locale === "vi"
+                ? "Lưu bản xem xét"
+                : "Save review"}
           </button>
           <button
             type="button"
@@ -738,8 +807,12 @@ export function CvDraftReview({
             onClick={() => void confirm()}
           >
             {review.pending === "confirm"
-              ? "Confirming..."
-              : "Confirm selected changes"}
+              ? locale === "vi"
+                ? "Đang xác nhận…"
+                : "Confirming…"
+              : locale === "vi"
+                ? "Xác nhận các thay đổi đã chọn"
+                : "Confirm selected changes"}
           </button>
         </div>
       </section>

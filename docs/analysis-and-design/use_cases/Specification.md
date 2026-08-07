@@ -1,21 +1,36 @@
-# Summary Specification for PA3 — Group 9
+# Consolidated Use-Case Specification
 
-| Document Metadata | Value |
-|---|---|
-| Group | 9 |
-| Document Owner | Nguyễn Gia Quốc Uy (Student ID: 24127261) |
-| Reviewers | Nguyễn Quốc Thành, Ngô Quốc Tuấn, Lưu Chí Hải, Nguyễn Minh Khôi |
-| Last Updated | 2026-07-25 |
+> **Status:** Implemented and synchronized with the five domain specifications and use-case diagrams.
+>
+> This file is the consolidated report-facing specification. The authoritative domain files remain in ./specification/. Prototype evidence is embedded directly in each use-case section; the coverage files are indexes and QA appendices.
 
-``This specification was developed in parallel with the implementation of the first functional group using Spec Kit; therefore, some features may differ slightly from the final implemented version. The prototypes across the five diagrams were AI-generated for illustrative purposes and may not represent the final product interface with complete accuracy.``
+## Shared Modeling Rules
 
-## DGM-01 — Specification of Identity, Access, and Profile
+- Report diagrams use a consistent light background and dark text.
+- Use «include» only for mandatory reusable behavior.
+- Use «extend» only for optional or conditional behavior at an extension point; it is not used to represent a normal workflow sequence.
+- Actor generalization arrows point from the specialized actor to the parent actor.
+- A related use case or entry point is documented in prose when two independent user goals are connected but neither behavior is mandatory or conditionally inserted into the other.
+- Prototype evidence is placed inside the corresponding use-case specification rather than in a separate standalone section.
+
+## DGM-01 - Identity, Access, and Candidate Profile
+
+See the split source: [01_Identity_Access_Profile.md](./specification/01_Identity_Access_Profile.md).
+
+# DGM-01 - Specification of Identity, Access, and Profile
+
+## Use-Case Specifications
 
 *Performed by: Nguyen Gia Quoc Uy | Reviewed by: Group 9 | Edited by: Nguyen Gia Quoc Uy*
-### UC-AUTH-01 — Register Account
+**Version:** V1.4 (25/07/2026) — Reconciled with PA3 implementation; added 2FA, owned-session management, and full account recovery
+**Version History:**
+- V1.1 (20/7/2026) - First initialization (UC1 --> 3)
+- V1.2 (22/7/2026) - Second initialization (UC3 --> 7)
+- V1.3 (23/7/2026) - Third initialization (UC7 --> 12)
 
-#### Use-Case Information
+# 1. UC-AUTH-01 — Register Account
 
+## 1.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-AUTH-01 |
@@ -25,120 +40,111 @@
 | **Priority** | High |
 | **Trigger** | The visitor selects **Create account** |
 
-#### Brief Description
-
+## 1.2. Brief Description
 This use case allows a visitor to create a standard SmartHire account by providing a full name, email address, and password. The system creates a pending account and sends an email-verification message.
 
-#### Preconditions
-
+## 1.3. Preconditions
 1. The visitor does not have an active authenticated session.
 2. The registration service and account database are available.
 3. The visitor can access the supplied email address.
 
-#### Basic Flow
-
+## 1.4. Basic Flow
 1. The Visitor selects **Create account**.
 2. The System displays the registration form.
 3. The Visitor enters full name, email address, password, and password confirmation.
-4. The System will check the valid password whether it contains upper_case letter, lower_case letter, number and special character.
-5. The Visitor accepts the Terms of Service and submits the form
+4. The System validates that the password contains at least one uppercase letter, one lowercase letter, one number, and one special character.
+5. The Visitor accepts the Terms of Service and submits the form.
 6. The System validates the submitted information.
 7. The System verifies that the email address is not already associated with an account.
 8. The System securely hashes the password.
 9. The System creates an account with the PENDING_VERIFICATION status.
-10. The System creates an a single-use email-verification token.
+10. The System creates a single-use email-verification token.
 11. The Email Delivery Service sends a verification message.
 12. The System displays the verification-pending page.
 13. Account activation continues through **UC-AUTH-02 — Verify Email Address**.
 
-#### Alternative Flows
+## 1.5. Alternative Flows
 
-##### AF-01 — Required Information Is Missing
-
+### 1.5.1. AF-01 — Required Information Is Missing
 At Step 6, if a required field is missing:
 1. The System highlights the missing fields.
 2. The System preserves valid entered information.
 3. The use case resumes at Step 3.
 
-##### AF-02 — Email Format is Invalid
-
+### 1.5.2. AF-02 — Email Format Is Invalid
 At Step 5, if the email format is invalid:
-1. The System displays an email-format-validation message
+1. The System displays an email-format-validation message.
 2. The use case resumes at Step 3.
 
-##### AF-03 — Password Does Not Satisfy the Rule
-
+### 1.5.3. AF-03 — Password Does Not Satisfy the Rule
 At Step 4, if the password does not match the rule:
 1. The System displays the applicable password requirements.
 2. The System clears the password fields.
 3. The use case resumes at Step 3.
 
-##### AF-04 — Password Confirmation Does Not Match
-
-At Step 5, if the two password values do nat match:
+### 1.5.4. AF-04 — Password Confirmation Does Not Match
+At Step 5, if the two password values do not match:
 1. The System displays a password-mismatch message.
 2. The use case resumes at Step 3.
 
-##### AF-05 — Email Address Is Already Registered
-
+### 1.5.5. AF-05 — Email Address Is Already Registered
 At Step 6, if the email is already associated with an account:
 1. The System displays a neutral response instructing the Visitor to check the email inbox or log in.
 2. The System does not disclose detailed account status.
 3. The use case ends without creating another account or the Visitor try another email which is not associated with any account.
 
-##### AF-06 — Visitor Cancels Registration
-
+### 1.5.6. AF-06 — Visitor Cancels Registration
 Before Step 8, the Visitor may leave or cancel the form. The System does not create an account.
 
-##### EF-01 — Email Delivery Fails
-
+### 1.5.7. EF-01 — Email Delivery Fails
 At Step 11, if the verification message cannot be delivered
 1. The System retains the pending account.
 2. The System records the failed delivery.
 3. The System displays the verification-pending page with a resend option.
 4. The use case ends.
 
-##### EF-02 — Account Creation Fails
-
+### 1.5.8. EF-02 — Account Creation Fails
 At Step 9, if the account cannot be saved:
 1. The System does not report successful registration.
 2. The System records the failure.
 3. The System displays a general retry message.
 4. The use case ends.
 
-#### Postconditions
-
-##### Success Postconditions
-
+## 1.6. Postconditions
+### 1.6.1. Success Postconditions
 - A pending account exists.
 - A verification token has been generated.
 - A verification message has been sent or scheduled.
 - No authenticated session has been established.
 
-##### Failure Postconditions
-
+### 1.6.2 Failure Postconditions
 - No incomplete active account is created.
 - Password values are never stored or logged in plain text.
 
-#### Special Requirements
-
+## 1.7. Special Requirements
 - Passwords must be hashed using an approved adaptive password-hashing algorithm.
 - The registration endpoint must enforce abuse-control limits.
 - Verification tokens must be single-use, securely generated, and time-limited.
 - Sensitive values must not appear in logs or URLs other than the required opaque token.
 
-#### Extension Points
+## Prototype Evidence
 
-##### Email Verification
+![UC-AUTH-01 — registration form](./prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-01/UC-AUTH-01-BF-Registration-Form.png)
 
-After the pending account is created, account activation proceeds through UC-AUTH-02.
+*Figure 1.1 — UC-AUTH-01 basic flow; the Visitor enters registration data.*
+
+![UC-AUTH-01 — validation states](./prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-01/UC-AUTH-01-AF-Validation-States.png)
+
+*Figure 1.2 — UC-AUTH-01 alternative-flow evidence; validation feedback is shown without creating an account.*
+
+## Related Use Cases and Entry Points
+### Email Verification
+After the pending account is created, the Visitor may start UC-AUTH-02 to activate it. Email verification is a separate goal, not a mandatory sub-flow of registration.
 
 ---
+# 2. UC-AUTH-02 — Verify Email Address
 
-### UC-AUTH-02 — Verify Email Address
-
-#### Use-Case Information
-
+## 2.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-AUTH-02 |
@@ -148,17 +154,14 @@ After the pending account is created, account activation proceeds through UC-AUT
 | **Priority** | High |
 | **Trigger** | The Visitor opens an email-verification link. |
 
-#### Brief Description
+## 2.2. Brief Description
+This use case confirms that the Visitor controls the registered email address and activates the corresponding pending account.
 
-This use case confirms that the Visitor controls the registered email address and activates the correspoding pending account
-
-#### Preconditions
-
+## 2.3. Preconditions
 1. A pending account exists.
 2. A verification token has been issued for the account
 
-#### Basic Flow
-
+## 2.4. Basic Flow
 1. The Visitor opens the verification link.
 2. The System extracts the verification token.
 3. The System validates the token’s signature, purpose, expiration time, and unused status.
@@ -169,57 +172,56 @@ This use case confirms that the Visitor controls the registered email address an
 8. The System records the verification event.
 9. The System displays a verification-success page with a login action.
 
-#### Alternative Flows
+## 2.5. Alternative Flows
 
-##### AF-01 — Verification Token Is Invalid
-
+### 2.5.1. AF-01 — Verification Token Is Invalid
 At Step 3, if the token is invalid, the System displays a neutral invalid-link message and offers a new verification-message request.
 
-##### AF-02 — Verification Token Has Expired
-
+### 2.5.2. AF-02 — Verification Token Has Expired
 At Step 3, if the token has expired, the System displays an expired-link message and offers a resend action.
 
-##### AF-03 — Token Has Already Been Used
-
+### 2.5.3. AF-03 — Token Has Already Been Used
 At Step 3, if the token has already been used, the System displays a neutral message indicating that the link is no longer valid.
 
-##### AF-04 — Account Is Already Verified
-
+### 2.5.4. AF-04 — Account Is Already Verified
 At Step 4, if the account is already active, the System displays the verification-success page without changing the account.
 
-##### AF-05 — Visitor Requests Another Verification Message
-
+### 2.5.5. AF-05 — Visitor Requests Another Verification Message
 1. The Visitor submits the email address.
 2. The System displays the same neutral response regardless of whether a matching account exists.
 3. If an eligible pending account exists, the System invalidates previous verification tokens and sends a new token.
 
-##### AF-06 — Resend Is Rate-Limited
-
+### 2.5.6. AF-06 — Resend Is Rate-Limited
 If fewer than 60 seconds have passed since the previous request, or the hourly limit is exceeded, the System displays the remaining cooldown time.
 
-##### EF-01 — Activation Cannot Be Saved
-
+### 2.5.7. EF-01 — Activation Cannot Be Saved
 If Steps 5–7 cannot be committed atomically, the System rolls back the operation, records the failure, and displays a retry message.
 
-#### Postconditions
-
+## 2.6. Postconditions
 - On success, the account is active and the email address is verified.
 - The used verification token cannot be used again.
 - On the failure, the account remains in its  previous consistent state.
 
-#### Special Requirements
-
+## 2.7. Special Requirements
 - Token validation must not expose internal token contents.
 - Invalid-token attempts must be rate-limited.
 - Account activation and token invalidation must be atomic.
 - Resend responses must prevent account enumeration.
 
+## Prototype Evidence
+
+![UC-AUTH-02 — verification success](./prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-02/UC-AUTH-02-BF-Verification-Success.png)
+
+*Figure 2.1 — UC-AUTH-02 basic flow; the verification link activates the pending account.*
+
+![UC-AUTH-02 — resend cooldown](./prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-02/UC-AUTH-02-AF-Resend-Cooldown.png)
+
+*Figure 2.2 — UC-AUTH-02 AF-06; resend is rate-limited with a visible cooldown.*
+
 ---
+# 3. UC-AUTH-03 — Log In
 
-### UC-AUTH-03 — Log In
-
-#### Use-Case Information
-
+## 3.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-AUTH-03 |
@@ -229,17 +231,14 @@ If Steps 5–7 cannot be committed atomically, the System rolls back the operati
 | **Priority** | High |
 | **Trigger** | The Visitor submits the login form.|
 
-#### Brief Description
-
+## 3.2. Brief Description
 This use case validates the primary email-and-password factor. It establishes a secure full session immediately only when the account does not require two-factor authentication; otherwise it creates a restricted, short-lived challenge completed by **UC-AUTH-09**.
 
-#### Preconditions
-
+## 3.3. Preconditions
 1. The Visitor is not currently authenticated.
 2. An active, verified account exists.
 
-#### Basic Flow
-
+## 3.4. Basic Flow
 1. The Visitor opens the login page.
 2. The System displays the login form.
 3. The Visitor enters an email address and password.
@@ -253,82 +252,78 @@ This use case validates the primary email-and-password factor. It establishes a 
 11. The System records the successful login without recording credentials.
 12. The System redirects the Authenticated User to the requested protected page or default dashboard.
 
-#### Alternative Flows
+## 3.5. Alternative Flows
 
-##### AF-01 — Invalid Credentials
-
+### 3.5.1. AF-01 — Invalid Credentials
 At Steps 6–7, if the account is not found or the password is incorrect:
 1. The System records the failed attempt.
 2. The System displays the same neutral invalid-credentials message.
 3. The use case resumes at Step 3.
 
-##### AF-02 — Email Is Not Verified
-
+### 3.5.2. AF-02 — Email Is Not Verified
 At Step 8, if the account is pending verification, the System displays a verification-required message with a resend option.
 
-##### AF-03 — Account Is Temporarily Locked
-
+### 3.5.3. AF-03 —  Account Is Temporarily Locked
 At Step 8, if the account is temporarily locked, the System displays a neutral temporary-restriction message.
 
-##### AF-04 — Account Is Suspended or Disabled
-
+### 3.5.4. AF-04 — Account Is Suspended or Disabled
 At Step 8, the System denies access and provides the permitted support or appeal instruction.
 
-##### AF-05 — Visitor Selects Forgot Password
-
+### 3.5.5. AF-05 — Visitor Selects Forgot Password
 At Step 2, the use case invokes **UC-AUTH-05 — Reset Forgotten Password**.
 
-##### AF-06 — Valid Session Already Exists
-
+### 3.5.6. AF-06 — Valid Session Already Exists
 If a valid session exists, the System redirects the user to the requested page without creating another session.
 
-##### AF-07 — Login Rate Limit Is Exceeded
-
+### 3.5.7. AF-07 — Login Rate Limit Is Exceeded
 If the account or source exceeds the configured limit, the System rejects the attempt and displays a retry-later message.
 
-##### EF-01 — Authentication Service Is Unavailable
-
+### 3.5.8. EF-01 — Authentication Service Is Unavailable
 The System does not establish a session and displays a temporary-unavailability message.
 
-##### AF-08 — Two-Factor Authentication Is Enabled
-
+### 3.5.9. AF-08 — Two-Factor Authentication Is Enabled
 At Step 9, if two-factor authentication is enabled:
 1. The System creates only a restricted, short-lived pre-authentication challenge.
 2. The System does not create a full authenticated session and does not authorize protected resources.
 3. The System redirects the Visitor to **UC-AUTH-09 — Complete Two-Factor Verification**.
 4. Login completes only after the TOTP or backup-code challenge succeeds.
 
-##### AF-09 — Full Account Recovery Is Required
-
+### 3.5.10. AF-09 — Full Account Recovery Is Required
 If the Visitor has lost the password, TOTP access, and every backup code, the Visitor may initiate **UC-AUTH-11 — Recover Account After Loss of All Factors**. The System does not disable 2FA through ordinary login support or ordinary password reset.
 
-#### Postconditions
-
+## 3.6. Postconditions
 - On success without 2FA, a valid authenticated session exists.
 - When 2FA is enabled, only a restricted challenge exists until **UC-AUTH-09** succeeds.
 - On failure, no session is created.
 - Login success or failure is recorded without logging the password.
 
-#### Special Requirements
-
+## 3.7. Special Requirements
 - Login errors must not reveal whether an account exists.
 - Five failed attempts per account or 20 attempts per IP address within 15 minutes trigger the configured cooldown.
 - Session identifiers must be regenerated after authentication.
 - Authentication cookies must be secure and inaccessible to client-side scripts.
 
-#### Extension Points
+## Prototype Evidence
 
-- **Forgot Password**: At the login form, the Visitor may initiate **UC-AUTH-05**.
-- **Two-Factor Challenge**: When 2FA is enabled, login is extended by **UC-AUTH-09**.
-- **Loss of All Factors**: A Visitor who cannot use the password, TOTP, or any backup code may initiate **UC-AUTH-11**.
-- **Protected Page Authentication**: This use case extends **UC-AUTH-07** when no valid session exists.
+![UC-AUTH-03 — login form](./prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-03/UC-AUTH-03-BF-Login.png)
+
+*Figure 3.1 — UC-AUTH-03 basic flow; the Visitor submits primary credentials.*
+
+![UC-AUTH-03 — successful redirect](./prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-03/UC-AUTH-03-BF-Successful-Redirect.png)
+
+*Figure 3.2 — UC-AUTH-03 postcondition; a successful login redirects to the protected workspace.*
+
+## 3.8. Related Use Cases and Entry Points
+- **Forgot Password:** At the login form, the Visitor may start **UC-AUTH-05 — Reset Forgotten Password**.
+- **Two-Factor Challenge:** When 2FA is enabled, **UC-AUTH-09 — Complete Two-Factor Verification** is inserted at the explicit extension point after primary credentials are validated and before a full session is created.
+- **Loss of All Factors:** A Visitor who cannot use the password, TOTP, or any backup code may start **UC-AUTH-11 — Recover Account After Loss of All Factors**.
+- **Protected Page Authentication:** When **UC-AUTH-07 — Access Protected Account Page** finds no valid session, it directs the person to this login goal. The page-access goal is not modeled as an extension of login.
 
 ---
 
-### UC-AUTH-04 — Log Out and End Session
+# 4. UC-AUTH-04 — Log Out and End Session
 
-#### Use-Case Information
-
+## 4.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-AUTH-04 |
@@ -338,16 +333,13 @@ If the Visitor has lost the password, TOTP access, and every backup code, the Vi
 | **Priority** | High |
 | **Trigger** | The Authenticated User selects **Log Out**|
 
-#### Brief Description
-
+## 4.2. Brief Description
 This use case securely terminates the current authenticated session.
 
-#### Preconditions
-
+## 4.3. Preconditions
 - The user has or recently had an authenticated session
 
-#### Basic Flow
-
+## 4.4. Basic Flow
 1. The Authenticated User opens the account menu.
 2. The System displays the available account actions.
 3. The Authenticated User selects **Log out**.
@@ -357,36 +349,37 @@ This use case securely terminates the current authenticated session.
 7. The System records the logout event.
 8. The System redirects the Visitor to the public home or login page.
 
-#### Alternative Flows
+## 4.5. Alternative Flows
 
-##### AF-01 — Session Has Already Expired
-
+### 4.5.1. AF-01 — Session Has Already Expired
 The System clears any remaining local authentication data and redirects the Visitor to the login page.
 
-##### EF-01 — Server-Side Revocation Fails
-
+### 4.5.2. EF-01 — Server-Side Revocation Fails
 1. The System still clears local authentication cookies.
 2. The System records or queues the revocation failure.
 3. The System redirects the Visitor to the public page.
 4. The System does not prevent the local logout from completing.
 
-#### Postconditions
-
+## 4.6. Postconditions
 - The current browser no longer has usable authentication credentials.
 - Protected pages require authentication again.
 
-#### Special Requirements
-
+## 4.7. Special Requirements
 - Logout must be idempotent.
 - Failure to write an audit record must not prevent session invalidation.
 - Cached protected content must not remain available after logout.
 
+## Prototype Evidence
+
+![UC-AUTH-04 — logged-out state](./prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-04/UC-AUTH-04-BF-Logged-Out.png)
+
+*Figure 4.1 — UC-AUTH-04 basic flow; the current session has ended and protected content is no longer displayed.*
+
 ---
 
-### UC-AUTH-05 — Reset Forgotten Password
+# 5. UC-AUTH-05 — Reset Forgotten Password
 
-#### Use-Case Information
-
+## 5.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-AUTH-05 |
@@ -396,17 +389,15 @@ The System clears any remaining local authentication data and redirects the Visi
 | **Priority** | High |
 | **Trigger** | The Visitor selects **Forgot password**.|
 
-#### Brief Description
 
+## 5.2. Brief Description
 This use case allows a Visitor who has forgotten the password to establish a new password through a time-limited email reset link. It is not the lower-assurance full-account-recovery procedure and does not disable an existing TOTP factor or unused backup codes.
 
-#### Preconditions
-
+## 5.3. Preconditions
 - The Visitor is not required to be authenticated.
 - The Visitor can access the registered email inbox.
 
-#### Basic Flow
-
+## 5.4. Basic Flow
 1. The Visitor selects Forgot password.
 2. The System displays the password-recovery form.
 3. The Visitor enters an email address.
@@ -425,58 +416,58 @@ This use case allows a Visitor who has forgotten the password to establish a new
 16. The System preserves enabled TOTP and every unused backup code.
 17. The System displays a password-reset-success page and requires a normal login; it does not create a session automatically.
 
-#### Alternative Flows
+## 5.5. Alternative Flows
 
-##### AF-01 — Email Is Invalid or Not Registered
-
+### 5.5.1. AF-01 — Email Is Invalid or Not Registered
 The System displays the same neutral response as Step 4 and does not disclose whether an account exists.
 
-##### AF-02 — Reset Token Is Invalid, Expired, or Used
-
+### 5.5.2. AF-02 — Reset Token Is Invalid, Expired, or Used
 At Step 9, the System displays an invalid-or-expired-link page with an option to request another message.
 
-##### AF-03 — Password Does Not Satisfy Policy
-
+### 5.5.3. AF-03 — Password Does Not Satisfy Policy
 At Step 12, the System displays the applicable password requirements and resumes at Step 11.
 
-##### AF-04 — Password Confirmation Does Not Match
-
+### 5.5.4. AF-04 — Password Confirmation Does Not Match
 The System displays a mismatch message and resumes at Step 11.
 
-##### AF-05 — New Password Matches Current Password
-
+### 5.5.5. AF-05 — New Password Matches Current Password
 The System asks the Visitor to choose a different password.
 
-##### EF-01 — Email Delivery Fails
-
+### 5.5.6. EF-01 — Email Delivery Fails
 The System retains the neutral public response, records the delivery failure, and does not reveal the account status.
 
-##### EF-02 — Password Update Fails
-
+### 5.5.7. EF-02 — Password Update Fails
 The System preserves the old password, keeps the reset operation consistent, and displays a retry message.
 
-#### Postconditions
-
+## 5.6. Postconditions
 - On success, the password is replaced and previous sessions are invalidated.
 - Existing TOTP configuration and unused backup codes remain enabled.
 - No authenticated session is created automatically.
 - The used reset token cannot be reused.
 - On failure, the existing password remains valid unless the update was committed successfully.
 
-#### Special Requirements
-
+## 5.7. Special Requirements
 - Public recovery responses must prevent account enumeration.
 - Reset tokens must be single-use and time-limited.
 - Reset links must use HTTPS.
 - Recovery requests must be rate-limited and audited.
 - A normal password reset must preserve TOTP and unused backup codes; loss of every factor is handled only by **UC-AUTH-11**.
 
+## Prototype Evidence
+
+![UC-AUTH-05 — recovery request](./prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-05/UC-AUTH-05-BF-Recovery-Request.png)
+
+*Figure 5.1 — UC-AUTH-05 basic flow; the Visitor requests a normal password reset.*
+
+![UC-AUTH-05 — reset password](./prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-05/UC-AUTH-05-BF-Reset-Password.png)
+
+*Figure 5.2 — UC-AUTH-05 completion state; the new password is set without creating a session automatically.*
+
 ---
 
-### UC-AUTH-06 — Change Password
+# 6. UC-AUTH-06 — Change Password
 
-#### Use-Case Information
-
+## 6.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-AUTH-06 |
@@ -486,17 +477,14 @@ The System preserves the old password, keeps the reset operation consistent, and
 | **Priority** | High |
 | **Trigger** | The Authenticated User selects **Change password**.|
 
-#### Brief Description
-
+## 6.2. Brief Description
 This use case allows an Authenticated User to replace the current account password.
 
-#### Preconditions
-
+## 6.3. Preconditions
 1. The user has a valid authenticated session.
 2. The account uses password-based authentication.
 
-#### Basic Flow
-
+## 6.4. Basic Flow
 1. The Authenticated User opens account security settings.
 2. The System displays the change-password form.
 3. The Authenticated User enters the current password.
@@ -508,54 +496,54 @@ This use case allows an Authenticated User to replace the current account passwo
 9. The System records the password-change event.
 10. The System displays a success confirmation.
 
-#### Alternative Flows
+## 6.5. Alternative Flows
 
-##### AF-01 — Current Password Is Incorrect
-
+### 6.5.1. AF-01 — Current Password Is Incorrect
 The System displays a neutral error and resumes at Step 3.
 
-##### AF-02 — New Password Violates Policy
-
+### 6.5.2. AF-02 — New Password Violates Policy
 The System displays the applicable requirements and resumes at Step 4.
 
-##### AF-03 — Password Confirmation Does Not Match
-
+### 6.5.3. AF-03 — Password Confirmation Does Not Match
 The System displays a mismatch message and resumes at Step 4.
 
-##### AF-04 — New Password Equals Current Password
-
+### 6.5.4. AF-04 — New Password Equals Current Password
 The System requires the user to choose a different password.
 
-##### AF-05 — User Cancels the Change
-
+### 6.5.5. AF-05 — User Cancels the Change
 Before Step 7, the user cancels. The existing password remains unchanged.
 
-##### AF-06 — Session Has Expired
-
+### 6.5.6. AF-06 — Session Has Expired
 The System redirects the user to login and preserves no password values.
 
-##### EF-01 — Password Update Fails
-
+### 6.5.7. EF-01 — Password Update Fails
 The System keeps the existing password, records the failure, and displays a retry message.
 
-#### Postconditions
-
+## 6.6. Postconditions
 - On success, the new password is active
 - Other active sessions are invalidated.
 - On failure, the existing password remains unchanged.
 
-#### Special Requirements
-
+## 6.7. Special Requirements
 - Password values must never be logged.
 - The current password must be reverified before the change.
 - The update and session invalidation must be performed consistently.
 
+## Prototype Evidence
+
+![UC-AUTH-06 — change password](./prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-06/UC-AUTH-06-BF-Change-Password.png)
+
+*Figure 6.1 — UC-AUTH-06 basic flow; the authenticated user submits a password change.*
+
+![UC-AUTH-06 — validation states](./prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-06/UC-AUTH-06-AF-Validation-States.png)
+
+*Figure 6.2 — UC-AUTH-06 alternative-flow evidence; invalid password input is rejected.*
+
 ---
 
-### UC-AUTH-07 — Access Protected Account Page
+# 7. UC-AUTH-07 — Access Protected Account Page
 
-#### Use-Case Information
-
+## 7.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-AUTH-07 |
@@ -565,15 +553,13 @@ The System keeps the existing password, records the failure, and displays a retr
 | **Priority** | High |
 | **Trigger** | A person requests a protected account page.|
 
-#### Brief Description
-
+## 7.2. Brief Description
 This use case verifies the requester's session and authorization before displaying a protected account page.
 
-#### Preconditions
-
+## 7.3. Preconditions
 - The requested route is classified as protected
 
-#### Basic Flow
+## 7.4. Basic Flow
 
 1. The Authenticated User requests a protected account page.
 2. The System reads the authentication credential.
@@ -583,49 +569,50 @@ This use case verifies the requester's session and authorization before displayi
 6. The System verifies that the user is authorized to access the requested resource.
 7. The System displays the protected page.
 
-#### Alternative Flows
+## 7.5. Alternative Flows
 
-##### AF-01 — No Authenticated Session Exists
-
+### 7.5.1. AF-01 — No Authenticated Session Exists
 The System invokes UC-AUTH-03 — Log In and retains the requested destination.
 
-##### AF-02 — Session Has Expired
-
+### 7.5.2. AF-02 — Session Has Expired
 The System clears invalid authentication data and redirects the person to login.
 
-##### AF-03 — User Lacks Permission
-
+### 7.5.3. AF-03 — User Lacks Permission
 The System denies access and displays an access-denied page.
 
-##### AF-04 — Account Is Suspended
-
+### 7.5.4. AF-04 — Account Is Suspended
 The System terminates the session and displays the permitted support or appeal information.
 
-##### AF-05 — Requested Resource Does Not Exist
-
+### 7.5.5. AF-05 — Requested Resource Does Not Exist
 The System displays a not-found page without exposing unauthorized resource information.
 
-##### EF-01 — Authorization Service Is Unavailable
-
+### 7.5.6. EF-01 — Authorization Service Is Unavailable
 The System denies access by default and displays a temporary-error page.
 
-#### Postconditions
-
+## 7.6. Postconditions
 - On success, the authorized page is displayed.
 - On failure, protected data is not disclosed.
 
-#### Special Requirements
-
+## 7.7. Special Requirements
 - Authorization must be checked server-side.
 - The system must deny access by default when authorization cannot be determined.
 - Resource existence must not be disclosed to unauthorized users.
 
+## Prototype Evidence
+
+![UC-AUTH-07 — protected-page denial](./prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-07/UC-AUTH-07-BF-Protected-Page.png)
+
+*Figure 7.1 — UC-AUTH-07 alternative-flow evidence; an unauthenticated or unauthorized request is denied safely.*
+
+![UC-AUTH-07 — protected dashboard](./prototypes/DGM-01-Identity-Access-Profile/shared/S-APP-DASHBOARD.png)
+
+*Figure 7.2 — UC-AUTH-07 basic-flow evidence; the protected dashboard is shown after authorization succeeds.*
+
 ---
 
-### UC-ACC-01 — Manage Account Information
+# 8. UC-ACC-01 — Manage Account Information
 
-#### Use-Case Information
-
+## 8.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-ACC-01 |
@@ -635,17 +622,14 @@ The System denies access by default and displays a temporary-error page.
 | **Priority** | High |
 | **Trigger** | The user opens account-information settings.|
 
-#### Brief Description
-
+## 8.2. Brief Description
 This use case allows an Authenticated User to view and update general account information.
 
-#### Preconditions
-
+## 8.3. Preconditions
 1. The user has a valid authenticated session
 2. The account is active
 
-#### Basic Flow
-
+## 8.4. Basic Flow
 1. The Authenticated User opens account settings.
 2. The System displays the current account information.
 3. The Authenticated User selects **Edit**.
@@ -658,58 +642,57 @@ This use case allows an Authenticated User to view and update general account in
 10. The System records the account-update event.
 11. The System displays the updated information and a success message.
 
-#### Alternative Flows
+## 8.5. Alternative Flows
 
-##### AF-01 — Submitted Information Is Invalid
-
+### 8.5.1. AF-01 — Submitted Information Is Invalid
 The System identifies invalid fields, preserves valid input, and resumes at Step 5.
 
-##### AF-02 — User Changes the Email Address
-
+### 8.5.2. AF-02 — User Changes the Email Address
 The System records the new email as pending, preserves the current verified email, and initiates email verification.
 
-##### AF-03 — New Email Is Already Registered
-
+### 8.5.3. AF-03 — New Email Is Already Registered
 The System displays a neutral unavailable-email message and resumes at Step 5.
 
-##### AF-04 — User Cancels Editing
-
+### 8.5.4. AF-04 — User Cancels Editing
 The System discards unsaved changes and displays the previously stored information.
 
-##### AF-05 — Concurrent Update Is Detected
-
+### 8.5.5. AF-05 — Concurrent Update Is Detected
 The System informs the user that the information has changed, reloads the current version, and asks the user to review the update again.
 
-##### AF-06 — Session Has Expired
-
+### 8.5.6. AF-06 — Session Has Expired
 The System redirects the user to login without saving the changes.
 
-##### EF-01 — Save Operation Fails
-
+### 8.5.7. EF-01 — Save Operation Fails
 The System preserves the previous account information and displays a retry message.
 
-#### Postconditions
-
+## 8.6. Postconditions
 - On success, valid account information is updated.
 - On cancellation or failure, stored information remains unchanged.
 - An email change does not become verified until verification succeeds.
 
-#### Special Requirements
-
-- Only explicity editable fields may be changed.
+## 8.7. Special Requirements
+- Only explicitly editable fields may be changed.
 - Sensitive changes must be audited.
 - Concurrent updates must not silently overwrite newer information.
 
-#### Extension Points
+## 8.8. Related Use Cases and Entry Points
+- **Verify Changed Email Address:** Email verification may be started when the user changes the account email address.
 
-- **Verify Changed Email Address**: Email verification is initiated when the user changes the account email address.
+## Prototype Evidence
+
+![UC-ACC-01 — account information](./prototypes/DGM-01-Identity-Access-Profile/UC-ACC-01/UC-ACC-01-BF-Account-Information.png)
+
+*Figure 8.1 — UC-ACC-01 basic flow; current account information is displayed.*
+
+![UC-ACC-01 — edit account](./prototypes/DGM-01-Identity-Access-Profile/UC-ACC-01/UC-ACC-01-BF-Edit-Account.png)
+
+*Figure 8.2 — UC-ACC-01 editing state; permitted account information can be updated.*
 
 ---
 
-### UC-ACC-02 — Manage Account Preferences
+# 9. UC-ACC-02 — Manage Account Preferences
 
-#### Use-Case Information
-
+## 9.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-ACC-02 |
@@ -719,16 +702,13 @@ The System preserves the previous account information and displays a retry messa
 | **Priority** | High |
 | **Trigger** | The user opens account preferences. |
 
-#### Brief Description
-
+## 9.2. Brief Description
 This use case allows an Authenticated User to configure supported account, language, privacy, communication, and notification preferences.
 
-#### Preconditions
-
+## 9.3. Preconditions
 - The user has a valid authenticated session.
 
-#### Basic Flow
-
+## 9.4. Basic Flow
 1. The Authenticated User opens account preferences.
 2. The System displays the current preference values.
 3. The Authenticated User changes one or more preferences.
@@ -738,49 +718,50 @@ This use case allows an Authenticated User to configure supported account, langu
 7. The System applies preferences that take effect immediately.
 8. The System displays a success confirmation.
 
-#### Alternative Flows
+## 9.5. Alternative Flows
 
-##### AF-01 — Unsupported Preference Value
-
+### 9.5.1. AF-01 — Unsupported Preference Value
 The System identifies the unsupported value and restores the nearest valid option.
 
-##### AF-02 — User Restores Default Preferences
-
+### 9.5.2. AF-02 — User Restores Default Preferences
 The System displays the default values, requests confirmation, and saves them after confirmation.
 
-##### AF-03 — User Cancels Changes
-
+### 9.5.3. AF-03 — User Cancels Changes
 The System discards unsaved changes and restores the stored values.
 
-##### AF-04 — Concurrent Update Is Detected
-
+### 9.5.4. AF-04 — Concurrent Update Is Detected
 The System reloads the latest preference values and asks the user to reapply the changes.
 
-##### AF-05 — Session Has Expired
-
+### 9.5.5. AF-05 — Session Has Expired
 The System redirects the user to login without saving changes.
 
-##### EF-01 — Preferences Cannot Be Saved
-
+### 9.5.6. EF-01 — Preferences Cannot Be Saved
 The System retains the previous values and displays a retry message.
 
-#### Postconditions
-
+## 9.6. Postconditions
 - On success, validated preferences are stored.
 - On failure or cancellation, previous preferences remain active.
 
-#### Special Requirements
-
+## 9.7. Special Requirements
 - Mandatory security notifications cannot be disabled.
 - Preference changes must apply consistently across supported devices.
 - Privacy-related preferences must comply with applicable policy.
 
+## Prototype Evidence
+
+![UC-ACC-02 — account preferences](./prototypes/DGM-01-Identity-Access-Profile/UC-ACC-02/S-ACC-PREFERENCES.png)
+
+*Figure 9.1 — UC-ACC-02 basic flow; the authenticated user manages account preferences.*
+
+![UC-ACC-02 — restore defaults](./prototypes/DGM-01-Identity-Access-Profile/UC-ACC-02/UC-ACC-02-AF-Restore-Defaults.png)
+
+*Figure 9.2 — UC-ACC-02 AF-02; the user can review and confirm restoration of default values.*
+
 ---
 
-### UC-PROF-01 — Manage Candidate Profile
+# 10. UC-PROF-01 — Manage Candidate Profile
 
-#### Use-Case Information
-
+## 10.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-PROF-01 |
@@ -790,17 +771,14 @@ The System retains the previous values and displays a retry message.
 | **Priority** | High |
 | **Trigger** | The Candidate opens the candidate profile. |
 
-#### Brief Description
-
+## 10.2. Brief Description
 This use case allows a Candidate to create, view, and update professional profile information used for job applications and candidate screening.
 
-#### Preconditions
-
+## 10.3. Preconditions
 1. The Candidate has a valid authenticated session.
 2. The account is permitted to use candidate features.
 
-#### Basic Flow
-
+## 10.4. Basic Flow
 1.  Candidate opens **My Profile**.
 2. The System displays the current candidate profile and completion status.
 3. The Candidate selects **Edit profile**.
@@ -813,62 +791,60 @@ This use case allows a Candidate to create, view, and update professional profil
 10. The System recalculates the profile-completion status.
 11. The System displays the updated profile and success confirmation.
 
-#### Alternative Flows
+## 10.5. Alternative Flows
 
-##### AF-01 — Candidate Creates the First Profile
-
+### 10.5.1. AF-01 — Candidate Creates the First Profile
 If no profile exists, the System displays an empty profile form and creates the profile after valid submission.
 
-##### AF-02 — Required Information Is Missing
-
+### 10.5.2. AF-02 — Required Information Is Missing
 The System highlights the incomplete sections and resumes at Step 5.
 
-##### AF-03 — Experience or Education Dates Are Invalid
-
+### 10.5.3. AF-03 — Experience or Education Dates Are Invalid
 The System identifies the invalid date range and resumes at Step 5.
 
-##### AF-04 — Candidate Uploads a CV
-
+### 10.5.4. AF-04 — Candidate Uploads a CV
 At Step 4, the Candidate may invoke **UC-PROF-02 — Upload and Parse CV**.
 
-##### AF-05 — Candidate Cancels Editing
-
+### 10.5.5. AF-05 — Candidate Cancels Editing
 The System discards unsaved changes and displays the stored profile.
 
-##### AF-06 — Concurrent Modification Is Detected
-
+### 10.5.6. AF-06 — Concurrent Modification Is Detected
 The System displays the latest profile version and asks the Candidate to review the changes again.
 
-##### AF-07 — Session Has Expired
-
+### 10.5.7. AF-07 — Session Has Expired
 The System redirects the Candidate to login without saving unsaved information.
 
-##### EF-01 — Profile Cannot Be Saved
-
+### 10.5.8. EF-01 — Profile Cannot Be Saved
 The System retains the previous profile and displays a retry message.
 
-#### Postconditions
-
+## 10.6. Postconditions
 - On success, the candidate profile contains the validated changes.
 - Profile completion is recalculated.
 - On cancellation or failure, the previous profile remains unchanged.
 
-#### Special Requirements
-
+## 10.7. Special Requirements
 - Only the Candidate and explicitly authorized platform functions may access private profile data.
 - Profile fields must enforce documented length and format limits.
 - Profile changes relevant to screening should be versioned or audited.
 
-#### Extension Points
+## 10.8. Related Use Cases and Entry Points
+- **Upload CV:** At the profile-editing page, the Candidate may start **UC-PROF-02 — Upload and Parse CV**.
 
-- **Upload CV**: At the profile-editing page, the Candidate may initiate **UC-PROF-02**.
+## Prototype Evidence
+
+![UC-PROF-01 — profile view](./prototypes/DGM-01-Identity-Access-Profile/UC-PROF-01/UC-PROF-01-BF-Profile-View.png)
+
+*Figure 10.1 — UC-PROF-01 basic flow; the Candidate views profile information and completion status.*
+
+![UC-PROF-01 — profile editor](./prototypes/DGM-01-Identity-Access-Profile/UC-PROF-01/UC-PROF-01-BF-Profile-Editor.png)
+
+*Figure 10.2 — UC-PROF-01 editing state; profile fields are available for update.*
 
 ---
 
-### UC-PROF-02 — Upload and Parse CV
+# 11. UC-PROF-02 — Upload and Parse CV
 
-#### Use-Case Information
-
+## 11.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-PROF-02 |
@@ -878,18 +854,15 @@ The System retains the previous profile and displays a retry message.
 | **Priority** | High |
 | **Trigger** | The Candidate selects **Upload CV** |
 
-#### Brief Description
-
+## 11.2. Brief Description
 This use case allows a Candidate to upload a supported CV document and have structured profile information extracted from it.
 
-#### Preconditions
-
+## 11.3. Preconditions
 1. The Candidate has a valid authenticated session.
 2. The Candidate may access candidate-profile functions.
 3. The CV Parsing Service is configured.
 
-#### Basic Flow
-
+## 11.4. Basic Flow
 1. The Candidate selects Upload CV.
 2. The System displays file requirements and the upload control.
 3. The Candidate selects a supported CV file.
@@ -902,67 +875,68 @@ This use case allows a Candidate to upload a supported CV document and have stru
 10. The System receives and stores the parsing result with confidence information.
 11. The System invokes **UC-PROF-03 — Review and Confirm Parsed CV**.
 
-#### Alternative Flows
+## 11.5. Alternative Flows
 
-##### AF-01 — Unsupported File Type
-
+### 11.5.1. AF-01 — Unsupported File Type
 The System rejects the file and displays the supported formats.
 
-##### AF-02 — File Exceeds the Size Limit
-
+### 11.5.2. AF-02 — File Exceeds the Size Limit
 The System rejects the file and displays the maximum permitted size.
 
-##### AF-03 — File Is Empty, Corrupted, or Password-Protected
-
+### 11.5.3. AF-03 — File Is Empty, Corrupted, or Password-Protected
 The System rejects the file and asks the Candidate to select another document.
 
-##### AF-04 — Unsafe Content Is Detected
-
+### 11.5.4. AF-04 — Unsafe Content Is Detected
 The System rejects and quarantines the file, records the event, and does not send it for parsing.
 
-##### AF-05 — Candidate Cancels the Upload
-
+### 11.5.5. AF-05 — Candidate Cancels the Upload
 Before Step 7, the Candidate cancels and no file is stored.
 
-##### AF-06 — Duplicate File Is Selected
-
+### 11.5.6. AF-06 — Duplicate File Is Selected
 The System warns that the same file was previously uploaded and allows the Candidate to replace or cancel it.
 
-##### AF-07 — Parsing Confidence Is Low
-
+### 11.5.7. AF-07 — Parsing Confidence Is Low
 The System completes parsing but marks uncertain fields for manual review in UC-PROF-03.
 
-##### EF-01 — CV Parsing Service Is Unavailable
-
+### 11.5.8. EF-01 — CV Parsing Service Is Unavailable
 The System records the failed parsing job and displays retry and manual-entry options.
 
-##### EF-02 — Upload or Storage Fails
-
+### 11.5.9. EF-02 — Upload or Storage Fails
 The System does not report a successful upload and displays a retry message.
 
-#### Postconditions
-
+## 11.6. Postconditions
 - On success, the protected CV and its parsing result are available for review.
 - Parsed information is not treated as confirmed profile data until **UC-PROF-03** succeeds.
 
-#### Special Requirements
-
+## 11.7. Special Requirements
 - Supported formats and maximum file size must be documented.
 - File validation must use content signatures, not only extensions.
 - CV files must be encrypted in transit and protected at rest.
 - The file must not be publicly addressable.
 - Parsing failures must be retryable without producing duplicate confirmed data.
 
-#### Extension Points
+## 11.8. Related Use Cases and Entry Points
+- **Review Parsed Information:** After successful parsing, the Candidate may start **UC-PROF-03 — Review and Confirm Parsed CV**. Review is a separate user-controlled goal; parsed data remains unconfirmed until that goal succeeds.
 
-- **Review Parsed Information**: After successful parsing, the System invokes **UC-PROF-03**.
+## Prototype Evidence
+
+![UC-PROF-02 — CV upload](./prototypes/DGM-01-Identity-Access-Profile/UC-PROF-02/UC-PROF-02-BF-CV-Upload.png)
+
+*Figure 11.1 — UC-PROF-02 basic flow; the Candidate selects a supported CV file.*
+
+![UC-PROF-02 — parsing progress](./prototypes/DGM-01-Identity-Access-Profile/UC-PROF-02/UC-PROF-02-BF-Parsing-Progress.png)
+
+*Figure 11.2 — UC-PROF-02 processing state; the CV Parsing Service is processing the upload.*
+
+![UC-PROF-02 — parsing failure](./prototypes/DGM-01-Identity-Access-Profile/UC-PROF-02/UC-PROF-02-EF-Parsing-Failure.png)
+
+*Figure 11.3 — UC-PROF-02 EF-01; a parsing-service failure is shown without confirming profile data.*
 
 ---
 
-### UC-PROF-03 — Review and Confirm Parsed CV
+# 12. UC-PROF-03 — Review and Confirm Parsed CV
 
-#### Use-Case Information
-
+## 12.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-PROF-03 |
@@ -972,18 +946,15 @@ The System does not report a successful upload and displays a retry message.
 | **Priority** | High |
 | **Trigger** | CV parsing completes successfully. |
 
-#### Brief Description
-
+## 12.2. Brief Description
 This use case allows the Candidate to review, correct, and confirm information extracted from an uploaded CV before it updates the candidate profile.
 
-#### Preconditions
-
+## 12.3. Preconditions
 1. The Candidate has a valid authenticated session.
 2. A parsing result exists and belongs to the Candidate.
 3. The parsing result has not been confirmed or discarded.
 
-#### Basic Flow
-
+## 12.4. Basic Flow
 1. The System displays the parsed CV information.
 2. The System identifies fields with low parsing confidence.
 3. The Candidate reviews personal information, skills, education, and work experience.
@@ -997,60 +968,62 @@ This use case allows the Candidate to review, correct, and confirm information e
 11. The System recalculates profile completion.
 12. The System displays the updated candidate profile.
 
-#### Alternative Flows
-
-##### AF-01 — Required Parsed Information Is Missing
-
+## 12.5. Alternative Flows
+### 12.5.1. AF-01 — Required Parsed Information Is Missing
 The System identifies missing required fields and asks the Candidate to complete them.
 
-##### AF-02 — Candidate Removes an Incorrect Parsed Entry
-
+### 12.5.2. AF-02 — Candidate Removes an Incorrect Parsed Entry
 The Candidate removes the entry, and the System excludes it from the confirmed profile update.
 
-##### AF-03 — Candidate Keeps Existing Profile Information
-
+### 12.5.3. AF-03 — Candidate Keeps Existing Profile Information
 When a conflict exists, the Candidate selects the stored profile value instead of the parsed value.
 
-##### AF-04 — Candidate Replaces Existing Information
-
+### 12.5.4. AF-04 — Candidate Replaces Existing Information
 When a conflict exists, the Candidate selects the parsed value to replace the stored value.
 
-##### AF-05 — Candidate Discards the Parsing Result
-
+### 12.5.5. AF-05 — Candidate Discards the Parsing Result
 The System requests confirmation, marks the result as discarded, and leaves the candidate profile unchanged.
 
-##### AF-06 — Candidate Returns Later
-
+### 12.5.6. AF-06 — Candidate Returns Later
 The System saves the parsing result as an unconfirmed draft and displays it when the Candidate returns.
 
-##### AF-07 — Candidate Profile Changed Concurrently
-
+### 12.5.7. AF-07 — Candidate Profile Changed Concurrently
 The System displays the latest profile values and requires the Candidate to resolve conflicts again.
 
-##### EF-01 — Confirmed Information Cannot Be Saved
-
+### 12.5.8. EF-01 — Confirmed Information Cannot Be Saved
 The System keeps the parsing result unconfirmed, preserves the previous profile, and displays a retry message.
 
-#### Postconditions
-
+## 12.6. Postconditions
 - On success, confirmed parsed information is merged into the candidate profile.
 - The parsing result is marked as confirmed.
 - On discard, the candidate profile remains unchanged.
 - On failure, no partial profile merge is reported as successful.
 
-#### Special Requirements
-
+## 12.7. Special Requirements
 - Parsed data must never be treated as verified solely because it was produced by the parsing service.
 - Low-confidence fields must be visually distinguishable.
 - Confirmation and profile update must be performed atomically.
 - Only the owning Candidate may review the parsing result.
 
+## Prototype Evidence
+
+![UC-PROF-03 — parsed CV review](./prototypes/DGM-01-Identity-Access-Profile/UC-PROF-03/UC-PROF-03-BF-Parsed-CV-Review.png)
+
+*Figure 12.1 — UC-PROF-03 basic flow; parsed information is reviewed before it becomes confirmed profile data.*
+
+![UC-PROF-03 — low-confidence fields](./prototypes/DGM-01-Identity-Access-Profile/UC-PROF-03/UC-PROF-03-AF-Low-Confidence-Fields.png)
+
+*Figure 12.2 — UC-PROF-03 AF-01; low-confidence fields require Candidate attention.*
+
+![UC-PROF-03 — confirmation success](./prototypes/DGM-01-Identity-Access-Profile/UC-PROF-03/UC-PROF-03-BF-Confirmation-Success.png)
+
+*Figure 12.3 — UC-PROF-03 postcondition; confirmed values are saved to the candidate profile.*
+
 ---
 
-### UC-AUTH-08 — Enable and Manage Two-Factor Authentication
+# 13. UC-AUTH-08 — Enable and Manage Two-Factor Authentication
 
-#### Use-Case Information
-
+## 13.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-AUTH-08 |
@@ -1060,18 +1033,15 @@ The System keeps the parsing result unconfirmed, preserves the previous profile,
 | **Priority** | High |
 | **Trigger** | The Authenticated User opens **Profile > Security** to enable or manage two-factor authentication. |
 
-#### Brief Description
-
+## 13.2. Brief Description
 This use case allows an Authenticated User to enroll a TOTP authenticator, receive one-time backup codes, regenerate the backup-code set, or disable two-factor authentication. Every high-impact action requires renewed proof and is auditable.
 
-#### Preconditions
-
+## 13.3. Preconditions
 1. The user has an active, verified account and a valid full authenticated session.
 2. The user can provide the current password when recent-authentication proof is required.
 3. TOTP enrollment and management are available through the authoritative authentication service.
 
-#### Basic Flow — Enable TOTP
-
+## 13.4. Basic Flow — Enable TOTP
 1. The Authenticated User opens **Profile > Security**.
 2. The System validates the full session and authoritative account state before rendering the protected page.
 3. The System shows that 2FA is disabled and offers **Enable two-factor authentication**.
@@ -1089,59 +1059,48 @@ This use case allows an Authenticated User to enroll a TOTP authenticator, recei
 15. The System records the successful enrollment without storing the password, TOTP code, plaintext secret, or plaintext backup codes in the audit event.
 16. The System returns to **Profile > Security** with a clear `2FA enabled` status.
 
-#### Alternative and Error Flows
+## 13.5. Alternative and Error Flows
 
-##### AF-01 — Two-Factor Authentication Is Already Enabled
-
+### 13.5.1. AF-01 — Two-Factor Authentication Is Already Enabled
 At Step 3, if 2FA is already enabled, the System must not start another enrollment or replace the existing TOTP secret. It displays the actions to regenerate backup codes or disable 2FA.
 
-##### AF-02 — Current Password Is Incorrect
-
+### 13.5.2. AF-02 — Current Password Is Incorrect
 At Step 7, the System rejects the renewed proof, records a non-sensitive failure, applies the configured attempt limit, and leaves the 2FA state unchanged.
 
-##### AF-03 — Initial TOTP Code Is Invalid, Malformed, or Outside the Accepted Window
-
+### 13.5.3. AF-03 — Initial TOTP Code Is Invalid, Malformed, or Outside the Accepted Window
 At Step 11, the System displays a generic verification failure, leaves 2FA disabled, does not issue backup codes, and permits another attempt within the configured limit.
 
-##### AF-04 — Regenerate Backup Codes
-
+### 13.5.4. AF-04 — Regenerate Backup Codes
 1. An Authenticated User with 2FA enabled selects **Regenerate backup codes**.
 2. The System requires the current password and a valid TOTP code as renewed proof.
 3. After successful proof, the System invalidates every previous backup code before activating the replacement set.
 4. The System displays the replacement plaintext codes once and audits the regeneration without recording them.
 
-##### AF-05 — Disable Two-Factor Authentication
-
+### 13.5.5. AF-05 — Disable Two-Factor Authentication
 1. An Authenticated User with 2FA enabled selects **Disable two-factor authentication**.
 2. The System requests explicit confirmation, the current password, and a valid TOTP code unless an approved full-recovery procedure authorizes the action.
 3. After successful proof, the System invalidates the TOTP secret and every backup code, rotates or revalidates affected sessions, and audits the disablement.
 
-##### AF-06 — User Cancels a Security Change
-
+### 13.5.6. AF-06 — User Cancels a Security Change
 Before a change is committed, the user may cancel. The System discards the pending action and does not change the authoritative 2FA state.
 
-##### AF-07 — Session Is Missing, Expired, or Revoked
-
+### 13.5.7. AF-07 — Session Is Missing, Expired, or Revoked
 The System does not render or process the security action and redirects safely to Login without exposing factor state.
 
-##### AF-08 — Attempt Limit Is Exceeded
-
+### 13.5.8. AF-08 — Attempt Limit Is Exceeded
 The System temporarily rejects further password or TOTP attempts, displays a retry-later message, and audits the limited event without recording submitted secrets.
 
-##### EF-01 — Enrollment or Management Update Fails
-
+### 13.5.9. EF-01 — Enrollment or Management Update Fails
 The System reports no success, keeps the prior authoritative 2FA state, and either rolls back the single-provider operation or retains a fail-closed retry state. No partial backup-code set becomes valid.
 
-#### Postconditions
-
+## 13.6. Postconditions
 - On successful enrollment, TOTP is enabled and exactly one current backup-code set is active.
 - On successful regeneration, all older backup codes are unusable and the replacement codes are displayed only once.
 - On successful disablement, the previous TOTP secret and every backup code are unusable.
 - On failure or cancellation, the previously committed 2FA state remains authoritative.
 - Every attempted security-state change produces an audit outcome without secret material.
 
-#### Special Requirements
-
+## 13.7. Special Requirements
 - TOTP must be RFC 6238-compatible, use six-digit codes and a 30-second time step, and apply only the documented limited clock-skew tolerance.
 - TOTP secrets must be unique per account, protected at rest, and never logged or returned after the approved setup interaction.
 - Plaintext backup codes must be shown only during their generation response and stored only as secure representations.
@@ -1149,23 +1108,17 @@ The System reports no success, keeps the prior authoritative 2FA state, and eith
 - Opening the Security page while 2FA is enabled must never silently start enrollment or replace the stored secret.
 - Password, TOTP, backup-code, and session-replacement values must not appear in audit events, URLs, analytics, or client persistence.
 
-#### Required Prototype Evidence
+## 13.8. Prototype Evidence
 
-- Disabled 2FA state and enable action.
-- Current-password proof.
-- QR code and manual setup key.
-- Initial TOTP verification and invalid-code state.
-- One-time backup-code display.
-- Enabled management state.
-- Regeneration confirmation and replacement-code result.
-- Disable confirmation, invalid-proof state, and success result.
+![UC-AUTH-08 — enable and manage 2FA](./prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-08/UC-AUTH-08-BF-Enable-Manage-2FA.jpg)
+
+*Figure 13.1 — UC-AUTH-08 basic and alternative states; the security page shows enrollment, proof, backup-code management, and disablement states.*
 
 ---
 
-### UC-AUTH-09 — Complete Two-Factor Verification
+# 14. UC-AUTH-09 — Complete Two-Factor Verification
 
-#### Use-Case Information
-
+## 14.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-AUTH-09 |
@@ -1175,19 +1128,16 @@ The System reports no success, keeps the prior authoritative 2FA state, and eith
 | **Priority** | High |
 | **Trigger** | Correct primary credentials are submitted for an active account with 2FA enabled. |
 
-#### Brief Description
+## 14.2. Brief Description
+This use case is the conditional second-factor stage associated with **UC-AUTH-03 — Log In** when 2FA is enabled. The Visitor completes a restricted pre-authentication challenge with a valid TOTP or an unused backup code before the System creates a full authenticated session.
 
-This use case extends **UC-AUTH-03 — Log In** when 2FA is enabled. The Visitor completes a restricted pre-authentication challenge with a valid TOTP or an unused backup code before the System creates a full authenticated session.
-
-#### Preconditions
-
+## 14.3. Preconditions
 1. Primary email-and-password validation succeeded.
 2. The account is active, verified, and has 2FA enabled.
 3. A restricted, short-lived, single-account challenge exists and has not expired or been consumed.
 4. No full authenticated session has been created from the primary factor alone.
 
-#### Basic Flow — TOTP
-
+## 14.4. Basic Flow — TOTP
 1. The System redirects the Visitor from Login to the two-factor verification page.
 2. The System places focus on the authenticator-code control and does not expose account or factor secrets.
 3. The Visitor obtains the current six-digit code from a compatible authenticator application.
@@ -1199,73 +1149,59 @@ This use case extends **UC-AUTH-03 — Log In** when 2FA is enabled. The Visitor
 9. The System audits second-factor success without recording the submitted code.
 10. The System redirects the Authenticated User to the approved protected destination or `/dashboard`.
 
-#### Alternative and Error Flows
+## 14.5. Alternative and Error Flows
 
-##### AF-01 — Use an Unused Backup Code
-
+### 14.5.1. AF-01 — Use an Unused Backup Code
 1. At Step 3, the Visitor selects **Backup code**.
 2. The Visitor enters one unused backup code.
 3. The System validates and atomically consumes the code.
 4. The flow resumes at Step 7. The used backup code can never succeed again.
 
-##### AF-02 — TOTP Is Invalid, Malformed, or Outside the Accepted Window
-
+### 14.5.2. AF-02 — TOTP Is Invalid, Malformed, or Outside the Accepted Window
 The System displays a generic failure, creates no full session, keeps only an otherwise valid restricted challenge, and records the failed event without the submitted code.
 
-##### AF-03 — Backup Code Is Invalid or Already Used
-
+### 14.5.3. AF-03 — Backup Code Is Invalid or Already Used
 The System displays the same generic factor failure, creates no full session, and does not reveal whether the submitted value was previously valid.
 
-##### AF-04 — Challenge Is Missing, Expired, Consumed, or for Another Account
-
+### 14.5.4. AF-04 — Challenge Is Missing, Expired, Consumed, or for Another Account
 The System rejects the attempt, creates no session, clears unusable provisional state, and directs the Visitor to restart Login.
 
-##### AF-05 — Attempt Limit Is Exceeded
-
+### 14.5.5. AF-05 — Attempt Limit Is Exceeded
 The System rejects further attempts for the configured cooldown, creates no session, and displays a retry-later response.
 
-##### AF-06 — Account State Changes During the Challenge
-
+### 14.5.6. AF-06 — Account State Changes During the Challenge
 If the account becomes Pending Verification, Suspended, Deleted, or subject to pending full recovery, the System invalidates the challenge and denies full authentication.
 
-##### AF-07 — Visitor Lost Every Authentication Factor
-
+### 14.5.7. AF-07 — Visitor Lost Every Authentication Factor
 The Visitor may navigate to **UC-AUTH-11 — Recover Account After Loss of All Factors**. The System does not automatically disable 2FA or accept email OTP as a replacement second factor.
 
-##### EF-01 — Authentication Service Is Unavailable
-
+### 14.5.8. EF-01 — Authentication Service Is Unavailable
 The System creates no full session, reports a temporary failure, and preserves no client-visible secret or reusable authorization result.
 
-#### Postconditions
-
+## 14.6. Postconditions
 - On success, the restricted challenge is consumed and exactly one full authenticated session is established.
 - A successfully used backup code is permanently consumed.
 - On failure, protected resources remain inaccessible and no full session exists.
 - Successful and failed factor outcomes are auditable without submitted codes.
 
-#### Special Requirements
-
+## 14.7. Special Requirements
 - Primary password success must never authorize a protected resource while 2FA is required.
 - The challenge must be short-lived, single-account, single-use, and incapable of acting as a browser session.
 - Factor failures must be generic and rate-limited.
 - A backup code must have one atomic winner under concurrent use.
 - The page must support keyboard focus, password-manager-safe field purposes, and approved internal navigation only.
 
-#### Required Prototype Evidence
+## 14.8. Prototype Evidence
 
-- Authenticator-code mode.
-- Backup-code mode.
-- Invalid or expired code.
-- Expired challenge and restart-login action.
-- Rate-limited state.
-- Successful completion and Dashboard redirect.
+![UC-AUTH-09 — complete 2FA](./prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-09/UC-AUTH-09-BF-Complete-2FA.jpg)
+
+*Figure 14.1 — UC-AUTH-09 basic and alternative states; authenticator and backup-code verification are shown before the Dashboard redirect.*
 
 ---
 
-### UC-AUTH-10 — Review…7351 tokens truncated…ion/UC-ORG-02-UI_03.png)
+# 15. UC-AUTH-10 — Review and Revoke Active Sessions
 
-#### Use-Case Information
-
+## 15.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-AUTH-10 |
@@ -1275,18 +1211,15 @@ The System creates no full session, reports a temporary failure, and preserves n
 | **Priority** | High |
 | **Trigger** | The Authenticated User opens **Profile > Sessions**. |
 
-#### Brief Description
-
+## 15.2. Brief Description
 This use case allows an Authenticated User to review sanitized metadata for owned active sessions, identify the current session, and revoke another owned session without ending the current one.
 
-#### Preconditions
-
+## 15.3. Preconditions
 1. The user has a valid full authenticated session.
 2. The account is active.
 3. Session ownership and revocation are enforced by the authoritative server-side session store.
 
-#### Basic Flow — Revoke Another Session
-
+## 15.4. Basic Flow — Revoke Another Session
 1. The Authenticated User opens **Profile > Sessions**.
 2. The System validates the current session and account state before rendering the page.
 3. The System lists only active sessions owned by the account.
@@ -1300,66 +1233,53 @@ This use case allows an Authenticated User to review sanitized metadata for owne
 11. The System refreshes the list, keeps the current session active, and displays a success message.
 12. The revoked session is rejected on its next request.
 
-#### Alternative and Error Flows
+## 15.5. Alternative and Error Flows
 
-##### AF-01 — Only the Current Session Exists
-
+### 15.5.1. AF-01 — Only the Current Session Exists
 The System displays the current session and explains that there are no other devices to revoke. Current-session termination remains available through **UC-AUTH-04 — Log Out and End Session**.
 
-##### AF-02 — User Attempts to Revoke the Current Session
-
+### 15.5.2. AF-02 — User Attempts to Revoke the Current Session
 The System directs the user to the authoritative Logout action or requires explicit confirmation that the current browser will be signed out. It does not present the action as revocation of another device.
 
-##### AF-03 — Target Session Already Expired or Was Revoked Concurrently
-
+### 15.5.3. AF-03 — Target Session Already Expired or Was Revoked Concurrently
 The System treats the result idempotently, refreshes the list, and reports that the session is no longer active.
 
-##### AF-04 — Session Limit Is Reached During New Login
-
+### 15.5.4. AF-04 — Session Limit Is Reached During New Login
 When creating a sixth session, the System automatically revokes the least recently active older session, excludes the newly created session, and audits the automatic revocation. The refreshed list contains at most five active sessions.
 
-##### AF-05 — Current Session Is Missing, Expired, or Revoked
-
+### 15.5.5. AF-05 — Current Session Is Missing, Expired, or Revoked
 The System does not display owned-session data and redirects safely to Login.
 
-##### AF-06 — User Cancels Revocation
-
+### 15.5.6. AF-06 — User Cancels Revocation
 The System closes the confirmation interaction and leaves all sessions unchanged.
 
-##### EF-01 — Revocation Fails
-
+### 15.5.7. EF-01 — Revocation Fails
 The System does not claim success, keeps the target session visible until authoritative state confirms revocation, and records or queues the failure where possible.
 
-#### Postconditions
-
+## 15.6. Postconditions
 - On successful selected revocation, the target session can no longer access protected resources.
 - Revoking another session does not end the current session.
 - No session belonging to another account is disclosed or modified.
 - On cancellation or failure, no unconfirmed revocation is reported as successful.
 
-#### Special Requirements
-
+## 15.7. Special Requirements
 - Raw session tokens, raw database identifiers, full IP addresses, cookies, and authentication credentials must never be displayed.
 - Idle timeout, absolute timeout, ownership, account state, and revocation must be enforced server-side.
 - The account may have at most five active sessions; the sixth login revokes the least recently active older session.
 - Revocation and rejected reuse must be auditable using non-sensitive references.
 - The Sessions page must clearly distinguish the current session and remain keyboard accessible.
 
-#### Required Prototype Evidence
+## 15.8. Prototype Evidence
 
-- Current-session-only state.
-- Multiple owned sessions with a current-session marker.
-- Revoke action and confirmation dialog.
-- Successful revocation with refreshed list.
-- Already-revoked or expired state.
-- Revocation failure and revoked-session access rejection.
+![UC-AUTH-10 — review sessions](./prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-10/UC-AUTH-10-BF-Review-Session.jpg)
+
+*Figure 15.1 — UC-AUTH-10 basic and alternative states; the current session, other sessions, and revocation flow are represented.*
 
 ---
 
-### UC-AUTH-11 — Recover Account After Loss of All Factors
+# 16. UC-AUTH-11 — Recover Account After Loss of All Factors
 
-#### Use-Case Information
-
+## 16.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-AUTH-11 |
@@ -1369,19 +1289,16 @@ The System does not claim success, keeps the target session visible until author
 | **Priority** | High |
 | **Trigger** | The Visitor states that the password, TOTP access, and every backup code are unavailable. |
 
-#### Brief Description
-
+## 16.2. Brief Description
 This is a separate, lower-assurance account-recovery workflow for an eligible user who has lost every authentication factor. Verified email starts a 24-hour security hold. Existing sessions and challenges are revoked, login remains blocked while recovery is pending, and completion changes the password and disables old 2FA only after the hold. The workflow never creates an automatic session.
 
-#### Preconditions
-
+## 16.3. Preconditions
 1. The Visitor is not required to have a valid authenticated session.
 2. The Visitor can access the verified email address associated with the account.
 3. The account is active, verified, 2FA-enabled, and eligible for full recovery.
 4. The account is not already Deleted or otherwise ineligible under the approved recovery policy.
 
-#### Basic Flow
-
+## 16.4. Basic Flow
 1. The Visitor opens the full account-recovery page.
 2. The System explains that the workflow is intended only for loss of the password, TOTP access, and every backup code, and that email-only recovery has lower assurance.
 3. The Visitor enters the registered email address and submits the request.
@@ -1403,69 +1320,55 @@ This is a separate, lower-assurance account-recovery workflow for an eligible us
 19. The System queues a completion notification and records the final audit result without secrets.
 20. The System displays recovery success and directs the Visitor to normal Login. It does not create a full session or provisional challenge automatically.
 
-#### Alternative and Error Flows
+## 16.5. Alternative and Error Flows
 
-##### AF-01 — Email Format Is Invalid
-
+### 16.5.1. AF-01 — Email Format Is Invalid
 At Step 4, the System displays a format-validation message and does not create recovery proofs.
 
-##### AF-02 — Account Is Unknown or Ineligible
-
+### 16.5.2. AF-02 — Account Is Unknown or Ineligible
 The System returns the documented account-not-found or ineligible outcome, queues no recovery email, and records only the non-sensitive request result allowed by policy.
 
-##### AF-03 — Confirmation Proof Is Invalid, Expired, or Already Used
-
+### 16.5.3. AF-03 — Confirmation Proof Is Invalid, Expired, or Already Used
 At Step 9, the System rejects the link, starts no new hold, changes no factor, and offers a safe route to restart the request when permitted.
 
-##### AF-04 — Confirmation Is Submitted Concurrently
-
+### 16.5.4. AF-04 — Confirmation Is Submitted Concurrently
 Exactly one request starts the hold. Every concurrent or replayed confirmation receives a non-success outcome and creates no duplicate hold, notification, or audit completion.
 
-##### AF-05 — Login Attempt During the Security Hold
-
+### 16.5.5. AF-05 — Login Attempt During the Security Hold
 The System returns the approved blocked outcome and creates neither a full session nor a provisional challenge.
 
-##### AF-06 — Visitor Cancels Pending Recovery
-
+### 16.5.6. AF-06 — Visitor Cancels Pending Recovery
 1. Before completion, the Visitor opens the single-use cancellation link.
 2. The System validates and atomically consumes the cancellation proof.
 3. The System marks recovery cancelled, invalidates remaining recovery proofs, queues a notification, and audits the result.
 4. A reused or concurrent cancellation proof fails without changing state again.
 
-##### AF-07 — Completion Is Attempted Before the Hold Ends
-
+### 16.5.7. AF-07 — Completion Is Attempted Before the Hold Ends
 The System rejects the attempt, preserves the pending hold and credentials, and displays the remaining wait policy without exposing secret proof data.
 
-##### AF-08 — Completion Proof Is Invalid, Expired, Used, or Superseded
-
+### 16.5.8. AF-08 — Completion Proof Is Invalid, Expired, Used, or Superseded
 The System rejects completion, does not change the password or 2FA state, and does not create a session.
 
-##### AF-09 — New Password Violates Policy or Confirmation Does Not Match
-
+### 16.5.9. AF-09 — New Password Violates Policy or Confirmation Does Not Match
 The System displays the applicable validation message and allows correction while the valid completion operation remains safely controlled.
 
-##### AF-10 — Recovery Was Cancelled or Already Completed
-
+### 16.5.10. AF-10 — Recovery Was Cancelled or Already Completed
 The System reports the terminal status, performs no repeated credential or factor change, and directs the Visitor to the appropriate safe next action.
 
-##### EF-01 — Email Delivery Fails Before an Eligible Request Is Issued
-
+### 16.5.11. EF-01 — Email Delivery Fails Before an Eligible Request Is Issued
 The System does not claim that instructions were delivered, retains only policy-approved retry state, and records the provider failure without credentials or plaintext proofs.
 
-##### EF-02 — Mandatory Recovery Step Fails
-
+### 16.5.12. EF-02 — Mandatory Recovery Step Fails
 The System does not report success. It retains a durable fail-closed operation that can resume idempotently, keeps login blocked when cleanup is incomplete, and finalizes only after password update, factor disablement, session/challenge revocation, notification enqueue, and final audit completion are confirmed.
 
-#### Postconditions
-
+## 16.6. Postconditions
 - On confirmed request, one 24-hour hold exists, prior sessions and challenges are revoked, and login is blocked.
 - On cancellation, recovery proofs are invalidated and credentials remain unchanged.
 - On successful completion, the password is replaced and old TOTP and backup codes are disabled exactly once.
 - No recovery path creates an authenticated session automatically.
 - On incomplete mandatory cleanup, access remains fail closed until the durable operation converges.
 
-#### Special Requirements
-
+## 16.7. Special Requirements
 - Full account recovery must remain separate from ordinary forgotten-password reset.
 - Every confirmation, cancellation, and completion proof must be HMAC-digested, time-limited, single-use, and absent from logs and persistent plaintext storage.
 - The 24-hour hold must be server-enforced and must not depend on browser time.
@@ -1473,28 +1376,27 @@ The System does not report success. It retains a durable fail-closed operation t
 - Audit records and notifications must be durable and idempotent and must exclude passwords, TOTP values, backup codes, cookies, raw session identifiers, and plaintext proofs.
 - The interface must clearly state that verified-email-only recovery is lower assurance.
 
-#### Required Prototype Evidence
+## 16.8. Prototype Evidence
 
-- Recovery request and eligibility feedback.
-- Check-email state.
-- Invalid, expired, and reused confirmation link.
-- Security-hold status and login-blocked state.
-- Cancellation confirmation and terminal cancelled state.
-- Too-early completion state.
-- New-password completion form and validation.
-- Successful completion with required normal-login action.
-- Provider or mandatory-step failure without false success.
+![UC-AUTH-11 — recover account after loss of all factors](./prototypes/DGM-01-Identity-Access-Profile/UC-AUTH-11/UC-AUTH-11-BF-Recovery-Account-All.jpg)
 
----
+*Figure 16.1 — UC-AUTH-11 basic and alternative states; request, security hold, cancellation, completion, and fail-closed recovery outcomes are represented.*
 
-## DGM-02 — Specification of Candidate Job Journey
+## DGM-02 - Candidate Job Journey
+
+See the split source: [02_Candidate_Job_Journey.md](./specification/02_Candidate_Job_Journey.md).
+
+# DGM-02 - Specification of Candidate Job Journey
+
+## Use-Case Specifications
 
 *Performed by: Nguyen Gia Quoc Uy | Reviewed by: Group 9 | Edited by: Nguyen Gia Quoc Uy*
+**Version:** V1.1 (24/07/2026) — First initialization
+**Version History:**
 
-### UC-JOB-01 — Browse, Search, and Filter Jobs
+# 1. UC-JOB-01 — Browse, Search, and Filter Jobs
 
-#### Use-Case Information
-
+## 1.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-JOB-01 |
@@ -1504,18 +1406,15 @@ The System does not report success. It retains a durable fail-closed operation t
 | **Priority** | High |
 | **Trigger** | The actor opens the job-discovery page. |
 
-#### Brief Description
-
+## 1.2. Brief Description
 This use case allows a Visitor or Authenticated User to discover active job postings by browsing the default listing, entering search terms, applying filters, selecting sorting options, and navigating through result pages.
 
-#### Preconditions
-
+## 1.3. Preconditions
 1. The public job-discovery function is available.
 2. At least zero active job postings may exist.
 3. Authentication is not required for public job discovery.
 
-#### Basic Flow
-
+## 1.4. Basic Flow
 1. The Actor opens the job-discovery page.
 2. The System displays the search field, available filters, sorting options, and a default list of active job postings.
 3. The Actor enters one or more search terms.
@@ -1527,92 +1426,85 @@ This use case allows a Visitor or Authenticated User to discover active job post
 9. The System applies the selected filters and sorting option.
 10. The System displays the matching job postings and total result information.
 11. The Actor reviews the displayed results.
-12. The Actor may select a job, extending this use case through **UC-JOB-02 — View Job Details**.
+12. The Actor may select a job and start **UC-JOB-02 — View Job Details**.
 
-#### Alternative Flows
+## 1.5. Alternative Flows
 
-##### AF-01 — No Search Term Is Entered
-
+### 1.5.1. AF-01 — No Search Term Is Entered
 At Step 3, if the Actor leaves the search field empty:
 1. The System treats the request as a browse operation.
 2. The System applies any selected filters.
 3. The use case resumes at Step 8.
 
-##### AF-02 — Search or Filter Value Is Invalid
-
+### 1.5.2. AF-02 — Search or Filter Value Is Invalid
 At Step 7, if a value is invalid:
 1. The System identifies the invalid value.
 2. The System preserves the remaining valid criteria.
 3. The use case resumes at Step 3 or Step 4.
 
-##### AF-03 — No Job Matches the Criteria
-
+### 1.5.3. AF-03 — No Job Matches the Criteria
 At Step 10, if no active posting matches:
 1. The System displays an empty-result state.
 2. The System suggests removing or changing filters.
 3. The Actor may modify the criteria.
 4. The use case resumes at Step 3.
 
-##### AF-04 — Actor Clears Search Criteria
-
+### 1.5.4. AF-04 — Actor Clears Search Criteria
 1.  The Actor selects Clear all.
 2. The System removes the search term and selected filters.
 3. The System displays the default active-job listing.
 4. The use case resumes at Step 2.
 
-##### AF-05 — Actor Requests Another Result Page
-
+### 1.5.5. AF-05 — Actor Requests Another Result Page
 1. The Actor selects another page or requests more results.
 2. The System preserves the current search, filter, and sorting criteria.
 3. The System retrieves the requested result set.
 4. The System displays the additional results.
 5. The use case resumes at Step 11.
 
-##### AF-06 — Previously Displayed Job Becomes Unavailable
-
+### 1.5.6. AF-06 — Previously Displayed Job Becomes Unavailable
 If a job changes status while the results are displayed:
 1. The System removes the job from new active results or labels it unavailable.
 2. The System does not allow a new application to the unavailable posting.
 3. The remaining search results stay available.
 
-##### EF-01 — Search Service or Database Is Unavailable
-
+### 1.5.7. EF-01 — Search Service or Database Is Unavailable
 At Step 8:
 1. The System does not display incomplete results as complete.
 2. The System displays a temporary-error state with a retry action.
 3. The System records the failure.
 4. The use case ends or resumes at Step 6 after retry.
 
-#### Postconditions
-
-##### Success Postconditions
-
+## 1.6. Postconditions
+### Success Postconditions
 - Matching active job postings are displayed.
 - Search criteria remain available during the current discovery session.
 
-##### Failure Postconditions
-
+### Failure Postconditions
 - No private or inactive job information is disclosed.
 - No account or job data is modified.
 
-#### Special Requirements
-
+## 1.7. Special Requirements
 - Search criteria must be safely validated and encoded.
 - Results should be returned within two seconds under normal supported load.
 - Search results must support pagination or controlled incremental loading.
 - Filters and sorting must be keyboard accessible.
 - Public results must not include internal moderation or recruiter-only fields.
 
-#### Extension Points
+## Prototype Evidence
 
-- **Job Selected**: At Step 12, selecting a jobs invokes **UC-JOB-02 — View Job Details**.
+![UC-JOB-01 — browse, search, and filter](<./prototypes/DGM-02-Candidate-Job-Journey/UC-JOB-01/UC-JOB-01-Browse, Search, and Filter Jobs.png>)
+
+*Figure 1.1 — UC-JOB-01 basic flow; public job discovery, search, and filtering are represented.*
+
+## 1.8. Related Use Cases and Entry Points
+- **Job Selected:** At Step 12, selecting a job starts **UC-JOB-02 — View Job Details**. This is a separate navigation goal.
 
 ---
 
-### UC-JOB-02 — View Job Details
+# 2. UC-JOB-02 — View Job Details
 
-#### Use-Case Information
-
+## 2.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-JOB-02 |
@@ -1622,18 +1514,15 @@ At Step 8:
 | **Priority** | High |
 | **Trigger** | The Actor selects a job posting from a job list or opens a public job link. |
 
-#### Brief Description
-
+## 2.2. Brief Description
 This use case allows the Actor to view the complete public information of a selected job posting and the actions currently available for that posting.
 
-#### Preconditions
-
+## 2.3. Preconditions
 1. A job-posting identifier or public link has been supplied.
 2. The posting exists or previously existed.
 3. Authentication is not required for public job details.
 
-#### Basic Flow
-
+## 2.4. Basic Flow
 1. The Actor selects a job posting or opens its public link.
 2. The System receives the job-posting identifier.
 3. The System retrieves the posting and its public company information.
@@ -1643,67 +1532,63 @@ This use case allows the Actor to view the complete public information of a sele
 7. The System displays the actions available to the Actor based on authentication, role, posting status, and previous interactions.
 8. The Actor reviews the job information.
 
-#### Alternative Flows
+## 2.5. Alternative Flows
 
-##### AF-01 — Job Is Closed or Expired
-
+### 2.5.1. AF-01 — Job Is Closed or Expired
 At Step 5:
 1. The System displays the available public job information.
 2. The System labels the posting as closed or expired.
 3. The System disables the application action.
 4. Saving, removing, or sharing remains available when permitted.
 
-##### AF-02 — Job Was Removed or Is Not Public
-
+### 2.5.2. AF-02 — Job Was Removed or Is Not Public
 At Step 4:
 1. The System displays a neutral unavailable-job page.
 2. The System does not disclose moderation or removal details.
 3. The use case ends.
 
-##### AF-03 — Actor Has Already Applied
-
+### 2.5.3. AF-03 — Actor Has Already Applied
 At Step 7, if the Candidate previously applied:
 1. The System replaces the application action with View application.
 2. The Candidate may continue through **UC-APP-02 — Track Job Applications**.
 
-##### AF-04 — Job Is Already Saved
-
+### 2.5.4. AF-04 — Job Is Already Saved
 At Step 7, the System displays **Remove from saved jobs** instead of **Save job**.
 
-##### AF-05 — Visitor Selects a Protected Action
-
+### 2.5.5. AF-05 — Visitor Selects a Protected Action
 If a Visitor selects Save, Report, or Apply:
 1. The System displays the login page.
 2. The System preserves the selected job as the return destination.
 3. After successful login, the System returns the user to the job-detail page.
 4. The requested action may continue if authorization requirements are satisfied.
 
-##### AF-06 — Company Public Information Is Limited
-
+### 2.5.6. AF-06 — Company Public Information Is Limited
 The System displays only the company information approved for public visibility and omits unavailable private fields.
 
-##### EF-01 — Job Details Cannot Be Loaded
-
+### 2.5.7. EF-01 — Job Details Cannot Be Loaded
 1. The System displays a temporary-error state.
 2. The System provides Retry and Back to jobs actions.
 3. The System records the failure.
 4. The use case ends or resumes at Step 1 after retry.
 
-#### Postconditions
-
+## 2.6. Postconditions
 - The selected job’s permitted public information is displayed.
 - No job, account, saved-job, report, or application record is modified.
 
-#### Special Requirements
-
+## 2.7. Special Requirements
 - Public details must not expose private company or recruiter data.
 - Removed and unauthorized postings must use a neutral unavailable response.
 - The job-detail page should load within two seconds under normal supported load.
 - The canonical public URL must be stable and safe to share.
 - The page must clearly distinguish active, closed, expired, and unavailable states.
 
-#### Extension Points
+## Prototype Evidence
 
+![UC-JOB-02 — view job details](<./prototypes/DGM-02-Candidate-Job-Journey/UC-JOB-02/UC-JOB-02-View Job Details.png>)
+
+*Figure 2.1 — UC-JOB-02 basic flow; public job details and available actions are displayed.*
+
+## 2.8. Related Use Cases and Entry Points
 - **Save or Remove Job**: The Actor may invoke **UC-JOB-03**.
 - **Share Job**: The Actor may invoke **UC-JOB-04**.
 - **Report Job Posting**: An Authenticated User may invoke **UC-JOB-05**.
@@ -1711,10 +1596,9 @@ The System displays only the company information approved for public visibility 
 
 ---
 
-### UC-JOB-03 — Save or Remove Job
+# 3. UC-JOB-03 — Save or Remove Job
 
-#### Use-Case Information
-
+## 3.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-JOB-03 |
@@ -1724,18 +1608,15 @@ The System displays only the company information approved for public visibility 
 | **Priority** | Medium |
 | **Trigger** | The Authenticated User selects the save control for a job. |
 
-#### Brief Description
-
+## 3.2. Brief Description
 This use case allows an Authenticated User to save a job for later review or remove a previously saved job from the saved-job collection.
 
-#### Preconditions
-
+## 3.3 Preconditions
 1. The user has a valid authenticated session.
 2. A valid job-posting identifier has been provided.
 3. The user is authorized to manage the account’s saved jobs.
 
-#### Basic Flow
-
+## 3.4 Basic Flow
 1. The Authenticated User views a job card or job-detail page.
 2. The System displays the job as not currently saved.
 3. The Authenticated User selects Save job.
@@ -1746,10 +1627,9 @@ This use case allows an Authenticated User to save a job for later review or rem
 8. The System updates the save control to Saved or Remove from saved jobs.
 9. The System displays a brief success confirmation.
 
-#### Alternative Flows
+## 3.5. Alternative Flows
 
-##### AF-01 — Remove a Saved Job
-
+### 3.5.1. AF-01 — Remove a Saved Job
 At Step 2, if the job is already saved:
 1. The System displays Remove from saved jobs.
 2. The Authenticated User selects the remove action.
@@ -1759,72 +1639,67 @@ At Step 2, if the job is already saved:
 6. The System updates the control to Save job.
 7. The System displays a removal confirmation.
 
-##### AF-02 — Job Is Already Saved
-
+### 3.5.2. AF-02 — Job Is Already Saved
 At Step 6, if the saved-job relationship already exists:
 1. The System does not create a duplicate record.
 2. The System displays the job as saved.
 3. The use case ends successfully.
 
-##### AF-03 — Job Has Already Been Removed from Saved Jobs
-
+### 3.5.3. AF-03 — Job Has Already Been Removed from Saved Jobs
 During AF-01, if the relationship no longer exists:
 1. The System treats the removal as successfully completed.
 2. The System displays the job as not saved.
 
-##### AF-04 — Session Has Expired
-
+### 3.5.4. AF-04 — Session Has Expired
 At Step 4:
 - The System does not change the saved-job collection.
 - The System redirects the user to login.
 - The System preserves the selected job as the return destination.
 
-##### AF-05 — Job Becomes Unavailable
-
+### 3.5.5. AF-05 — Job Becomes Unavailable
 At Step 5:
 - The System may allow the unavailable job to remain in the saved collection for historical reference.
 - The System labels the job unavailable.
 - The System prevents actions that are no longer permitted.
 
-##### AF-06 — User Cancels Removal
-
+### 3.5.6. AF-06 — User Cancels Removal
 During AF-01, if the user cancels confirmation, the saved-job relationship remains unchanged.
 
-##### AF-07 — Concurrent Save or Remove Request
-
+### 3.5.7. AF-07 — Concurrent Save or Remove Request
 The System performs the requested operation idempotently and displays the final stored state.
 
-##### EF-01 — Saved-Job Update Fails
-
+### 3.5.8. EF-01 — Saved-Job Update Fails
 1. The System retains the previous save state.
 2. The System displays an error and retry action.
 3. The System records the failure.
 4. The use case ends.
 
-#### Postconditions
-
+## 3.6. Postconditions
 - **Save Success**: One saved-job relationship exists between the account and job.
 - **Remove Success**: No saved-job relationship exists between the account and job.
 - **Failure**: The previous saved-job state remains unchanged.
 
-#### Special Requirements
-
+## 3.7. Special Requirements
 - The account-job pair must be unique.
 - Save and removal operations must be idempotent.
 - Authorization must be checked server-side.
 - The UI must not display success before the stored state is confirmed.
 - Concurrent requests must not create duplicate saved-job records.
 
-#### Extension Points
+## Prototype Evidence
 
+![UC-JOB-03 — save and remove states](<./prototypes/DGM-02-Candidate-Job-Journey/UC-JOB-03/UC-JOB-03 Save Remove States.png>)
+
+*Figure 3.1 — UC-JOB-03 basic and alternative states; the authenticated user can save or remove a job.*
+
+## 3.8. Related Use Cases and Entry Points
 - **Remove Saved Job**: The remove path may be initiated from the job-detail page or saved-job list.
 
 ---
 
-### UC-JOB-04 — Share Job
+# 4. UC-JOB-04 — Share Job
 
-#### Use-Case Information
-
+## 4.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-JOB-04 |
@@ -1834,18 +1709,15 @@ The System performs the requested operation idempotently and displays the final 
 | **Priority** | Medium |
 | **Trigger** | The Actor selects **Share job**. |
 
-#### Brief Description
-
+## 4.2. Brief Description
 This use case allows an Actor to copy or distribute a public job-posting link through a supported external sharing destination.
 
-#### Preconditions
-
+## 4.3. Preconditions
 1. A public job-posting link is available.
 2. The Actor may view the posting.
 3. Authentication is not required.
 
-#### Basic Flow
-
+## 4.4. Basic Flow
 1. The Actor views an active public job posting.
 2. The Actor selects Share job.
 3. The System creates or retrieves the canonical public job URL.
@@ -1856,57 +1728,55 @@ This use case allows an Actor to copy or distribute a public job-posting link th
 8. The Actor completes the share operation.
 9. Control returns to the SmartHire job-detail page.
 
-#### Alternative Flows
+## 4.5. Alternative Flows
 
-##### AF-01 — Actor Copies the Job Link
-
+### 4.5.1. AF-01 — Actor Copies the Job Link
 At Step 5:
 1. The Actor selects Copy link.
 2. The System copies the canonical URL.
 3. The System displays a copy-success confirmation.
 4. The use case ends.
 
-##### AF-02 — Native Sharing Is Unsupported
-
+### 4.5.2. AF-02 — Native Sharing Is Unsupported
 1. The System does not display unsupported sharing destinations.
 2. The System provides the Copy link action.
 3. The use case continues through AF-01.
 
-##### AF-03 — Actor Cancels Sharing
-
+### 4.5.3. AF-03 — Actor Cancels Sharing
 At Step 7, the Actor closes the external sharing interface. No SmartHire data is modified.
 
-##### AF-04 — Job Becomes Unavailable
-
+### 4.5.4. AF-04 — Job Becomes Unavailable
 At Step 3:
 1. The System displays a neutral unavailable-job message.
 2. The System does not generate a new public sharing action.
 3. The use case ends.
 
-##### EF-01 — Clipboard or External Application Fails
-
+### 4.5.5. EF-01 — Clipboard or External Application Fails
 1. The System displays a share-failure message.
 2. The System preserves the job-detail page.
 3. The Actor may retry or manually copy the visible link.
 
-#### Postconditions
-
+## 4.6. Postconditions
 - On success, a public job URL has been copied or passed to an external application.
 - No saved-job, application, or report record is modified.
 
-#### Special Requirements
-
+## 4.7. Special Requirements
 - Shared URLs must not contain session credentials or private tracking data.
-- The URL must reference only publicly visible job informations.
+- The URL must reference only publicly visible job information.
 - Sharing must not imply that the external application is endorsed by SmartHire.
 - The Actor must remain in control of the final external sharing action.
 
+## Prototype Evidence
+
+![UC-JOB-04 — share action sheet](<./prototypes/DGM-02-Candidate-Job-Journey/UC-JOB-04/UC-JOB-04 Share Job Action Sheet.png>)
+
+*Figure 4.1 — UC-JOB-04 basic flow; the actor chooses an external sharing destination or copies the public link.*
+
 ---
 
-### UC-JOB-05 — Report Job Posting
+# 5. UC-JOB-05 — Report Job Posting
 
-#### Use-Case Information
-
+## 5.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-JOB-05 |
@@ -1916,18 +1786,15 @@ At Step 3:
 | **Priority** | Medium |
 | **Trigger** | The Authenticated User selects **Report job**. |
 
-#### Brief Description
-
+## 5.2. Brief Description
 This use case allows an Authenticated User to report a job posting that appears fraudulent, misleading, duplicated, inappropriate, discriminatory, or otherwise in violation of platform policy.
 
-#### Preconditions
-
+## 5.3. Preconditions
 1. The user has a valid authenticated session.
 2. A job-posting identifier is available.
 3. The user is permitted to submit reports.
 
-#### Basic Flow
-
+## 5.4. Basic Flow
 1. The Authenticated User views a job posting.
 2. The Authenticated User selects Report job.
 3. The System displays the report form and supported report reasons.
@@ -1941,88 +1808,82 @@ This use case allows an Authenticated User to report a job posting that appears 
 11. The System records the submission event.
 12. The System displays a neutral report-submission confirmation.
 
-#### Alternative Flows
+## 5.5. Alternative Flows
 
-##### AF-01 — Required Report Reason Is Missing
-
+### 5.5.1. AF-01 — Required Report Reason Is Missing
 At Step 8:
 1. The System highlights the report-reason field.
 2. The System preserves the entered details.
 3. The use case resumes at Step 4.
 
-##### AF-02 — Additional Details Are Required
-
+### 5.5.2. AF-02 — Additional Details Are Required
 1. If the selected reason requires an explanation:
 2. The System requires additional details.
 3. The use case resumes at Step 5.
 
-##### AF-03 — Duplicate Report Exists
-
+### 5.5.3. AF-03 — Duplicate Report Exists
 At Step 9:
 1. The System does not create another unresolved duplicate report.
 2. The System displays a neutral message indicating that the concern has already been received.
 3. The use case ends.
 
-##### AF-04 — User Cancels the Report
-
+### 5.5.4. AF-04 — User Cancels the Report
 Before Step 10:
 1. The System requests confirmation when the form contains information.
 2. The user confirms cancellation.
 3. The System discards the unsaved report.
 4. The use case ends.
 
-##### AF-05 — Session Has Expired
-
+### 5.5.5. AF-05 — Session Has Expired
 1. The System does not create the report.
 2. The System redirects the user to login.
 3. The System may retain the job as the return destination.
 
-##### AF-06 — Reporting Rate Limit Is Exceeded
-
+### 5.5.6. AF-06 — Reporting Rate Limit Is Exceeded
 1. The System rejects the report temporarily.
 2. The System displays a retry-later message.
 3. The System records the abuse-control event.
 4. The use case ends.
 
-##### AF-07 — Job Has Already Been Removed
-
+### 5.5.7. AF-07 — Job Has Already Been Removed
 1. The System displays that the job is no longer publicly available.
 2. The System may retain the supplied report information for moderation context when permitted.
 3. The System does not expose the internal removal reason.
 
-##### EF-01 — Report Cannot Be Saved
-
+### 5.5.8. EF-01 — Report Cannot Be Saved
 1. The System does not display a successful-submission message.
 2. The System preserves the entered report data when safe.
 3. The System displays a retry action.
 4. The use case ends.
 
-#### Postconditions
+## 5.6. Postconditions
 
-##### Success Postconditions
-
+### 5.6.1. Success Postconditions
 - One report exists with the PENDING_REVIEW status.
 - The report is available to authorized moderators.
 - The reporter’s identity is not disclosed publicly.
 
-##### Failure Postconditions
-
+### 5.6.2. Failure Postconditions
 - No incomplete report is recorded as successfully submitted.
 
-##### Special Requirements
-
+### 5.7. Special Requirements
 - The reporter’s identity and report contents must be restricted to authorized personnel.
 - Report submission must not automatically remove a posting without an applicable enforcement rule.
 - Report text must be validated and safely rendered.
 - Abuse-control limits must be applied.
 - Reporting actions must be audited.
 
+## Prototype Evidence
+
+![UC-JOB-05 — report job modal](<./prototypes/DGM-02-Candidate-Job-Journey/UC-JOB-05/UC-JOB-05 Report Job Modal.png>)
+
+*Figure 5.1 — UC-JOB-05 basic flow; the authenticated user selects a report reason and submits the report.*
+
 ---
 
-### UC-APP-01 — Apply for a Job
+# 6. UC-APP-01 — Apply for a Job
 
-#### Use-Case Information
-
+## 6.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-APP-01 |
@@ -2032,20 +1893,17 @@ Before Step 10:
 | **Priority** | High |
 | **Trigger** | The Candidate selects **Apply now** on an active job posting. |
 
-#### Brief Description
-
+## 6.2. Brief Description
 This use case allows an authenticated Candidate to submit an application to an active job posting using confirmed candidate-profile information, a selected CV, and job-specific application answers.
 
-#### Preconditions
-
+## 6.3. Preconditions
 1. The Candidate has a valid authenticated session.
 2. The account is active and permitted to use candidate functions.
 3. The job posting exists and accepts applications.
 4. The Candidate has not already submitted an application that prevents reapplication.
 5. Required candidate information and consent can be supplied.
 
-#### Basic Flow
-
+## 6.4. Basic Flow
 1. The Candidate views an active job posting.
 2. The Candidate selects Apply now.
 3. The System validates the Candidate’s session and authorization.
@@ -2067,109 +1925,94 @@ This use case allows an authenticated Candidate to submit an application to an a
 19. The System schedules applicable notifications.
 20. The System displays an application-submission confirmation.
 
-#### Alternative Flows
+## 6.5. Alternative Flows
 
-##### AF-01 — Required Candidate Profile Is Incomplete
-
+### 6.5.1. AF-01 — Required Candidate Profile Is Incomplete
 At Step 6:
 1. The System identifies the missing profile information.
 2. The System displays the missing items.
 3. The Candidate may open UC-PROF-01 — Manage Candidate Profile.
 4. After completing the profile, the Candidate may return to Step 2.
 
-##### AF-02 — No Confirmed CV Is Available
-
+### 6.5.2. AF-02 — No Confirmed CV Is Available
 At Step 6:
 1. The System informs the Candidate that a CV is required.
 2. The Candidate may invoke UC-PROF-02 — Upload and Parse CV.
 3. The Candidate must complete UC-PROF-03 — Review and Confirm Parsed CV.
 4. The Candidate may return to Step 6.
 
-##### AF-03 — Required Application Answer Is Missing
-
+### 6.5.3. AF-03 — Required Application Answer Is Missing
 At Step 14:
 1. The System highlights the missing answer.
 2. The System preserves other application information.
 3. The use case resumes at Step 9.
 
-##### AF-04 — Required Consent Is Not Accepted
-
+### 6.5.4. AF-04 — Required Consent Is Not Accepted
 At Step 14:
 1. The System highlights the required consent.
 2. The use case resumes at Step 12.
 
-##### AF-05 — Candidate Has Already Applied
-
+### 6.5.5. AF-05 — Candidate Has Already Applied
 At Step 5 or Step 15:
 1. The System does not create another application.
 2. The System displays View application.
 3. The Candidate may invoke UC-APP-02 — Track Job Applications.
 4. The use case ends.
 
-##### AF-06 — Job Closes Before Submission
-
+### 6.5.6. AF-06 — Job Closes Before Submission
 At Step 15:
 1. The System does not create the application.
 2. The System labels the job as no longer accepting applications.
 3. The System preserves no false success state.
 4. The use case ends.
 
-##### AF-07 — Candidate Cancels Before Submission
-
+### 6.5.7. AF-07 — Candidate Cancels Before Submission
 Before Step 16:
 1. The System asks whether the Candidate wants to leave when entered information would be lost.
 2. The Candidate confirms cancellation.
 3. The System does not create an application.
 4. The use case ends.
 
-##### AF-08 — Candidate Changes the Selected CV
-
+### 6.5.8. AF-08 — Candidate Changes the Selected CV
 Before Step 13, the Candidate selects another confirmed CV, and the System updates the application preview.
 
-##### AF-09 — Concurrent Duplicate Submission Occurs
-
+### 6.5.9. AF-09 — Concurrent Duplicate Submission Occurs
 At Step 16:
 1. The System accepts only one application.
 2. The System returns the existing successful application.
 3. The System does not create a duplicate application.
 
-##### AF-10 — Session Has Expired
-
+### 6.5.10. AF-10 — Session Has Expired
 1. The System does not submit the application.
 2. The System redirects the Candidate to login.
 3. Sensitive unsaved information is not exposed to another session.
 
-##### EF-01 — Application Transaction Fails
-
+### 6.5.11. EF-01 — Application Transaction Fails
 1. The System rolls back partial application records.
 2. The System does not display submission success.
 3. The System displays a retry message.
 4. The use case ends.
 
-##### EF-02 — Notification Delivery Fails
-
+### 6.5.12. EF-02 — Notification Delivery Fails
 At Step 19:
 1. The submitted application remains valid.
 2. The System records the failed notification delivery.
 3. The notification may be retried through the notification service.
 4. The System still displays the application-submission confirmation.
 
-#### Postconditions
+## 6.6. Postconditions
 
-##### Success Postconditions
-
+### 6.6.1. Success Postconditions
 - Exactly one submitted application exists.
 - An immutable or versioned submission snapshot exists.
 - The application is visible in the Candidate’s application history.
 - Applicable notification work has been created.
 
-##### Failure Postconditions
-
+### 6.6.2. Failure Postconditions
 - No partial application is reported as submitted.
 - The Candidate may retry when the business rules still permit submission.
 
-#### Special Requirements
-
+## 6.7. Special Requirements
 - Application creation must be transactional and idempotent.
 - Candidate and CV information must be protected from unauthorized access.
 - Stored snapshots must preserve the information used at submission time.
@@ -2177,12 +2020,21 @@ At Step 19:
 - Notification failure must not roll back a successfully submitted application.
 - The System must record the consent version accepted by the Candidate.
 
+## Prototype Evidence
+
+![UC-APP-01 — application form](./prototypes/DGM-02-Candidate-Job-Journey/UC-APP-01/S-APP-FORM.png)
+
+*Figure 6.1 — UC-APP-01 basic flow; the Candidate completes the application form.*
+
+![UC-APP-01 — application success](./prototypes/DGM-02-Candidate-Job-Journey/UC-APP-01/S-APP-SUCCESS.png)
+
+*Figure 6.2 — UC-APP-01 postcondition; successful submission is confirmed.*
+
 ---
 
-### UC-APP-02 — Track Job Applications
+# 7. UC-APP-02 — Track Job Applications
 
-#### Use-Case Information
-
+## 7.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-APP-02 |
@@ -2192,17 +2044,14 @@ At Step 19:
 | **Priority** | High |
 | **Trigger** | The Candidate opens **My Applications**. |
 
-#### Brief Description
-
+## 7.2. Brief Description
 This use case allows a Candidate to view submitted job applications, filter them by permitted status, and inspect the current recruitment stage and visible stage history.
 
-#### Preconditions
-
+## 7.3. Preconditions
 1. The Candidate has a valid authenticated session.
 2. The Candidate is authorized to access only the account’s applications.
 
-#### Basic Flow
-
+## 7.4. Basic Flow
 1. The Candidate opens My Applications.
 2. The System validates the Candidate’s session.
 3. The System retrieves applications owned by the Candidate.
@@ -2214,68 +2063,68 @@ This use case allows a Candidate to view submitted job applications, filter them
 9. The System displays the application details, submitted information summary, current status, and Candidate-visible stage history.
 10. The Candidate reviews the application information.
 
-#### Alternative Flows
+## 7.5. Alternative Flows
 
-##### AF-01 — Candidate Has No Applications
-
+### 7.5.1. AF-01 — Candidate Has No Applications
 At Step 3:
 1. The System displays an empty-application state.
 2. The System provides a Browse jobs action.
 3. The use case ends or continues through UC-JOB-01.
 
-##### AF-02 — No Application Matches the Selected Filter
-
+### 7.5.2. AF-02 — No Application Matches the Selected Filter
 The System displays an empty filtered result and provides a Clear filters action.
 
-##### AF-03 — Related Job Is Closed or Removed
-
+### 7.5.3. AF-03 — Related Job Is Closed or Removed
 1. The System preserves the application history.
 2. The System labels the related job as closed or unavailable.
 3. The System prevents unsupported job actions.
 
-##### AF-04 — Application Is No Longer Available
-
+### 7.5.4. AF-04 — Application Is No Longer Available
 At Step 8:
 1. The System displays a neutral unavailable-application message.
 2. The System does not expose another Candidate’s application.
 3. The use case ends.
 
-##### AF-05 — Application Stage Changes During Viewing
-
+### 7.5.5. AF-05 — Application Stage Changes During Viewing
 1. The System displays the latest committed Candidate-visible stage.
 2. The System refreshes the permitted stage history.
 3. The Candidate may continue reviewing.
 
-##### AF-06 — Session Has Expired
-
+### 7.5.6. AF-06 — Session Has Expired
 The System redirects the Candidate to login and does not display application information.
 
-##### EF-01 — Application Data Cannot Be Loaded
-
+### 7.5.7. EF-01 — Application Data Cannot Be Loaded
 1. The System displays a retry state.
 2. The System does not display incomplete data as current.
 3. The System records the failure.
 4. The use case ends or resumes at Step 1 after retry.
 
-#### Postconditions
-
+## 7.6. Postconditions
 - Candidate-owned application information has been displayed.
 - No application status or stage is modified by this use case.
 
-#### Special Requirements
-
+## 7.7. Special Requirements
 - Ownership authorization must be checked server-side.
 - Candidate-visible status must not expose private recruiter notes or internal screening information.
 - Stage-history events must be ordered consistently.
 - Removed job postings must not remove legitimate application-history records.
 - Application lists should support pagination when required.
 
+## Prototype Evidence
+
+![UC-APP-02 — applications list](./prototypes/DGM-02-Candidate-Job-Journey/UC-APP-02/S-APPLICATIONS.png)
+
+*Figure 7.1 — UC-APP-02 basic flow; the Candidate views submitted applications and their statuses.*
+
+![UC-APP-02 — application detail](./prototypes/DGM-02-Candidate-Job-Journey/UC-APP-02/S-APPLICATION-DETAIL.png)
+
+*Figure 7.2 — UC-APP-02 detail state; candidate-visible application information is shown without recruiter-only notes.*
+
 ---
 
-### UC-APP-03 — View Saved Jobs
+# 8. UC-APP-03 — View Saved Jobs
 
-#### Use-Case Information
-
+## 8.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-APP-03 |
@@ -2285,17 +2134,14 @@ The System redirects the Candidate to login and does not display application inf
 | **Priority** | Medium |
 | **Trigger** | The Authenticated User opens **Saved Jobs**. |
 
-#### Brief Description
-
+## 8.2. Brief Description
 This use case allows an Authenticated User to view saved jobs, identify postings that are no longer available, open job details, and remove jobs from the saved collection.
 
-#### Preconditions
-
+## 8.3. Preconditions
 1. The user has a valid authenticated session.
 2. The user is authorized to access the account’s saved-job collection.
 
-#### Basic Flow
-
+## 8.4. Basic Flow
 1. The Authenticated User opens Saved Jobs.
 2. The System validates the authenticated session.
 3. The System retrieves saved-job relationships belonging to the account.
@@ -2303,71 +2149,66 @@ This use case allows an Authenticated User to view saved jobs, identify postings
 5. The System displays the saved-job list with job title, company, location, saved date, and availability status.
 6. The Authenticated User reviews the saved jobs.
 7. The Authenticated User selects an available saved job.
-8. The System invokes UC-JOB-02 — View Job Details.
+8. The Actor may start UC-JOB-02 — View Job Details.
 
-#### Alternative Flows
+## 8.5. Alternative Flows
 
-##### AF-01 — No Saved Jobs Exist
-
+### 8.5.1. AF-01 — No Saved Jobs Exist
 At Step 3:
 1. The System displays an empty-saved-jobs state.
 2. The System provides a Browse jobs action.
 3. The use case ends or continues through UC-JOB-01.
 
-##### AF-02 — Saved Job Is Closed or Expired
-
+### 8.5.2. AF-02 — Saved Job Is Closed or Expired
 The System displays the saved job with a closed or expired label and disables the application action.
 
-##### AF-03 — Saved Job Was Removed
-
+### 8.5.3. AF-03 — Saved Job Was Removed
 The System displays a neutral unavailable state when historical display is permitted or removes it from the active saved list according to policy.
 
-##### AF-04 — User Removes a Saved Job
-
+### 8.5.4. AF-04 — User Removes a Saved Job
 1. The Authenticated User selects Remove.
-2. The System invokes the removal behavior of UC-JOB-03.
+2. The User may start UC-JOB-03 — Save or Remove Job.
 3. The System updates the saved-job list.
 
-##### AF-05 — User Applies Filters or Sorting
-
+### 8.5.5. AF-05 — User Applies Filters or Sorting
 1. The user selects supported availability filters or sorting.
 2. The System updates the displayed saved-job list.
 3. The use case resumes at Step 6.
 
-##### AF-06 — Session Has Expired
-
+### 8.5.6. AF-06 — Session Has Expired
 The System redirects the user to login and does not display saved-job information.
 
-##### EF-01 — Saved Jobs Cannot Be Loaded
-
+### 8.5.7. EF-01 — Saved Jobs Cannot Be Loaded
 1. The System displays a retry state.
 2. The System records the failure.
 3. The use case ends or resumes at Step 1 after retry.
 
-#### Postconditions
-
+## 8.6. Postconditions
 - The user’s saved-job list has been displayed.
 - If a removal was completed, the selected saved-job relationship no longer exists.
 - Other saved jobs remain unchanged.
 
-#### Special Requirements
-
+## 8.7. Special Requirements
 - The user may access only the account’s saved jobs.
 - Unavailable jobs must be clearly distinguished from active jobs.
 - Job removal must be idempotent.
 - Saved-job lists must not expose private job-posting data.
 
-#### Extension Points
+## Prototype Evidence
 
-- **Saved Job Selected**: Selecting a saved job invokes UC-JOB-02.
-- **Remove Saved Job**: Removing a saved job invokes UC-JOB-03.
+![UC-APP-03 — saved jobs](./prototypes/DGM-02-Candidate-Job-Journey/UC-APP-03/S-SAVED-JOBS.png)
+
+*Figure 8.1 — UC-APP-03 basic flow; the authenticated user views the saved-job collection.*
+
+## 8.8. Related Use Cases and Entry Points
+- **Saved Job Selected:** Selecting a saved job starts UC-JOB-02.
+- **Remove Saved Job:** Removing a saved job starts UC-JOB-03.
 
 ---
 
-### UC-APP-04 — View Recommended Jobs
+# 9. UC-APP-04 — View Recommended Jobs
 
-#### Use-Case Information
-
+## 9.1. Use-Case Information
 | Field | Value |
 |---|---|
 | **Use-Case ID** | UC-APP-04 |
@@ -2377,19 +2218,16 @@ The System redirects the user to login and does not display saved-job informatio
 | **Priority** | Medium |
 | **Trigger** | The Candidate opens the recommended-jobs section. |
 
-#### Brief Description
-
+## 9.2. Brief Description
 This use case allows a Candidate to view active job postings recommended using confirmed candidate-profile information, preferences, and other data permitted by platform policy.
 
-#### Preconditions
-
+## 9.3. Preconditions
 1. The Candidate has a valid authenticated session.
 2. The account is active.
 3. Personalized recommendations are permitted by the Candidate’s current preferences.
 4. The recommendation function can access permitted confirmed profile data.
 
-#### Basic Flow
-
+## 9.4. Basic Flow
 1. The Candidate opens Recommended Jobs.
 2. The System validates the Candidate’s session.
 3. The System retrieves permitted confirmed profile and preference information.
@@ -2399,60 +2237,51 @@ This use case allows a Candidate to view active job postings recommended using c
 7. The System displays recommended jobs and supported relevance explanations.
 8. The Candidate reviews the recommendations.
 9. The Candidate selects a recommended job.
-10. The System invokes UC-JOB-02 — View Job Details.
+10. The Candidate may start UC-JOB-02 — View Job Details.
 
-#### Alternative Flows
+## 9.5. Alternative Flows
 
-##### AF-01 — Candidate Profile Is Incomplete
-
+### 9.5.1. AF-01 — Candidate Profile Is Incomplete
 At Step 3:
 1. The System displays that recommendations may be limited.
 2. The System identifies useful missing profile sections.
 3. The Candidate may invoke UC-PROF-01 — Manage Candidate Profile.
 4. Any available recommendations may still be displayed.
 
-##### AF-02 — Personalized Recommendations Are Disabled
-
+### 9.5.2. AF-02 — Personalized Recommendations Are Disabled
 1. The System does not use disabled personalization data.
 2. The System displays information about the disabled preference.
 3. The Candidate may open UC-ACC-02 — Manage Account Preferences.
 4. The use case ends or displays non-personalized jobs if supported.
 
-##### AF-03 — No Suitable Recommendations Exist
-
+### 9.5.3. AF-03 — No Suitable Recommendations Exist
 1. The System displays an empty-recommendation state.
 2. The System suggests completing the profile or browsing all jobs.
 3. The Candidate may invoke UC-JOB-01.
 
-##### AF-04 — Recommended Job Becomes Unavailable
-
+### 9.5.4. AF-04 — Recommended Job Becomes Unavailable
 1. The System removes the job from refreshed recommendations.
 2. If the Candidate already selected it, the System displays the neutral unavailable-job state.
 
-##### AF-05 — Candidate Refreshes Recommendations
-
+### 9.5.5. AF-05 — Candidate Refreshes Recommendations
 1. The Candidate selects Refresh recommendations.
 2. The System repeats Steps 3–7.
 3. The Candidate reviews the refreshed list.
 
-##### AF-06 — Session Has Expired
-
+### 9.5.6. AF-06 — Session Has Expired
 The System redirects the Candidate to login and does not display personalized recommendations.
 
-##### EF-01 — Recommendation Function Is Unavailable
-
+### 9.5.7. EF-01 — Recommendation Function Is Unavailable
 1. The System displays a temporary-unavailability state.
 2. The System provides Browse jobs and Retry actions.
 3. The System does not display stale recommendations as guaranteed current results.
 4. The use case ends or resumes at Step 1 after retry.
 
-#### Postconditions
-
+## 9.6. Postconditions
 - Active and permitted job recommendations have been displayed.
 - No candidate-profile, job, saved-job, or application data is modified.
 
-#### Special Requirements
-
+## 9.7. Special Requirements
 - Recommendation generation must not use prohibited or protected personal characteristics.
 - Only permitted, confirmed profile information may be used.
 - The Candidate must be able to understand the general reason for a recommendation.
@@ -2460,572 +2289,580 @@ The System redirects the Candidate to login and does not display personalized re
 - Personalization preferences must be respected.
 - Recommendation data must not be exposed to another user.
 
-#### Extension Points
+## Prototype Evidence
 
-- **Recommendation Selected**: Selecting a recommendation invokes UC-JOB-02 — View Job Details.
+![UC-APP-04 — recommended jobs](./prototypes/DGM-02-Candidate-Job-Journey/UC-APP-04/S-RECOMMENDED-JOBS.png)
 
-## DGM-03 — Specification of Recruiter Operations
+*Figure 9.1 — UC-APP-04 basic flow; the Candidate views personalized job recommendations.*
 
-**Domains covered:** Job Posting Management · Applicant Screening & Ranking · Recruitment Pipeline
+## 9.8. Related Use Cases and Entry Points
+- **Recommendation Selected:** Selecting a recommendation starts UC-JOB-02 — View Job Details.
 
----
+## DGM-03 - Recruiter Operations
 
-**Student Name:** Ngô Quốc Tuấn  
-**Student ID:** 24127581  
-**Group:** 09  
-**Class:** 24C11  
-**Course/Project:** Software Engineering  
-**Review:** Nguyễn Gia Quốc Uy
+See the split source: [03_Recruiter_Operations.md](./specification/03_Recruiter_Operations.md).
 
----
+# DGM-03 - Use-Case Specification: Recruiter Operations
 
-### Use-Case Diagram
+*Performed by: Ngô Quốc Tuấn | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Group 9*
+**Version:** V1.3 (06/08/2026) — UML relationships, flow wording, and prototype placement revised
 
-```mermaid
----
-config:
-  theme: neutral
-  flowchart:
-    defaultRenderer: elk
----
-flowchart TB
-    %% Actors
-    ai["System / AI Service"]
-    cm["Company Member\n(Authenticated)"]
-    rec["Recruiter\n(Authorized)"]
-    hrm["HR Manager\n(Authorized)"]
-    own["Company Owner\n(Authorized)"]
+## 1. Scope and Diagram
 
-    %% Actor Generalization
-    cm --> rec
-    cm --> hrm
-    cm --> own
+![DGM-03 — Recruiter Operations](./diagrams/rendered_diagrams/diagram_03.png)
 
-    %% ================= DOMAIN 1 =================
-    subgraph subGraph0["Job Posting Management"]
-        direction TB
-        UC_POST_01("UC-POST-01: Create and Manage Job Draft")
-        UC_POST_02("UC-POST-02: Preview and Submit Job Posting")
-        UC_POST_03("UC-POST-03: Manage Job-Posting Lifecycle")
-        UC_POST_04("UC-POST-04: View Company Job Postings")
-    end
+The Mermaid source is maintained in [diagram_03.md](./diagrams/diagram_03.md). Recruiter, HR Manager, and Company Owner generalize Company Member. The posting, screening, and pipeline use cases are separate goals; navigation between them is recorded as Related Use Cases and Entry Points.
 
-    %% ================= DOMAIN 2 =================
-    subgraph subGraph1["Applicant Screening and Ranking"]
-        direction TB
-        UC_SCR_01("UC-SCR-01: Execute Hybrid Candidate Screening\n(ref. Diagram 5)")
-        UC_SCR_03("UC-SCR-03: Review and Rank Applicants")
-    end
+## 2. Actor and Traceability Summary
 
-    %% ================= DOMAIN 3 =================
-    subgraph subGraph2["Recruitment Pipeline"]
-        direction TB
-        UC_PIPE_01("UC-PIPE-01: View Recruitment Pipeline Kanban Board")
-        UC_PIPE_02("UC-PIPE-02: Update Candidate Recruitment Stage")
-        UC_PIPE_03("UC-PIPE-03: View Application Stage History")
-    end
+| Actor | Type | Responsibility |
+|---|---|---|
+| Company Member | Parent human actor | Authenticated company-scoped account. |
+| Recruiter | Specialized human actor | Creates postings, reviews applicants, and updates recruitment stages. |
+| HR Manager | Specialized human actor | Performs recruiter operations with the permitted HR scope. |
+| Company Owner | Specialized human actor | Manages company-level posting visibility and views pipeline information. |
+| System / AI Service | Supporting system actor | Executes asynchronous candidate screening. |
 
-    %% Actor to Use Case Relationships
-    rec --- UC_POST_01
-    rec --- UC_POST_02
-    rec --- UC_POST_03
-    rec --- UC_POST_04
+| Use Case ID | Use Case Name | Primary Actor(s) | Prototype Evidence |
+|---|---|---|---|
+| UC-POST-01 | Create and Manage Job Draft | Recruiter, HR Manager | Draft form and validation state |
+| UC-POST-02 | Preview and Submit Job Posting | Recruiter, HR Manager | Preview and duplicate-title warning |
+| UC-POST-03 | Manage Job-Posting Lifecycle | Recruiter, HR Manager, Company Owner | Actions menu and status-filter states |
+| UC-POST-04 | View Company Job Postings | Recruiter, HR Manager, Company Owner | Company posting list |
+| UC-SCR-01 | Execute Hybrid Candidate Screening | System / AI Service | Processing and failed-scoring states |
+| UC-SCR-03 | Review and Rank Applicants | Recruiter, HR Manager | Ranked candidates and decision states |
+| UC-PIPE-01 | View Recruitment Pipeline Kanban Board | Recruiter, HR Manager, Company Owner | Editable and owner read-only boards |
+| UC-PIPE-02 | Update Candidate Recruitment Stage | Recruiter, HR Manager | Drag state and success state |
+| UC-PIPE-03 | View Application Stage History | Recruiter, HR Manager, Company Owner | Stage-history timeline |
 
-    hrm --- UC_POST_01
-    hrm --- UC_POST_02
-    hrm --- UC_POST_03
-    hrm --- UC_POST_04
+## 3. Use-Case Specifications
 
-    own --- UC_POST_03
-    own --- UC_POST_04
+### 3.1. UC-POST-01 — Create and Manage Job Draft
 
-    ai --- UC_SCR_01
+#### Use-Case Information
 
-    rec --- UC_SCR_03
-    hrm --- UC_SCR_03
-
-    rec --- UC_PIPE_01
-    rec --- UC_PIPE_02
-    rec --- UC_PIPE_03
-
-    hrm --- UC_PIPE_01
-    hrm --- UC_PIPE_02
-    hrm --- UC_PIPE_03
-
-    own --- UC_PIPE_01
-    own --- UC_PIPE_03
-
-    %% Use Case to Use Case Relationships
-    UC_POST_02 -. "«extend»" .-> UC_POST_01
-    UC_POST_03 -. "«extend»" .-> UC_POST_02
-
-    UC_SCR_03 -. "«include»" .-> UC_SCR_01
-
-    UC_PIPE_02 -. "«extend»" .-> UC_PIPE_01
-    UC_PIPE_03 -. "«include»" .-> UC_PIPE_02
-```
-
-#### Summary Table (Use-Case ↔ Requirement Traceability Anchor)
-
-> This table is the primary junction between **Part C (Use Case Diagram)** and the **Traceability Matrix**. Each row links a Use Case ID to the actor(s) allowed to trigger it and the Functional Requirement(s) it realizes.
-
-| Use Case ID | Use Case Name | Actor(s) | Covered Requirements |
-| :--- | :--- | :--- | :--- |
-| UC-POST-01 | Create and Manage Job Draft | Recruiter, HR Manager | FR-POST-01, FR-POST-02 |
-| UC-POST-02 | Preview and Submit Job Posting | Recruiter, HR Manager | FR-POST-03, FR-POST-04 |
-| UC-POST-03 | Manage Job-Posting Lifecycle | Recruiter, HR Manager, Company Owner | FR-POST-05, FR-POST-06 |
-| UC-POST-04 | View Company Job Postings | Recruiter, HR Manager, Company Owner | FR-POST-07 |
-| UC-SCR-01 *(ref. Diagram 5)* | Execute Hybrid Candidate Screening | System / AI Service | FR-SCR-01 |
-| UC-SCR-03 | Review and Rank Applicants | Recruiter, HR Manager | FR-SCR-02, FR-SCR-03 |
-| UC-PIPE-01 | View Recruitment Pipeline Kanban Board | Recruiter, HR Manager, Company Owner | FR-PIPE-01 |
-| UC-PIPE-02 | Update Candidate Recruitment Stage | Recruiter, HR Manager | FR-PIPE-02 |
-| UC-PIPE-03 | View Application Stage History | Recruiter, HR Manager, Company Owner | FR-PIPE-03 |
-
----
-
-> **Note on writing style:**
-> - The **Basic Flow** describes only the single successful path (no error handling), with actor and system steps alternating.
-> - Each **Alternative Flow** is derived by challenging every Basic Flow step against: missing/invalid input, duplicate data, insufficient permission, deleted/closed resource, expired token, external service failure, actor cancellation, concurrent update, and database save failure.
-
----
-
-### Domain 1 — Job Posting Management
-
-![Job Posting Management prototype overview](prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_01_Create_Job_Draft.png)
-
-*Figure 1 — Domain overview: the Job Draft base screen, the shell reused across UC-POST-01 to UC-POST-04. Each use case below has its own specific screen(s) placed directly under its "Screens" subsection.*
-
-#### UC-POST-01 — Create and Manage Job Draft
-
-| Field | Description |
-| :--- | :--- |
-| **Actors** | Recruiter (Authorized), HR Manager (Authorized) |
-| **Precondition** | The user is logged in and holds the `Recruiter` or `HR Manager` role within the company. |
-| **Postcondition** | The draft is saved with a `Draft` status, ready for UC-POST-02. |
-
-##### Basic Flow
-
-| Step | Actor | System |
-| :---: | :--- | :--- |
-| 1 | Recruiter opens "Create Job Posting" and fills in job information (title, department, location, description, etc.). | — |
-| 2 | — | System validates the form fields in real time. |
-| 3 | Recruiter clicks "Save as Draft." | — |
-| 4 | — | System persists the posting with status `Draft` and displays it in the postings list. |
-
-##### Alternative Flows
-
-| ID | Trigger Condition | Flow |
-| :--- | :--- | :--- |
-| AF-1 | Required field is missing or data format is invalid | System blocks the save action, outlines the invalid field(s) in red, and displays a validation message. Recruiter corrects the data and retries. |
-| AF-2 | Recruiter reopens a previously saved draft | System loads the saved draft data into the form for continued editing. |
-| AF-3 | Recruiter deletes an unpublished draft | System prompts a confirmation dialog before permanently deleting the draft. |
-| AF-4 | Database save fails (e.g., connection timeout) | System displays an error toast and keeps the form data intact so the recruiter can retry without data loss. |
-
-##### Prototype Evidence
-
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: Create a job posting draft | `UC_POST_01_Create_Job_Draft.png` | Job draft base screen, new-entry form, `Draft` badge |
-| AF-1: Invalid input data | `UC_POST_01_Validate_Error.png` | (Reuse `UC_POST_01_Create_Job_Draft.png`) + red-outlined invalid field & validation message |
-
-##### Screens
-
-![BF: Create a job posting draft](prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_01_Create_Job_Draft.png)
-*BF — Job draft base screen with the new-entry form and `Draft` badge.*
-
-![AF-1: Invalid input data](prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_01_Validate_Error.png)
-*AF-1 — Same form with a red-outlined invalid field and validation message.*
-
----
-
-#### UC-POST-02 — Preview and Submit Job Posting
-
-| Field | Description |
-| :--- | :--- |
-| **Actors** | Recruiter (Authorized), HR Manager (Authorized) |
-| **Relationship** | «extend» UC-POST-01 (extends from the draft-saving step) |
-| **Precondition** | A job posting exists with status `Draft`. |
-| **Postcondition** | The posting's status changes to `Pending Review`, awaiting processing in UC-POST-03. |
-
-##### Basic Flow
-
-| Step | Actor | System |
-| :---: | :--- | :--- |
-| 1 | Recruiter opens a `Draft` posting and clicks "Preview." | — |
-| 2 | — | System renders the posting exactly as candidates will see it. |
-| 3 | Recruiter reviews the content and clicks "Submit for approval." | — |
-| 4 | — | System validates required fields and changes the status to `Pending Review`. |
-
-##### Alternative Flows
-
-| ID | Trigger Condition | Flow |
-| :--- | :--- | :--- |
-| AF-1 | A required field is missing (e.g., salary range, application deadline) | System blocks the submission and displays an inline error listing the missing fields. |
-| AF-2 | Posting title duplicates an existing posting title in the same company | System displays a warning banner on the preview screen, allowing the recruiter to proceed or rename the title. |
-| AF-3 | Recruiter cancels before submitting | System returns to the draft screen without changing the posting's status. |
-| AF-4 | Recruiter's session/token expires during submission | System redirects to the login screen; unsaved preview state is discarded. |
-
-##### Prototype Evidence
-
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: Preview & submit for approval | `UC_POST_02_Preview_And_Submit.png` | Preview base screen + "Submit for approval" button |
-| AF-2: Duplicate job posting title warning | `UC_POST_02_Preview_Duplicate_Title_Warning.png` | (Reuse the Preview screen) + banner warning of a title duplicate |
-
-##### Screens
-
-![BF: Preview & submit for approval](prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_02_Preview_And_Submit.png)
-*BF — Candidate-facing preview with the "Submit for approval" button.*
-
-![AF-2: Duplicate job posting title warning](prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_02_Preview_Duplicate_Title_Warning.png)
-*AF-2 — Same preview screen with a duplicate-title warning banner.*
-
----
-
-#### UC-POST-03 — Manage Job-Posting Lifecycle
-
-| Field | Description |
-| :--- | :--- |
-| **Actors** | Recruiter, HR Manager, Company Owner (all Authorized) |
-| **Relationship** | «extend» UC-POST-02 |
-| **Precondition** | A posting exists with status `Pending Review`, `Published`, or `Paused`. |
-| **Postcondition** | The posting's status accurately reflects its current lifecycle state (`Draft` / `Pending Review` / `Published` / `Archived` / `Rejected`). |
-
-##### Basic Flow
-
-| Step | Actor | System |
-| :---: | :--- | :--- |
-| 1 | HR Manager/Owner opens the postings list and filters by `Pending Review`. | System displays matching postings. |
-| 2 | User opens the actions menu (⋮) on a posting. | — |
-| 3 | User selects "Approve." | — |
-| 4 | — | System changes the posting's status to `Published`. |
-
-##### Alternative Flows
-
-| ID | Trigger Condition | Flow |
-| :--- | :--- | :--- |
-| AF-1 | User selects "Reject" instead of "Approve" | System requires a rejection reason, then reverts the posting to `Draft` status. |
-| AF-2 | User selects "Close/Archive" on a fully staffed or expired posting | System changes the posting's status to `Archived`. |
-| AF-3 | User does not have the required role (e.g., a plain Recruiter attempting Owner-only action) | System hides or disables the restricted action and shows a permission-denied message if attempted directly. |
-| AF-4 | Two managers act on the same posting concurrently | System detects the stale state on the second submit and prompts the user to refresh before retrying. |
-
-##### Prototype Evidence
-
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: Open the actions menu (approve/reject/close/pause) | `UC_POST_03_Actions_Menu.png` | List row + actions menu (⋮) on a posting |
-| State: List filtered by `Draft` | `UC_POST_03_Filter_List_Draft.png` | Postings list + `Draft` filter selected |
-| State: List filtered by `Pending Review` | `UC_POST_03_Filter_List_Pending_Review.png` | Postings list + `Pending Review` filter selected |
-| State: List filtered by `Published` | `UC_POST_03_Filter_List_Published.png` | Postings list + `Published` filter selected |
-| State: List filtered by `Paused` | `UC_POST_03_Filter_List_Paused.png` | Postings list + `Paused` filter selected |
-| State: List filtered by `Closed` | `UC_POST_03_Filter_List_Closed.png` | Postings list + `Closed` filter selected |
-
-##### Screens
-
-![BF: Open the actions menu](prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_03_Actions_Menu.png)
-*BF — Posting list row with the actions menu (⋮) open (approve/reject/close/pause).*
-
-![State: Draft filter](prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_03_Filter_List_Draft.png)
-*State — List filtered by `Draft` status.*
-
-![State: Pending Review filter](prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_03_Filter_List_Pending_Review.png)
-*State — List filtered by `Pending Review` status.*
-
-![State: Published filter](prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_03_Filter_List_Published.png)
-*State — List filtered by `Published` status.*
-
-![State: Paused filter](prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_03_Filter_List_Paused.png)
-*State — List filtered by `Paused` status.*
-
-![State: Closed filter](prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_03_Filter_List_Closed.png)
-*State — List filtered by `Closed` status.*
-
----
-
-#### UC-POST-04 — View Company Job Postings
-
-| Field | Description |
-| :--- | :--- |
-| **Actors** | Recruiter, HR Manager, Company Owner |
-| **Precondition** | The user belongs to the company. |
-| **Postcondition** | The list accurately reflects the current status of every posting in the company. |
-
-##### Basic Flow
-
-| Step | Actor | System |
-| :---: | :--- | :--- |
-| 1 | User navigates to "Job Postings." | — |
-| 2 | — | System fetches and displays the full list of postings with status badges. |
-
-##### Alternative Flows
-
-| ID | Trigger Condition | Flow |
-| :--- | :--- | :--- |
-| AF-1 | Company has no job postings yet | System displays an empty state with a call-to-action to create a new posting. |
-| AF-2 | List-fetch fails (external/database error) | System displays a retry prompt instead of a blank list. |
-
-##### Prototype Evidence
-
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: View the company's job postings list | `UC_POST_04_View_Company_Job_Postings.png` | Full list, unfiltered, multiple statuses interleaved |
-
-##### Screens
-
-![BF: View the company's job postings list](prototypes/DGM-03-Recruiter-Operations/Domain%201/UC_POST_04_View_Company_Job_Postings.png)
-*BF — Full, unfiltered postings list with multiple statuses interleaved.*
-
----
-
-### Domain 2 — Applicant Screening and Ranking
-
-![Applicant Screening prototype overview](prototypes/DGM-03-Recruiter-Operations/Domain%202/UC_SCR_01_AI_Scanning.png)
-
-*Figure 2 — Domain overview: the Screening/Evaluation base screen showing the AI scoring state (UC-SCR-01), extended into the ranked-candidates view for UC-SCR-03. Specific screens per flow are placed under each use case's "Screens" subsection.*
-
-#### UC-SCR-01 — Execute Hybrid Candidate Screening *(ref. Diagram 5)*
-
-> This use case belongs to the scope of **Diagram 5 (Supporting Services and Analytics)**. It is included by UC-SCR-03. Only its interface touchpoints relevant to the Recruiter's workflow are summarized here; the full flow and screenshots (`UI_01_*`) are documented in the Diagram 5 specification.
-
-| Field | Description |
-| :--- | :--- |
-| **Actors** | System / AI Service |
-| **Precondition** | An applicant has submitted a résumé against a `Published` job posting. |
-| **Postcondition** | A screening score is generated for the candidate and made available to UC-SCR-03. |
-
-##### Prototype Evidence (referenced, owned by Diagram 5)
-
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: The AI system is scoring | `UC_SCR_01_AI_Scanning.png` | Evaluation base screen + loading/scanning indicator |
-| AF: Scoring failed | `UC_SCR_01_Scoring_Failed.png` | Evaluation base screen + scoring-failure message |
-
-##### Screens
-
-![BF: The AI system is scoring](prototypes/DGM-03-Recruiter-Operations/Domain%202/UC_SCR_01_AI_Scanning.png)
-*BF — Evaluation base screen with the loading/scanning indicator.*
-
-![AF: Scoring failed](prototypes/DGM-03-Recruiter-Operations/Domain%202/UC_SCR_01_Scoring_Failed.png)
-*AF — Evaluation base screen with the scoring-failure message.*
-
----
-
-#### UC-SCR-03 — Review and Rank Applicants
-
-| Field | Description |
-| :--- | :--- |
-| **Actors** | Recruiter (Authorized), HR Manager (Authorized) |
-| **Relationship** | «include» UC-SCR-01: Execute Hybrid Candidate Screening (ref. Diagram 5) |
-| **Precondition** | UC-SCR-01 has executed successfully and returned a score for the candidate. |
-| **Postcondition** | The ranked list (whether overridden or not) is used as input for the Recruitment Pipeline. |
-
-##### Basic Flow
-
-| Step | Actor | System |
-| :---: | :--- | :--- |
-| 1 | Recruiter opens the "Candidates" tab for a job posting. | — |
-| 2 | — | System includes UC-SCR-01 to retrieve AI scores, then displays candidates sorted by score (descending) with a résumé summary. |
-| 3 | Recruiter reviews the ranked list. | — |
-
-##### Alternative Flows
-
-| ID | Trigger Condition | Flow |
-| :--- | :--- | :--- |
-| AF-1 | Recruiter disagrees with the AI-suggested order | Recruiter manually re-prioritizes a candidate; system saves the manual override and marks the entry as "manually ranked." |
-| AF-2 | Recruiter advances a top candidate directly to the Offer stage | System moves the candidate's pipeline stage to `Offer` and logs the transition (feeds UC-PIPE-03). |
-| AF-3 | Recruiter rejects a candidate from the ranked list | System requires a rejection reason and moves the candidate to `Rejected`. |
-| AF-4 | UC-SCR-01 has not yet returned a score for a candidate | System shows the candidate in a "Pending screening" state instead of a numeric rank. |
-
-##### Prototype Evidence
-
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: List of ranked candidates | `UC_SCR_03_Ranked_Candidates.png` | Candidate list sorted by AI score in descending order |
-| State: Results ready to review | `UC_SCR_03_Ready.png` | (Reuse `UC_SCR_03_Ranked_Candidates.png`) + "Ready to review" badge |
-| AF-2: Move a candidate to the Offer stage | `UC_SCR_03_Advanced_To_Offer.png` | Rank row + "Advance to Offer" action |
-| AF-3: Reject a candidate | `UC_SCR_03_Reject.png` | Rank row + "Reject" action |
-
-##### Screens
-
-![BF: List of ranked candidates](prototypes/DGM-03-Recruiter-Operations/Domain%202/UC_SCR_03_Ranked_Candidates.png)
-*BF — Candidate list sorted by AI score, descending, with résumé summary.*
-
-![State: Results ready to review](prototypes/DGM-03-Recruiter-Operations/Domain%202/UC_SCR_03_Ready.png)
-*State — Ranked list with the "Ready to review" badge.*
-
-![AF-2: Advance to Offer](prototypes/DGM-03-Recruiter-Operations/Domain%202/UC_SCR_03_Advanced_To_Offer.png)
-*AF-2 — Rank row with the "Advance to Offer" action.*
-
-![AF-3: Reject a candidate](prototypes/DGM-03-Recruiter-Operations/Domain%202/UC_SCR_03_Reject.png)
-*AF-3 — Rank row with the "Reject" action.*
-
----
-
-### Domain 3 — Recruitment Pipeline
-
-![Recruitment Pipeline prototype overview](prototypes/DGM-03-Recruiter-Operations/Domain%203/UC_PIPE_01_Kanban_Board.png)
-
-*Figure 3 — Domain overview: the Kanban board base screen shared across UC-PIPE-01 (view), UC-PIPE-02 (drag-and-drop update), and the entry point into UC-PIPE-03 (stage history). Specific screens per flow are placed under each use case's "Screens" subsection.*
-
-#### UC-PIPE-01 — View Recruitment Pipeline Kanban Board
-
-| Field | Description |
-| :--- | :--- |
-| **Actors** | Recruiter, HR Manager, Company Owner |
-| **Precondition** | At least one candidate has an active application. |
-| **Postcondition** | The board accurately reflects the current stage of every active candidate for the selected posting(s). |
-
-##### Basic Flow
-
-| Step | Actor | System |
-| :---: | :--- | :--- |
-| 1 | User navigates to "Pipeline." | — |
-| 2 | — | System displays stage columns (Applied → Screening → Interview → Offer → Hired) with candidate cards. |
-
-##### Alternative Flows
-
-| ID | Trigger Condition | Flow |
-| :--- | :--- | :--- |
-| AF-1 | User filters the board by a specific job posting | System re-renders the board scoped to that posting only. |
-| AF-2 | Actor is a Company Owner | System displays the board in read-only mode, hiding drag-and-drop actions. |
-
-##### Prototype Evidence
-
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: Kanban board by stage | `UC_PIPE_01_Kanban_Board.png` | All stage columns shown, with full action permissions |
-| AF-2: Company Owner viewing in read-only mode | `UC_PIPE_01_Kanban_Board_Owner_View_Only.png` | (Reuse `UC_PIPE_01_Kanban_Board.png`) + drag-and-drop actions hidden |
-
-##### Screens
-
-![BF: Kanban board by stage](prototypes/DGM-03-Recruiter-Operations/Domain%203/UC_PIPE_01_Kanban_Board.png)
-*BF — All stage columns (Applied → Screening → Interview → Offer → Hired) with full action permissions.*
-
-![AF-2: Owner read-only view](prototypes/DGM-03-Recruiter-Operations/Domain%203/UC_PIPE_01_Kanban_Board_Owner_View_Only.png)
-*AF-2 — Same board with drag-and-drop actions hidden for the Company Owner.*
-
----
-
-#### UC-PIPE-02 — Update Candidate Recruitment Stage
-
-| Field | Description |
-| :--- | :--- |
-| **Actors** | Recruiter (Authorized), HR Manager (Authorized) |
-| **Relationship** | «extend» UC-PIPE-01 |
-| **Precondition** | The candidate's card is visible on the kanban board. |
-| **Postcondition** | The new stage is saved, and a history record is created (input for UC-PIPE-03). |
-
-##### Basic Flow
-
-| Step | Actor | System |
-| :---: | :--- | :--- |
-| 1 | Recruiter drags a candidate's card from the current column to the next stage column. | — |
-| 2 | — | System validates the transition and updates the candidate's stage. |
-| 3 | — | System logs the change and displays a confirmation toast. |
-
-##### Alternative Flows
-
-| ID | Trigger Condition | Flow |
-| :--- | :--- | :--- |
-| AF-1 | Recruiter drops the card onto the `Rejected` column | System requires a rejection reason before confirming the move. |
-| AF-2 | Recruiter cancels the drag mid-action (drops back on the original column) | System discards the action; no stage change or history record is created. |
-| AF-3 | Two recruiters move the same card at the same time | System applies the first successful update and notifies the second user that the card has already moved, refreshing their board. |
-| AF-4 | Database save of the stage change fails | System reverts the card to its original column and displays an error toast. |
-
-##### Prototype Evidence
-
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: Drag and drop a candidate's card to another column | `UC_PIPE_02_Drag_And_Drop_Card.png` | Candidate card shown mid-drag (dragging state) |
-| BF: Confirm the stage update | `UC_PIPE_02_Move_Stage.png` | Toast/confirmation message that the stage change succeeded |
-
-##### Screens
-
-![BF: Drag and drop a candidate's card](prototypes/DGM-03-Recruiter-Operations/Domain%203/UC_PIPE_02_Drag_And_Drop_Card.png)
-*BF — Candidate card shown mid-drag toward the next stage column.*
-
-![BF: Confirm the stage update](prototypes/DGM-03-Recruiter-Operations/Domain%203/UC_PIPE_02_Move_Stage.png)
-*BF — Toast/confirmation message that the stage change succeeded.*
-
----
-
-#### UC-PIPE-03 — View Application Stage History
-
-| Field | Description |
-| :--- | :--- |
-| **Actors** | Recruiter, HR Manager, Company Owner |
-| **Relationship** | «include» UC-PIPE-02 (each stage update creates a history record) |
-| **Precondition** | At least one stage transition has occurred for the selected application. |
-| **Postcondition** | The full, ordered history of stage transitions is visible for the selected application. |
-
-##### Basic Flow
-
-| Step | Actor | System |
-| :---: | :--- | :--- |
-| 1 | User opens a candidate's application and selects "History." | — |
-| 2 | — | System displays a chronological timeline: stage, transition time, and the actor who performed the update. |
-
-##### Alternative Flows
-
-| ID | Trigger Condition | Flow |
-| :--- | :--- | :--- |
-| AF-1 | No stage transitions have occurred yet | System displays an empty timeline with the application's initial `Applied` state only. |
-
-##### Prototype Evidence
-
-| Specification Flow | Filename | State / Reuse |
-| :--- | :--- | :--- |
-| BF: Application history log | `UC_PIPE_03_Stage_History.png` | Timeline of stage changes in chronological order |
-
-##### Screens
-
-![BF: Application history log](prototypes/DGM-03-Recruiter-Operations/Domain%203/UC_PIPE_03_Stage_History.png)
-*BF — Chronological timeline of stage changes, transition time, and the acting user.*
-
----
-
-### Traceability Summary
-
-| Domain | Use Cases | Evidence Files | Reused Base Screens |
-| :--- | :--- | :--- | :--- |
-| Job Posting Management | UC-POST-01 → 04 | 11 | 2 (Draft form, Preview shell) |
-| Applicant Screening & Ranking | UC-SCR-03 (incl. UC-SCR-01 ref.) | 6 | 1 (Ranked candidates list) |
-| Recruitment Pipeline | UC-PIPE-01 → 03 | 5 | 1 (Kanban board) |
----
-
-## DGM-04 — Specification of Company Administration
-
-**Author:** Nguyễn Minh Khôi<br>
-**Student ID:** 24127066<br>
-**Reviewer:** Nguyễn Gia Quốc Uy
-
-
-### UC-ORG-01 — Submit Company Verification Request
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-POST-01 |
+| Primary Actor | Recruiter or HR Manager |
+| Supporting Actor | None |
+| Trigger | The actor selects **Create job posting** or opens an existing draft. |
 
 #### Brief Description
 
-This use case allows an **Authenticated User** to request company-scoped Recruiter access by either registering a new company (with business-license verification) or requesting membership in an existing company. The request is validated, screened for malicious files, and placed into the Administrator Review Queue. No recruitment permissions are granted until an Administrator completes verification (handled by **UC-ORG-03 — Review Company or Membership Request** use case).
-
-#### Actors
-
-- Authenticated User.
-- Platform Administrator.
-- Company OWNER.
-- File Parsing Service.
+The actor creates, edits, or deletes a job-posting draft before submitting it for review.
 
 #### Preconditions
 
-##### The User Holds an Active Session
+1. The actor has an active authenticated session.
+2. The actor has Recruiter or HR Manager permissions for the company.
 
+#### Basic Flow
+
+1. The actor opens the job-posting workspace.
+2. The System displays a new form or the selected existing draft.
+3. The actor enters or edits the title, department, location, description, requirements, salary range, and application settings.
+4. The System validates the fields and displays the current draft state.
+5. The actor selects **Save draft**.
+6. The System stores the validated draft with status `Draft` and records the update time.
+7. The System displays a confirmation and keeps the draft available for later actions.
+
+#### Alternative and Error Flows
+
+- **AF-01 — Invalid Input:** The System highlights invalid fields, preserves valid input, and returns the actor to the editing state.
+- **AF-02 — Reopen Existing Draft:** The actor selects a saved draft and continues editing it.
+- **AF-03 — Delete Draft:** The actor selects **Delete**, confirms the action, and the System removes the unpublished draft.
+- **EF-01 — Save Fails:** The System does not display success, preserves the last authoritative draft, and shows a retry message.
+
+#### Postconditions
+
+- A valid draft is stored with status `Draft`, or an explicitly confirmed deletion is recorded.
+- No posting is visible to candidates until a later submission and moderation process succeeds.
+
+#### Prototype Evidence
+
+![UC-POST-01 — Basic Flow: create a job draft](<./prototypes/DGM-03-Recruiter-Operations/Domain 1/UC_POST_01_Create_Job_Draft.png>)
+
+*Figure 3.1 — UC-POST-01 basic-flow draft form; conceptual prototype evidence for entering and saving a `Draft` posting.*
+
+![UC-POST-01 — Alternative Flow: validation error](<./prototypes/DGM-03-Recruiter-Operations/Domain 1/UC_POST_01_Validate_Error.png>)
+
+*Figure 3.2 — UC-POST-01 AF-01; invalid fields remain visible while validation feedback is shown.*
+
+#### Related Use Cases and Entry Points
+
+After a draft is complete, the actor may start UC-POST-02 from the draft actions. This is a separate goal and not a mandatory sub-behavior of UC-POST-01.
+
+### 3.2. UC-POST-02 — Preview and Submit Job Posting
+
+#### Use-Case Information
+
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-POST-02 |
+| Primary Actor | Recruiter or HR Manager |
+| Supporting Actor | None |
+| Trigger | The actor opens a saved draft and selects **Preview**. |
+
+#### Brief Description
+
+The actor previews a completed draft as candidates will see it and submits the posting for review.
+
+#### Preconditions
+
+1. A draft exists and is owned by the actor's company.
+2. Required posting fields are complete.
+
+#### Basic Flow
+
+1. The actor opens a completed draft.
+2. The System validates the draft and renders the candidate-facing preview.
+3. The actor reviews the content and selects **Submit for approval**.
+4. The System performs the final submission validation.
+5. The System changes the posting status to `Pending Review` and records the submitting actor.
+6. The System displays the submitted state.
+
+#### Alternative and Error Flows
+
+- **AF-01 — Required Field Missing:** The System identifies the missing field and returns the actor to the draft editor.
+- **AF-02 — Duplicate Title Warning:** The System shows a warning about a similar posting; the actor may revise the title or explicitly continue if policy permits.
+- **AF-03 — Actor Cancels Preview:** The actor returns to the draft without changing its status.
+- **EF-01 — Submission Fails:** The System retains the `Draft` state and reports a retryable failure.
+
+#### Postconditions
+
+- On success, the posting is `Pending Review` and is available to the configured review process.
+- On cancellation or failure, the last valid draft remains available.
+
+#### Prototype Evidence
+
+![UC-POST-02 — Basic Flow: preview and submit](<./prototypes/DGM-03-Recruiter-Operations/Domain 1/UC_POST_02_Preview_And_Submit.png>)
+
+*Figure 3.3 — UC-POST-02 basic flow; preview and submission action for a completed draft.*
+
+![UC-POST-02 — Alternative Flow: duplicate title warning](<./prototypes/DGM-03-Recruiter-Operations/Domain 1/UC_POST_02_Preview_Duplicate_Title_Warning.png>)
+
+*Figure 3.4 — UC-POST-02 AF-02; duplicate-title warning is displayed before the actor decides whether to continue.*
+
+#### Related Use Cases and Entry Points
+
+UC-POST-02 starts from a draft created by UC-POST-01. A submitted posting may later be handled by UC-POST-03 or by the moderation use cases in DGM-04.
+
+### 3.3. UC-POST-03 — Manage Job-Posting Lifecycle
+
+#### Use-Case Information
+
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-POST-03 |
+| Primary Actor | Recruiter, HR Manager, or Company Owner |
+| Supporting Actor | None |
+| Trigger | The actor opens the company's posting list and chooses a lifecycle action or filter. |
+
+#### Brief Description
+
+The actor views and manages permitted lifecycle actions for company postings, including publish, pause, close, or archive operations.
+
+#### Preconditions
+
+1. The actor is authenticated and has the required company permission.
+2. The selected posting belongs to the active company context.
+
+#### Basic Flow
+
+1. The actor opens the company posting list.
+2. The System displays postings and their statuses.
+3. The actor opens the action menu for a posting.
+4. The System displays only actions permitted for the current status and role.
+5. The actor selects an action and confirms it when required.
+6. The System validates the transition, updates the status, records the actor and reason, and refreshes the list.
+
+#### Alternative and Error Flows
+
+- **AF-01 — Filter by Status:** The actor selects `Draft`, `Pending Review`, `Published`, `Paused`, or `Closed`; the System shows matching postings.
+- **AF-02 — Close or Archive:** The actor confirms that a staffed, expired, or no-longer-needed posting should be closed or archived.
+- **AF-03 — Transition Not Allowed:** The System explains why the requested status transition is unavailable and leaves the posting unchanged.
+- **EF-01 — Update Fails:** The System keeps the authoritative status and displays a retry message.
+
+#### Postconditions
+
+The posting status and audit record accurately reflect the permitted lifecycle action, or no state changes on failure.
+
+#### Prototype Evidence
+
+![UC-POST-03 — lifecycle actions](<./prototypes/DGM-03-Recruiter-Operations/Domain 1/UC_POST_03_Actions_Menu.png>)
+
+*Figure 3.5 — UC-POST-03 basic flow; lifecycle action menu for a posting.*
+
+![UC-POST-03 — filtered posting list](<./prototypes/DGM-03-Recruiter-Operations/Domain 1/UC_POST_03_Filter_List_Published.png>)
+
+*Figure 3.6 — UC-POST-03 AF-01/state; the list is filtered to `Published` postings. The Draft, Pending Review, Paused, and Closed screenshots represent the corresponding states.*
+
+#### Related Use Cases and Entry Points
+
+The actor may open UC-POST-04 to view the company list. A posting in `Pending Review` may be handled by the moderation process in DGM-04.
+
+### 3.4. UC-POST-04 — View Company Job Postings
+
+#### Use-Case Information
+
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-POST-04 |
+| Primary Actor | Recruiter, HR Manager, or Company Owner |
+| Supporting Actor | None |
+| Trigger | The actor opens **Company job postings**. |
+
+#### Brief Description
+
+The actor views the company's job-posting list and current statuses.
+
+#### Preconditions
+
+1. The actor has an active authenticated session.
+2. The actor belongs to the selected company context.
+
+#### Basic Flow
+
+1. The actor opens the company posting list.
+2. The System verifies the company scope.
+3. The System retrieves the company's postings.
+4. The System displays each posting with its status and permitted actions.
+
+#### Alternative and Error Flows
+
+- **AF-01 — No Postings:** The System displays an empty state and a permitted create-posting action.
+- **AF-02 — Filter Requested:** The actor filters the list by status and the System refreshes the results.
+- **EF-01 — List Cannot Be Loaded:** The System shows a retry message without presenting stale data as current.
+
+#### Postconditions
+
+The actor has a read-only view of the current company posting list and may start a related posting action.
+
+#### Prototype Evidence
+
+![UC-POST-04 — company posting list](<./prototypes/DGM-03-Recruiter-Operations/Domain 1/UC_POST_04_View_Company_Job_Postings.png>)
+
+*Figure 3.7 — UC-POST-04 basic flow; company postings with their current statuses.*
+
+#### Related Use Cases and Entry Points
+
+The actor may start UC-POST-01, UC-POST-02, or UC-POST-03 from an appropriate row action; each remains a separate goal.
+
+### 3.5. UC-SCR-01 — Execute Hybrid Candidate Screening
+
+#### Use-Case Information
+
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-SCR-01 |
+| Primary Actor | System / AI Service |
+| Supporting Actor | AI Service |
+| Trigger | A valid candidate application is submitted and normalized CV data is available. |
+
+#### Brief Description
+
+The System asynchronously calculates a deterministic and semantic screening result. The complete service specification and cross-domain evidence are maintained in DGM-05; this section records the recruiter-facing state.
+
+#### Preconditions
+
+1. A valid application has been submitted.
+2. Required job and candidate data are available.
+
+#### Basic Flow
+
+1. The System detects the submitted application.
+2. The System changes screening status to `Processing`.
+3. The System calculates deterministic matches.
+4. The AI Service calculates semantic evaluation and returns an explanation.
+5. The System stores the blended score and changes status to `Completed`.
+
+#### Alternative and Error Flows
+
+- **EF-01 — Screening Fails:** The System changes status to `Failed`, records a retryable error, and does not expose a partial score as final.
+
+#### Postconditions
+
+The application has a completed score or a durable `Failed` state. UC-SCR-03 can be started only when a usable result exists.
+
+#### Prototype Evidence
+
+![UC-SCR-01 — screening in progress](<./prototypes/DGM-03-Recruiter-Operations/Domain 2/UC_SCR_01_AI_Scanning.png>)
+
+*Figure 3.8 — UC-SCR-01 basic-flow processing state; the full screening-service evidence is also documented in DGM-05.*
+
+![UC-SCR-01 — screening failed](<./prototypes/DGM-03-Recruiter-Operations/Domain 2/UC_SCR_01_Scoring_Failed.png>)
+
+*Figure 3.9 — UC-SCR-01 EF-01; a failed result is clearly separated from a completed score.*
+
+#### Related Use Cases and Entry Points
+
+After a completed result is available, the recruiter may start UC-SCR-03. The screening process is asynchronous and is not a mandatory sub-step of opening the ranked list.
+
+### 3.6. UC-SCR-03 — Review and Rank Applicants
+
+#### Use-Case Information
+
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-SCR-03 |
+| Primary Actor | Recruiter or HR Manager |
+| Supporting Actor | None |
+| Trigger | The actor opens the ranked-applicant view for a job posting. |
+
+#### Brief Description
+
+The actor reviews candidates whose screening results are already available and may record a recruitment decision.
+
+#### Preconditions
+
+1. A completed screening result is available for the selected application.
+2. The actor has permission to view the company's applicants.
+
+#### Basic Flow
+
+1. The actor opens the ranked-applicant view.
+2. The System retrieves completed scores and permitted candidate summaries.
+3. The System sorts candidates by the configured ranking.
+4. The actor reviews the score, permitted explanation, and candidate summary.
+5. The actor may select an applicant action.
+6. The System records the decision or ranking adjustment.
+
+#### Alternative and Error Flows
+
+- **AF-01 — Result Not Ready:** The System shows a `Processing` or `Failed` status and does not display an incomplete result as final.
+- **AF-02 — Manual Override:** The actor changes the ranking or advances a candidate, and the System records the actor and reason when required.
+- **AF-03 — Reject Candidate:** The actor records a rejection reason and the System updates the candidate's recruitment state.
+- **EF-01 — Results Cannot Be Loaded:** The System shows a retry message and retains the last authoritative ranking.
+
+#### Postconditions
+
+The actor has reviewed the available applicants and any manual decision is auditable. The resulting application may be handled by the pipeline use cases.
+
+#### Prototype Evidence
+
+![UC-SCR-03 — ranked candidates](<./prototypes/DGM-03-Recruiter-Operations/Domain 2/UC_SCR_03_Ranked_Candidates.png>)
+
+*Figure 3.10 — UC-SCR-03 basic flow; candidates are listed in ranked order.*
+
+![UC-SCR-03 — ready state](<./prototypes/DGM-03-Recruiter-Operations/Domain 2/UC_SCR_03_Ready.png>)
+
+*Figure 3.11 — UC-SCR-03 state; results are ready for review.*
+
+![UC-SCR-03 — decision states](<./prototypes/DGM-03-Recruiter-Operations/Domain 2/UC_SCR_03_Advanced_To_Offer.png>)
+
+*Figure 3.12 — UC-SCR-03 AF-02; the actor advances a candidate to the Offer stage. The Reject screenshot represents AF-03.*
+
+#### Related Use Cases and Entry Points
+
+UC-SCR-03 consumes a result produced by UC-SCR-01. A reviewed application may be opened in UC-PIPE-01 or updated with UC-PIPE-02.
+
+### 3.7. UC-PIPE-01 — View Recruitment Pipeline Kanban Board
+
+#### Use-Case Information
+
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-PIPE-01 |
+| Primary Actor | Recruiter, HR Manager, or Company Owner |
+| Supporting Actor | None |
+| Trigger | The actor opens the recruitment pipeline for a selected job or company. |
+
+#### Brief Description
+
+The actor views applications grouped by recruitment stage on a Kanban board.
+
+#### Preconditions
+
+1. The actor is authenticated and has access to the company context.
+2. The selected job or company has accessible applications.
+
+#### Basic Flow
+
+1. The actor opens the pipeline.
+2. The System retrieves applications and their current stages.
+3. The System displays stage columns and candidate cards.
+4. The actor filters by job when needed.
+
+#### Alternative and Error Flows
+
+- **AF-01 — Company Owner View:** The System displays a read-only board and hides stage-changing controls.
+- **AF-02 — Filter by Job:** The actor selects a job and the System refreshes the board.
+- **EF-01 — Pipeline Cannot Be Loaded:** The System reports the failure and does not present an incomplete board as current.
+
+#### Postconditions
+
+The actor can see the current authorized pipeline state.
+
+#### Prototype Evidence
+
+![UC-PIPE-01 — editable Kanban board](<./prototypes/DGM-03-Recruiter-Operations/Domain 3/UC_PIPE_01_Kanban_Board.png>)
+
+*Figure 3.13 — UC-PIPE-01 basic flow; stage columns and candidate cards are visible.*
+
+![UC-PIPE-01 — owner read-only board](<./prototypes/DGM-03-Recruiter-Operations/Domain 3/UC_PIPE_01_Kanban_Board_Owner_View_Only.png>)
+
+*Figure 3.14 — UC-PIPE-01 AF-01; Company Owner sees the board without stage-changing controls.*
+
+#### Related Use Cases and Entry Points
+
+The actor may start UC-PIPE-02 from an editable card or UC-PIPE-03 from an application's history action. These are separate goals.
+
+### 3.8. UC-PIPE-02 — Update Candidate Recruitment Stage
+
+#### Use-Case Information
+
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-PIPE-02 |
+| Primary Actor | Recruiter or HR Manager |
+| Supporting Actor | None |
+| Trigger | The actor selects a candidate card and chooses a permitted destination stage. |
+
+#### Brief Description
+
+The actor changes an application's recruitment stage. The stage update and its history event are committed atomically.
+
+#### Preconditions
+
+1. The actor has permission to change the selected application's stage.
+2. The application and target stage are still current.
+
+#### Basic Flow
+
+1. The actor selects a candidate card.
+2. The actor drags the card or chooses **Change stage**.
+3. The System validates the transition and any required reason.
+4. The actor confirms the destination stage.
+5. The System updates the stage and creates exactly one history event in the same transaction.
+6. The System refreshes the board and confirms the change.
+
+#### Alternative and Error Flows
+
+- **AF-01 — Move to Rejected:** The System requests a rejection reason before committing the transition.
+- **AF-02 — Stale Card:** The System detects a concurrent change, reloads the current application, and asks the actor to retry.
+- **AF-03 — Actor Cancels:** The System restores the card to its original stage and creates no history event.
+- **EF-01 — Transaction Fails:** The System rolls back both the stage update and its history event and displays a retry message.
+
+#### Postconditions
+
+On success, the new stage and exactly one corresponding history event are stored atomically. UC-PIPE-03 can later read that event; it is not executed as part of this use case.
+
+#### Prototype Evidence
+
+![UC-PIPE-02 — drag and drop](<./prototypes/DGM-03-Recruiter-Operations/Domain 3/UC_PIPE_02_Drag_And_Drop_Card.png>)
+
+*Figure 3.15 — UC-PIPE-02 basic flow; the card is being moved to a new stage.*
+
+![UC-PIPE-02 — stage update confirmation](<./prototypes/DGM-03-Recruiter-Operations/Domain 3/UC_PIPE_02_Move_Stage.png>)
+
+*Figure 3.16 — UC-PIPE-02 postcondition evidence; the stage update succeeds and the board confirms it.*
+
+#### Related Use Cases and Entry Points
+
+UC-PIPE-02 may be started from UC-PIPE-01. The resulting history data is available to UC-PIPE-03.
+
+### 3.9. UC-PIPE-03 — View Application Stage History
+
+#### Use-Case Information
+
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-PIPE-03 |
+| Primary Actor | Recruiter, HR Manager, or Company Owner |
+| Supporting Actor | None |
+| Trigger | The actor opens **Stage history** for an application. |
+
+#### Brief Description
+
+The actor views the immutable timeline of stage changes for an application.
+
+#### Preconditions
+
+1. The actor can access the selected application.
+2. The application history is available, including an empty history when no transition has occurred.
+
+#### Basic Flow
+
+1. The actor selects an application and opens **Stage history**.
+2. The System verifies authorization and retrieves history records.
+3. The System displays stage, transition time, actor, and permitted reason for each event in chronological order.
+4. The actor reviews the timeline.
+
+#### Alternative and Error Flows
+
+- **AF-01 — No History Yet:** The System displays the current stage and an empty-history message.
+- **AF-02 — History Is Paginated:** The actor requests another page and the System loads older records.
+- **EF-01 — History Cannot Be Loaded:** The System shows a retry message and does not fabricate or reorder records.
+
+#### Postconditions
+
+The actor has a read-only view of the authorized application-stage history. No stage update is performed by this use case.
+
+#### Prototype Evidence
+
+![UC-PIPE-03 — stage-history timeline](<./prototypes/DGM-03-Recruiter-Operations/Domain 3/UC_PIPE_03_Stage_History.png>)
+
+*Figure 3.17 — UC-PIPE-03 basic flow; stage transitions are shown in chronological order.*
+
+#### Related Use Cases and Entry Points
+
+UC-PIPE-03 reads history events created by UC-PIPE-02. The actor may open it from UC-PIPE-01 or an application-detail view.
+
+## 4. Relationship and Prototype Rules Applied
+
+- The actor hierarchy is represented as Recruiter / HR Manager / Company Owner → Company Member.
+- POST-01 → POST-02 → POST-03 is documented as a sequence of separate goals and entry points.
+- Screening is asynchronous: UC-SCR-03 requires a completed result and does not start scoring implicitly.
+- UC-PIPE-02 writes one stage event atomically; UC-PIPE-03 only reads that data.
+- Each use case contains its own prototype evidence with a flow/state caption. The coverage file remains an index, and the HTML prototype is supplementary demo material.
+
+## DGM-04 - Company Administration and Moderation
+
+See the split source: [04_Administration_Moderation.md](./specification/04_Administration_Moderation.md).
+
+# DGM-04 - Use-Case Specification: Company Administration and Moderation
+
+*Performed by: Nguyễn Minh Khôi | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Group 9*
+**Version:** V1.3 (06/08/2026) — Actor naming, relationship wording, and editorial pass revised
+
+![DGM-04 — Company Administration and Moderation](./diagrams/rendered_diagrams/diagram_04.png)
+
+The Mermaid source is maintained in [diagram_04.md](./diagrams/diagram_04.md). Candidate, Company Member, and Platform Administrator generalize Authenticated User. Recruiter, HR Manager, and Company Owner generalize Company Member.
+
+# UC-ORG-01 — Submit Company Verification Request
+
+## Use-Case Information
+
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-ORG-01 |
+| Primary Actor | Authenticated User |
+| Supporting Actor | File Scanning Service; Platform Administrator |
+| Trigger | The user requests company-scoped access. |
+
+## Brief Description
+
+This use case allows an **Authenticated User** to request company-scoped Recruiter access by either registering a new company (with business-license verification) or requesting membership in an existing company. The request is validated, screened for malicious files, and placed into the Administrator Review Queue. No recruitment permissions are granted until an Administrator completes verification (handled by **UC-ORG-03 — Review Company or Membership Request** use case).
+
+## Actors
+
+- Authenticated User.
+- Platform Administrator.
+- Company Owner.
+- File Scanning Service.
+
+## Preconditions
+
+### The User Holds an Active Session
 The User has successfully authenticated and holds an active, non-suspended account.
 
-##### No Existing Active Membership
-
+### No Existing Active Membership
 The User does not already hold an active or Pending membership for the target company.
 
-#### Flow of Events
+## Flow of Events
 
-##### Basic Flow — Register New Company
+### Basic Flow — Register New Company
 
 1. The use case begins when the authenticated User selects the option to request recruiter/company access.
 2. The System prompts the User to search for an existing company by Company Name or Tax Identification Number.
@@ -3038,99 +2875,100 @@ The User does not already hold an active or Pending membership for the target co
 9. The System displays a confirmation to the User indicating the request has been submitted for review and that a notification will be sent once a decision is made.
 10. The use case ends.
 
-#### Alternative Flows
+## Alternative Flows
 
-##### A1 — Invalid Document
+### A1 — Invalid Document
 
-At Basic Flow step 7, if the uploaded document fails :
+At Basic Flow step 7, if the uploaded document fails validation or the malware scan:
 
 1. The System rejects the file and displays a specific validation or safety error to the User; the file is not stored or queued for review.
 2. The User may correct and re-upload the document.
 3. The flow resumes at Basic Flow step 6.
 
-##### A2 — User Cancels Submission
+### A2 — User Cancels Submission
 
-At any point prior to final submission (Basic Flow step 8 ), the User may cancel the request.
+At any point prior to final submission (Basic Flow step 8), the User may cancel the request.
 
 1. The System discards all unsaved form data and any provisionally uploaded file.
 2. The use case ends without creating a request record.
 
-#### Special Requirements
+## Special Requirements
 
-##### Malware Scanning Before Visibility
-
+### Malware Scanning Before Visibility
 Uploaded business license documents must complete a malware scan before becoming available to Administrators or any downstream process; failed scans must never persist the file.
 
-##### No Implicit Access Grant
+### No Implicit Access Grant
+A Tax ID match against an existing company must never automatically grant membership or data access; access is only created after both invitation/Company Owner approval (for existing companies) and Platform Administrator verification.
 
-A Tax ID match against an existing company must never automatically grant membership or data access; access is only created after both invitation/OWNER approval (for existing companies) and Administrator verification.
-
-##### Auditability
-
+### Auditability
 Every submission, and any subsequent approval, rejection, or role assignment resulting from it, must be recorded in the backend audit log with actor and timestamp.
 
-##### Tenant Isolation
-
+### Tenant Isolation
 Until the request is approved, the User must have no access to the target company's job postings, applicants, or other company-scoped data.
 
-##### Data Protection
-
+### Data Protection
 The uploaded business document is sensitive business information and must be stored securely, transmitted over HTTPS, and restricted to Administrators for review purposes only.
 
-#### Postconditions
+## Postconditions
 
-##### Success End Condition
-
+### Success End Condition
 A Company Membership Request exists with status `Pending`, correctly associated with either a new unverified company record or an existing company and requested role, is visible in the Administrator Review Queue, and the User has received on-screen confirmation. The event is recorded in the audit log.
 
-##### Failure End Condition
+### Failure End Condition
+No Company Membership Request record is created. The User has been informed of the specific reason (validation error, malware detection, or missing invitation/Company Owner approval), and their account and candidate profile remain unchanged.
 
-No Company Membership Request record is created. The User has been informed of the specific reason (validation error, malware detection, or missing invitation/OWNER approval), and their account and candidate profile remain unchanged.
+## Related Use Cases and Entry Points
 
-#### Extension Points
+### Admin Verification Decision
+After Basic Flow step 9, the request may be opened in **UC-ORG-03 — Review Company or Membership Request**. That is a separate administrator goal; it is not a workflow extension of this submission.
 
-##### Admin Verification Decision
-
-Located after Basic Flow step 9 : once a request enters the Administrator Review Queue, control passes to ***UC-ORG-03 Review Company or Membership Request usecase**, where an Administrator approves or rejects the request and the resulting membership or rejection notification is generated.
-
-#### Prototype Evidence
+## Prototype Evidence
 
 1.
-   ![UC-ORG-01 UI 01](prototypes/DGM-04-Company-Administration/UC-ORG-01-UI_01.png)
+   ![UC-ORG-01 UI 01](./prototypes/DGM-04-Company-Administration/UC-ORG-01-UI_01.png)
 
 2.
-   ![UC-ORG-01 UI 02](prototypes/DGM-04-Company-Administration/UC-ORG-01-UI_02.png)
+   ![UC-ORG-01 UI 02](./prototypes/DGM-04-Company-Administration/UC-ORG-01-UI_02.png)
 
 3.
-   ![UC-ORG-01 UI 02a](prototypes/DGM-04-Company-Administration/UC-ORG-01-UI_02a.png)
+   ![UC-ORG-01 UI 02a](./prototypes/DGM-04-Company-Administration/UC-ORG-01-UI_02a.png)
 
 4.
-   ![UC-ORG-01 UI 03](prototypes/DGM-04-Company-Administration/UC-ORG-01-UI_03.png)
+   ![UC-ORG-01 UI 03](./prototypes/DGM-04-Company-Administration/UC-ORG-01-UI_03.png)
 
 5.
-   ![UC-ORG-01 UI 03a](prototypes/DGM-04-Company-Administration/UC-ORG-01-UI_03a.png)
+   ![UC-ORG-01 UI 03a](./prototypes/DGM-04-Company-Administration/UC-ORG-01-UI_03a.png)
 
 6.
-   ![UC-ORG-01 UI 04](prototypes/DGM-04-Company-Administration/UC-ORG-01-UI_04.png)
+   ![UC-ORG-01 UI 04](./prototypes/DGM-04-Company-Administration/UC-ORG-01-UI_04.png)
 
 7.
-   ![UC-ORG-01 UI 05](prototypes/DGM-04-Company-Administration/UC-ORG-01-UI_05.png)
+   ![UC-ORG-01 UI 05](./prototypes/DGM-04-Company-Administration/UC-ORG-01-UI_05.png)
 
-### UC-ORG-02 — Request to Join Existing Company
+# UC-ORG-02 — Request to Join Existing Company
 
-#### Brief Description
+## Use-Case Information
 
-This use case allows an authenticated Candidate to request `HR_MANAGER` or `RECRUITER` permissions for a company that already exists in the system, by locating that company and submitting a membership request — either via a valid invitation code or by requesting approval from an existing company `OWNER`. The request does not grant any access on its own; it must pass OWNER approval (or a valid invitation) and, subsequently, Administrator verification before company-scoped permissions are activated.
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-ORG-02 |
+| Primary Actor | Authenticated User |
+| Supporting Actor | Company Owner; Platform Administrator |
+| Trigger | The user selects **Join an existing company**. |
 
-#### Actors
+## Brief Description
+
+This use case allows an authenticated Candidate to request `HR_MANAGER` or `RECRUITER` permissions for a company that already exists in the system, by locating that company and submitting a membership request — either via a valid invitation code or by requesting approval from an existing Company Owner. The request does not grant any access on its own; it must pass Company Owner approval (or a valid invitation) and, subsequently, Platform Administrator verification before company-scoped permissions are activated.
+
+## Actors
 
 - Authenticated User
-- Company OWNER.
+- Company Owner.
 - Platform Administrator.
 
-#### Flow of Events
+## Flow of Events
 
-##### Basic Flow
+### Basic Flow
 
 1. The use case begins when the authenticated User selects the option to join an existing company.
 2. The System prompts the User to search for a company by Company Name or Tax Identification Number.
@@ -3145,9 +2983,9 @@ This use case allows an authenticated Candidate to request `HR_MANAGER` or `RECR
 11. The System displays a confirmation to the User indicating the request has been submitted for review.
 12. The use case ends.
 
-#### Alternative Flows
+## Alternative Flows
 
-##### A1 — No Matching Company Found
+### A1 — No Matching Company Found
 
 At Basic Flow step 4, if the search returns no matching, verified company:
 
@@ -3155,116 +2993,115 @@ At Basic Flow step 4, if the search returns no matching, verified company:
 2. The System offers the User the option to register a new company instead (see **UC-ORG-01 — Submit Company Verification Request**).
 3. The use case ends.
 
-##### A2 — No Invitation Code Provided (Owner Approval Path)
+### A2 — No Invitation Code Provided (Company Owner Approval Path)
 
 At Basic Flow step 8, if the User does not provide an invitation code:
 
 1. The System creates a Company Membership Request with status `Awaiting Owner Approval`, linked to the User, target company, and requested role.
-2. The System notifies the active `OWNER`(s) of the target company that a membership request is awaiting review.
-3. The `OWNER` reviews the request and approves or rejects it.
+2. The System notifies the active Company Owner(s) of the target company that a membership request is awaiting review.
+3. The Company Owner reviews the request and approves or rejects it.
 4. If approved, the flow resumes at Basic Flow step 10, with the request now eligible for the Administrator Review Queue.
 5. If rejected, see Exception Flow E1.
 
-##### A3 — User Cancels Submission
+### A3 — User Cancels Submission
 
 At any point prior to final submission (Basic Flow step 10 / A2 step 1), the User may cancel the request.
 
 1. The System discards all unsaved form data.
 2. The use case ends without creating a request record.
 
-#### Exception Flows
+## Exception Flows
 
-##### E1 — Owner Rejects Request
+### E1 — Company Owner Rejects Request
 
-If the target company's `OWNER` rejects the request during A2:
+If the target company's Company Owner rejects the request during A2:
 
-1. The System updates the request status to `Rejected` and records the OWNER's stated reason.
+1. The System updates the request status to `Rejected` and records the Company Owner's stated reason.
 2. The System notifies the User of the rejection and reason.
 3. The use case ends in failure. The User may submit a corrected request.
 
-##### E2 — Invalid or Expired Invitation Code
+### E2 — Invalid or Expired Invitation Code
 
 At Basic Flow step 8, if the entered invitation code is invalid, expired, or already consumed:
 
 1. The System rejects the code and displays a specific error to the User.
-2. The User may re-enter a code or proceed via Alternative Flow A2 (Owner Approval Path).
+2. The User may re-enter a code or proceed via Alternative Flow A2 (Company Owner Approval Path).
 3. The flow resumes at Basic Flow step 7.
 
-#### Special Requirements
+## Special Requirements
 
-##### Authorization Safeguard
+### Authorization Safeguard
+A join request must never result in an active membership without either (a) a valid, unexpired invitation tied to the target company and role, or (b) explicit approval from an existing Company Owner of that company — in addition to final Platform Administrator verification. Neither the invitation nor the Company Owner approval alone is sufficient to grant access.
 
-A join request must never result in an active membership without either (a) a valid, unexpired invitation tied to the target company and role, or (b) explicit approval from an existing `OWNER` of that company — in addition to final Administrator verification. Neither the invitation nor the OWNER approval alone is sufficient to grant access.
-
-##### No Access Prior to Approval
-
+### No Access Prior to Approval
 The User must have no access to the target company's job postings, applicants, evaluation notes, or analytics at any point before the request reaches an `Approved` state.
 
-##### Notification Timing
-
+### Notification Timing
 Owner-approval notifications and User-facing decision notifications must be enqueued within the platform's standard notification window (≤ 5 seconds after the triggering transaction is committed).
 
-##### Auditability
+### Auditability
+Every state transition of the request (submission, Company Owner approval/rejection, Platform Administrator approval/rejection) must be written to the backend audit log with actor and timestamp.
 
-Every state transition of the request (submission, OWNER approval/rejection, Admin approval/rejection) must be written to the backend audit log with actor and timestamp.
+## Postconditions
 
-#### Postconditions
+### Success End Condition
+A Company Membership Request exists linked to the User, the target company, and the requested role, in status `Pending` (invitation path) or `Awaiting Owner Approval` (no-invitation path), and the appropriate party (Platform Administrator or Company Owner) has been notified. The event is recorded in the audit log.
 
-##### Success End Condition
-
-A Company Membership Request exists linked to the User, the target company, and the requested role, in status `Pending` (invitation path) or `Awaiting Owner Approval` (no-invitation path), and the appropriate party (Administrator or OWNER) has been notified. The event is recorded in the audit log.
-
-##### Failure End Condition
-
+### Failure End Condition
 No membership is granted; the request is either not created (cancelled, no match) or ends in status `Rejected` with a recorded reason communicated to the User.
 
-#### Extension Points
+## Related Use Cases and Entry Points
 
-##### Owner Review of Membership Request
+### Company Owner Review of Membership Request
+At Alternative Flow A2, step 3, the Company Owner may start a separate membership-review action to approve or reject the pending join request.
 
-Located at Alternative Flow A2, step 3: control passes to a separate use case in which the company `OWNER` reviews and approves or rejects the pending join request.
+### Admin Verification Decision
+After Basic Flow step 10, an eligible request may be opened in **UC-ORG-03 — Review Company or Membership Request**.
 
-##### Admin Verification Decision
-
-Located after Basic Flow step 10: once a request (invited or Owner-approved) enters the Administrator Review Queue,see the **UC-ORG-03 Review Company or Membership Request** usecase.
-
-#### Prototype Evidence
+## Prototype Evidence
 
 1.
-   ![UC-ORG-02 UI 01](prototypes/DGM-04-Company-Administration/UC-ORG-02-UI_01.png)
+   ![UC-ORG-02 UI 01](./prototypes/DGM-04-Company-Administration/UC-ORG-02-UI_01.png)
 
 2.
-   ![UC-ORG-02 UI 02](prototypes/DGM-04-Company-Administration/UC-ORG-02-UI_02.png)
+   ![UC-ORG-02 UI 02](./prototypes/DGM-04-Company-Administration/UC-ORG-02-UI_02.png)
 
 3.
-   ![UC-ORG-02 UI 02a](prototypes/DGM-04-Company-Administration/UC-ORG-02-UI_02a.png)
+   ![UC-ORG-02 UI 02a](./prototypes/DGM-04-Company-Administration/UC-ORG-02-UI_02a.png)
 
 4.
-   ![UC-ORG-02 UI 03](prototypes/DGM-04-Company-Administration/UC-ORG-02-UI_03.png)
+   ![UC-ORG-02 UI 03](./prototypes/DGM-04-Company-Administration/UC-ORG-02-UI_03.png)
 
 5.
-   ![UC-ORG-02 UI 03a](prototypes/DGM-04-Company-Administration/UC-ORG-02-UI_03a.png)
+   ![UC-ORG-02 UI 03a](./prototypes/DGM-04-Company-Administration/UC-ORG-02-UI_03a.png)
 
-### UC-ORG-03 — Review Company or Membership Request
+# UC-ORG-03 — Review Company or Membership Request
 
-#### Brief Description
+## Use-Case Information
 
-This use case allows a System Administrator to review a Pending Company Membership Request — either a new-company registration with an uploaded business license or a join-request for an existing company that has already passed invitation validation or OWNER approval — and issue a final Approve or Reject decision.
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-ORG-03 |
+| Primary Actor | Platform Administrator |
+| Supporting Actor | File Scanning Service |
+| Trigger | The administrator opens the company-verification queue. |
 
-#### Actors
+## Brief Description
 
+This use case allows a Platform Administrator to review a Pending Company Membership Request — either a new-company registration with an uploaded business license or a join-request for an existing company that has already passed invitation validation or Company Owner approval — and issue a final Approve or Reject decision.
+
+## Actors
 - Platform Administrator
 - Authenticated User
 
-#### Preconditions
+## Preconditions
 
-##### Request Awaiting Verification
+### Request Awaiting Verification
+A Company Membership Request exists in the Administrator Review Queue with status `Pending`, and (for existing-company requests) has already cleared invitation validation or Company Owner approval per UC-ORG-02.
 
-A Company Membership Request exists in the Administrator Review Queue with status `Pending`, and (for existing-company requests) has already cleared invitation validation or OWNER approval per UC-ORG-02.
+## Flow of Events
 
-#### Flow of Events
-
-##### Basic Flow — Approve Request
+### Basic Flow — Approve Request
 
 1. The use case begins when the Administrator opens the Company Verification Queue.
 2. The System displays all `Pending` requests, showing request type (New Company / Join Existing Company), requesting user, target company, and submission date.
@@ -3278,9 +3115,9 @@ A Company Membership Request exists in the Administrator Review Queue with statu
 10. The System notifies the requesting User by email and in-app alert that access has been granted.
 11. The use case ends.
 
-#### Alternative Flows
+## Alternative Flows
 
-##### A1 — Reject Request
+### A1 — Reject Request
 
 At Basic Flow step 6, if the Administrator rejects the request:
 
@@ -3291,166 +3128,171 @@ At Basic Flow step 6, if the Administrator rejects the request:
 5. No `Company` or `CompanyMembership` record is created or modified.
 6. The use case ends.
 
-#### Exception Flows
+## Exception Flows
 
-##### E1 — Suspicious or Fraudulent Submission
+### E1 — Suspicious or Fraudulent Submission
 
 At Basic Flow step 5, if the Administrator suspects a fraudulent business license or repeated abusive submissions:
 
 1. The Administrator rejects the request per A1.
 2. The Administrator may additionally proceed to **UC-USER-02 — Apply Account Enforcement Action** against the Requesting User.
 
-#### Special Requirements
+## Special Requirements
 
-##### Restricted Document Access
-
+### Restricted Document Access
 Business license documents must be viewable only by Administrators performing verification.
 
-##### Auditability
-
+### Auditability
 Every approval and rejection decision must be recorded in the backend audit log.
 
-##### Notification Timing
-
+### Notification Timing
 Outcome notifications must be enqueued within 5 seconds of the decision being committed.
 
-#### Postconditions
+## Postconditions
 
-##### Success End Condition
-
+### Success End Condition
 The `Company` (if new) is `Verified` and/or a `CompanyMembership` is `Active`; the Requesting User has Recruiter Dashboard access scoped to that company; the decision is logged; the user is notified.
 
-##### Failure End Condition
-
+### Failure End Condition
 The request is `Rejected`; no company or membership record is created or altered; the user is notified with the reason.
 
-#### Prototype Evidence
+## Prototype Evidence
 
 1.
-   ![UC-ORG-03 UI 01](prototypes/DGM-04-Company-Administration/UC-ORG-03-UI_01.png)
+   ![UC-ORG-03 UI 01](./prototypes/DGM-04-Company-Administration/UC-ORG-03-UI_01.png)
 
 2.
-   ![UC-ORG-03 UI 02](prototypes/DGM-04-Company-Administration/UC-ORG-03-UI_02.png)
+   ![UC-ORG-03 UI 02](./prototypes/DGM-04-Company-Administration/UC-ORG-03-UI_02.png)
 
 3.
-   ![UC-ORG-03 UI 03](prototypes/DGM-04-Company-Administration/UC-ORG-03-UI_03.png)
+   ![UC-ORG-03 UI 03](./prototypes/DGM-04-Company-Administration/UC-ORG-03-UI_03.png)
 
 4.
-   ![UC-ORG-03 UI 03a](prototypes/DGM-04-Company-Administration/UC-ORG-03-UI_03a.png)
+   ![UC-ORG-03 UI 03a](./prototypes/DGM-04-Company-Administration/UC-ORG-03-UI_03a.png)
 
 5.
-   ![UC-ORG-03 UI 03b](prototypes/DGM-04-Company-Administration/UC-ORG-03-UI_03b.png)
+   ![UC-ORG-03 UI 03b](./prototypes/DGM-04-Company-Administration/UC-ORG-03-UI_03b.png)
 
 ---
 
-### UC-ORG-04 — Manage Company Memberships and Roles
+# UC-ORG-04 — Manage Company Memberships and Roles
 
-#### Brief Description
+## Use-Case Information
 
-This use case allows a company `OWNER` to view existing company members, invite new members by email with an assigned role, change an existing member's role, and remove a member — all scoped to the OWNER's own company, without affecting the removed or reassigned member's underlying candidate identity.
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-ORG-04 |
+| Primary Actor | Company Owner |
+| Supporting Actor | Company Member |
+| Trigger | The Company Owner opens company membership settings. |
 
-#### Actors
+## Brief Description
 
-- OWNER
+This use case allows a Company Owner to view existing company members, invite new members by email with an assigned role, change an existing member's role, and remove a member — all scoped to the owner's own company, without affecting the removed or reassigned member's underlying candidate identity.
+
+## Actors
+- Company Owner
 - Company Member
 
-#### Preconditions
+## Preconditions
 
-##### Active OWNER Membership
-
+### Active Company Owner Membership
 The User holds an `Active` `CompanyMembership` with role `OWNER` for the company being managed.
 
-#### Flow of Events
+## Flow of Events
 
-##### Basic Flow — Invite New Member
+### Basic Flow — Invite New Member
 
-1. The use case begins when the OWNER navigates to Company Membership Management.
+1. The use case begins when the Company Owner navigates to Company Membership Management.
 2. The System displays current members with name, role, and status.
-3. The OWNER selects "Invite Member."
+3. The Company Owner selects "Invite Member."
 4. The System prompts for the invitee's email and the role to assign (`HR_MANAGER` or `RECRUITER`).
-5. The OWNER submits the invitation.
+5. The Company Owner submits the invitation.
 6. The System generates a unique, time-limited invitation code linked to the company and role.
 7. The System sends an invitation email to the specified address.
 8. The System logs the invitation issuance to the audit log.
 9. The use case ends.
 
-#### Alternative Flows
+## Alternative Flows
 
-##### A1 — Change an Existing Member's Role
+### A1 — Change an Existing Member's Role
 
-1. The OWNER selects an `Active` member and chooses a new role (`HR_MANAGER` or `RECRUITER`).
-2. The System confirms the OWNER is not attempting to reassign their own `OWNER` role through this action *(ownership transfer is handled by UC-ORG-05)*.
+1. The Company Owner selects an `Active` member and chooses a new role (`HR_MANAGER` or `RECRUITER`).
+2. The System confirms the Company Owner is not attempting to reassign their own `OWNER` role through this action *(ownership transfer is handled by UC-ORG-05)*.
 3. The System updates the `CompanyMembership` role.
 4. The System logs the change (old role, new role, actor, timestamp) to the audit log.
 5. The System notifies the affected member.
 6. The flow resumes at Basic Flow step 2.
 
-##### A2 — Remove a Member
+### A2 — Remove a Member
 
-1. The OWNER selects an existing member and chooses "Remove from Company."
+1. The Company Owner selects an existing member and chooses "Remove from Company."
 2. The System requests confirmation.
-3. The OWNER confirms.
+3. The Company Owner confirms.
 4. The System sets the `CompanyMembership` status to `Removed`, immediately revoking the member's access to company data.
 5. The System logs the removal to the audit log and notifies the removed member.
 6. The flow resumes at Basic Flow step 2.
 
-#### Special Requirements
+## Special Requirements
 
-##### Owner-Only Authorization
-
+### Owner-Only Authorization
 Only members with an `Active` `OWNER` membership for the company may perform these actions.
 
-##### Immediate Revocation
-
+### Immediate Revocation
 Removal must immediately and transactionally revoke the affected member's access — no caching delay.
 
-##### Auditability
-
+### Auditability
 Invitations, role changes, and removals must all be logged.
 
-#### Postconditions
+## Postconditions
 
-##### Success End Condition
-
+### Success End Condition
 The company's membership list reflects the invitation, role change, or removal; affected users are notified; the audit log is updated.
 
-#### Prototype Evidence
+## Prototype Evidence
 
 1.
-   ![UC-ORG-04 UI 01](prototypes/DGM-04-Company-Administration/UC-ORG-04-UI_01.png)
+   ![UC-ORG-04 UI 01](./prototypes/DGM-04-Company-Administration/UC-ORG-04-UI_01.png)
 
 2.
-   ![UC-ORG-04 UI 02](prototypes/DGM-04-Company-Administration/UC-ORG-04-UI_02.png)
+   ![UC-ORG-04 UI 02](./prototypes/DGM-04-Company-Administration/UC-ORG-04-UI_02.png)
 
 3.
-   ![UC-ORG-04 UI 02a](prototypes/DGM-04-Company-Administration/UC-ORG-04-UI_02a.png)
+   ![UC-ORG-04 UI 02a](./prototypes/DGM-04-Company-Administration/UC-ORG-04-UI_02a.png)
 
 4.
-   ![UC-ORG-04 UI 02b](prototypes/DGM-04-Company-Administration/UC-ORG-04-UI_02b.png)
+   ![UC-ORG-04 UI 02b](./prototypes/DGM-04-Company-Administration/UC-ORG-04-UI_02b.png)
 
 ---
 
-### UC-ORG-05 — Manage Membership Lifecycle
+# UC-ORG-05 — Manage Membership Lifecycle
 
-#### Brief Description
+## Use-Case Information
 
-This use case covers the post-approval lifecycle events that change a `CompanyMembership`'s state outside of routine role management: a member voluntarily leaving a company, an Administrator revoking a membership, an OWNER transferring ownership, and full company deactivation (which cascades to unpublish job postings and disable all memberships).
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-ORG-05 |
+| Primary Actor | Company Owner, Company Member, or Platform Administrator |
+| Supporting Actor | None |
+| Trigger | The actor opens a membership action. |
 
-#### Actors
+## Brief Description
 
+This use case covers the post-approval lifecycle events that change a `CompanyMembership`'s state outside of routine role management: a member voluntarily leaving a company, an Administrator revoking a membership, a Company Owner transferring ownership, and full company deactivation (which cascades to unpublish job postings and disable all memberships).
+
+## Actors
 - Company Member
 - Platform Administrator
 - Company Owner
 
-#### Preconditions
+## Preconditions
 
-##### Existing Active Membership
-
+### Existing Active Membership
 The company and the relevant `CompanyMembership` record(s) exist with status `Active`.
 
-#### Flow of Events
+## Flow of Events
 
-##### Basic Flow — Member Voluntarily Leaves Company
+### Basic Flow — Member Voluntarily Leaves Company
 
 1. The use case begins when an authenticated Company Member selects "Leave Company."
 2. The System displays a warning that access will be immediately revoked.
@@ -3458,31 +3300,31 @@ The company and the relevant `CompanyMembership` record(s) exist with status `Ac
 4. The System checks whether the Member is the sole `OWNER`. *(If so, see Exception Flow E1.)*
 5. The System sets the `CompanyMembership` status to `Left`, immediately revoking access.
 6. The System logs the event to the audit log.
-7. The System notifies the company's remaining `OWNER`(s), if any.
+7. The System notifies the company's remaining Company Owner(s), if any.
 8. The use case ends.
 
-#### Alternative Flows
+## Alternative Flows
 
-##### A1 — Administrator Revokes Membership
+### A1 — Administrator Revokes Membership
 
 1. The Administrator locates the target membership via **UC-USER-01 — Search and View User Accounts**.
 2. The Administrator selects "Revoke Membership" and enters a reason.
 3. The System sets the `CompanyMembership` status to `Revoked`, immediately disabling access.
 4. The System logs the revocation (actor, reason, timestamp) to the audit log.
-5. The System notifies the affected user and the company's `OWNER`(s).
+5. The System notifies the affected user and the company's Company Owner(s).
 6. The use case ends.
 
-##### A2 — OWNER Transfers Ownership
+### A2 — Company Owner Transfers Ownership
 
-1. The current `OWNER` selects "Transfer Ownership" and selects an existing `Active` member (`HR_MANAGER` or `RECRUITER`) as the new `OWNER`.
+1. The current Company Owner selects "Transfer Ownership" and selects an existing `Active` member (`HR_MANAGER` or `RECRUITER`) as the new role `OWNER`.
 2. The System requests confirmation.
-3. The current `OWNER` confirms.
-4. The System atomically updates the current `OWNER`'s role to `HR_MANAGER` and the selected member's role to `OWNER`.
+3. The current Company Owner confirms.
+4. The System atomically updates the current Company Owner's role to `HR_MANAGER` and the selected member's role to `OWNER`.
 5. The System logs the transfer to the audit log.
 6. The System notifies both users.
 7. The use case ends.
 
-##### A3 — Company Deactivation
+### A3 — Company Deactivation
 
 1. An Administrator selects "Deactivate Company" and enters a reason.
 2. The System requests confirmation.
@@ -3492,83 +3334,86 @@ The company and the relevant `CompanyMembership` record(s) exist with status `Ac
 6. The System notifies all affected members.
 7. The use case ends.
 
-#### Exception Flows
+## Exception Flows
 
-##### E1 — Sole Owner Cannot Leave
+### E1 — Sole Owner Cannot Leave
 
 At Basic Flow step 4, if the Member is the company's only `OWNER`:
 
 1. The System blocks the departure and instructs the User to transfer ownership (A2) or deactivate the company first.
 2. The use case ends without change.
 
-#### Special Requirements
+## Special Requirements
 
-##### Atomicity
-
+### Atomicity
 Ownership transfer must be a single atomic transaction — the system must never have zero or two OWNERs mid-operation.
 
-##### Cascading Deactivation
-
+### Cascading Deactivation
 Company deactivation must unpublish all job postings and disable all memberships consistently with the Job Post Lifecycle.
 
-##### Auditability and Timing
-
+### Auditability and Timing
 All lifecycle transitions must be logged and trigger notifications within 5 seconds.
 
-#### Postconditions
+## Postconditions
 
-##### Success End Condition
-
+### Success End Condition
 The membership or company reflects the new lifecycle state (`Left`, `Revoked`, ownership transferred, or `Deactivated`), dependent job postings are updated accordingly, and the audit trail is complete.
 
-#### Prototype Evidence
+## Prototype Evidence
 
 1.
-   ![UC-ORG-05 UI 01](prototypes/DGM-04-Company-Administration/UC-ORG-05-UI_01.png)
+   ![UC-ORG-05 UI 01](./prototypes/DGM-04-Company-Administration/UC-ORG-05-UI_01.png)
 
 2.
-   ![UC-ORG-05 UI 02](prototypes/DGM-04-Company-Administration/UC-ORG-05-UI_02.png)
+   ![UC-ORG-05 UI 02](./prototypes/DGM-04-Company-Administration/UC-ORG-05-UI_02.png)
 
 3.
-   ![UC-ORG-05 UI 02a](prototypes/DGM-04-Company-Administration/UC-ORG-05-UI_02a.png)
+   ![UC-ORG-05 UI 02a](./prototypes/DGM-04-Company-Administration/UC-ORG-05-UI_02a.png)
 
 4.
-   ![UC-ORG-05 UI 03](prototypes/DGM-04-Company-Administration/UC-ORG-05-UI_03.png)
+   ![UC-ORG-05 UI 03](./prototypes/DGM-04-Company-Administration/UC-ORG-05-UI_03.png)
 
 5.
-   ![UC-ORG-05 UI 03a](prototypes/DGM-04-Company-Administration/UC-ORG-05-UI_03a.png)
+   ![UC-ORG-05 UI 03a](./prototypes/DGM-04-Company-Administration/UC-ORG-05-UI_03a.png)
 
 6.
-   ![UC-ORG-05 UI 04](prototypes/DGM-04-Company-Administration/UC-ORG-05-UI_04.png)
+   ![UC-ORG-05 UI 04](./prototypes/DGM-04-Company-Administration/UC-ORG-05-UI_04.png)
 
 7.
-   ![UC-ORG-05 UI 04a](prototypes/DGM-04-Company-Administration/UC-ORG-05-UI_04a.png)
+   ![UC-ORG-05 UI 04a](./prototypes/DGM-04-Company-Administration/UC-ORG-05-UI_04a.png)
 
 8.
-   ![UC-ORG-05 UI 04b](prototypes/DGM-04-Company-Administration/UC-ORG-05-UI_04b.png)
+   ![UC-ORG-05 UI 04b](./prototypes/DGM-04-Company-Administration/UC-ORG-05-UI_04b.png)
 
 ---
 
-### UC-USER-01 — Search and View User Accounts
+# UC-USER-01 — Search and View User Accounts
 
-#### Brief Description
+## Use-Case Information
 
-This use case allows a System Administrator to search, filter, and view details of registered Candidate and Recruiter accounts, including their company memberships and account status, as the entry point for account enforcement actions.
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-USER-01 |
+| Primary Actor | Platform Administrator |
+| Supporting Actor | None |
+| Trigger | The administrator opens the User Account Directory. |
 
-#### Actors
+## Brief Description
 
+This use case allows a Platform Administrator to search, filter, and view details of registered Candidate and Recruiter accounts, including their company memberships and account status, as the entry point for account enforcement actions.
+
+## Actors
 - Platform
 - Administrator
 
-#### Preconditions
+## Preconditions
 
-##### Administrator Session
-
+### Administrator Session
 The Administrator holds an active platform `ADMIN` role and an authenticated session.
 
-#### Flow of Events
+## Flow of Events
 
-##### Basic Flow
+### Basic Flow
 
 1. The use case begins when the Administrator navigates to the User Account Directory.
 2. The System displays a paginated list of registered accounts, showing name, email, platform role, account status, and company memberships.
@@ -3578,63 +3423,66 @@ The Administrator holds an active platform `ADMIN` role and an authenticated ses
 6. The System displays the full account profile, including registration date, verification status, company memberships/roles, and recent audit history.
 7. The use case ends.
 
-#### Alternative Flows
+## Alternative Flows
 
-##### A1 — No Matching Results
+### A1 — No Matching Results
 
 At Basic Flow step 4, if no accounts match the criteria:
 
 1. The System displays an empty-state message.
 2. The Administrator may adjust criteria and resume at step 3.
 
-#### Special Requirements
+## Special Requirements
 
-##### Performance
-
+### Performance
 Search and filter results should meet the dashboard-navigation performance target (≤ 2 seconds).
 
-##### Access Restriction
-
+### Access Restriction
 The User Account Directory is accessible only to users holding the platform `ADMIN` role.
 
-#### Postconditions
+## Postconditions
 
-##### Success End Condition
-
+### Success End Condition
 This is a read-only use case; no system state changes. The Administrator has obtained the information needed for further action, such as **UC-USER-02 — Apply Account Enforcement Action**.
 
-#### Extension Points
+## Related Use Cases and Entry Points
 
-##### Apply Account Enforcement Action
+### Apply Account Enforcement Action
+After the target account is identified, the administrator may start **UC-USER-02 — Apply Account Enforcement Action**.
 
-Located at Basic Flow step 6: from an account's detail view, control may pass to UC-USER-02.
+## Prototype Evidence
 
-#### Prototype Evidence
-
-   ![UC-USER-01](prototypes/DGM-04-Company-Administration/UC-USER-01.png)
+   ![UC-USER-01](./prototypes/DGM-04-Company-Administration/UC-USER-01.png)
 
 ---
 
-### UC-USER-02 — Apply Account Enforcement Action
+# UC-USER-02 — Apply Account Enforcement Action
 
-#### Brief Description
+## Use-Case Information
 
-This use case allows a System Administrator to suspend a user account that violates platform policy, or reactivate a previously suspended account, with all actions recorded for audit and accountability.
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-USER-02 |
+| Primary Actor | Platform Administrator |
+| Supporting Actor | None |
+| Trigger | The administrator selects an enforcement action for an identified account. |
 
-#### Actors
+## Brief Description
 
+This use case allows a Platform Administrator to suspend a user account that violates platform policy, or reactivate a previously suspended account, with all actions recorded for audit and accountability.
+
+## Actors
 - Platform Administrator
 - Authenticated User
 
-#### Preconditions
+## Preconditions
 
-##### Target Account Identified
-
+### Target Account Identified
 The Administrator has located the target account, typically via UC-USER-01.
 
-#### Flow of Events
+## Flow of Events
 
-##### Basic Flow — Suspend Account
+### Basic Flow — Suspend Account
 
 1. The use case begins when the Administrator, viewing a user account, selects "Suspend Account."
 2. The System prompts for a required suspension reason.
@@ -3645,9 +3493,9 @@ The Administrator has located the target account, typically via UC-USER-01.
 7. The System notifies the affected user of the suspension and reason.
 8. The use case ends.
 
-#### Alternative Flows
+## Alternative Flows
 
-##### A1 — Reactivate Account
+### A1 — Reactivate Account
 
 1. The Administrator selects a `Suspended` account and chooses "Reactivate Account."
 2. The System requests confirmation and optional notes.
@@ -3657,63 +3505,65 @@ The Administrator has located the target account, typically via UC-USER-01.
 6. The System notifies the user of the reactivation.
 7. The use case ends.
 
-#### Exception Flows
+## Exception Flows
 
-##### E1 — Attempt to Suspend Own Administrator Account
+### E1 — Attempt to Suspend Own Administrator Account
 
 1. The System detects the target account is the acting Administrator's own account and blocks the action.
 2. The System displays an error explaining that self-suspension is not permitted.
 3. The use case ends without change.
 
-#### Special Requirements
+## Special Requirements
 
-##### Immediate Session Invalidation
-
+### Immediate Session Invalidation
 Suspension must immediately invalidate active JWT-based sessions for the affected user.
 
-##### Auditability
+### Auditability
+Both suspension and reactivation must be logged.
 
-Both suspension and reactivation must be logged .
+### Notification Timing
+Notifications must be enqueued within 5 seconds of the action being committed.
 
-##### Notification Timing
+## Postconditions
 
-Notifications must be enqueued within 5 seconds of the action being committed .
-
-#### Postconditions
-
-##### Success End Condition
-
+### Success End Condition
 The account status is updated (`Suspended` or `Active`); sessions are invalidated on suspension; the audit log is updated; the user is notified.
 
-##### Failure End Condition
-
+### Failure End Condition
 No state change occurs; an error is displayed to the Administrator.
 
-#### Prototype Evidence
+## Prototype Evidence
 
-   ![UC-USER-02](prototypes/DGM-04-Company-Administration/UC-USER-02.png)
+   ![UC-USER-02](./prototypes/DGM-04-Company-Administration/UC-USER-02.png)
 
 ---
 
-### UC-MOD-01 — Review Submitted Job Posting
+# UC-MOD-01 — Review Submitted Job Posting
 
-#### Brief Description
+## Use-Case Information
 
-This use case allows a System Administrator to inspect a job posting submitted for moderation before it becomes publicly visible, checking its content against platform Content Moderation guidelines in preparation for an approve/reject/revision decision.
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-MOD-01 |
+| Primary Actor | Platform Administrator |
+| Supporting Actor | None |
+| Trigger | The administrator opens the job-posting moderation queue. |
 
-#### Actors
+## Brief Description
 
+This use case allows a Platform Administrator to inspect a job posting submitted for moderation before it becomes publicly visible, checking its content against platform Content Moderation guidelines in preparation for an approve/reject/revision decision.
+
+## Actors
 - **Administrator** (primary)
 
-#### Preconditions
+## Preconditions
 
-##### Posting Awaiting Review
-
+### Posting Awaiting Review
 A job posting exists with status `Pending`, having been submitted for review by a company-authorized recruiter.
 
-#### Flow of Events
+## Flow of Events
 
-##### Basic Flow
+### Basic Flow
 
 1. The use case begins when the Administrator opens the Job Posting Moderation Queue.
 2. The System displays all `Pending` postings, sorted by submission date, showing job title, company, recruiter, and submission date.
@@ -3723,9 +3573,9 @@ A job posting exists with status `Pending`, having been submitted for review by 
 6. The Administrator proceeds to record a decision. *(Continues in **UC-MOD-02 — Approve, Reject, or Request Revision**.)*
 7. The use case ends.
 
-#### Alternative Flows
+## Alternative Flows
 
-##### A1 — Flag for Escalated Review
+### A1 — Flag for Escalated Review
 
 At Basic Flow step 5, if the Administrator is uncertain and wants a second opinion:
 
@@ -3733,54 +3583,57 @@ At Basic Flow step 5, if the Administrator is uncertain and wants a second opini
 2. The System keeps the posting status as `Pending`.
 3. The use case ends.
 
-#### Special Requirements
+## Special Requirements
 
-##### Public Invisibility
-
+### Public Invisibility
 The posting must remain invisible on the public Job Board and unsearchable while `Pending`.
 
-##### Performance
-
+### Performance
 The moderation queue should meet the dashboard-navigation performance target.
 
-#### Postconditions
+## Postconditions
 
-##### Success End Condition
-
+### Success End Condition
 The Administrator has reviewed the posting content; the posting status is unchanged (`Pending`) pending a decision, or is flagged for escalated review.
 
-#### Extension Points
+## Related Use Cases and Entry Points
 
-##### Approve, Reject, or Request Revision
+### Approve, Reject, or Request Revision
+After the posting has been reviewed, the administrator may start **UC-MOD-02 — Approve, Reject, or Request Revision**.
 
-Located at Basic Flow step 6: control passes to UC-MOD-02.
+## Prototype Evidence
 
-#### Prototype Evidence
-
-   ![UC-MOD-01](prototypes/DGM-04-Company-Administration/UC-MOD-01.png)
+   ![UC-MOD-01](./prototypes/DGM-04-Company-Administration/UC-MOD-01.png)
 
 ---
 
-### UC-MOD-02 — Approve, Reject, or Request Revision
+# UC-MOD-02 — Approve, Reject, or Request Revision
 
-#### Brief Description
+## Use-Case Information
 
-This use case allows a System Administrator to finalize a moderation decision on a `Pending` job posting — approving it for publication, rejecting it with feedback, or requesting specific revisions — following the Job Post Lifecycle.
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-MOD-02 |
+| Primary Actor | Platform Administrator |
+| Supporting Actor | None |
+| Trigger | The administrator selects a reviewed posting and records a decision. |
 
-#### Actors
+## Brief Description
 
+This use case allows a Platform Administrator to finalize a moderation decision on a `Pending` job posting — approving it for publication, rejecting it with feedback, or requesting specific revisions — following the Job Post Lifecycle.
+
+## Actors
 - Administrator
 - Recruiter
 
-#### Preconditions
+## Preconditions
 
-##### Posting Reviewed
-
+### Posting Reviewed
 The job posting has status `Pending` and has typically been reviewed via UC-MOD-01.
 
-#### Flow of Events
+## Flow of Events
 
-##### Basic Flow — Approve
+### Basic Flow — Approve
 
 1. The use case begins when the Administrator, having reviewed a `Pending` posting, selects "Approve."
 2. The System sets the posting status to `Active`, publishes it to the public Job Board, and makes it searchable.
@@ -3788,9 +3641,9 @@ The job posting has status `Pending` and has typically been reviewed via UC-MOD-
 4. The System notifies the Recruiter that the posting is live.
 5. The use case ends.
 
-#### Alternative Flows
+## Alternative Flows
 
-##### A1 — Reject with Feedback
+### A1 — Reject with Feedback
 
 1. The Administrator selects "Reject."
 2. The System requires the Administrator to enter a rejection reason.
@@ -3800,74 +3653,76 @@ The job posting has status `Pending` and has typically been reviewed via UC-MOD-
 6. The System sends an automated email and in-app notification to the Recruiter explaining the rejection.
 7. The use case ends.
 
-##### A2 — Request Revision
+### A2 — Request Revision
 
 1. The Administrator selects "Request Revision" and enters specific requested changes.
 2. The System returns the posting to `Draft` status with the Administrator's notes attached.
 3. The System logs the request and notifies the Recruiter of the required changes.
 4. The use case ends. The Recruiter must edit and resubmit the posting (Job Posting Management) to re-enter the `Pending` queue.
 
-#### Special Requirements
+## Special Requirements
 
-##### Recorded Reasons
-
+### Recorded Reasons
 Rejection and revision requests must include a recorded reason.
 
-##### Lifecycle Conformance
-
+### Lifecycle Conformance
 Status transitions must strictly follow the Job Post Lifecycle: `Draft → Pending → Active → Closed`, with rejection returning `Pending → Draft`.
 
-##### Auditability and Timing
-
+### Auditability and Timing
 All decisions must be logged and notifications enqueued within 5 seconds.
 
-#### Postconditions
+## Postconditions
 
-##### Success End Condition (Approve)
-
+### Success End Condition (Approve)
 The posting is `Active`, published, and searchable; the Recruiter is notified.
 
-##### Success End Condition (Reject/Revision)
-
+### Success End Condition (Reject/Revision)
 The posting returns to `Draft` with recorded feedback; it remains unpublished; the Recruiter is notified.
 
-#### Prototype Evidence
+## Prototype Evidence
 
 1.
-   ![UC-MOD-02 UI 01](prototypes/DGM-04-Company-Administration/UC-MOD-02-UI_01.png)
+   ![UC-MOD-02 UI 01](./prototypes/DGM-04-Company-Administration/UC-MOD-02-UI_01.png)
 
 2.
-   ![UC-MOD-02 UI 02](prototypes/DGM-04-Company-Administration/UC-MOD-02-UI_02.png)
+   ![UC-MOD-02 UI 02](./prototypes/DGM-04-Company-Administration/UC-MOD-02-UI_02.png)
 
 3.
-   ![UC-MOD-02 UI 03](prototypes/DGM-04-Company-Administration/UC-MOD-02-UI_03.png)
+   ![UC-MOD-02 UI 03](./prototypes/DGM-04-Company-Administration/UC-MOD-02-UI_03.png)
 
 4.
-   ![UC-MOD-02 UI 04](prototypes/DGM-04-Company-Administration/UC-MOD-02-UI_04.png)
+   ![UC-MOD-02 UI 04](./prototypes/DGM-04-Company-Administration/UC-MOD-02-UI_04.png)
 
 ---
 
-### UC-MOD-03 — Investigate Job Report
+# UC-MOD-03 — Investigate Job Report
 
-#### Brief Description
+## Use-Case Information
 
-This use case allows a System Administrator to review spam/abuse reports filed against a job posting, determine whether the posting violates platform policy, and either take the posting down immediately or dismiss the report as unfounded.
+| Field | Value |
+|---|---|
+| Use-Case ID | UC-MOD-03 |
+| Primary Actor | Platform Administrator |
+| Supporting Actor | None |
+| Trigger | The administrator opens an unresolved job report. |
 
-#### Actors
+## Brief Description
 
+This use case allows a Platform Administrator to review spam/abuse reports filed against a job posting, determine whether the posting violates platform policy, and either take the posting down immediately or dismiss the report as unfounded.
+
+## Actors
 - Platform Administrator
 - Recruiter
 - Candidate(s)
 
-#### Preconditions
+## Preconditions
 
-##### Open Report Exists
-
+### Open Report Exists
 At least one Spam/Abuse report exists in `Open` status against the job posting.
 
-#### Flow of Events
+## Flow of Events
 
-##### Basic Flow — Take Down Posting
+### Basic Flow — Take Down Posting
 
 1. The use case begins when the Administrator opens the Reported Job Postings queue.
 2. The System displays postings with open reports, showing report count, reasons, and posting status.
@@ -3882,9 +3737,9 @@ At least one Spam/Abuse report exists in `Open` status against the job posting.
 11. The System marks the associated reports as `Resolved`.
 12. The use case ends.
 
-#### Alternative Flows
+## Alternative Flows
 
-##### A1 — Dismiss Report as Invalid
+### A1 — Dismiss Report as Invalid
 
 At Basic Flow step 6, if the Administrator determines the report is unfounded:
 
@@ -3893,138 +3748,141 @@ At Basic Flow step 6, if the Administrator determines the report is unfounded:
 3. The System logs the dismissal to the audit log.
 4. The use case ends.
 
-##### A2 — Escalate to Account Enforcement
+### A2 — Escalate to Account Enforcement
 
 At Basic Flow step 6, if the violation warrants action against the responsible recruiter or company (e.g., repeated violations):
 
 1. The Administrator proceeds to **UC-USER-02 — Apply Account Enforcement Action** in addition to taking down the posting.
 2. The flow resumes at Basic Flow step 8.
 
-#### Special Requirements
+## Special Requirements
 
-##### Immediate Unpublication
-
+### Immediate Unpublication
 A takedown must immediately remove the posting from all public views and search results.
 
-##### Auditability and Timing
-
+### Auditability and Timing
 All report-handling decisions must be logged, and Recruiter notifications enqueued within 5 seconds.
 
-#### Postconditions
+## Postconditions
 
-##### Success End Condition (Take Down)
-
+### Success End Condition (Take Down)
 The posting is `Closed`/unpublished; associated reports are `Resolved`; the Recruiter is notified; the audit log is updated.
 
-##### Success End Condition (Dismiss)
-
+### Success End Condition (Dismiss)
 Reports are marked `Resolved – Dismissed`; the posting status is unchanged.
 
-#### Extension Points
+## Related Use Cases and Entry Points
 
-##### Apply Account Enforcement Action
+### Apply Account Enforcement Action
+At Alternative Flow A2, the administrator may start **UC-USER-02 — Apply Account Enforcement Action** for the responsible account.
 
-Located at Alternative Flow A2: control passes to UC-USER-02.
-
-#### Prototype Evidence
+## Prototype Evidence
 
 1.
-   ![UC-MOD-03 UI 01](prototypes/DGM-04-Company-Administration/UC-MOD-03-UI_01.png)
+   ![UC-MOD-03 UI 01](./prototypes/DGM-04-Company-Administration/UC-MOD-03-UI_01.png)
 
 2.
-   ![UC-MOD-03 UI 02](prototypes/DGM-04-Company-Administration/UC-MOD-03-UI_02.png)
+   ![UC-MOD-03 UI 02](./prototypes/DGM-04-Company-Administration/UC-MOD-03-UI_02.png)
 
 3.
-   ![UC-MOD-03 UI 03](prototypes/DGM-04-Company-Administration/UC-MOD-03-UI_03.png)
+   ![UC-MOD-03 UI 03](./prototypes/DGM-04-Company-Administration/UC-MOD-03-UI_03.png)
 
 4.
-   ![UC-MOD-03 UI 04](prototypes/DGM-04-Company-Administration/UC-MOD-03-UI_04.png)
+   ![UC-MOD-03 UI 04](./prototypes/DGM-04-Company-Administration/UC-MOD-03-UI_04.png)
 
 5.
-   ![UC-MOD-03 UI 05](prototypes/DGM-04-Company-Administration/UC-MOD-03-UI_05.png)
+   ![UC-MOD-03 UI 05](./prototypes/DGM-04-Company-Administration/UC-MOD-03-UI_05.png)
 
----
+## DGM-05 - Services and Analytics
 
-## DGM-05 — Specification of Supporting Services and Analytics
+See the split source: [05_Services_Analytics.md](./specification/05_Services_Analytics.md).
 
-*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
-
-### Use-Case Diagram
+# DGM-05 - Use-Case Specification: Supporting Services and Analytics
 
 *Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
 
-*Below is the static render of the Diagram for PDF. The Mermaid source code is attached underneath for reference.*
+**Version:** V1.3 (06/08/2026) — Actor hierarchy, conditional relationships, and editorial pass revised
 
-![Diagram 5 - Supporting Services and Analytics](diagrams/rendered_diagrams/Diagram_05.png)
+## 1. Use-Case Diagram
 
-### Mermaid Source Code
+*Below is the static render of the diagram for PDF. The Mermaid source is included below for reference.*
 
-*Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy | Edited by: Lưu Chí Hải*
+![Diagram 5 - Supporting Services and Analytics](./diagrams/rendered_diagrams/diagram_05.png)
 
-```text
----
-config:
-  theme: neutral
-  flowchart:
-    defaultRenderer: elk
----
+## 2. Mermaid Source Code
+
+```mermaid
 flowchart TB
-    %% Actors
     sys["System / AI Service"]
     auth_user["Authenticated User"]
     cand["Candidate"]
-    cm["Company Member\n(Authorized)"]
-    rec["Recruiter\n(Authorized)"]
+    cm["Company Member<br/>(Authorized)"]
+    rec["Recruiter<br/>(Authorized)"]
     admin["Platform Administrator"]
 
-    %% Actor Generalization
-    auth_user --> cand
-    auth_user --> cm
-    auth_user --> admin
-    cm --> rec
-
-    %% System Boundary
-    subgraph subGraph0["Diagram 5 - Screening, Notifications and Analytics"]
+    subgraph SYSTEM["SmartHire Recruitment Platform"]
         direction TB
-        UC_SCR_01("UC-SCR-01: Execute Hybrid Candidate Screening")
-        UC_SCR_02("UC-SCR-02: View Candidate Score and Explanation")
-        UC_SCR_04("UC-SCR-04: Retry Failed Scoring")
-        UC_NOT_01("UC-NOT-01: Receive Event Notification")
-        UC_NOT_02("UC-NOT-02: Manage In-App Notifications")
-        UC_NOT_03("UC-NOT-03: Retry Failed Notification Delivery")
-        UC_ANL_01("UC-ANL-01: View Company Recruitment Analytics")
-        UC_ANL_02("UC-ANL-02: View Platform Analytics")
-        UC_ANL_03("UC-ANL-03: Export Authorized Data")
+        subgraph SCREENING["Screening"]
+            direction TB
+            UC_SCR_01(["UC-SCR-01<br/>Execute Hybrid Candidate Screening"])
+            UC_SCR_02(["UC-SCR-02<br/>View Candidate Score and Explanation"])
+            UC_SCR_04(["UC-SCR-04<br/>Retry Failed Scoring"])
+        end
+        subgraph NOTIFICATIONS["Notifications"]
+            direction TB
+            UC_NOT_01(["UC-NOT-01<br/>Receive Event Notification"])
+            UC_NOT_02(["UC-NOT-02<br/>Manage In-App Notifications"])
+            UC_NOT_03(["UC-NOT-03<br/>Retry Failed Notification Delivery"])
+        end
+        subgraph ANALYTICS["Analytics"]
+            direction TB
+            UC_ANL_01(["UC-ANL-01<br/>View Company Recruitment Analytics"])
+            UC_ANL_02(["UC-ANL-02<br/>View Platform Analytics"])
+            UC_ANL_03(["UC-ANL-03<br/>Export Authorized Data"])
+        end
     end
 
-    %% Actor to Use Case Relationships
+    cand -. "generalizes" .-> auth_user
+    cm -. "generalizes" .-> auth_user
+    admin -. "generalizes" .-> auth_user
+    rec -. "generalizes" .-> cm
     sys --- UC_SCR_01
     sys --- UC_SCR_04
     sys --- UC_NOT_03
-
     rec --- UC_SCR_02
     rec --- UC_SCR_04
-
     cand --- UC_SCR_02
     cand --- UC_NOT_01
-
     cm --- UC_NOT_01
     cm --- UC_ANL_01
     cm --- UC_ANL_03
-
     auth_user --- UC_NOT_02
-
     admin --- UC_ANL_02
     admin --- UC_ANL_03
+    UC_SCR_04 -. "«extend»<br/>[screening failed; retry selected]" .-> UC_SCR_01
+    UC_ANL_03 -. "«extend»<br/>[Export selected]" .-> UC_ANL_01
+    UC_ANL_03 -. "«extend»<br/>[Export selected]" .-> UC_ANL_02
 
-    %% Use Case to Use Case Relationships (Extend)
-    UC_SCR_04 -. "«extend»" .-> UC_SCR_01
-    UC_NOT_03 -. "«extend»" .-> UC_NOT_01
-    UC_ANL_03 -. "«extend»" .-> UC_ANL_01
-    UC_ANL_03 -. "«extend»" .-> UC_ANL_02
+    classDef primaryActor fill:#ffffff,stroke:#334155,stroke-width:1.5px,color:#0f172a;
+    classDef supportingActor fill:#f8fafc,stroke:#64748b,stroke-width:1.5px,color:#0f172a;
+    classDef screeningCase fill:#fff7ed,stroke:#ea580c,stroke-width:1.5px,color:#172033;
+    classDef notificationCase fill:#eff6ff,stroke:#2563eb,stroke-width:1.5px,color:#172033;
+    classDef analyticsCase fill:#f0fdf4,stroke:#16a34a,stroke-width:1.5px,color:#172033;
+    class auth_user,cand,cm,rec,admin primaryActor;
+    class sys supportingActor;
+    class UC_SCR_01,UC_SCR_02,UC_SCR_04 screeningCase;
+    class UC_NOT_01,UC_NOT_02,UC_NOT_03 notificationCase;
+    class UC_ANL_01,UC_ANL_02,UC_ANL_03 analyticsCase;
+    style SYSTEM fill:#ffffff,stroke:#334155,stroke-width:2px,color:#0f172a
+    style SCREENING fill:#f8fafc,stroke:#fdba74,stroke-width:1px,color:#172033
+    style NOTIFICATIONS fill:#f8fafc,stroke:#93c5fd,stroke-width:1px,color:#172033
+    style ANALYTICS fill:#f8fafc,stroke:#86efac,stroke-width:1px,color:#172033
+    linkStyle default stroke:#64748b,stroke-width:1.5px,color:#334155
 ```
 
-### Traceability Summary
+The arrows labelled `generalizes` point from each specialized actor to its parent. UC-SCR-04 is a conditional retry at the failed-result extension point. UC-NOT-03 is a separate automated recovery process. UC-ANL-03 is optional export only when the actor selects **Export**.
+
+## 3. Traceability Summary
 
 | Use Case ID | Use Case Name | Actor(s) | Covered Requirements |
 | :--- | :--- | :--- | :--- |
@@ -4036,11 +3894,13 @@ flowchart TB
 | UC-NOT-03 | Retry Failed Notification Delivery | System | FR-NOT-07, FR-NOT-08 |
 | UC-ANL-01 | View Company Recruitment Analytics | Authorized Company Member | FR-ANL-01, FR-ANL-02, FR-ANL-04, FR-ANL-07 |
 | UC-ANL-02 | View Platform Analytics | Platform Administrator | FR-ANL-03, FR-ANL-04, FR-ANL-07 |
-| UC-ANL-03 | Export Authorized Data | Authorized User(Company Member, Platform Administrator) | FR-ANL-05 to FR-ANL-07 |
+| UC-ANL-03 | Export Authorized Data | Authorized User (Company Member or Platform Administrator) | FR-ANL-05 to FR-ANL-07 |
 
 ---
 
-### UC-SCR-01 — Execute Hybrid Candidate Screening
+## 4. Use Case Specifications
+
+### 4.1. UC-SCR-01: Execute Hybrid Candidate Screening
 
 *   **Use-case ID:** UC-SCR-01
 *   **Use-case Name:** Execute Hybrid Candidate Screening
@@ -4063,19 +3923,19 @@ flowchart TB
 *   **Special Requirements:** Processing time should ideally not exceed 30 seconds to maintain real-time responsiveness for recruiters viewing newly submitted applications.
 
 **Prototype Evidence:**
-*   Basic Flow (Processing): ![Scanning State](prototypes/DGM-05-Services-Analytics/UI_01_Scanning_State.png)
-*   Basic Flow (Completed): ![Ready State](prototypes/DGM-05-Services-Analytics/UI_01_Ready_State.png)
-*   AF-01 (Failed): ![Error State](prototypes/DGM-05-Services-Analytics/UI_01_Error_State.png)
+*   Basic Flow (Processing): ![Scanning State](./prototypes/DGM-05-Services-Analytics/UI_01_Scanning_State.png)
+*   Basic Flow (Completed): ![Ready State](./prototypes/DGM-05-Services-Analytics/UI_01_Ready_State.png)
+*   AF-01 (Failed): ![Error State](./prototypes/DGM-05-Services-Analytics/UI_01_Error_State.png)
 
 ---
 
-### UC-SCR-02 — View Candidate Score and Explanation
+### 4.2. UC-SCR-02: View Candidate Score and Explanation
 
 *   **Use-case ID:** UC-SCR-02
 *   **Use-case Name:** View Candidate Score and Explanation
 *   **Actor(s):** Recruiter (Authorized), Candidate
-*   **Description:** Allows an authorized recruiter to view the full screening score and AI-generated explanation, while allowing the candidate to view limited, non-confidential screening progress.
-*   **Preconditions:** The screening process (UC-SCR-01) has been initiated or completed. The actor is authenticated.
+*   **Description:** Allows an authorized recruiter to view the full screening score and AI-generated explanation, while allowing the candidate to view limited, non-confidential screening progress. Candidate views must never expose confidential scores or recruiter-only explanations.
+*   **Preconditions:** The actor is authenticated. For the recruiter view, a completed screening result exists; the candidate view may show `Processing` or `Completed` status.
 *   **Basic Flow (Recruiter View):**
     1.  **Recruiter** navigates to the application detail view for a specific candidate.
     2.  **System** verifies company ownership and permissions.
@@ -4087,18 +3947,20 @@ flowchart TB
 *   **Postconditions:** The actor views the score details corresponding to their role permissions.
 *   **Special Requirements:** None.
 
+**Related Use Cases and Entry Points:** UC-SCR-01 starts asynchronously after application submission. UC-SCR-04 may be started when a recruiter sees a failed result.
+
 **Prototype Evidence:**
-*   Basic Flow (Recruiter): ![Ready State](prototypes/DGM-05-Services-Analytics/UI_01_Ready_State.png)
-*   AF-01 (Candidate View): ![Hidden Score](prototypes/DGM-05-Services-Analytics/UI_02_Hidden_Score.png)
+*   Basic Flow (Recruiter): ![Ready State](./prototypes/DGM-05-Services-Analytics/UI_01_Ready_State.png)
+*   AF-01 (Candidate View): ![Hidden Score](./prototypes/DGM-05-Services-Analytics/UI_02_Hidden_Score.png)
 
 ---
 
-### UC-SCR-04 — Retry Failed Scoring
+### 4.3. UC-SCR-04: Retry Failed Scoring
 
 *   **Use-case ID:** UC-SCR-04
 *   **Use-case Name:** Retry Failed Scoring
 *   **Actor(s):** Recruiter (Authorized), System
-*   **Description:** Allows a recruiter or the system to retry the hybrid scoring process for an application that previously encountered an AI service failure, without changing the application's overall recruitment stage.
+*   **Description:** Allows a recruiter or the System to retry the hybrid scoring process for an application that previously encountered an AI service failure, without changing the application's overall recruitment stage.
 *   **Preconditions:** The application has a screening status of `Failed`.
 *   **Basic Flow:**
     1.  **Recruiter** views an application with a failed scoring status and clicks "Retry AI Scoring".
@@ -4108,21 +3970,23 @@ flowchart TB
 *   **Alternative Flows:**
     *   **AF-01: Retry Fails Again (at Step 3):**
         1.  If the system fails again, it reverts the status to `Failed` and notifies the recruiter.
-*   **Postconditions:** The screening process is successfully restarted.
+*   **Postconditions:** The screening process is successfully restarted, or the application remains in the authoritative `Failed` state after another failure.
 *   **Special Requirements:** None.
 
+**Related Use Cases and Entry Points:** This is an optional recovery action at the `Failed` screening-result state; it is not a mandatory step in viewing a score.
+
 **Prototype Evidence:**
-*   Basic Flow (Error visible): ![Error State](prototypes/DGM-05-Services-Analytics/UI_01_Error_State.png)
-*   Basic Flow (Retry in progress): ![Retry Progress](prototypes/DGM-05-Services-Analytics/UI_01_Retry_Progress.png)
+*   Basic Flow (Error visible): ![Error State](./prototypes/DGM-05-Services-Analytics/UI_01_Error_State.png)
+*   Basic Flow (Retry in progress): ![Retry Progress](./prototypes/DGM-05-Services-Analytics/UI_01_Retry_Progress.png)
 
 ---
 
-### UC-NOT-01 — Receive Event Notification
+### 4.4. UC-NOT-01: Receive Event Notification
 
 *   **Use-case ID:** UC-NOT-01
 *   **Use-case Name:** Receive Event Notification
 *   **Actor(s):** Candidate, Company Member (Authorized)
-*   **Description:** Delivers system-generated notifications (in-app alerts and emails) to relevant actors when recruitment, verification, or account events occur.
+*   **Description:** Delivers system-generated in-app notifications to relevant actors when recruitment, verification, or account events occur.
 *   **Preconditions:** A trigger event has occurred (e.g., application stage change, moderation decision).
 *   **Basic Flow:**
     1.  **System** generates a notification payload based on the event.
@@ -4130,15 +3994,17 @@ flowchart TB
     3.  **Actor** views the newly surfaced alert indicator on their interface.
 *   **Alternative Flows:** None.
 *   **Postconditions:** The notification is delivered and added to the user's unread list.
-*   **Special Requirements:** In-app notifications must be delivered to active user sessions in near real-time (e.g., via WebSocket).
+*   **Special Requirements:** In-app notifications must be delivered to active user sessions in near real-time (e.g., via WebSocket). Email delivery is outside the scope of this UC and is handled by the platform's notification infrastructure.
+
+**Related Use Cases and Entry Points:** A failed external delivery attempt may start UC-NOT-03 as a separate system process.
 
 **Prototype Evidence:**
-*   Basic Flow (Dropdown Alert): ![Dropdown Alert](prototypes/DGM-05-Services-Analytics/UI_03_Dropdown_Alert.png)
-*   Basic Flow (Toast Alert): ![Toast Alert](prototypes/DGM-05-Services-Analytics/UI_03_Toast_Alert.png)
+*   Basic Flow (Dropdown Alert): ![Dropdown Alert](./prototypes/DGM-05-Services-Analytics/UI_03_Dropdown_Alert.png)
+*   Basic Flow (Toast Alert): ![Toast Alert](./prototypes/DGM-05-Services-Analytics/UI_03_Toast_Alert.png)
 
 ---
 
-### UC-NOT-02 — Manage In-App Notifications
+### 4.5. UC-NOT-02: Manage In-App Notifications
 
 *   **Use-case ID:** UC-NOT-02
 *   **Use-case Name:** Manage In-App Notifications
@@ -4157,13 +4023,15 @@ flowchart TB
 *   **Postconditions:** The notification statuses are updated in the database.
 *   **Special Requirements:** None.
 
+**Related Use Cases and Entry Points:** UC-NOT-02 may be opened from the notification indicator displayed by UC-NOT-01.
+
 **Prototype Evidence:**
-*   Basic Flow (List with Unread status): ![List Unread](prototypes/DGM-05-Services-Analytics/UI_03_List_Unread.png)
-*   AF-01 (Empty State): ![Empty State](prototypes/DGM-05-Services-Analytics/UI_03_Empty_State.png)
+*   Basic Flow (List with Unread status): ![List Unread](./prototypes/DGM-05-Services-Analytics/UI_03_List_Unread.png)
+*   AF-01 (Empty State): ![Empty State](./prototypes/DGM-05-Services-Analytics/UI_03_Empty_State.png)
 
 ---
 
-### UC-NOT-03 — Retry Failed Notification Delivery
+### 4.6. UC-NOT-03: Retry Failed Notification Delivery
 
 *   **Use-case ID:** UC-NOT-03
 *   **Use-case Name:** Retry Failed Notification Delivery
@@ -4179,12 +4047,14 @@ flowchart TB
 *   **Postconditions:** The notification is either delivered successfully or logged as permanently failed after max retries.
 *   **Special Requirements:** Retry mechanism should implement exponential backoff to avoid overloading external email services.
 
+**Related Use Cases and Entry Points:** UC-NOT-03 is started by a delivery failure and is not a sub-step of the recipient's notification view.
+
 **Prototype Evidence:**
-*   Basic Flow (System recording failure metrics): ![Gauge Fail Rate](prototypes/DGM-05-Services-Analytics/UI_05_Gauge_Fail_Rate.png)
+*   Basic Flow (System recording failure metrics): ![Gauge Fail Rate](./prototypes/DGM-05-Services-Analytics/UI_05_Gauge_Fail_Rate.png)
 
 ---
 
-### UC-ANL-01 — View Company Recruitment Analytics
+### 4.7. UC-ANL-01: View Company Recruitment Analytics
 
 *   **Use-case ID:** UC-ANL-01
 *   **Use-case Name:** View Company Recruitment Analytics
@@ -4204,14 +4074,16 @@ flowchart TB
 *   **Postconditions:** The user views the dashboard populated with their company's data.
 *   **Special Requirements:** None.
 
+**Related Use Cases and Entry Points:** The actor may start UC-ANL-03 by selecting **Export** from the dashboard.
+
 **Prototype Evidence:**
-*   Basic Flow (Dashboard with data): ![Company Dashboard](prototypes/DGM-05-Services-Analytics/UI_04_Company_Dashboard.png)
-*   AF-01 (No Data): ![No Data](prototypes/DGM-05-Services-Analytics/UI_04_No_Data.png)
-*   AF-02 (Unauthorized): ![Unauthorized State](prototypes/DGM-05-Services-Analytics/UI_04_Unauthorized_State.png)
+*   Basic Flow (Dashboard with data): ![Company Dashboard](./prototypes/DGM-05-Services-Analytics/UI_04_Company_Dashboard.png)
+*   AF-01 (No Data): ![No Data](./prototypes/DGM-05-Services-Analytics/UI_04_No_Data.png)
+*   AF-02 (Unauthorized): ![Unauthorized State](./prototypes/DGM-05-Services-Analytics/UI_04_Unauthorized_State.png)
 
 ---
 
-### UC-ANL-02 — View Platform Analytics
+### 4.8. UC-ANL-02: View Platform Analytics
 
 *   **Use-case ID:** UC-ANL-02
 *   **Use-case Name:** View Platform Analytics
@@ -4229,21 +4101,23 @@ flowchart TB
 *   **Postconditions:** The administrator receives a comprehensive view of platform health and statistics.
 *   **Special Requirements:** None.
 
+**Related Use Cases and Entry Points:** The administrator may start UC-ANL-03 by selecting **Export** from the dashboard.
+
 **Prototype Evidence:**
-*   Basic Flow (Admin Dashboard): ![Admin Dashboard](prototypes/DGM-05-Services-Analytics/UI_05_Admin_Dashboard.png)
-*   AF-01 (Warning Banner): ![Admin Banner](prototypes/DGM-05-Services-Analytics/UI_05_Admin_Banner.png)
+*   Basic Flow (Admin Dashboard): ![Admin Dashboard](./prototypes/DGM-05-Services-Analytics/UI_05_Admin_Dashboard.png)
+*   AF-01 (Warning Banner): ![Admin Banner](./prototypes/DGM-05-Services-Analytics/UI_05_Admin_Banner.png)
 
 ---
 
-### UC-ANL-03 — Export Authorized Data
+### 4.9. UC-ANL-03: Export Authorized Data
 
 *   **Use-case ID:** UC-ANL-03
 *   **Use-case Name:** Export Authorized Data
-*   **Actor(s):** Authorized User(Company Member, Platform Administrator)
+*   **Actor(s):** Authorized User (Company Member or Platform Administrator)
 *   **Description:** Allows a user with the appropriate permissions to export filtered recruitment analytics or platform data into external formats (CSV or PDF).
 *   **Preconditions:** The user is viewing an analytics dashboard and has export privileges.
 *   **Basic Flow:**
-    1.  **Authorized User(Company Member, Platform Administrator)** clicks the "Export Data" button on the dashboard.
+    1.  **Authorized User (Company Member or Platform Administrator)** clicks the "Export Data" button on the dashboard.
     2.  **System** displays a dropdown menu with available format options (CSV, PDF).
     3.  **User** selects a format (e.g., CSV).
     4.  **System** compiles the authorized data payload and triggers the file download.
@@ -4254,6 +4128,8 @@ flowchart TB
 *   **Postconditions:** A file containing the requested data is downloaded to the user's device.
 *   **Special Requirements:** Exported documents (especially PDF) must adhere to the system's data privacy policies, ensuring sensitive PII is masked if the user's role requires it.
 
+**Related Use Cases and Entry Points:** UC-ANL-03 is optional and starts only after the actor explicitly selects **Export** from UC-ANL-01 or UC-ANL-02.
+
 **Prototype Evidence:**
-*   Basic Flow (Format Menu): ![Export Menu](prototypes/DGM-05-Services-Analytics/UI_04_Export_Menu.png)
-*   AF-01 (Disabled Button): ![Export Disabled](prototypes/DGM-05-Services-Analytics/UI_04_Export_Disabled.png)
+*   Basic Flow (Format Menu): ![Export Menu](./prototypes/DGM-05-Services-Analytics/UI_04_Export_Menu.png)
+*   AF-01 (Disabled Button): ![Export Disabled](./prototypes/DGM-05-Services-Analytics/UI_04_Export_Disabled.png)

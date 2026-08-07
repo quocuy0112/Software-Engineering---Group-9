@@ -1,0 +1,31 @@
+{
+  "userId": "user-abc123",
+  "savedJobIds": ["job-000001", "job-000045"],
+  "hiddenJobIds": ["job-000099"],
+  "appliedJobs": [
+    {
+      "jobId": "job-000001",
+      "appliedAt": "2026-08-04T10:00:00.000Z",
+      "status": "submitted",
+      "cvFileRef": "cv-storage-id-xyz",
+      "contactSnapshot": {
+        "fullName": "Nguyen Van A",
+        "email": "candidate@example.com",
+        "phone": "0901234567"
+      },
+      "aiAnalysisConsent": true,
+      "aiMatchScore": 82
+    }
+  ],
+  "savedFilterPresets": [
+    {
+      "id": "preset-1",
+      "name": "High-paying construction jobs in HCMC",
+      "filters": {
+        "categoryFamily": "r1080",
+        "salaryMin": 20000000,
+        "city": "Ho Chi Minh City"
+      }
+    }
+  ]
+}

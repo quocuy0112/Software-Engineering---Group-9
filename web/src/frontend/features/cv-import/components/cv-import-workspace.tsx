@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 import { useCvImport } from "../client/use-cv-import";
 import type { CvImportSummary } from "@/shared/contracts/cv-import/upload";
+import { cvCopy } from "../i18n/cv-import-copy";
 import { CvImportList } from "./cv-import-list";
 import { CvUploadForm } from "./cv-upload-form";
 import styles from "./cv-import-workspace.module.css";
@@ -20,6 +22,8 @@ export function CvImportWorkspace({
     external: boolean;
   }>;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = cvCopy(locale);
   const importer = useCvImport({ csrfProof });
   return (
     <div className={styles.root}>
@@ -29,10 +33,16 @@ export function CvImportWorkspace({
       >
         <header className={styles.sectionHeading}>
           <div>
-            <p>NEW IMPORT</p>
-            <h2 id="cv-upload-heading">Upload your CV</h2>
+            <p>{locale === "vi" ? "NHẬP MỚI" : "NEW IMPORT"}</p>
+            <h2 id="cv-upload-heading">
+              {locale === "vi" ? "Tải CV của bạn lên" : "Upload your CV"}
+            </h2>
           </div>
-          <span>Encrypted temporary storage</span>
+          <span>
+            {locale === "vi"
+              ? "Lưu trữ tạm thời được mã hóa"
+              : "Encrypted temporary storage"}
+          </span>
         </header>
         <CvUploadForm
           csrfProof={csrfProof}
@@ -54,7 +64,9 @@ export function CvImportWorkspace({
         <div
           className={styles.progressTrack}
           role="progressbar"
-          aria-label="CV import progress"
+          aria-label={
+            locale === "vi" ? "Tiến trình nhập CV" : "CV import progress"
+          }
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={importer.progress.percentage}
@@ -66,7 +78,8 @@ export function CvImportWorkspace({
             className={styles.statusLink}
             href={`/profile/cv-imports/${importer.progress.uploadId}`}
           >
-            Open import status <span aria-hidden="true">→</span>
+            {locale === "vi" ? "Mở trạng thái nhập" : "Open import status"}{" "}
+            <span aria-hidden="true">→</span>
           </Link>
         ) : null}
       </div>
@@ -77,10 +90,14 @@ export function CvImportWorkspace({
       >
         <header className={styles.sectionHeading}>
           <div>
-            <p>RECENT ACTIVITY</p>
-            <h2 id="cv-import-history-heading">Import history</h2>
+            <p>{locale === "vi" ? "HOẠT ĐỘNG GẦN ĐÂY" : "RECENT ACTIVITY"}</p>
+            <h2 id="cv-import-history-heading">{copy.common.importHistory}</h2>
           </div>
-          <span>{initialItems.length} retained</span>
+          <span>
+            {locale === "vi"
+              ? `${initialItems.length} được lưu giữ`
+              : `${initialItems.length} retained`}
+          </span>
         </header>
         <CvImportList items={initialItems} />
       </section>

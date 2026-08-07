@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import type { CvImportResource } from "@/shared/contracts/cv-import/upload";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { cvCopy, cvKnownError } from "../i18n/cv-import-copy";
 import styles from "./cv-failure-recovery.module.css";
 
 export type CvFailureRecoveryResource = Readonly<{
@@ -27,21 +29,35 @@ export class CvRecoveryActionError extends Error {
 
 type ActiveAction = "retry" | "delete";
 
-function retryDetails(resource: CvFailureRecoveryResource) {
+function retryDetails(
+  resource: CvFailureRecoveryResource,
+  locale: "vi" | "en",
+) {
   if (resource.status === "SCAN_FAILED")
-    return { count: resource.scanRetriesRemaining, label: "scan" } as const;
+    return {
+      count: resource.scanRetriesRemaining,
+      label: locale === "vi" ? "quét" : "scan",
+    } as const;
   if (resource.status === "PARSE_FAILED")
     return {
       count: resource.parseRetriesRemaining,
-      label: "parsing",
+      label: locale === "vi" ? "phân tích" : "parsing",
     } as const;
   return null;
 }
 
-function retryCountMessage(details: ReturnType<typeof retryDetails>) {
+function retryCountMessage(
+  details: ReturnType<typeof retryDetails>,
+  locale: "vi" | "en",
+) {
   if (!details) return null;
-  if (details.count === 0) return `No ${details.label} retries remaining.`;
-  return `${details.count} ${details.label} ${details.count === 1 ? "retry" : "retries"} remaining.`;
+  if (details.count === 0)
+    return locale === "vi"
+      ? `Không còn lượt thử lại cho ${details.label}.`
+      : `No ${details.label} retries remaining.`;
+  return locale === "vi"
+    ? `Còn ${details.count} lượt thử lại cho ${details.label}.`
+    : `${details.count} ${details.label} ${details.count === 1 ? "retry" : "retries"} remaining.`;
 }
 
 export function CvFailureRecovery({
@@ -55,6 +71,8 @@ export function CvFailureRecovery({
   onRetry: () => Promise<void>;
   onDelete: () => Promise<boolean | void> | boolean | void;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = cvCopy(locale).failure;
   const heading = useRef<HTMLHeadingElement>(null);
   const activeAction = useRef<ActiveAction | null>(null);
   const [busy, setBusy] = useState<ActiveAction | null>(null);
@@ -65,7 +83,7 @@ export function CvFailureRecovery({
     retryAfterSeconds ? 1 : 0,
   );
   const [actionMessage, setActionMessage] = useState<string | null>(null);
-  const details = retryDetails(resource);
+  const details = retryDetails(resource, locale);
   const canRetry = Boolean(
     resource.failure?.retryable &&
     resource.failure.suggestedActions.includes("RETRY") &&
@@ -98,7 +116,7 @@ export function CvFailureRecovery({
     setActionMessage(null);
     try {
       await onRetry();
-      setActionMessage("Retry queued.");
+      setActionMessage(copy.retryQueued);
     } catch (error) {
       if (error instanceof CvRecoveryActionError) {
         if (error.retryAfterSeconds) {
@@ -108,7 +126,9 @@ export function CvFailureRecovery({
         setActionMessage(error.message);
       } else {
         setActionMessage(
-          "Retry could not be queued. Your failed import is unchanged.",
+          locale === "vi"
+            ? "Không thể xếp hàng thử lại. Lần nhập thất bại vẫn được giữ nguyên."
+            : "Retry could not be queued. Your failed import is unchanged.",
         );
       }
       heading.current?.focus();
@@ -126,15 +146,13 @@ export function CvFailureRecovery({
     try {
       const deleted = await onDelete();
       setActionMessage(
-        deleted === false
-          ? "Import deletion cancelled."
-          : "Import deletion requested.",
+        deleted === false ? copy.deleteCancelled : copy.deleteRequested,
       );
     } catch (error) {
       setActionMessage(
         error instanceof CvRecoveryActionError
           ? error.message
-          : "The import could not be deleted. It remains available in your history.",
+          : copy.deleteFailed,
       );
       heading.current?.focus();
     } finally {
@@ -145,14 +163,14 @@ export function CvFailureRecovery({
 
   const statusMessage = busy
     ? busy === "retry"
-      ? "Requesting retry…"
-      : "Requesting import deletion…"
+      ? copy.retryRequesting
+      : copy.deleteRequesting
     : (actionMessage ??
       (canRetry
         ? countdown > 0
-          ? `Retry available in ${countdown} ${countdown === 1 ? "second" : "seconds"}.`
-          : "Retry is available."
-        : "Choose a recovery action below."));
+          ? `${copy.retryIn} ${countdown} ${countdown === 1 ? copy.second : copy.seconds}.`
+          : copy.retryAvailable
+        : copy.chooseAction));
 
   return (
     <section
@@ -168,16 +186,24 @@ export function CvFailureRecovery({
         aria-labelledby="cv-failure-heading"
       >
         <h2 id="cv-failure-heading" ref={heading} tabIndex={-1}>
-          CV processing could not finish
+          {copy.heading}
         </h2>
-        <p>{resource.failure?.message}</p>
+        <p>
+          {resource.failure
+            ? cvKnownError(
+                locale,
+                resource.failure.message,
+                resource.failure.code,
+              )
+            : null}
+        </p>
         <p className={styles.code}>
-          Safe result code: <code>{resource.failure?.code}</code>
+          {copy.safeCode}: <code>{resource.failure?.code}</code>
         </p>
       </div>
 
       {details ? (
-        <p className={styles.counter}>{retryCountMessage(details)}</p>
+        <p className={styles.counter}>{retryCountMessage(details, locale)}</p>
       ) : null}
       <p
         className={styles.status}
@@ -196,13 +222,13 @@ export function CvFailureRecovery({
             aria-busy={busy === "retry"}
             onClick={() => void retry()}
           >
-            Retry {details?.label}
+            {locale === "vi" ? "Thử lại" : "Retry"} {details?.label}
           </button>
         ) : null}
-        <Link href="/profile/cv-imports">Upload a replacement CV</Link>
+        <Link href="/profile/cv-imports">{copy.replacement}</Link>
         {resource.availableActions.includes("MANUAL_PROFILE") ||
         resource.failure?.suggestedActions.includes("MANUAL_PROFILE") ? (
-          <Link href="/profile">Enter Candidate Profile manually</Link>
+          <Link href="/profile">{copy.manual}</Link>
         ) : null}
         {resource.availableActions.includes("DELETE") ||
         resource.failure?.suggestedActions.includes("DELETE") ? (
@@ -212,14 +238,11 @@ export function CvFailureRecovery({
             aria-busy={busy === "delete"}
             onClick={() => void remove()}
           >
-            Delete import
+            {copy.delete}
           </button>
         ) : null}
       </div>
-      <p className={styles.guidance}>
-        You can recover without waiting for another person. Manual entry keeps
-        this failed import in your history and does not create an empty draft.
-      </p>
+      <p className={styles.guidance}>{copy.guidance}</p>
     </section>
   );
 }
