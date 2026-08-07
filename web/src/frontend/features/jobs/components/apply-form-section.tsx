@@ -563,6 +563,30 @@ export function ApplyFormSection({
   const [form, setForm] = useState<ApplicationForm | null>(null);
   const [outcome, setOutcome] = useState<ApplicationOutcome | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const dialogRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    document.body.style.overflow = "hidden";
+    const focusTimer = window.setTimeout(() => dialogRef.current?.focus(), 0);
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      onOpenChange(false);
+    }
+
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      window.clearTimeout(focusTimer);
+      document.removeEventListener("keydown", closeOnEscape);
+      document.body.style.overflow = previousOverflow;
+      previousFocus?.focus();
+    };
+  }, [onOpenChange, open]);
 
   useEffect(() => {
     if (!open || applied || form || outcome || loadError) return;
@@ -616,19 +640,32 @@ export function ApplyFormSection({
     onSubmitted?.(submitted);
   }
 
+  if (!open) return null;
+
+  const headingId = "job-apply-heading-" + jobId;
+
   return (
-    <section
+    <div
       id="apply"
-      className={"job-apply-section" + (open ? " is-open" : "")}
-      aria-labelledby="job-apply-heading"
-      aria-hidden={!open}
+      className="job-apply-modal-backdrop"
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onOpenChange(false);
+      }}
     >
-      <div className="job-apply-section-inner">
-        <div className="job-apply-section-heading">
+      <section
+        ref={dialogRef}
+        className="job-apply-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={headingId}
+        tabIndex={-1}
+      >
+        <header className="job-apply-modal-header">
           <div>
-            <p className="panel-kicker">APPLY INLINE</p>
-            <h2 id="job-apply-heading">Application form</h2>
-            <p>Apply for {jobTitle} on SmartHire.</p>
+            <p className="panel-kicker">APPLY</p>
+            <h2 id={headingId}>Apply for {jobTitle}</h2>
+            <p>Complete your application on SmartHire.</p>
           </div>
           <button
             type="button"
@@ -638,44 +675,47 @@ export function ApplyFormSection({
           >
             ×
           </button>
+        </header>
+
+        <div className="job-apply-modal-body">
+          {open && !form && !outcome && !applied && !loadError ? (
+            <p className="job-feedback job-feedback-info" role="status">
+              Preparing the application form...
+            </p>
+          ) : loadError ? (
+            <div className="job-feedback" role="alert">
+              <p>{loadError}</p>
+              <button type="button" onClick={() => setLoadError(null)}>
+                Try again
+              </button>
+            </div>
+          ) : outcome ? (
+            <div className="job-application-confirmation" role="status">
+              <strong>
+                Application submitted successfully for{" "}
+                {form?.jobTitle ?? jobTitle}.
+              </strong>
+              <p>The employer will contact you if there is a match.</p>
+              {outcome.aiAnalysisConsent ? (
+                <p>
+                  AI match: <strong>{outcome.aiMatchScore ?? 82}%</strong> —
+                  based on skills and experience relevant to this role.
+                </p>
+              ) : null}
+            </div>
+          ) : applied ? (
+            <div className="job-application-confirmation" role="status">
+              You have already applied for this role.
+            </div>
+          ) : form ? (
+            <InlineApplicationForm
+              form={form}
+              onCancel={() => onOpenChange(false)}
+              onSubmitted={handleSubmitted}
+            />
+          ) : null}
         </div>
-        {open && !form && !outcome && !applied && !loadError ? (
-          <p className="job-feedback job-feedback-info" role="status">
-            Preparing the application form...
-          </p>
-        ) : loadError ? (
-          <div className="job-feedback" role="alert">
-            <p>{loadError}</p>
-            <button type="button" onClick={() => setLoadError(null)}>
-              Try again
-            </button>
-          </div>
-        ) : outcome ? (
-          <div className="job-application-confirmation" role="status">
-            <strong>
-              Application submitted successfully for{" "}
-              {form?.jobTitle ?? jobTitle}.
-            </strong>
-            <p>The employer will contact you if there is a match.</p>
-            {outcome.aiAnalysisConsent ? (
-              <p>
-                AI match: <strong>{outcome.aiMatchScore ?? 82}%</strong> — based
-                on skills and experience relevant to this role.
-              </p>
-            ) : null}
-          </div>
-        ) : applied ? (
-          <div className="job-application-confirmation" role="status">
-            You have already applied for this role.
-          </div>
-        ) : form ? (
-          <InlineApplicationForm
-            form={form}
-            onCancel={() => onOpenChange(false)}
-            onSubmitted={handleSubmitted}
-          />
-        ) : null}
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }

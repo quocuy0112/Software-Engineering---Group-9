@@ -83,6 +83,8 @@ describe("workspace job-card salary display", () => {
     ],
   ])("uses the shared salary formatter in %s", (_label, view) => {
     render(view());
-    expect(screen.getByText(expectedSalary)).toBeVisible();
+    const salary = screen.getByText(expectedSalary);
+    expect(salary).toBeVisible();
+    expect(salary).not.toHaveClass("job-salary--negotiable");
   });
 });

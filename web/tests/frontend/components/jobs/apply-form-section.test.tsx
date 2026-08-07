@@ -29,8 +29,8 @@ const applicationForm = {
   csrfToken: "csrf-proof",
 };
 
-describe("inline application form section", () => {
-  it("prefills contact, accepts a local CV draft, and closes inline", async () => {
+describe("application form modal", () => {
+  it("prefills contact, accepts a local CV draft, and closes from its overlay controls", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => applicationForm,
@@ -60,6 +60,7 @@ describe("inline application form section", () => {
       "/legal/ai-cv-analysis-policy",
     );
 
+    expect(screen.getByRole("dialog")).toBeVisible();
     const submit = screen.getByRole("button", {
       name: /submit application/i,
     });
@@ -72,6 +73,16 @@ describe("inline application form section", () => {
     });
     expect(screen.getByText(/resume\.docx/i)).toBeVisible();
     expect(submit).toBeEnabled();
+
+    const backdrop = document.querySelector(".job-apply-modal-backdrop");
+    expect(backdrop).not.toBeNull();
+    fireEvent.mouseDown(backdrop!);
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /close application form/i }),
+    );
+    expect(onOpenChange).toHaveBeenCalledWith(false);
 
     fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
     expect(onOpenChange).toHaveBeenCalledWith(false);

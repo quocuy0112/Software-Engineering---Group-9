@@ -113,6 +113,43 @@ describe("job board navigation", () => {
     expect(styles).toContain("max-height: min(70dvh, 40rem);");
   });
 
+  it("uses the Next.js apply query to open the detail-page modal", async () => {
+    const detailSource = await readFile(
+      resolve(
+        process.cwd(),
+        "src/frontend/features/jobs/components/job-detail-redesign.tsx",
+      ),
+      "utf8",
+    );
+    const cardSource = await readFile(
+      resolve(
+        process.cwd(),
+        "src/frontend/features/jobs/components/job-card.tsx",
+      ),
+      "utf8",
+    );
+    const formSource = await readFile(
+      resolve(
+        process.cwd(),
+        "src/frontend/features/jobs/components/apply-form-section.tsx",
+      ),
+      "utf8",
+    );
+    const styles = await readFile(
+      resolve(process.cwd(), "src/frontend/features/jobs/styles/job-board.css"),
+      "utf8",
+    );
+
+    expect(cardSource).toContain('"?apply=true"');
+    expect(detailSource).toContain('params.get("apply") === "true"');
+    expect(detailSource).not.toContain("scrollIntoView");
+    expect(formSource).toContain('className="job-apply-modal-backdrop"');
+    expect(formSource).toContain('role="dialog"');
+    expect(styles).toContain(".job-apply-modal-body {");
+    expect(styles).toContain("position: sticky;");
+    expect(styles).toContain("bottom: 0;");
+  });
+
   it("shows the Profile workspace bar and marks Jobs as active", () => {
     render(
       <WorkspaceShell

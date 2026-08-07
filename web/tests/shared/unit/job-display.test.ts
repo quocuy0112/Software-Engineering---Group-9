@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { formatSalary } from "@/shared/utils/jobs/job-display";
+import {
+  formatSalary,
+  isSalaryNegotiable,
+} from "@/shared/utils/jobs/job-display";
 
 describe("formatSalary", () => {
   it.each([
@@ -33,4 +36,16 @@ describe("formatSalary", () => {
       expect(formatSalary(salary)).toBe("Negotiable");
     },
   );
+
+  it("keeps the negotiable style only for the fallback display", () => {
+    expect(
+      isSalaryNegotiable({
+        minimum: 35.5,
+        maximum: 63.5,
+        period: "MONTH",
+        isNegotiable: true,
+      }),
+    ).toBe(false);
+    expect(isSalaryNegotiable(null)).toBe(true);
+  });
 });

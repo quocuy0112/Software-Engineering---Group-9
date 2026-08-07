@@ -27,10 +27,17 @@ function amount(value: number) {
   return amountFormatter.format(value);
 }
 
+export function isSalaryNegotiable(
+  salary: JobCard["salary"] | SalaryDisplayValue | null | undefined,
+): boolean {
+  if (!salary) return true;
+  return !hasAmount(salary.minimum) && !hasAmount(salary.maximum);
+}
+
 export function formatSalary(
   salary: JobCard["salary"] | SalaryDisplayValue | null | undefined,
 ): string {
-  if (!salary) return "Negotiable";
+  if (!salary || isSalaryNegotiable(salary)) return "Negotiable";
 
   const suffix =
     salary.period &&
