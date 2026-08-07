@@ -50,30 +50,30 @@ describe("inline application form section", () => {
 
     await waitFor(() =>
       expect(
-        screen.getByRole("form", { name: /ứng tuyển cho kỹ sư autocad/i }),
+        screen.getByRole("form", { name: /apply for kỹ sư autocad/i }),
       ).toBeVisible(),
     );
     expect(screen.getByDisplayValue("Nguyễn Văn A")).toBeVisible();
     expect(screen.getByDisplayValue("candidate@example.com")).toBeVisible();
-    expect(screen.getByRole("link", { name: "Tìm hiểu thêm" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Learn more" })).toHaveAttribute(
       "href",
       "/legal/ai-cv-analysis-policy",
     );
 
     const submit = screen.getByRole("button", {
-      name: /gửi hồ sơ ứng tuyển/i,
+      name: /submit application/i,
     });
     expect(submit).toBeDisabled();
     const file = new File(["cv"], "resume.docx", {
       type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     });
-    fireEvent.change(screen.getByLabelText(/kéo-thả cv/i), {
+    fireEvent.change(screen.getByLabelText(/drag a cv/i), {
       target: { files: [file] },
     });
     expect(screen.getByText(/resume\.docx/i)).toBeVisible();
     expect(submit).toBeEnabled();
 
-    fireEvent.click(screen.getByRole("button", { name: /huỷ/i }));
+    fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
     expect(onOpenChange).toHaveBeenCalledWith(false);
     vi.unstubAllGlobals();
   });

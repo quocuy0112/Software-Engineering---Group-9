@@ -123,6 +123,7 @@ export const salarySchema = z
     maximum: z.number().nonnegative(),
     currency: z.string().regex(/^[A-Z]{3}$/u),
     period: salaryPeriodSchema,
+    isNegotiable: z.boolean().optional(),
   })
   .strict()
   .refine((value) => value.minimum <= value.maximum)

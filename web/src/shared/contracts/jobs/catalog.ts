@@ -1,4 +1,11 @@
 import { z } from "zod";
+import {
+  defaultJobPreferences,
+  jobApplicationStatusSchema,
+  jobPreferencesSchema,
+  jobPreferencesUpdateSchema,
+  type JobPreferences,
+} from "./preferences";
 
 const nullableString = (maximum: number) =>
   z.string().trim().max(maximum).nullable();
@@ -100,9 +107,7 @@ export const appliedJobStateSchema = z
   .object({
     jobId: z.string().min(1).max(128),
     appliedAt: z.string().datetime(),
-    status: z
-      .enum(["submitted", "withdrawn", "under_review"])
-      .default("submitted"),
+    status: jobApplicationStatusSchema.default("submitted"),
     cvFileRef: z.string().min(1).max(256).nullable().optional(),
     contactSnapshot: z
       .object({
@@ -122,6 +127,7 @@ export const userJobStateSchema = z
     savedJobIds: z.array(z.string().min(1).max(128)).max(10_000),
     hiddenJobIds: z.array(z.string().min(1).max(128)).max(10_000),
     appliedJobs: z.array(appliedJobStateSchema).max(10_000),
+    jobPreferences: jobPreferencesSchema.default(defaultJobPreferences),
     savedFilterPresets: z
       .array(
         z
@@ -147,3 +153,5 @@ export type JobCatalogItem = z.infer<typeof jobCatalogSchema>;
 export type CompanyCatalogItem = z.infer<typeof companyCatalogSchema>;
 export type UserJobState = z.infer<typeof userJobStateSchema>;
 export type AppliedJobState = z.infer<typeof appliedJobStateSchema>;
+export type { JobPreferences };
+export { jobPreferencesSchema, jobPreferencesUpdateSchema };

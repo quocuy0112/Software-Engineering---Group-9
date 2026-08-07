@@ -25,6 +25,7 @@ import {
 } from "@/shared/utils/jobs/similarity";
 import { GetProfileAggregateService } from "@/backend/services/profile/get-profile-aggregate";
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
+import { normalizeSalaryAmount } from "@/shared/utils/jobs/job-display";
 
 const experienceYears: Record<string, number> = {
   ENTRY: 0,
@@ -143,10 +144,11 @@ function salary(row: PublicJobRow): JobCard["salary"] {
   )
     return null;
   return {
-    minimum: Number(row.salaryMin),
-    maximum: Number(row.salaryMax),
+    minimum: normalizeSalaryAmount(Number(row.salaryMin)),
+    maximum: normalizeSalaryAmount(Number(row.salaryMax)),
     currency: row.salaryCurrency,
     period: row.salaryPeriod,
+    isNegotiable: false,
   };
 }
 

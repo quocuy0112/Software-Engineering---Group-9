@@ -56,17 +56,17 @@ function fileRef(file: File) {
 
 function validateContact(contact: ApplicationContactSnapshot): FieldErrors {
   const errors: FieldErrors = {};
-  if (!contact.fullName.trim()) errors.fullName = "Vui lòng nhập họ và tên.";
+  if (!contact.fullName.trim()) errors.fullName = "Enter your full name.";
   if (!contact.email.trim()) {
-    errors.email = "Vui lòng nhập email.";
+    errors.email = "Enter your email address.";
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(contact.email.trim())) {
-    errors.email = "Email chưa đúng định dạng.";
+    errors.email = "Enter a valid email address.";
   }
   const phone = normalizePhone(contact.phone);
   if (!phone) {
-    errors.phone = "Vui lòng nhập số điện thoại.";
+    errors.phone = "Enter your phone number.";
   } else if (!/^(?:0|\+84)(?:3|5|7|8|9)\d{8}$/u.test(phone)) {
-    errors.phone = "Số điện thoại phải là số điện thoại Việt Nam hợp lệ.";
+    errors.phone = "Enter a valid Vietnamese phone number.";
   }
   return errors;
 }
@@ -112,7 +112,7 @@ function InlineApplicationForm({
       setSelectedFile(null);
       setErrors((current) => ({
         ...current,
-        cv: "CV chỉ nhận định dạng PDF, DOC hoặc DOCX.",
+        cv: "CV files must be PDF, DOC, or DOCX.",
       }));
       return;
     }
@@ -120,7 +120,7 @@ function InlineApplicationForm({
       setSelectedFile(null);
       setErrors((current) => ({
         ...current,
-        cv: "Dung lượng CV phải từ 1 đến 5MB.",
+        cv: "CV files must be between 1 and 5 MB.",
       }));
       return;
     }
@@ -140,7 +140,7 @@ function InlineApplicationForm({
       phone: normalizePhone(contact.phone),
     });
     if (!selectedCvId && !selectedFile)
-      next.cv = "Vui lòng chọn CV đã lưu hoặc tải CV lên.";
+      next.cv = "Select a saved CV or upload a CV.";
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -210,7 +210,7 @@ function InlineApplicationForm({
         setError(
           typeof problem.message === "string"
             ? problem.message
-            : "Không thể gửi hồ sơ ứng tuyển.",
+            : "Unable to submit your application.",
         );
         return;
       }
@@ -230,7 +230,7 @@ function InlineApplicationForm({
         },
       );
     } catch {
-      setError("Không thể gửi hồ sơ ứng tuyển. Vui lòng thử lại.");
+      setError("Unable to submit your application. Please try again.");
     } finally {
       setPending(false);
     }
@@ -243,9 +243,7 @@ function InlineApplicationForm({
   return (
     <form
       className="job-form-grid"
-      aria-label={
-        "Apply for " + form.jobTitle + " / Ứng tuyển cho " + form.jobTitle
-      }
+      aria-label={"Apply for " + form.jobTitle}
       onSubmit={submit}
       onChange={() => {
         idempotencyKey.current = null;
@@ -255,20 +253,20 @@ function InlineApplicationForm({
     >
       {!form.profileReady ? (
         <div role="alert">
-          Hoàn thiện các trường hồ sơ trước:{" "}
+          Please complete these profile fields first:{" "}
           {form.missingProfileFields.join(", ")}.
         </div>
       ) : null}
 
       <fieldset className="job-application-fieldset">
-        <legend>CV ứng tuyển</legend>
+        <legend>Application CV</legend>
         <p className="job-form-help">
-          Chọn CV đã lưu trên SmartHire hoặc tải CV mới (PDF, DOC, DOCX; tối đa
-          5MB).
+          Choose a saved CV from SmartHire or upload a new one (PDF, DOC, DOCX;
+          up to 5 MB).
         </p>
         {form.cvs.length ? (
           <label htmlFor="application-cv-id">
-            Dùng CV đã lưu trên SmartHire / Select CV
+            Use a saved SmartHire CV / Select CV
             <select
               id="application-cv-id"
               name="cvId"
@@ -285,7 +283,7 @@ function InlineApplicationForm({
                 });
               }}
             >
-              <option value="">Chọn CV đã lưu</option>
+              <option value="">Select a saved CV</option>
               {form.cvs.map((cv) => (
                 <option key={cv.id} value={cv.id}>
                   {cv.displayName} · {cv.fileName} ({formatBytes(cv.byteSize)})
@@ -305,10 +303,10 @@ function InlineApplicationForm({
         >
           <span className="job-cv-dropzone-title">
             {selectedFile
-              ? "CV mới đã chọn"
-              : "Kéo-thả CV vào đây hoặc click để chọn"}
+              ? "New CV selected"
+              : "Drag a CV here or click to choose"}
           </span>
-          <span className="job-form-help">PDF, DOC, DOCX · tối đa 5MB</span>
+          <span className="job-form-help">PDF, DOC, DOCX · up to 5 MB</span>
           <input
             ref={fileInputRef}
             id="application-cv-upload"
@@ -335,14 +333,14 @@ function InlineApplicationForm({
                 onClick={() => fileInputRef.current?.click()}
                 disabled={pending}
               >
-                Đổi file
+                Change file
               </button>
               <button
                 type="button"
                 onClick={() => setSelectedFile(null)}
                 disabled={pending}
               >
-                Xoá
+                Remove
               </button>
             </span>
           </div>
@@ -355,9 +353,9 @@ function InlineApplicationForm({
       </fieldset>
 
       <fieldset className="job-application-fieldset">
-        <legend>Thông tin liên hệ</legend>
+        <legend>Contact information</legend>
         <label htmlFor="application-full-name">
-          Họ và tên <span aria-hidden="true">*</span>
+          Full name <span aria-hidden="true">*</span>
           <input
             id="application-full-name"
             name="fullName"
@@ -400,7 +398,7 @@ function InlineApplicationForm({
           ) : null}
         </label>
         <label htmlFor="application-phone">
-          Số điện thoại <span aria-hidden="true">*</span>
+          Phone number <span aria-hidden="true">*</span>
           <input
             id="application-phone"
             name="phone"
@@ -484,21 +482,21 @@ function InlineApplicationForm({
             id="application-ai-consent"
             name="aiAnalysisConsent"
             type="checkbox"
-            aria-label="I consent to AI CV analysis / Tôi đồng ý để SmartHire sử dụng AI phân tích CV"
+            aria-label="I agree to let SmartHire use AI to analyze how well my CV matches this role."
             checked={aiConsent}
             onChange={(event) => setAiConsent(event.currentTarget.checked)}
           />
           <span>
-            Tôi đồng ý để SmartHire sử dụng công nghệ AI để phân tích mức độ phù
-            hợp giữa CV của tôi và vị trí ứng tuyển này.{" "}
+            I agree to let SmartHire use AI to analyze how well my CV matches
+            this role.{" "}
             <Link href="/legal/ai-cv-analysis-policy" target="_blank">
-              Tìm hiểu thêm
+              Learn more
             </Link>
           </span>
         </label>
         <p className="job-form-help">
-          Không bắt buộc. Nếu không chọn, CV vẫn được gửi tới nhà tuyển dụng
-          bình thường và không được AI chấm điểm.
+          Optional. If you do not select this, your CV will still be submitted
+          without an AI match score.
         </p>
       </div>
 
@@ -509,10 +507,10 @@ function InlineApplicationForm({
       ) : null}
       <div className="job-actions">
         <button type="submit" disabled={submitDisabled}>
-          {pending ? "Đang gửi…" : "Gửi hồ sơ ứng tuyển / Submit application"}
+          {pending ? "Submitting..." : "Submit application"}
         </button>
         <button type="button" onClick={onCancel} disabled={pending}>
-          Huỷ / Cancel
+          Cancel
         </button>
       </div>
     </form>
@@ -552,7 +550,7 @@ export function ApplyFormSection({
           throw new Error(
             typeof problem.message === "string"
               ? problem.message
-              : "Không thể tải form ứng tuyển.",
+              : "Unable to load the application form.",
           );
         }
         return body;
@@ -565,7 +563,7 @@ export function ApplyFormSection({
           setLoadError(
             caught instanceof Error
               ? caught.message
-              : "Không thể tải form ứng tuyển.",
+              : "Unable to load the application form.",
           );
       });
     return () => {
@@ -602,13 +600,13 @@ export function ApplyFormSection({
         <div className="job-apply-section-heading">
           <div>
             <p className="panel-kicker">APPLY INLINE</p>
-            <h2 id="job-apply-heading">Form ứng tuyển</h2>
-            <p>Ứng tuyển vào {jobTitle} trên SmartHire.</p>
+            <h2 id="job-apply-heading">Application form</h2>
+            <p>Apply for {jobTitle} on SmartHire.</p>
           </div>
           <button
             type="button"
             className="job-icon-button"
-            aria-label="Close application form / Đóng form ứng tuyển"
+            aria-label="Close application form"
             onClick={() => onOpenChange(false)}
           >
             ×
@@ -616,31 +614,32 @@ export function ApplyFormSection({
         </div>
         {open && !form && !outcome && !applied && !loadError ? (
           <p className="job-feedback job-feedback-info" role="status">
-            Đang chuẩn bị form ứng tuyển…
+            Preparing the application form...
           </p>
         ) : loadError ? (
           <div className="job-feedback" role="alert">
             <p>{loadError}</p>
             <button type="button" onClick={() => setLoadError(null)}>
-              Thử lại
+              Try again
             </button>
           </div>
         ) : outcome ? (
           <div className="job-application-confirmation" role="status">
             <strong>
-              Đã ứng tuyển thành công vào {form?.jobTitle ?? jobTitle}.
+              Application submitted successfully for{" "}
+              {form?.jobTitle ?? jobTitle}.
             </strong>
-            <p>Nhà tuyển dụng sẽ liên hệ nếu phù hợp.</p>
+            <p>The employer will contact you if there is a match.</p>
             {outcome.aiAnalysisConsent ? (
               <p>
-                Độ phù hợp: <strong>{outcome.aiMatchScore ?? 82}%</strong> — dựa
-                trên các kỹ năng và kinh nghiệm liên quan đến vị trí này.
+                AI match: <strong>{outcome.aiMatchScore ?? 82}%</strong> — based
+                on skills and experience relevant to this role.
               </p>
             ) : null}
           </div>
         ) : applied ? (
           <div className="job-application-confirmation" role="status">
-            Bạn đã ứng tuyển vào vị trí này.
+            You have already applied for this role.
           </div>
         ) : form ? (
           <InlineApplicationForm

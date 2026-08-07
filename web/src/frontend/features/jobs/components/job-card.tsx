@@ -3,6 +3,10 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { JobCard as JobCardData } from "@/shared/contracts/jobs/discovery";
+import {
+  formatRelativeTime,
+  formatSalary,
+} from "@/shared/utils/jobs/job-display";
 import { ApplyFormSection } from "./apply-form-section";
 import { CompanyAvatar } from "./company-avatar";
 import { QuickViewPanel } from "./quick-view-panel";
@@ -26,36 +30,25 @@ const labels: Record<string, string> = {
   REMOTE: "Remote",
 };
 
-const jobDate = new Intl.DateTimeFormat("en-GB", {
-  day: "numeric",
-  month: "short",
-  year: "numeric",
-});
+export type JobCardVariant = "grid" | "row";
+export type JobCardTimeMode = "posted" | "updated";
 
-function salary(value: JobCardData["salary"]) {
-  if (!value) return "Salary not disclosed";
-  const format = new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: value.currency,
-    maximumFractionDigits: 0,
-  });
+function timeLabel(job: JobCardData, timeMode: JobCardTimeMode) {
+  const value =
+    timeMode === "updated"
+      ? (job.updatedAt ?? job.publishedAt)
+      : job.publishedAt;
   return (
-    format.format(value.minimum) +
-    " \u2013 " +
-    format.format(value.maximum) +
-    " / " +
-    value.period.toLowerCase()
+    (timeMode === "updated" ? "Updated " : "Posted ") +
+    formatRelativeTime(value)
   );
 }
 
-function dates(job: JobCardData) {
-  const posted = jobDate.format(new Date(job.publishedAt));
-  return job.applicationDeadline
-    ? "Posted " +
-        posted +
-        " \u00b7 Apply by " +
-        jobDate.format(new Date(job.applicationDeadline))
-    : "Posted " + posted;
+function visibleTagValues(job: JobCardData) {
+  return [...job.skills].filter(
+    (value, index, values): value is string =>
+      Boolean(value) && values.indexOf(value) === index,
+  );
 }
 
 function HeartIcon() {
@@ -83,7 +76,16 @@ function QuickViewIcon() {
   );
 }
 
-export function JobCardHeader({ job }: { job: JobCardData }) {
+const hoverActionClassName =
+  "job-icon-button job-card-hover-action opacity-0 transition-[opacity,transform] duration-150 group-hover:opacity-100 group-focus-within:opacity-100";
+
+export function JobCardHeader({
+  job,
+  timeMode,
+}: {
+  job: JobCardData;
+  timeMode: JobCardTimeMode;
+}) {
   return (
     <header className="job-card-header job-redesign-card-header">
       <CompanyAvatar
@@ -92,52 +94,71 @@ export function JobCardHeader({ job }: { job: JobCardData }) {
         size="sm"
         className="job-card-avatar"
       />
-      <span className="job-card-arrangement">
-        {labels[job.workArrangement] ?? job.workArrangement}
-      </span>
+      <div className="job-card-company-block">
+        <p className="job-card-company-name">{job.company.displayName}</p>
+      </div>
+      <div className="job-card-header-meta">
+        <p
+          className={
+            "job-salary" +
+            (job.salary?.isNegotiable ? " job-salary--negotiable" : "")
+          }
+        >
+          {formatSalary(job.salary)}
+        </p>
+        <p className="job-card-timing">
+          <time
+            dateTime={
+              timeMode === "updated"
+                ? (job.updatedAt ?? job.publishedAt)
+                : job.publishedAt
+            }
+          >
+            {timeLabel(job, timeMode)}
+          </time>
+        </p>
+      </div>
     </header>
   );
 }
 
 export function JobCardBody({ job }: { job: JobCardData }) {
-  const skills = job.skills.slice(0, 3);
+  const tagValues = visibleTagValues(job);
+  const secondaryTags = [
+    labels[job.employmentType] ?? job.employmentType,
+    labels[job.experienceLevel] ?? job.experienceLevel,
+  ];
+  const taxonomyPreview = tagValues.slice(0, 3).join(" | ");
+  const overflowTags = tagValues.slice(3);
 
   return (
     <div className="job-card-body">
       <h2 id={"job-" + job.id} className="job-card-title">
         <Link href={"/jobs/" + job.slug}>{job.title}</Link>
       </h2>
-      <p className="job-company-name job-card-company">
-        {job.company.displayName}
-      </p>
-      <p
-        className="job-card-meta-line"
-        aria-label="Location, employment type, and level"
-      >
-        <span>{job.location}</span>
-        <span aria-hidden="true">{"\u00b7"}</span>
-        <span>{labels[job.employmentType] ?? job.employmentType}</span>
-        <span aria-hidden="true">{"\u00b7"}</span>
-        <span>{labels[job.experienceLevel] ?? job.experienceLevel}</span>
-      </p>
-      <div className="job-card-highlight-row">
-        <p className="job-salary">{salary(job.salary)}</p>
-        <p className="job-card-timing">
-          <time dateTime={job.publishedAt}>{dates(job)}</time>
-        </p>
+      <p className="job-card-location">{job.location}</p>
+      <div className="job-card-tags" aria-label="Job tags">
+        {secondaryTags.map((tag) => (
+          <span className="job-card-tag" key={tag}>
+            {tag}
+          </span>
+        ))}
+        {taxonomyPreview ? (
+          <span className="job-card-tag job-card-tag--taxonomy">
+            {taxonomyPreview}
+          </span>
+        ) : null}
+        {overflowTags.length ? (
+          <details className="job-card-overflow">
+            <summary
+              aria-label={"Show " + String(overflowTags.length) + " more tags"}
+            >
+              +{overflowTags.length}
+            </summary>
+            <div role="tooltip">{overflowTags.join(" | ")}</div>
+          </details>
+        ) : null}
       </div>
-      {job.summary ? (
-        <p className="job-summary job-card-summary" title={job.summary}>
-          {job.summary}
-        </p>
-      ) : null}
-      {skills.length ? (
-        <ul className="job-skills job-card-skills" aria-label="Top skills">
-          {skills.map((skill) => (
-            <li key={skill}>{skill}</li>
-          ))}
-        </ul>
-      ) : null}
     </div>
   );
 }
@@ -149,7 +170,7 @@ function SignInApplyLink({ job }: { job: JobCardData }) {
       className="sh-button job-card-apply-button"
       href={"/login?returnTo=" + encodeURIComponent(returnTo)}
     >
-      Apply now
+      Apply
     </Link>
   );
 }
@@ -246,7 +267,7 @@ export function ApplyButton({ job }: { job: JobCardData }) {
         aria-controls={"job-apply-dialog-" + job.id}
         onClick={() => setOpen(true)}
       >
-        Apply now
+        Apply
       </button>
       {open ? (
         <div id={"job-apply-dialog-" + job.id}>
@@ -296,7 +317,7 @@ export function HideButton({
 
   return (
     <button
-      className="job-icon-button job-card-hover-action"
+      className={hoverActionClassName}
       type="button"
       aria-label="Hide job"
       title="Hide job"
@@ -313,7 +334,7 @@ export function HideButton({
 export function QuickViewButton({ onQuickView }: { onQuickView: () => void }) {
   return (
     <button
-      className="job-icon-button job-card-hover-action"
+      className={hoverActionClassName}
       type="button"
       aria-label="Quick view"
       title="Quick view"
@@ -326,10 +347,12 @@ export function QuickViewButton({ onQuickView }: { onQuickView: () => void }) {
 
 export function JobCardActions({
   job,
+  variant,
   onQuickView,
   onHidden,
 }: {
   job: JobCardData;
+  variant: JobCardVariant;
   onQuickView?: () => void;
   onHidden?: () => void;
 }) {
@@ -341,18 +364,26 @@ export function JobCardActions({
 
   return (
     <>
-      <footer className="job-card-footer job-redesign-card-footer">
-        <div className="job-card-hover-actions" aria-label="More job actions">
-          <HideButton jobId={job.id} onHidden={onHidden} />
-          <QuickViewButton onQuickView={openQuickView} />
-        </div>
-        <div
-          className="job-card-primary-actions"
-          aria-label="Primary job actions"
-        >
-          <ApplyButton job={job} />
-          <SaveButton job={job} />
-        </div>
+      <footer
+        className={
+          "job-card-footer job-redesign-card-footer job-card-footer--" + variant
+        }
+      >
+        {variant === "row" ? (
+          <div className="job-card-row-actions" aria-label="Job actions">
+            <QuickViewButton onQuickView={openQuickView} />
+            <HideButton jobId={job.id} onHidden={onHidden} />
+            <SaveButton job={job} />
+            <ApplyButton job={job} />
+          </div>
+        ) : (
+          <div className="job-card-grid-actions" aria-label="Job actions">
+            <QuickViewButton onQuickView={openQuickView} />
+            <HideButton jobId={job.id} onHidden={onHidden} />
+            <SaveButton job={job} />
+            <ApplyButton job={job} />
+          </div>
+        )}
       </footer>
 
       {!onQuickView ? (
@@ -369,27 +400,38 @@ export function JobCardActions({
 
 export function JobCard({
   job,
+  variant = "row",
+  timeMode = "posted",
   onQuickView,
   onHidden,
 }: {
   job: JobCardData;
+  variant?: JobCardVariant;
+  timeMode?: JobCardTimeMode;
   onQuickView?: () => void;
   onHidden?: () => void;
 }) {
   return (
     <article
-      className="group job-card job-redesign-card"
+      className={"group job-card job-redesign-card job-card--" + variant}
       aria-labelledby={"job-" + job.id}
     >
-      <JobCardHeader job={job} />
+      <JobCardHeader job={job} timeMode={timeMode} />
       <JobCardBody job={job} />
-      <JobCardActions job={job} onQuickView={onQuickView} onHidden={onHidden} />
+      <JobCardActions
+        job={job}
+        variant={variant}
+        onQuickView={onQuickView}
+        onHidden={onHidden}
+      />
     </article>
   );
 }
 
 export function JobCardView(props: {
   job: JobCardData;
+  variant?: JobCardVariant;
+  timeMode?: JobCardTimeMode;
   onQuickView?: () => void;
   onHidden?: () => void;
 }) {

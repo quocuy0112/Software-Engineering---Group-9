@@ -5,6 +5,7 @@ import { JobServiceError } from "@/backend/services/jobs/job-types";
 import { optionalJobActor } from "@/backend/security/job-request-boundary";
 import { JobResultsList } from "@/frontend/features/jobs/components/job-results-list";
 import { JobSearchForm } from "@/frontend/features/jobs/components/job-search-form";
+import { JobsWorkspaceNav } from "@/frontend/features/jobs/components/jobs-workspace";
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -83,6 +84,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
   return (
     <div className="jobs-page">
       <div className="jobs-fixed-region">
+        <JobsWorkspaceNav activeTab="search" />
         <header className="page-heading jobs-heading">
           <div>
             <p className="workspace-kicker">SMART HIRE OPPORTUNITIES</p>

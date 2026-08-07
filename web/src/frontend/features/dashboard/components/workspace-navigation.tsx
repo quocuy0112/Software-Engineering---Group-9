@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useWorkspaceLocale } from "../client/workspace-locale";
 
 export function WorkspaceNavigation({
   busy,
@@ -14,33 +13,32 @@ export function WorkspaceNavigation({
   collapsed: boolean;
   onSignOut: () => void;
 }) {
-  const locale = useWorkspaceLocale();
-  const copy =
-    locale === "vi"
-      ? {
-          dashboard: "Bảng điều khiển",
-          jobs: "Việc làm",
-          profile: "Hồ sơ",
-          workspace: "Không gian ứng viên",
-          openMenu: "Mở menu không gian",
-          closeMenu: "Đóng menu không gian",
-          signOut: "Đăng xuất",
-          signingOut: "Đang đăng xuất…",
-        }
-      : {
-          dashboard: "Dashboard",
-          jobs: "Jobs",
-          profile: "Profile",
-          workspace: "Candidate workspace",
-          openMenu: "Open workspace menu",
-          closeMenu: "Close workspace menu",
-          signOut: "Sign out",
-          signingOut: "Signing out…",
-        };
+  const copy = {
+    dashboard: "Dashboard",
+    jobs: "Jobs",
+    profile: "Profile",
+    workspace: "Candidate workspace",
+    openMenu: "Open workspace menu",
+    closeMenu: "Close workspace menu",
+    signOut: "Sign out",
+    signingOut: "Signing out…",
+  };
   const destinations = [
     { href: "/dashboard", label: copy.dashboard, icon: "dashboard" },
     { href: "/jobs", label: copy.jobs, icon: "jobs" },
     { href: "/profile", label: copy.profile, icon: "profile" },
+  ] as const;
+  const jobsSubnav = [
+    { href: "/jobs/saved", label: "Saved Jobs" },
+    {
+      href: "/jobs/applied",
+      label: "Applied Jobs",
+    },
+    { href: "/jobs/matches", label: "Suggested Jobs" },
+    {
+      href: "/jobs/settings",
+      label: "Job Recommendation Settings",
+    },
   ] as const;
   const pathname = usePathname() ?? "/";
   const [menuOpen, setMenuOpen] = useState(false);
@@ -109,19 +107,38 @@ export function WorkspaceNavigation({
               (destination.href !== "/dashboard" &&
                 pathname.startsWith(destination.href));
             return (
-              <Link
-                key={destination.href}
-                href={destination.href}
-                aria-current={active ? "page" : undefined}
-                aria-label={destination.label}
-                title={collapsed ? destination.label : undefined}
-                onClick={() => setMenuOpen(false)}
-              >
-                <NavIcon name={destination.icon} />
-                <span className="workspace-navigation-label">
-                  {destination.label}
-                </span>
-              </Link>
+              <div key={destination.href} className="workspace-navigation-item">
+                <Link
+                  href={destination.href}
+                  aria-current={active ? "page" : undefined}
+                  aria-label={destination.label}
+                  title={collapsed ? destination.label : undefined}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <NavIcon name={destination.icon} />
+                  <span className="workspace-navigation-label">
+                    {destination.label}
+                  </span>
+                </Link>
+                {destination.href === "/jobs" && active ? (
+                  <div className="workspace-navigation-subnav">
+                    {jobsSubnav.map((subnav) => {
+                      const subnavActive = pathname === subnav.href;
+                      return (
+                        <Link
+                          key={subnav.href}
+                          href={subnav.href}
+                          aria-current={subnavActive ? "page" : undefined}
+                          title={collapsed ? subnav.label : undefined}
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          <span>{subnav.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
             );
           })}
         </div>
