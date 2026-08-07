@@ -24,6 +24,7 @@ import type { AppliedJobState } from "@/shared/contracts/jobs/catalog";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
 
 const MAX_CV_BYTES = 5_000_000;
+const PHONE_INPUT_MAX_LENGTH = 15;
 const ACCEPTED_CV_TYPES = new Set([
   "application/pdf",
   "application/msword",
@@ -43,7 +44,24 @@ function formatBytes(bytes: number) {
 }
 
 function normalizePhone(value: string) {
-  return value.replace(/[\s().-]/gu, "");
+  return value
+    .replace(/[^\d+]/gu, "")
+    .replace(/(?!^)\+/gu, "")
+    .slice(0, PHONE_INPUT_MAX_LENGTH);
+}
+
+function canonicalizePhone(value: string) {
+  const normalized = normalizePhone(value);
+  return normalized.startsWith("0") ? "+84" + normalized.slice(1) : normalized;
+}
+
+function phoneValidationError(value: string) {
+  const phone = normalizePhone(value);
+  if (!phone) return "Enter your phone number.";
+  if (!/^(?:0|\+84)(?:3|5|7|8|9)\d{8}$/u.test(phone)) {
+    return "Enter a valid Vietnamese phone number.";
+  }
+  return null;
 }
 
 function fileRef(file: File) {
@@ -62,12 +80,8 @@ function validateContact(contact: ApplicationContactSnapshot): FieldErrors {
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(contact.email.trim())) {
     errors.email = "Enter a valid email address.";
   }
-  const phone = normalizePhone(contact.phone);
-  if (!phone) {
-    errors.phone = "Enter your phone number.";
-  } else if (!/^(?:0|\+84)(?:3|5|7|8|9)\d{8}$/u.test(phone)) {
-    errors.phone = "Enter a valid Vietnamese phone number.";
-  }
+  const phoneError = phoneValidationError(contact.phone);
+  if (phoneError) errors.phone = phoneError;
   return errors;
 }
 
@@ -93,7 +107,9 @@ function InlineApplicationForm({
   const [selectedCvId, setSelectedCvId] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [contact, setContact] = useState<ApplicationContactSnapshot>(
-    form.contact ?? { fullName: "", email: "", phone: "" },
+    form.contact
+      ? { ...form.contact, phone: normalizePhone(form.contact.phone) }
+      : { fullName: "", email: "", phone: "" },
   );
   const [aiConsent, setAiConsent] = useState(false);
   const [pending, setPending] = useState(false);
@@ -162,7 +178,7 @@ function InlineApplicationForm({
     const contactSnapshot = {
       fullName: contact.fullName.trim(),
       email: contact.email.trim(),
-      phone: normalizePhone(contact.phone),
+      phone: canonicalizePhone(contact.phone),
     };
 
     try {
@@ -236,9 +252,7 @@ function InlineApplicationForm({
     }
   }
 
-  const contactValid = Object.keys(validateContact(contact)).length === 0;
-  const submitDisabled =
-    pending || !contactValid || (!selectedCvId && !selectedFile);
+  const submitDisabled = pending || (!selectedCvId && !selectedFile);
 
   return (
     <form
@@ -403,16 +417,29 @@ function InlineApplicationForm({
             id="application-phone"
             name="phone"
             type="tel"
-            inputMode="tel"
+            inputMode="numeric"
             autoComplete="tel"
+            maxLength={PHONE_INPUT_MAX_LENGTH}
             value={contact.phone}
             {...fieldA11y("phone", errors)}
-            onChange={(event) =>
-              setContact((current) => ({
-                ...current,
-                phone: event.currentTarget.value,
-              }))
-            }
+            onChange={(event) => {
+              const phone = normalizePhone(event.currentTarget.value);
+              setContact((current) => ({ ...current, phone }));
+              setErrors((current) => {
+                const next = { ...current };
+                delete next.phone;
+                return next;
+              });
+            }}
+            onBlur={() => {
+              const phoneError = phoneValidationError(contact.phone);
+              setErrors((current) => {
+                const next = { ...current };
+                if (phoneError) next.phone = phoneError;
+                else delete next.phone;
+                return next;
+              });
+            }}
           />
           {errors.phone ? (
             <span id="phone-error" className="job-field-error" role="alert">

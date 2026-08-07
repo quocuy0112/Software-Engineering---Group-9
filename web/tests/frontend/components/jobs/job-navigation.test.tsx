@@ -75,7 +75,7 @@ describe("job board navigation", () => {
     expect(source).toContain("profile={context.account}");
   });
 
-  it("keeps the Jobs heading fixed and gives each desktop pane its own focusable scroll region", async () => {
+  it("lets the results list grow with the page instead of creating a nested scroll region", async () => {
     const source = await readFile(
       resolve(process.cwd(), "src/app/jobs/page.tsx"),
       "utf8",
@@ -89,21 +89,13 @@ describe("job board navigation", () => {
     expect(source).toContain('className="job-filter-column"');
     expect(source).toContain('className="job-results"');
     expect(source).toContain("tabIndex={0}");
-    expect(styles).toContain("grid-template-rows: auto minmax(0, 1fr)");
-    expect(styles).toContain("overflow-y: auto");
-    expect(styles).toContain("overscroll-behavior: contain");
-    expect(styles).toContain("@media (min-width: 981px)");
-    expect(styles).toContain(".job-board-layout {\n    display: flex;");
-    expect(styles).toContain(
-      '.workspace-main[data-content-mode="job-board"] {\n    display: flex;',
+    expect(styles).toContain(".job-list");
+    expect(styles).not.toContain(
+      '.job-board-public-main .jobs-page,\n  .workspace-content[data-content-mode="job-board"] > .jobs-page',
     );
-    expect(styles).toContain(
-      '.workspace-content[data-content-mode="job-board"] {\n    display: flex;',
+    expect(styles).not.toContain(
+      ".job-filter-column,\n  .job-results {\n    position: static;",
     );
-    expect(styles).toContain(
-      '.workspace-layout[data-sidebar-collapsed="true"]',
-    );
-    expect(styles).toContain("width: min(100%, 100rem)");
   });
 
   it("shows the Profile workspace bar and marks Jobs as active", () => {
