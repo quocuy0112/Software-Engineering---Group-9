@@ -6,7 +6,7 @@ import { SearchIntentSelectionPolicy } from "@/backend/image-search/interpretati
 const text =
   "Vị trí: Senior TypeScript Engineer\nĐịa điểm: Hồ Chí Minh\nRemote full-time\nLương: 30 triệu";
 
-describe("search-intent-selection-v1", () => {
+describe("search-intent-selection-v2", () => {
   it("derives only evidence-backed Feature 003 criteria", async () => {
     const proposals =
       await new DeterministicSearchIntentInterpreter().interpret({
@@ -14,7 +14,7 @@ describe("search-intent-selection-v1", () => {
         language: "BILINGUAL",
         purposeVersion: "job-image-search-purpose-v1",
         inputVersion: "search-ocr-text-v1",
-        instructionVersion: "job-search-intent-v1",
+        instructionVersion: "job-search-intent-v2",
         schemaVersion: "job-search-intent-v1",
         allowedFields: [
           "q",
@@ -66,7 +66,7 @@ describe("search-intent-selection-v1", () => {
           stringValues: [],
           confidence: 0.99,
           basis: "EXPLICIT",
-          evidence: [{ startCodePoint: 100, endCodePoint: 108 }],
+          evidenceText: ["Engineer"],
         },
         {
           id: "remote",
@@ -76,7 +76,7 @@ describe("search-intent-selection-v1", () => {
           stringValues: ["REMOTE"],
           confidence: 0.95,
           basis: "NORMALIZED",
-          evidence: [{ startCodePoint: 0, endCodePoint: 6 }],
+          evidenceText: ["Remote"],
         },
       ],
     });
@@ -121,6 +121,70 @@ describe("search-intent-selection-v1", () => {
       field: "q",
       selected: false,
       selectionReason: "MANUAL_VALUE_CONFLICT",
+    });
+  });
+
+  it("resolves Vietnamese OCR evidence locally by Unicode code point", () => {
+    const ocrText = "Professional basics\nHeadline\nChuyên viên Marketing";
+    const result = new SearchIntentSelectionPolicy().validateAndSelect({
+      ocrText,
+      language: "BILINGUAL",
+      proposals: [
+        {
+          id: "marketing-title",
+          field: "q",
+          stringValue: "Chuyên viên Marketing",
+          numberValue: null,
+          stringValues: [],
+          confidence: 0.98,
+          basis: "EXPLICIT",
+          evidenceText: ["Chuyên viên Marketing"],
+        },
+      ],
+    });
+
+    expect(result.warnings).toEqual([]);
+    expect(result.proposals).toEqual([
+      expect.objectContaining({
+        field: "q",
+        stringValue: "Chuyên viên Marketing",
+        selected: true,
+        selectionReason: "AUTO_EXPLICIT",
+        evidence: [
+          {
+            startCodePoint: 29,
+            endCodePoint: 50,
+            text: "Chuyên viên Marketing",
+          },
+        ],
+      }),
+    ]);
+  });
+
+  it("keeps an inferred occupation visible but requires user confirmation", () => {
+    const result = new SearchIntentSelectionPolicy().validateAndSelect({
+      ocrText:
+        "Build campaigns, optimize paid media, and analyze conversion rates",
+      language: "EN",
+      proposals: [
+        {
+          id: "inferred-marketing",
+          field: "q",
+          stringValue: "Digital Marketing Specialist",
+          numberValue: null,
+          stringValues: [],
+          confidence: 0.82,
+          basis: "INFERRED",
+          evidenceText: ["optimize paid media"],
+        },
+      ],
+    });
+
+    expect(result.proposals[0]).toMatchObject({
+      field: "q",
+      stringValue: "Digital Marketing Specialist",
+      selected: false,
+      selectionReason: "USER_SELECTION_REQUIRED",
     });
   });
 });

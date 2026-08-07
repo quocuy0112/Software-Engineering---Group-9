@@ -175,8 +175,8 @@ const imageSearchDefaults = [
     "IMAGE_SEARCH_STORAGE_PREFLIGHT_REPORT",
     resolve(root, "web/.local/evidence/image-search-storage-preflight.json"),
   ],
-  ["IMAGE_SEARCH_INTERPRETER", "deterministic"],
-  ["IMAGE_SEARCH_OPENAI_ENABLED", "false"],
+  ["IMAGE_SEARCH_INTERPRETER", "openai"],
+  ["IMAGE_SEARCH_OPENAI_ENABLED", "true"],
   ["IMAGE_SEARCH_OPENAI_MODEL", "gpt-5.4-mini-2026-03-17"],
   ["IMAGE_SEARCH_OPENAI_DPA_APPROVED", "false"],
   ["IMAGE_SEARCH_OPENAI_PRIVACY_APPROVED", "false"],
@@ -228,6 +228,8 @@ const pinnedFeatureSettings = new Map([
       key !== "IMAGE_SEARCH_STORAGE_ADAPTER" &&
       key !== "IMAGE_SEARCH_INTERPRETER",
   ),
+  ["IMAGE_SEARCH_INTERPRETER", "openai"],
+  ["IMAGE_SEARCH_OPENAI_ENABLED", "true"],
 ]);
 const reconcilePinnedFeatureSettings = async (path) => {
   let contents = await readFile(path, "utf8");

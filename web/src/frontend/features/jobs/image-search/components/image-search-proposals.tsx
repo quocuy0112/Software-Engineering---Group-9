@@ -7,6 +7,21 @@ import {
   type SearchIntent,
 } from "@/shared/contracts/jobs/search-intent";
 
+const fieldLabels: Record<SearchIntent["proposals"][number]["field"], string> =
+  {
+    q: "Job title or keyword",
+    location: "Location",
+    employmentType: "Employment type",
+    experienceLevel: "Experience level",
+    workArrangement: "Work arrangement",
+    skills: "Skills",
+    salaryMin: "Minimum salary",
+    salaryMax: "Maximum salary",
+    salaryCurrency: "Salary currency",
+    salaryPeriod: "Salary period",
+    postedWithinDays: "Posted within",
+  };
+
 function visibleValue(proposal: SearchIntent["proposals"][number]) {
   if (proposal.stringValue !== null) return proposal.stringValue;
   if (proposal.numberValue !== null) return String(proposal.numberValue);
@@ -24,6 +39,14 @@ export function ImageSearchProposals({
 }) {
   const [draft, setDraft] = useState(intent);
   const [error, setError] = useState("");
+  const selectedCount = draft.proposals.filter(
+    (proposal) => proposal.selected,
+  ).length;
+  const uncertainOccupation = draft.proposals.find(
+    (proposal) =>
+      proposal.field === "q" &&
+      (proposal.basis === "INFERRED" || proposal.confidence < 0.9),
+  );
   const update = (id: string, value: string) =>
     setDraft((current) => ({
       ...current,
@@ -44,12 +67,27 @@ export function ImageSearchProposals({
       }),
     }));
   return (
-    <section aria-labelledby="image-search-proposals-heading">
-      <h3 id="image-search-proposals-heading">Review suggested job filters</h3>
+    <section
+      className="image-search-proposal-review"
+      aria-labelledby="image-search-proposals-heading"
+    >
+      <div className="image-search-proposal-heading">
+        <h3 id="image-search-proposals-heading">Review suggested filters</h3>
+        <span>{draft.proposals.length} found</span>
+      </div>
       <p>
         Every filter is optional. Edit, remove, or reverse selections before
         searching.
       </p>
+      {uncertainOccupation ? (
+        <p className="image-search-occupation-confirmation">
+          This may be a “{visibleValue(uncertainOccupation)}” role. Is that what
+          you want to search for? Select it below if the suggestion is correct.
+        </p>
+      ) : null}
+      {!draft.proposals.length ? (
+        <p>No supported job-search filters were found in the image.</p>
+      ) : null}
       <ul className="image-search-proposals">
         {draft.proposals.map((proposal) => (
           <li key={proposal.id}>
@@ -68,7 +106,7 @@ export function ImageSearchProposals({
                   }))
                 }
               />
-              {proposal.field}
+              {fieldLabels[proposal.field]}
             </label>
             <input
               aria-label={`Edit ${proposal.field} proposal`}
@@ -87,6 +125,7 @@ export function ImageSearchProposals({
             </small>
             <button
               type="button"
+              aria-label={`Remove ${proposal.field}`}
               onClick={() =>
                 setDraft((current) => ({
                   ...current,
@@ -96,7 +135,7 @@ export function ImageSearchProposals({
                 }))
               }
             >
-              Remove {proposal.field}
+              Remove
             </button>
           </li>
         ))}
@@ -124,7 +163,9 @@ export function ImageSearchProposals({
           Clear proposals
         </button>
         <button
+          className="image-search-apply-button"
           type="button"
+          disabled={selectedCount === 0}
           onClick={() => {
             const parsed = searchIntentSchema.safeParse({
               ...draft,

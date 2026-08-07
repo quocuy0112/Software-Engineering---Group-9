@@ -6,13 +6,41 @@ import { ImageSearchInput } from "@/frontend/features/jobs/image-search/componen
 import { ImageSearchProgress } from "@/frontend/features/jobs/image-search/components/image-search-progress";
 import { ImageSearchProposals } from "@/frontend/features/jobs/image-search/components/image-search-proposals";
 import { ImageSearchRecovery } from "@/frontend/features/jobs/image-search/components/image-search-recovery";
+import { ImageSearchFeedback } from "@/frontend/features/jobs/image-search/components/image-search-feedback";
+import { GlobalImageSearch } from "@/frontend/features/jobs/image-search/components/global-image-search";
 import type { SearchIntent } from "@/shared/contracts/jobs/search-intent";
+
+const toast = vi.hoisted(() => ({
+  error: vi.fn(),
+  success: vi.fn(),
+  warning: vi.fn(),
+}));
+
+vi.mock("sonner", () => ({ toast }));
 
 const intent: SearchIntent = {
   schemaVersion: "job-search-intent-v1",
   language: "EN",
   warnings: [],
   proposals: [
+    {
+      id: "occupation-1",
+      field: "q",
+      stringValue: "Digital Marketing Specialist",
+      numberValue: null,
+      stringValues: [],
+      confidence: 0.82,
+      basis: "INFERRED",
+      evidence: [
+        {
+          startCodePoint: 15,
+          endCodePoint: 34,
+          text: "optimize paid media",
+        },
+      ],
+      selected: false,
+      selectionReason: "USER_SELECTION_REQUIRED",
+    },
     {
       id: "remote-1",
       field: "workArrangement",
@@ -41,6 +69,31 @@ const intent: SearchIntent = {
 };
 
 describe("image-assisted job-search controls", () => {
+  it("keeps an English text-and-camera search bar available in the global header", () => {
+    window.history.replaceState(null, "", "/jobs?q=Sidebar%20keyword");
+    render(<GlobalImageSearch />);
+
+    expect(
+      screen.getByRole("search", { name: "Global job search" }),
+    ).toBeVisible();
+    expect(
+      screen.getByPlaceholderText("Search jobs, skills, or companies"),
+    ).toHaveValue("");
+    expect(
+      screen.getByRole("button", { name: "Search jobs from an image" }),
+    ).toBeVisible();
+    expect(screen.getByRole("button", { name: "Search jobs" })).toBeVisible();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Search jobs from an image" }),
+    );
+    const file = screen.getByLabelText("Job poster image");
+    expect(file).toBeDisabled();
+    fireEvent.click(screen.getByRole("checkbox"));
+    expect(file).toBeEnabled();
+    window.history.replaceState(null, "", "/");
+  });
+
   it("accepts a PNG/JPEG file through the accessible labeled input", () => {
     const onSelect = vi.fn();
     render(<ImageSearchInput disabled={false} onSelect={onSelect} />);
@@ -51,7 +104,8 @@ describe("image-assisted job-search controls", () => {
       target: { files: [file] },
     });
     expect(onSelect).toHaveBeenCalledWith(file);
-    expect(screen.getByText(/up to 5 MB and 20 megapixels/u)).toBeVisible();
+    expect(screen.getByText(/up to 5 MB/u)).toBeVisible();
+    expect(screen.getByText(/maximum 20 MP/u)).toBeVisible();
   });
 
   it("shows provenance and confidence while supporting edit, reverse, remove, and clear", () => {
@@ -64,7 +118,11 @@ describe("image-assisted job-search controls", () => {
       />,
     );
     expect(screen.getByText("High confidence")).toBeVisible();
-    expect(screen.getByText("Review suggested")).toBeVisible();
+    expect(screen.getAllByText("Review suggested")).toHaveLength(2);
+    expect(
+      screen.getByText(/This may be a “Digital Marketing Specialist” role/u),
+    ).toBeVisible();
+    expect(screen.getByText("Job title or keyword")).toBeVisible();
     expect(screen.getByText(/Source: Remote/u)).toBeVisible();
     fireEvent.change(screen.getByLabelText("Edit location proposal"), {
       target: { value: "Hanoi" },
@@ -104,7 +162,7 @@ describe("image-assisted job-search controls", () => {
         <ImageSearchProgress progress={42} onCancel={cancel} />
         <ImageSearchRecovery
           error="OCR unavailable"
-          fallbackText={null}
+          fallbackReason={null}
           onRetry={vi.fn()}
           onManual={manual}
         />
@@ -124,17 +182,75 @@ describe("image-assisted job-search controls", () => {
     rerender(
       <ImageSearchRecovery
         error={null}
-        fallbackText="Senior TypeScript remote"
+        fallbackReason="INTERPRETER_UNAVAILABLE"
         onRetry={vi.fn()}
         onManual={manual}
       />,
     );
-    expect(screen.getByLabelText("Recognized job poster text")).toHaveValue(
-      "Senior TypeScript remote",
-    );
+    expect(
+      screen.getByRole("heading", {
+        name: "AI filter suggestions are unavailable",
+      }),
+    ).toBeVisible();
+    expect(
+      screen.queryByLabelText("Recognized job poster text"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Use as keyword search" }),
+    ).not.toBeInTheDocument();
     fireEvent.click(
-      screen.getByRole("button", { name: "Use as keyword search" }),
+      screen.getByRole("button", { name: "Continue to Find jobs" }),
     );
-    expect(manual).toHaveBeenLastCalledWith("Senior TypeScript remote");
+    expect(manual).toHaveBeenLastCalledWith();
+  });
+
+  it("uses error, warning, and success toasts for image-search outcomes", () => {
+    vi.clearAllMocks();
+    const { rerender } = render(
+      <ImageSearchFeedback
+        phase="ERROR"
+        error="Image search is temporarily unavailable."
+        fallbackReason={null}
+        retryAt={null}
+        proposalCount={0}
+        warningCount={0}
+      />,
+    );
+    expect(toast.error).toHaveBeenCalledWith(
+      "Image search could not continue",
+      expect.objectContaining({
+        description: "Image search is temporarily unavailable.",
+      }),
+    );
+
+    rerender(
+      <ImageSearchFeedback
+        phase="FALLBACK"
+        error={null}
+        fallbackReason="INTERPRETER_UNAVAILABLE"
+        retryAt={null}
+        proposalCount={0}
+        warningCount={0}
+      />,
+    );
+    expect(toast.warning).toHaveBeenCalledWith(
+      "AI filter suggestions are unavailable",
+      expect.any(Object),
+    );
+
+    rerender(
+      <ImageSearchFeedback
+        phase="READY"
+        error={null}
+        fallbackReason={null}
+        retryAt={null}
+        proposalCount={2}
+        warningCount={0}
+      />,
+    );
+    expect(toast.success).toHaveBeenCalledWith(
+      "Job filters are ready",
+      expect.objectContaining({ description: expect.stringContaining("2") }),
+    );
   });
 });

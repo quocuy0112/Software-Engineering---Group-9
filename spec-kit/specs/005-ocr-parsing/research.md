@@ -337,7 +337,7 @@ adapters:
 - The optional production semantic adapter reuses the existing server-only
   OpenAI SDK `7.3.0` and approved model snapshot
   `gpt-5.4-mini-2026-03-17`, but with separate purpose
-  `job-image-search-purpose-v1`, instruction `job-search-intent-v1`, and strict
+  `job-image-search-purpose-v1`, instruction `job-search-intent-v2`, and strict
   JSON Schema `job-search-intent-v1`. It uses the Responses API,
   `store=false`, background disabled, tools disabled, SDK retries zero, and a
   bounded deadline.
@@ -362,10 +362,12 @@ The interpreter output contains proposals, not jobs. Allowed fields are `q`,
 `postedWithinDays`. `sort`, cursor, job IDs, scores, private fields, and actions
 are absent from the schema.
 
-Selection policy `search-intent-selection-v1`:
+Selection policy `search-intent-selection-v2`:
 
-- The server verifies that each evidence range exactly maps to normalized OCR
-  text and that values pass the existing `jobSearchQuerySchema` limits.
+- The provider returns short verbatim OCR excerpts rather than offsets. The
+  server finds each excerpt in normalized OCR text, derives Unicode code-point
+  ranges locally, and verifies values against the existing
+  `jobSearchQuerySchema` limits.
 - `EXPLICIT` or `NORMALIZED` criteria with verified evidence and confidence
   `>=0.90` may be selected automatically.
 - `INFERRED` criteria and valid criteria with confidence `>=0.60` and `<0.90`
@@ -379,8 +381,15 @@ Selection policy `search-intent-selection-v1`:
 
 Confidence is one signal and cannot override evidence/type validation. The
 result contains at most 20 proposals and a 32-KiB UTF-8 OCR input/output bound.
-If valid intent cannot be produced, the recognized text is delivered once for
-manual editing and ordinary text search.
+If valid intent cannot be produced, the one-time fallback is consumed for its
+safe reason only. The client discards recognized text and does not prefill the
+global header query or ordinary job-search filters.
+
+Instruction v2 treats explicit role labels such as `Headline`, `Job title`,
+`Position`, and their Vietnamese equivalents as strong occupation evidence. If
+duties or skills imply a role without naming one, it may provide a best-effort
+occupation prediction as `INFERRED`; that proposal remains unselected and the
+review UI asks the user to confirm it.
 
 **Alternatives rejected**:
 

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const SEARCH_INTENT_SCHEMA_VERSION = "job-search-intent-v1" as const;
 export const SEARCH_INTENT_SELECTION_POLICY_VERSION =
-  "search-intent-selection-v1" as const;
+  "search-intent-selection-v2" as const;
 export const IMAGE_SEARCH_ALLOWED_FIELDS = [
   "q",
   "location",

@@ -6,8 +6,9 @@ synthetic/licensed fixtures. Never test with a real person's CV, private job
 poster, production object, or copied provider payload.
 
 The default local path uses private filesystem artifacts, self-hosted OCR, and
-the deterministic search-intent interpreter. It requires no OpenAI or AWS
-credential.
+the approved OpenAI search-intent interpreter. Image search reuses the same
+server-only `OPENAI_API_KEY` configured for CV parsing; it has no separate API
+key and requires no AWS credential.
 
 ## Local Topology
 
@@ -84,8 +85,9 @@ IMAGE_SEARCH_WORKER_ENABLED=true
 IMAGE_SEARCH_CLEANUP_ENABLED=true
 IMAGE_SEARCH_STORAGE_ADAPTER=filesystem
 IMAGE_SEARCH_STORAGE_LOCAL_ROOT=<absolute repo-local web/.local/image-search-storage path>
-IMAGE_SEARCH_INTERPRETER=deterministic
-IMAGE_SEARCH_OPENAI_ENABLED=false
+IMAGE_SEARCH_INTERPRETER=openai
+IMAGE_SEARCH_OPENAI_ENABLED=true
+OPENAI_API_KEY=<same server-only key used by CV parsing>
 ```
 
 `env:init` generates separate server-only values for search artifact encryption,
@@ -185,9 +187,9 @@ npm run ocr:config:check
 npm run image-search:config:check
 ```
 
-Local acceptance requires exact internal OCR manifest, private roots, distinct
-keys, deterministic interpreter, and enabled cleanup. Negative production tests
-must reject:
+Local acceptance requires the exact internal OCR manifest, private roots,
+distinct keys, the approved OpenAI interpreter with the shared server key, and
+enabled cleanup. Negative production tests must reject:
 
 - local filesystem storage or a root outside the allowlisted subtree;
 - shared CV/search encryption key or storage prefix;
@@ -299,9 +301,9 @@ deadline.
    text query and filters must work before, during, and after image processing.
 2. Choose image mode and attach one clean static Vietnamese/English/bilingual
    PNG/JPEG <=5,000,000 bytes and <=20 decoded megapixels.
-3. Confirm the external semantic option, when shown, starts unselected and names
-   provider/purpose/retention. Default deterministic mode needs no external
-   content consent.
+3. Confirm the required OpenAI consent starts unselected and names the
+   provider, purpose, and retention boundary. The image picker remains disabled
+   until the user agrees for that request.
 4. Submit. Browser performs metadata reservation then raw upload without
    placing query capability in URL, cookie, local/session storage, or persisted
    cache.
@@ -326,10 +328,10 @@ application, Profile, or alternate browser session.
 ### AI failure fallback
 
 Inject an interpreter timeout/invalid schema after successful OCR. Consume the
-one-time fallback, edit recognized text in the current component, and submit it
-through ordinary text search. Reload/navigation/cancel/newer query must erase
-that text. The server copy is inaccessible/deletion-due at consume time and
-cannot be fetched twice.
+one-time fallback and confirm the client displays only a safe reason and retry
+actions. It must discard recognized text immediately and must not populate the
+global header query or any Feature 003 filter. The server copy is
+inaccessible/deletion-due at consume time and cannot be fetched twice.
 
 ## 9. Required Failure Walkthroughs
 
@@ -344,7 +346,7 @@ cannot be fetched twice.
 | AI emits sort/job IDs/private fields/invalid enum/range/unsupported evidence | Entire invalid proposal is discarded; no job authority changes.                                                         |
 | AI confidence 0.8999, inferred at 0.99, explicit at 0.90                     | First unselected; inferred unselected; valid evidenced explicit may auto-select.                                        |
 | Existing non-empty manual location differs from image                        | Manual value preserved; generated location is unselected conflict.                                                      |
-| External consent absent/revoked/version changed before dispatch              | No external request; deterministic/manual fallback.                                                                     |
+| External consent absent/revoked/version changed before dispatch              | No external request; safe recovery without copying OCR text into search fields.                                         |
 | Provider fails and another is configured                                     | No silent alternate provider.                                                                                           |
 | Older query completes after new query/manual edit/cancel                     | Late result cannot alter filters, URL, or results.                                                                      |
 | Result consume response lost/replayed                                        | Server remains consumed/deleting; no second content delivery; manual search remains.                                    |
@@ -486,8 +488,8 @@ The release profile documents at least:
 - 4 dedicated CPU cores/8 GiB for OCR, 2 cores/1 GiB per Node worker;
 - local PostgreSQL and fresh ClamAV;
 - 100 warm search samples at concurrency 4;
-- representative PNG/JPEG sizes, language/quality groups, and deterministic vs
-  approved external interpreter conditions;
+- representative PNG/JPEG sizes, language/quality groups, and approved OpenAI
+  interpreter success/failure conditions;
 - at least the 60-fixture/6,000-word CV matrix at concurrency 2, with a
   20-second per-unit deadline and immutable 180-second aggregate deadline;
 - model/container digests, dataset/sample size, duration, percentile method,
@@ -517,8 +519,9 @@ Expected adapter:
 openai SDK: 7.3.0
 model: gpt-5.4-mini-2026-03-17
 purpose: job-image-search-purpose-v1
-instruction/schema: job-search-intent-v1
-selection policy: search-intent-selection-v1
+instruction: job-search-intent-v2
+schema: job-search-intent-v1
+selection policy: search-intent-selection-v2
 store: false
 background/tools/file/image/conversation reuse: disabled
 SDK retries: 0
@@ -532,7 +535,9 @@ npm run test:image-search:openai-synthetic
 
 Test grant, no grant, revocation immediately before dispatch, provider/model/
 notice mismatch, timeout, refusal, invalid/unknown/oversized output, job-ID/sort
-injection, provider request ID HMAC handling, and deterministic/manual fallback.
+injection, exact evidence excerpt resolution (including Vietnamese Unicode),
+uncertain occupation confirmation, provider request ID HMAC handling, and
+one-time OCR fallback without query or filter prefill.
 No prompt, input, output, token content, or provider body may appear in test
 output.
 

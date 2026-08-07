@@ -1,6 +1,7 @@
 import "server-only";
 
 import { prisma } from "@/backend/database/prisma";
+import { Prisma } from "@/backend/generated/prisma/client";
 import { recordImageSearchOperationalEvidence } from "@/backend/services/image-search/image-search-admission-readiness";
 
 export class ImageSearchReconciliationWorker {
@@ -26,28 +27,39 @@ export class ImageSearchReconciliationWorker {
             contentInaccessibleAt: now,
           },
         });
-        await transaction.searchStoredArtifact.updateMany({
-          where: { queryId: { in: overdueIds }, status: { not: "DELETED" } },
-          data: {
-            status: "DELETE_PENDING",
-            contentInaccessibleAt: now,
-            deleteAfter: now,
-            deleteLeaseOwner: null,
-            deleteLeaseExpiresAt: null,
-          },
-        });
+        await transaction.$executeRaw(
+          Prisma.sql`
+            UPDATE "SearchStoredArtifact" AS artifact
+               SET "status" = 'DELETE_PENDING',
+                   "contentInaccessibleAt" = ${now},
+                   "deleteAfter" = LEAST(
+                     COALESCE(artifact."deleteAfter", ${now}),
+                     ${now},
+                     artifact."deleteBy"
+                   ),
+                   "deleteLeaseOwner" = NULL,
+                   "deleteLeaseExpiresAt" = NULL,
+                   "updatedAt" = ${now}
+             WHERE artifact."queryId" IN (${Prisma.join(overdueIds)})
+               AND artifact."status" <> 'DELETED'
+          `,
+        );
       }
-      await transaction.searchStoredArtifact.updateMany({
-        where: {
-          query: { contentInaccessibleAt: { not: null } },
-          status: { in: ["QUARANTINED", "AVAILABLE"] },
-        },
-        data: {
-          status: "DELETE_PENDING",
-          contentInaccessibleAt: now,
-          deleteAfter: now,
-        },
-      });
+      await transaction.$executeRaw`
+        UPDATE "SearchStoredArtifact" AS artifact
+           SET "status" = 'DELETE_PENDING',
+               "contentInaccessibleAt" = ${now},
+               "deleteAfter" = LEAST(
+                 COALESCE(artifact."deleteAfter", ${now}),
+                 ${now},
+                 artifact."deleteBy"
+               ),
+               "updatedAt" = ${now}
+          FROM "SearchImageQuery" AS query
+         WHERE artifact."queryId" = query."id"
+           AND query."contentInaccessibleAt" IS NOT NULL
+           AND artifact."status" IN ('QUARANTINED', 'AVAILABLE')
+      `;
       await transaction.searchScanAssessment.updateMany({
         where: {
           status: "PROCESSING",

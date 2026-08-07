@@ -6,27 +6,16 @@ import type {
   SearchIntentInterpreter,
 } from "./search-intent-interpreter";
 
-function codePointOffset(text: string, codeUnitOffset: number) {
-  return Array.from(text.slice(0, codeUnitOffset)).length;
-}
-
 function proposal(
-  input: SearchIntentInterpretRequest,
   match: RegExpExecArray,
-  value: Omit<RawIntentProposal, "id" | "evidence">,
+  value: Omit<RawIntentProposal, "id" | "evidenceText">,
   index: number,
 ): RawIntentProposal {
   const evidence = match[0];
-  const start = codePointOffset(input.text, match.index);
   return {
     id: `det-${value.field}-${index}`,
     ...value,
-    evidence: [
-      {
-        startCodePoint: start,
-        endCodePoint: start + Array.from(evidence).length,
-      },
-    ],
+    evidenceText: [evidence],
   };
 }
 
@@ -92,7 +81,6 @@ export class DeterministicSearchIntentInterpreter implements SearchIntentInterpr
         if (!match) continue;
         proposals.push(
           proposal(
-            input,
             match,
             {
               field: rule.field,
@@ -115,7 +103,6 @@ export class DeterministicSearchIntentInterpreter implements SearchIntentInterpr
       if (!match) continue;
       proposals.push(
         proposal(
-          input,
           match,
           {
             field: "skills",
@@ -147,7 +134,6 @@ export class DeterministicSearchIntentInterpreter implements SearchIntentInterpr
       if (!match || !value) continue;
       proposals.push(
         proposal(
-          input,
           match,
           {
             field: rule.field,
@@ -169,7 +155,6 @@ export class DeterministicSearchIntentInterpreter implements SearchIntentInterpr
       const amount = Number((salary[1] ?? "0").replace(",", ".")) * 1_000_000;
       proposals.push(
         proposal(
-          input,
           salary,
           {
             field: "salaryMin",
@@ -184,7 +169,6 @@ export class DeterministicSearchIntentInterpreter implements SearchIntentInterpr
       );
       proposals.push(
         proposal(
-          input,
           salary,
           {
             field: "salaryCurrency",

@@ -3,10 +3,11 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 from hashlib import sha256
 from pathlib import Path
+from stat import S_IMODE, S_ISSOCK
 
 from fastapi.testclient import TestClient
 
-from src.app import create_app
+from src.app import bind_private_unix_socket, create_app
 from src.contracts import RecognitionResponse
 from src.engine import EngineManifest, RecognitionEngine
 
@@ -141,3 +142,14 @@ def test_openapi_contract_matches_committed_service_contract() -> None:
         assert token in text
     assert sha256(text.encode("utf-8")).hexdigest()
 
+
+def test_unix_socket_is_group_private(tmp_path: Path) -> None:
+    socket_path = tmp_path / "ocr.sock"
+    uds_socket = bind_private_unix_socket(str(socket_path))
+    try:
+        metadata = socket_path.stat()
+        assert S_ISSOCK(metadata.st_mode)
+        assert S_IMODE(metadata.st_mode) == 0o660
+    finally:
+        uds_socket.close()
+        socket_path.unlink(missing_ok=True)

@@ -73,23 +73,46 @@ function valueKey(proposal: RawIntentProposal) {
   );
 }
 
+function codePointOffset(text: string, codeUnitOffset: number) {
+  return Array.from(text.slice(0, codeUnitOffset)).length;
+}
+
+function resolveEvidence(ocrText: string, excerpts: readonly string[]) {
+  const unique = [...new Set(excerpts.map((value) => value.trim()))].filter(
+    Boolean,
+  );
+  const evidence = unique.flatMap((text) => {
+    const startCodeUnit = ocrText.indexOf(text);
+    if (startCodeUnit < 0) return [];
+    const startCodePoint = codePointOffset(ocrText, startCodeUnit);
+    return [
+      {
+        startCodePoint,
+        endCodePoint: startCodePoint + Array.from(text).length,
+        text,
+      },
+    ];
+  });
+  return { evidence, expectedCount: unique.length };
+}
+
 export class SearchIntentSelectionPolicy {
   validateAndSelect(input: {
     ocrText: string;
     language: SearchIntent["language"];
     proposals: readonly RawIntentProposal[];
   }): SearchIntent {
-    const codePoints = Array.from(input.ocrText);
     const warnings = new Set<SearchIntent["warnings"][number]>();
     const accepted: SearchIntent["proposals"] = [];
     const seen = new Set<string>();
-    for (const candidate of input.proposals) {
-      const parsed = rawIntentProposalSchema.safeParse(candidate);
-      if (
-        !parsed.success ||
-        !carrierValid(candidate) ||
-        !valuesValid(candidate)
-      ) {
+    for (const rawCandidate of input.proposals) {
+      const parsed = rawIntentProposalSchema.safeParse(rawCandidate);
+      if (!parsed.success) {
+        warnings.add("UNSUPPORTED_CRITERIA_REMOVED");
+        continue;
+      }
+      const candidate = parsed.data;
+      if (!carrierValid(candidate) || !valuesValid(candidate)) {
         warnings.add("UNSUPPORTED_CRITERIA_REMOVED");
         continue;
       }
@@ -97,22 +120,11 @@ export class SearchIntentSelectionPolicy {
         warnings.add("LOW_CONFIDENCE_CRITERIA_REMOVED");
         continue;
       }
-      const evidence = candidate.evidence.map((range) => ({
-        ...range,
-        text: codePoints
-          .slice(range.startCodePoint, range.endCodePoint)
-          .join(""),
-      }));
-      if (
-        evidence.some(
-          (item) =>
-            item.startCodePoint < 0 ||
-            item.endCodePoint > codePoints.length ||
-            item.endCodePoint <= item.startCodePoint ||
-            !item.text.trim(),
-        )
-      ) {
+      const resolved = resolveEvidence(input.ocrText, candidate.evidenceText);
+      if (resolved.evidence.length !== resolved.expectedCount) {
         warnings.add("UNVERIFIED_EVIDENCE_REMOVED");
+      }
+      if (!resolved.evidence.length) {
         continue;
       }
       const key = valueKey(candidate);
@@ -125,8 +137,14 @@ export class SearchIntentSelectionPolicy {
       const selected =
         candidate.confidence >= 0.9 && candidate.basis !== "INFERRED";
       accepted.push({
-        ...candidate,
-        evidence,
+        id: candidate.id,
+        field: candidate.field,
+        stringValue: candidate.stringValue,
+        numberValue: candidate.numberValue,
+        stringValues: candidate.stringValues,
+        confidence: candidate.confidence,
+        basis: candidate.basis,
+        evidence: resolved.evidence,
         selected,
         selectionReason: selected
           ? candidate.basis === "EXPLICIT"

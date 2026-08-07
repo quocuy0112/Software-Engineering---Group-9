@@ -4,7 +4,6 @@ import { randomUUID } from "node:crypto";
 
 import { ClamAvScanner } from "@/backend/cv/scanning/clamav";
 import { createSearchStorageResource } from "@/backend/image-search/storage/factory";
-import { DeterministicSearchIntentInterpreter } from "@/backend/image-search/interpretation/deterministic";
 import { OpenAiSearchIntentInterpreter } from "@/backend/image-search/interpretation/openai";
 import { SearchIntentSelectionPolicy } from "@/backend/image-search/interpretation/selection-policy";
 import { SharpImageNormalizer } from "@/backend/ocr/image-normalizer";
@@ -47,19 +46,14 @@ export function createImageSearchWorkerResources() {
     expectedModelName: "PP-OCRv6-medium",
   });
   const selectionPolicy = new SearchIntentSelectionPolicy();
-  const deterministicValidator = new ValidateSearchIntentService({
-    interpreter: new DeterministicSearchIntentInterpreter(),
+  const externalValidator = new ValidateSearchIntentService({
+    interpreter: new OpenAiSearchIntentInterpreter({
+      // Image search intentionally shares the server-only CV parsing key. It
+      // has no separate browser-visible or image-search-specific credential.
+      apiKey: process.env.OPENAI_API_KEY ?? "",
+    }),
     selectionPolicy,
   });
-  const externalValidator =
-    process.env.IMAGE_SEARCH_INTERPRETER === "openai"
-      ? new ValidateSearchIntentService({
-          interpreter: new OpenAiSearchIntentInterpreter({
-            apiKey: process.env.OPENAI_API_KEY ?? "",
-          }),
-          selectionPolicy,
-        })
-      : null;
   const owner = `image-search-worker:${randomUUID()}`;
   return {
     owner,
@@ -81,7 +75,7 @@ export function createImageSearchWorkerResources() {
       OCR: new ImageSearchOcrStage({ ocr, storage, work, queries }),
       INTERPRET: new ImageSearchInterpretStage({
         validators: {
-          deterministic: deterministicValidator,
+          deterministic: null,
           external: externalValidator,
         },
         storage,

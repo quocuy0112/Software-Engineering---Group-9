@@ -83,7 +83,7 @@ export class ImageSearchInterpretStage {
   constructor(
     private readonly dependencies: Readonly<{
       validators: Readonly<{
-        deterministic: ValidateSearchIntentService;
+        deterministic: ValidateSearchIntentService | null;
         external: ValidateSearchIntentService | null;
       }>;
       storage: SearchStorageResource;

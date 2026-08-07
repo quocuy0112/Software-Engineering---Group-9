@@ -23,6 +23,15 @@ describe("image-search public contracts", () => {
         extension: "png",
         mediaType: "image/png",
         bytes: 100,
+        interpreterClass: "DETERMINISTIC_INTERNAL",
+        consent: null,
+      }).success,
+    ).toBe(false);
+    expect(
+      createImageSearchRequestSchema.safeParse({
+        extension: "png",
+        mediaType: "image/png",
+        bytes: 100,
         interpreterClass: "EXTERNAL_OPENAI",
         consent: null,
       }).success,

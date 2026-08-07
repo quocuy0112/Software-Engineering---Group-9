@@ -71,9 +71,10 @@ export function loadImageSearchConfiguration(environment: Environment) {
   if (applicationEnvironment === "production" && adapter !== "s3") {
     fail("IMAGE_SEARCH_PRODUCTION_STORAGE_REQUIRED");
   }
-  const interpreter = environment.IMAGE_SEARCH_INTERPRETER;
-  if (!["deterministic", "openai"].includes(interpreter ?? "")) fail();
+  exact(environment, "IMAGE_SEARCH_INTERPRETER", "openai");
+  const workerEnabled = boolean(environment, "IMAGE_SEARCH_WORKER_ENABLED");
   const openAiEnabled = boolean(environment, "IMAGE_SEARCH_OPENAI_ENABLED");
+  if (!openAiEnabled) fail("IMAGE_SEARCH_EXTERNAL_APPROVALS_REQUIRED");
   exact(environment, "IMAGE_SEARCH_OPENAI_MODEL", "gpt-5.4-mini-2026-03-17");
   const approvals = [
     "IMAGE_SEARCH_OPENAI_DPA_APPROVED",
@@ -81,17 +82,13 @@ export function loadImageSearchConfiguration(environment: Environment) {
     "IMAGE_SEARCH_OPENAI_CROSS_BORDER_APPROVED",
     "IMAGE_SEARCH_OPENAI_ZDR_APPROVED",
   ].map((key) => boolean(environment, key));
-  if (interpreter === "openai") {
-    if (
-      !openAiEnabled ||
-      !environment.OPENAI_API_KEY ||
-      (applicationEnvironment === "production" &&
-        approvals.some((value) => !value))
-    ) {
-      fail("IMAGE_SEARCH_EXTERNAL_APPROVALS_REQUIRED");
-    }
-  } else if (openAiEnabled) {
-    fail("IMAGE_SEARCH_CONFIGURATION_INVALID");
+  if (
+    ((applicationEnvironment === "production" || workerEnabled) &&
+      !environment.OPENAI_API_KEY) ||
+    (applicationEnvironment === "production" &&
+      approvals.some((value) => !value))
+  ) {
+    fail("IMAGE_SEARCH_EXTERNAL_APPROVALS_REQUIRED");
   }
   if (applicationEnvironment === "production") {
     for (const key of [
@@ -117,7 +114,7 @@ export function loadImageSearchConfiguration(environment: Environment) {
       cvHybridDeadlineMs: 180_000,
       searchTimeoutMs: 6_000,
     },
-    workerEnabled: boolean(environment, "IMAGE_SEARCH_WORKER_ENABLED"),
+    workerEnabled,
     cleanupEnabled: boolean(environment, "IMAGE_SEARCH_CLEANUP_ENABLED"),
     storage: {
       adapter: adapter as "filesystem" | "s3",
@@ -135,10 +132,7 @@ export function loadImageSearchConfiguration(environment: Environment) {
           : null,
     },
     interpreter: {
-      class:
-        interpreter === "openai"
-          ? ("EXTERNAL_OPENAI" as const)
-          : ("DETERMINISTIC_INTERNAL" as const),
+      class: "EXTERNAL_OPENAI" as const,
       model: environment.IMAGE_SEARCH_OPENAI_MODEL!,
     },
     sourceMaximumBytes: 5_000_000,

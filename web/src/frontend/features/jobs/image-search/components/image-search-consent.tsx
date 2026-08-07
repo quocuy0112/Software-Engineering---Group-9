@@ -8,19 +8,21 @@ export function ImageSearchConsent({
   onChange(selected: boolean): void;
 }) {
   return (
-    <fieldset>
-      <legend>Optional external interpretation</legend>
+    <fieldset className="image-search-consent">
+      <legend>Required AI processing consent</legend>
       <label>
         <input
           type="checkbox"
           checked={selected}
           onChange={(event) => onChange(event.target.checked)}
         />
-        Send recognized text only to the approved OpenAI model for this
-        job-filter purpose.
+        I agree that SmartHire may send only the recognized text from this image
+        to the approved OpenAI deployment to create editable job-search filters
+        for this request.
       </label>
       <p>
-        Initially off. Refusing or revoking keeps local/manual search available.
+        Image search is AI-only. Consent starts off and applies only to this
+        request. Ordinary text search remains available without consent.
       </p>
     </fieldset>
   );

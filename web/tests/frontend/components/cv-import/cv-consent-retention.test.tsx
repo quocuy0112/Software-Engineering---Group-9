@@ -28,8 +28,13 @@ vi.mock("next/navigation", () => ({ useRouter: () => navigation }));
 
 const challenge =
   "eyJ1IjoidXBsb2FkX2NvbnNlbnRfMTIzNCIsImUiOjE3ODU2MzAwMDB9.signature_fixture_12345678901234567890";
+const refreshedChallenge =
+  "eyJ1IjoidXBsb2FkX2NvbnNlbnRfMTIzNCIsImUiOjE3ODU2MzA2MDB9.refreshed_signature_fixture_1234567890";
 
-function notice(granted = false): CvConsentNotice {
+function notice(
+  granted = false,
+  consentChallenge = challenge,
+): CvConsentNotice {
   return {
     required: true,
     granted,
@@ -37,7 +42,7 @@ function notice(granted = false): CvConsentNotice {
     processingPurpose:
       "Create a private CV review draft by extracting professional facts",
     noticeText: CV_EXTERNAL_CONSENT_NOTICE_TEXT,
-    consentChallenge: challenge,
+    consentChallenge,
   };
 }
 
@@ -117,6 +122,46 @@ describe("CV external consent and retention controls", () => {
     expect(screen.getByRole("status")).toHaveTextContent(/consent granted/i);
     expect(screen.getByTestId("cv-processing-consent")).not.toHaveTextContent(
       /model selector|provider selector|endpoint/i,
+    );
+  });
+
+  it("keeps acceptance checked across status polls and submits the newest challenge", async () => {
+    const onGrant = vi.fn(async () => undefined);
+    const view = render(
+      <CvProcessingConsent
+        notice={notice()}
+        canGrant
+        canRevoke={false}
+        onGrant={onGrant}
+        onRevoke={vi.fn()}
+      />,
+    );
+    const acceptance = screen.getByRole("checkbox", {
+      name: CV_EXTERNAL_CONSENT_NOTICE_TEXT,
+    });
+    fireEvent.click(acceptance);
+
+    view.rerender(
+      <CvProcessingConsent
+        notice={notice(false, refreshedChallenge)}
+        canGrant
+        canRevoke={false}
+        onGrant={onGrant}
+        onRevoke={vi.fn()}
+      />,
+    );
+
+    expect(acceptance).toBeChecked();
+    const grant = screen.getByRole("button", {
+      name: /grant external processing consent/i,
+    });
+    expect(grant).toBeEnabled();
+    fireEvent.click(grant);
+    await waitFor(() =>
+      expect(onGrant).toHaveBeenCalledWith({
+        accepted: true,
+        consentChallenge: refreshedChallenge,
+      }),
     );
   });
 

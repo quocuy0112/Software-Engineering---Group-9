@@ -232,7 +232,7 @@ type SearchIntentInterpretRequest = Readonly<{
   language: "VI" | "EN" | "BILINGUAL" | "UNKNOWN";
   purposeVersion: "job-image-search-purpose-v1";
   inputVersion: "search-ocr-text-v1";
-  instructionVersion: "job-search-intent-v1";
+  instructionVersion: "job-search-intent-v2";
   schemaVersion: "job-search-intent-v1";
   allowedFields: readonly AllowedImageSearchField[];
   safetyIdentifier?: string;
@@ -248,7 +248,7 @@ type RawIntentProposal = Readonly<{
   stringValues: readonly string[];
   confidence: number;
   basis: "EXPLICIT" | "NORMALIZED" | "INFERRED";
-  evidence: readonly { startCodePoint: number; endCodePoint: number }[];
+  evidenceText: readonly string[];
 }>;
 
 interface SearchIntentInterpreter {
@@ -304,20 +304,21 @@ interface SearchIntentSelectionPolicy {
   validateAndSelect(input: {
     ocrText: string;
     proposals: readonly RawIntentProposal[];
-    policyVersion: "search-intent-selection-v1";
+    policyVersion: "search-intent-selection-v2";
   }): ValidatedIntent;
   mergeForDelivery(input: {
     intent: ValidatedIntent;
     existingManualSearch: ExistingManualSearch;
-    policyVersion: "search-intent-selection-v1";
+    policyVersion: "search-intent-selection-v2";
   }): ValidatedIntent;
 }
 ```
 
 The policy must:
 
-1. convert evidence offsets by Unicode code point, prove every range is inside
-   the exact input, and derive UI evidence text locally;
+1. find every exact provider-supplied evidence excerpt in the normalized OCR
+   input, derive Unicode code-point ranges locally, and reject unverifiable
+   excerpts instead of trusting provider-calculated offsets;
 2. validate each carrier/field/value against the existing Feature 003 Zod
    schemas, including enum, array, currency, salary-range, and posting-window
    bounds;
@@ -329,7 +330,9 @@ The policy must:
 6. discard confidence `<0.60`;
 7. during one-time delivery, validate the browser's current visible criteria
    with the existing Feature 003 schema, preserve non-empty manual scalar/query
-   values, and merge set fields without duplicates;
+   values, and merge set fields without duplicates; generated conflicts remain
+   unselected, but a later explicit user selection replaces that corresponding
+   form field when the browser starts the reviewed search;
 8. produce at most 20 proposals and validate both the stored candidate intent
    and final delivered intent against
    `search-intent.schema.json`.
@@ -472,8 +475,9 @@ The response is one of the two public schemas in `openapi.yaml`.
 - `VALIDATED_INTENT`: final locally validated proposal artifact. Selected
   criteria may be mapped to `/jobs`; evidence excerpts remain browser memory.
 - `OCR_TEXT_FALLBACK`: at most 32 KiB of bounded recognized text plus safe
-  warnings. It may populate the current manual text editor but is never
-  automatically persisted or restored.
+  warnings. The client uses only the safe warning to explain why AI filters were
+  not created, discards the text immediately, and never copies it into the
+  global header query or Feature 003 filters.
 
 If response transmission fails after commit, the content is not re-delivered.
 The UI reports that the one-time result is unavailable and keeps ordinary manual

@@ -6,16 +6,24 @@ export function applyImageSearchIntent(
   intent: SearchIntent,
 ) {
   const next: ManualSearchContext = structuredClone(current);
+  const appliedScalarFields = new Set<string>();
+  const replacedSetFields = new Set<string>();
   for (const proposal of intent.proposals.filter((item) => item.selected)) {
     if (proposal.field === "q" || proposal.field === "location") {
-      if (!next[proposal.field])
+      if (!appliedScalarFields.has(proposal.field)) {
         next[proposal.field] = proposal.stringValue ?? "";
+        appliedScalarFields.add(proposal.field);
+      }
     } else if (
       proposal.field === "employmentType" ||
       proposal.field === "experienceLevel" ||
       proposal.field === "workArrangement" ||
       proposal.field === "skills"
     ) {
+      if (!replacedSetFields.has(proposal.field)) {
+        next[proposal.field] = [] as never;
+        replacedSetFields.add(proposal.field);
+      }
       const existing = new Set(
         next[proposal.field].map((value) => value.toLocaleLowerCase("vi")),
       );
@@ -29,17 +37,27 @@ export function applyImageSearchIntent(
       proposal.field === "salaryMin" ||
       proposal.field === "salaryMax"
     ) {
-      if (next[proposal.field] === null)
+      if (!appliedScalarFields.has(proposal.field)) {
         next[proposal.field] = proposal.numberValue;
+        appliedScalarFields.add(proposal.field);
+      }
     } else if (proposal.field === "postedWithinDays") {
-      if (next.postedWithinDays === null)
+      if (!appliedScalarFields.has(proposal.field)) {
         next.postedWithinDays = proposal.numberValue as 1 | 3 | 7 | 14 | 30;
+        appliedScalarFields.add(proposal.field);
+      }
     } else if (proposal.field === "salaryCurrency") {
-      next.salaryCurrency = proposal.stringValue ?? next.salaryCurrency;
+      if (!appliedScalarFields.has(proposal.field)) {
+        next.salaryCurrency = proposal.stringValue ?? next.salaryCurrency;
+        appliedScalarFields.add(proposal.field);
+      }
     } else if (proposal.field === "salaryPeriod") {
-      next.salaryPeriod =
-        (proposal.stringValue as ManualSearchContext["salaryPeriod"]) ??
-        next.salaryPeriod;
+      if (!appliedScalarFields.has(proposal.field)) {
+        next.salaryPeriod =
+          (proposal.stringValue as ManualSearchContext["salaryPeriod"]) ??
+          next.salaryPeriod;
+        appliedScalarFields.add(proposal.field);
+      }
     }
   }
   const parameters = new URLSearchParams();

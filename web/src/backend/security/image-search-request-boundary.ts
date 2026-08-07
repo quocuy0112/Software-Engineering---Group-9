@@ -4,7 +4,10 @@ import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 
 import { getActiveSession } from "@/backend/auth/session/get-session";
 import { serverEnvironment } from "@/backend/env/runtime";
-import { validateSameOrigin } from "@/backend/security/csrf/csrf";
+import {
+  validateSameOrigin,
+  validateSameOriginRead,
+} from "@/backend/security/csrf/csrf";
 import { validCsrfProof } from "@/backend/security/csrf/csrf-proof";
 
 export const IMAGE_SEARCH_RATE_COOKIE = "__Host-smarthire-image-rate";
@@ -88,7 +91,10 @@ export async function enforceImageSearchRequestBoundary(
   visitorCapability: string | null;
   newRateCookie: string | null;
 }> {
-  if (!validateSameOrigin(request, serverEnvironment.NEXT_PUBLIC_APP_URL)) {
+  const sameOrigin = input.mutation
+    ? validateSameOrigin(request, serverEnvironment.NEXT_PUBLIC_APP_URL)
+    : validateSameOriginRead(request, serverEnvironment.NEXT_PUBLIC_APP_URL);
+  if (!sameOrigin) {
     throw new ImageSearchRequestFailure(403, "REQUEST_FORBIDDEN");
   }
   const idempotencyKey = strictHeader(

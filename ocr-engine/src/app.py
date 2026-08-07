@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import socket
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from pathlib import Path
@@ -185,12 +186,36 @@ def _runtime() -> tuple[FastAPI, PaddleOcrOnnxEngine]:
     return app, engine
 
 
+def bind_private_unix_socket(socket_path: str) -> socket.socket:
+    path = Path(socket_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.unlink(missing_ok=True)
+    previous_umask = os.umask(0o007)
+    uds_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    try:
+        uds_socket.bind(socket_path)
+        # Uvicorn's built-in UDS binder forces 0666 after bind. Supplying our
+        # own socket preserves the worker-group-only boundary instead.
+        path.chmod(0o660)
+        return uds_socket
+    except BaseException:
+        uds_socket.close()
+        path.unlink(missing_ok=True)
+        raise
+    finally:
+        os.umask(previous_umask)
+
+
 if __name__ == "__main__":
     runtime_app, _ = _runtime()
     socket_path = os.environ.get(
         "OCR_ENGINE_SOCKET_PATH", "/run/smarthire-ocr/ocr.sock"
     )
-    Path(socket_path).parent.mkdir(parents=True, exist_ok=True)
-    Path(socket_path).unlink(missing_ok=True)
-    os.umask(0o007)
-    uvicorn.run(runtime_app, uds=socket_path, log_level="warning", access_log=False)
+    uds_socket = bind_private_unix_socket(socket_path)
+    config = uvicorn.Config(runtime_app, log_level="warning", access_log=False)
+    server = uvicorn.Server(config)
+    try:
+        server.run(sockets=[uds_socket])
+    finally:
+        uds_socket.close()
+        Path(socket_path).unlink(missing_ok=True)

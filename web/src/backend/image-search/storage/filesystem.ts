@@ -31,9 +31,22 @@ export class FilesystemPrivateSearchArtifactStorage implements PrivateSearchArti
     this.root = resolve(options.root);
   }
 
+  private usesDockerDesktopBindMount(): boolean {
+    return (
+      process.env.IMAGE_SEARCH_STORAGE_DOCKER_BIND_MOUNT === "true" &&
+      process.env.APP_ENV !== "production" &&
+      this.root === "/app/.local/image-search-storage"
+    );
+  }
+
   async assertReady(): Promise<void> {
     await mkdir(this.root, { recursive: true, mode: 0o700 });
-    await chmod(this.root, 0o700);
+    // Docker Desktop bind mounts backed by Windows do not implement chmod and
+    // return EPERM. This explicit local-only gate mirrors CV storage; Linux
+    // deployments still enforce the private POSIX modes below.
+    if (!this.usesDockerDesktopBindMount()) {
+      await chmod(this.root, 0o700);
+    }
     const details = await stat(this.root);
     if (!details.isDirectory()) {
       throw new SearchStorageFailure("SEARCH_STORAGE_NOT_READY");
@@ -61,7 +74,9 @@ export class FilesystemPrivateSearchArtifactStorage implements PrivateSearchArti
     } finally {
       await handle.close();
     }
-    await chmod(path, 0o600);
+    if (!this.usesDockerDesktopBindMount()) {
+      await chmod(path, 0o600);
+    }
     return {
       locator,
       plaintextBytes: sealed.plaintextBytes,

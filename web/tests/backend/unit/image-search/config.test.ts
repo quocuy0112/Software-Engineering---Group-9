@@ -33,13 +33,14 @@ function localEnvironment(
     IMAGE_SEARCH_RATE_HMAC_KEY_V1: Buffer.alloc(32, 2).toString("base64"),
     IMAGE_SEARCH_CAPABILITY_HMAC_KEY_V1: Buffer.alloc(32, 3).toString("base64"),
     CV_ARTIFACT_KEY_V1: Buffer.alloc(32, 4).toString("base64"),
-    IMAGE_SEARCH_INTERPRETER: "deterministic",
-    IMAGE_SEARCH_OPENAI_ENABLED: "false",
+    IMAGE_SEARCH_INTERPRETER: "openai",
+    IMAGE_SEARCH_OPENAI_ENABLED: "true",
     IMAGE_SEARCH_OPENAI_MODEL: "gpt-5.4-mini-2026-03-17",
     IMAGE_SEARCH_OPENAI_DPA_APPROVED: "false",
     IMAGE_SEARCH_OPENAI_PRIVACY_APPROVED: "false",
     IMAGE_SEARCH_OPENAI_CROSS_BORDER_APPROVED: "false",
     IMAGE_SEARCH_OPENAI_ZDR_APPROVED: "false",
+    OPENAI_API_KEY: "shared-cv-and-image-search-test-key",
     IMAGE_SEARCH_SOURCE_MAX_BYTES: "5000000",
     IMAGE_SEARCH_MAX_DECODED_PIXELS: "20000000",
     IMAGE_SEARCH_VISITOR_LIMIT_PER_HOUR: "3",
@@ -64,7 +65,7 @@ describe("Feature 005 configuration", () => {
       searchTimeoutMs: 6_000,
     });
     expect(configuration.storage.adapter).toBe("filesystem");
-    expect(configuration.interpreter.class).toBe("DETERMINISTIC_INTERNAL");
+    expect(configuration.interpreter.class).toBe("EXTERNAL_OPENAI");
     expect(configuration.retentionMs).toBe(15 * 60_000);
   });
 
@@ -94,6 +95,22 @@ describe("Feature 005 configuration", () => {
         localEnvironment({ NEXT_PUBLIC_OCR_MODEL_SHA256: modelSha }),
       ),
     ).toThrow("IMAGE_SEARCH_PUBLIC_CONFIGURATION_FORBIDDEN");
+  });
+
+  it("rejects deterministic mode, a disabled AI gate, or a missing shared API key", () => {
+    expect(() =>
+      loadImageSearchConfiguration(
+        localEnvironment({ IMAGE_SEARCH_INTERPRETER: "deterministic" }),
+      ),
+    ).toThrow("IMAGE_SEARCH_CONFIGURATION_INVALID");
+    expect(() =>
+      loadImageSearchConfiguration(
+        localEnvironment({ IMAGE_SEARCH_OPENAI_ENABLED: "false" }),
+      ),
+    ).toThrow("IMAGE_SEARCH_EXTERNAL_APPROVALS_REQUIRED");
+    expect(() =>
+      loadImageSearchConfiguration(localEnvironment({ OPENAI_API_KEY: "" })),
+    ).toThrow("IMAGE_SEARCH_EXTERNAL_APPROVALS_REQUIRED");
   });
 
   it("rejects filesystem storage and incomplete external approvals in production", () => {

@@ -280,11 +280,9 @@ components:
           minimum: 1
           maximum: 5000000
         interpreterClass:
-          enum: [DETERMINISTIC_INTERNAL, EXTERNAL_OPENAI]
+          const: EXTERNAL_OPENAI
         consent:
-          oneOf:
-            - type: "null"
-            - $ref: "#/components/schemas/SearchConsentGrant"
+          $ref: "#/components/schemas/SearchConsentGrant"
     SearchConsentGrant:
       type: object
       additionalProperties: false

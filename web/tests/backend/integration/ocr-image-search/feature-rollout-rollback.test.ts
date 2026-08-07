@@ -28,8 +28,15 @@ describe("Feature 005 rollout and rollback flags", () => {
           extension: "png",
           mediaType: "image/png",
           bytes: 128,
-          interpreterClass: "DETERMINISTIC_INTERNAL",
-          consent: null,
+          interpreterClass: "EXTERNAL_OPENAI",
+          consent: {
+            provider: "openai",
+            model: "gpt-5.4-mini-2026-03-17",
+            purposeVersion: "job-image-search-purpose-v1",
+            noticeVersion: "image-search-notice-v1",
+            consentTextVersion: "image-search-consent-v1",
+            retentionDisclosureVersion: "image-search-retention-v1",
+          },
         },
       }),
     ).rejects.toMatchObject({

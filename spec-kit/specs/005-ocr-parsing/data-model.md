@@ -478,9 +478,9 @@ no input text, proposal values, or provider response.
 | `model`                  | `String`                 | Exact deterministic/model version.      |
 | `purposeVersion`         | `String`                 | `job-image-search-purpose-v1`.          |
 | `inputVersion`           | `String`                 | `search-ocr-text-v1`.                   |
-| `instructionVersion`     | `String`                 | `job-search-intent-v1`.                 |
+| `instructionVersion`     | `String`                 | `job-search-intent-v2`.                 |
 | `schemaVersion`          | `String`                 | `job-search-intent-v1`.                 |
-| `selectionPolicyVersion` | `String`                 | `search-intent-selection-v1`.           |
+| `selectionPolicyVersion` | `String`                 | `search-intent-selection-v2`.           |
 | `proposalCount`          | `Int?`                   | `0..20`.                                |
 | `autoSelectedCount`      | `Int?`                   | `<=proposalCount`.                      |
 | `suggestedCount`         | `Int?`                   | `<=proposalCount`.                      |

@@ -13,17 +13,7 @@ export const rawIntentProposalSchema = z
     stringValues: z.array(z.string().min(1).max(80)).max(20),
     confidence: z.number().finite().min(0).max(1),
     basis: z.enum(["EXPLICIT", "NORMALIZED", "INFERRED"]),
-    evidence: z
-      .array(
-        z
-          .object({
-            startCodePoint: z.number().int().min(0).max(32_768),
-            endCodePoint: z.number().int().min(1).max(32_768),
-          })
-          .strict(),
-      )
-      .min(1)
-      .max(3),
+    evidenceText: z.array(z.string().trim().min(1).max(120)).min(1).max(3),
   })
   .strict();
 
@@ -34,7 +24,7 @@ export type SearchIntentInterpretRequest = Readonly<{
   language: "VI" | "EN" | "BILINGUAL" | "UNKNOWN";
   purposeVersion: "job-image-search-purpose-v1";
   inputVersion: "search-ocr-text-v1";
-  instructionVersion: "job-search-intent-v1";
+  instructionVersion: "job-search-intent-v2";
   schemaVersion: "job-search-intent-v1";
   allowedFields: typeof IMAGE_SEARCH_ALLOWED_FIELDS;
   safetyIdentifier?: string;

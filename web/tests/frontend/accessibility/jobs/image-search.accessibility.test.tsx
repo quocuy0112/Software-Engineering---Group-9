@@ -13,7 +13,7 @@ describe("image-assisted search accessibility", () => {
         <ImageSearchProgress progress={65} onCancel={vi.fn()} />
         <ImageSearchRecovery
           error="The image could not be read."
-          fallbackText={null}
+          fallbackReason={null}
           onRetry={vi.fn()}
           onManual={vi.fn()}
         />

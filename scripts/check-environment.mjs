@@ -221,10 +221,10 @@ if (await canAccess("web/.env.local")) {
   );
   check(
     appEnvironment.IMAGE_SEARCH_OPENAI_MODEL === "gpt-5.4-mini-2026-03-17" &&
-      ["deterministic", "openai"].includes(
-        appEnvironment.IMAGE_SEARCH_INTERPRETER,
-      ),
-    "image-search interpreter and external model are allowlisted",
+      appEnvironment.IMAGE_SEARCH_INTERPRETER === "openai" &&
+      appEnvironment.IMAGE_SEARCH_OPENAI_ENABLED === "true" &&
+      Boolean(appEnvironment.OPENAI_API_KEY),
+    "image search uses the approved OpenAI model and shared server API key",
   );
   check(
     appEnvironment.CV_CLAMD_SOCKET_PATH === "/run/clamav/clamd.sock",
@@ -431,8 +431,9 @@ if (await canAccess("web/.env.local")) {
   );
   const localImageSearchConfigurationValid =
     appEnvironment.IMAGE_SEARCH_STORAGE_ADAPTER === "filesystem" &&
-    appEnvironment.IMAGE_SEARCH_INTERPRETER === "deterministic" &&
-    appEnvironment.IMAGE_SEARCH_OPENAI_ENABLED === "false";
+    appEnvironment.IMAGE_SEARCH_INTERPRETER === "openai" &&
+    appEnvironment.IMAGE_SEARCH_OPENAI_ENABLED === "true" &&
+    Boolean(appEnvironment.OPENAI_API_KEY);
   const productionImageSearchConfigurationValid =
     appEnvironment.IMAGE_SEARCH_STORAGE_ADAPTER === "s3" &&
     productionImageSearchS3CoordinatesValid &&

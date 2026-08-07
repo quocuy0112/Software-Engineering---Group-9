@@ -9,13 +9,13 @@ test("starts external consent off, explains boundaries, and sends exact consent 
   page,
 }) => {
   const mock = await installMockImageSearchApi(page, "INTENT");
-  const input = await openImageSearch(page);
+  const input = await openImageSearch(page, "/jobs", false);
   await expect(page.getByRole("note")).toContainText(
     "deleted within 15 minutes",
   );
   await expect(page.getByRole("note")).toContainText("not used for face");
   const consent = page.getByRole("checkbox", {
-    name: /Send recognized text only/u,
+    name: /I agree that SmartHire may send only the recognized text/u,
   });
   await expect(consent).not.toBeChecked();
   await consent.check();
@@ -46,7 +46,12 @@ test("reload loses private in-memory results and never persists authority in URL
   const mock = await installMockImageSearchApi(page, "FALLBACK");
   const input = await openImageSearch(page);
   await input.setInputFiles(posterFixture());
-  await expect(page.getByLabel("Recognized job poster text")).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "AI filter suggestions are unavailable",
+    }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Recognized job poster text")).toHaveCount(0);
   expect(page.url()).not.toContain(mock.queryId);
   expect(page.url()).not.toContain(mock.capability);
   expect(
@@ -58,8 +63,19 @@ test("reload loses private in-memory results and never persists authority in URL
     ),
   ).not.toContain(mock.capability);
   await page.reload();
-  await expect(page.getByLabel("Recognized job poster text")).toHaveCount(0);
   await expect(
-    page.getByRole("checkbox", { name: /Send recognized text only/u }),
+    page.getByRole("heading", {
+      name: "AI filter suggestions are unavailable",
+    }),
+  ).toHaveCount(0);
+  await page
+    .getByRole("button", {
+      name: "Search jobs from an image",
+    })
+    .click();
+  await expect(
+    page.getByRole("checkbox", {
+      name: /I agree that SmartHire may send only the recognized text/u,
+    }),
   ).not.toBeChecked();
 });

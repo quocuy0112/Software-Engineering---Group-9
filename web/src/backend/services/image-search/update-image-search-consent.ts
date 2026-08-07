@@ -193,9 +193,9 @@ export class UpdateImageSearchConsentService {
               model: grant.model,
               purposeVersion: grant.purposeVersion,
               inputVersion: "search-ocr-text-v1",
-              instructionVersion: "job-search-intent-v1",
+              instructionVersion: "job-search-intent-v2",
               schemaVersion: "job-search-intent-v1",
-              selectionPolicyVersion: "search-intent-selection-v1",
+              selectionPolicyVersion: "search-intent-selection-v2",
             },
           });
         await transaction.searchImageQuery.update({

@@ -17,16 +17,33 @@ type State = Readonly<{
   phase: "IDLE" | "UPLOADING" | "PROCESSING" | "READY" | "FALLBACK" | "ERROR";
   progress: number;
   intent: SearchIntent | null;
-  fallbackText: string | null;
+  fallbackReason: ImageSearchFallbackReason | null;
   error: string | null;
   retryAt: string | null;
 }>;
+
+export type ImageSearchFallbackReason =
+  | "LOW_CONFIDENCE"
+  | "INTERPRETER_UNAVAILABLE"
+  | "INTERPRETER_INVALID_OUTPUT"
+  | "UNKNOWN";
+
+function fallbackReason(
+  warnings: readonly string[],
+): ImageSearchFallbackReason {
+  if (warnings.includes("INTERPRETER_INVALID_OUTPUT"))
+    return "INTERPRETER_INVALID_OUTPUT";
+  if (warnings.includes("INTERPRETER_UNAVAILABLE"))
+    return "INTERPRETER_UNAVAILABLE";
+  if (warnings.includes("LOW_CONFIDENCE")) return "LOW_CONFIDENCE";
+  return "UNKNOWN";
+}
 
 const initialState: State = {
   phase: "IDLE",
   progress: 0,
   intent: null,
-  fallbackText: null,
+  fallbackReason: null,
   error: null,
   retryAt: null,
 };
@@ -34,7 +51,6 @@ const initialState: State = {
 export function useImageSearch(input: {
   currentCriteria: ManualSearchContext;
   csrfProof: string;
-  externalInterpretation: boolean;
 }) {
   const [state, setState] = useState<State>(initialState);
   const active = useRef<{
@@ -90,19 +106,15 @@ export function useImageSearch(input: {
             extension: file.type === "image/png" ? "png" : "jpg",
             mediaType: file.type as "image/png" | "image/jpeg",
             bytes: file.size,
-            interpreterClass: input.externalInterpretation
-              ? "EXTERNAL_OPENAI"
-              : "DETERMINISTIC_INTERNAL",
-            consent: input.externalInterpretation
-              ? {
-                  provider: "openai",
-                  model: "gpt-5.4-mini-2026-03-17",
-                  purposeVersion: "job-image-search-purpose-v1",
-                  noticeVersion: "image-search-notice-v1",
-                  consentTextVersion: "image-search-consent-v1",
-                  retentionDisclosureVersion: "image-search-retention-v1",
-                }
-              : null,
+            interpreterClass: "EXTERNAL_OPENAI",
+            consent: {
+              provider: "openai",
+              model: "gpt-5.4-mini-2026-03-17",
+              purposeVersion: "job-image-search-purpose-v1",
+              noticeVersion: "image-search-notice-v1",
+              consentTextVersion: "image-search-consent-v1",
+              retentionDisclosureVersion: "image-search-retention-v1",
+            },
           },
           idempotencyKey: crypto.randomUUID(),
           csrfProof: input.csrfProof,
@@ -165,7 +177,7 @@ export function useImageSearch(input: {
                     ...initialState,
                     phase: "FALLBACK",
                     progress: 100,
-                    fallbackText: result.text,
+                    fallbackReason: fallbackReason(result.warnings),
                   },
             );
             return;
@@ -206,12 +218,7 @@ export function useImageSearch(input: {
         });
       }
     },
-    [
-      cancel,
-      input.csrfProof,
-      input.currentCriteria,
-      input.externalInterpretation,
-    ],
+    [cancel, input.csrfProof, input.currentCriteria],
   );
 
   const revokeConsent = useCallback(async () => {

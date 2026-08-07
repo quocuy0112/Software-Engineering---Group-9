@@ -129,7 +129,7 @@ const schema = z
     IMAGE_SEARCH_S3_PREFIX: z.string().optional(),
     IMAGE_SEARCH_S3_KMS_KEY_ID: z.string().optional(),
     IMAGE_SEARCH_S3_WORKER_ROLE_ARN: z.string().optional(),
-    IMAGE_SEARCH_INTERPRETER: z.enum(["deterministic", "openai"]).optional(),
+    IMAGE_SEARCH_INTERPRETER: z.literal("openai").optional(),
     IMAGE_SEARCH_OPENAI_ENABLED: booleanString.optional(),
     IMAGE_SEARCH_OPENAI_MODEL: z.string().optional(),
     IMAGE_SEARCH_OPENAI_DPA_APPROVED: booleanString.optional(),

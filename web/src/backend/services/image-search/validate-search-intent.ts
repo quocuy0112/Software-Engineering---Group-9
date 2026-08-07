@@ -28,7 +28,7 @@ export class ValidateSearchIntentService {
         language: input.language,
         purposeVersion: "job-image-search-purpose-v1",
         inputVersion: "search-ocr-text-v1",
-        instructionVersion: "job-search-intent-v1",
+        instructionVersion: "job-search-intent-v2",
         schemaVersion: "job-search-intent-v1",
         allowedFields: [
           "q",

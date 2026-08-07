@@ -66,7 +66,6 @@ describe("image-search client recovery races", () => {
       useImageSearch({
         currentCriteria: criteria,
         csrfProof: "csrf-proof",
-        externalInterpretation: false,
       }),
     );
 
@@ -80,6 +79,14 @@ describe("image-search client recovery races", () => {
     });
     expect(api.uploadImageSearchContent).toHaveBeenCalledWith(
       expect.objectContaining({ queryId: "new-query" }),
+    );
+    expect(api.reserveImageSearch).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        request: expect.objectContaining({
+          interpreterClass: "EXTERNAL_OPENAI",
+          consent: expect.objectContaining({ provider: "openai" }),
+        }),
+      }),
     );
 
     await act(async () => {
@@ -121,7 +128,6 @@ describe("image-search client recovery races", () => {
         useImageSearch({
           currentCriteria: { ...criteria, q },
           csrfProof: "csrf-proof",
-          externalInterpretation: false,
         }),
       { initialProps: { q: "manual one" } },
     );
@@ -137,5 +143,37 @@ describe("image-search client recovery races", () => {
       ),
     );
     expect(result.current.phase).toBe("IDLE");
+  });
+
+  it("keeps OCR fallback text out of client state and records only the safe reason", async () => {
+    api.reserveImageSearch.mockResolvedValue({
+      queryId: "fallback-query",
+      capability: "fallback-capability",
+    });
+    api.getImageSearchStatus.mockResolvedValue({ state: "FALLBACK_READY" });
+    api.consumeImageSearchResult.mockResolvedValue({
+      kind: "OCR_TEXT_FALLBACK",
+      queryId: "fallback-query",
+      text: "Private recognized poster text",
+      language: "EN",
+      warnings: ["INTERPRETER_UNAVAILABLE"],
+    });
+    const { result } = renderHook(() =>
+      useImageSearch({
+        currentCriteria: criteria,
+        csrfProof: "csrf-proof",
+      }),
+    );
+
+    await act(async () => {
+      await result.current.start(image("fallback.png"));
+    });
+
+    expect(result.current.phase).toBe("FALLBACK");
+    expect(result.current.fallbackReason).toBe("INTERPRETER_UNAVAILABLE");
+    expect(result.current).not.toHaveProperty("fallbackText");
+    expect(JSON.stringify(result.current)).not.toContain(
+      "Private recognized poster text",
+    );
   });
 });

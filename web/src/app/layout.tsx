@@ -27,8 +27,8 @@ export default function RootLayout({
     >
       <body suppressHydrationWarning>
         <ThemeProvider>
-          {children}
           <GlobalImageSearch />
+          {children}
           <Toaster
             className="app-toaster"
             position="top-right"

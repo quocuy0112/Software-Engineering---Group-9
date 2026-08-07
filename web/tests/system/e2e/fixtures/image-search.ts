@@ -157,11 +157,23 @@ export function posterFixture() {
   return resolve(process.cwd(), "tests/fixtures/ocr-corpus/images/ocr-061.jpg");
 }
 
-export async function openImageSearch(page: Page, path = "/jobs") {
+export async function openImageSearch(
+  page: Page,
+  path = "/jobs",
+  grantConsent = true,
+) {
   await page.goto(path);
-  const summary = page.getByText("Search jobs from a poster image", {
-    exact: true,
-  });
-  await summary.click();
+  await page
+    .getByRole("button", {
+      name: "Search jobs from an image",
+    })
+    .click();
+  if (grantConsent) {
+    await page
+      .getByRole("checkbox", {
+        name: /I agree that SmartHire may send only the recognized text/u,
+      })
+      .check();
+  }
   return page.getByLabel("Job poster image");
 }

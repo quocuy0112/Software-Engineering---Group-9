@@ -90,7 +90,7 @@ export class CreateImageSearchService {
         throw new ImageSearchServiceError(
           503,
           "IMAGE_PROCESSING_UNAVAILABLE",
-          "External interpretation is unavailable; choose internal or manual search.",
+          "AI image interpretation is unavailable; ordinary text search remains available.",
         );
       }
     }

@@ -22,9 +22,9 @@ PP-OCRv6-medium service using ONNX Runtime over a private Unix socket. The
 existing CV worker and a new independently limited image-search worker perform
 all purpose, scan, decode, storage, consent, and persistence decisions. Search
 artifacts use a separate encrypted namespace and hard 15-minute deletion
-deadline. Optional semantic intent uses the existing OpenAI adapter behind a
-new provider-independent contract and per-query consent; a conservative local
-interpreter and ordinary text search remain available.
+deadline. Image intent uses the existing OpenAI adapter and shared server-only
+CV parsing API key behind a provider-independent contract and per-query
+consent; ordinary text search remains available without AI consent.
 
 ## Technical Context
 
@@ -122,7 +122,6 @@ PostgreSQL <---------------- image-search-worker <-------------+
      |                         |-- Sharp normalize
      |                         |-- OCR Unix socket ------> ocr-engine
      |                         `-- SearchIntentInterpreter
-     |                              |-- deterministic-v1
      |                              `-- consented OpenAI
      |
      `------------------------ cv-worker
@@ -261,18 +260,23 @@ storage root. Its stages are:
 3. call the private OCR engine with a six-second search deadline and validate
    the strict result;
 4. store at most 32 KiB UTF-8 OCR text as an encrypted ephemeral artifact;
-5. if exact external consent and deployment gates pass, call the semantic
-   interpreter; otherwise use `deterministic-v1` or prepare OCR fallback;
-6. verify evidence offsets, confidence/basis, contradictions, and every value
-   against the existing `jobSearchQuerySchema`; store a bounded encrypted
-   one-time candidate intent;
+5. if exact external consent and deployment gates pass, call the OpenAI
+   semantic interpreter; otherwise prepare a safe retry/ordinary-search
+   recovery that never prefills recognized text into a query or filter;
+6. resolve verbatim evidence excerpts to Unicode code-point ranges locally,
+   verify confidence/basis, contradictions, and every value against the
+   existing `jobSearchQuerySchema`; store a bounded encrypted one-time
+   candidate intent;
 7. finalize state only if query, lease, consent, capability/actor ownership, and
    hard deadline are current.
 
 At result consumption, the service validates the browser's current visible
 Feature 003 criteria, turns any conflicting generated scalar/query proposal into
 an unselected suggestion, merges set-valued criteria without duplicates, and
-does not persist that current criteria payload.
+does not persist that current criteria payload. When the user explicitly checks
+a reviewed proposal and applies it, the browser replaces the corresponding
+visible filter, preserves fields without a checked proposal, and navigates to
+`/jobs` so Feature 003 runs the search immediately.
 
 The worker never queries `JobPosting` and never returns job IDs. Job availability
 is checked only later by Feature 003.
@@ -293,11 +297,10 @@ No automatic external OCR fallback exists.
 field schema, purpose/instruction/schema versions, deadline, and optional
 purpose-separated safety identifier. It returns proposals only.
 
-- `deterministic-v1` is local, conservative, and always available when its
-  process is healthy.
-- `openai` is optional, receives text only, uses the existing exact SDK/model
-  baseline with new strict `job-search-intent-v1`, tools/background/reuse off,
-  `store=false`, and retries zero.
+- `openai` receives text only and uses the existing exact SDK/model baseline
+  with instruction `job-search-intent-v2`, strict public schema
+  `job-search-intent-v1`, tools/background/reuse off, `store=false`, and retries
+  zero.
 - Production external mode additionally requires approved DPA/privacy/cross-
   border and verified ZDR/equivalent flags. If those fail, startup/dispatch
   rejects external mode and offers local/manual behavior.
@@ -305,10 +308,12 @@ purpose-separated safety identifier. It returns proposals only.
   The worker rechecks the latest event immediately before dispatch. Revocation
   wins. No second provider is attempted silently.
 
-`search-intent-selection-v1` auto-selects only evidence-verified `EXPLICIT` or
+`search-intent-selection-v2` auto-selects only evidence-verified `EXPLICIT` or
 `NORMALIZED` criteria at confidence `>=0.90`; `INFERRED` and `0.60..0.899...`
 criteria are unselected; lower/invalid/contradictory/excess criteria are
-discarded. Self-reported confidence alone never permits selection.
+discarded. The interpreter supplies exact OCR excerpts, while the server—not
+the model—resolves their Unicode ranges. Self-reported confidence alone never
+permits selection.
 
 ## Security, Session, Capability, and Privacy Controls
 
@@ -446,8 +451,8 @@ an equivalent consistent prefix.
 | `IMAGE_SEARCH_ARTIFACT_KEY_V1`          | Separate 32-byte AES key, never printed or shared with CV storage.                           |
 | `IMAGE_SEARCH_RATE_HMAC_KEY_V1`         | HMAC key for IP/browser/admission subjects.                                                  |
 | `IMAGE_SEARCH_CAPABILITY_HMAC_KEY_V1`   | Separate HMAC key for visitor query capabilities.                                            |
-| `IMAGE_SEARCH_INTERPRETER`              | `deterministic` or `openai`; no arbitrary module/provider URL.                               |
-| `IMAGE_SEARCH_OPENAI_ENABLED`           | Explicit external semantic enable gate.                                                      |
+| `IMAGE_SEARCH_INTERPRETER`              | Must be `openai`; no deterministic or arbitrary module/provider URL.                         |
+| `IMAGE_SEARCH_OPENAI_ENABLED`           | Must be `true` whenever image-search admission is enabled.                                   |
 | `IMAGE_SEARCH_OPENAI_*_APPROVED`        | Provider/model, DPA/privacy, cross-border, ZDR/equivalent, and production enable assertions. |
 | Existing `OPENAI_API_KEY`               | Reused only server-side; dispatch still requires search-specific gates/consent.              |
 | Existing ClamAV variables               | Reused freshness/socket limits; no bypass or TCP fallback.                                   |
@@ -474,10 +479,9 @@ native CV extraction; supervisor messaging reports reduced capability.
    No real user content is shadow-copied or used for training.
 5. Enable Candidate OCR for internal test accounts, first image-only PDFs, then
    suspicious PDFs/DOCX, while retaining the native v1 path.
-6. Enable image search with the deterministic interpreter and strict quotas.
-7. Enable optional OpenAI interpretation only after consent/UI, ZDR/privacy,
-   schema, canary, and fallback gates pass.
-8. Rollback disables new OCR/image admissions and semantic dispatch but leaves
+6. Enable OpenAI-only image search with strict quotas only after consent/UI,
+   ZDR/privacy, schema, canary, and fallback gates pass.
+7. Rollback disables new OCR/image admissions and semantic dispatch but leaves
    CV/search cleanup, deletion, reconciliation, and existing native/manual paths
    active until all temporary content is gone. The additive schema remains safe.
 
@@ -621,7 +625,8 @@ returns recognized lines only.
 - Visitor IP+browser and authenticated account rolling limits use concurrency,
   controlled clocks, multi-device/shared-IP cases, idempotent replay, and exact
   retry time.
-- AI/deterministic outputs cover allowed fields, evidence offsets, threshold
+- AI outputs cover allowed fields, exact evidence excerpts and locally resolved
+  Unicode ranges, threshold
   boundaries, explicit/normalized/inferred selection, manual-value conflict,
   invalid enum/range, job ID/sort/private-field rejection, stale/cancelled/
   superseded result, and one-time OCR fallback memory lifecycle.

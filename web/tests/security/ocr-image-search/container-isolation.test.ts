@@ -25,7 +25,8 @@ describe("OCR container isolation", () => {
     );
     expect(app).toContain('os.environ.get(\n        "OCR_ENGINE_SOCKET_PATH"');
     expect(app).toContain("os.umask(0o007)");
-    expect(app).toContain("uds=socket_path");
+    expect(app).toContain("path.chmod(0o660)");
+    expect(app).toContain("server.run(sockets=[uds_socket])");
     expect(app).not.toMatch(/host=|port=/u);
   });
 
@@ -41,6 +42,10 @@ describe("OCR container isolation", () => {
     expect(worker).toContain(
       "./web/.local/image-search-storage:/app/.local/image-search-storage",
     );
-    expect(worker).not.toContain("cv-storage");
+    expect(worker).toContain('IMAGE_SEARCH_STORAGE_DOCKER_BIND_MOUNT: "true"');
+    expect(worker).toContain("CV_STORAGE_LOCAL_ROOT: /app/.local/cv-storage");
+    expect(worker).not.toContain(
+      "./web/.local/cv-storage:/app/.local/cv-storage",
+    );
   });
 });

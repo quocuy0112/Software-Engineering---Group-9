@@ -17,7 +17,7 @@ describe("external interpretation prompt and biometric boundary", () => {
             stringValues: [],
             confidence: 0.99,
             basis: "EXPLICIT",
-            evidence: [{ startCodePoint: 0, endCodePoint: 19 }],
+            evidenceText: ["TypeScript engineer"],
           },
         ],
       }),
@@ -34,7 +34,7 @@ describe("external interpretation prompt and biometric boundary", () => {
         language: "EN",
         purposeVersion: "job-image-search-purpose-v1",
         inputVersion: "search-ocr-text-v1",
-        instructionVersion: "job-search-intent-v1",
+        instructionVersion: "job-search-intent-v2",
         schemaVersion: "job-search-intent-v1",
         allowedFields: IMAGE_SEARCH_ALLOWED_FIELDS,
         safetyIdentifier: "safe_fixture_identifier_00000000001",
@@ -57,6 +57,10 @@ describe("external interpretation prompt and biometric boundary", () => {
     expect(body.instructions).toMatch(
       /Never identify or analyze people, faces, portraits/u,
     );
+    expect(body.instructions).toMatch(/single best q prediction/u);
+    expect(body.instructions).toMatch(/exact, verbatim substrings/u);
+    expect(body.instructions).toMatch(/Never calculate or return character/u);
+    expect(JSON.stringify(body.input)).toContain("job-search-intent-v2");
     expect(options).toMatchObject({ maxRetries: 0 });
   });
 
@@ -74,7 +78,7 @@ describe("external interpretation prompt and biometric boundary", () => {
         language: "EN",
         purposeVersion: "job-image-search-purpose-v1",
         inputVersion: "search-ocr-text-v1",
-        instructionVersion: "job-search-intent-v1",
+        instructionVersion: "job-search-intent-v2",
         schemaVersion: "job-search-intent-v1",
         allowedFields: IMAGE_SEARCH_ALLOWED_FIELDS,
         safetyIdentifier: "safe_fixture_identifier_00000000002",

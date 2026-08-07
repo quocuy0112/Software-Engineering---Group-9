@@ -12,6 +12,7 @@ import { ImageSearchProgress } from "./image-search-progress";
 import { ImageSearchProposals } from "./image-search-proposals";
 import { ImageSearchRecovery } from "./image-search-recovery";
 import { ImageSearchConsent } from "./image-search-consent";
+import { ImageSearchFeedback } from "./image-search-feedback";
 
 const defaults: ManualSearchContext = {
   q: "",
@@ -89,21 +90,107 @@ export function GlobalImageSearch() {
   const csrfProof = useCsrfProof();
   const criteria = useMemo(() => criteriaFromLocation(), []);
   const [externalConsent, setExternalConsent] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const search = useImageSearch({
     currentCriteria: criteria,
     csrfProof,
-    externalInterpretation: externalConsent,
   });
   const busy = search.phase === "UPLOADING" || search.phase === "PROCESSING";
+  const showPanel = panelOpen || search.phase !== "IDLE";
+
   return (
-    <aside
+    <header
       id="global-image-search"
       className="global-image-search"
-      aria-label="Search jobs from an image"
+      data-phase={search.phase.toLowerCase()}
+      aria-label="Global job search"
     >
-      <details open={search.phase !== "IDLE"}>
-        <summary>Search jobs from a poster image</summary>
-        <div className="global-image-search-panel">
+      <ImageSearchFeedback
+        phase={search.phase}
+        error={search.error}
+        fallbackReason={search.fallbackReason}
+        retryAt={search.retryAt}
+        proposalCount={search.intent?.proposals.length ?? 0}
+        warningCount={search.intent?.warnings.length ?? 0}
+      />
+      <form
+        className="global-image-search-bar"
+        role="search"
+        aria-label="Global job search"
+        onSubmit={(event) => {
+          event.preventDefault();
+          const value = query.trim();
+          const parameters = new URLSearchParams();
+          if (value) parameters.set("q", value.slice(0, 200));
+          window.location.assign(
+            parameters.size ? `/jobs?${parameters.toString()}` : "/jobs",
+          );
+        }}
+      >
+        <button
+          className="global-image-search-camera-button"
+          type="button"
+          aria-label="Search jobs from an image"
+          aria-controls="global-image-search-panel"
+          aria-expanded={showPanel}
+          onClick={() => setPanelOpen((open) => !open)}
+        >
+          <span aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img">
+              <path d="M8.5 7 10 4.8h4L15.5 7H18a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z" />
+              <circle cx="12" cy="13" r="3.2" />
+            </svg>
+          </span>
+        </button>
+        <label className="sr-only" htmlFor="global-job-search-query">
+          Search jobs, skills, or companies
+        </label>
+        <input
+          id="global-job-search-query"
+          type="search"
+          value={query}
+          maxLength={200}
+          placeholder="Search jobs, skills, or companies"
+          onChange={(event) => setQuery(event.currentTarget.value)}
+        />
+        <button
+          className="global-image-search-submit"
+          type="submit"
+          aria-label="Search jobs"
+        >
+          <span aria-hidden="true">
+            <svg viewBox="0 0 20 20" role="img">
+              <circle cx="8.5" cy="8.5" r="5.5" />
+              <path d="m12.5 12.5 4 4" />
+            </svg>
+          </span>
+        </button>
+      </form>
+      {showPanel ? (
+        <div
+          id="global-image-search-panel"
+          className="global-image-search-panel"
+        >
+          <div className="global-image-search-panel-heading">
+            <div>
+              <strong>Search jobs from an image</strong>
+              <p>Turn a job poster into editable search filters.</p>
+            </div>
+            <button
+              className="global-image-search-close"
+              type="button"
+              aria-label="Close image search"
+              disabled={busy}
+              onClick={() => {
+                setPanelOpen(false);
+                setExternalConsent(false);
+                search.clear();
+              }}
+            >
+              <span aria-hidden="true">&#215;</span>
+            </button>
+          </div>
           <ImageSearchPrivacyNotice />
           <ImageSearchConsent
             selected={externalConsent}
@@ -113,19 +200,34 @@ export function GlobalImageSearch() {
             }}
           />
           <ImageSearchInput
-            disabled={busy}
-            onSelect={(file) => void search.start(file)}
+            disabled={!externalConsent || busy}
+            onSelect={(file) => {
+              setPanelOpen(true);
+              void search.start(file).finally(() => setExternalConsent(false));
+            }}
           />
+          {!externalConsent ? (
+            <p className="image-search-consent-required" role="status">
+              Agree to the OpenAI text-processing notice before choosing an
+              image.
+            </p>
+          ) : null}
           {busy ? (
             <ImageSearchProgress
               progress={search.progress}
-              onCancel={() => void search.cancel()}
+              onCancel={() => {
+                setExternalConsent(false);
+                void search.cancel();
+              }}
             />
           ) : null}
           {search.intent ? (
             <ImageSearchProposals
               intent={search.intent}
-              onClear={search.clear}
+              onClear={() => {
+                setExternalConsent(false);
+                search.clear();
+              }}
               onApply={(intent) =>
                 window.location.assign(applyImageSearchIntent(criteria, intent))
               }
@@ -133,16 +235,16 @@ export function GlobalImageSearch() {
           ) : null}
           <ImageSearchRecovery
             error={search.error}
-            fallbackText={search.fallbackText}
-            onRetry={search.clear}
-            onManual={(text) => {
-              if (!text) return window.location.assign("/jobs");
-              const parameters = new URLSearchParams({ q: text.slice(0, 200) });
-              window.location.assign(`/jobs?${parameters.toString()}`);
+            fallbackReason={search.fallbackReason}
+            retryAt={search.retryAt}
+            onRetry={() => {
+              setExternalConsent(false);
+              search.clear();
             }}
+            onManual={() => window.location.assign("/jobs")}
           />
         </div>
-      </details>
-    </aside>
+      ) : null}
+    </header>
   );
 }

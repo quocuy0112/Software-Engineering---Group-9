@@ -13,6 +13,10 @@ if (process.env.CV_OPENAI_LIVE_SYNTHETIC !== "1") {
   process.env.CV_OPENAI_ENABLED = "false";
   process.env.CV_OPENAI_LOCAL_DEV_ENABLED = "false";
   process.env.OPENAI_API_KEY = "";
+  // The normal suite injects interpreters and must never start a credentialed
+  // image-search worker. Runtime/local validation still requires the shared
+  // API key whenever the real worker is enabled.
+  process.env.IMAGE_SEARCH_WORKER_ENABLED = "false";
 }
 // PostgreSQL timestamp columns are timezone-naive. Run tests in UTC so the
 // controlled clocks used by lease, retry, and retention tests stay portable.

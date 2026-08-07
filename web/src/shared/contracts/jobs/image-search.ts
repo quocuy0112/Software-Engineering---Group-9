@@ -60,6 +60,12 @@ export const createImageSearchRequestSchema = z
         path: ["consent"],
         message: "External interpretation requires explicit exact consent.",
       });
+    if (value.interpreterClass !== "EXTERNAL_OPENAI")
+      context.addIssue({
+        code: "custom",
+        path: ["interpreterClass"],
+        message: "Image search uses only the approved OpenAI interpreter.",
+      });
   });
 
 export const createImageSearchResponseSchema = z
