@@ -11,6 +11,7 @@ import type {
   WorkspaceApplication,
 } from "@/shared/contracts/jobs/workspace";
 import type { UserJobState } from "@/shared/contracts/jobs/catalog";
+import { normalizeSalaryAmount } from "@/shared/utils/jobs/job-display";
 import { readUserJobState } from "./user-job-state-store";
 
 const dataPath = (name: string) => resolve(process.cwd(), "data", "jobs", name);
@@ -125,17 +126,6 @@ function normalize(value: string) {
     .replace(/\s+/gu, " ");
 }
 
-function canonicalCity(value: string) {
-  const city = normalize(value);
-  if (city.includes("hanoi") || city === "ha noi") return "ha noi";
-  if (city.includes("ho chi minh")) return "ho chi minh";
-  if (city.includes("vung tau") || city.includes("ba ria"))
-    return "ba ria vung tau";
-  if (city.includes("nha trang") || city.includes("khanh hoa"))
-    return "khanh hoa";
-  return city;
-}
-
 function locationLabel(job: SourceJob) {
   if (job.location.isNationwideRemote) return "Remote · " + job.location.city;
   return [job.location.district, job.location.city].filter(Boolean).join(", ");
@@ -199,12 +189,13 @@ export function projectWorkspaceJob(
     experienceLevel: experienceLevel(job),
     workArrangement: workArrangement(job),
     salary: {
-      minimum: job.salary.min,
-      maximum: job.salary.max,
+      minimum: normalizeSalaryAmount(job.salary.min),
+      maximum: normalizeSalaryAmount(job.salary.max),
       currency: job.salary.currency,
       period: job.salary.period.toUpperCase() as NonNullable<
         JobCard["salary"]
       >["period"],
+      isNegotiable: job.salary.isNegotiable,
     },
     summary: job.shortPitch,
     education: job.education,
@@ -349,10 +340,7 @@ function skillsMatch(job: SourceJob, preferences: JobPreferences) {
 
 function locationMatches(job: SourceJob, preferences: JobPreferences) {
   if (job.location.isNationwideRemote) return true;
-  const jobCity = canonicalCity(job.location.city);
-  return preferences.workLocations.some(
-    (location) => canonicalCity(location) === jobCity,
-  );
+  return preferences.workLocations.includes(job.location.city);
 }
 
 export function isJobPreferencesConfigured(preferences: JobPreferences) {
@@ -407,20 +395,16 @@ export function suggestedJobsForSnapshot(
         positionConfigured
           ? {
               matched: positionMatched,
-              label: "\u0056\u1ecb tr\u00ed mong mu\u1ed1n",
+              label: "Desired position",
             }
           : null,
-        skillsConfigured
-          ? { matched: skillMatched, label: "K\u1ef9 n\u0103ng" }
-          : null,
+        skillsConfigured ? { matched: skillMatched, label: "Skills" } : null,
         experienceConfigured
-          ? { matched: experienceMatched, label: "Kinh nghi\u1ec7m" }
+          ? { matched: experienceMatched, label: "Experience" }
           : null,
-        salaryConfigured
-          ? { matched: salaryMatched, label: "M\u1ee9c l\u01b0\u01a1ng" }
-          : null,
+        salaryConfigured ? { matched: salaryMatched, label: "Salary" } : null,
         locationConfigured
-          ? { matched: locationMatched, label: "\u0110\u1ecba \u0111i\u1ec3m" }
+          ? { matched: locationMatched, label: "Location" }
           : null,
       ].filter(
         (criterion): criterion is { matched: boolean; label: string } =>
@@ -439,11 +423,7 @@ export function suggestedJobsForSnapshot(
         (skillsConfigured && skillMatched);
       const hardFiltersMatch = criteria
         .filter((criterion) =>
-          [
-            "Kinh nghi\u1ec7m",
-            "M\u1ee9c l\u01b0\u01a1ng",
-            "\u0110\u1ecba \u0111i\u1ec3m",
-          ].includes(criterion.label),
+          ["Experience", "Salary", "Location"].includes(criterion.label),
         )
         .every((criterion) => criterion.matched);
       return (

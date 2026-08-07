@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { JobCard, JobDetail } from "@/shared/contracts/jobs/discovery";
+import { formatSalary } from "@/shared/utils/jobs/job-display";
 
 import companyCatalog from "../../../../../data/jobs/companies.json";
 import { CompanyAvatar } from "./company-avatar";
@@ -331,18 +332,6 @@ export function GeneralInfoCard({ job }: { job: JobDetail }) {
   );
 }
 
-function formatJobSalary(salary: JobCard["salary"]) {
-  if (!salary) return "Salary not disclosed";
-  const formatter = new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: salary.currency,
-    maximumFractionDigits: 0,
-  });
-  return (
-    formatter.format(salary.minimum) + " - " + formatter.format(salary.maximum)
-  );
-}
-
 function SimilarJobRow({ job }: { job: JobCard }) {
   const company = resolveSidebarCompany(job.company);
 
@@ -352,8 +341,12 @@ function SimilarJobRow({ job }: { job: JobCard }) {
       <span className="job-sidebar-similar-copy">
         <strong>{job.title}</strong>
         <small>{company.displayName}</small>
-        <small>
-          {formatJobSalary(job.salary)} · {job.location}
+        <small
+          className={
+            job.salary?.isNegotiable ? "job-salary--negotiable" : undefined
+          }
+        >
+          {formatSalary(job.salary)} · {job.location}
         </small>
       </span>
     </Link>
@@ -389,7 +382,7 @@ export function SimilarJobsCard({ job }: { job: JobDetail }) {
         </p>
       )}
       <Link className="job-similar-more-link" href="/jobs">
-        Xem thêm <span aria-hidden="true">→</span>
+        See more <span aria-hidden="true">→</span>
       </Link>
     </section>
   );

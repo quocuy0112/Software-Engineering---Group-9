@@ -44,7 +44,7 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
             name="location"
             maxLength={160}
             defaultValue={one(criteria.location)}
-            placeholder="Hồ Chí Minh"
+            placeholder="Ho Chi Minh City"
           />
         </label>
         <label>

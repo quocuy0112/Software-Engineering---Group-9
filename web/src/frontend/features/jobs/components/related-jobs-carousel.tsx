@@ -3,37 +3,16 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import type { JobCard } from "@/shared/contracts/jobs/discovery";
+import {
+  formatRelativeTime,
+  formatSalary,
+} from "@/shared/utils/jobs/job-display";
 import { SaveJobAction } from "./save-job-action";
 import { CompanyLogo } from "./job-detail-sidebar";
 
-function salary(value: JobCard["salary"]) {
-  if (!value) return "Salary not disclosed";
-  const formatter = new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: value.currency,
-    maximumFractionDigits: 0,
-  });
-  return (
-    formatter.format(value.minimum) + " - " + formatter.format(value.maximum)
-  );
-}
-
-const updatedDate = new Intl.DateTimeFormat("vi-VN", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-});
-
-function updatedLabel(value: string) {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime())
-    ? "Recently updated"
-    : "Updated " + updatedDate.format(date);
-}
-
 function relatedBadge(job: JobCard) {
-  if (job.isUrgent) return "Tin mới";
-  if ((job.matchScore ?? 0) >= 80) return "Nổi bật";
+  if (job.isUrgent) return "New";
+  if ((job.matchScore ?? 0) >= 80) return "Featured";
   return null;
 }
 
@@ -97,7 +76,7 @@ export function RelatedJobsCarousel({
           <h2 id="related-jobs-heading">{title}</h2>
         </div>
         <Link className="job-related-see-more" href="/jobs">
-          Xem thêm việc làm <span aria-hidden="true">→</span>
+          See more jobs <span aria-hidden="true">→</span>
         </Link>
       </div>
 
@@ -131,13 +110,22 @@ export function RelatedJobsCarousel({
                     <span>{job.location}</span>
                     <span aria-hidden="true">·</span>
                     <time dateTime={job.updatedAt ?? job.publishedAt}>
-                      {updatedLabel(job.updatedAt ?? job.publishedAt)}
+                      Updated{" "}
+                      {formatRelativeTime(job.updatedAt ?? job.publishedAt)}
                     </time>
                   </div>
                 </div>
 
                 <div className="job-related-list-side">
-                  <strong>{salary(job.salary)}</strong>
+                  <strong
+                    className={
+                      job.salary?.isNegotiable
+                        ? "job-salary--negotiable"
+                        : undefined
+                    }
+                  >
+                    {formatSalary(job.salary)}
+                  </strong>
                   <RelatedJobSave job={job} />
                 </div>
               </article>

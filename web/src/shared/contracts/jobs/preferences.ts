@@ -66,21 +66,21 @@ export const jobExperiencePreferenceOptions: ReadonlyArray<{
   value: JobExperiencePreference;
   label: string;
 }> = [
-  { value: "no_experience", label: "\u0043h\u01b0a c\u00f3 kinh nghi\u1ec7m" },
-  { value: "under_1_year", label: "D\u01b0\u1edbi 1 n\u0103m" },
-  { value: "1_3_years", label: "1\u20133 n\u0103m" },
-  { value: "3_5_years", label: "3\u20135 n\u0103m" },
-  { value: "5_plus_years", label: "Tr\u00ean 5 n\u0103m" },
+  { value: "no_experience", label: "No experience" },
+  { value: "under_1_year", label: "Under 1 year" },
+  { value: "1_3_years", label: "1-3 years" },
+  { value: "3_5_years", label: "3-5 years" },
+  { value: "5_plus_years", label: "5+ years" },
 ];
 
 export const jobApplicationStatusLabels: Record<JobApplicationStatus, string> =
   {
-    submitted: "Ti\u1ebfp nh\u1eadn",
-    viewed: "\u0110\u00e3 xem",
-    screening: "Duy\u1ec7t h\u1ed3 s\u01a1",
-    considering: "C\u00e2n nh\u1eafc",
-    matched: "Ph\u00f9 h\u1ee3p",
-    not_fit: "Ch\u01b0a ph\u00f9 h\u1ee3p",
+    submitted: "Received",
+    viewed: "Viewed",
+    screening: "Screening",
+    considering: "Considering",
+    matched: "Matched",
+    not_fit: "Not a fit",
   };
 
 /** The 63-province list used by the candidate-facing location selector. */

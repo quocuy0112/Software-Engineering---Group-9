@@ -27,11 +27,8 @@ export function SavedJobsPage({ jobs }: { jobs: JobCard[] }) {
     return (
       <EmptyState
         illustration="folder"
-        title={"B\u1ea1n ch\u01b0a l\u01b0u c\u00f4ng vi\u1ec7c n\u00e0o!"}
-        cta={{
-          href: "/jobs",
-          label: "T\u00ecm vi\u1ec7c ngay \u2192",
-        }}
+        title="You have not saved any jobs yet."
+        cta={{ href: "/jobs", label: "Find jobs \u2192" }}
       />
     );
   }
@@ -44,15 +41,20 @@ export function SavedJobsPage({ jobs }: { jobs: JobCard[] }) {
       <header className="jobs-workspace-heading">
         <div>
           <p className="workspace-kicker">CANDIDATE WORKSPACE</p>
-          <h1 id="saved-jobs-heading">Việc làm đã lưu</h1>
-          <p>Danh sách những cơ hội bạn muốn xem lại và ứng tuyển sau.</p>
+          <h1 id="saved-jobs-heading">Saved Jobs</h1>
+          <p>Keep track of opportunities you want to revisit.</p>
         </div>
         <span className="jobs-workspace-count">{visibleJobs.length}</span>
       </header>
-      <ol className="job-list" aria-label="Việc làm đã lưu">
+      <ol className="job-list saved-job-grid" aria-label="Saved jobs">
         {visibleJobs.map((job) => (
           <li key={job.id}>
-            <JobCardView job={job} onQuickView={() => setQuickViewId(job.id)} />
+            <JobCardView
+              job={job}
+              variant="grid"
+              timeMode="posted"
+              onQuickView={() => setQuickViewId(job.id)}
+            />
           </li>
         ))}
       </ol>

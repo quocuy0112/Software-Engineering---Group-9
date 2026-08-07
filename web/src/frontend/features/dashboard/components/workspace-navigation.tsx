@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useWorkspaceLocale } from "../client/workspace-locale";
 
 export function WorkspaceNavigation({
   busy,
@@ -14,44 +13,31 @@ export function WorkspaceNavigation({
   collapsed: boolean;
   onSignOut: () => void;
 }) {
-  const locale = useWorkspaceLocale();
-  const copy =
-    locale === "vi"
-      ? {
-          dashboard: "Bảng điều khiển",
-          jobs: "Việc làm",
-          profile: "Hồ sơ",
-          workspace: "Không gian ứng viên",
-          openMenu: "Mở menu không gian",
-          closeMenu: "Đóng menu không gian",
-          signOut: "Đăng xuất",
-          signingOut: "Đang đăng xuất…",
-        }
-      : {
-          dashboard: "Dashboard",
-          jobs: "Jobs",
-          profile: "Profile",
-          workspace: "Candidate workspace",
-          openMenu: "Open workspace menu",
-          closeMenu: "Close workspace menu",
-          signOut: "Sign out",
-          signingOut: "Signing out…",
-        };
+  const copy = {
+    dashboard: "Dashboard",
+    jobs: "Jobs",
+    profile: "Profile",
+    workspace: "Candidate workspace",
+    openMenu: "Open workspace menu",
+    closeMenu: "Close workspace menu",
+    signOut: "Sign out",
+    signingOut: "Signing out…",
+  };
   const destinations = [
     { href: "/dashboard", label: copy.dashboard, icon: "dashboard" },
     { href: "/jobs", label: copy.jobs, icon: "jobs" },
     { href: "/profile", label: copy.profile, icon: "profile" },
   ] as const;
   const jobsSubnav = [
-    { href: "/jobs/saved", label: "Vi\u1ec7c l\u00e0m \u0111\u00e3 l\u01b0u" },
+    { href: "/jobs/saved", label: "Saved Jobs" },
     {
       href: "/jobs/applied",
-      label: "Vi\u1ec7c l\u00e0m \u0111\u00e3 \u1ee9ng tuy\u1ec3n",
+      label: "Applied Jobs",
     },
-    { href: "/jobs/matches", label: "Vi\u1ec7c l\u00e0m ph\u00f9 h\u1ee3p" },
+    { href: "/jobs/matches", label: "Suggested Jobs" },
     {
       href: "/jobs/settings",
-      label: "C\u00e0i \u0111\u1eb7t g\u1ee3i \u00fd vi\u1ec7c l\u00e0m",
+      label: "Job Recommendation Settings",
     },
   ] as const;
   const pathname = usePathname() ?? "/";

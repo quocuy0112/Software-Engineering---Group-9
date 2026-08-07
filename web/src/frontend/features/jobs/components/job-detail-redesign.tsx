@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { JobDetail } from "@/shared/contracts/jobs/discovery";
+import { formatSalary } from "@/shared/utils/jobs/job-display";
 import { ApplyFormSection } from "./apply-form-section";
 import { CompanyLogo, JobDetailSidebar } from "./job-detail-sidebar";
 import { JobDetailOverview, JobDetailSections } from "./job-detail-sections";
@@ -17,22 +18,6 @@ const stateLabel = {
   CLOSED: "Closed",
   EXPIRED: "Expired",
 } as const;
-
-function formatSalary(job: JobDetail) {
-  if (!job.salary) return "Salary not disclosed";
-  const formatter = new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: job.salary.currency,
-    maximumFractionDigits: 0,
-  });
-  return (
-    formatter.format(job.salary.minimum) +
-    " - " +
-    formatter.format(job.salary.maximum) +
-    " / " +
-    job.salary.period.toLowerCase()
-  );
-}
 
 const jobDate = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" });
 
@@ -248,7 +233,15 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
             <p className="job-detail-summary">{job.summary}</p>
 
             <div className="job-detail-salary-line">
-              <strong>{formatSalary(job)}</strong>
+              <strong
+                className={
+                  job.salary?.isNegotiable
+                    ? "job-salary--negotiable"
+                    : undefined
+                }
+              >
+                {formatSalary(job.salary)}
+              </strong>
               <Link href="/jobs?tool=salary-market">
                 View market salary for this position
               </Link>

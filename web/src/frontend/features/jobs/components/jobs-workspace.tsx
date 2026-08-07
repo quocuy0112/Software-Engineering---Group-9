@@ -1,14 +1,14 @@
 import Link from "next/link";
 
 export const jobsWorkspaceTabs = [
-  { id: "search", href: "/jobs", label: "Tìm việc" },
-  { id: "saved", href: "/jobs/saved", label: "Việc làm đã lưu" },
-  { id: "applied", href: "/jobs/applied", label: "Việc làm đã ứng tuyển" },
-  { id: "matches", href: "/jobs/matches", label: "Việc làm phù hợp" },
+  { id: "search", href: "/jobs", label: "Find jobs" },
+  { id: "saved", href: "/jobs/saved", label: "Saved Jobs" },
+  { id: "applied", href: "/jobs/applied", label: "Applied Jobs" },
+  { id: "matches", href: "/jobs/matches", label: "Suggested Jobs" },
   {
     id: "settings",
     href: "/jobs/settings",
-    label: "Cài đặt gợi ý việc làm",
+    label: "Job Recommendation Settings",
   },
 ] as const;
 
@@ -20,7 +20,7 @@ export function JobsWorkspaceNav({
   activeTab: JobsWorkspaceTab;
 }) {
   return (
-    <nav className="jobs-workspace-nav" aria-label="Khu vực việc làm">
+    <nav className="jobs-workspace-nav" aria-label="Jobs workspace">
       <div className="jobs-workspace-nav-scroll">
         {jobsWorkspaceTabs.map((tab) => (
           <Link

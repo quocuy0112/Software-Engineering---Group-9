@@ -1,7 +1,8 @@
 {
   "userId": "user-abc123",
   "savedJobIds": [
-    "job-000222"
+    "job-000222",
+    "job-001106"
   ],
   "hiddenJobIds": [
     "job-000099"

@@ -11,8 +11,11 @@ import {
   type JobPreferences,
 } from "@/shared/contracts/jobs/preferences";
 import type { JobPositionOption } from "@/shared/contracts/jobs/workspace";
+import {
+  SearchableChipSelect,
+  type SearchableChipOption,
+} from "./searchable-chip-select";
 
-type TagField = "customPositions" | "skills" | "workLocations";
 type FormState = Omit<JobPreferences, "desiredSalaryMin"> & {
   desiredSalaryMin: string;
 };
@@ -29,12 +32,24 @@ function toFormState(preferences: JobPreferences): FormState {
 
 function formatSalaryInput(value: string) {
   const digits = value.replace(/[^\d]/gu, "");
-  return digits ? new Intl.NumberFormat("vi-VN").format(Number(digits)) : "";
+  return digits ? new Intl.NumberFormat("en-US").format(Number(digits)) : "";
+}
+
+function positionOptions(options: JobPositionOption[]): SearchableChipOption[] {
+  return options.map((option) => ({
+    value: option.id,
+    label: option.label.replace(/\s*·\s*r\d+\s*$/iu, "").trim(),
+    keywords: [option.family],
+  }));
+}
+
+function valueOptions(values: readonly string[]): SearchableChipOption[] {
+  return values.map((value) => ({ value, label: value }));
 }
 
 export function JobPreferencesForm({
   initialPreferences,
-  positionOptions,
+  positionOptions: availablePositions,
   skillOptions,
 }: {
   initialPreferences: JobPreferences;
@@ -44,61 +59,9 @@ export function JobPreferencesForm({
   const router = useRouter();
   const csrfProof = useCsrfProof();
   const [form, setForm] = useState(() => toFormState(initialPreferences));
-  const [tagInputs, setTagInputs] = useState<Record<TagField, string>>({
-    customPositions: "",
-    skills: "",
-    workLocations: "",
-  });
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
   const [pending, setPending] = useState(false);
-
-  function addTag(field: TagField, maximum: number) {
-    const value = tagInputs[field].trim();
-    if (!value) return;
-    const values = form[field];
-    if (
-      values.some(
-        (item) => item.toLocaleLowerCase() === value.toLocaleLowerCase(),
-      )
-    ) {
-      setTagInputs((current) => ({ ...current, [field]: "" }));
-      return;
-    }
-    if (values.length >= maximum) {
-      setError(
-        field === "customPositions"
-          ? "Bạn chỉ có thể thêm tối đa 5 vị trí tự nhập."
-          : field === "skills"
-            ? "Bạn chỉ có thể thêm tối đa 20 kỹ năng."
-            : "Bạn chỉ có thể chọn tối đa 63 tỉnh/thành phố.",
-      );
-      return;
-    }
-    setForm((current) => ({
-      ...current,
-      [field]: [...current[field], value],
-    }));
-    setTagInputs((current) => ({ ...current, [field]: "" }));
-    setError("");
-  }
-
-  function removeTag(field: TagField, value: string) {
-    setForm((current) => ({
-      ...current,
-      [field]: current[field].filter((item) => item !== value),
-    }));
-  }
-
-  function handleTagKeyDown(
-    event: React.KeyboardEvent<HTMLInputElement>,
-    field: TagField,
-    maximum: number,
-  ) {
-    if (event.key !== "Enter") return;
-    event.preventDefault();
-    addTag(field, maximum);
-  }
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -106,7 +69,7 @@ export function JobPreferencesForm({
     setStatus("");
     if (!form.aiAnalysisConsent) {
       setError(
-        "Bạn cần đồng ý cho phép SmartHire phân tích để nhận gợi ý việc làm.",
+        "AI-analysis consent is required before SmartHire can recommend jobs.",
       );
       return;
     }
@@ -116,7 +79,7 @@ export function JobPreferencesForm({
         Number(form.desiredSalaryMin.replace(/[^\d]/gu, "")) || 0,
     });
     if (!parsed.success) {
-      setError("Vui lòng kiểm tra lại các thông tin đã nhập.");
+      setError("Please review the information you entered.");
       return;
     }
     setPending(true);
@@ -140,17 +103,17 @@ export function JobPreferencesForm({
         throw new Error(
           typeof body?.message === "string"
             ? body.message
-            : "Không thể cập nhật tùy chọn việc làm.",
+            : "Could not update job preferences.",
         );
       }
-      setStatus("Đã cập nhật tùy chọn việc làm.");
+      setStatus("Job preferences updated.");
       router.push("/jobs/matches");
       router.refresh();
     } catch (caught) {
       setError(
         caught instanceof Error
           ? caught.message
-          : "Không thể cập nhật tùy chọn việc làm.",
+          : "Could not update job preferences.",
       );
     } finally {
       setPending(false);
@@ -166,11 +129,13 @@ export function JobPreferencesForm({
         <span aria-hidden="true">✦</span>
         <div>
           <strong>Get matched to relevant opportunities</strong>
-          <p>Chia sẻ nhu cầu để nhận các cơ hội phù hợp hơn với bạn.</p>
+          <p>
+            Tell us what you want next so SmartHire can surface better matches.
+          </p>
         </div>
       </div>
       <p className="job-preferences-required">
-        <span>*</span> Các thông tin bắt buộc
+        <span>*</span> Required information
       </p>
       {error ? (
         <div className="job-preferences-message is-error" role="alert">
@@ -184,14 +149,14 @@ export function JobPreferencesForm({
       ) : null}
 
       <fieldset>
-        <legend>Thông tin cá nhân</legend>
+        <legend>Personal information</legend>
         <div className="preference-field">
-          <span className="preference-label">Giới tính</span>
+          <span className="preference-label">Gender</span>
           <div className="preference-radio-group">
             {[
-              ["female", "Nữ"],
-              ["male", "Nam"],
-              ["undisclosed", "Không xác định"],
+              ["female", "Female"],
+              ["male", "Male"],
+              ["undisclosed", "Prefer not to say"],
             ].map(([value, label]) => (
               <label key={value}>
                 <input
@@ -214,101 +179,65 @@ export function JobPreferencesForm({
       </fieldset>
 
       <fieldset>
-        <legend>Nhu cầu việc làm</legend>
+        <legend>Job needs</legend>
         <div className="preference-field">
-          <label className="preference-label" htmlFor="professional-positions">
-            Vị trí chuyên môn <span>*</span>
-          </label>
-          <select
+          <SearchableChipSelect
             id="professional-positions"
-            className="preference-select preference-select--multiple"
-            multiple
-            value={form.professionalPositions}
-            onChange={(event) => {
-              const values = Array.from(
-                event.currentTarget.selectedOptions,
-                (option) => option.value,
-              );
+            label="Professional Position"
+            placeholder="Search professional positions"
+            options={positionOptions(availablePositions)}
+            selectedValues={form.professionalPositions}
+            maximum={5}
+            required
+            onChange={(values) =>
               setForm((current) => ({
                 ...current,
-                professionalPositions: values.slice(0, 5),
-              }));
-            }}
-          >
-            {positionOptions.map((position) => (
-              <option key={position.id} value={position.id}>
-                {position.label} · {position.family}
-              </option>
-            ))}
-          </select>
-          <small>Giữ Ctrl/Cmd để chọn tối đa 5 vị trí.</small>
-        </div>
-
-        <div className="preference-field">
-          <label className="preference-label" htmlFor="custom-position">
-            Vị trí khác
-          </label>
-          <div className="preference-tag-input">
-            <input
-              id="custom-position"
-              value={tagInputs.customPositions}
-              placeholder="Nhập vị trí chưa có trong danh sách"
-              onChange={(event) =>
-                setTagInputs((current) => ({
-                  ...current,
-                  customPositions: event.target.value,
-                }))
-              }
-              onKeyDown={(event) =>
-                handleTagKeyDown(event, "customPositions", 5)
-              }
-            />
-            <button type="button" onClick={() => addTag("customPositions", 5)}>
-              Thêm
-            </button>
-          </div>
-          <TagList
-            values={form.customPositions}
-            onRemove={(value) => removeTag("customPositions", value)}
+                professionalPositions: values,
+              }))
+            }
           />
         </div>
 
         <div className="preference-field">
-          <label className="preference-label" htmlFor="skills-input">
-            Kỹ năng <span>*</span>
-          </label>
-          <div className="preference-tag-input">
-            <input
-              id="skills-input"
-              list="skills-options"
-              value={tagInputs.skills}
-              placeholder="Thêm kỹ năng"
-              onChange={(event) =>
-                setTagInputs((current) => ({
-                  ...current,
-                  skills: event.target.value,
-                }))
-              }
-              onKeyDown={(event) => handleTagKeyDown(event, "skills", 20)}
-            />
-            <datalist id="skills-options">
-              {skillOptions.map((skill) => (
-                <option key={skill} value={skill} />
-              ))}
-            </datalist>
-            <button type="button" onClick={() => addTag("skills", 20)}>
-              Thêm
-            </button>
-          </div>
-          <TagList
-            values={form.skills}
-            onRemove={(value) => removeTag("skills", value)}
+          <SearchableChipSelect
+            id="custom-positions"
+            label="Custom Position"
+            placeholder="Search or add a position not in the category list"
+            options={[]}
+            selectedValues={form.customPositions}
+            maximum={5}
+            allowCustom
+            helperText="Add up to 5 custom positions."
+            onChange={(values) =>
+              setForm((current) => ({
+                ...current,
+                customPositions: values,
+              }))
+            }
+          />
+        </div>
+
+        <div className="preference-field">
+          <SearchableChipSelect
+            id="skills"
+            label="Skills"
+            placeholder="Search skills"
+            options={valueOptions(skillOptions)}
+            selectedValues={form.skills}
+            maximum={20}
+            required
+            onChange={(values) =>
+              setForm((current) => ({
+                ...current,
+                skills: values,
+              }))
+            }
           />
         </div>
 
         <div className="preference-field">
           <label className="preference-label" htmlFor="experience-level">
-            Kinh nghiệm <span>*</span>
+            Experience <span>*</span>
           </label>
           <select
             id="experience-level"
@@ -332,14 +261,14 @@ export function JobPreferencesForm({
 
         <div className="preference-field">
           <label className="preference-label" htmlFor="desired-salary">
-            Mức lương mong muốn <span>*</span>
+            Desired Salary <span>*</span>
           </label>
           <div className="preference-input-suffix">
             <input
               id="desired-salary"
               inputMode="numeric"
               value={formatSalaryInput(form.desiredSalaryMin)}
-              placeholder="15.000.000"
+              placeholder="15,000,000"
               onChange={(event) =>
                 setForm((current) => ({
                   ...current,
@@ -352,37 +281,20 @@ export function JobPreferencesForm({
         </div>
 
         <div className="preference-field">
-          <label className="preference-label" htmlFor="location-input">
-            Tỉnh/Thành phố cũ (trước 1/7/2025) <span>*</span>
-          </label>
-          <div className="preference-tag-input">
-            <input
-              id="location-input"
-              list="province-options"
-              value={tagInputs.workLocations}
-              placeholder="Chọn tỉnh/thành phố"
-              onChange={(event) =>
-                setTagInputs((current) => ({
-                  ...current,
-                  workLocations: event.target.value,
-                }))
-              }
-              onKeyDown={(event) =>
-                handleTagKeyDown(event, "workLocations", 63)
-              }
-            />
-            <datalist id="province-options">
-              {VIETNAM_PROVINCES_63.map((province) => (
-                <option key={province} value={province} />
-              ))}
-            </datalist>
-            <button type="button" onClick={() => addTag("workLocations", 63)}>
-              Thêm
-            </button>
-          </div>
-          <TagList
-            values={form.workLocations}
-            onRemove={(value) => removeTag("workLocations", value)}
+          <SearchableChipSelect
+            id="work-locations"
+            label="Province/City (pre 7/1/2025)"
+            placeholder="Search provinces or cities"
+            options={valueOptions(VIETNAM_PROVINCES_63)}
+            selectedValues={form.workLocations}
+            maximum={63}
+            required
+            onChange={(values) =>
+              setForm((current) => ({
+                ...current,
+                workLocations: values,
+              }))
+            }
           />
         </div>
         <label className="preference-checkbox">
@@ -396,12 +308,12 @@ export function JobPreferencesForm({
               }))
             }
           />
-          Tôi có thể thay đổi địa điểm làm việc
+          I&apos;m open to relocating
         </label>
       </fieldset>
 
       <fieldset>
-        <legend>Đồng ý nhận thông tin</legend>
+        <legend>Consent</legend>
         <label className="preference-checkbox">
           <input
             type="checkbox"
@@ -414,8 +326,8 @@ export function JobPreferencesForm({
               }))
             }
           />
-          Tôi đồng ý để SmartHire gợi ý việc làm dựa trên CV và hoạt động tìm
-          việc, quá trình phân tích có thể sử dụng công nghệ AI. <span>*</span>
+          I agree to let SmartHire recommend jobs based on my CV and job-search
+          activity, using AI-based analysis. <span>*</span>
         </label>
         <label className="preference-checkbox">
           <input
@@ -428,42 +340,16 @@ export function JobPreferencesForm({
               }))
             }
           />
-          Tôi đồng ý cho phép SmartHire gửi thông tin liên quan đến việc làm, sự
-          kiện nghề nghiệp.
+          I agree to let SmartHire send me information about jobs and career
+          events.
         </label>
       </fieldset>
 
       <div className="job-preferences-actions">
         <button className="dashboard-hero-cta" type="submit" disabled={pending}>
-          {pending ? "Đang cập nhật..." : "Cập nhật"}
+          {pending ? "Updating..." : "Update"}
         </button>
       </div>
     </form>
-  );
-}
-
-function TagList({
-  values,
-  onRemove,
-}: {
-  values: string[];
-  onRemove: (value: string) => void;
-}) {
-  if (!values.length) return null;
-  return (
-    <ul className="preference-tag-list">
-      {values.map((value) => (
-        <li key={value}>
-          <span>{value}</span>
-          <button
-            type="button"
-            aria-label={"Xóa " + value}
-            onClick={() => onRemove(value)}
-          >
-            ×
-          </button>
-        </li>
-      ))}
-    </ul>
   );
 }

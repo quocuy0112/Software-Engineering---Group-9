@@ -8,35 +8,6 @@ import { JobCardView } from "./job-card";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
 import { QuickViewPanel } from "./quick-view-panel";
 
-export function MatchScoreExplainer({
-  criteria,
-  score,
-}: {
-  criteria: string[];
-  score?: number;
-}) {
-  return (
-    <details className="match-score-explainer">
-      <summary>
-        Vì sao phù hợp?
-        {score != null ? <span>{score}%</span> : null}
-      </summary>
-      {criteria.length ? (
-        <ul>
-          {criteria.map((criterion) => (
-            <li key={criterion}>
-              <span aria-hidden="true">✓</span>
-              {criterion}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>Được chọn dựa trên các tùy chọn việc làm của bạn.</p>
-      )}
-    </details>
-  );
-}
-
 export function SuggestedJobsPage({
   jobs,
   preferencesConfigured,
@@ -65,11 +36,11 @@ export function SuggestedJobsPage({
     return (
       <EmptyState
         illustration="preferences"
-        title="Hoàn thiện tùy chọn việc làm"
-        description="Hãy cho SmartHire biết vị trí, kỹ năng, kinh nghiệm và địa điểm mong muốn để nhận được các gợi ý phù hợp hơn."
+        title="Complete your job preferences"
+        description="Share your target position, skills, experience, and location so SmartHire can recommend better opportunities."
         cta={{
           href: "/jobs/settings",
-          label: "Cập nhật tùy chọn",
+          label: "Update preferences",
         }}
       />
     );
@@ -83,32 +54,30 @@ export function SuggestedJobsPage({
       <header className="jobs-workspace-heading jobs-workspace-heading--wide">
         <div>
           <p className="workspace-kicker">CANDIDATE WORKSPACE</p>
-          <h1 id="matches-heading">Việc làm phù hợp</h1>
+          <h1 id="matches-heading">Suggested Jobs</h1>
           <p>
-            Các gợi ý được sắp xếp dựa trên tùy chọn, kỹ năng và kinh nghiệm bạn
-            đã chia sẻ.
+            Recommendations are based on the preferences, skills, and experience
+            you have shared.
           </p>
         </div>
       </header>
       <p className="jobs-match-count">
-        Tìm thấy <strong>{visibleJobs.length}</strong> việc làm phù hợp với yêu
-        cầu của bạn
+        Found <strong>{visibleJobs.length}</strong> jobs that match your
+        preferences
       </p>
       {displayedJobs.length ? (
         <>
           <ol
             className="job-list suggested-job-list"
-            aria-label="Việc làm phù hợp"
+            aria-label="Suggested jobs"
           >
             {displayedJobs.map((job) => (
               <li key={job.id}>
                 <JobCardView
                   job={job}
+                  variant="row"
+                  timeMode="updated"
                   onQuickView={() => setQuickViewId(job.id)}
-                />
-                <MatchScoreExplainer
-                  criteria={job.matchedCriteria}
-                  score={job.matchScore}
                 />
               </li>
             ))}
@@ -119,25 +88,22 @@ export function SuggestedJobsPage({
               type="button"
               onClick={() => setShowAll(true)}
             >
-              Xem thêm
+              See more
             </button>
           ) : null}
         </>
       ) : (
         <div className="workspace-inline-empty">
-          Hiện chưa có việc làm phù hợp. Hãy thử mở rộng tùy chọn hoặc cập nhật
-          kỹ năng của bạn.
+          No matching jobs are available right now. Try broadening your
+          preferences.
         </div>
       )}
       <div className="jobs-preferences-prompt">
         <div>
-          <strong>Chưa đúng với mong muốn của bạn?</strong>
-          <p>
-            Cập nhật tùy chọn việc làm để SmartHire điều chỉnh các gợi ý tiếp
-            theo.
-          </p>
+          <strong>Not quite right?</strong>
+          <p>Update your preferences to improve future recommendations.</p>
         </div>
-        <Link href="/jobs/settings">Cập nhật tùy chọn</Link>
+        <Link href="/jobs/settings">Update preferences</Link>
       </div>
       <QuickViewPanel
         jobs={visibleJobs}

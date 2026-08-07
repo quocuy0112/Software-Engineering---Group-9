@@ -1,46 +1,23 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
-import type { JobCard } from "@/shared/contracts/jobs/discovery";
 import type { JobApplicationStatus } from "@/shared/contracts/jobs/preferences";
 import { jobApplicationStatusLabels } from "@/shared/contracts/jobs/preferences";
 import type { WorkspaceApplication } from "@/shared/contracts/jobs/workspace";
-import { CompanyAvatar } from "./company-avatar";
+import { formatRelativeTime } from "@/shared/utils/jobs/job-display";
 import { EmptyState } from "./job-empty-state";
+import { JobCardView } from "./job-card";
 
 type ApplicationFilter = "all" | JobApplicationStatus;
 
 const statusTabs: Array<{ id: ApplicationFilter; label: string }> = [
-  { id: "all", label: "T\u1ea5t c\u1ea3" },
+  { id: "all", label: "All" },
   ...(
     Object.entries(jobApplicationStatusLabels) as Array<
       [JobApplicationStatus, string]
     >
   ).map(([id, label]) => ({ id, label })),
 ];
-
-function salary(job: JobCard) {
-  if (!job.salary) return "M\u1ee9c l\u01b0\u01a1ng th\u1ecfa thu\u1eadn";
-  const formatter = new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: job.salary.currency,
-    maximumFractionDigits: 0,
-  });
-  return (
-    formatter.format(job.salary.minimum) +
-    " - " +
-    formatter.format(job.salary.maximum)
-  );
-}
-
-function appliedDate(value: string) {
-  return new Intl.DateTimeFormat("vi-VN", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  }).format(new Date(value));
-}
 
 export function StatusTabs({
   active,
@@ -55,7 +32,7 @@ export function StatusTabs({
     <div
       className="application-status-tabs"
       role="tablist"
-      aria-label="Trạng thái ứng tuyển"
+      aria-label="Application status"
     >
       {statusTabs.map((tab) => {
         const count =
@@ -86,50 +63,24 @@ export function ApplicationCard({ item }: { item: WorkspaceApplication }) {
   const status = jobApplicationStatusLabels[item.application.status];
   if (!job) {
     return (
-      <article className="job-card application-card">
-        <div>
-          <p className="panel-kicker">APPLICATION</p>
-          <h2>Công việc không còn trong danh mục</h2>
-          <p>Mã công việc: {item.application.jobId}</p>
+      <div className="application-card">
+        <div className="application-card-status-row">
+          <span className="application-status-badge">{status}</span>
+          <span>Application ID: {item.application.jobId}</span>
         </div>
-        <span className="application-status-badge">{status}</span>
-      </article>
+        <h2>This job is no longer available</h2>
+      </div>
     );
   }
 
   return (
-    <article className="job-card application-card">
-      <header className="application-card-header">
-        <CompanyAvatar
-          name={job.company.displayName}
-          imageUrl={job.company.logoUrl}
-          size="md"
-        />
-        <div>
-          <p className="panel-kicker">VIỆC LÀM ĐÃ ỨNG TUYỂN</p>
-          <h2>
-            <Link href={"/jobs/" + job.slug}>{job.title}</Link>
-          </h2>
-          <p>{job.company.displayName}</p>
-        </div>
+    <div className="application-card">
+      <div className="application-card-status-row">
         <span className="application-status-badge">{status}</span>
-      </header>
-      <div className="application-card-meta">
-        <span>{job.location}</span>
-        <span>{salary(job)}</span>
-        <span>Ứng tuyển ngày {appliedDate(item.application.appliedAt)}</span>
+        <span>Applied {formatRelativeTime(item.application.appliedAt)}</span>
       </div>
-      <footer>
-        {item.application.aiMatchScore != null ? (
-          <span className="application-match-score">
-            AI match {item.application.aiMatchScore}%
-          </span>
-        ) : null}
-        <Link className="job-secondary-link" href={"/jobs/" + job.slug}>
-          Xem chi tiết
-        </Link>
-      </footer>
-    </article>
+      <JobCardView job={job} variant="row" timeMode="posted" />
+    </div>
   );
 }
 
@@ -155,8 +106,8 @@ export function AppliedJobsPage({
       <header className="jobs-workspace-heading">
         <div>
           <p className="workspace-kicker">CANDIDATE WORKSPACE</p>
-          <h1 id="applied-jobs-heading">Việc làm đã ứng tuyển</h1>
-          <p>Theo dõi các hồ sơ bạn đã gửi và trạng thái xử lý hiện tại.</p>
+          <h1 id="applied-jobs-heading">Applied Jobs</h1>
+          <p>Track the jobs you have applied for and their current status.</p>
         </div>
         <span className="jobs-workspace-count">{applications.length}</span>
       </header>
@@ -175,20 +126,16 @@ export function AppliedJobsPage({
             </div>
           ) : (
             <div className="workspace-inline-empty">
-              Chưa có hồ sơ ở trạng thái này.
+              No applications have this status yet.
             </div>
           )}
         </>
       ) : (
         <EmptyState
           illustration="headset"
-          title={
-            "B\u1ea1n ch\u01b0a \u1ee9ng tuy\u1ec3n c\u00f4ng vi\u1ec7c n\u00e0o!"
-          }
-          description={
-            "H\u00e3y b\u1eaft \u0111\u1ea7u t\u00ecm ki\u1ebfm c\u00f4ng vi\u1ec7c ph\u00f9 h\u1ee3p \u0111\u1ec3 k\u1ebft n\u1ed1i v\u1edbi c\u00e1c nh\u00e0 tuy\u1ec3n d\u1ee5ng h\u00e0ng \u0111\u1ea7u."
-          }
-          cta={{ href: "/jobs", label: "T\u00ecm vi\u1ec7c ngay" }}
+          title="You have not applied to any jobs yet."
+          description="Start searching for the right opportunity and connect with leading employers."
+          cta={{ href: "/jobs", label: "Find jobs" }}
         />
       )}
     </section>

@@ -3,27 +3,12 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef } from "react";
 import type { JobCard } from "@/shared/contracts/jobs/discovery";
+import { formatSalary } from "@/shared/utils/jobs/job-display";
 import { JobApplicationAction } from "./job-application-form";
 import { QuickSkillChips } from "./quick-skill-chips";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
 import { SaveJobAction } from "./save-job-action";
 import { jobWhyHighlights } from "./job-detail-data";
-
-function formatSalary(value: JobCard["salary"]) {
-  if (!value) return "Salary not disclosed";
-  const formatter = new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: value.currency,
-    maximumFractionDigits: 0,
-  });
-  return (
-    formatter.format(value.minimum) +
-    " - " +
-    formatter.format(value.maximum) +
-    " / " +
-    value.period.toLowerCase()
-  );
-}
 
 function experienceLabel(value: string) {
   return value
@@ -143,7 +128,15 @@ export function QuickViewPanel({
           <dl className="job-quick-view-meta">
             <div>
               <dt>Salary</dt>
-              <dd>{formatSalary(job.salary)}</dd>
+              <dd
+                className={
+                  job.salary?.isNegotiable
+                    ? "job-salary--negotiable"
+                    : undefined
+                }
+              >
+                {formatSalary(job.salary)}
+              </dd>
             </div>
             <div>
               <dt>Location</dt>
