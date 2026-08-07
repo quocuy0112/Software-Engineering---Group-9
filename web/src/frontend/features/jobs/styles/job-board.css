@@ -5694,6 +5694,18 @@
 
 /* Contained desktop Jobs layout: header, filters, and results are separate regions. */
 @media (min-width: 981px) {
+  .job-board-layout {
+    display: flex;
+    height: 100dvh;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .job-board-header {
+    flex: 0 0 auto;
+  }
+
   .job-board-public-main,
   .workspace-main[data-content-mode="job-board"],
   .workspace-content[data-content-mode="job-board"] {
@@ -5701,8 +5713,30 @@
     min-height: 0;
   }
 
+  .job-board-public-main {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
   .workspace-main[data-content-mode="job-board"] {
+    display: flex;
     height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .workspace-main[data-content-mode="job-board"] > .workspace-header,
+  .workspace-main[data-content-mode="job-board"] > .workspace-status {
+    flex: 0 0 auto;
+  }
+
+  .workspace-content[data-content-mode="job-board"] {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .job-board-public-main .jobs-page,

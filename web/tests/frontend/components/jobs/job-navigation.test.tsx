@@ -93,6 +93,13 @@ describe("job board navigation", () => {
     expect(styles).toContain("overflow-y: auto");
     expect(styles).toContain("overscroll-behavior: contain");
     expect(styles).toContain("@media (min-width: 981px)");
+    expect(styles).toContain(".job-board-layout {\n    display: flex;");
+    expect(styles).toContain(
+      '.workspace-main[data-content-mode="job-board"] {\n    display: flex;',
+    );
+    expect(styles).toContain(
+      '.workspace-content[data-content-mode="job-board"] {\n    display: flex;',
+    );
     expect(styles).toContain(
       '.workspace-layout[data-sidebar-collapsed="true"]',
     );
