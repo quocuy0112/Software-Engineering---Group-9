@@ -9,9 +9,17 @@ describe("job application accessibility", () => {
         form={{
           jobId: "j",
           jobTitle: "Engineer",
+          jobLocation: "TP Hồ Chí Minh",
           companyName: "Company",
           profileReady: false,
           missingProfileFields: ["headline"],
+          profileRevision: 1,
+          profileBasics: {
+            headline: null,
+            summary: null,
+            phone: null,
+            location: null,
+          },
           cvs: [],
           questions: [],
           consentVersion: "v1",

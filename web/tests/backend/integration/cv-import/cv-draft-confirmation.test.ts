@@ -3,6 +3,7 @@ import { Pool } from "pg";
 import { afterAll, afterEach, describe, expect, it } from "vitest";
 
 import { PrismaCvConfirmationRepository } from "@/backend/repositories/cv-import/prisma-cv-confirmation-repository";
+import { ConfirmCvDraftService } from "@/backend/services/cv-import/confirm-cv-draft";
 import {
   cleanupReviewAccounts,
   cvReviewFixtureNow,
@@ -31,17 +32,22 @@ describe.sequential("atomic CV draft confirmation", () => {
     accounts.push(seeded.accountId);
     client.release();
     const repository = new PrismaCvConfirmationRepository();
+    const service = new ConfirmCvDraftService(
+      repository,
+      "fixture-confirm-secret",
+    );
     const input = {
       accountId: seeded.accountId,
       draftId: seeded.draftId,
-      idempotencyDigest: randomBytes(32),
-      draftRevision: 0,
-      sourceProfileRevision: 0,
-      reviewedProfileRevision: 0,
-      now: cvReviewFixtureNow,
+      idempotencyKey: "confirm-" + seeded.uploadId,
+      request: {
+        draftRevision: 0,
+        sourceProfileRevision: 0,
+        reviewedProfileRevision: 0,
+      },
     };
-    const first = await repository.confirm(input);
-    const replay = await repository.confirm(input);
+    const first = await service.execute(input);
+    const replay = await service.execute(input);
     expect(first.replayed).toBe(false);
     expect(replay).toEqual({ ...first, replayed: true });
     const profile = await pool.query(
@@ -59,6 +65,23 @@ describe.sequential("atomic CV draft confirmation", () => {
       skills: 1,
       socialLinks: 0,
     });
+    const savedCv = await pool.query(
+      `SELECT "id", "candidateUserId", "displayName", "fileName",
+              "storageKey", "checksumSha256", "confirmedAt"
+         FROM "CandidateCv"
+        WHERE "candidateUserId" = $1`,
+      [seeded.accountId],
+    );
+    expect(savedCv.rows).toHaveLength(1);
+    expect(savedCv.rows[0]).toMatchObject({
+      id: "candidate-cv-" + seeded.uploadId,
+      candidateUserId: seeded.accountId,
+      displayName: "imported-cv-" + seeded.uploadId + ".pdf",
+      fileName: "imported-cv-" + seeded.uploadId + ".pdf",
+      storageKey: "candidate-cv-" + seeded.uploadId,
+      checksumSha256: "11".repeat(32),
+    });
+    expect(savedCv.rows[0].confirmedAt).toEqual(cvReviewFixtureNow);
     const scheduled = await pool.query(
       `SELECT artifact."deleteAfter",
               artifact."deleteAfter" = receipt."confirmedAt" + interval '7 days' AS exact_window
@@ -85,7 +108,10 @@ describe.sequential("atomic CV draft confirmation", () => {
       { reviewedProfileRevision: 1 },
     ])
       await expect(
-        repository.confirm({ ...input, ...rebound }),
+        service.execute({
+          ...input,
+          request: { ...input.request, ...rebound },
+        }),
       ).rejects.toMatchObject({ code: "IDEMPOTENCY_KEY_REUSED" });
   });
 

@@ -1,0 +1,38 @@
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
+
+describe("CV import status route identity", () => {
+  it("uses the persisted uploadId for pending and completed imports", async () => {
+    const route = await readFile(
+      resolve(
+        process.cwd(),
+        "src/app/(workspace)/profile/cv-imports/[uploadId]/page.tsx",
+      ),
+      "utf8",
+    );
+    const list = await readFile(
+      resolve(
+        process.cwd(),
+        "src/frontend/features/cv-import/components/cv-import-list.tsx",
+      ),
+      "utf8",
+    );
+    const status = await readFile(
+      resolve(
+        process.cwd(),
+        "src/frontend/features/cv-import/components/cv-import-status.tsx",
+      ),
+      "utf8",
+    );
+
+    expect(route).toContain("cvUploadIdSchema.safeParse(uploadId)");
+    expect(route).toContain("getCvImportResource(context.userId, parsed.data)");
+    expect(route).toContain("<CvImportStatus");
+    expect(route).toContain("<CvConfirmationReceipt");
+    expect(route).toContain('export const dynamic = "force-dynamic"');
+    expect(list).toContain("/profile/cv-imports/${item.uploadId}");
+    expect(status).toContain('current.status === "REVIEW_READY"');
+    expect(status).toContain("current.draft?.reviewUrl");
+  });
+});

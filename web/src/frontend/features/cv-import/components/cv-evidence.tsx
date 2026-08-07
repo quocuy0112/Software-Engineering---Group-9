@@ -1,3 +1,5 @@
+"use client";
+
 import type { z } from "zod";
 
 import { cvEvidenceSchema } from "@/shared/contracts/cv-import/review";

@@ -21,6 +21,15 @@ const stateLabel = {
 
 const jobDate = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" });
 
+function shouldOpenApplyFromLocation() {
+  const params = new URLSearchParams(window.location.search);
+  return (
+    window.location.hash.toLowerCase() === "#apply" ||
+    params.get("apply") === "true" ||
+    params.get("openApply") === "true"
+  );
+}
+
 function DetailActionButtons({
   job,
   applied,
@@ -82,14 +91,7 @@ function DetailActionButtons({
 
 export function JobDetailPage({ job }: { job: JobDetail }) {
   const shared = useOptionalJobInteraction();
-  const [applyOpen, setApplyOpen] = useState(() => {
-    if (typeof window === "undefined") return false;
-    const params = new URLSearchParams(window.location.search);
-    return (
-      window.location.hash.toLowerCase() === "#apply" ||
-      params.get("openApply") === "true"
-    );
-  });
+  const [applyOpen, setApplyOpen] = useState(false);
   const [submittedHere, setSubmittedHere] = useState(false);
   const applied =
     job.actions.applied ||
@@ -105,43 +107,31 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
   }, [job.actions.applied, job.actions.saved, job.id, registerJob]);
   useEffect(() => {
     function syncApplyState() {
-      const params = new URLSearchParams(window.location.search);
-      const shouldOpen =
-        window.location.hash.toLowerCase() === "#apply" ||
-        params.get("openApply") === "true";
-      setApplyOpen(shouldOpen);
-      if (shouldOpen) {
-        window.setTimeout(() => {
-          document
-            .getElementById("apply")
-            ?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 0);
-      }
+      setApplyOpen(shouldOpenApplyFromLocation());
     }
 
     syncApplyState();
     window.addEventListener("hashchange", syncApplyState);
-    return () => window.removeEventListener("hashchange", syncApplyState);
+    window.addEventListener("popstate", syncApplyState);
+    return () => {
+      window.removeEventListener("hashchange", syncApplyState);
+      window.removeEventListener("popstate", syncApplyState);
+    };
   }, []);
 
   function setApplyVisibility(next: boolean) {
     setApplyOpen(next);
     const url = new URL(window.location.href);
     if (next) {
-      url.hash = "apply";
+      url.searchParams.set("apply", "true");
       url.searchParams.delete("openApply");
+      url.hash = "";
     } else {
       url.hash = "";
+      url.searchParams.delete("apply");
       url.searchParams.delete("openApply");
     }
     window.history.replaceState(null, "", url);
-    if (next) {
-      window.setTimeout(() => {
-        document
-          .getElementById("apply")
-          ?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 0);
-    }
   }
 
   return (

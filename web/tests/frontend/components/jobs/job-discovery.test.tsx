@@ -1,6 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { JobCardView } from "@/frontend/features/jobs/components/job-card";
+import {
+  ApplyButton,
+  JobCardView,
+} from "@/frontend/features/jobs/components/job-card";
 import { JobSearchForm } from "@/frontend/features/jobs/components/job-search-form";
 import JobsLoading from "@/app/jobs/loading";
 
@@ -41,7 +44,26 @@ describe("job discovery presentation", () => {
     expect(
       screen.getByRole("link", { name: /lập trình viên typescript/i }),
     ).toHaveAttribute("href", "/jobs/lap-trinh-vien");
+    expect(screen.getByText("Negotiable")).toHaveClass(
+      "job-salary--negotiable",
+    );
     expect(screen.getByText("Hồ Chí Minh")).toBeVisible();
+  });
+
+  it("routes authenticated card Apply clicks to the detail-page modal", () => {
+    render(
+      <ApplyButton
+        job={{
+          ...job,
+          actions: { ...job.actions, authenticated: true },
+        }}
+      />,
+    );
+
+    expect(screen.getByRole("link", { name: "Apply" })).toHaveAttribute(
+      "href",
+      "/jobs/lap-trinh-vien?apply=true",
+    );
   });
 
   it("keeps secondary actions hover-only and preserves action order", () => {

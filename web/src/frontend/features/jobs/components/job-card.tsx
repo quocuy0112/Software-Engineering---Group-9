@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { JobCard as JobCardData } from "@/shared/contracts/jobs/discovery";
 import {
   formatRelativeTime,
   formatSalary,
+  isSalaryNegotiable,
 } from "@/shared/utils/jobs/job-display";
-import { ApplyFormSection } from "./apply-form-section";
 import { CompanyAvatar } from "./company-avatar";
 import { QuickViewPanel } from "./quick-view-panel";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
@@ -101,7 +101,7 @@ export function JobCardHeader({
         <p
           className={
             "job-salary" +
-            (job.salary?.isNegotiable ? " job-salary--negotiable" : "")
+            (isSalaryNegotiable(job.salary) ? " job-salary--negotiable" : "")
           }
         >
           {formatSalary(job.salary)}
@@ -164,7 +164,7 @@ export function JobCardBody({ job }: { job: JobCardData }) {
 }
 
 function SignInApplyLink({ job }: { job: JobCardData }) {
-  const returnTo = "/jobs/" + job.slug + "?openApply=true#apply";
+  const returnTo = "/jobs/" + job.slug + "?apply=true";
   return (
     <Link
       className="sh-button job-card-apply-button"
@@ -175,74 +175,10 @@ function SignInApplyLink({ job }: { job: JobCardData }) {
   );
 }
 
-function JobCardApplicationDialog({
-  job,
-  applied,
-  onClose,
-}: {
-  job: JobCardData;
-  applied: boolean;
-  onClose: () => void;
-}) {
-  const dialogRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const previousFocus = document.activeElement as HTMLElement | null;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const focusTimer = window.setTimeout(() => dialogRef.current?.focus(), 0);
-
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key !== "Escape") return;
-      event.preventDefault();
-      onClose();
-    }
-
-    document.addEventListener("keydown", closeOnEscape);
-    return () => {
-      window.clearTimeout(focusTimer);
-      document.removeEventListener("keydown", closeOnEscape);
-      document.body.style.overflow = previousOverflow;
-      previousFocus?.focus();
-    };
-  }, [onClose]);
-
-  return (
-    <div
-      className="job-card-apply-backdrop"
-      role="presentation"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
-    >
-      <div
-        ref={dialogRef}
-        className="job-card-apply-dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="job-apply-heading"
-        tabIndex={-1}
-      >
-        <ApplyFormSection
-          jobId={job.id}
-          jobTitle={job.title}
-          open
-          applied={applied}
-          onOpenChange={(open) => {
-            if (!open) onClose();
-          }}
-        />
-      </div>
-    </div>
-  );
-}
-
 export function ApplyButton({ job }: { job: JobCardData }) {
   const shared = useOptionalJobInteraction();
-  const [open, setOpen] = useState(false);
   const applied =
     job.actions.applied || Boolean(shared?.records[job.id]?.applied);
-  const close = useCallback(() => setOpen(false), []);
 
   if (applied) {
     return (
@@ -259,26 +195,12 @@ export function ApplyButton({ job }: { job: JobCardData }) {
   if (!job.actions.authenticated) return <SignInApplyLink job={job} />;
 
   return (
-    <>
-      <button
-        className="sh-button job-card-apply-button"
-        type="button"
-        aria-expanded={open}
-        aria-controls={"job-apply-dialog-" + job.id}
-        onClick={() => setOpen(true)}
-      >
-        Apply
-      </button>
-      {open ? (
-        <div id={"job-apply-dialog-" + job.id}>
-          <JobCardApplicationDialog
-            job={job}
-            applied={applied}
-            onClose={close}
-          />
-        </div>
-      ) : null}
-    </>
+    <Link
+      className="sh-button job-card-apply-button"
+      href={"/jobs/" + job.slug + "?apply=true"}
+    >
+      Apply
+    </Link>
   );
 }
 

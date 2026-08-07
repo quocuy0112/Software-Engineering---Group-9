@@ -17,6 +17,8 @@ type CvFailureOptions = Readonly<{
   retryAfterSeconds?: number;
 }>;
 
+type CvHttpErrorContext = Readonly<Record<string, string | number | boolean>>;
+
 export class CvImportServiceError extends Error {
   readonly name = "CvImportServiceError";
   readonly fieldErrors: CvApiError["error"]["fieldErrors"];
@@ -124,6 +126,64 @@ function normalizeRequestId(requestId: string): string {
     : randomUUID();
 }
 
+function diagnosticError(error: unknown) {
+  if (error instanceof Error) {
+    const candidate = error as Error & {
+      code?: unknown;
+      constraint?: unknown;
+      meta?: { modelName?: unknown; target?: unknown };
+    };
+    return {
+      name: error.name,
+      message: error.message.slice(0, 1_000),
+      code:
+        typeof candidate.code === "string"
+          ? candidate.code.slice(0, 120)
+          : undefined,
+      constraint:
+        typeof candidate.constraint === "string"
+          ? candidate.constraint.slice(0, 200)
+          : undefined,
+      modelName:
+        typeof candidate.meta?.modelName === "string"
+          ? candidate.meta.modelName.slice(0, 120)
+          : undefined,
+      target: Array.isArray(candidate.meta?.target)
+        ? candidate.meta.target
+            .filter((value): value is string => typeof value === "string")
+            .slice(0, 20)
+        : undefined,
+      stack: error.stack?.slice(0, 4_000),
+    };
+  }
+  return {
+    name: typeof error,
+    message: String(error).slice(0, 1_000),
+  };
+}
+
+function logUnexpectedCvError(
+  error: unknown,
+  requestId: string,
+  context: CvHttpErrorContext,
+) {
+  if (
+    error instanceof CvImportServiceError ||
+    error instanceof CvRequestBoundaryError
+  )
+    return;
+  // Keep upstream/database details server-side. The request id is the only
+  // diagnostic reference that is returned to the browser.
+  console.error(
+    JSON.stringify({
+      event: "cv_api_unexpected_error",
+      requestId,
+      ...context,
+      error: diagnosticError(error),
+    }),
+  );
+}
+
 export function mapCvHttpError(
   error: unknown,
   requestId: string = randomUUID(),
@@ -157,8 +217,11 @@ export function mapCvHttpError(
 export function cvHttpErrorResponse(
   error: unknown,
   requestId: string = randomUUID(),
+  context: CvHttpErrorContext = {},
 ): Response {
-  const mapped = mapCvHttpError(error, requestId);
+  const safeRequestId = normalizeRequestId(requestId);
+  logUnexpectedCvError(error, safeRequestId, context);
+  const mapped = mapCvHttpError(error, safeRequestId);
   return cvJsonResponse(mapped.body, {
     status: mapped.status,
     headers: mapped.retryAfterSeconds

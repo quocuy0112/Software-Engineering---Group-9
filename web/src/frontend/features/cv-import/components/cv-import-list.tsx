@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 import type { CvImportSummary } from "@/shared/contracts/cv-import/upload";

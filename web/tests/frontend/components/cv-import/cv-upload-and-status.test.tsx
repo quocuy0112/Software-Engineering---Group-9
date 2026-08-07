@@ -129,6 +129,10 @@ describe("CV upload and authoritative status UI", () => {
       />,
     );
     expect(screen.getByText("synthetic.pdf")).toBeVisible();
+    expect(screen.getByRole("link", { name: /view status/i })).toHaveAttribute(
+      "href",
+      "/profile/cv-imports/upload_fixture_1234",
+    );
     rerender(
       <CvImportStatus
         resource={{
@@ -180,6 +184,11 @@ describe("CV upload and authoritative status UI", () => {
         stage: "REVIEW" as const,
         availableActions: ["REVIEW"],
         pollingAfterMs: null,
+        draft: {
+          draftId: "draft_polling_1234",
+          revision: 1,
+          reviewUrl: "/profile/cv-imports/upload_polling_1234/review",
+        },
       });
     render(
       <CvImportStatus
@@ -215,6 +224,26 @@ describe("CV upload and authoritative status UI", () => {
     expect(navigation.replace).toHaveBeenCalledWith(
       "/profile/cv-imports/upload_polling_1234/review",
     );
+  });
+
+  it("keeps a confirmed import on the status route and renders its completed state", () => {
+    render(
+      <CvImportStatus
+        resource={{
+          uploadId: "upload_confirmed_1234",
+          parserClass: "EXTERNAL_OPENAI",
+          status: "CONFIRMED",
+          stage: "COMPLETE",
+          availableActions: [],
+          pollingAfterMs: null,
+        }}
+      />,
+    );
+    expect(screen.getByTestId("openai-status")).toHaveAttribute(
+      "data-tone",
+      "success",
+    );
+    expect(navigation.replace).not.toHaveBeenCalled();
   });
 
   it("transitions OpenAI status through consent, pending, API work, success, and safe error", () => {

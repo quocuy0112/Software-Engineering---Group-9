@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { getWorkspaceContext } from "@/backend/auth/get-workspace-context";
 import { cvConfiguration, cvParserAvailability } from "@/backend/cv/config";
+import { listCandidateCvLibrary } from "@/backend/services/profile/candidate-cv-library";
 import { listCvImports } from "@/backend/services/cv-import/cv-import-projection";
 import { CvImportWorkspace } from "@/frontend/features/cv-import/components/cv-import-workspace";
 import { ProfileNavigation } from "@/frontend/features/profile/components/profile-navigation";
@@ -13,7 +14,10 @@ export const revalidate = 0;
 export default async function CvImportsPage() {
   const context = await getWorkspaceContext();
   if (!context) redirect("/login?returnTo=%2Fprofile%2Fcv-imports");
-  const imports = await listCvImports(context.userId);
+  const [imports, candidateCvs] = await Promise.all([
+    listCvImports(context.userId),
+    listCandidateCvLibrary(context.userId),
+  ]);
   const parserAvailability = cvParserAvailability(cvConfiguration);
   const vi = context.initialLocale === "vi";
   return (
@@ -91,6 +95,7 @@ export default async function CvImportsPage() {
       <CvImportWorkspace
         csrfProof={context.csrfProof}
         initialItems={imports.items}
+        initialCandidateCvs={candidateCvs.items}
         parserAvailability={parserAvailability}
       />
     </main>

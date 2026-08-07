@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { profileBasicsSchema } from "@/shared/contracts/account/profile";
 
 export const jobProblemSchema = z
   .object({
@@ -104,9 +105,12 @@ export const applicationFormSchema = z
   .object({
     jobId: z.string().min(1).max(128),
     jobTitle: z.string().min(1).max(200),
+    jobLocation: z.string().trim().min(1).max(160),
     companyName: z.string().min(1).max(160),
     profileReady: z.boolean(),
     missingProfileFields: z.array(z.string().min(1).max(80)).max(20),
+    profileRevision: z.number().int().nonnegative(),
+    profileBasics: profileBasicsSchema,
     cvs: z.array(candidateCvOptionSchema).max(50),
     contact: applicationContactFormSchema.optional(),
     questions: z.array(applicationQuestionSchema).max(20),

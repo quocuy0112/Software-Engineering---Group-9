@@ -1,3 +1,5 @@
+"use client";
+
 import type { CvParserClass } from "@/shared/contracts/cv-import/common";
 import { cvProcessingNotice } from "@/shared/contracts/cv-import/upload";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";

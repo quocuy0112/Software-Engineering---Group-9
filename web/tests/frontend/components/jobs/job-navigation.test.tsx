@@ -75,7 +75,7 @@ describe("job board navigation", () => {
     expect(source).toContain("profile={context.account}");
   });
 
-  it("keeps the Jobs heading fixed and gives each desktop pane its own focusable scroll region", async () => {
+  it("lets the results list grow with the page instead of creating a nested scroll region", async () => {
     const source = await readFile(
       resolve(process.cwd(), "src/app/jobs/page.tsx"),
       "utf8",
@@ -89,21 +89,65 @@ describe("job board navigation", () => {
     expect(source).toContain('className="job-filter-column"');
     expect(source).toContain('className="job-results"');
     expect(source).toContain("tabIndex={0}");
-    expect(styles).toContain("grid-template-rows: auto minmax(0, 1fr)");
-    expect(styles).toContain("overflow-y: auto");
-    expect(styles).toContain("overscroll-behavior: contain");
-    expect(styles).toContain("@media (min-width: 981px)");
-    expect(styles).toContain(".job-board-layout {\n    display: flex;");
-    expect(styles).toContain(
-      '.workspace-main[data-content-mode="job-board"] {\n    display: flex;',
+    expect(styles).toContain(".job-list");
+    expect(styles).not.toContain(
+      '.job-board-public-main .jobs-page,\n  .workspace-content[data-content-mode="job-board"] > .jobs-page',
     );
-    expect(styles).toContain(
-      '.workspace-content[data-content-mode="job-board"] {\n    display: flex;',
+    expect(styles).not.toContain(
+      ".job-filter-column,\n  .job-results {\n    position: static;",
     );
-    expect(styles).toContain(
-      '.workspace-layout[data-sidebar-collapsed="true"]',
+  });
+
+  it("bounds the Filters sidebar and gives it a subtle internal scrollbar", async () => {
+    const styles = await readFile(
+      resolve(process.cwd(), "src/frontend/features/jobs/styles/job-board.css"),
+      "utf8",
     );
-    expect(styles).toContain("width: min(100%, 100rem)");
+
+    expect(styles).toContain(
+      "max-height: calc(\n    100dvh - var(--sh-topbar-height) - var(--sh-space-8)\n  );",
+    );
+    expect(styles).toContain("overflow-y: auto;");
+    expect(styles).toContain("scrollbar-width: thin;");
+    expect(styles).toContain(".job-filter-column::-webkit-scrollbar {");
+    expect(styles).toContain("max-height: min(70dvh, 40rem);");
+  });
+
+  it("uses the Next.js apply query to open the detail-page modal", async () => {
+    const detailSource = await readFile(
+      resolve(
+        process.cwd(),
+        "src/frontend/features/jobs/components/job-detail-redesign.tsx",
+      ),
+      "utf8",
+    );
+    const cardSource = await readFile(
+      resolve(
+        process.cwd(),
+        "src/frontend/features/jobs/components/job-card.tsx",
+      ),
+      "utf8",
+    );
+    const formSource = await readFile(
+      resolve(
+        process.cwd(),
+        "src/frontend/features/jobs/components/apply-form-section.tsx",
+      ),
+      "utf8",
+    );
+    const styles = await readFile(
+      resolve(process.cwd(), "src/frontend/features/jobs/styles/job-board.css"),
+      "utf8",
+    );
+
+    expect(cardSource).toContain('"?apply=true"');
+    expect(detailSource).toContain('params.get("apply") === "true"');
+    expect(detailSource).not.toContain("scrollIntoView");
+    expect(formSource).toContain('className="job-apply-modal-backdrop"');
+    expect(formSource).toContain('role="dialog"');
+    expect(styles).toContain(".job-apply-modal-body {");
+    expect(styles).toContain("position: sticky;");
+    expect(styles).toContain("bottom: 0;");
   });
 
   it("shows the Profile workspace bar and marks Jobs as active", () => {

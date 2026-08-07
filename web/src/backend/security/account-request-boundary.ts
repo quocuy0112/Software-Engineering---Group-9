@@ -17,7 +17,7 @@ export type AuthenticatedAccountContext = {
   sessionId: string;
 };
 
-export type AccountErrorStatus = 400 | 401 | 403 | 409 | 413 | 429 | 503;
+export type AccountErrorStatus = 400 | 401 | 403 | 404 | 409 | 413 | 429 | 503;
 
 export class AccountRequestError extends Error {
   constructor(

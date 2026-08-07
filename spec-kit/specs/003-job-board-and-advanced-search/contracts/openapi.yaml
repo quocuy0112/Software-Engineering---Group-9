@@ -528,6 +528,15 @@ components:
             type: string,
             pattern: '^(?:0|\+84)(?:3|5|7|8|9)\d{8}$',
           }
+    ApplicationProfileBasics:
+      type: object
+      additionalProperties: false
+      required: [headline, summary, phone, location]
+      properties:
+        headline: { type: [string, "null"], maxLength: 200 }
+        summary: { type: [string, "null"], maxLength: 5000 }
+        phone: { type: [string, "null"], maxLength: 32 }
+        location: { type: [string, "null"], maxLength: 160 }
     ApplicationForm:
       type: object
       additionalProperties: false
@@ -535,9 +544,12 @@ components:
         [
           jobId,
           jobTitle,
+          jobLocation,
           companyName,
           profileReady,
           missingProfileFields,
+          profileRevision,
+          profileBasics,
           cvs,
           questions,
           consentVersion,
@@ -546,11 +558,14 @@ components:
       properties:
         jobId: { type: string }
         jobTitle: { type: string }
+        jobLocation: { type: string, minLength: 1, maxLength: 160 }
         companyName: { type: string }
         profileReady: { type: boolean }
         missingProfileFields:
           type: array
           items: { type: string }
+        profileRevision: { type: integer, minimum: 0 }
+        profileBasics: { $ref: "#/components/schemas/ApplicationProfileBasics" }
         cvs:
           type: array
           items: { $ref: "#/components/schemas/CandidateCvOption" }

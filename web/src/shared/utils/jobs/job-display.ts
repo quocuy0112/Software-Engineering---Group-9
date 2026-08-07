@@ -27,11 +27,17 @@ function amount(value: number) {
   return amountFormatter.format(value);
 }
 
+export function isSalaryNegotiable(
+  salary: JobCard["salary"] | SalaryDisplayValue | null | undefined,
+): boolean {
+  if (!salary) return true;
+  return !hasAmount(salary.minimum) && !hasAmount(salary.maximum);
+}
+
 export function formatSalary(
   salary: JobCard["salary"] | SalaryDisplayValue | null | undefined,
 ): string {
-  if (!salary) return "Salary not disclosed";
-  if (salary.isNegotiable === true) return "Negotiable";
+  if (!salary || isSalaryNegotiable(salary)) return "Negotiable";
 
   const suffix =
     salary.period &&
@@ -40,11 +46,11 @@ export function formatSalary(
   const minimum = hasAmount(salary.minimum) ? amount(salary.minimum) : null;
   const maximum = hasAmount(salary.maximum) ? amount(salary.maximum) : null;
 
-  if (minimum && maximum)
+  if (minimum !== null && maximum !== null)
     return minimum + " - " + maximum + " million" + (suffix ?? "");
-  if (maximum) return "Up to " + maximum + " million";
-  if (minimum) return "From " + minimum + " million";
-  return "Salary not disclosed";
+  if (maximum !== null) return "Up to " + maximum + " million" + (suffix ?? "");
+  if (minimum !== null) return "From " + minimum + " million" + (suffix ?? "");
+  return "Negotiable";
 }
 
 export function formatRelativeTime(value: string | Date, now = new Date()) {
