@@ -76,6 +76,9 @@ function QuickViewIcon() {
   );
 }
 
+const hoverActionClassName =
+  "job-icon-button job-card-hover-action opacity-0 transition-[opacity,transform] duration-150 group-hover:opacity-100 group-focus-within:opacity-100";
+
 export function JobCardHeader({
   job,
   timeMode,
@@ -314,7 +317,7 @@ export function HideButton({
 
   return (
     <button
-      className="job-icon-button job-card-hover-action"
+      className={hoverActionClassName}
       type="button"
       aria-label="Hide job"
       title="Hide job"
@@ -331,7 +334,7 @@ export function HideButton({
 export function QuickViewButton({ onQuickView }: { onQuickView: () => void }) {
   return (
     <button
-      className="job-icon-button job-card-hover-action"
+      className={hoverActionClassName}
       type="button"
       aria-label="Quick view"
       title="Quick view"
@@ -377,8 +380,8 @@ export function JobCardActions({
           <div className="job-card-grid-actions" aria-label="Job actions">
             <QuickViewButton onQuickView={openQuickView} />
             <HideButton jobId={job.id} onHidden={onHidden} />
-            <ApplyButton job={job} />
             <SaveButton job={job} />
+            <ApplyButton job={job} />
           </div>
         )}
       </footer>

@@ -849,6 +849,36 @@
   }
 }
 
+/* JobCard actions: final cascade for hover and touch behavior. */
+.job-redesign-card.group .job-card-hover-action {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+
+.job-redesign-card.group:hover .job-card-hover-action,
+.job-redesign-card.group:focus-within .job-card-hover-action {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+@media (hover: none) {
+  .job-redesign-card.group .job-card-hover-action {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .job-redesign-card.group .job-card-hover-action {
+    transition: none;
+  }
+}
 @media (max-width: 420px) {
   .job-board-header-inner {
     flex-direction: column;

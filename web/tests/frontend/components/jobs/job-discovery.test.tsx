@@ -44,6 +44,33 @@ describe("job discovery presentation", () => {
     expect(screen.getByText("Hồ Chí Minh")).toBeVisible();
   });
 
+  it("keeps secondary actions hover-only and preserves action order", () => {
+    render(<JobCardView job={job} variant="grid" />);
+
+    for (const name of ["Quick view", "Hide job"]) {
+      expect(screen.getByRole("button", { name })).toHaveClass(
+        "opacity-0",
+        "group-hover:opacity-100",
+        "duration-150",
+      );
+    }
+
+    const actions = document.querySelector(".job-card-grid-actions");
+    expect(actions).not.toBeNull();
+    const orderedActions = Array.from(
+      actions?.querySelectorAll("button, a") ?? [],
+    ).map(
+      (element) =>
+        element.getAttribute("aria-label") ?? element.textContent?.trim() ?? "",
+    );
+    expect(orderedActions).toEqual([
+      "Quick view",
+      "Hide job",
+      "Sign in to save this job",
+      "Apply",
+    ]);
+  });
+
   it("exposes labeled filters and a clear action", () => {
     render(<JobSearchForm criteria={{ q: "TypeScript" }} />);
     expect(screen.getByLabelText(/keywords/i)).toHaveValue("TypeScript");
