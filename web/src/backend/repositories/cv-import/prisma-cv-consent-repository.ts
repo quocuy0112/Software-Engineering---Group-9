@@ -293,9 +293,10 @@ export class PrismaCvConsentRepository implements CvConsentReadGateway {
           },
         },
         orderBy: { attemptNumber: "desc" },
-        select: { id: true },
+        select: { id: true, segmentSchemaVersion: true },
       });
       if (!extraction) throw new CvImportServiceError("IMPORT_STATE_CONFLICT");
+      const hybrid = extraction.segmentSchemaVersion === "cv-segments-v2";
       const id = randomUUID();
       await transaction.cvProcessingConsent.create({
         data: {
@@ -341,9 +342,9 @@ export class PrismaCvConsentRepository implements CvConsentReadGateway {
           provider: input.provider,
           model: input.model,
           purposeVersion: input.purposeVersion,
-          inputVersion: "cv-segments-v1",
-          instructionVersion: "cv-extract-v1",
-          schemaVersion: "cv-draft-v1",
+          inputVersion: hybrid ? "cv-segments-v2" : "cv-segments-v1",
+          instructionVersion: hybrid ? "cv-extract-v2" : "cv-extract-v1",
+          schemaVersion: hybrid ? "cv-draft-v2" : "cv-draft-v1",
           createdAt: input.occurredAt,
         },
         select: { id: true },

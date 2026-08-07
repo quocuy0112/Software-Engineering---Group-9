@@ -13,6 +13,7 @@ import {
   buildCvTraceEvent,
 } from "@/backend/cv/telemetry";
 import { systemClock, type Clock } from "@/backend/time/clock";
+import { PrivateRasterWorkspace } from "@/backend/cv/extraction/private-raster-workspace";
 import { CvWorkerPipeline } from "./pipeline";
 
 type CvWorkRepository = Pick<
@@ -183,6 +184,7 @@ export class CvWorkerRuntime {
   }
 
   async assertReady(): Promise<void> {
+    await PrivateRasterWorkspace.cleanupStale();
     await this.readiness();
     if (!this.pipeline.has("DELETE")) {
       throw new Error("CV_CLEANUP_PROCESSOR_REQUIRED");

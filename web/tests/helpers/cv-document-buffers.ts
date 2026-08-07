@@ -56,13 +56,15 @@ function crc32(input: Buffer): number {
   return (crc ^ 0xffffffff) >>> 0;
 }
 
-function storedZip(entries: ReadonlyArray<readonly [string, string]>): Buffer {
+function storedZip(
+  entries: ReadonlyArray<readonly [string, string | Buffer]>,
+): Buffer {
   const localParts: Buffer[] = [];
   const centralParts: Buffer[] = [];
   let localOffset = 0;
   for (const [name, value] of entries) {
     const nameBytes = Buffer.from(name, "utf8");
-    const data = Buffer.from(value, "utf8");
+    const data = Buffer.isBuffer(value) ? value : Buffer.from(value, "utf8");
     const checksum = crc32(data);
     const local = Buffer.alloc(30);
     local.writeUInt32LE(0x04034b50, 0);
@@ -127,5 +129,51 @@ export function createSyntheticDocx(
         `<w:body><w:p><w:r><w:t>${escaped}</w:t></w:r></w:p><w:sectPr/></w:body>` +
         "</w:document>",
     ],
+  ]);
+}
+
+/** Builds a minimal DOCX whose main document body references one JPEG image. */
+export function createSyntheticImageDocx(
+  image: Buffer,
+  anchorText = "Work experience",
+): Buffer {
+  const escaped = anchorText
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+  return storedZip([
+    [
+      "[Content_Types].xml",
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+        '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+        '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+        '<Default Extension="xml" ContentType="application/xml"/>' +
+        '<Default Extension="jpg" ContentType="image/jpeg"/>' +
+        '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>' +
+        "</Types>",
+    ],
+    [
+      "_rels/.rels",
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>' +
+        "</Relationships>",
+    ],
+    [
+      "word/_rels/document.xml.rels",
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+        '<Relationship Id="rIdImage1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/cv.jpg"/>' +
+        "</Relationships>",
+    ],
+    [
+      "word/document.xml",
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+        '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+        `<w:body><w:p><w:r><w:t>${escaped}</w:t></w:r></w:p>` +
+        '<w:p><w:r><w:drawing><a:blip r:embed="rIdImage1"/></w:drawing></w:r></w:p>' +
+        "<w:sectPr/></w:body></w:document>",
+    ],
+    ["word/media/cv.jpg", image],
   ]);
 }

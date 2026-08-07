@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { mkdir, unlink, writeFile } from "node:fs/promises";
+import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import { dirname, extname, isAbsolute, relative, resolve } from "node:path";
 import process from "node:process";
 import { setTimeout as delay } from "node:timers/promises";
@@ -11,10 +11,6 @@ import { config as loadEnvironment } from "dotenv";
 import { Pool } from "pg";
 
 import {
-  createSyntheticDocx,
-  createSyntheticPdf,
-} from "../tests/helpers/cv-document-buffers.ts";
-import {
   cleanupCvRecoveryAccounts,
   seedCvRecoveryImport,
 } from "../tests/helpers/cv-failure-retry-fixture.ts";
@@ -24,7 +20,11 @@ const webRoot = process.cwd();
 loadEnvironment({ path: resolve(webRoot, ".env.local"), quiet: true });
 
 const baseUrl = process.env.PERF_BASE_URL ?? "http://localhost:3001";
-const iterations = Number.parseInt(process.env.CV_PERF_ITERATIONS ?? "10", 10);
+const iterations = Number.parseInt(process.env.CV_PERF_ITERATIONS ?? "60", 10);
+const journeyConcurrency = Number.parseInt(
+  process.env.CV_PERF_JOURNEY_CONCURRENCY ?? "2",
+  10,
+);
 const claims = Number.parseInt(process.env.CV_PERF_CLAIM_SAMPLES ?? "20", 10);
 const cleanupUnits = Number.parseInt(
   process.env.CV_PERF_CLEANUP_UNITS ?? "100",
@@ -52,6 +52,7 @@ const controlledDeadlineAt = new Date(
 
 for (const [name, value, minimum] of [
   ["CV_PERF_ITERATIONS", iterations, 2],
+  ["CV_PERF_JOURNEY_CONCURRENCY", journeyConcurrency, 2],
   ["CV_PERF_CLAIM_SAMPLES", claims, 1],
   ["CV_PERF_CLEANUP_UNITS", cleanupUnits, 1],
   ["CV_PERF_CLAIM_CONCURRENCY", claimConcurrency, 2],
@@ -60,6 +61,9 @@ for (const [name, value, minimum] of [
   if (!Number.isInteger(value) || value < minimum) {
     throw new Error(`${name}_INVALID`);
   }
+}
+if (journeyConcurrency !== 2) {
+  throw new Error("CV_PERF_JOURNEY_CONCURRENCY_MUST_BE_TWO");
 }
 if (!process.env.DATABASE_URL || !process.env.DIRECT_URL) {
   throw new Error("CV_PERF_DATABASE_URLS_REQUIRED");
@@ -91,33 +95,23 @@ function resource(metric, valueBytes, ceilingBytes, condition) {
   return { kind: "RESOURCE", metric, valueBytes, ceilingBytes, condition };
 }
 
-function formatFixture(index) {
-  const sizeClass = index % 3;
-  const textLength = [1_000, 20_000, 200_000][sizeClass];
-  const languageSeed = [
-    "Synthetic English platform engineer ",
-    "Ky su nen tang du lieu tong hop ",
-    "Synthetic bilingual ky su platform ",
-  ][sizeClass];
-  const text = languageSeed
-    .repeat(Math.ceil(textLength / languageSeed.length))
-    .slice(0, textLength);
-  if (index % 2 === 0) {
-    return {
-      format: "PDF",
-      sizeClass,
-      name: "synthetic-performance.pdf",
-      mimeType: "application/pdf",
-      buffer: createSyntheticPdf(text),
-    };
-  }
+async function formatFixture(index) {
+  const corpusRoot = resolve(webRoot, "tests/fixtures/ocr-corpus");
+  const manifest = JSON.parse(
+    await readFile(resolve(corpusRoot, "manifest.json"), "utf8"),
+  );
+  const fixtures = manifest.fixtures.filter(
+    (fixture) => fixture.purpose === "CV" && fixture.documentPath,
+  );
+  if (fixtures.length < 60) throw new Error("CV_PERF_CORPUS_FLOOR_NOT_MET");
+  const fixture = fixtures[index % fixtures.length];
   return {
-    format: "DOCX",
-    sizeClass,
-    name: "synthetic-performance.docx",
-    mimeType:
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    buffer: createSyntheticDocx(text),
+    format: "PDF",
+    sizeClass: index % 3,
+    wordCount: fixture.wordCount,
+    name: `${fixture.id}.pdf`,
+    mimeType: "application/pdf",
+    buffer: await readFile(resolve(corpusRoot, fixture.documentPath)),
   };
 }
 
@@ -207,7 +201,7 @@ async function signIn(browser, email) {
 }
 
 async function measureJourney(page, pool, index, observations) {
-  const fixture = formatFixture(index);
+  const fixture = await formatFixture(index);
   const condition = index === 0 ? "COLD" : "WARM";
   const selectedHeadline = `Measured Synthetic Engineer ${index}`;
   const profileBefore = await page.request
@@ -641,6 +635,7 @@ const supportAccounts = [];
 const contexts = [];
 const dataset = {
   documents: iterations,
+  labeledWords: 0,
   pdf: 0,
   docx: 0,
   small: 0,
@@ -671,15 +666,26 @@ try {
     contexts.push(signedIn.context);
     pages.push(signedIn.page);
   }
-  for (let index = 0; index < iterations; index += 1) {
-    const fixture = await measureJourney(
-      pages[Math.floor(index / 5)],
-      database,
-      index,
-      observations,
+  for (let index = 0; index < iterations; index += journeyConcurrency) {
+    const batch = await Promise.all(
+      Array.from(
+        { length: Math.min(journeyConcurrency, iterations - index) },
+        (_, offset) => {
+          const fixtureIndex = index + offset;
+          return measureJourney(
+            pages[Math.floor(fixtureIndex / 5)],
+            database,
+            fixtureIndex,
+            observations,
+          );
+        },
+      ),
     );
-    dataset[fixture.format.toLowerCase()] += 1;
-    dataset[["small", "medium", "large"][fixture.sizeClass]] += 1;
+    for (const fixture of batch) {
+      dataset[fixture.format.toLowerCase()] += 1;
+      dataset[["small", "medium", "large"][fixture.sizeClass]] += 1;
+      dataset.labeledWords += fixture.wordCount;
+    }
   }
   await collectClaims(database, observations, supportAccounts);
   await collectCleanup(database, observations, supportAccounts);
@@ -694,7 +700,7 @@ try {
         clock: "CONTROLLED_RETENTION_CLOCK",
       },
       conditions: {
-        concurrency: Math.max(1, claimConcurrency),
+        concurrency: journeyConcurrency,
         server: "NEXT_DEVELOPMENT",
         scanner: "CLAMAV_UNIX_SOCKET",
         parser: "DETERMINISTIC_INTERNAL",

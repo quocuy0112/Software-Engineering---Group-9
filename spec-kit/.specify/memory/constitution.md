@@ -1,26 +1,35 @@
 <!--
 Sync Impact Report
-- Version change: unversioned baseline (treated as 1.x) -> 2.0.0
+- Version change: 2.0.0 -> 2.1.0
 - Modified principles:
-  - Principle II - Security, Privacy, and Tenant Isolation: clarified the
-    existing 5 MB upload cap as decimal 5,000,000 bytes without changing it.
-  - Principle VI - Measurable Quality and Accessible Experience: mandatory
-    latency targets now use explicit P95 acceptance semantics with transparent
-    outlier/error reporting; correctness, security, retention, and hard workflow
-    deadlines remain non-percentile gates.
+  - Principle II - Security, Privacy, and Tenant Isolation: permits bounded OCR
+    inside accepted PDF/DOCX CVs and ephemeral PNG/JPEG job-search inputs while
+    preserving the PDF/DOCX-only CV upload boundary and purpose-limited deletion.
+  - Principle III - Deterministic Core and Explainable AI: permits AI to derive
+    typed job-search intent while keeping deterministic retrieval and ranking
+    authoritative, reversible, and available as a fallback.
+  - Principle VI - Measurable Quality and Accessible Experience: adds a separate
+    asynchronous P95 target for image-assisted search interpretation without
+    weakening the existing deterministic job-search target.
+  - Mandatory Product Boundaries - Explicit exclusions and restrictions: adds
+    the narrow approved exception for OCR/AI-generated job-search keywords and
+    filters; direct LLM job selection and ranking remain excluded.
 - Added sections: none
 - Removed sections: none
 - Templates:
-  - ✅ spec-kit/.specify/templates/plan-template.md updated to use the explicit
-    P95 notation in its performance-constraint example.
-  - ✅ spec-kit/.specify/templates/spec-template.md updated to distinguish an
-    independently testable story checkpoint from a releasable P0 workflow.
-  - ✅ spec-kit/.specify/templates/tasks-template.md updated to prevent a partial
-    P0 story slice from being labelled or deployed as a complete MVP.
+  - ✅ spec-kit/.specify/templates/plan-template.md reviewed; its Constitution
+    Check and performance fields already cover the amended requirements.
+  - ✅ spec-kit/.specify/templates/spec-template.md reviewed; its mandatory user
+    scenarios, requirements, and measurable outcomes need no structural change.
+  - ✅ spec-kit/.specify/templates/tasks-template.md reviewed; its foundational,
+    security, fallback, and verification task structure remains compatible.
   - ✅ spec-kit/.specify/templates/commands/ reviewed; directory is not present.
 - Runtime guidance:
   - ✅ README.md and AGENTS.md reviewed; no principle reference requires change.
-- Follow-up TODOs: none.
+- Follow-up TODOs:
+  - Feature 005 must specify the purpose-specific CV OCR and image-assisted job
+    search policies before implementation; completed Features 003 and 004 remain
+    the deterministic search and PDF/DOCX CV-import baselines.
 -->
 
 # SmartHire Constitution
@@ -75,6 +84,17 @@ Personal, recruitment, and company data MUST be protected by design.
   before processing.
 - CV uploads MUST be limited to PDF and DOCX files with a maximum size of 5 MB
   (exactly 5,000,000 bytes), unless this constitution is amended.
+- An approved CV-document OCR feature MAY derive temporary raster images from an
+  accepted PDF or DOCX and MAY process safe PNG/JPEG media contained within that
+  document only after malware and structural validation. This processing MUST
+  NOT expand the accepted CV upload types and MUST be isolated, resource-bounded,
+  purpose-limited, and covered by the approved CV retention policy.
+- An approved image-assisted job-search feature MAY accept standalone PNG and
+  JPEG files only as ephemeral search-query inputs. Such inputs MUST NOT become
+  CV uploads, Candidate Profile content, application artifacts, or persistent
+  search-index data. Source images and derived OCR text MUST be validated,
+  excluded from ordinary logs, purpose-limited, and deleted within a short hard
+  deadline defined and verified by the approved feature specification.
 - Secrets and production personal data MUST NOT be committed to the repository,
   written to ordinary application logs, or sent to an AI provider unless
   required for the approved feature and protected by the defined data policy.
@@ -108,9 +128,20 @@ unavailable, or uncertain.
 - When the AI service is unavailable, application processing MUST continue with
   deterministic matching where applicable, and the reduced-capability result
   MUST be clearly identified.
-- The model/provider, prompt or instruction version, parser version, score
-  weights, thresholds, and relevant input version MUST be traceable for each AI
-  result.
+- An approved image-assisted job-search feature MAY use OCR and AI to transform
+  user-provided text or image content into schema-validated search keywords and
+  structured filters. AI MUST NOT directly select, exclude, or rank job
+  identifiers; deterministic job retrieval and ranking MUST remain authoritative.
+- AI-generated search filters MAY be applied automatically only when they are
+  simultaneously visible, editable, removable, and reversible by the user.
+  Manual text search and deterministic filtering MUST remain available when OCR
+  or AI is unavailable, slow, or uncertain.
+- The applicable model/provider, OCR engine/model, prompt or instruction
+  version, parser or search-intent schema version, and relevant input-policy
+  version MUST be traceable for each AI-assisted result. Scoring results MUST
+  additionally retain their weights and thresholds. Traceability MUST NOT require
+  retaining an ephemeral raw search image or its OCR text beyond its approved
+  retention deadline.
 - A specification or plan MUST NOT change the 60/40 weights, score bands, or
   human-override rule without first amending this constitution.
 
@@ -128,7 +159,9 @@ The database is the authoritative source of recruitment state.
   records MUST be prevented through constraints or idempotency controls.
 - The canonical application states are **Applied, Viewed, Shortlisted,
   Interviewing, Offered, Hired, Offer Declined, Rejected, and Waitlisted**.
-- The Hired state MUST only be set by an explicit Recruiter confirmation action (triggering the hiring confirmation email) - never automatically from a candidate's in-app offer acceptance, which MUST only notify the recruiter.
+- The Hired state MUST only be set by an explicit Recruiter confirmation action,
+  which triggers the hiring confirmation email. A candidate's in-app offer
+  acceptance MUST only notify the recruiter and MUST NOT set Hired automatically.
 - Every allowed state transition MUST be explicitly defined and validated on the
   server.
 - The Kanban interface MUST NOT bypass state-transition, authorization, or
@@ -179,17 +212,22 @@ representative test window. This percentile convention is the project SLA
 baseline because it resists isolated network, scheduling, and cold-start jitter
 while still measuring sustained user experience.
 
-| Interaction                 |                  Mandatory target |
-| --------------------------- | --------------------------------: |
-| Page load                   |                       P95 ≤ 3 seconds |
-| Dashboard navigation        |                       P95 ≤ 2 seconds |
-| Job search and filtering    |                       P95 ≤ 2 seconds |
-| Profile update              |                       P95 ≤ 2 seconds |
-| Kanban visual response      |                P95 ≤ 500 milliseconds |
-| In-app notification         |                       P95 ≤ 5 seconds |
-| AI semantic scoring         | P95 ≤ 20 seconds and asynchronous |
-| Export up to 10,000 records |                      P95 ≤ 10 seconds |
+| Interaction                          |                  Mandatory target |
+| ------------------------------------ | --------------------------------: |
+| Page load                            |                   P95 ≤ 3 seconds |
+| Dashboard navigation                 |                   P95 ≤ 2 seconds |
+| Job search and filtering             |                   P95 ≤ 2 seconds |
+| Profile update                       |                   P95 ≤ 2 seconds |
+| Kanban visual response               |            P95 ≤ 500 milliseconds |
+| In-app notification                  |                   P95 ≤ 5 seconds |
+| AI semantic scoring                  | P95 ≤ 20 seconds and asynchronous |
+| Image-assisted search interpretation | P95 ≤ 10 seconds and asynchronous |
+| Export up to 10,000 records          |                  P95 ≤ 10 seconds |
 
+- The job-search-and-filtering target measures deterministic query execution
+  after a text query or validated search intent is available. OCR and AI search
+  interpretation use their separate target and MUST NOT block or disable manual
+  search while processing.
 - Each performance claim MUST identify its environment, dataset, measurement
   method, sample size, test duration, concurrency, percentile calculation,
   maximum observed latency, error rate, and relevant external-service
@@ -329,10 +367,17 @@ approved product baseline is amended.
   misrepresent a candidate's qualifications.
 - Gap analysis MUST NOT be implemented as a separate feature; relevant strengths
   and gaps belong in the score explanation.
-- Job recommendations MUST use approved deterministic tag and location matching,
-  not LLM-based semantic recommendations.
+- Job retrieval, ranking, and recommendations MUST use approved deterministic
+  matching. AI MUST NOT directly select, exclude, or rank job identifiers.
 - Job search MUST be case-insensitive and Vietnamese-diacritic-insensitive.
-  AI-generated search keywords are outside the current scope.
+- An approved image-assisted job-search feature MAY use OCR and AI to derive
+  schema-validated keywords and structured filters from user-provided text or
+  PNG/JPEG search inputs. These filters MAY be applied automatically only when
+  they are simultaneously visible, editable, removable, and reversible;
+  deterministic search MUST remain authoritative. The search MUST return only
+  job records the actor is authorized to access and MUST NOT expose private
+  candidate, application, or company data. Other AI-generated search keywords
+  and LLM-based semantic job recommendations remain outside scope.
 - A full user-facing Administrator activity-history feature MAY remain optional,
   but the backend audit events required by Principle IV are mandatory.
 
@@ -348,6 +393,10 @@ Every generated artifact MUST apply this constitution as follows:
 - A task list MUST include the work required for authorization, validation,
   persistence integrity, AI fallback and explanation, auditability, accessibility,
   and relevant tests whenever those concerns apply to the feature.
+- A specification that permits OCR or AI-assisted search MUST define
+  purpose-specific input types, validation, isolation, provenance, retention and
+  deletion, visible user controls, deterministic fallback, provider boundaries,
+  and measurable quality gates.
 - A Constitution Check MUST treat any unresolved conflict with `MUST` or
   `MUST NOT` as blocking.
 - A plan MUST NOT weaken a constitutional principle merely to simplify
@@ -373,4 +422,4 @@ they do not conflict with this constitution.
 - Compliance MUST be checked when generating or updating a specification, plan,
   or task list.
 
-**Version**: 2.0.0 | **Ratified**: 2026-07-11 | **Last Amended**: 2026-08-01
+**Version**: 2.1.0 | **Ratified**: 2026-07-11 | **Last Amended**: 2026-08-06

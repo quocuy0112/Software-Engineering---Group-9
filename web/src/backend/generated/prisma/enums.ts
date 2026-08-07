@@ -413,3 +413,193 @@ export const CvConsentAction = {
 } as const
 
 export type CvConsentAction = (typeof CvConsentAction)[keyof typeof CvConsentAction]
+
+
+export const OcrProcessingPurpose = {
+  CV_IMPORT: 'CV_IMPORT',
+  JOB_IMAGE_SEARCH: 'JOB_IMAGE_SEARCH'
+} as const
+
+export type OcrProcessingPurpose = (typeof OcrProcessingPurpose)[keyof typeof OcrProcessingPurpose]
+
+
+export const OcrAttemptStatus = {
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  SUCCEEDED: 'SUCCEEDED',
+  PARTIAL_REVIEW_REQUIRED: 'PARTIAL_REVIEW_REQUIRED',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type OcrAttemptStatus = (typeof OcrAttemptStatus)[keyof typeof OcrAttemptStatus]
+
+
+export const OcrUnitKind = {
+  PDF_PAGE: 'PDF_PAGE',
+  DOCX_BODY_IMAGE: 'DOCX_BODY_IMAGE',
+  SEARCH_IMAGE: 'SEARCH_IMAGE'
+} as const
+
+export type OcrUnitKind = (typeof OcrUnitKind)[keyof typeof OcrUnitKind]
+
+
+export const OcrUnitStatus = {
+  NATIVE_SUFFICIENT: 'NATIVE_SUFFICIENT',
+  OCR_SUCCEEDED: 'OCR_SUCCEEDED',
+  NON_TEXT: 'NON_TEXT',
+  LOW_CONFIDENCE: 'LOW_CONFIDENCE',
+  CONFLICT: 'CONFLICT',
+  DEDUPLICATED: 'DEDUPLICATED',
+  EXCLUDED: 'EXCLUDED',
+  UNSUPPORTED: 'UNSUPPORTED',
+  FAILED: 'FAILED'
+} as const
+
+export type OcrUnitStatus = (typeof OcrUnitStatus)[keyof typeof OcrUnitStatus]
+
+
+export const OcrSourceMethod = {
+  NATIVE: 'NATIVE',
+  OCR: 'OCR',
+  NATIVE_AND_OCR: 'NATIVE_AND_OCR',
+  NONE: 'NONE'
+} as const
+
+export type OcrSourceMethod = (typeof OcrSourceMethod)[keyof typeof OcrSourceMethod]
+
+
+export const OcrAnchorQuality = {
+  EXACT: 'EXACT',
+  APPROXIMATE: 'APPROXIMATE',
+  PAGE_ONLY: 'PAGE_ONLY',
+  NOT_APPLICABLE: 'NOT_APPLICABLE'
+} as const
+
+export type OcrAnchorQuality = (typeof OcrAnchorQuality)[keyof typeof OcrAnchorQuality]
+
+
+export const SearchActorClass = {
+  VISITOR: 'VISITOR',
+  AUTHENTICATED: 'AUTHENTICATED'
+} as const
+
+export type SearchActorClass = (typeof SearchActorClass)[keyof typeof SearchActorClass]
+
+
+export const SearchImageStatus = {
+  AWAITING_CONTENT: 'AWAITING_CONTENT',
+  SCAN_QUEUED: 'SCAN_QUEUED',
+  SCANNING: 'SCANNING',
+  DECODE_QUEUED: 'DECODE_QUEUED',
+  DECODING: 'DECODING',
+  OCR_QUEUED: 'OCR_QUEUED',
+  OCR_PROCESSING: 'OCR_PROCESSING',
+  AWAITING_CONSENT: 'AWAITING_CONSENT',
+  INTERPRET_QUEUED: 'INTERPRET_QUEUED',
+  INTERPRETING: 'INTERPRETING',
+  RESULT_READY: 'RESULT_READY',
+  FALLBACK_READY: 'FALLBACK_READY',
+  VALIDATION_FAILED: 'VALIDATION_FAILED',
+  INFECTED: 'INFECTED',
+  SCAN_FAILED: 'SCAN_FAILED',
+  DECODE_FAILED: 'DECODE_FAILED',
+  OCR_FAILED: 'OCR_FAILED',
+  INTERPRET_FAILED: 'INTERPRET_FAILED',
+  CONSUMED: 'CONSUMED',
+  CANCELLED: 'CANCELLED',
+  EXPIRED: 'EXPIRED',
+  DELETED: 'DELETED'
+} as const
+
+export type SearchImageStatus = (typeof SearchImageStatus)[keyof typeof SearchImageStatus]
+
+
+export const SearchArtifactKind = {
+  SOURCE_IMAGE: 'SOURCE_IMAGE',
+  NORMALIZED_IMAGE: 'NORMALIZED_IMAGE',
+  OCR_TEXT: 'OCR_TEXT',
+  VALIDATED_INTENT: 'VALIDATED_INTENT'
+} as const
+
+export type SearchArtifactKind = (typeof SearchArtifactKind)[keyof typeof SearchArtifactKind]
+
+
+export const SearchArtifactStatus = {
+  QUARANTINED: 'QUARANTINED',
+  AVAILABLE: 'AVAILABLE',
+  DELETE_PENDING: 'DELETE_PENDING',
+  DELETING: 'DELETING',
+  DELETED: 'DELETED',
+  DELETE_FAILED: 'DELETE_FAILED'
+} as const
+
+export type SearchArtifactStatus = (typeof SearchArtifactStatus)[keyof typeof SearchArtifactStatus]
+
+
+export const SearchScanStatus = {
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  CLEAN: 'CLEAN',
+  INFECTED: 'INFECTED',
+  INDETERMINATE: 'INDETERMINATE',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type SearchScanStatus = (typeof SearchScanStatus)[keyof typeof SearchScanStatus]
+
+
+export const SearchDecodeStatus = {
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type SearchDecodeStatus = (typeof SearchDecodeStatus)[keyof typeof SearchDecodeStatus]
+
+
+export const SearchInterpreterClass = {
+  DETERMINISTIC_INTERNAL: 'DETERMINISTIC_INTERNAL',
+  EXTERNAL_OPENAI: 'EXTERNAL_OPENAI'
+} as const
+
+export type SearchInterpreterClass = (typeof SearchInterpreterClass)[keyof typeof SearchInterpreterClass]
+
+
+export const SearchIntentStatus = {
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  SUCCEEDED: 'SUCCEEDED',
+  FALLBACK_READY: 'FALLBACK_READY',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type SearchIntentStatus = (typeof SearchIntentStatus)[keyof typeof SearchIntentStatus]
+
+
+export const SearchResultKind = {
+  VALIDATED_INTENT: 'VALIDATED_INTENT',
+  OCR_TEXT_FALLBACK: 'OCR_TEXT_FALLBACK'
+} as const
+
+export type SearchResultKind = (typeof SearchResultKind)[keyof typeof SearchResultKind]
+
+
+export const SearchConsentAction = {
+  GRANTED: 'GRANTED',
+  REVOKED: 'REVOKED'
+} as const
+
+export type SearchConsentAction = (typeof SearchConsentAction)[keyof typeof SearchConsentAction]
+
+
+export const ImageSearchAdmissionSubject = {
+  SOURCE_IP: 'SOURCE_IP',
+  BROWSER: 'BROWSER',
+  ACCOUNT: 'ACCOUNT'
+} as const
+
+export type ImageSearchAdmissionSubject = (typeof ImageSearchAdmissionSubject)[keyof typeof ImageSearchAdmissionSubject]

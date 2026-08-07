@@ -16,7 +16,12 @@ describe.skipIf(!databaseAvailable)("PostgreSQL public job search", () => {
     const helpers = await import("../../../helpers/job-board-database-fixture");
     const repositoryModule =
       await import("@/backend/repositories/jobs/prisma-public-job-repository");
-    fixture = await helpers.createJobBoardDatabaseFixture("search");
+    // Keep this fixture at the front of NEWEST even when a developer database
+    // already contains the large synthetic performance corpus.
+    fixture = await helpers.createJobBoardDatabaseFixture(
+      "search",
+      new Date("2099-08-01T08:00:00.000Z"),
+    );
     repository = new repositoryModule.PrismaPublicJobRepository();
   });
 

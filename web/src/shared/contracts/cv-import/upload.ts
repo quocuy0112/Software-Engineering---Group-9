@@ -187,6 +187,10 @@ export const CV_SAFE_FAILURE_CODES = [
   "EXTRACTION_EMPTY",
   "EXTRACTION_TIMEOUT",
   "EXTRACTION_FAILED",
+  "OCR_UNAVAILABLE",
+  "OCR_TIMEOUT",
+  "OCR_OUTPUT_INVALID",
+  "OCR_LOW_CONFIDENCE",
   "CONSENT_REQUIRED",
   "CONSENT_REVOKED",
   "PARSER_TIMEOUT",
@@ -257,6 +261,24 @@ export const cvImportResourceSchema = z
     createdAt: cvUtcTimestampSchema,
     expiresAt: cvUtcTimestampSchema,
     draft: cvDraftReferenceSchema.nullable(),
+    ocr: z
+      .object({
+        status: z.enum([
+          "QUEUED",
+          "PROCESSING",
+          "SUCCEEDED",
+          "PARTIAL_REVIEW_REQUIRED",
+          "FAILED",
+          "CANCELLED",
+        ]),
+        accountedUnitCount: z.number().int().min(0).max(10_000),
+        totalUnitCount: z.number().int().min(0).max(10_000),
+        lowConfidenceUnitCount: z.number().int().min(0).max(10_000),
+        conflictUnitCount: z.number().int().min(0).max(10_000),
+      })
+      .strict()
+      .nullable()
+      .default(null),
     processingNotice: cvProcessingNoticeSchema,
     consent: cvConsentNoticeSchema.nullable(),
     failure: cvSafeFailureSchema.nullable(),

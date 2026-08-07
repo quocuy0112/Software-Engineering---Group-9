@@ -53,6 +53,7 @@ const statuses: Record<CvUploadStatus, Bilingual> = {
 };
 
 const stages: Record<CvImportStage, Bilingual> = {
+  OCR: { en: "OCR", vi: "OCR" },
   UPLOAD: { en: "Upload", vi: "Tải lên" },
   VALIDATE: { en: "Validate", vi: "Kiểm tra" },
   SCAN: { en: "Security scan", vi: "Quét bảo mật" },

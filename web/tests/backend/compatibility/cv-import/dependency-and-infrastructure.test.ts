@@ -193,6 +193,14 @@ describe.sequential("Feature 004 dependency and infrastructure gate", () => {
     expect(worker.environment?.CV_CLAMD_SOCKET_PATH).toBe(
       "/run/clamav/clamd.sock",
     );
+    expect(worker.environment?.IMAGE_SEARCH_STORAGE_LOCAL_ROOT).toBe(
+      "/app/.local/image-search-storage",
+    );
+    expect(
+      worker.volumes?.some(
+        (volume) => volume.target === "/app/.local/image-search-storage",
+      ) ?? false,
+    ).toBe(false);
     expect(worker.group_add).toContain("101");
     expect(
       worker.volumes?.some((volume) => volume.target === "/run/clamav"),

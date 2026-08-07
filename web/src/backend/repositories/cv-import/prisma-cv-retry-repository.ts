@@ -10,6 +10,7 @@ import {
   CV_CANDIDATE_PARSE_RETRY_LIMIT,
   CV_CANDIDATE_SCAN_RETRY_LIMIT,
   CV_RETRYABLE_PARSE_FAILURE_CODES,
+  CV_RETRYABLE_OCR_FAILURE_CODES,
   CV_RETRYABLE_SCAN_FAILURE_CODES,
   cvRetryAcceptedSchema,
   projectCvRetryRemainingCounts,
@@ -25,6 +26,7 @@ const retryableScanFailures = new Set<string>(CV_RETRYABLE_SCAN_FAILURE_CODES);
 const retryableParseFailures = new Set<string>(
   CV_RETRYABLE_PARSE_FAILURE_CODES,
 );
+const retryableOcrFailures = new Set<string>(CV_RETRYABLE_OCR_FAILURE_CODES);
 
 type RetryUpload = Readonly<{
   id: string;
@@ -169,6 +171,15 @@ function assertBaseRetryState(
       throw new CvImportServiceError("IMPORT_STATE_CONFLICT");
     return "SCAN";
   }
+  if (upload.status === "EXTRACTION_FAILED") {
+    if (
+      source.status !== "AVAILABLE" ||
+      !upload.failureCode ||
+      !retryableOcrFailures.has(upload.failureCode)
+    )
+      throw new CvImportServiceError("IMPORT_STATE_CONFLICT");
+    return "SCAN";
+  }
   if (upload.status === "PARSE_FAILED") {
     if (source.status !== "AVAILABLE")
       throw new CvImportServiceError("IMPORT_STATE_CONFLICT");
@@ -185,12 +196,17 @@ function assertScanEligibility(upload: RetryUpload, prior: ScanAttempt | null) {
   ) {
     throw retryLimitReached();
   }
-  if (
-    !prior ||
-    prior.status !== "INDETERMINATE" ||
-    !prior.failureCode ||
-    !retryableScanFailures.has(prior.failureCode)
-  ) {
+  const retryingExtraction = upload.status === "EXTRACTION_FAILED";
+  const validPrior = retryingExtraction
+    ? prior?.status === "CLEAN" &&
+      Boolean(
+        upload.failureCode && retryableOcrFailures.has(upload.failureCode),
+      )
+    : prior?.status === "INDETERMINATE" &&
+      Boolean(
+        prior.failureCode && retryableScanFailures.has(prior.failureCode),
+      );
+  if (!prior || !validPrior) {
     throw new CvImportServiceError("IMPORT_STATE_CONFLICT");
   }
 }
@@ -667,7 +683,7 @@ export class PrismaCvRetryRepository {
               where: {
                 id: input.uploadId,
                 accountId: input.accountId,
-                status: "SCAN_FAILED",
+                status: upload.status as "SCAN_FAILED" | "EXTRACTION_FAILED",
                 candidateScanRetriesUsed: upload.candidateScanRetriesUsed,
               },
               data: {

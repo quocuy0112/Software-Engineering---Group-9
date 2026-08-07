@@ -7,9 +7,12 @@ export function JobBoardHeader({ authenticated }: { authenticated: boolean }) {
     <header className="job-board-header">
       <div className="job-board-header-inner">
         <SmartHireBrand className="job-board-brand" />
+
         <div className="job-board-header-actions">
           <nav className="job-board-navigation" aria-label="Job board">
             <Link href="/jobs">Browse jobs</Link>
+            <Link href="#global-image-search">Image search</Link>
+
             {authenticated ? (
               <>
                 <Link href="/dashboard">Dashboard</Link>
@@ -24,6 +27,7 @@ export function JobBoardHeader({ authenticated }: { authenticated: boolean }) {
               </>
             )}
           </nav>
+
           <ThemeToggle compact />
         </div>
       </div>

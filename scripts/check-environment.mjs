@@ -136,6 +136,96 @@ if (await canAccess("web/.env.local")) {
     forbiddenScannerOrProviderKeys.length === 0,
     "no scanner host/port/TCP or custom OpenAI endpoint configuration",
   );
+  const forbiddenOcrOrSearchKeys = Object.keys(combinedEnvironment).filter(
+    (key) =>
+      /^NEXT_PUBLIC_(?:OCR|IMAGE_SEARCH)_/i.test(key) ||
+      /^OCR_ENGINE_(?:URL|HOST|PORT|TCP|ADDRESS)$/i.test(key) ||
+      /^(?:IMAGE_SEARCH_OPENAI_(?:BASE_URL|ENDPOINT)|OPENAI_BASE_URL)$/i.test(
+        key,
+      ),
+  );
+  check(
+    forbiddenOcrOrSearchKeys.length === 0,
+    "OCR/search configuration is server-only with no TCP or custom provider endpoint",
+  );
+  check(
+    isStrictBoolean(appEnvironment.OCR_ENGINE_ENABLED) &&
+      appEnvironment.OCR_ENGINE_SOCKET_PATH === "/run/smarthire-ocr/ocr.sock" &&
+      isAbsolute(appEnvironment.OCR_ENGINE_SOCKET_PATH),
+    "OCR uses only the fixed absolute private Unix socket",
+  );
+  check(
+    appEnvironment.OCR_ENGINE_NAME === "paddleocr-onnx" &&
+      appEnvironment.OCR_ENGINE_VERSION === "1.0.0" &&
+      appEnvironment.OCR_MODEL_NAME === "PP-OCRv6-medium" &&
+      appEnvironment.OCR_MODEL_SHA256 ===
+        "4a7ec9635845d44fd6c6fb323386ee526282b8de566358fe646d711b5992e505" &&
+      appEnvironment.OCR_POLICY_VERSION === "ocr-confidence-v1",
+    "OCR engine, model manifest, and policy pins are immutable",
+  );
+  check(
+    appEnvironment.OCR_CV_UNIT_TIMEOUT_SECONDS === "20" &&
+      appEnvironment.CV_HYBRID_DEADLINE_SECONDS === "180" &&
+      appEnvironment.OCR_SEARCH_TIMEOUT_SECONDS === "6",
+    "OCR deadlines are exactly 20-second CV, 180-second hybrid, and 6-second search",
+  );
+
+  const decode32ByteKey = (key) => {
+    const encoded = appEnvironment[key] ?? "";
+    if (!/^[A-Za-z0-9+/]+={0,2}$/.test(encoded) || encoded.length % 4 !== 0)
+      return Buffer.alloc(0);
+    return Buffer.from(encoded, "base64");
+  };
+  const imageSearchKeyNames = [
+    "IMAGE_SEARCH_ARTIFACT_KEY_V1",
+    "IMAGE_SEARCH_RATE_HMAC_KEY_V1",
+    "IMAGE_SEARCH_CAPABILITY_HMAC_KEY_V1",
+  ];
+  const imageSearchKeys = imageSearchKeyNames.map(decode32ByteKey);
+  check(
+    appEnvironment.IMAGE_SEARCH_ARTIFACT_ACTIVE_KEY_VERSION === "1" &&
+      imageSearchKeys.every((key) => key.length === 32) &&
+      new Set([
+        appEnvironment.CV_ARTIFACT_KEY_V1,
+        ...imageSearchKeyNames.map((key) => appEnvironment[key]),
+      ]).size === 4,
+    "CV, search artifact, rate, and capability key material is valid and purpose-separated",
+  );
+  const fixedSearchSettings = {
+    IMAGE_SEARCH_SOURCE_MAX_BYTES: "5000000",
+    IMAGE_SEARCH_MAX_DECODED_PIXELS: "20000000",
+    IMAGE_SEARCH_VISITOR_LIMIT_PER_HOUR: "3",
+    IMAGE_SEARCH_ACCOUNT_LIMIT_PER_HOUR: "10",
+    IMAGE_SEARCH_RETENTION_MINUTES: "15",
+  };
+  check(
+    Object.entries(fixedSearchSettings).every(
+      ([key, expected]) => appEnvironment[key] === expected,
+    ),
+    "image-search byte, pixel, quota, and retention constants match the reviewed policy",
+  );
+  check(
+    isStrictBoolean(appEnvironment.IMAGE_SEARCH_WORKER_ENABLED) &&
+      appEnvironment.IMAGE_SEARCH_CLEANUP_ENABLED === "true",
+    "image-search worker flag is explicit and cleanup remains enabled",
+  );
+  check(
+    [
+      "IMAGE_SEARCH_OPENAI_ENABLED",
+      "IMAGE_SEARCH_OPENAI_DPA_APPROVED",
+      "IMAGE_SEARCH_OPENAI_PRIVACY_APPROVED",
+      "IMAGE_SEARCH_OPENAI_CROSS_BORDER_APPROVED",
+      "IMAGE_SEARCH_OPENAI_ZDR_APPROVED",
+    ].every((key) => isStrictBoolean(appEnvironment[key])),
+    "image-search external processing gates use explicit booleans",
+  );
+  check(
+    appEnvironment.IMAGE_SEARCH_OPENAI_MODEL === "gpt-5.4-mini-2026-03-17" &&
+      appEnvironment.IMAGE_SEARCH_INTERPRETER === "openai" &&
+      appEnvironment.IMAGE_SEARCH_OPENAI_ENABLED === "true" &&
+      Boolean(appEnvironment.OPENAI_API_KEY),
+    "image search uses the approved OpenAI model and shared server API key",
+  );
   check(
     appEnvironment.CV_CLAMD_SOCKET_PATH === "/run/clamav/clamd.sock",
     "ClamAV uses only the fixed same-host/pod Unix socket",
@@ -240,6 +330,41 @@ if (await canAccess("web/.env.local")) {
     "local CV storage root is real, traversal-safe, owner-private, and writable",
   );
 
+  const imageSearchStorageRoot =
+    appEnvironment.IMAGE_SEARCH_STORAGE_LOCAL_ROOT ?? "";
+  const resolvedImageSearchStorageRoot = resolve(
+    imageSearchStorageRoot || root,
+  );
+  check(
+    isAbsolute(imageSearchStorageRoot) &&
+      isPathWithin(
+        approvedLocalStorageParent,
+        resolvedImageSearchStorageRoot,
+      ) &&
+      resolvedImageSearchStorageRoot !== resolvedLocalStorageRoot,
+    "local image-search storage is absolute, purpose-separated, and contained by web/.local",
+  );
+  let imageSearchStorageRootIsPrivate = false;
+  try {
+    const [metadata, realParent, realStorage] = await Promise.all([
+      lstat(resolvedImageSearchStorageRoot),
+      realpath(approvedLocalStorageParent),
+      realpath(resolvedImageSearchStorageRoot),
+    ]);
+    imageSearchStorageRootIsPrivate =
+      metadata.isDirectory() &&
+      !metadata.isSymbolicLink() &&
+      isPathWithin(realParent, realStorage) &&
+      (process.platform === "win32" || (metadata.mode & 0o077) === 0) &&
+      (await canAccess(resolvedImageSearchStorageRoot, constants.W_OK));
+  } catch {
+    imageSearchStorageRootIsPrivate = false;
+  }
+  check(
+    imageSearchStorageRootIsPrivate,
+    "local image-search storage is real, private, and writable",
+  );
+
   const isProduction = appEnvironment.APP_ENV === "production";
   const productionUsesRoleCredentials = ![
     "AWS_ACCESS_KEY_ID",
@@ -254,16 +379,28 @@ if (await canAccess("web/.env.local")) {
     /^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/.test(
       appEnvironment.CV_S3_BUCKET ?? "",
     ) &&
-      /^[a-z]{2}(?:-gov)?-[a-z]+-\d$/.test(
-        appEnvironment.CV_S3_REGION ?? "",
-      ) &&
-      appEnvironment.CV_S3_KMS_KEY_ID &&
-      !appEnvironment.CV_S3_KMS_KEY_ID.includes(":s3:") &&
-      !appEnvironment.CV_S3_KMS_KEY_ID.includes("aws/s3"),
+    /^[a-z]{2}(?:-gov)?-[a-z]+-\d$/.test(appEnvironment.CV_S3_REGION ?? "") &&
+    appEnvironment.CV_S3_KMS_KEY_ID &&
+    !appEnvironment.CV_S3_KMS_KEY_ID.includes(":s3:") &&
+    !appEnvironment.CV_S3_KMS_KEY_ID.includes("aws/s3"),
   );
   check(
     !isProduction || productionS3CoordinatesValid,
     "production S3 bucket/region and customer-managed KMS identity are explicit",
+  );
+  const productionImageSearchS3CoordinatesValid = Boolean(
+    /^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/.test(
+      appEnvironment.IMAGE_SEARCH_S3_BUCKET ?? "",
+    ) &&
+    /^[a-z]{2}(?:-gov)?-[a-z]+-\d$/.test(
+      appEnvironment.IMAGE_SEARCH_S3_REGION ?? "",
+    ) &&
+    appEnvironment.IMAGE_SEARCH_S3_PREFIX === "image-search/" &&
+    appEnvironment.IMAGE_SEARCH_S3_KMS_KEY_ID &&
+    !appEnvironment.IMAGE_SEARCH_S3_KMS_KEY_ID.includes("aws/s3") &&
+    /^arn:aws:iam::\d{12}:role\/[A-Za-z0-9+=,.@_-]{1,64}$/.test(
+      appEnvironment.IMAGE_SEARCH_S3_WORKER_ROLE_ARN ?? "",
+    ),
   );
   const localCvConfigurationValid =
     appEnvironment.CV_STORAGE_ADAPTER === "filesystem" &&
@@ -292,6 +429,31 @@ if (await canAccess("web/.env.local")) {
       ? "production CV storage/parser configuration fails closed"
       : "local CV storage/parser configuration is explicit and private",
   );
+  const localImageSearchConfigurationValid =
+    appEnvironment.IMAGE_SEARCH_STORAGE_ADAPTER === "filesystem" &&
+    appEnvironment.IMAGE_SEARCH_INTERPRETER === "openai" &&
+    appEnvironment.IMAGE_SEARCH_OPENAI_ENABLED === "true" &&
+    Boolean(appEnvironment.OPENAI_API_KEY);
+  const productionImageSearchConfigurationValid =
+    appEnvironment.IMAGE_SEARCH_STORAGE_ADAPTER === "s3" &&
+    productionImageSearchS3CoordinatesValid &&
+    productionUsesRoleCredentials &&
+    appEnvironment.IMAGE_SEARCH_INTERPRETER === "openai" &&
+    appEnvironment.IMAGE_SEARCH_OPENAI_ENABLED === "true" &&
+    appEnvironment.IMAGE_SEARCH_OPENAI_MODEL === "gpt-5.4-mini-2026-03-17" &&
+    Boolean(appEnvironment.OPENAI_API_KEY) &&
+    appEnvironment.IMAGE_SEARCH_OPENAI_DPA_APPROVED === "true" &&
+    appEnvironment.IMAGE_SEARCH_OPENAI_PRIVACY_APPROVED === "true" &&
+    appEnvironment.IMAGE_SEARCH_OPENAI_CROSS_BORDER_APPROVED === "true" &&
+    appEnvironment.IMAGE_SEARCH_OPENAI_ZDR_APPROVED === "true";
+  check(
+    isProduction
+      ? productionImageSearchConfigurationValid
+      : localImageSearchConfigurationValid,
+    isProduction
+      ? "production image-search storage/interpreter configuration fails closed"
+      : "local image-search storage/interpreter configuration is explicit and private",
+  );
 
   const sharedCvKeys = [
     "CV_STORAGE_ADAPTER",
@@ -305,10 +467,30 @@ if (await canAccess("web/.env.local")) {
     "CV_OPENAI_LOCAL_DEV_ENABLED",
     "CV_WORKER_ENABLED",
     "CV_CLEANUP_ENABLED",
+    "OCR_ENGINE_ENABLED",
+    "OCR_ENGINE_SOCKET_PATH",
+    "OCR_ENGINE_NAME",
+    "OCR_ENGINE_VERSION",
+    "OCR_MODEL_NAME",
+    "OCR_MODEL_SHA256",
+    "OCR_POLICY_VERSION",
+    "OCR_CV_UNIT_TIMEOUT_SECONDS",
+    "CV_HYBRID_DEADLINE_SECONDS",
+    "OCR_SEARCH_TIMEOUT_SECONDS",
+    "IMAGE_SEARCH_WORKER_ENABLED",
+    "IMAGE_SEARCH_CLEANUP_ENABLED",
+    "IMAGE_SEARCH_STORAGE_ADAPTER",
+    "IMAGE_SEARCH_STORAGE_LOCAL_ROOT",
+    "IMAGE_SEARCH_ARTIFACT_ACTIVE_KEY_VERSION",
+    "IMAGE_SEARCH_ARTIFACT_KEY_V1",
+    "IMAGE_SEARCH_RATE_HMAC_KEY_V1",
+    "IMAGE_SEARCH_CAPABILITY_HMAC_KEY_V1",
+    "IMAGE_SEARCH_INTERPRETER",
+    "IMAGE_SEARCH_OPENAI_ENABLED",
   ];
   check(
     sharedCvKeys.every((key) => rootEnvironment[key] === appEnvironment[key]),
-    "root Compose and web Feature 004 settings agree",
+    "root Compose and web Feature 004/005 worker settings agree",
   );
 
   const prismaCli = resolve(root, "node_modules/prisma/build/index.js");

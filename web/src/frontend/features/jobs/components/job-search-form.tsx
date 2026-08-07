@@ -147,6 +147,9 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
         <Link className="job-secondary-link" href="/jobs">
           Clear all
         </Link>
+        <a className="job-secondary-link" href="#global-image-search">
+          Search from an image
+        </a>
       </div>
     </form>
   );

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { canonicalJsonBytes } from "./common";
 
 export const CV_DRAFT_SCHEMA_VERSION = "cv-draft-v1" as const;
+export const CV_DRAFT_V2_SCHEMA_VERSION = "cv-draft-v2" as const;
 export const CV_DRAFT_MAX_BYTES = 256 * 1024;
 export const CV_PROVENANCE_MAX_BYTES = 128 * 1024;
 
@@ -97,7 +98,42 @@ export const cvParserOutputSchema = z
 
 export type CvParserOutput = z.infer<typeof cvParserOutputSchema>;
 
-function evidenceIdentifiers(output: CvParserOutput): string[] {
+export const cvParserSegmentEvidenceSchema = z
+  .object({
+    segmentId: sourceSegmentIdSchema,
+    sourceMethod: z.enum(["NATIVE", "OCR", "NATIVE_AND_OCR"]),
+    sourceLocation: z.string().min(1).max(160),
+    confidenceLevel: z.enum(["NATIVE", "HIGH", "REVIEW", "LOW"]),
+    warnings: z
+      .array(
+        z.enum([
+          "LOW_CONFIDENCE",
+          "MATERIAL_NATIVE_OCR_CONFLICT",
+          "APPROXIMATE_ANCHOR",
+          "PARTIAL_UNIT_TEXT",
+          "DEDUPLICATED_WITH_NATIVE",
+        ]),
+      )
+      .max(8),
+  })
+  .strict();
+
+export const cvParserOutputV2Schema = cvParserOutputSchema
+  .omit({ schemaVersion: true })
+  .extend({
+    schemaVersion: z.literal(CV_DRAFT_V2_SCHEMA_VERSION),
+    segmentEvidence: z.array(cvParserSegmentEvidenceSchema).max(10_000),
+  })
+  .strict();
+
+export const cvParserAnyOutputSchema = z.union([
+  cvParserOutputSchema,
+  cvParserOutputV2Schema,
+]);
+export type CvParserOutputV2 = z.infer<typeof cvParserOutputV2Schema>;
+export type CvParserAnyOutput = z.infer<typeof cvParserAnyOutputSchema>;
+
+function evidenceIdentifiers(output: CvParserAnyOutput): string[] {
   const identifiers: string[] = [];
   for (const proposal of Object.values(output.scalars)) {
     if (proposal) identifiers.push(...proposal.sourceSegmentIds);
@@ -114,18 +150,18 @@ function evidenceIdentifiers(output: CvParserOutput): string[] {
 }
 
 export function validateParserEvidenceMembership(
-  output: CvParserOutput,
+  output: CvParserAnyOutput,
   availableSegmentIds: ReadonlySet<string>,
 ): boolean {
   return evidenceIdentifiers(output).every((id) => availableSegmentIds.has(id));
 }
 
-export function canonicalParserOutputBytes(output: CvParserOutput): number {
-  return canonicalJsonBytes(cvParserOutputSchema.parse(output));
+export function canonicalParserOutputBytes(output: CvParserAnyOutput): number {
+  return canonicalJsonBytes(cvParserAnyOutputSchema.parse(output));
 }
 
 export function assertParserOutputWithinLimits(
-  output: CvParserOutput,
+  output: CvParserAnyOutput,
   provenance: unknown,
 ): void {
   if (canonicalParserOutputBytes(output) > CV_DRAFT_MAX_BYTES) {
