@@ -10,7 +10,7 @@ export const revalidate = 0;
 export default async function JobSettingsRoute() {
   const context = await getWorkspaceContext();
   if (!context) redirect("/login?returnTo=%2Fjobs%2Fsettings");
-  const snapshot = await readJobWorkspaceSnapshot();
+  const snapshot = await readJobWorkspaceSnapshot(context.userId);
   return (
     <JobsWorkspace activeTab="settings">
       <section

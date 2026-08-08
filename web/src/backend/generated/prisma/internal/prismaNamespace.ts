@@ -410,6 +410,7 @@ export const ModelName = {
   CandidateProfileSkill: 'CandidateProfileSkill',
   SocialLink: 'SocialLink',
   AccountPreferences: 'AccountPreferences',
+  UserJobWorkspaceState: 'UserJobWorkspaceState',
   EmailChangeRequest: 'EmailChangeRequest',
   PasswordChangeAttemptWindow: 'PasswordChangeAttemptWindow',
   PasswordChangeOperation: 'PasswordChangeOperation',
@@ -465,7 +466,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "auditEvent" | "company" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence"
+    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "auditEvent" | "company" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1428,6 +1429,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.AccountPreferencesCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.AccountPreferencesCountAggregateOutputType> | number
+        }
+      }
+    }
+    UserJobWorkspaceState: {
+      payload: Prisma.$UserJobWorkspaceStatePayload<ExtArgs>
+      fields: Prisma.UserJobWorkspaceStateFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserJobWorkspaceStateFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserJobWorkspaceStatePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserJobWorkspaceStateFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserJobWorkspaceStatePayload>
+        }
+        findFirst: {
+          args: Prisma.UserJobWorkspaceStateFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserJobWorkspaceStatePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserJobWorkspaceStateFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserJobWorkspaceStatePayload>
+        }
+        findMany: {
+          args: Prisma.UserJobWorkspaceStateFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserJobWorkspaceStatePayload>[]
+        }
+        create: {
+          args: Prisma.UserJobWorkspaceStateCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserJobWorkspaceStatePayload>
+        }
+        createMany: {
+          args: Prisma.UserJobWorkspaceStateCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserJobWorkspaceStateCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserJobWorkspaceStatePayload>[]
+        }
+        delete: {
+          args: Prisma.UserJobWorkspaceStateDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserJobWorkspaceStatePayload>
+        }
+        update: {
+          args: Prisma.UserJobWorkspaceStateUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserJobWorkspaceStatePayload>
+        }
+        deleteMany: {
+          args: Prisma.UserJobWorkspaceStateDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserJobWorkspaceStateUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserJobWorkspaceStateUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserJobWorkspaceStatePayload>[]
+        }
+        upsert: {
+          args: Prisma.UserJobWorkspaceStateUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserJobWorkspaceStatePayload>
+        }
+        aggregate: {
+          args: Prisma.UserJobWorkspaceStateAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserJobWorkspaceState>
+        }
+        groupBy: {
+          args: Prisma.UserJobWorkspaceStateGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserJobWorkspaceStateGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserJobWorkspaceStateCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserJobWorkspaceStateCountAggregateOutputType> | number
         }
       }
     }
@@ -4619,6 +4694,18 @@ export const AccountPreferencesScalarFieldEnum = {
 export type AccountPreferencesScalarFieldEnum = (typeof AccountPreferencesScalarFieldEnum)[keyof typeof AccountPreferencesScalarFieldEnum]
 
 
+export const UserJobWorkspaceStateScalarFieldEnum = {
+  userId: 'userId',
+  hiddenJobIds: 'hiddenJobIds',
+  jobPreferences: 'jobPreferences',
+  savedFilterPresets: 'savedFilterPresets',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserJobWorkspaceStateScalarFieldEnum = (typeof UserJobWorkspaceStateScalarFieldEnum)[keyof typeof UserJobWorkspaceStateScalarFieldEnum]
+
+
 export const EmailChangeRequestScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -5667,6 +5754,20 @@ export type ListEnumPreferenceLanguageFieldRefInput<$PrismaModel> = FieldRefInpu
 
 
 /**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
  * Reference to a field of type 'EmailChangeStatus'
  */
 export type EnumEmailChangeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmailChangeStatus'>
@@ -5831,20 +5932,6 @@ export type EnumEmailKindFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
  * Reference to a field of type 'EmailKind[]'
  */
 export type ListEnumEmailKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmailKind[]'>
-    
-
-
-/**
- * Reference to a field of type 'Json'
- */
-export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-/**
- * Reference to a field of type 'QueryMode'
- */
-export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -6641,6 +6728,7 @@ export type GlobalOmitConfig = {
   candidateProfileSkill?: Prisma.CandidateProfileSkillOmit
   socialLink?: Prisma.SocialLinkOmit
   accountPreferences?: Prisma.AccountPreferencesOmit
+  userJobWorkspaceState?: Prisma.UserJobWorkspaceStateOmit
   emailChangeRequest?: Prisma.EmailChangeRequestOmit
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowOmit
   passwordChangeOperation?: Prisma.PasswordChangeOperationOmit

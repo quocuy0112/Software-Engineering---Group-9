@@ -9,6 +9,7 @@ SmartHire is a full-stack application for building a secure talent workspace for
 - [Prerequisites](#prerequisites)
 - [Local Setup](#local-setup)
 - [Common Commands](#common-commands)
+- [Data Ownership and Database Reset](#data-ownership-and-database-reset)
 - [Quality Checks](#quality-checks)
 - [Troubleshooting](#troubleshooting)
 - [Project Structure](#project-structure)
@@ -118,12 +119,14 @@ npm start
 | `npm run db:down`                                                     | Stop Compose services and retain their volumes                   |
 | `npm run db:status`                                                   | Show PostgreSQL status                                            |
 | `npm run db:logs`                                                     | Follow PostgreSQL logs                                             |
-| `npm run db:migrate`                                                  | Apply committed migrations in local development                  |
+| `npm run db:migrate`                                                  | Apply pending migrations and create a local migration when the Prisma schema changes |
+| `npm run db:deploy`                                                   | Apply already-created migrations without creating a new one       |
 | `npm run db:validate`                                                 | Validate the Prisma schema                                        |
 | `npm run db:verify`                                                   | Verify migrations against a temporary clean database              |
 | `npm run db:studio`                                                   | Open Prisma Studio                                                 |
 | `npm run db:seed:jobs`                                                | Seed the local job-board fixture data                              |
-| `npm run db:reset`                                                    | Delete the local PostgreSQL volume and recreate PostgreSQL        |
+| `npm run db:reset`                                                    | Delete the local PostgreSQL volume, reapply migrations, and reseed demo jobs |
+| `npm run db:reset:user -- <userId>`                                   | Delete one user's activity/profile/CV data while preserving account/auth data |
 | `npm run cv:worker:probe`                                             | Probe the CV worker configuration/runtime boundary                |
 | `docker compose exec cv-worker node scripts/check-cv-scanner.mjs`     | Verify the private ClamAV socket from the worker                  |
 | `npm run test:job-board`                                              | Run the focused job-board suite                                    |
@@ -132,6 +135,41 @@ npm start
 | `npm run test:e2e`                                                    | Run the complete Playwright suite                                   |
 
 > **Warning:** `npm run db:reset` permanently deletes all data in the current local PostgreSQL volume.
+
+## Data Ownership and Database Reset
+
+Candidate activity and personal data are account-scoped:
+
+- Saved jobs use `SavedJob.userId`.
+- Applied jobs use `JobApplication.candidateUserId`.
+- Profile skills use `CandidateProfileSkill` through the user's `CandidateProfile`.
+- CV records use the user's `CandidateCv` and `CvUpload` rows.
+- Job preferences and hidden jobs use `UserJobWorkspaceState.userId`.
+- `Skill` is a shared reference catalog; the user's selected skills are stored in the profile-to-skill relation.
+
+The legacy `web/data/jobs/user-job-state.json` file is not used as an application data source.
+
+`npm run db:reset` recreates the complete local PostgreSQL database. It therefore
+removes user accounts, authentication data, saved jobs, applications, profiles,
+CVs, skills links, and workspace state. It does not call `db:reset:user`
+afterward because there are no users left to reset.
+
+To remove only one user's activity and personal data while keeping that user's
+account and authentication records:
+
+```bash
+npm run db:reset:user -- <userId>
+```
+
+If no ID is supplied, the script auto-selects the only account. When multiple
+accounts exist, pass the ID explicitly. If the database has no accounts, the
+command completes as a no-op.
+
+The account-scoped workspace state is introduced by the committed migration
+`20260808090000_user_job_workspace_state`. The preceding
+`20260807081414_smarthire` migration remains part of the normal migration
+history. Both are applied automatically when they are pending; they are not
+re-created on every command.
 
 ## Quality Checks
 

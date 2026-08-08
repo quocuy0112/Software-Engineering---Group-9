@@ -31,6 +31,7 @@
     "db:deploy": "npm run db:deploy --workspace @smarthire/web",
     "db:reset:empty": "docker compose down -v && docker compose up -d --wait postgres",
     "db:reset": "node scripts/reset-local-database.mjs",
+    "db:reset:user": "node scripts/db-reset-user.mjs",
     "dev": "node scripts/run-local-development.mjs",
     "dev:web": "npm run dev:web --workspace @smarthire/web",
     "start": "npm run start --workspace @smarthire/web",

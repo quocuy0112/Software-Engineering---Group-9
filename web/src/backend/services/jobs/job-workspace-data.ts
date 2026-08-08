@@ -264,11 +264,12 @@ function taxonomy(jobs: SourceJob[]) {
 }
 
 export async function readJobWorkspaceSnapshot(
+  userId: string,
   now = new Date(),
 ): Promise<JobWorkspaceSnapshot> {
   const [catalog, state] = await Promise.all([
     readCatalog(),
-    readUserJobState(),
+    readUserJobState(userId),
   ]);
   const cardById = new Map(
     catalog.jobs.map((job) => [

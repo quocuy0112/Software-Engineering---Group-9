@@ -462,6 +462,7 @@ model UserAccount {
   challenges                    AuthenticationChallenge[]
   outbox                        EmailOutbox[]
   preferences                   AccountPreferences?
+  jobWorkspaceState             UserJobWorkspaceState?
   emailChangeRequests           EmailChangeRequest[]
   passwordChangeAttemptWindow   PasswordChangeAttemptWindow?
   passwordChangeOperations      PasswordChangeOperation[]
@@ -672,6 +673,16 @@ model AccountPreferences {
   createdAt               DateTime           @default(now())
   updatedAt               DateTime           @updatedAt
   user                    UserAccount        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserJobWorkspaceState {
+  userId             String      @id
+  hiddenJobIds       Json
+  jobPreferences     Json
+  savedFilterPresets Json
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  user               UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model EmailChangeRequest {

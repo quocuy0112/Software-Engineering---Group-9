@@ -10,7 +10,7 @@ export const revalidate = 0;
 export default async function AppliedJobsRoute() {
   const context = await getWorkspaceContext();
   if (!context) redirect("/login?returnTo=%2Fjobs%2Fapplied");
-  const snapshot = await readJobWorkspaceSnapshot();
+  const snapshot = await readJobWorkspaceSnapshot(context.userId);
   return (
     <JobsWorkspace activeTab="applied">
       <AppliedJobsPage applications={snapshot.applications} />

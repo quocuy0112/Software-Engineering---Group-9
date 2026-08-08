@@ -14,7 +14,6 @@ import {
   projectUserJobState,
   readUserJobState,
   updateUserJobState,
-  userJobStateFileEnabled,
   type UserJobStateMutation,
 } from "@/backend/services/jobs/user-job-state-store";
 
@@ -58,23 +57,12 @@ const mutationSchema = z.discriminatedUnion("action", [
     .strict(),
 ]);
 
-function unavailable() {
-  return jobJson(
-    {
-      code: "JOB_STATE_UNAVAILABLE",
-      message: "The local job-state mirror is not enabled.",
-    },
-    { status: 404 },
-  );
-}
-
 export async function GET(request: Request) {
-  if (!userJobStateFileEnabled()) return unavailable();
   try {
-    await requireJobActor(request, { mutation: false });
+    const actor = await requireJobActor(request, { mutation: false });
     return jobJson(
       userJobStateViewSchema.parse(
-        projectUserJobState(await readUserJobState()),
+        projectUserJobState(await readUserJobState(actor.userId)),
       ),
     );
   } catch (error) {
@@ -83,15 +71,14 @@ export async function GET(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  if (!userJobStateFileEnabled()) return unavailable();
   try {
-    await requireJobActor(request);
+    const actor = await requireJobActor(request);
     const mutation = (await parseBoundedJson(
       request,
       mutationSchema,
       64 * 1024,
     )) as UserJobStateMutation;
-    const state = await updateUserJobState(mutation);
+    const state = await updateUserJobState(actor.userId, mutation);
     return jobJson(userJobStateViewSchema.parse(projectUserJobState(state)));
   } catch (error) {
     return jobErrorResponse(error);

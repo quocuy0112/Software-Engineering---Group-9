@@ -9,6 +9,37 @@ if (!npmCli) throw new Error("npm_execpath is required");
 const children = new Map();
 let shutdownPromise;
 
+function runCommand(name, executable, args) {
+  console.log(`[dev] ${name}`);
+  const child = spawn(executable, args, {
+    stdio: "inherit",
+    windowsHide: true,
+    detached: process.platform !== "win32",
+  });
+  children.set(name, child);
+
+  return new Promise((resolve) => {
+    let resolved = false;
+    const finish = (result) => {
+      if (resolved) return;
+      resolved = true;
+      children.delete(name);
+      resolve(result);
+    };
+
+    child.once("error", (error) => {
+      console.error(
+        `[dev] ${name} failed to start: ${error.code ?? "PROCESS_START_FAILED"}`,
+      );
+      finish({ ok: false, exitCode: 1 });
+    });
+    child.once("exit", (code, signal) => {
+      const exitCode = typeof code === "number" ? code : 1;
+      finish({ ok: exitCode === 0, exitCode, signal });
+    });
+  });
+}
+
 function startProcess(name, executable, args, fatal = true) {
   const child = spawn(executable, args, {
     stdio: "inherit",
@@ -130,26 +161,55 @@ async function shutdown(exitCode, reason) {
 process.once("SIGINT", () => void shutdown(0, "SIGINT"));
 process.once("SIGTERM", () => void shutdown(0, "SIGTERM"));
 
-startProcess("CV worker and scanner", "docker", [
-  "compose",
-  "up",
-  "--build",
-  "postgres",
-  "clamav",
-  "cv-worker",
-]);
-startProcess(
-  "OCR and image-search workers",
-  "docker",
-  [
+async function main() {
+  start("web", "dev:web");
+  start("email worker", "email:worker");
+
+  const cvBuild = await runCommand("building CV worker image", "docker", [
+    "compose",
+    "build",
+    "cv-worker",
+  ]);
+  if (!cvBuild.ok) {
+    if (!shutdownPromise) {
+      await shutdown(cvBuild.exitCode, "CV worker image build failed");
+    }
+    return;
+  }
+  if (shutdownPromise) return;
+
+  const optionalBuild = await runCommand(
+    "building OCR and image-search worker images",
+    "docker",
+    ["compose", "build", "ocr-engine", "image-search-worker"],
+  );
+  if (!optionalBuild.ok) {
+    const exitReason = optionalBuild.signal ?? "code " + optionalBuild.exitCode;
+    console.error(
+      "[dev] OCR/image-search image build stopped (" +
+        exitReason +
+        "); continuing with reduced OCR/image-search capability",
+    );
+  }
+
+  if (shutdownPromise) return;
+
+  const composeServices = ["postgres", "clamav", "cv-worker"];
+  if (optionalBuild.ok) {
+    composeServices.push("ocr-engine", "image-search-worker");
+  }
+
+  console.log("[dev] starting Compose services: " + composeServices.join(", "));
+  startProcess("Compose services", "docker", [
     "compose",
     "up",
-    "--build",
-    "--no-deps",
-    "ocr-engine",
-    "image-search-worker",
-  ],
-  false,
-);
-start("web", "dev:web");
-start("email worker", "email:worker");
+    "--no-build",
+    ...composeServices,
+  ]);
+}
+
+void main().catch((error) => {
+  const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
+  console.error("[dev] local development supervisor failed: " + message);
+  if (!shutdownPromise) void shutdown(1, "local supervisor failed");
+});

@@ -1,22 +1,33 @@
 import "server-only";
 
-import { readFile, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { Prisma } from "@/backend/generated/prisma/client";
+import { prisma } from "@/backend/database/prisma";
+import { applicationContactSnapshotSchema } from "@/shared/contracts/jobs/actions";
 import {
-  userJobStateSchema,
+  appliedJobStateSchema,
   type AppliedJobState,
   type JobPreferences,
   type UserJobState,
+  userJobStateSchema,
 } from "@/shared/contracts/jobs/catalog";
+import {
+  defaultJobPreferences,
+  jobPreferencesSchema,
+} from "@/shared/contracts/jobs/preferences";
+import { z } from "zod";
 
-const stateFilePath = resolve(
-  process.cwd(),
-  "data",
-  "jobs",
-  "user-job-state.json",
-);
-
-let pendingWrite: Promise<void> = Promise.resolve();
+const hiddenJobIdsSchema = z.array(z.string().min(1).max(128)).max(10_000);
+const savedFilterPresetsSchema = z
+  .array(
+    z
+      .object({
+        id: z.string().min(1).max(128),
+        name: z.string().min(1).max(160),
+        filters: z.record(z.string(), z.unknown()),
+      })
+      .strict(),
+  )
+  .max(100);
 
 export type UserJobStateMutation =
   | { action: "save"; jobId: string }
@@ -26,13 +37,147 @@ export type UserJobStateMutation =
   | { action: "update-preferences"; jobPreferences: JobPreferences }
   | { action: "apply"; jobId: string; appliedJob: AppliedJobState };
 
-export function userJobStateFileEnabled() {
-  return process.env.NODE_ENV !== "production";
+function applicationStatus(stage: string): AppliedJobState["status"] {
+  switch (stage) {
+    case "VIEWED":
+      return "viewed";
+    case "SHORTLISTED":
+    case "INTERVIEWING":
+    case "OFFERED":
+    case "HIRED":
+      return "considering";
+    case "WAITLISTED":
+      return "matched";
+    case "OFFER_DECLINED":
+    case "REJECTED":
+      return "not_fit";
+    default:
+      return "submitted";
+  }
 }
 
-export async function readUserJobState(): Promise<UserJobState> {
-  const text = await readFile(stateFilePath, "utf8");
-  return userJobStateSchema.parse(JSON.parse(text));
+type CandidateContact = {
+  name: string;
+  email: string;
+  phone: string | null;
+};
+
+function fallbackContactSnapshot(
+  candidate: CandidateContact | null,
+): AppliedJobState["contactSnapshot"] {
+  const parsed = applicationContactSnapshotSchema.safeParse({
+    fullName: candidate?.name?.trim() || "Candidate",
+    email: candidate?.email || "candidate@example.com",
+    phone: candidate?.phone?.trim() || "0900000000",
+  });
+  return parsed.success
+    ? parsed.data
+    : {
+        fullName: "Candidate",
+        email: "candidate@example.com",
+        phone: "0900000000",
+      };
+}
+
+function projectApplication(
+  row: {
+    jobPostingId: string;
+    submittedAt: Date;
+    stage: string;
+    cvFileRef: string | null;
+    contactSnapshot: unknown;
+    aiAnalysisConsent: boolean;
+    aiMatchScore: number | null;
+  },
+  candidate: CandidateContact | null,
+): AppliedJobState {
+  const contact = applicationContactSnapshotSchema.safeParse(
+    row.contactSnapshot,
+  );
+  return appliedJobStateSchema.parse({
+    jobId: row.jobPostingId,
+    appliedAt: row.submittedAt.toISOString(),
+    status: applicationStatus(row.stage),
+    cvFileRef: row.cvFileRef,
+    contactSnapshot: contact.success
+      ? contact.data
+      : fallbackContactSnapshot(candidate),
+    aiAnalysisConsent: row.aiAnalysisConsent,
+    aiMatchScore: row.aiMatchScore,
+  });
+}
+
+function jsonValue(value: unknown): Prisma.InputJsonValue {
+  return value as Prisma.InputJsonValue;
+}
+
+export async function readUserJobState(userId: string): Promise<UserJobState> {
+  const [savedJobs, applications, workspace, account] = await Promise.all([
+    prisma.savedJob.findMany({
+      where: { userId },
+      orderBy: [{ createdAt: "asc" }, { jobPostingId: "asc" }],
+      select: { jobPostingId: true },
+    }),
+    prisma.jobApplication.findMany({
+      where: { candidateUserId: userId },
+      orderBy: [{ submittedAt: "desc" }, { id: "desc" }],
+      select: {
+        jobPostingId: true,
+        submittedAt: true,
+        stage: true,
+        cvFileRef: true,
+        contactSnapshot: true,
+        aiAnalysisConsent: true,
+        aiMatchScore: true,
+      },
+    }),
+    prisma.userJobWorkspaceState.findUnique({
+      where: { userId },
+      select: {
+        hiddenJobIds: true,
+        jobPreferences: true,
+        savedFilterPresets: true,
+      },
+    }),
+    prisma.userAccount.findUnique({
+      where: { id: userId },
+      select: {
+        name: true,
+        email: true,
+        candidateIdentity: {
+          select: { profile: { select: { phone: true } } },
+        },
+      },
+    }),
+  ]);
+
+  const candidate: CandidateContact | null = account
+    ? {
+        name: account.name,
+        email: account.email,
+        phone: account.candidateIdentity?.profile?.phone ?? null,
+      }
+    : null;
+  const preferences = jobPreferencesSchema.safeParse(workspace?.jobPreferences);
+  const hiddenJobIds = hiddenJobIdsSchema.safeParse(workspace?.hiddenJobIds);
+  const savedFilterPresets = savedFilterPresetsSchema.safeParse(
+    workspace?.savedFilterPresets,
+  );
+
+  return userJobStateSchema.parse({
+    userId,
+    savedJobIds: savedJobs.map((job) => job.jobPostingId),
+    hiddenJobIds: hiddenJobIds.success ? hiddenJobIds.data : [],
+    appliedJobs: applications.map((application) =>
+      projectApplication(application, candidate),
+    ),
+    jobPreferences: preferences.success
+      ? preferences.data
+      : defaultJobPreferences,
+    savedFilterPresets: savedFilterPresets.success
+      ? savedFilterPresets.data
+      : [],
+  });
 }
 
 export function projectUserJobState(state: UserJobState) {
@@ -43,76 +188,76 @@ export function projectUserJobState(state: UserJobState) {
   };
 }
 
-export function updateUserJobState(mutation: UserJobStateMutation) {
-  const operation = pendingWrite.then(async () => {
-    const current = await readUserJobState();
-    let next: UserJobState = current;
-
-    switch (mutation.action) {
-      case "save":
-        next = current.savedJobIds.includes(mutation.jobId)
-          ? current
-          : {
-              ...current,
-              savedJobIds: [...current.savedJobIds, mutation.jobId],
-            };
-        break;
-      case "unsave":
-        next = {
-          ...current,
-          savedJobIds: current.savedJobIds.filter(
-            (jobId) => jobId !== mutation.jobId,
-          ),
-        };
-        break;
-      case "hide":
-        next = current.hiddenJobIds.includes(mutation.jobId)
-          ? current
-          : {
-              ...current,
-              hiddenJobIds: [...current.hiddenJobIds, mutation.jobId],
-            };
-        break;
-      case "unhide":
-        next = {
-          ...current,
-          hiddenJobIds: current.hiddenJobIds.filter(
-            (jobId) => jobId !== mutation.jobId,
-          ),
-        };
-        break;
-      case "update-preferences":
-        next = {
-          ...current,
-          jobPreferences: mutation.jobPreferences,
-        };
-        break;
-      case "apply":
-        next = {
-          ...current,
-          appliedJobs: [
-            ...current.appliedJobs.filter(
-              (application) => application.jobId !== mutation.jobId,
-            ),
-            mutation.appliedJob,
-          ],
-        };
-        break;
-    }
-
-    if (next !== current) {
-      await writeFile(
-        stateFilePath,
-        JSON.stringify(next, null, 2) + "\n",
-        "utf8",
-      );
-    }
-    return next;
+async function persistWorkspaceState(
+  userId: string,
+  state: UserJobState,
+): Promise<void> {
+  await prisma.userJobWorkspaceState.upsert({
+    where: { userId },
+    create: {
+      userId,
+      hiddenJobIds: jsonValue(state.hiddenJobIds),
+      jobPreferences: jsonValue(state.jobPreferences),
+      savedFilterPresets: jsonValue(state.savedFilterPresets),
+    },
+    update: {
+      hiddenJobIds: jsonValue(state.hiddenJobIds),
+      jobPreferences: jsonValue(state.jobPreferences),
+      savedFilterPresets: jsonValue(state.savedFilterPresets),
+    },
   });
+}
 
-  pendingWrite = operation.then(
-    () => undefined,
-    () => undefined,
-  );
-  return operation;
+export async function updateUserJobState(
+  userId: string,
+  mutation: UserJobStateMutation,
+): Promise<UserJobState> {
+  switch (mutation.action) {
+    case "save":
+      await prisma.savedJob.createMany({
+        data: { userId, jobPostingId: mutation.jobId },
+        skipDuplicates: true,
+      });
+      break;
+    case "unsave":
+      await prisma.savedJob.deleteMany({
+        where: { userId, jobPostingId: mutation.jobId },
+      });
+      break;
+    case "hide": {
+      const current = await readUserJobState(userId);
+      if (!current.hiddenJobIds.includes(mutation.jobId)) {
+        await persistWorkspaceState(userId, {
+          ...current,
+          hiddenJobIds: [...current.hiddenJobIds, mutation.jobId],
+        });
+      }
+      break;
+    }
+    case "unhide": {
+      const current = await readUserJobState(userId);
+      await persistWorkspaceState(userId, {
+        ...current,
+        hiddenJobIds: current.hiddenJobIds.filter(
+          (jobId) => jobId !== mutation.jobId,
+        ),
+      });
+      break;
+    }
+    case "update-preferences": {
+      const current = await readUserJobState(userId);
+      await persistWorkspaceState(userId, {
+        ...current,
+        jobPreferences: mutation.jobPreferences,
+      });
+      break;
+    }
+    case "apply":
+      // Applications are written by the application submission service. Read
+      // the authoritative JobApplication rows below instead of mirroring a
+      // client payload into a second user-state store.
+      break;
+  }
+
+  return readUserJobState(userId);
 }

@@ -31,11 +31,8 @@ export type JobInteractionRecord = JobInteractionSeed & {
 
 type FilterPreset = UserJobState["savedFilterPresets"][number];
 type UserJobStateMutation =
-  | { action: "save"; jobId: string }
-  | { action: "unsave"; jobId: string }
   | { action: "hide"; jobId: string }
-  | { action: "unhide"; jobId: string }
-  | { action: "apply"; jobId: string; appliedJob: AppliedJobState };
+  | { action: "unhide"; jobId: string };
 
 type JobInteractionContextValue = {
   records: Record<string, JobInteractionRecord>;
@@ -101,8 +98,8 @@ export function JobInteractionProvider({
       if (!active || !view) return;
       setRecords((current) => {
         const next = { ...current };
-        let changed = false;
         const ids = new Set([
+          ...Object.keys(current),
           ...view.savedJobIds,
           ...view.hiddenJobIds,
           ...view.appliedJobIds,
@@ -115,21 +112,16 @@ export function JobInteractionProvider({
           };
           const updated = {
             ...existing,
-            saved: existing.saved || view.savedJobIds.includes(jobId),
-            applied: existing.applied || view.appliedJobIds.includes(jobId),
-            hidden: existing.hidden || view.hiddenJobIds.includes(jobId),
+            saved: view.savedJobIds.includes(jobId),
+            applied: view.appliedJobIds.includes(jobId),
+            appliedJob: view.appliedJobIds.includes(jobId)
+              ? existing.appliedJob
+              : undefined,
+            hidden: view.hiddenJobIds.includes(jobId),
           };
-          if (
-            updated.saved === existing.saved &&
-            updated.applied === existing.applied &&
-            updated.hidden === existing.hidden
-          ) {
-            continue;
-          }
           next[jobId] = updated;
-          changed = true;
         }
-        return changed ? next : current;
+        return next;
       });
     });
     return () => {
@@ -179,10 +171,6 @@ export function JobInteractionProvider({
           hidden: state[jobId]?.hidden ?? false,
         },
       }));
-      void syncUserJobState(csrfProof, {
-        action: outcome.saved ? "save" : "unsave",
-        jobId,
-      }).catch(() => undefined);
       toast(outcome.saved ? "Saved to Saved Jobs" : "Removed from Saved Jobs");
       return outcome.saved;
     },
@@ -200,15 +188,8 @@ export function JobInteractionProvider({
           hidden: state[jobId]?.hidden ?? false,
         },
       }));
-      if (appliedJob) {
-        void syncUserJobState(csrfProof, {
-          action: "apply",
-          jobId,
-          appliedJob,
-        }).catch(() => undefined);
-      }
     },
-    [csrfProof],
+    [],
   );
 
   const undoHide = useCallback(
