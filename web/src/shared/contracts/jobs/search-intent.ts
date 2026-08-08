@@ -106,6 +106,7 @@ export const searchIntentSchema = z
           "EXCESS_CRITERIA_REMOVED",
           "LOW_CONFIDENCE_CRITERIA_REMOVED",
           "MANUAL_VALUE_PRESERVED",
+          "PARTIAL_OCR_TEXT",
           "UNSUPPORTED_CRITERIA_REMOVED",
           "UNVERIFIED_EVIDENCE_REMOVED",
         ]),

@@ -22,7 +22,7 @@ type SearchOcrText = Readonly<{
   schemaVersion: "search-ocr-text-v1";
   text: string;
   language: "VI" | "EN" | "BILINGUAL" | "UNKNOWN";
-  warnings: readonly "LOW_CONFIDENCE"[];
+  warnings: readonly ("LOW_CONFIDENCE" | "PARTIAL_OCR")[];
 }>;
 
 function detectLanguage(text: string): SearchOcrText["language"] {
@@ -206,7 +206,10 @@ export class ImageSearchOcrStage {
         schemaVersion: "search-ocr-text-v1",
         text,
         language: detectLanguage(text),
-        warnings: lowConfidence ? ["LOW_CONFIDENCE"] : [],
+        warnings: [
+          ...(lowConfidence ? (["LOW_CONFIDENCE"] as const) : []),
+          ...(recognition.summary.partial ? (["PARTIAL_OCR"] as const) : []),
+        ],
       };
       const payloadBytes = Buffer.from(JSON.stringify(payload), "utf8");
       if (payloadBytes.byteLength > 32 * 1024)

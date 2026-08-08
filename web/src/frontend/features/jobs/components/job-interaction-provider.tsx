@@ -29,8 +29,6 @@ export type JobInteractionRecord = JobInteractionSeed & {
 
 type FilterPreset = UserJobState["savedFilterPresets"][number];
 type UserJobStateMutation =
-  | { action: "save"; jobId: string }
-  | { action: "unsave"; jobId: string }
   | { action: "hide"; jobId: string }
   | { action: "unhide"; jobId: string };
 
@@ -112,17 +110,9 @@ export function JobInteractionProvider({
             applied: existing.applied,
             hidden: existing.hidden || view.hiddenJobIds.includes(jobId),
           };
-          if (
-            updated.saved === existing.saved &&
-            updated.applied === existing.applied &&
-            updated.hidden === existing.hidden
-          ) {
-            continue;
-          }
           next[jobId] = updated;
-          changed = true;
         }
-        return changed ? next : current;
+        return next;
       });
     });
     return () => {
@@ -170,10 +160,6 @@ export function JobInteractionProvider({
           hidden: state[jobId]?.hidden ?? false,
         },
       }));
-      void syncUserJobState(csrfProof, {
-        action: outcome.saved ? "save" : "unsave",
-        jobId,
-      }).catch(() => undefined);
       toast(outcome.saved ? "Saved to Saved Jobs" : "Removed from Saved Jobs");
       return outcome.saved;
     },

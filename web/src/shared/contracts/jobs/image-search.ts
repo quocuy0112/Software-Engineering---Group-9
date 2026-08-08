@@ -252,6 +252,7 @@ export const ocrFallbackResultSchema = z
     warnings: uniqueArray(
       z.enum([
         "LOW_CONFIDENCE",
+        "PARTIAL_OCR",
         "INTERPRETER_UNAVAILABLE",
         "INTERPRETER_INVALID_OUTPUT",
       ]),

@@ -72,6 +72,7 @@ export const ocrRecognitionResultSchema = z
         utf8Bytes: z.number().int().min(0).max(OCR_RESULT_MAX_UTF8_BYTES),
         averageConfidence: z.number().finite().min(0).max(1).nullable(),
         minimumConfidence: z.number().finite().min(0).max(1).nullable(),
+        partial: z.boolean().default(false),
       })
       .strict(),
   })

@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timedelta
 from hashlib import sha256
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 from src.engine import EngineManifest, PaddleOcrOnnxEngine, normalize_engine_lines
@@ -108,3 +109,19 @@ def test_warmup_uses_local_models_only(monkeypatch: pytest.MonkeyPatch, tmp_path
         "intra_op_num_threads": 4,
         "inter_op_num_threads": 1,
     }
+
+
+def test_search_regions_bound_work_and_mark_partial_output() -> None:
+    polygons = [
+        [[0, 0], [300, 0], [300, 10], [0, 10]],
+        [[0, 10], [100, 10], [100, 20], [0, 20]],
+        [[0, 20], [180, 20], [180, 30], [0, 30]],
+    ]
+    crops = [
+        np.zeros((10, 300, 3), dtype=np.uint8),
+        np.zeros((10, 100, 3), dtype=np.uint8),
+        np.zeros((10, 180, 3), dtype=np.uint8),
+    ]
+    selected, partial = PaddleOcrOnnxEngine._search_regions(crops, polygons)
+    assert [crop.shape[1] for crop, _ in selected] == [200, 100]
+    assert partial is True

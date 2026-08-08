@@ -107,6 +107,11 @@ export type SocialLink = Prisma.SocialLinkModel
  */
 export type AccountPreferences = Prisma.AccountPreferencesModel
 /**
+ * Model UserJobWorkspaceState
+ * 
+ */
+export type UserJobWorkspaceState = Prisma.UserJobWorkspaceStateModel
+/**
  * Model EmailChangeRequest
  * 
  */

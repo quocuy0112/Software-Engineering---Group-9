@@ -25,7 +25,6 @@ export default async function JobSettingsRoute() {
           description:
             "Update your preferences so SmartHire can find relevant opportunities for you.",
         };
-
   return (
     <JobsWorkspace activeTab="settings">
       <section
