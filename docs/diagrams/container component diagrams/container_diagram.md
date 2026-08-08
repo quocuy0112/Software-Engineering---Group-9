@@ -11,9 +11,11 @@
 flowchart TB
     Visitor["Visitor\n[Person]\nUnauthenticated"]
     Candidate["Candidate\n[Person]\nAuthenticated"]
+    Recruiter["Recruiter / Company Member\n[Person]\nAuthenticated, membership-authorized"]
 
-    Visitor -->|"HTTP(S) — browse/search jobs,\nview details, image-assisted search"| Web
+    Visitor -->|"HTTP(S) — browse/search jobs, view details,\nimage-assisted search, and register"| Web
     Candidate -->|"HTTP(S) — authenticate, manage profile/CV,\nsearch, apply, and track applications"| Web
+    Recruiter -->|"HTTP(S) — update candidate application\nstages via implemented recruiter API"| Web
 
     subgraph SmartHire["SmartHire Platform"]
         direction TB
@@ -80,7 +82,7 @@ flowchart TB
     classDef person fill:#eef2ff,stroke:#1d4ed8,stroke-width:1.2px,color:#1e3a8a;
     classDef external fill:#fff7e6,stroke:#8a5a00,stroke-width:1.2px,color:#0f172a,stroke-dasharray: 5 5;
     class Web,EmailWorker,CVWorker,ImageWorker,ClamAV,OCREngine,DB,MailCapture,CVStorage,SearchStorage container;
-    class Visitor,Candidate person;
+    class Visitor,Candidate,Recruiter person;
     class EmailProvider,AIProvider,AWSStorage,ClamAVUpdates external;
 ```
 
@@ -91,7 +93,7 @@ flowchart TB
 - Responsibilities: Serves both the React/Next.js frontend and the backend Route Handlers/services in one deployable container; handles authentication, profile management, job-board operations, CV import admission, image-search admission, and writes durable work (email outbox, CV-import, and image-search rows) into PostgreSQL.
 - Technology used: Next.js 16, React 19, TypeScript, Better Auth, Prisma, Tailwind CSS.
 - Data provided: User sessions, profile data, job listings, applications, audit records, CV import metadata.
-- Which container calls it?: `Visitor` and `Candidate` call it over HTTP(S).
+- Which container calls it?: `Visitor` and `Candidate` use the implemented browser-facing workflows. Membership-authorized `Recruiter / Company Member` actors call the narrowly scoped recruiter application-stage API over HTTP(S); this does not imply a complete recruiter frontend.
 - Communication protocol: HTTP(S) for client traffic; PostgreSQL wire protocol using Prisma for database access; Filesystem API through the storage adapter by default; AWS S3 API/HTTPS only when the adapter is switched to `s3` (not provisioned in this repository).
 
 The separate Frontend and Backend Level 3 diagrams are two logical component views of this single deployable Next.js container.

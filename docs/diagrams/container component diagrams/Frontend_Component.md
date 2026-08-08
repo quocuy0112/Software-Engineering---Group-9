@@ -22,7 +22,7 @@ flowchart TD
                 C_Profile["<b>Profile Overview UI</b><br/>[Component: React/Next.js]<br/><br/>Displays and manages professional<br/>profile data (skills, experience)"]:::component
                 C_Account["<b>Account Identity UI</b><br/>[Component: React/Next.js]<br/><br/>Manages account name<br/>and email change requests"]:::component
                 C_Security["<b>Security & Prefs UI</b><br/>[Component: React/Next.js]<br/><br/>Manages passwords, 2FA,<br/>and notification settings"]:::component
-                C_CV["<b>CV Import Workspace UI</b><br/>[Component: React/Next.js]<br/><br/>Uploads CVs and tracks<br/>parsing status/history"]:::component
+                C_CV["<b>CV Import Workspace UI</b><br/>[Component: React/Next.js]<br/><br/>Uploads and reviews CV imports,<br/>tracks processing and manages CV library"]:::component
             end
 
             %% Job Board & Advanced Search Boundary
@@ -43,7 +43,7 @@ flowchart TD
     C_Profile -. "GET, PATCH<br/>/api/account/profile" .-> API
     C_Account -. "PATCH /api/account/identity<br/>POST /api/account/email-change/request" .-> API
     C_Security -. "POST /api/account/password/change<br/>PUT /api/account/preferences" .-> API
-    C_CV -. "POST, GET<br/>/api/account/cv-imports" .-> API
+    C_CV -. "POST reserve; PUT content; GET status;<br/>retry/consent/cancel; review/confirm draft;<br/>mutate Candidate CV library" .-> API
 
     %% Relationships - Jobs
     C_Search -. "Server-side job search<br/>request" .-> API
@@ -85,9 +85,9 @@ _Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy, Nguyễn Q
 
 - **CV Import Workspace UI (`cv-import-workspace.tsx`)**
 
-- **Responsibilities:** Provides the workspace for uploading CV documents (PDF/DOCX), viewing import history, and polling the real-time status of the CV parsing process.
+- **Responsibilities:** Provides the workspace for uploading PDF/DOCX CVs, tracking import progress and history, reviewing and editing extracted CV data, confirming the import, and managing confirmed Candidate CV entries.
 
-- **Backend Interaction:** Uploads files to `POST /api/account/cv-imports` and polls status/actions using `GET /api/account/cv-imports/{uploadId}` (including endpoints for retries and consent).
+- **Backend Interaction:** Reserves an import with metadata through `POST /api/account/cv-imports`, then uploads the raw file through `PUT` to the returned `/api/account/cv-imports/{uploadId}/content` URL. It retrieves processing status with `GET /api/account/cv-imports/{uploadId}`; requests retries and manages consent through the import subresources; cancels an import with `DELETE`; retrieves and edits review data through `/api/account/cv-drafts/{draftId}`; confirms through `/api/account/cv-drafts/{draftId}/confirm`; and updates or removes confirmed Candidate CV library entries through `/api/account/candidate-cvs/{cvId}`.
 
 **Group 2: Job Board & Advanced Search**
 

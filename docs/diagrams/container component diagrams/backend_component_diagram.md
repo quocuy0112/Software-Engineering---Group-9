@@ -15,6 +15,7 @@
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 60, "rankSpacing": 90}}}%%
 graph TD
     User["User\n[Person]\nGuest or candidate"]
+    RecruiterActor["Recruiter / Company Member\n[Person]\nMembership-authorized API caller"]
 
     subgraph NextWeb["Next.js Web Application\n[Container] — web/"]
       direction TB
@@ -26,11 +27,12 @@ graph TD
       IdentityServices["Identity & Account Services\nRegistration, login, 2FA,\nrecovery, session, preferences"]
       ProfileServices["Candidate Profile Services\nRead and update Profile aggregate"]
       JobServices["Job Discovery Services\nDeterministic search, save,\napply and report job"]
+      StageServices["Application Stage Management\nMembership-authorized recruiter API\ntransitions candidate application stages"]
       CvServices["CV Import Services\nAdmission, consent, upload,\nreview, retry, confirmation"]
       ImageServices["Image Search Services\nAdmission, capability, status,\nconsent, consume, merge criteria"]
 
       AuthGateway["Better Auth Gateway\nOwns browser session\nand authentication operations"]
-      Repositories["Prisma Repositories\nTransaction, query, row lock,\nlease and projection"]
+      Persistence["Persistence Layer / Prisma Data Access\nRepository abstractions plus current\nservice-owned Prisma transactions"]
       RepositorySupport["Service-located Policies & Helpers\nJob policy/types/normalization, CV errors,\nprofile validation and CandidateCv projection"]
       StorageAdapters["Private Storage Adapters\nSelect filesystem or S3, enforce\nencryption/integrity contract"]
       SharedContracts["Shared Contracts\nZod and TypeScript — schemas\nshared across server/client/worker"]
@@ -38,32 +40,35 @@ graph TD
 
     subgraph DataStores["Data Stores"]
         PostgreSQL[("PostgreSQL\nContainer\nPostgreSQL 16 — business\ndata and durable work")]
-        CVLocalStorage[("Local CV Artifact Store\nContainer\nEncrypted filesystem — default")]
-        SearchLocalStorage[("Local Search Artifact Store\nContainer\nEncrypted filesystem — default")]
+        CVLocalStorage[("Local CV Artifact Store\nLogical data store\nEncrypted filesystem — default")]
+        SearchLocalStorage[("Local Search Artifact Store\nLogical data store\nEncrypted filesystem — default")]
     end
 
     AWSStorage["AWS S3/KMS\nExternal — optional\nBackend implemented, requires\nexternal infrastructure/config"]
 
     User -->|"HTTPS"| Presentation
+    RecruiterActor -->|"HTTPS — application-stage command"| RouteHandlers
     Presentation -->|"HTTPS / JSON / raw stream —\nsend command/query from client"| RouteHandlers
     Presentation -->|"Server-rendered query"| IdentityServices
     Presentation -->|"Server-rendered query"| ProfileServices
     Presentation -->|"Server-rendered query"| JobServices
 
-    RouteHandlers -->|"Forward preliminarily parsed request"| RequestSecurity
-    RequestSecurity -->|"Delegate identity/account use case"| IdentityServices
-    RequestSecurity -->|"Delegate Profile use case"| ProfileServices
-    RequestSecurity -->|"Delegate job use case"| JobServices
-    RequestSecurity -->|"Delegate CV use case"| CvServices
-    RequestSecurity -->|"Delegate image-search use case"| ImageServices
+    RouteHandlers -->|"Authenticate/authorize/validate request;\nobtain actor, session or capability context"| RequestSecurity
+    RouteHandlers -->|"Invoke identity/account use case\nusing validated context"| IdentityServices
+    RouteHandlers -->|"Invoke Profile use case\nusing validated context"| ProfileServices
+    RouteHandlers -->|"Invoke job use case\nusing validated context"| JobServices
+    RouteHandlers -->|"Invoke membership-authorized\napplication-stage transition"| StageServices
+    RouteHandlers -->|"Invoke CV use case\nusing validated context"| CvServices
+    RouteHandlers -->|"Invoke image-search use case\nusing validated context"| ImageServices
 
     IdentityServices -->|"Authentication and session management"| AuthGateway
-    IdentityServices -->|"Read/write account, token, audit"| Repositories
-    ProfileServices -->|"Read/write Profile aggregate"| Repositories
-    JobServices -->|"Query jobs and write user\nstate"| Repositories
-    CvServices -->|"Write lifecycle, consent,\nand work item"| Repositories
-    ImageServices -->|"Write lifecycle, rate limit,\nand capability HMAC"| Repositories
-    Repositories -.->|"Current source dependency:\nimport/call selected policies, errors,\nvalidation and projection helper"| RepositorySupport
+    IdentityServices -->|"Read/write account, token, audit"| Persistence
+    ProfileServices -->|"Read/write Profile aggregate"| Persistence
+    JobServices -->|"Query jobs and write user\nstate"| Persistence
+    StageServices -->|"Service-owned Prisma transaction:\nstage event, notification work, outbox, audit"| Persistence
+    CvServices -->|"Repository access and current\nservice-owned Prisma transactions"| Persistence
+    ImageServices -->|"Repository access and current\nservice-owned Prisma transactions"| Persistence
+    Persistence -.->|"Repository implementations import/call\nselected service-located policies, errors,\nvalidation and projection helpers"| RepositorySupport
     CvServices -->|"Store/read CV artifact"| StorageAdapters
     ImageServices -->|"Store/read search artifact"| StorageAdapters
 
@@ -71,12 +76,13 @@ graph TD
     IdentityServices -->|"Validate use-case data"| SharedContracts
     ProfileServices -->|"Validate use-case data"| SharedContracts
     JobServices -->|"Validate search contract"| SharedContracts
+    StageServices -->|"Validate stage transition contract"| SharedContracts
     CvServices -->|"Validate CV contract"| SharedContracts
     ImageServices -->|"Validate image-search contract"| SharedContracts
     RepositorySupport -->|"Use shared schemas/types\nwhere applicable"| SharedContracts
 
     AuthGateway -->|"PostgreSQL wire protocol via Prisma —\nread/write auth-owned tables"| PostgreSQL
-    Repositories -->|"PostgreSQL wire protocol via Prisma —\nquery and transaction"| PostgreSQL
+    Persistence -->|"PostgreSQL wire protocol via Prisma —\nrepository and service-owned query/transaction"| PostgreSQL
     StorageAdapters -->|"Filesystem API —\nwhen CV uses filesystem"| CVLocalStorage
     StorageAdapters -->|"Filesystem API — when image\nsearch uses filesystem"| SearchLocalStorage
     StorageAdapters -.->|"AWS S3 API / HTTPS —\nwhen adapter is s3"| AWSStorage
@@ -85,7 +91,7 @@ graph TD
     classDef person fill:#eef2ff,stroke:#1d4ed8,stroke-width:1.2px,color:#1e3a8a;
     classDef external fill:#fff7e6,stroke:#8a5a00,stroke-width:1.2px,color:#0f172a,stroke-dasharray: 5 5;
     class PostgreSQL,CVLocalStorage,SearchLocalStorage container;
-    class User person;
+    class User,RecruiterActor person;
     class AWSStorage external;
 ```
 
@@ -96,71 +102,82 @@ graph TD
 - **Responsibilities:** Interact with App Router/React UI via browser.
 - **Relationships:** Calls `App Router and React UI` over HTTPS.
 
+#### Recruiter / Company Member
+
+- **Responsibilities:** Call the implemented recruiter application-stage API as an authenticated, active member of the job's company. No complete recruiter frontend is represented.
+- **Relationships:** Calls the applicable `Route Handler` over HTTPS; the handler obtains actor context from the request-security boundary and invokes `Application Stage Management`.
+
 #### App Router and React UI
 
 - **Responsibilities:** Render pages, maintain interactive state in the browser, send commands/queries to Route Handlers, and perform server-rendered queries directly to Identity, Profile, and Job services for SSR/RSC portions.
 - **Technology:** Next.js Pages, Server/Client Components.
-- **Relationships:** Calls `Route Handlers`, `Identity & Account Services`, `Candidate Profile Services`, `Job Discovery Services`.
+- **Relationships:** Calls `Route Handlers`, `Identity & Account Services`, `Candidate Profile Services`, and `Job Discovery Services`. Server-rendered pages call the service groups in process; client-side commands go through Route Handlers.
 
 #### Route Handlers
 
-- **Responsibilities:** Parse requests/responses, use `no-store`, forward preliminarily parsed requests to `Request Security Boundary`; validate transport schemas via `Shared Contracts`.
+- **Responsibilities:** Parse requests/responses, use `no-store`, call request-security helpers to obtain validated actor/session/capability context, and invoke application services with that context; validate transport schemas via `Shared Contracts`.
 - **Technology:** Next.js App Router.
-- **Relationships:** Calls `Request Security Boundary` and `Shared Contracts`. **Does not** call Prisma/provider directly.
+- **Relationships:** Calls `Request Security Boundary`, the applicable application service, and `Shared Contracts`. **Does not** call Prisma/provider directly.
 
 #### Request Security Boundary
 
-- **Responsibilities:** Authenticate session/ownership (Better Auth session), check CSRF/origin, capability, and validate input using Zod before delegating to the appropriate application service. This is the mandatory boundary between transport layer and business logic.
+- **Responsibilities:** Authenticate session/ownership (Better Auth session), check CSRF/origin and capability requirements, and return validated request/actor context to the Route Handler. It does not orchestrate application services.
 - **Technology:** Better Auth session, CSRF/origin check, capability, Zod.
-- **Relationships:** Receives requests from `Route Handlers`; delegates use cases to `Identity & Account Services`, `Candidate Profile Services`, `Job Discovery Services`, `CV Import Services`, `Image Search Services`.
+- **Relationships:** Called by `Route Handlers`; returns validated actor, session, capability, idempotency, or related request context to the caller.
 
 #### Identity & Account Services
 
 - **Responsibilities:** Registration, login, 2FA, recovery, session, and preferences.
 - **Technology:** TypeScript.
-- **Relationships:** Uses `Better Auth Gateway` for authentication/session management, reads/writes via `Prisma Repositories`, validates use-case data via `Shared Contracts`.
+- **Relationships:** Uses `Better Auth Gateway` for authentication/session management, reads/writes through `Persistence Layer / Prisma Data Access`, and validates use-case data via `Shared Contracts`.
 
 #### Candidate Profile Services
 
 - **Responsibilities:** Read and update Profile aggregate.
 - **Technology:** TypeScript.
-- **Relationships:** Reads/writes via `Prisma Repositories`, validates via `Shared Contracts`.
+- **Relationships:** Reads/writes through `Persistence Layer / Prisma Data Access` and validates via `Shared Contracts`.
 
 #### Job Discovery Services
 
 - **Responsibilities:** Deterministic search, save, apply, and report job.
 - **Technology:** TypeScript.
-- **Relationships:** Queries/writes user state via `Prisma Repositories`, validates search contract via `Shared Contracts`.
+- **Relationships:** Queries/writes user state through the `Persistence Layer / Prisma Data Access`, validates search contracts via `Shared Contracts`.
+
+#### Application Stage Management
+
+- **Responsibilities:** Implement the narrowly scoped recruiter API that permits an authorized active company member to transition a candidate application stage. It records the stage event, recruitment notification work, optional email outbox work, and audit evidence. It does not represent a complete recruiter portal.
+- **Technology:** TypeScript service with a service-owned Prisma transaction.
+- **Relationships:** Invoked by the recruiter Route Handler after request authentication and input validation; validates the stage-transition contract through `Shared Contracts`; accesses PostgreSQL through `Persistence Layer / Prisma Data Access`.
 
 #### CV Import Services
 
 - **Responsibilities:** Admission, consent, upload, review, retry, and confirmation for CV import flow.
 - **Technology:** TypeScript.
-- **Relationships:** Writes lifecycle/consent/work item via `Prisma Repositories`, stores/reads artifact via `Private Storage Adapters`, validates CV contract via `Shared Contracts`.
+- **Relationships:** Writes lifecycle, consent, and work state through `Persistence Layer / Prisma Data Access`, stores/reads artifacts via `Private Storage Adapters`, and validates CV contracts via `Shared Contracts`.
 
 #### Image Search Services
 
 - **Responsibilities:** Admission, capability, status, consent, consume, and merge job search criteria from images.
 - **Technology:** TypeScript.
-- **Relationships:** Writes lifecycle/rate limit/capability HMAC via `Prisma Repositories`, stores/reads search artifact via `Private Storage Adapters`, validates image-search contract via `Shared Contracts`.
+- **Relationships:** Writes lifecycle, rate-limit, and capability state through `Persistence Layer / Prisma Data Access`, stores/reads search artifacts via `Private Storage Adapters`, and validates image-search contracts via `Shared Contracts`.
 
 #### Better Auth Gateway
 
 - **Responsibilities:** Owns browser session and authentication operations.
 - **Technology:** Better Auth.
-- **Relationships:** Called by `Identity & Account Services`; **reads/writes directly** to tables owned by Better Auth in PostgreSQL via Prisma (does not go through `Prisma Repositories`).
+- **Relationships:** Called by `Identity & Account Services`; **reads/writes directly** to Better Auth-owned PostgreSQL tables via its Prisma adapter, outside the application `Persistence Layer / Prisma Data Access` component.
 
-#### Prisma Repositories
+#### Persistence Layer / Prisma Data Access
 
-- **Responsibilities:** Transaction, query, row lock, lease, and projection shared across all domains (identity, profile, job, CV, image-search).
+- **Responsibilities:** Represent current Prisma-backed persistence across all domains. This includes repository abstractions where implemented and direct/service-owned Prisma queries and transactions where the current source keeps persistence inside a service.
 - **Technology:** Prisma 7.
-- **Relationships:** Called by Identity/Profile/Job/CV/Image services and queries/transactions directly on `PostgreSQL` via Prisma. In the current source, several repository implementations also import selected modules located under `web/src/backend/services/`, represented by `Service-located Policies & Helpers`; therefore the physical source dependency is not a strictly one-way Service → Repository dependency.
+- **Relationships:** Used by Identity/Profile/Job/Application Stage/CV/Image services and queries/transactions on `PostgreSQL` via Prisma. Repository implementations also import selected modules under `web/src/backend/services/`, represented by `Service-located Policies & Helpers`; therefore neither persistence style nor the physical source dependency is uniformly Service → Repository.
 
 #### Service-located Policies & Helpers
 
 - **Responsibilities:** Represent policy, type, normalization, error, validation, and projection helpers that repository implementations currently reuse. Examples include job application policy/search normalization, CV HTTP errors, profile validation, and the `CandidateCv` projection helper used by Apply.
 - **Technology:** TypeScript modules currently located under `web/src/backend/services/jobs/`, `services/cv-import/`, and `services/profile/`.
-- **Relationships:** Imported or called by selected `Prisma Repositories`; may use `Shared Contracts`. This component documents the current implementation rather than claiming an ideal strict-layer dependency. Moving these cross-layer helpers to a shared domain/application-support boundary would require a separate source-code refactor.
+- **Relationships:** Imported or called by selected repository implementations inside `Persistence Layer / Prisma Data Access`; may use `Shared Contracts`. This component documents the current implementation rather than claiming an ideal strict-layer dependency. Moving these cross-layer helpers to a shared domain/application-support boundary would require a separate source-code refactor.
 
 #### Private Storage Adapters
 
@@ -177,7 +194,7 @@ graph TD
 #### PostgreSQL
 
 - **Responsibilities:** Store business data and durable work (outbox, CV import jobs, image-search jobs).
-- **Relationships:** Accessed by `Better Auth Gateway` and `Prisma Repositories` via Prisma.
+- **Relationships:** Accessed by `Better Auth Gateway` and `Persistence Layer / Prisma Data Access` via Prisma.
 
 #### Local CV Artifact Store / Local Search Artifact Store
 
@@ -206,7 +223,8 @@ graph TD
     subgraph ImageWorkerBoundary["Image Search Worker\n[Container]"]
         direction TB
         ImageRuntime["Worker Runtime & Lease Controller\nNode.js — claim stage, hold\nimmutable deletion deadline"]
-        ImageScanDecode["Scan & Decode\nClamAV and Sharp — scan, check\nformat/pixel, normalize sRGB PNG"]
+        ImageScan["Malware Scan Stage\nClamAV adapter — fail-closed scan\nbefore any image decoding"]
+        ImageDecode["Decode & Normalize Stage\nSharp — check format/pixels,\nnormalize sRGB PNG"]
         ImageOcrStage["OCR Stage\nOcrEngine port — send PNG,\ncheck strict OCR result"]
         ImageInterpret["Intent Interpretation\nOpenAI adapter, selection policy —\ngenerate criteria suggestions, check evidence/schema"]
         ImageCleanup["Search Cleanup & Reconciliation\nNode.js — physically delete artifact\nwithin 15-minute deadline"]
@@ -216,7 +234,7 @@ graph TD
         direction TB
         OcrApi["Private Recognition API\nFastAPI on Unix socket —\nhealth check, request limits,\npurpose/deadline validation"]
         OcrRuntime["Paddle OCR ONNX Runtime\nPaddleOCR, ONNX Runtime CPU —\ndetection, recognition, geometry, confidence"]
-        ModelVerifier["Model Manifest Verifier\nSHA-256 manifest — block incorrect\nor tampered models, prevent runtime download"]
+        OcrStartup["OCR Engine Startup & Model Integrity\nLoad manifest, verify model digests,\ninitialize and warm runtime"]
     end
 
     PostgreSQL[("PostgreSQL\nWork state, lease, consent,\naudit, deletion evidence")]
@@ -247,14 +265,18 @@ graph TD
     CvCleanup -.->|"AWS S3 API / HTTPS —\nwhen adapter is s3"| AWSStorage
 
     ImageRuntime -->|"PostgreSQL wire protocol via Prisma —\nclaim/update image-search stage"| PostgreSQL
-    ImageRuntime -->|"Orchestrate scan/decode"| ImageScanDecode
+    ImageRuntime -->|"Claim and orchestrate SCAN"| ImageScan
+    ImageRuntime -->|"After successful scan, claim\nand orchestrate DECODE"| ImageDecode
     ImageRuntime -->|"Orchestrate OCR"| ImageOcrStage
     ImageRuntime -->|"Orchestrate interpretation"| ImageInterpret
     ImageRuntime -->|"Orchestrate cleanup/reconciliation"| ImageCleanup
 
-    ImageScanDecode -->|"Unix socket — scan image"| ClamAV
-    ImageScanDecode -->|"Read source, write normalized\nPNG when using filesystem"| SearchLocalStorage
-    ImageScanDecode -.->|"AWS S3 API / HTTPS —\nwhen adapter is s3"| AWSStorage
+    ImageScan -->|"Unix socket — scan image"| ClamAV
+    ImageScan -->|"Read source when using filesystem"| SearchLocalStorage
+    ImageScan -.->|"AWS S3 API / HTTPS —\nwhen adapter is s3"| AWSStorage
+    ImageScan -->|"Persist clean assessment; only then\nmake DECODE claimable"| PostgreSQL
+    ImageDecode -->|"Read source, write normalized\nPNG when using filesystem"| SearchLocalStorage
+    ImageDecode -.->|"AWS S3 API / HTTPS —\nwhen adapter is s3"| AWSStorage
     ImageOcrStage -->|"Read normalized PNG\nwhen using filesystem"| SearchLocalStorage
     ImageOcrStage -.->|"AWS S3 API / HTTPS —\nwhen adapter is s3"| AWSStorage
     ImageOcrStage -->|"Unix socket / HTTP —\nrecognize text"| OcrApi
@@ -267,9 +289,9 @@ graph TD
 
     ClamAV -.->|"HTTPS — update signatures\nusing freshclam"| ClamAVUpdates
 
-    OcrApi -->|"Check manifest\nand expected digest"| ModelVerifier
+    OcrStartup -->|"Initialize and warm after\nmanifest/artifact verification"| OcrRuntime
+    OcrApi -->|"Compare caller's expected digest\nwith already loaded manifest state"| OcrRuntime
     OcrApi -->|"Call recognition"| OcrRuntime
-    OcrRuntime -->|"Check ONNX artifact\nbefore warm-up"| ModelVerifier
 
     classDef container fill:#f8fafc,stroke:#475569,stroke-width:1.2px,color:#0f172a;
     classDef external fill:#fff7e6,stroke:#8a5a00,stroke-width:1.2px,color:#0f172a,stroke-dasharray: 5 5;
@@ -307,11 +329,17 @@ graph TD
 - **Responsibilities:** Delete expired artifacts/temp files, fix orphan states.
 - **Relationships:** Claims cleanup and writes evidence to `PostgreSQL`; deletes artifacts from `Local CV Artifact Store` (or optional S3).
 
-#### Scan & Decode (Image Search Worker)
+#### Malware Scan Stage (Image Search Worker)
 
-- **Responsibilities:** Scan images before decoding, check format/pixel, normalize to sRGB PNG.
-- **Technology:** ClamAV, Sharp.
-- **Relationships:** Calls `Malware Scanner`; reads source/writes normalized PNG to `Local Search Artifact Store` (or optional S3).
+- **Responsibilities:** Fail closed while scanning an uploaded image before any decode operation. A successful assessment advances durable work so DECODE becomes claimable.
+- **Technology:** ClamAV adapter.
+- **Relationships:** Calls `Malware Scanner`; reads the source from `Local Search Artifact Store` (or optional S3); persists the scan outcome to PostgreSQL.
+
+#### Decode & Normalize Stage (Image Search Worker)
+
+- **Responsibilities:** After successful malware scanning, enforce format and decoded-pixel limits and normalize the image to an sRGB PNG.
+- **Technology:** Sharp.
+- **Relationships:** Reads source and writes normalized PNG to `Local Search Artifact Store` (or optional S3). It is separately claimed as the durable DECODE stage after SCAN succeeds.
 
 #### OCR Stage (Image Search Worker)
 
@@ -333,20 +361,20 @@ graph TD
 
 - **Responsibilities:** Health check, request limits, purpose and deadline validation for OCR requests.
 - **Technology:** FastAPI on Unix socket.
-- **Relationships:** Receives requests from `Hybrid Extraction` (CV Worker) and `OCR Stage` (Image Search Worker); checks manifest via `Model Manifest Verifier`; calls `Paddle OCR ONNX Runtime`.
+- **Relationships:** Receives requests from `Hybrid Extraction` (CV Worker) and `OCR Stage` (Image Search Worker); compares the caller's expected manifest digest with already loaded engine state and calls `Paddle OCR ONNX Runtime`.
 
 #### Paddle OCR ONNX Runtime
 
 - **Responsibilities:** Detection, recognition, geometry, confidence on normalized images.
 - **Technology:** PaddleOCR, ONNX Runtime CPU.
-- **Relationships:** Called by `Private Recognition API`; verifies ONNX artifacts via `Model Manifest Verifier` before warm-up.
+- **Relationships:** Initialized and warmed by `OCR Engine Startup & Model Integrity` after model artifacts pass digest verification; called by `Private Recognition API` for recognition.
 
-#### Model Manifest Verifier
+#### OCR Engine Startup & Model Integrity
 
-- **Responsibilities:** Block incorrect or tampered models using SHA-256 manifest; prevent runtime downloads.
-- **Relationships:** Called by `Private Recognition API` and `Paddle OCR ONNX Runtime` to validate models before use.
+- **Responsibilities:** At OCR Engine startup, load the pinned manifest, reject unsafe runtime-download/network settings, verify required ONNX artifacts against SHA-256 digests, initialize the PaddleOCR/ONNX pipeline, and warm it before readiness. This is internal startup behavior, not an independently called per-request service.
+- **Relationships:** Initializes and warms `Paddle OCR ONNX Runtime` only after manifest and artifact verification succeeds. Recognition requests compare the caller's expected manifest digest with the already loaded engine state; they do not re-hash every model artifact per request.
 
 #### Malware Scanner
 
 - **Responsibilities:** Scan files/images via Unix socket for both workers.
-- **Relationships:** Called by `CV Scan Stage` and `Scan & Decode`; updates signatures from `ClamAV Definition Service` via HTTPS (`freshclam`).
+- **Relationships:** Called by `CV Scan Stage` and `Malware Scan Stage`; updates signatures from `ClamAV Definition Service` via HTTPS (`freshclam`).
