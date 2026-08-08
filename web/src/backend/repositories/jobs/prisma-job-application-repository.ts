@@ -4,8 +4,10 @@ import { prisma } from "@/backend/database/prisma";
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
 import {
   ApplicationRepositoryError,
+  type DirectApplicationCv,
   prepareApplicationSubmission,
 } from "@/backend/services/jobs/application-policy";
+import { DIRECT_APPLICATION_CV_ID } from "@/shared/contracts/jobs/actions";
 import { ensureCandidateCvLibrary } from "@/backend/services/profile/candidate-cv-library";
 import type {
   ApplicationForm,
@@ -45,6 +47,7 @@ export type ApplicationRepositoryPort = {
     idempotencyKey: string;
     submissionBindingDigest: string;
     command: ApplicationSubmission;
+    directCv?: DirectApplicationCv;
     activeConsentVersion: string;
     occurredAt: Date;
     correlationId: string;
@@ -260,9 +263,30 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
               },
             },
           });
-          const cv = await tx.candidateCv.findUnique({
-            where: { id: input.command.cvId },
-          });
+          if (
+            input.directCv &&
+            input.command.cvId !== DIRECT_APPLICATION_CV_ID
+          ) {
+            throw new ApplicationRepositoryError("APPLICATION_CV_INELIGIBLE");
+          }
+          const cv = input.directCv
+            ? await tx.candidateCv.create({
+                data: {
+                  id: input.directCv.id,
+                  candidateUserId: input.candidateUserId,
+                  displayName: input.directCv.displayName,
+                  fileName: input.directCv.fileName,
+                  mimeType: input.directCv.mimeType,
+                  byteSize: input.directCv.byteSize,
+                  storageKey: input.directCv.storageKey,
+                  checksumSha256: input.directCv.checksumSha256,
+                  version: 1,
+                  confirmedAt: input.occurredAt,
+                },
+              })
+            : await tx.candidateCv.findUnique({
+                where: { id: input.command.cvId },
+              });
           const job = await tx.jobPosting.findFirst({
             where: {
               id: input.jobId,
@@ -430,6 +454,12 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
               },
             },
           });
+          if (input.directCv) {
+            await tx.candidateCv.update({
+              where: { id: input.directCv.id },
+              data: { archivedAt: input.occurredAt },
+            });
+          }
           await new PrismaAuditRepository(tx).append({
             occurredAt: input.occurredAt,
             actorType: "user",

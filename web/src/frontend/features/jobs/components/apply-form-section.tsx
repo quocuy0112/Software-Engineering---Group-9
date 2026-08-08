@@ -12,14 +12,15 @@ import {
 } from "react";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
-import { useCvImport } from "@/frontend/features/cv-import/client/use-cv-import";
 import { profileMutationOutcomeSchema } from "@/shared/contracts/account/profile";
+import { candidateCvSummarySchema } from "@/shared/contracts/cv-import/candidate-cv";
 import type {
   ApplicationContactSnapshot,
   ApplicationForm,
   ApplicationOutcome,
 } from "@/shared/contracts/jobs/actions";
 import {
+  DIRECT_APPLICATION_CV_ID,
   applicationFormSchema,
   applicationOutcomeSchema,
 } from "@/shared/contracts/jobs/actions";
@@ -29,9 +30,9 @@ const MAX_CV_BYTES = 5_000_000;
 const PHONE_INPUT_MAX_LENGTH = 15;
 const ACCEPTED_CV_TYPES = new Set([
   "application/pdf",
+  "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]);
-
 type FieldErrors = Record<string, string>;
 function formatBytes(bytes: number) {
   if (bytes < 1024) return bytes + " B";
@@ -88,32 +89,18 @@ function RequiredMark() {
   );
 }
 
-function applyCvImportSessionKey(jobId: string) {
-  return `smarthire:apply-cv-import:${jobId}`;
-}
-
-type ApplyImportCleanup = () => boolean | Promise<boolean>;
-
 function InlineApplicationForm({
   form,
-  onCancel,
   onProfileSaved,
-  onImportConfirmed,
-  preferredCvId,
-  onRegisterImportCleanup,
   contactDraft,
   onContactChange,
   onSubmitted,
 }: {
   form: ApplicationForm;
-  onCancel: () => void;
   onProfileSaved: (profile: {
     revision: number;
     basics: ApplicationForm["profileBasics"];
   }) => void;
-  onImportConfirmed: (uploadId: string) => void;
-  preferredCvId: string | null;
-  onRegisterImportCleanup: (cleanup: ApplyImportCleanup | null) => void;
   contactDraft: ApplicationContactSnapshot | null;
   onContactChange: (contact: ApplicationContactSnapshot) => void;
   onSubmitted: (outcome: ApplicationOutcome) => void;
@@ -121,23 +108,13 @@ function InlineApplicationForm({
   const csrfProof = useCsrfProof();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const idempotencyKey = useRef<string | null>(null);
-  const importer = useCvImport({ csrfProof: form.csrfToken || csrfProof });
-  const importProgress = importer.progress;
-  const resumeImport = importer.resume;
-  const loadImportStatus = importer.loadStatus;
-  const cancelImport = importer.cancel;
-  const importSessionKey = applyCvImportSessionKey(form.jobId);
-  const resumedImport = useRef(false);
-  const consentNavigationAttempted = useRef<string | null>(null);
+  const cvUploadIdempotencyKey = useRef<string | null>(null);
   const [selectedCvId, setSelectedCvId] = useState(() =>
-    preferredCvId && form.cvs.some((cv) => cv.id === preferredCvId)
-      ? preferredCvId
-      : form.cvs.length === 1
-        ? form.cvs[0]!.id
-        : "",
+    form.cvs.length === 1 ? form.cvs[0]!.id : "",
   );
+  const [savedCvs, setSavedCvs] = useState(() => form.cvs);
   const [newCvFile, setNewCvFile] = useState<File | null>(null);
-  const [newCvImportStarted, setNewCvImportStarted] = useState(false);
+  const [newCvAttached, setNewCvAttached] = useState(false);
   const [contact, setContact] = useState<ApplicationContactSnapshot>(
     contactDraft
       ? { ...contactDraft, phone: normalizePhone(contactDraft.phone) }
@@ -159,186 +136,15 @@ function InlineApplicationForm({
   const [applicationConsent, setApplicationConsent] = useState(false);
   const [aiConsent, setAiConsent] = useState(false);
   const [pending, setPending] = useState(false);
+  const [cvSaving, setCvSaving] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [cvSelectionError, setCvSelectionError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const importBusy = [
-    "RESERVING",
-    "UPLOADING",
-    "PROCESSING",
-    "AWAITING_CONSENT",
-    "AI_PENDING",
-    "AI_PROCESSING",
-  ].includes(importer.progress.state);
-
-  const cleanupImport = useCallback<ApplyImportCleanup>(() => {
-    if (!newCvImportStarted) {
-      cancelImport();
-      try {
-        window.sessionStorage.removeItem(importSessionKey);
-      } catch {
-        // Session storage can be unavailable in privacy-restricted browsers.
-      }
-      return true;
-    }
-    return (async () => {
-      if (
-        !window.confirm(
-          "Your AI CV import is not complete. Leave and cancel this import?",
-        )
-      )
-        return false;
-
-      const uploadId = importProgress.uploadId;
-      let confirmed = false;
-      if (uploadId) {
-        try {
-          const resource = await loadImportStatus(uploadId);
-          confirmed = "status" in resource && resource.status === "CONFIRMED";
-        } catch {
-          // A confirmed race is safe: the DELETE endpoint rejects CONFIRMED.
-        }
-        if (!confirmed) {
-          try {
-            await mutateWithCurrentCsrf(
-              `/api/account/cv-imports/${uploadId}`,
-              { method: "DELETE" },
-              form.csrfToken || csrfProof,
-            );
-          } catch {
-            // The session marker is still cleared so a failed cleanup cannot
-            // resurrect a broken Apply state on the next open.
-          }
-        }
-      }
-      cancelImport();
-      try {
-        if (
-          !uploadId ||
-          window.sessionStorage.getItem(importSessionKey) === uploadId
-        )
-          window.sessionStorage.removeItem(importSessionKey);
-      } catch {
-        // Session storage can be unavailable in privacy-restricted browsers.
-      }
-      setNewCvImportStarted(false);
-      setNewCvFile(null);
-      setSelectedCvId("");
-      return true;
-    })();
-  }, [
-    cancelImport,
-    csrfProof,
-    form.csrfToken,
-    importProgress.uploadId,
-    importSessionKey,
-    loadImportStatus,
-    newCvImportStarted,
-  ]);
-
-  useEffect(() => {
-    onRegisterImportCleanup(cleanupImport);
-    return () => onRegisterImportCleanup(null);
-  }, [cleanupImport, onRegisterImportCleanup]);
 
   function updateContact(next: ApplicationContactSnapshot) {
     setContact(next);
     onContactChange(next);
   }
-
-  useEffect(() => {
-    const uploadId = importProgress.uploadId;
-    if (!uploadId) return;
-    try {
-      window.sessionStorage.setItem(importSessionKey, uploadId);
-    } catch {
-      // Session storage can be unavailable in privacy-restricted browsers.
-    }
-  }, [importProgress.uploadId, importSessionKey]);
-
-  useEffect(() => {
-    if (resumedImport.current) return;
-    resumedImport.current = true;
-    let uploadId: string | null = null;
-    try {
-      uploadId = window.sessionStorage.getItem(importSessionKey);
-    } catch {
-      uploadId = null;
-    }
-    if (!uploadId) return;
-    setNewCvImportStarted(true);
-    void resumeImport(uploadId).catch(() => {
-      try {
-        if (window.sessionStorage.getItem(importSessionKey) === uploadId)
-          window.sessionStorage.removeItem(importSessionKey);
-      } catch {
-        // Session storage can be unavailable in privacy-restricted browsers.
-      }
-      setNewCvImportStarted(false);
-    });
-  }, [importSessionKey, resumeImport]);
-
-  useEffect(() => {
-    const uploadId = importProgress.uploadId;
-    if (
-      importProgress.state !== "AWAITING_CONSENT" ||
-      !uploadId ||
-      consentNavigationAttempted.current === uploadId
-    )
-      return;
-    consentNavigationAttempted.current = uploadId;
-    try {
-      window.open(
-        "/profile/cv-imports/" + encodeURIComponent(uploadId),
-        "_blank",
-        "noopener,noreferrer",
-      );
-    } catch {
-      // A blocked popup leaves the manual fallback link visible below.
-    }
-  }, [importProgress.state, importProgress.uploadId]);
-
-  useEffect(() => {
-    const uploadId = importProgress.uploadId;
-    if (importProgress.state !== "SUCCESS" || !uploadId) return;
-    let active = true;
-    void loadImportStatus(uploadId)
-      .then((resource) => {
-        if (
-          !active ||
-          !("status" in resource) ||
-          resource.status !== "CONFIRMED"
-        )
-          return;
-        try {
-          if (window.sessionStorage.getItem(importSessionKey) === uploadId)
-            window.sessionStorage.removeItem(importSessionKey);
-        } catch {
-          // Session storage can be unavailable in privacy-restricted browsers.
-        }
-        onImportConfirmed(uploadId);
-      })
-      .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, [
-    importSessionKey,
-    importProgress.state,
-    importProgress.uploadId,
-    loadImportStatus,
-    onImportConfirmed,
-  ]);
-
-  useEffect(() => {
-    const uploadId = importProgress.uploadId;
-    if (importProgress.state !== "SUCCESS" || !uploadId) return;
-    const refreshWhenFocused = () => {
-      void resumeImport(uploadId).catch(() => undefined);
-    };
-    window.addEventListener("focus", refreshWhenFocused);
-    return () => window.removeEventListener("focus", refreshWhenFocused);
-  }, [importProgress.state, importProgress.uploadId, resumeImport]);
 
   function chooseFile(file: File | undefined) {
     if (!file) return;
@@ -346,31 +152,37 @@ function InlineApplicationForm({
     const accepted =
       ACCEPTED_CV_TYPES.has(file.type) ||
       extension === "pdf" ||
+      extension === "doc" ||
       extension === "docx";
     if (!accepted) {
       setNewCvFile(null);
-      setErrors((current) => ({
-        ...current,
-        cv: "CV files must be PDF or DOCX.",
-      }));
+      setNewCvAttached(false);
+      setCvSelectionError("CV files must be PDF, DOC, or DOCX.");
+      setErrors((current) => {
+        const next = { ...current };
+        delete next.cv;
+        return next;
+      });
       return;
     }
     if (file.size < 1 || file.size > MAX_CV_BYTES) {
       setNewCvFile(null);
-      setErrors((current) => ({
-        ...current,
-        cv: "CV files must be between 1 and 5 MB and must be PDF or DOCX.",
-      }));
+      setNewCvAttached(false);
+      setCvSelectionError(
+        "CV files must be between 1 and 5 MB and must be PDF, DOC, or DOCX.",
+      );
+      setErrors((current) => {
+        const next = { ...current };
+        delete next.cv;
+        return next;
+      });
       return;
     }
-    try {
-      window.sessionStorage.removeItem(importSessionKey);
-    } catch {
-      // Session storage can be unavailable in privacy-restricted browsers.
-    }
     setNewCvFile(file);
+    setNewCvAttached(false);
+    setCvSelectionError(null);
+    cvUploadIdempotencyKey.current = null;
     setSelectedCvId("");
-    setNewCvImportStarted(false);
     setErrors((current) => {
       const next = { ...current };
       delete next.cv;
@@ -378,26 +190,54 @@ function InlineApplicationForm({
     });
   }
 
-  async function startNewCvImport() {
-    if (!newCvFile || newCvImportStarted) return;
-    setNewCvImportStarted(true);
+  async function attachNewCv() {
+    if (!newCvFile || newCvAttached || cvSaving) return;
+    setCvSaving(true);
     setError(null);
-    setErrors((current) => {
-      const next = { ...current };
-      delete next.cv;
-      return next;
-    });
     try {
-      await importer.upload(newCvFile, "EXTERNAL_OPENAI");
+      cvUploadIdempotencyKey.current ??=
+        globalThis.crypto?.randomUUID?.() ?? "cv-upload-" + Date.now() + "-key";
+      const multipart = new FormData();
+      multipart.append("file", newCvFile, newCvFile.name);
+      const response = await mutateWithCurrentCsrf(
+        "/api/account/candidate-cvs",
+        {
+          method: "POST",
+          headers: { "Idempotency-Key": cvUploadIdempotencyKey.current },
+          body: multipart,
+        },
+        form.csrfToken || csrfProof,
+      );
+      const body: unknown = await response.json().catch(() => null);
+      if (!response.ok) {
+        const problem = body as { message?: unknown } | null;
+        throw new Error(
+          typeof problem?.message === "string"
+            ? problem.message
+            : "Unable to save this CV to your Profile.",
+        );
+      }
+      const saved = candidateCvSummarySchema.parse(body);
+      setSavedCvs((current) => [
+        saved,
+        ...current.filter((cv) => cv.id !== saved.id),
+      ]);
+      setSelectedCvId(saved.id);
+      setNewCvAttached(true);
+      setCvSelectionError(null);
+      setErrors((current) => {
+        const next = { ...current };
+        delete next.cv;
+        return next;
+      });
     } catch (caught) {
-      setNewCvImportStarted(false);
-      setErrors((current) => ({
-        ...current,
-        cv:
-          caught instanceof Error
-            ? caught.message
-            : "Unable to start AI CV import.",
-      }));
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "Unable to save this CV to your Profile.",
+      );
+    } finally {
+      setCvSaving(false);
     }
   }
 
@@ -407,12 +247,11 @@ function InlineApplicationForm({
       email: contact.email.trim(),
       phone: normalizePhone(contact.phone),
     });
-    if (!selectedCvId) {
-      next.cv = newCvImportStarted
-        ? "Finish the AI CV review and confirmation, then reopen Apply to select the imported CV."
-        : newCvFile
-          ? "Start the AI import before applying this new CV."
-          : "Select one saved CV or import one new CV with AI.";
+    if (!selectedCvId && !(newCvFile && newCvAttached)) {
+      next.cv = newCvFile
+        ? "Select Import CV before applying this new CV."
+        : (cvSelectionError ??
+          "Select a saved CV or attach a valid PDF, DOC, or DOCX file.");
     }
     if (!locationReady) {
       next.location = selectedLocation
@@ -513,7 +352,9 @@ function InlineApplicationForm({
           ? data.get("question-" + question.id) === "true"
           : String(data.get("question-" + question.id) ?? ""),
     }));
-    const cvFileRef = selectedCvId;
+    const directCv =
+      newCvFile && newCvAttached && !selectedCvId ? newCvFile : null;
+    const cvFileRef = selectedCvId || null;
     const contactSnapshot = {
       fullName: contact.fullName.trim(),
       email: contact.email.trim(),
@@ -525,7 +366,7 @@ function InlineApplicationForm({
         globalThis.crypto?.randomUUID?.() ??
         "application-" + Date.now() + "-key";
       const payload = {
-        cvId: selectedCvId || cvFileRef,
+        cvId: directCv ? DIRECT_APPLICATION_CV_ID : selectedCvId || cvFileRef,
         cvFileRef,
         contactSnapshot,
         answers,
@@ -534,15 +375,23 @@ function InlineApplicationForm({
         consentAccepted: applicationConsent,
         aiAnalysisConsent: aiConsent,
       };
+      const requestBody = directCv
+        ? (() => {
+            const multipart = new FormData();
+            multipart.append("application", JSON.stringify(payload));
+            multipart.append("cvFile", directCv, directCv.name);
+            return multipart;
+          })()
+        : JSON.stringify(payload);
       const response = await mutateWithCurrentCsrf(
         "/api/jobs/" + form.jobId + "/applications",
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
+            ...(directCv ? {} : { "Content-Type": "application/json" }),
             "Idempotency-Key": idempotencyKey.current,
           },
-          body: JSON.stringify(payload),
+          body: requestBody,
         },
         form.csrfToken || csrfProof,
       );
@@ -592,7 +441,7 @@ function InlineApplicationForm({
     ]),
   );
   const profileReady = missingProfileFields.length === 0;
-  const submitDisabled = pending || locationSaving || importBusy;
+  const submitDisabled = pending || locationSaving || cvSaving;
 
   return (
     <form
@@ -622,7 +471,7 @@ function InlineApplicationForm({
         </legend>
         <p className="job-form-help">
           Select exactly one confirmed CV from your Profile, or import one new
-          PDF/DOCX through AI review.
+          PDF, DOC, or DOCX file.
         </p>
         <label htmlFor="application-cv-id">
           Select a CV from Profile
@@ -631,16 +480,13 @@ function InlineApplicationForm({
             name="cvId"
             required
             value={selectedCvId}
-            disabled={pending || newCvImportStarted}
+            disabled={pending || cvSaving}
             {...fieldA11y("cv", errors)}
             onChange={(event) => {
-              try {
-                window.sessionStorage.removeItem(importSessionKey);
-              } catch {
-                // Session storage can be unavailable in privacy-restricted browsers.
-              }
               setSelectedCvId(event.currentTarget.value);
               setNewCvFile(null);
+              setNewCvAttached(false);
+              setCvSelectionError(null);
               setErrors((current) => {
                 const next = { ...current };
                 delete next.cv;
@@ -649,11 +495,11 @@ function InlineApplicationForm({
             }}
           >
             <option value="">
-              {form.cvs.length
+              {savedCvs.length
                 ? "Select one saved CV"
                 : "No confirmed CVs in Profile"}
             </option>
-            {form.cvs.map((cv) => (
+            {savedCvs.map((cv) => (
               <option key={cv.id} value={cv.id}>
                 {(cv.displayName.trim() || cv.fileName) +
                   ` (${formatBytes(cv.byteSize)})`}
@@ -672,18 +518,18 @@ function InlineApplicationForm({
         >
           <span className="job-cv-dropzone-title">
             {newCvFile
-              ? "New CV ready for AI import"
+              ? "CV file selected"
               : "Drag a CV here or click to choose"}
           </span>
           <span className="job-form-help">PDF, DOC, DOCX · up to 5 MB</span>
           <input
             ref={fileInputRef}
             id="application-cv-upload"
-            name="newCvImport"
+            name="newCvFile"
             type="file"
-            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             aria-describedby={errors.cv ? "cv-error" : undefined}
-            disabled={pending || newCvImportStarted}
+            disabled={pending || cvSaving}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               chooseFile(event.currentTarget.files?.[0]);
               event.currentTarget.value = "";
@@ -699,43 +545,39 @@ function InlineApplicationForm({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                disabled={pending || newCvImportStarted}
+                disabled={pending || cvSaving}
               >
                 Change file
               </button>
               <button
                 type="button"
-                onClick={() => setNewCvFile(null)}
-                disabled={pending || newCvImportStarted}
+                onClick={() => {
+                  setNewCvFile(null);
+                  setNewCvAttached(false);
+                  setSelectedCvId("");
+                  cvUploadIdempotencyKey.current = null;
+                  setCvSelectionError(null);
+                  setErrors((current) => {
+                    const next = { ...current };
+                    delete next.cv;
+                    return next;
+                  });
+                }}
+                disabled={pending || cvSaving}
               >
                 Remove
               </button>
             </span>
           </div>
         ) : null}
-        {newCvFile && !newCvImportStarted ? (
+        {newCvFile && !newCvAttached ? (
           <button
             type="button"
-            onClick={() => void startNewCvImport()}
-            disabled={pending || importBusy}
+            onClick={() => void attachNewCv()}
+            disabled={submitDisabled}
           >
-            Import this CV with AI
+            {cvSaving ? "Saving CV..." : "Import CV"}
           </button>
-        ) : null}
-        {newCvImportStarted ? (
-          <div className="job-feedback job-feedback-info" role="status">
-            <strong>{importer.progress.title}</strong>
-            <p>{importer.progress.message}</p>
-            {importer.progress.uploadId ? (
-              <Link
-                href={`/profile/cv-imports/${importer.progress.uploadId}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Open AI import status and review
-              </Link>
-            ) : null}
-          </div>
         ) : null}
         {errors.cv ? (
           <p id="cv-error" className="job-field-error" role="alert">
@@ -926,70 +768,71 @@ function InlineApplicationForm({
         />
       </label>
 
-      <div className="job-ai-consent">
-        <label className="job-checkbox-label" htmlFor="application-consent">
-          <input
-            id="application-consent"
-            name="consentAccepted"
-            type="checkbox"
-            required
-            aria-label="I consent to SmartHire sharing this application with the hiring company."
-            checked={applicationConsent}
-            {...fieldA11y("consent", errors)}
-            onChange={(event) => {
-              setApplicationConsent(event.currentTarget.checked);
-              setErrors((current) => {
-                const next = { ...current };
-                delete next.consent;
-                return next;
-              });
-            }}
-          />
-          <span>
-            I consent to SmartHire sharing this application with the hiring
-            company.
-            <RequiredMark />
-          </span>
-        </label>
-        {errors.consent ? (
-          <p id="consent-error" className="job-field-error" role="alert">
-            {errors.consent}
-          </p>
-        ) : null}
-        <label className="job-checkbox-label" htmlFor="application-ai-consent">
-          <input
-            id="application-ai-consent"
-            name="aiAnalysisConsent"
-            type="checkbox"
-            aria-label="I agree to let SmartHire use AI to analyze how well my CV matches this role."
-            checked={aiConsent}
-            onChange={(event) => setAiConsent(event.currentTarget.checked)}
-          />
-          <span>
-            I agree to let SmartHire use AI to analyze how well my CV matches
-            this role.{" "}
-            <Link href="/legal/ai-cv-analysis-policy" target="_blank">
-              Learn more
-            </Link>
-          </span>
-        </label>
-        <p className="job-form-help">
-          Optional. If you do not select this, your CV will still be submitted
-          without an AI match score.
-        </p>
-      </div>
-
       {error ? (
         <div role="alert" className="job-feedback">
           {error}
         </div>
       ) : null}
       <div className="job-actions">
+        <div className="job-ai-consent">
+          <label className="job-checkbox-label" htmlFor="application-consent">
+            <input
+              id="application-consent"
+              name="consentAccepted"
+              type="checkbox"
+              required
+              aria-label="I consent to SmartHire sharing this application with the hiring company."
+              checked={applicationConsent}
+              {...fieldA11y("consent", errors)}
+              onChange={(event) => {
+                setApplicationConsent(event.currentTarget.checked);
+                setErrors((current) => {
+                  const next = { ...current };
+                  delete next.consent;
+                  return next;
+                });
+              }}
+            />
+            <span>
+              I consent to SmartHire sharing this application with the hiring
+              company.
+              <RequiredMark />
+            </span>
+          </label>
+          {errors.consent ? (
+            <p id="consent-error" className="job-field-error" role="alert">
+              {errors.consent}
+            </p>
+          ) : null}
+        </div>
+        <div className="job-ai-consent">
+          <label
+            className="job-checkbox-label"
+            htmlFor="application-ai-consent"
+          >
+            <input
+              id="application-ai-consent"
+              name="aiAnalysisConsent"
+              type="checkbox"
+              aria-label="I agree to let SmartHire use AI to analyze how well my CV matches this role."
+              checked={aiConsent}
+              onChange={(event) => setAiConsent(event.currentTarget.checked)}
+            />
+            <span>
+              I agree to let SmartHire use AI to analyze how well my CV matches
+              this role.{" "}
+              <Link href="/legal/ai-cv-analysis-policy" target="_blank">
+                Learn more
+              </Link>
+            </span>
+          </label>
+          <p className="job-form-help">
+            Optional. If you do not select this, your CV will be submitted
+            without an AI match score.
+          </p>
+        </div>
         <button type="submit" disabled={submitDisabled}>
           {pending ? "Submitting..." : "Submit application"}
-        </button>
-        <button type="button" onClick={onCancel} disabled={pending}>
-          Cancel
         </button>
       </div>
     </form>
@@ -1016,45 +859,17 @@ export function ApplyFormSection({
   const [outcome, setOutcome] = useState<ApplicationOutcome | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const dialogRef = useRef<HTMLElement>(null);
-  const importCleanupRef = useRef<ApplyImportCleanup | null>(null);
   const [closing, setClosing] = useState(false);
   const [contactDraft, setContactDraft] =
     useState<ApplicationContactSnapshot | null>(null);
-  const [preferredCvId, setPreferredCvId] = useState<string | null>(null);
   const wasOpenRef = useRef(false);
 
-  const registerImportCleanup = useCallback(
-    (cleanup: ApplyImportCleanup | null) => {
-      importCleanupRef.current = cleanup;
-    },
-    [],
-  );
-
-  const handleModalClose = useCallback(async () => {
+  const handleModalClose = useCallback(() => {
     if (closing) return;
     setClosing(true);
-    try {
-      const cleanup = importCleanupRef.current;
-      if (!cleanup) {
-        onOpenChange(false);
-        return;
-      }
-      const result = cleanup();
-      if (result instanceof Promise) {
-        if (await result) onOpenChange(false);
-      } else if (result) {
-        onOpenChange(false);
-      }
-    } finally {
-      setClosing(false);
-    }
+    onOpenChange(false);
+    setClosing(false);
   }, [closing, onOpenChange]);
-
-  const handleImportConfirmed = useCallback((uploadId: string) => {
-    setPreferredCvId("candidate-cv-" + uploadId);
-    setForm(null);
-    setLoadError(null);
-  }, []);
 
   useEffect(() => {
     const reopened = open && !wasOpenRef.current;
@@ -1073,20 +888,12 @@ export function ApplyFormSection({
     document.body.style.overflow = "hidden";
     const focusTimer = window.setTimeout(() => dialogRef.current?.focus(), 0);
 
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key !== "Escape") return;
-      event.preventDefault();
-      void handleModalClose();
-    }
-
-    document.addEventListener("keydown", closeOnEscape);
     return () => {
       window.clearTimeout(focusTimer);
-      document.removeEventListener("keydown", closeOnEscape);
       document.body.style.overflow = previousOverflow;
       previousFocus?.focus();
     };
-  }, [handleModalClose, open]);
+  }, [open]);
 
   useEffect(() => {
     if (!open || applied || form || outcome || loadError) return;
@@ -1157,14 +964,7 @@ export function ApplyFormSection({
   const headingId = "job-apply-heading-" + jobId;
 
   return (
-    <div
-      id="apply"
-      className="job-apply-modal-backdrop"
-      role="presentation"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) void handleModalClose();
-      }}
-    >
+    <div id="apply" className="job-apply-modal-backdrop" role="presentation">
       <section
         ref={dialogRef}
         className="job-apply-modal"
@@ -1223,11 +1023,7 @@ export function ApplyFormSection({
           ) : form ? (
             <InlineApplicationForm
               form={form}
-              onCancel={() => void handleModalClose()}
               onProfileSaved={handleProfileSaved}
-              onImportConfirmed={handleImportConfirmed}
-              preferredCvId={preferredCvId}
-              onRegisterImportCleanup={registerImportCleanup}
               contactDraft={contactDraft}
               onContactChange={handleContactChange}
               onSubmitted={handleSubmitted}

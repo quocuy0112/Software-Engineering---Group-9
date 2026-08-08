@@ -126,6 +126,8 @@ export const applicationAnswerInputSchema = z
   })
   .strict();
 
+export const DIRECT_APPLICATION_CV_ID = "application-upload";
+
 export const applicationSubmissionSchema = z
   .object({
     cvId: z.string().min(1).max(128),

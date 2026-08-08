@@ -7,14 +7,30 @@ import {
 } from "./application-policy";
 import {
   applicationSubmissionSchema,
+  DIRECT_APPLICATION_CV_ID,
   idempotencyKeySchema,
   type ApplicationSubmission,
 } from "@/shared/contracts/jobs/actions";
 import { JobServiceError, type CandidateActor } from "./job-types";
+import type {
+  DirectApplicationCvSource,
+  PreparedDirectApplicationCv,
+} from "./prepare-direct-application-cv";
 
-function binding(command: ApplicationSubmission) {
+function binding(
+  command: ApplicationSubmission,
+  directCv?: PreparedDirectApplicationCv,
+) {
   const stable = {
     ...command,
+    directCv: directCv
+      ? {
+          fileName: directCv.fileName,
+          mimeType: directCv.mimeType,
+          byteSize: directCv.byteSize,
+          checksumSha256: directCv.checksumSha256,
+        }
+      : null,
     answers: [...command.answers].sort((a, b) =>
       a.questionId.localeCompare(b.questionId),
     ),
@@ -29,7 +45,7 @@ function applicationFailureMessage(code: string) {
     case "APPLICATION_PROFILE_INCOMPLETE":
       return "Complete your profile name and location before applying.";
     case "APPLICATION_CV_INELIGIBLE":
-      return "Select a confirmed CV. If you just imported a CV, confirm its review and reopen Apply.";
+      return "Select a saved CV or attach a valid PDF, DOC, or DOCX file.";
     case "APPLICATION_ANSWER_REQUIRED":
       return "Answer all required employer questions before applying.";
     case "APPLICATION_ANSWER_INVALID":
@@ -109,10 +125,30 @@ export class JobApplicationService {
     idempotencyKey: string,
     raw: unknown,
     now = new Date(),
+    directCvSource?: DirectApplicationCvSource,
   ) {
     const command = applicationSubmissionSchema.parse(raw);
     const key = idempotencyKeySchema.parse(idempotencyKey);
+    let directCv: PreparedDirectApplicationCv | undefined;
     try {
+      if (directCvSource) {
+        if (command.cvId !== DIRECT_APPLICATION_CV_ID) {
+          throw new JobServiceError(400, {
+            code: "APPLICATION_CV_INELIGIBLE",
+            message: applicationFailureMessage("APPLICATION_CV_INELIGIBLE"),
+          });
+        }
+        try {
+          directCv = await (
+            await import("./prepare-direct-application-cv")
+          ).prepareDirectApplicationCv(directCvSource);
+        } catch {
+          throw new JobServiceError(400, {
+            code: "APPLICATION_CV_INELIGIBLE",
+            message: applicationFailureMessage("APPLICATION_CV_INELIGIBLE"),
+          });
+        }
+      }
       const result = await (
         await this.repo()
       ).submit({
@@ -120,14 +156,17 @@ export class JobApplicationService {
         sessionId: actor.sessionId,
         jobId,
         idempotencyKey: key,
-        submissionBindingDigest: binding(command),
+        submissionBindingDigest: binding(command, directCv),
         command,
+        directCv,
         activeConsentVersion: ACTIVE_APPLICATION_CONSENT_VERSION,
         occurredAt: now,
         correlationId: randomUUID(),
       });
+      if (!result.created) await directCv?.cleanup();
       return { ...result.application, created: result.created };
     } catch (error) {
+      if (directCv) await directCv.cleanup().catch(() => undefined);
       if (error instanceof ApplicationRepositoryError) {
         const conflict = [
           "IDEMPOTENCY_KEY_REUSED",
