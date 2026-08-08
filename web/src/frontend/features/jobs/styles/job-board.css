@@ -729,6 +729,7 @@
 .job-card-row-actions .job-applied-state,
 .job-card-grid-actions .job-applied-state {
   color: var(--sh-color-brand-primary);
+  background: var(--sh-color-info-bg);
   font-weight: var(--sh-font-weight-semibold);
 }
 
