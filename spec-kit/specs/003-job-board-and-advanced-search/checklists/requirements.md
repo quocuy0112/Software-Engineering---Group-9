@@ -1,4 +1,4 @@
-# Specification Quality Checklist: Job Board and Advanced Search
+# Specification Quality Checklist: Job Board and Candidate Job Workspace
 
 **Purpose**: Validate specification completeness and quality before planning
 **Created**: 2026-08-01
@@ -33,4 +33,8 @@
 
 - Validation iteration 1: 16/16 items pass.
 - Clarification used the approved SmartHire constitution and the detailed candidate-job-journey use cases; no unresolved decision required another user question.
-- Revalidated 2026-08-02 after the Feature 004 merge: 16/16 items pass; the retained-CV release dependency and decimal byte limit are explicit.
+- Revalidated 2026-08-02 after the Feature 004 merge: 16/16 items passed; the Feature 004 non-promotion boundary and decimal byte limit were explicit.
+- Revalidated 2026-08-07 after aligning the spec with implemented Candidate-facing capabilities: 16/16 items pass.
+- The validated scope now covers quick view, related jobs, Saved/Hidden state, preference-based Suggested Jobs, direct retained-CV import, and Candidate-owned application tracking.
+- Job-post management, recruiter pipeline mutation, Feature 005 image/OCR processing, and scoring generation remain explicitly outside Feature 003.
+- Constitution reconciliation keeps application CV input to PDF/DOCX and treats optional scoring only as an approved external integration result.
