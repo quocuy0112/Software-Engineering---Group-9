@@ -1,41 +1,12 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ApplyFormSection } from "@/frontend/features/jobs/components/apply-form-section";
-import { cvImportResourceSchema } from "@/shared/contracts/cv-import/upload";
-
-const pendingApplyImport = cvImportResourceSchema.parse({
-  uploadId: "upload_pending_1234",
-  displayFilename: "resume.docx",
-  documentKind: "DOCX",
-  parserClass: "EXTERNAL_OPENAI",
-  status: "AWAITING_CONSENT",
-  stage: "CONSENT",
-  availableActions: ["GRANT_CONSENT", "DELETE", "MANUAL_PROFILE"],
-  scanRetriesRemaining: 2,
-  parseRetriesRemaining: 2,
-  createdAt: "2026-08-07T00:00:00.000Z",
-  expiresAt: "2026-09-07T00:00:00.000Z",
-  draft: null,
-  processingNotice: {
-    noticeVersion: "cv-processing.v1",
-    noticeText: "Synthetic processing notice.",
-    externalConsentRequiredFor: ["EXTERNAL_OPENAI"],
-  },
-  consent: {
-    required: true,
-    granted: false,
-    providerDisplayName: "OpenAI",
-    processingPurpose: "Create a private CV review draft",
-    noticeText: "Synthetic consent notice.",
-    consentChallenge:
-      "eyJ1IjoidXBsb2FkX3BlbmRpbmdfMTIzNCJ9.signature_fixture_1234567890",
-  },
-  failure: null,
-  receipt: null,
-  contentInaccessibleAt: null,
-  deleteAfter: null,
-  deletedAt: null,
-});
 
 const applicationForm = {
   jobId: "job-1",
@@ -72,12 +43,38 @@ const applicationForm = {
   csrfToken: "csrf-proof",
 };
 
+const savedPdfCv = {
+  id: "cv-local-pdf",
+  displayName: "resume.pdf",
+  fileName: "resume.pdf",
+  mimeType: "application/pdf" as const,
+  byteSize: 2,
+  version: 1,
+  confirmedAt: "2026-08-08T00:00:00.000Z",
+};
+const savedDocxCv = {
+  id: "cv-local-docx",
+  displayName: "resume.docx",
+  fileName: "resume.docx",
+  mimeType:
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document" as const,
+  byteSize: 2,
+  version: 1,
+  confirmedAt: "2026-08-08T00:00:00.000Z",
+};
+
 describe("application form modal", () => {
-  it("prefills contact, stages a new CV for AI import, and closes from its overlay controls", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => applicationForm,
-    });
+  it("prefills contact, attaches a local CV directly, and closes from the X", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => applicationForm,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => savedDocxCv,
+      });
     const onOpenChange = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
@@ -135,6 +132,33 @@ describe("application form modal", () => {
     expect(screen.getByLabelText(/select a cv from profile/i)).toHaveValue(
       "cv-1",
     );
+    expect(
+      screen.queryByText(
+        "Select a saved CV or attach a valid PDF, DOC, or DOCX file.",
+      ),
+    ).toBeNull();
+    const actionArea = document.querySelector(".job-actions");
+    expect(actionArea).not.toBeNull();
+    const actionControls = [
+      within(actionArea as HTMLElement).getByLabelText(
+        /i consent to smarthire sharing this application/i,
+      ),
+      within(actionArea as HTMLElement).getByLabelText(
+        /i agree to let smarthire use ai/i,
+      ),
+      within(actionArea as HTMLElement).getByRole("button", {
+        name: /submit application/i,
+      }),
+    ];
+    expect(
+      actionControls.map(
+        (control) => control.id || control.textContent?.trim(),
+      ),
+    ).toEqual([
+      "application-consent",
+      "application-ai-consent",
+      "Submit application",
+    ]);
     const file = new File(["cv"], "resume.docx", {
       type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     });
@@ -142,25 +166,23 @@ describe("application form modal", () => {
       target: { files: [file] },
     });
     expect(screen.getByText(/resume\.docx/i)).toBeVisible();
+    expect(screen.queryByText(/new cv ready for ai import/i)).toBeNull();
     expect(
-      screen.getByLabelText(/new cv ready for ai import/i),
-    ).not.toHaveAttribute("multiple");
+      screen.queryByRole("button", { name: /import this cv with ai/i }),
+    ).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Import CV" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    await waitFor(() =>
+      expect(screen.getByLabelText(/select a cv from profile/i)).toHaveValue(
+        savedDocxCv.id,
+      ),
+    );
     expect(submit).toBeEnabled();
-    expect(
-      screen.getByRole("button", { name: /import this cv with ai/i }),
-    ).toBeVisible();
-
-    const backdrop = document.querySelector(".job-apply-modal-backdrop");
-    expect(backdrop).not.toBeNull();
-    fireEvent.mouseDown(backdrop!);
-    expect(onOpenChange).toHaveBeenCalledWith(false);
+    expect(screen.queryByRole("button", { name: /^cancel$/i })).toBeNull();
 
     fireEvent.click(
       screen.getByRole("button", { name: /close application form/i }),
     );
-    expect(onOpenChange).toHaveBeenCalledWith(false);
-
-    fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
     expect(onOpenChange).toHaveBeenCalledWith(false);
     vi.unstubAllGlobals();
   });
@@ -225,6 +247,121 @@ describe("application form modal", () => {
         'label[for="question-optional-question"] .job-required-mark',
       ),
     ).toBeNull();
+    vi.unstubAllGlobals();
+  });
+
+  it("saves an imported local CV to Profile before submitting", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => applicationForm,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 201,
+        json: async () => savedPdfCv,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 201,
+        json: async () => ({
+          applicationId: "app-1",
+          jobId: "job-1",
+          stage: "APPLIED",
+          submittedAt: "2026-08-01T00:00:00.000Z",
+          created: true,
+          message: "Application submitted.",
+        }),
+      });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <ApplyFormSection
+        jobId="job-1"
+        jobTitle={applicationForm.jobTitle}
+        open
+        applied={false}
+        onOpenChange={() => undefined}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByLabelText(/drag a cv/i)).toBeVisible(),
+    );
+    const file = new File(["cv"], "resume.pdf", { type: "application/pdf" });
+    fireEvent.change(screen.getByLabelText(/drag a cv/i), {
+      target: { files: [file] },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Import CV" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    await waitFor(() =>
+      expect(screen.getByLabelText(/select a cv from profile/i)).toHaveValue(
+        savedPdfCv.id,
+      ),
+    );
+    fireEvent.click(
+      screen.getByLabelText(/i consent to smarthire sharing this application/i),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: /submit application/i }),
+    );
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
+    const saveRequest = fetchMock.mock.calls[1]?.[1] as RequestInit;
+    expect(new Headers(saveRequest.headers).get("Content-Type")).toBeNull();
+    expect(saveRequest.body).toBeInstanceOf(FormData);
+    expect((saveRequest.body as FormData).get("file")).toBeInstanceOf(File);
+    const request = fetchMock.mock.calls[2]?.[1] as RequestInit;
+    expect(new Headers(request.headers).get("Content-Type")).toBe(
+      "application/json",
+    );
+    expect(JSON.parse(String(request.body))).toMatchObject({
+      cvId: savedPdfCv.id,
+      cvFileRef: savedPdfCv.id,
+    });
+    expect(screen.getByRole("status")).toHaveTextContent(/submitted/i);
+    vi.unstubAllGlobals();
+  });
+
+  it("shows CV validation only after submitting without a valid CV", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ ...applicationForm, cvs: [] }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <ApplyFormSection
+        jobId="job-1"
+        jobTitle={applicationForm.jobTitle}
+        open
+        applied={false}
+        onOpenChange={() => undefined}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByText("No confirmed CVs in Profile")).toBeVisible(),
+    );
+    const cvError =
+      "Select a saved CV or attach a valid PDF, DOC, or DOCX file.";
+    expect(screen.queryByText(cvError)).toBeNull();
+
+    const unsupportedFile = new File(["cv"], "resume.txt", {
+      type: "text/plain",
+    });
+    fireEvent.change(screen.getByLabelText(/drag a cv/i), {
+      target: { files: [unsupportedFile] },
+    });
+    expect(screen.queryByText(/CV files must be PDF, DOC, or DOCX/)).toBeNull();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /submit application/i }),
+    );
+    expect(
+      screen.getByText(/CV files must be PDF, DOC, or DOCX/),
+    ).toBeVisible();
     vi.unstubAllGlobals();
   });
 
@@ -348,64 +485,6 @@ describe("application form modal", () => {
     );
     expect(fetchMock).toHaveBeenCalledTimes(2);
     vi.unstubAllGlobals();
-  });
-
-  it("cancels an unfinished AI import when Apply is closed and preserves contact fields", async () => {
-    const sessionKey = "smarthire:apply-cv-import:job-1";
-    window.sessionStorage.setItem(sessionKey, pendingApplyImport.uploadId);
-    const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
-    const open = vi.spyOn(window, "open").mockReturnValue({} as Window);
-    const fetchMock = vi.fn(
-      async (input: RequestInfo | URL, init?: RequestInit) => {
-        const url = String(input);
-        if (url.endsWith("/application-form"))
-          return { ok: true, json: async () => applicationForm };
-        if (url.endsWith(`/cv-imports/${pendingApplyImport.uploadId}`)) {
-          if (init?.method === "DELETE")
-            return { ok: true, status: 202, json: async () => ({}) };
-          return { ok: true, json: async () => pendingApplyImport };
-        }
-        throw new Error(`Unexpected request: ${url}`);
-      },
-    );
-    const onOpenChange = vi.fn();
-    vi.stubGlobal("fetch", fetchMock);
-
-    render(
-      <ApplyFormSection
-        jobId="job-1"
-        jobTitle={applicationForm.jobTitle}
-        open
-        applied={false}
-        onOpenChange={onOpenChange}
-      />,
-    );
-
-    await waitFor(() =>
-      expect(screen.getByText(/waiting for your consent/i)).toBeVisible(),
-    );
-    expect(open).toHaveBeenCalledWith(
-      "/profile/cv-imports/" + pendingApplyImport.uploadId,
-      "_blank",
-      "noopener,noreferrer",
-    );
-    fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
-
-    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
-    expect(
-      fetchMock.mock.calls.some(
-        ([input, init]) =>
-          String(input).endsWith(
-            `/cv-imports/${pendingApplyImport.uploadId}`,
-          ) && init?.method === "DELETE",
-      ),
-    ).toBe(true);
-    expect(window.sessionStorage.getItem(sessionKey)).toBeNull();
-    expect(screen.getByDisplayValue("Nguyễn Văn A")).toBeVisible();
-    expect(screen.getByDisplayValue("candidate@example.com")).toBeVisible();
-    expect(confirm).toHaveBeenCalledOnce();
-    expect(open).toHaveBeenCalledOnce();
-    open.mockRestore();
   });
 
   it("keeps submission blocked when the job location is still missing", async () => {

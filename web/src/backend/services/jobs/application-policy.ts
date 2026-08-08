@@ -3,6 +3,16 @@ import type { ApplicationSubmission } from "@/shared/contracts/jobs/actions";
 
 export const ACTIVE_APPLICATION_CONSENT_VERSION = "2026-08-01";
 
+export type DirectApplicationCv = Readonly<{
+  id: string;
+  displayName: string;
+  fileName: string;
+  mimeType: string;
+  byteSize: number;
+  storageKey: string;
+  checksumSha256: string;
+}>;
+
 export class ApplicationRepositoryError extends Error {
   constructor(readonly code: string) {
     super(code);

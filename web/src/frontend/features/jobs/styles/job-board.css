@@ -340,6 +340,15 @@
   background: var(--sh-color-surface-tinted);
 }
 
+.job-actions > .job-ai-consent {
+  flex: 1 0 100%;
+}
+
+.job-apply-modal-body .job-actions > button[type="submit"] {
+  flex: 1 0 100%;
+  width: 100%;
+}
+
 .job-ai-consent a {
   color: var(--sh-color-brand-primary);
   font-weight: var(--sh-font-weight-semibold);
