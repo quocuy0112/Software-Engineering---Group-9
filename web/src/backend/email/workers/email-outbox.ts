@@ -38,6 +38,14 @@ import {
   EmailChangeAlertTemplate,
   emailChangeAlertText,
 } from "../templates/email-change-alert";
+import {
+  ApplicationStageChangedTemplate,
+  applicationStageChangedEmailText,
+} from "../templates/application-stage-changed";
+import {
+  applicationStageLabel,
+  applicationStageSchema,
+} from "@/shared/contracts/jobs/applications";
 import { EmailDeliveryError, type EmailService } from "../email-service";
 const protector = new TokenProtector();
 const emailChangeProofs = new EmailChangeProofProtector();
@@ -94,7 +102,38 @@ export async function deliverClaimedOutbox(
       protectedCancellationProof?: string;
       holdEndsAt?: string;
     };
-    if (row.templateVersion === "email-change-verification.v1") {
+    if (row.templateVersion === "application-stage-changed.v1") {
+      const stagePayload = row.payloadRef as {
+        applicationId?: string;
+        stage?: string;
+        jobTitle?: string;
+        companyName?: string;
+      };
+      const stage = applicationStageSchema.safeParse(stagePayload.stage);
+      if (
+        !stage.success ||
+        !stagePayload.applicationId ||
+        !stagePayload.jobTitle ||
+        !stagePayload.companyName
+      ) {
+        throw new Error("APPLICATION_STAGE_EMAIL_PAYLOAD_INVALID");
+      }
+      const applicationUrl = new URL(
+        `/jobs/applied/${encodeURIComponent(stagePayload.applicationId)}`,
+        serverEnvironment.NEXT_PUBLIC_APP_URL,
+      ).toString();
+      const templateProps = {
+        stageLabel: applicationStageLabel[stage.data],
+        jobTitle: stagePayload.jobTitle,
+        companyName: stagePayload.companyName,
+        applicationUrl,
+      };
+      subject = `Application update: ${templateProps.stageLabel}`;
+      html = await render(
+        createElement(ApplicationStageChangedTemplate, templateProps),
+      );
+      text = applicationStageChangedEmailText(templateProps);
+    } else if (row.templateVersion === "email-change-verification.v1") {
       const emailChangePayload = row.payloadRef as {
         protectedProof?: string;
       };

@@ -27,7 +27,7 @@ function binding(command: ApplicationSubmission) {
 function applicationFailureMessage(code: string) {
   switch (code) {
     case "APPLICATION_PROFILE_INCOMPLETE":
-      return "Complete your profile headline and location before applying.";
+      return "Complete your profile name and location before applying.";
     case "APPLICATION_CV_INELIGIBLE":
       return "Select a confirmed CV. If you just imported a CV, confirm its review and reopen Apply.";
     case "APPLICATION_ANSWER_REQUIRED":

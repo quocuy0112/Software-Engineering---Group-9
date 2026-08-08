@@ -23,7 +23,6 @@ import {
   applicationFormSchema,
   applicationOutcomeSchema,
 } from "@/shared/contracts/jobs/actions";
-import type { AppliedJobState } from "@/shared/contracts/jobs/catalog";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
 
 const MAX_CV_BYTES = 5_000_000;
@@ -34,11 +33,6 @@ const ACCEPTED_CV_TYPES = new Set([
 ]);
 
 type FieldErrors = Record<string, string>;
-type ApplicationMeta = Pick<
-  AppliedJobState,
-  "cvFileRef" | "contactSnapshot" | "aiAnalysisConsent" | "aiMatchScore"
->;
-
 function formatBytes(bytes: number) {
   if (bytes < 1024) return bytes + " B";
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
@@ -86,6 +80,14 @@ function fieldA11y(field: string, errors: FieldErrors) {
   };
 }
 
+function RequiredMark() {
+  return (
+    <span className="job-required-mark" aria-hidden="true">
+      *
+    </span>
+  );
+}
+
 function applyCvImportSessionKey(jobId: string) {
   return `smarthire:apply-cv-import:${jobId}`;
 }
@@ -114,7 +116,7 @@ function InlineApplicationForm({
   onRegisterImportCleanup: (cleanup: ApplyImportCleanup | null) => void;
   contactDraft: ApplicationContactSnapshot | null;
   onContactChange: (contact: ApplicationContactSnapshot) => void;
-  onSubmitted: (outcome: ApplicationOutcome, meta: ApplicationMeta) => void;
+  onSubmitted: (outcome: ApplicationOutcome) => void;
 }) {
   const csrfProof = useCsrfProof();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -130,7 +132,9 @@ function InlineApplicationForm({
   const [selectedCvId, setSelectedCvId] = useState(() =>
     preferredCvId && form.cvs.some((cv) => cv.id === preferredCvId)
       ? preferredCvId
-      : "",
+      : form.cvs.length === 1
+        ? form.cvs[0]!.id
+        : "",
   );
   const [newCvFile, setNewCvFile] = useState<File | null>(null);
   const [newCvImportStarted, setNewCvImportStarted] = useState(false);
@@ -418,6 +422,20 @@ function InlineApplicationForm({
     if (!applicationConsent)
       next.consent = "Accept the application consent before applying.";
     setErrors(next);
+    const firstInvalidField = Object.keys(next)[0];
+    if (firstInvalidField) {
+      const fieldIds: Record<string, string> = {
+        cv: "application-cv-id",
+        fullName: "application-full-name",
+        email: "application-email",
+        phone: "application-phone",
+        location: "application-location",
+        consent: "application-consent",
+      };
+      window.requestAnimationFrame(() =>
+        document.getElementById(fieldIds[firstInvalidField] ?? "")?.focus(),
+      );
+    }
     return Object.keys(next).length === 0;
   }
 
@@ -551,19 +569,11 @@ function InlineApplicationForm({
       }
 
       const outcome = applicationOutcomeSchema.parse(body);
-      onSubmitted(
-        {
-          ...outcome,
-          aiAnalysisConsent: aiConsent,
-          aiMatchScore: aiConsent ? 82 : null,
-        },
-        {
-          cvFileRef,
-          contactSnapshot,
-          aiAnalysisConsent: aiConsent,
-          aiMatchScore: aiConsent ? 82 : null,
-        },
-      );
+      onSubmitted({
+        ...outcome,
+        aiAnalysisConsent: aiConsent,
+        aiMatchScore: aiConsent ? 82 : null,
+      });
     } catch {
       setError("Unable to submit your application. Please try again.");
     } finally {
@@ -582,8 +592,7 @@ function InlineApplicationForm({
     ]),
   );
   const profileReady = missingProfileFields.length === 0;
-  const submitDisabled =
-    pending || locationSaving || importBusy || !selectedCvId;
+  const submitDisabled = pending || locationSaving || importBusy;
 
   return (
     <form
@@ -596,6 +605,9 @@ function InlineApplicationForm({
       }}
       noValidate
     >
+      <p className="job-required-note">
+        <RequiredMark /> Required fields
+      </p>
       {!profileReady ? (
         <div role="alert">
           Please complete these profile fields first:{" "}
@@ -604,7 +616,10 @@ function InlineApplicationForm({
       ) : null}
 
       <fieldset className="job-application-fieldset">
-        <legend>Application CV</legend>
+        <legend>
+          Application CV
+          <RequiredMark />
+        </legend>
         <p className="job-form-help">
           Select exactly one confirmed CV from your Profile, or import one new
           PDF/DOCX through AI review.
@@ -614,6 +629,7 @@ function InlineApplicationForm({
           <select
             id="application-cv-id"
             name="cvId"
+            required
             value={selectedCvId}
             disabled={pending || newCvImportStarted}
             {...fieldA11y("cv", errors)}
@@ -731,10 +747,14 @@ function InlineApplicationForm({
       <fieldset className="job-application-fieldset">
         <legend>Contact information</legend>
         <label htmlFor="application-full-name">
-          Full name <span aria-hidden="true">*</span>
+          <span className="job-field-label">
+            Full name
+            <RequiredMark />
+          </span>
           <input
             id="application-full-name"
             name="fullName"
+            required
             autoComplete="name"
             value={contact.fullName}
             {...fieldA11y("fullName", errors)}
@@ -752,11 +772,15 @@ function InlineApplicationForm({
           ) : null}
         </label>
         <label htmlFor="application-email">
-          Email <span aria-hidden="true">*</span>
+          <span className="job-field-label">
+            Email
+            <RequiredMark />
+          </span>
           <input
             id="application-email"
             name="email"
             type="email"
+            required
             autoComplete="email"
             value={contact.email}
             {...fieldA11y("email", errors)}
@@ -774,11 +798,15 @@ function InlineApplicationForm({
           ) : null}
         </label>
         <label htmlFor="application-phone">
-          Phone number <span aria-hidden="true">*</span>
+          <span className="job-field-label">
+            Phone number
+            <RequiredMark />
+          </span>
           <input
             id="application-phone"
             name="phone"
             type="tel"
+            required
             inputMode="numeric"
             autoComplete="tel"
             maxLength={PHONE_INPUT_MAX_LENGTH}
@@ -810,7 +838,10 @@ function InlineApplicationForm({
           ) : null}
         </label>
         <label htmlFor="application-location">
-          Location <span aria-hidden="true">*</span>
+          <span className="job-field-label">
+            Location
+            <RequiredMark />
+          </span>
           <select
             id="application-location"
             name="location"
@@ -840,7 +871,10 @@ function InlineApplicationForm({
 
       {form.questions.map((question) => (
         <label key={question.id} htmlFor={"question-" + question.id}>
-          {question.prompt}
+          <span className="job-field-label">
+            {question.prompt}
+            {question.required ? <RequiredMark /> : null}
+          </span>
           {question.kind === "BOOLEAN" ? (
             <select
               id={"question-" + question.id}
@@ -914,6 +948,7 @@ function InlineApplicationForm({
           <span>
             I consent to SmartHire sharing this application with the hiring
             company.
+            <RequiredMark />
           </span>
         </label>
         {errors.consent ? (
@@ -986,6 +1021,7 @@ export function ApplyFormSection({
   const [contactDraft, setContactDraft] =
     useState<ApplicationContactSnapshot | null>(null);
   const [preferredCvId, setPreferredCvId] = useState<string | null>(null);
+  const wasOpenRef = useRef(false);
 
   const registerImportCleanup = useCallback(
     (cleanup: ApplyImportCleanup | null) => {
@@ -1019,6 +1055,15 @@ export function ApplyFormSection({
     setForm(null);
     setLoadError(null);
   }, []);
+
+  useEffect(() => {
+    const reopened = open && !wasOpenRef.current;
+    wasOpenRef.current = open;
+    if (reopened && form && form.cvs.length === 0 && !outcome && !applied) {
+      setForm(null);
+      setLoadError(null);
+    }
+  }, [applied, form, open, outcome]);
 
   useEffect(() => {
     if (!open) return;
@@ -1077,21 +1122,9 @@ export function ApplyFormSection({
     };
   }, [applied, form, jobId, loadError, open, outcome]);
 
-  function handleSubmitted(
-    submitted: ApplicationOutcome,
-    meta: ApplicationMeta,
-  ) {
-    const state: AppliedJobState = {
-      jobId,
-      appliedAt: submitted.submittedAt,
-      status: "submitted",
-      cvFileRef: meta.cvFileRef,
-      contactSnapshot: meta.contactSnapshot,
-      aiAnalysisConsent: meta.aiAnalysisConsent,
-      aiMatchScore: meta.aiMatchScore,
-    };
+  function handleSubmitted(submitted: ApplicationOutcome) {
     setOutcome(submitted);
-    shared?.markApplied(jobId, state);
+    shared?.markApplied(jobId);
     onSubmitted?.(submitted);
   }
 

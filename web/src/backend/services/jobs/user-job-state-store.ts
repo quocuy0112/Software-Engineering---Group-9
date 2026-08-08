@@ -4,7 +4,6 @@ import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import {
   userJobStateSchema,
-  type AppliedJobState,
   type JobPreferences,
   type UserJobState,
 } from "@/shared/contracts/jobs/catalog";
@@ -23,8 +22,7 @@ export type UserJobStateMutation =
   | { action: "unsave"; jobId: string }
   | { action: "hide"; jobId: string }
   | { action: "unhide"; jobId: string }
-  | { action: "update-preferences"; jobPreferences: JobPreferences }
-  | { action: "apply"; jobId: string; appliedJob: AppliedJobState };
+  | { action: "update-preferences"; jobPreferences: JobPreferences };
 
 export function userJobStateFileEnabled() {
   return process.env.NODE_ENV !== "production";
@@ -39,7 +37,6 @@ export function projectUserJobState(state: UserJobState) {
   return {
     savedJobIds: state.savedJobIds,
     hiddenJobIds: state.hiddenJobIds,
-    appliedJobIds: state.appliedJobs.map((application) => application.jobId),
   };
 }
 
@@ -85,17 +82,6 @@ export function updateUserJobState(mutation: UserJobStateMutation) {
         next = {
           ...current,
           jobPreferences: mutation.jobPreferences,
-        };
-        break;
-      case "apply":
-        next = {
-          ...current,
-          appliedJobs: [
-            ...current.appliedJobs.filter(
-              (application) => application.jobId !== mutation.jobId,
-            ),
-            mutation.appliedJob,
-          ],
         };
         break;
     }

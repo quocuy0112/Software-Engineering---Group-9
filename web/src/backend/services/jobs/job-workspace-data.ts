@@ -8,10 +8,10 @@ import type { JobPreferences } from "@/shared/contracts/jobs/preferences";
 import type {
   JobPositionOption,
   SuggestedWorkspaceJob,
-  WorkspaceApplication,
 } from "@/shared/contracts/jobs/workspace";
 import type { UserJobState } from "@/shared/contracts/jobs/catalog";
 import { normalizeSalaryAmount } from "@/shared/utils/jobs/job-display";
+import { PrismaApplicationTrackingRepository } from "@/backend/repositories/jobs/prisma-application-tracking-repository";
 import { readUserJobState } from "./user-job-state-store";
 
 const dataPath = (name: string) => resolve(process.cwd(), "data", "jobs", name);
@@ -175,10 +175,9 @@ export function projectWorkspaceJob(
   state: UserJobState,
   now = new Date(),
   matchScore?: number,
+  appliedJobIds: ReadonlySet<string> = new Set(),
 ): JobCard {
-  const applied = state.appliedJobs.some(
-    (application) => application.jobId === job.id,
-  );
+  const applied = appliedJobIds.has(job.id);
   const card: JobCard = {
     id: job.id,
     slug: job.slug,
@@ -234,7 +233,7 @@ export type JobWorkspaceSnapshot = {
   jobs: SourceJob[];
   companies: Map<string, SourceCompany>;
   savedJobs: JobCard[];
-  applications: WorkspaceApplication[];
+  appliedJobIds: string[];
   positionOptions: JobPositionOption[];
   skillOptions: string[];
 };
@@ -264,12 +263,17 @@ function taxonomy(jobs: SourceJob[]) {
 }
 
 export async function readJobWorkspaceSnapshot(
+  candidateUserId: string,
   now = new Date(),
 ): Promise<JobWorkspaceSnapshot> {
-  const [catalog, state] = await Promise.all([
+  const [catalog, state, appliedJobIds] = await Promise.all([
     readCatalog(),
     readUserJobState(),
+    new PrismaApplicationTrackingRepository().listAppliedJobIds(
+      candidateUserId,
+    ),
   ]);
+  const appliedIds = new Set(appliedJobIds);
   const cardById = new Map(
     catalog.jobs.map((job) => [
       job.id,
@@ -278,13 +282,11 @@ export async function readJobWorkspaceSnapshot(
         catalog.companies.get(job.companyId),
         state,
         now,
+        undefined,
+        appliedIds,
       ),
     ]),
   );
-  const applications = state.appliedJobs.map((application) => ({
-    application,
-    job: cardById.get(application.jobId) ?? null,
-  }));
   const { positionOptions, skillOptions } = taxonomy(catalog.jobs);
   return {
     state,
@@ -294,7 +296,7 @@ export async function readJobWorkspaceSnapshot(
       const job = cardById.get(jobId);
       return job ? [job] : [];
     }),
-    applications,
+    appliedJobIds,
     positionOptions,
     skillOptions,
   };
@@ -364,7 +366,7 @@ export function suggestedJobsForSnapshot(
   if (!isJobPreferencesConfigured(preferences)) return [];
 
   const hiddenIds = new Set(state.hiddenJobIds);
-  const appliedIds = new Set(state.appliedJobs.map((item) => item.jobId));
+  const appliedIds = new Set(snapshot.appliedJobIds);
   const positionConfigured = Boolean(
     preferences.professionalPositions.length ||
     preferences.customPositions.length,
@@ -447,6 +449,7 @@ export function suggestedJobsForSnapshot(
           state,
           now,
           matchScore,
+          appliedIds,
         ),
         matchedCriteria,
       };

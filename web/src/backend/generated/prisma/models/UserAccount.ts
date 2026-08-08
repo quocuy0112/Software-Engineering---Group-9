@@ -266,6 +266,7 @@ export type UserAccountWhereInput = {
   cvConfirmations?: Prisma.CvImportConfirmationListRelationFilter
   imageSearchQueries?: Prisma.SearchImageQueryListRelationFilter
   imageSearchConsents?: Prisma.SearchProcessingConsentListRelationFilter
+  companyMemberships?: Prisma.CompanyMembershipListRelationFilter
 }
 
 export type UserAccountOrderByWithRelationInput = {
@@ -309,6 +310,7 @@ export type UserAccountOrderByWithRelationInput = {
   cvConfirmations?: Prisma.CvImportConfirmationOrderByRelationAggregateInput
   imageSearchQueries?: Prisma.SearchImageQueryOrderByRelationAggregateInput
   imageSearchConsents?: Prisma.SearchProcessingConsentOrderByRelationAggregateInput
+  companyMemberships?: Prisma.CompanyMembershipOrderByRelationAggregateInput
 }
 
 export type UserAccountWhereUniqueInput = Prisma.AtLeast<{
@@ -355,6 +357,7 @@ export type UserAccountWhereUniqueInput = Prisma.AtLeast<{
   cvConfirmations?: Prisma.CvImportConfirmationListRelationFilter
   imageSearchQueries?: Prisma.SearchImageQueryListRelationFilter
   imageSearchConsents?: Prisma.SearchProcessingConsentListRelationFilter
+  companyMemberships?: Prisma.CompanyMembershipListRelationFilter
 }, "id" | "email" | "normalizedEmail">
 
 export type UserAccountOrderByWithAggregationInput = {
@@ -434,6 +437,7 @@ export type UserAccountCreateInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateInput = {
@@ -477,6 +481,7 @@ export type UserAccountUncheckedCreateInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUpdateInput = {
@@ -520,6 +525,7 @@ export type UserAccountUpdateInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateInput = {
@@ -563,6 +569,7 @@ export type UserAccountUncheckedUpdateInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateManyInput = {
@@ -889,6 +896,20 @@ export type UserAccountUpdateOneWithoutOutboxNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutOutboxInput, Prisma.UserAccountUpdateWithoutOutboxInput>, Prisma.UserAccountUncheckedUpdateWithoutOutboxInput>
 }
 
+export type UserAccountCreateNestedOneWithoutCompanyMembershipsInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutCompanyMembershipsInput, Prisma.UserAccountUncheckedCreateWithoutCompanyMembershipsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutCompanyMembershipsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutCompanyMembershipsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutCompanyMembershipsInput, Prisma.UserAccountUncheckedCreateWithoutCompanyMembershipsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutCompanyMembershipsInput
+  upsert?: Prisma.UserAccountUpsertWithoutCompanyMembershipsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutCompanyMembershipsInput, Prisma.UserAccountUpdateWithoutCompanyMembershipsInput>, Prisma.UserAccountUncheckedUpdateWithoutCompanyMembershipsInput>
+}
+
 export type UserAccountCreateNestedOneWithoutSavedJobsInput = {
   create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSavedJobsInput, Prisma.UserAccountUncheckedCreateWithoutSavedJobsInput>
   connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSavedJobsInput
@@ -1129,6 +1150,7 @@ export type UserAccountCreateWithoutAccountsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutAccountsInput = {
@@ -1171,6 +1193,7 @@ export type UserAccountUncheckedCreateWithoutAccountsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutAccountsInput = {
@@ -1229,6 +1252,7 @@ export type UserAccountUpdateWithoutAccountsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutAccountsInput = {
@@ -1271,6 +1295,7 @@ export type UserAccountUncheckedUpdateWithoutAccountsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutSessionsInput = {
@@ -1313,6 +1338,7 @@ export type UserAccountCreateWithoutSessionsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutSessionsInput = {
@@ -1355,6 +1381,7 @@ export type UserAccountUncheckedCreateWithoutSessionsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutSessionsInput = {
@@ -1413,6 +1440,7 @@ export type UserAccountUpdateWithoutSessionsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSessionsInput = {
@@ -1455,6 +1483,7 @@ export type UserAccountUncheckedUpdateWithoutSessionsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutVerificationsInput = {
@@ -1497,6 +1526,7 @@ export type UserAccountCreateWithoutVerificationsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutVerificationsInput = {
@@ -1539,6 +1569,7 @@ export type UserAccountUncheckedCreateWithoutVerificationsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutVerificationsInput = {
@@ -1597,6 +1628,7 @@ export type UserAccountUpdateWithoutVerificationsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutVerificationsInput = {
@@ -1639,6 +1671,7 @@ export type UserAccountUncheckedUpdateWithoutVerificationsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutTwoFactorInput = {
@@ -1681,6 +1714,7 @@ export type UserAccountCreateWithoutTwoFactorInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutTwoFactorInput = {
@@ -1723,6 +1757,7 @@ export type UserAccountUncheckedCreateWithoutTwoFactorInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutTwoFactorInput = {
@@ -1781,6 +1816,7 @@ export type UserAccountUpdateWithoutTwoFactorInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutTwoFactorInput = {
@@ -1823,6 +1859,7 @@ export type UserAccountUncheckedUpdateWithoutTwoFactorInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutCandidateIdentityInput = {
@@ -1865,6 +1902,7 @@ export type UserAccountCreateWithoutCandidateIdentityInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutCandidateIdentityInput = {
@@ -1907,6 +1945,7 @@ export type UserAccountUncheckedCreateWithoutCandidateIdentityInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutCandidateIdentityInput = {
@@ -1965,6 +2004,7 @@ export type UserAccountUpdateWithoutCandidateIdentityInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCandidateIdentityInput = {
@@ -2007,6 +2047,7 @@ export type UserAccountUncheckedUpdateWithoutCandidateIdentityInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutPreferencesInput = {
@@ -2049,6 +2090,7 @@ export type UserAccountCreateWithoutPreferencesInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutPreferencesInput = {
@@ -2091,6 +2133,7 @@ export type UserAccountUncheckedCreateWithoutPreferencesInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutPreferencesInput = {
@@ -2149,6 +2192,7 @@ export type UserAccountUpdateWithoutPreferencesInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPreferencesInput = {
@@ -2191,6 +2235,7 @@ export type UserAccountUncheckedUpdateWithoutPreferencesInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutEmailChangeRequestsInput = {
@@ -2233,6 +2278,7 @@ export type UserAccountCreateWithoutEmailChangeRequestsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutEmailChangeRequestsInput = {
@@ -2275,6 +2321,7 @@ export type UserAccountUncheckedCreateWithoutEmailChangeRequestsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutEmailChangeRequestsInput = {
@@ -2333,6 +2380,7 @@ export type UserAccountUpdateWithoutEmailChangeRequestsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutEmailChangeRequestsInput = {
@@ -2375,6 +2423,7 @@ export type UserAccountUncheckedUpdateWithoutEmailChangeRequestsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordChangeAttemptWindowInput = {
@@ -2417,6 +2466,7 @@ export type UserAccountCreateWithoutPasswordChangeAttemptWindowInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordChangeAttemptWindowInput = {
@@ -2459,6 +2509,7 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeAttemptWindowInput = 
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordChangeAttemptWindowInput = {
@@ -2517,6 +2568,7 @@ export type UserAccountUpdateWithoutPasswordChangeAttemptWindowInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordChangeAttemptWindowInput = {
@@ -2559,6 +2611,7 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeAttemptWindowInput = 
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordChangeOperationsInput = {
@@ -2601,6 +2654,7 @@ export type UserAccountCreateWithoutPasswordChangeOperationsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordChangeOperationsInput = {
@@ -2643,6 +2697,7 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeOperationsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordChangeOperationsInput = {
@@ -2701,6 +2756,7 @@ export type UserAccountUpdateWithoutPasswordChangeOperationsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordChangeOperationsInput = {
@@ -2743,6 +2799,7 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeOperationsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutSecurityTokensInput = {
@@ -2785,6 +2842,7 @@ export type UserAccountCreateWithoutSecurityTokensInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutSecurityTokensInput = {
@@ -2827,6 +2885,7 @@ export type UserAccountUncheckedCreateWithoutSecurityTokensInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutSecurityTokensInput = {
@@ -2885,6 +2944,7 @@ export type UserAccountUpdateWithoutSecurityTokensInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSecurityTokensInput = {
@@ -2927,6 +2987,7 @@ export type UserAccountUncheckedUpdateWithoutSecurityTokensInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordResetOperationsInput = {
@@ -2969,6 +3030,7 @@ export type UserAccountCreateWithoutPasswordResetOperationsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordResetOperationsInput = {
@@ -3011,6 +3073,7 @@ export type UserAccountUncheckedCreateWithoutPasswordResetOperationsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordResetOperationsInput = {
@@ -3069,6 +3132,7 @@ export type UserAccountUpdateWithoutPasswordResetOperationsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordResetOperationsInput = {
@@ -3111,6 +3175,7 @@ export type UserAccountUncheckedUpdateWithoutPasswordResetOperationsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutFullAccountRecoveryOperationsInput = {
@@ -3153,6 +3218,7 @@ export type UserAccountCreateWithoutFullAccountRecoveryOperationsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutFullAccountRecoveryOperationsInput = {
@@ -3195,6 +3261,7 @@ export type UserAccountUncheckedCreateWithoutFullAccountRecoveryOperationsInput 
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutFullAccountRecoveryOperationsInput = {
@@ -3253,6 +3320,7 @@ export type UserAccountUpdateWithoutFullAccountRecoveryOperationsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutFullAccountRecoveryOperationsInput = {
@@ -3295,6 +3363,7 @@ export type UserAccountUncheckedUpdateWithoutFullAccountRecoveryOperationsInput 
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutChallengesInput = {
@@ -3337,6 +3406,7 @@ export type UserAccountCreateWithoutChallengesInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutChallengesInput = {
@@ -3379,6 +3449,7 @@ export type UserAccountUncheckedCreateWithoutChallengesInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutChallengesInput = {
@@ -3437,6 +3508,7 @@ export type UserAccountUpdateWithoutChallengesInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutChallengesInput = {
@@ -3479,6 +3551,7 @@ export type UserAccountUncheckedUpdateWithoutChallengesInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutOutboxInput = {
@@ -3521,6 +3594,7 @@ export type UserAccountCreateWithoutOutboxInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutOutboxInput = {
@@ -3563,6 +3637,7 @@ export type UserAccountUncheckedCreateWithoutOutboxInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutOutboxInput = {
@@ -3621,6 +3696,7 @@ export type UserAccountUpdateWithoutOutboxInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutOutboxInput = {
@@ -3645,6 +3721,195 @@ export type UserAccountUncheckedUpdateWithoutOutboxInput = {
   passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
   fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
   challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserAccountCreateWithoutCompanyMembershipsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+}
+
+export type UserAccountUncheckedCreateWithoutCompanyMembershipsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+}
+
+export type UserAccountCreateOrConnectWithoutCompanyMembershipsInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutCompanyMembershipsInput, Prisma.UserAccountUncheckedCreateWithoutCompanyMembershipsInput>
+}
+
+export type UserAccountUpsertWithoutCompanyMembershipsInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutCompanyMembershipsInput, Prisma.UserAccountUncheckedUpdateWithoutCompanyMembershipsInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutCompanyMembershipsInput, Prisma.UserAccountUncheckedCreateWithoutCompanyMembershipsInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutCompanyMembershipsInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutCompanyMembershipsInput, Prisma.UserAccountUncheckedUpdateWithoutCompanyMembershipsInput>
+}
+
+export type UserAccountUpdateWithoutCompanyMembershipsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutCompanyMembershipsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
   preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
   emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
   passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
@@ -3705,6 +3970,7 @@ export type UserAccountCreateWithoutSavedJobsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutSavedJobsInput = {
@@ -3747,6 +4013,7 @@ export type UserAccountUncheckedCreateWithoutSavedJobsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutSavedJobsInput = {
@@ -3805,6 +4072,7 @@ export type UserAccountUpdateWithoutSavedJobsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSavedJobsInput = {
@@ -3847,6 +4115,7 @@ export type UserAccountUncheckedUpdateWithoutSavedJobsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutJobReportsInput = {
@@ -3889,6 +4158,7 @@ export type UserAccountCreateWithoutJobReportsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutJobReportsInput = {
@@ -3931,6 +4201,7 @@ export type UserAccountUncheckedCreateWithoutJobReportsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutJobReportsInput = {
@@ -3989,6 +4260,7 @@ export type UserAccountUpdateWithoutJobReportsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutJobReportsInput = {
@@ -4031,6 +4303,7 @@ export type UserAccountUncheckedUpdateWithoutJobReportsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutCvQuotaInput = {
@@ -4073,6 +4346,7 @@ export type UserAccountCreateWithoutCvQuotaInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvQuotaInput = {
@@ -4115,6 +4389,7 @@ export type UserAccountUncheckedCreateWithoutCvQuotaInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvQuotaInput = {
@@ -4173,6 +4448,7 @@ export type UserAccountUpdateWithoutCvQuotaInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvQuotaInput = {
@@ -4215,6 +4491,7 @@ export type UserAccountUncheckedUpdateWithoutCvQuotaInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutCvUploadsInput = {
@@ -4257,6 +4534,7 @@ export type UserAccountCreateWithoutCvUploadsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvUploadsInput = {
@@ -4299,6 +4577,7 @@ export type UserAccountUncheckedCreateWithoutCvUploadsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvUploadsInput = {
@@ -4357,6 +4636,7 @@ export type UserAccountUpdateWithoutCvUploadsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvUploadsInput = {
@@ -4399,6 +4679,7 @@ export type UserAccountUncheckedUpdateWithoutCvUploadsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutCvStoredArtifactsInput = {
@@ -4441,6 +4722,7 @@ export type UserAccountCreateWithoutCvStoredArtifactsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvStoredArtifactsInput = {
@@ -4483,6 +4765,7 @@ export type UserAccountUncheckedCreateWithoutCvStoredArtifactsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvStoredArtifactsInput = {
@@ -4541,6 +4824,7 @@ export type UserAccountUpdateWithoutCvStoredArtifactsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvStoredArtifactsInput = {
@@ -4583,6 +4867,7 @@ export type UserAccountUncheckedUpdateWithoutCvStoredArtifactsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutCvScanAssessmentsInput = {
@@ -4625,6 +4910,7 @@ export type UserAccountCreateWithoutCvScanAssessmentsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvScanAssessmentsInput = {
@@ -4667,6 +4953,7 @@ export type UserAccountUncheckedCreateWithoutCvScanAssessmentsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvScanAssessmentsInput = {
@@ -4725,6 +5012,7 @@ export type UserAccountUpdateWithoutCvScanAssessmentsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvScanAssessmentsInput = {
@@ -4767,6 +5055,7 @@ export type UserAccountUncheckedUpdateWithoutCvScanAssessmentsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutCvExtractionsInput = {
@@ -4809,6 +5098,7 @@ export type UserAccountCreateWithoutCvExtractionsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvExtractionsInput = {
@@ -4851,6 +5141,7 @@ export type UserAccountUncheckedCreateWithoutCvExtractionsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvExtractionsInput = {
@@ -4909,6 +5200,7 @@ export type UserAccountUpdateWithoutCvExtractionsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvExtractionsInput = {
@@ -4951,6 +5243,7 @@ export type UserAccountUncheckedUpdateWithoutCvExtractionsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutCvParseJobsInput = {
@@ -4993,6 +5286,7 @@ export type UserAccountCreateWithoutCvParseJobsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvParseJobsInput = {
@@ -5035,6 +5329,7 @@ export type UserAccountUncheckedCreateWithoutCvParseJobsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvParseJobsInput = {
@@ -5093,6 +5388,7 @@ export type UserAccountUpdateWithoutCvParseJobsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvParseJobsInput = {
@@ -5135,6 +5431,7 @@ export type UserAccountUncheckedUpdateWithoutCvParseJobsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutCvRetryRequestsInput = {
@@ -5177,6 +5474,7 @@ export type UserAccountCreateWithoutCvRetryRequestsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvRetryRequestsInput = {
@@ -5219,6 +5517,7 @@ export type UserAccountUncheckedCreateWithoutCvRetryRequestsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvRetryRequestsInput = {
@@ -5277,6 +5576,7 @@ export type UserAccountUpdateWithoutCvRetryRequestsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvRetryRequestsInput = {
@@ -5319,6 +5619,7 @@ export type UserAccountUncheckedUpdateWithoutCvRetryRequestsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutCvDraftsInput = {
@@ -5361,6 +5662,7 @@ export type UserAccountCreateWithoutCvDraftsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvDraftsInput = {
@@ -5403,6 +5705,7 @@ export type UserAccountUncheckedCreateWithoutCvDraftsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvDraftsInput = {
@@ -5461,6 +5764,7 @@ export type UserAccountUpdateWithoutCvDraftsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvDraftsInput = {
@@ -5503,6 +5807,7 @@ export type UserAccountUncheckedUpdateWithoutCvDraftsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutCvConsentEventsInput = {
@@ -5545,6 +5850,7 @@ export type UserAccountCreateWithoutCvConsentEventsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvConsentEventsInput = {
@@ -5587,6 +5893,7 @@ export type UserAccountUncheckedCreateWithoutCvConsentEventsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvConsentEventsInput = {
@@ -5645,6 +5952,7 @@ export type UserAccountUpdateWithoutCvConsentEventsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvConsentEventsInput = {
@@ -5687,6 +5995,7 @@ export type UserAccountUncheckedUpdateWithoutCvConsentEventsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutCvConfirmationsInput = {
@@ -5729,6 +6038,7 @@ export type UserAccountCreateWithoutCvConfirmationsInput = {
   cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvConfirmationsInput = {
@@ -5771,6 +6081,7 @@ export type UserAccountUncheckedCreateWithoutCvConfirmationsInput = {
   cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvConfirmationsInput = {
@@ -5829,6 +6140,7 @@ export type UserAccountUpdateWithoutCvConfirmationsInput = {
   cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvConfirmationsInput = {
@@ -5871,6 +6183,7 @@ export type UserAccountUncheckedUpdateWithoutCvConfirmationsInput = {
   cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutImageSearchQueriesInput = {
@@ -5913,6 +6226,7 @@ export type UserAccountCreateWithoutImageSearchQueriesInput = {
   cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutImageSearchQueriesInput = {
@@ -5955,6 +6269,7 @@ export type UserAccountUncheckedCreateWithoutImageSearchQueriesInput = {
   cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutImageSearchQueriesInput = {
@@ -6013,6 +6328,7 @@ export type UserAccountUpdateWithoutImageSearchQueriesInput = {
   cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutImageSearchQueriesInput = {
@@ -6055,6 +6371,7 @@ export type UserAccountUncheckedUpdateWithoutImageSearchQueriesInput = {
   cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountCreateWithoutImageSearchConsentsInput = {
@@ -6097,6 +6414,7 @@ export type UserAccountCreateWithoutImageSearchConsentsInput = {
   cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountUncheckedCreateWithoutImageSearchConsentsInput = {
@@ -6139,6 +6457,7 @@ export type UserAccountUncheckedCreateWithoutImageSearchConsentsInput = {
   cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserAccountCreateOrConnectWithoutImageSearchConsentsInput = {
@@ -6197,6 +6516,7 @@ export type UserAccountUpdateWithoutImageSearchConsentsInput = {
   cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutImageSearchConsentsInput = {
@@ -6239,6 +6559,7 @@ export type UserAccountUncheckedUpdateWithoutImageSearchConsentsInput = {
   cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -6270,6 +6591,7 @@ export type UserAccountCountOutputType = {
   cvConfirmations: number
   imageSearchQueries: number
   imageSearchConsents: number
+  companyMemberships: number
 }
 
 export type UserAccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -6296,6 +6618,7 @@ export type UserAccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   cvConfirmations?: boolean | UserAccountCountOutputTypeCountCvConfirmationsArgs
   imageSearchQueries?: boolean | UserAccountCountOutputTypeCountImageSearchQueriesArgs
   imageSearchConsents?: boolean | UserAccountCountOutputTypeCountImageSearchConsentsArgs
+  companyMemberships?: boolean | UserAccountCountOutputTypeCountCompanyMembershipsArgs
 }
 
 /**
@@ -6469,6 +6792,13 @@ export type UserAccountCountOutputTypeCountImageSearchConsentsArgs<ExtArgs exten
   where?: Prisma.SearchProcessingConsentWhereInput
 }
 
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountCompanyMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CompanyMembershipWhereInput
+}
+
 
 export type UserAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -6511,6 +6841,7 @@ export type UserAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   cvConfirmations?: boolean | Prisma.UserAccount$cvConfirmationsArgs<ExtArgs>
   imageSearchQueries?: boolean | Prisma.UserAccount$imageSearchQueriesArgs<ExtArgs>
   imageSearchConsents?: boolean | Prisma.UserAccount$imageSearchConsentsArgs<ExtArgs>
+  companyMemberships?: boolean | Prisma.UserAccount$companyMembershipsArgs<ExtArgs>
   _count?: boolean | Prisma.UserAccountCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userAccount"]>
 
@@ -6589,6 +6920,7 @@ export type UserAccountInclude<ExtArgs extends runtime.Types.Extensions.Internal
   cvConfirmations?: boolean | Prisma.UserAccount$cvConfirmationsArgs<ExtArgs>
   imageSearchQueries?: boolean | Prisma.UserAccount$imageSearchQueriesArgs<ExtArgs>
   imageSearchConsents?: boolean | Prisma.UserAccount$imageSearchConsentsArgs<ExtArgs>
+  companyMemberships?: boolean | Prisma.UserAccount$companyMembershipsArgs<ExtArgs>
   _count?: boolean | Prisma.UserAccountCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserAccountIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -6625,6 +6957,7 @@ export type $UserAccountPayload<ExtArgs extends runtime.Types.Extensions.Interna
     cvConfirmations: Prisma.$CvImportConfirmationPayload<ExtArgs>[]
     imageSearchQueries: Prisma.$SearchImageQueryPayload<ExtArgs>[]
     imageSearchConsents: Prisma.$SearchProcessingConsentPayload<ExtArgs>[]
+    companyMemberships: Prisma.$CompanyMembershipPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -7061,6 +7394,7 @@ export interface Prisma__UserAccountClient<T, Null = never, ExtArgs extends runt
   cvConfirmations<T extends Prisma.UserAccount$cvConfirmationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$cvConfirmationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CvImportConfirmationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   imageSearchQueries<T extends Prisma.UserAccount$imageSearchQueriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$imageSearchQueriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SearchImageQueryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   imageSearchConsents<T extends Prisma.UserAccount$imageSearchConsentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$imageSearchConsentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SearchProcessingConsentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  companyMemberships<T extends Prisma.UserAccount$companyMembershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$companyMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CompanyMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8139,6 +8473,30 @@ export type UserAccount$imageSearchConsentsArgs<ExtArgs extends runtime.Types.Ex
   take?: number
   skip?: number
   distinct?: Prisma.SearchProcessingConsentScalarFieldEnum | Prisma.SearchProcessingConsentScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.companyMemberships
+ */
+export type UserAccount$companyMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CompanyMembership
+   */
+  select?: Prisma.CompanyMembershipSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CompanyMembership
+   */
+  omit?: Prisma.CompanyMembershipOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CompanyMembershipInclude<ExtArgs> | null
+  where?: Prisma.CompanyMembershipWhereInput
+  orderBy?: Prisma.CompanyMembershipOrderByWithRelationInput | Prisma.CompanyMembershipOrderByWithRelationInput[]
+  cursor?: Prisma.CompanyMembershipWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CompanyMembershipScalarFieldEnum | Prisma.CompanyMembershipScalarFieldEnum[]
 }
 
 /**

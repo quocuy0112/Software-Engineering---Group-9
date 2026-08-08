@@ -111,7 +111,8 @@ export const EmailKind = {
   EMAIL_CHANGE_VERIFY: 'EMAIL_CHANGE_VERIFY',
   RESET_PASSWORD: 'RESET_PASSWORD',
   PASSWORD_CHANGED: 'PASSWORD_CHANGED',
-  SECURITY_ALERT: 'SECURITY_ALERT'
+  SECURITY_ALERT: 'SECURITY_ALERT',
+  APPLICATION_STAGE_CHANGED: 'APPLICATION_STAGE_CHANGED'
 } as const
 
 export type EmailKind = (typeof EmailKind)[keyof typeof EmailKind]
@@ -269,6 +270,17 @@ export const ApplicationStage = {
 export type ApplicationStage = (typeof ApplicationStage)[keyof typeof ApplicationStage]
 
 
+export const ApplicationScoringStatus = {
+  NOT_REQUESTED: 'NOT_REQUESTED',
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+} as const
+
+export type ApplicationScoringStatus = (typeof ApplicationScoringStatus)[keyof typeof ApplicationScoringStatus]
+
+
 export const RecruitmentNotificationAudience = {
   CANDIDATE: 'CANDIDATE',
   COMPANY: 'COMPANY'
@@ -279,10 +291,38 @@ export type RecruitmentNotificationAudience = (typeof RecruitmentNotificationAud
 
 export const RecruitmentNotificationKind = {
   APPLICATION_SUBMITTED: 'APPLICATION_SUBMITTED',
-  APPLICATION_RECEIVED: 'APPLICATION_RECEIVED'
+  APPLICATION_RECEIVED: 'APPLICATION_RECEIVED',
+  APPLICATION_STAGE_CHANGED: 'APPLICATION_STAGE_CHANGED'
 } as const
 
 export type RecruitmentNotificationKind = (typeof RecruitmentNotificationKind)[keyof typeof RecruitmentNotificationKind]
+
+
+export const CompanyMembershipRole = {
+  OWNER: 'OWNER',
+  HR_MANAGER: 'HR_MANAGER',
+  RECRUITER: 'RECRUITER',
+  HIRING_MANAGER: 'HIRING_MANAGER'
+} as const
+
+export type CompanyMembershipRole = (typeof CompanyMembershipRole)[keyof typeof CompanyMembershipRole]
+
+
+export const CompanyMembershipStatus = {
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED'
+} as const
+
+export type CompanyMembershipStatus = (typeof CompanyMembershipStatus)[keyof typeof CompanyMembershipStatus]
+
+
+export const ApplicationStageActorType = {
+  CANDIDATE: 'CANDIDATE',
+  RECRUITER: 'RECRUITER',
+  SYSTEM_MIGRATION: 'SYSTEM_MIGRATION'
+} as const
+
+export type ApplicationStageActorType = (typeof ApplicationStageActorType)[keyof typeof ApplicationStageActorType]
 
 
 export const CvDocumentKind = {

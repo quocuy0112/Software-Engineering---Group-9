@@ -83,6 +83,7 @@ enum EmailKind {
   RESET_PASSWORD
   PASSWORD_CHANGED
   SECURITY_ALERT
+  APPLICATION_STAGE_CHANGED
 }
 
 enum PreferenceLanguage {
@@ -195,6 +196,14 @@ enum ApplicationStage {
   WAITLISTED
 }
 
+enum ApplicationScoringStatus {
+  NOT_REQUESTED
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
 enum RecruitmentNotificationAudience {
   CANDIDATE
   COMPANY
@@ -203,6 +212,25 @@ enum RecruitmentNotificationAudience {
 enum RecruitmentNotificationKind {
   APPLICATION_SUBMITTED
   APPLICATION_RECEIVED
+  APPLICATION_STAGE_CHANGED
+}
+
+enum CompanyMembershipRole {
+  OWNER
+  HR_MANAGER
+  RECRUITER
+  HIRING_MANAGER
+}
+
+enum CompanyMembershipStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum ApplicationStageActorType {
+  CANDIDATE
+  RECRUITER
+  SYSTEM_MIGRATION
 }
 
 enum CvDocumentKind {
@@ -479,6 +507,7 @@ model UserAccount {
   cvConfirmations               CvImportConfirmation[]
   imageSearchQueries            SearchImageQuery[]
   imageSearchConsents           SearchProcessingConsent[]
+  companyMemberships            CompanyMembership[]
 
   @@index([state, id])
   @@map("user")
@@ -927,8 +956,8 @@ model AuditEvent {
 }
 
 model Company {
-  id                String       @id @default(cuid())
-  slug              String       @unique
+  id                String              @id @default(cuid())
+  slug              String              @unique
   legalName         String
   displayName       String
   logoUrl           String?
@@ -939,11 +968,28 @@ model Company {
   industry          String?
   address           String?
   verifiedAt        DateTime?
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
   jobPostings       JobPosting[]
+  memberships       CompanyMembership[]
 
   @@index([verifiedAt, id])
+}
+
+model CompanyMembership {
+  id        String                  @id @default(cuid())
+  companyId String
+  userId    String
+  role      CompanyMembershipRole
+  status    CompanyMembershipStatus @default(ACTIVE)
+  createdAt DateTime                @default(now())
+  updatedAt DateTime                @updatedAt
+  company   Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user      UserAccount             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, userId])
+  @@index([userId, status])
+  @@index([companyId, role, status])
 }
 
 model JobPosting {
@@ -1091,7 +1137,10 @@ model JobApplication {
   contactSnapshot         Json?
   aiAnalysisConsent       Boolean                       @default(false)
   aiMatchScore            Int?
+  scoringStatus           ApplicationScoringStatus      @default(NOT_REQUESTED)
   stage                   ApplicationStage              @default(APPLIED)
+  stageVersion            Int                           @default(1)
+  lastStageChangedAt      DateTime                      @default(now())
   coverLetter             String?
   profileSnapshot         Json
   cvSnapshot              Json
@@ -1108,12 +1157,33 @@ model JobApplication {
   selectedCv              CandidateCv                   @relation(fields: [selectedCvId], references: [id], onDelete: Restrict)
   answers                 ApplicationAnswer[]
   notificationWork        RecruitmentNotificationWork[]
+  stageEvents             ApplicationStageEvent[]
 
   @@unique([candidateUserId, jobPostingId])
   @@unique([candidateUserId, idempotencyKey])
   @@index([jobPostingId, stage, submittedAt])
   @@index([candidateUserId, submittedAt(sort: Desc)])
   @@index([candidateUserId, aiAnalysisConsent])
+}
+
+model ApplicationStageEvent {
+  id                     String                    @id @default(cuid())
+  applicationId          String
+  fromStage              ApplicationStage?
+  toStage                ApplicationStage
+  actorUserId            String?
+  actorType              ApplicationStageActorType
+  reasonCode             String?
+  candidateVisibleReason String?
+  candidateVisible       Boolean                   @default(true)
+  occurredAt             DateTime                  @default(now())
+  applicationVersion     Int
+  metadata               Json?
+  application            JobApplication            @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@unique([applicationId, applicationVersion])
+  @@index([applicationId, occurredAt, id])
+  @@index([actorUserId, occurredAt])
 }
 
 model ApplicationAnswer {
@@ -1146,7 +1216,6 @@ model RecruitmentNotificationWork {
   updatedAt       DateTime                        @updatedAt
   application     JobApplication                  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 
-  @@unique([applicationId, audience, kind])
   @@index([status, nextAttemptAt])
   @@index([applicationId])
 }
@@ -1726,8 +1795,8 @@ model SearchProcessingConsent {
   supersededBy               SearchProcessingConsent[] @relation("SearchConsentChain")
   intentAttempts             SearchIntentAttempt[]
 
-  @@index([queryId, occurredAt(sort: Desc)])
   @@unique([queryId, idempotencyDigest])
+  @@index([queryId, occurredAt(sort: Desc)])
   @@index([accountId, occurredAt(sort: Desc)])
   @@index([supersedesConsentId])
 }

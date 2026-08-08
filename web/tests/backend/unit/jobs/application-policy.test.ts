@@ -130,6 +130,20 @@ describe("application submission policy", () => {
     ).not.toThrow();
   });
 
+  it("accepts an empty optional profile headline", () => {
+    expect(() =>
+      prepareApplicationSubmission(
+        {
+          ...context,
+          candidate: { ...context.candidate, headline: null },
+        },
+        command,
+        "2026-08-01",
+        now,
+      ),
+    ).not.toThrow();
+  });
+
   it("rejects foreign, unconfirmed, archived, or oversized CVs", () => {
     expect(() =>
       prepareApplicationSubmission(

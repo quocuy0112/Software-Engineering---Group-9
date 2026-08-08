@@ -1,7 +1,6 @@
 import { z } from "zod";
 import {
   defaultJobPreferences,
-  jobApplicationStatusSchema,
   jobPreferencesSchema,
   jobPreferencesUpdateSchema,
   type JobPreferences,
@@ -103,30 +102,11 @@ export const companyCatalogSchema = z
   })
   .strict();
 
-export const appliedJobStateSchema = z
-  .object({
-    jobId: z.string().min(1).max(128),
-    appliedAt: z.string().datetime(),
-    status: jobApplicationStatusSchema.default("submitted"),
-    cvFileRef: z.string().min(1).max(256).nullable().optional(),
-    contactSnapshot: z
-      .object({
-        fullName: z.string().trim().min(1).max(150),
-        email: z.string().trim().email().max(254),
-        phone: z.string().trim().min(9).max(20),
-      })
-      .strict(),
-    aiAnalysisConsent: z.boolean(),
-    aiMatchScore: z.number().int().min(0).max(100).nullable().optional(),
-  })
-  .strict();
-
 export const userJobStateSchema = z
   .object({
     userId: z.string().min(1).max(128),
     savedJobIds: z.array(z.string().min(1).max(128)).max(10_000),
     hiddenJobIds: z.array(z.string().min(1).max(128)).max(10_000),
-    appliedJobs: z.array(appliedJobStateSchema).max(10_000),
     jobPreferences: jobPreferencesSchema.default(defaultJobPreferences),
     savedFilterPresets: z
       .array(
@@ -146,12 +126,10 @@ export const userJobStateViewSchema = z
   .object({
     savedJobIds: z.array(z.string().min(1).max(128)).max(10_000),
     hiddenJobIds: z.array(z.string().min(1).max(128)).max(10_000),
-    appliedJobIds: z.array(z.string().min(1).max(128)).max(10_000),
   })
   .strict();
 export type JobCatalogItem = z.infer<typeof jobCatalogSchema>;
 export type CompanyCatalogItem = z.infer<typeof companyCatalogSchema>;
 export type UserJobState = z.infer<typeof userJobStateSchema>;
-export type AppliedJobState = z.infer<typeof appliedJobStateSchema>;
 export type { JobPreferences };
 export { jobPreferencesSchema, jobPreferencesUpdateSchema };

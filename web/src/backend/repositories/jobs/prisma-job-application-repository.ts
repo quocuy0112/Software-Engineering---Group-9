@@ -163,7 +163,6 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
     if (!candidate || !job) return null;
     const missingProfileFields = [
       !candidate.user.name.trim() ? "name" : null,
-      !candidate.profile?.headline?.trim() ? "headline" : null,
       !candidate.profile?.location?.trim() ? "location" : null,
     ].filter((field): field is string => field !== null);
     return {
@@ -367,6 +366,9 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
                 : undefined,
               aiAnalysisConsent: input.command.aiAnalysisConsent ?? false,
               aiMatchScore: input.command.aiAnalysisConsent ? 82 : null,
+              scoringStatus: input.command.aiAnalysisConsent
+                ? "COMPLETED"
+                : "NOT_REQUESTED",
               stage: "APPLIED",
               coverLetter: prepared.coverLetter,
               profileSnapshot:
@@ -378,6 +380,8 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
               idempotencyKey: input.idempotencyKey,
               submissionBindingDigest: input.submissionBindingDigest,
               submittedAt: input.occurredAt,
+              stageVersion: 1,
+              lastStageChangedAt: input.occurredAt,
               answers: {
                 create: prepared.answers.map((answer) => ({
                   questionId: answer.questionId,
@@ -385,6 +389,18 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
                     answer.questionSnapshot as Prisma.InputJsonValue,
                   answer: answer.answer as Prisma.InputJsonValue,
                 })),
+              },
+              stageEvents: {
+                create: {
+                  fromStage: null,
+                  toStage: "APPLIED",
+                  actorUserId: input.candidateUserId,
+                  actorType: "CANDIDATE",
+                  candidateVisible: true,
+                  occurredAt: input.occurredAt,
+                  applicationVersion: 1,
+                  metadata: { v: 1, source: "application-submission" },
+                },
               },
               notificationWork: {
                 create: [

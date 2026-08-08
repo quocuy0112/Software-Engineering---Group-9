@@ -49,6 +49,7 @@ export const authenticationAuditAction = z.enum([
   "job.report.submitted",
   "job.report.denied",
   "job.application.submitted",
+  "job.application.stage_changed",
   "job.application.denied",
   "job.application.failed",
   "cv_import.reserved",
@@ -108,6 +109,9 @@ const auditContextSchema = z
     automaticSessionCreated: z.boolean().optional(),
     duplicate: z.boolean().optional(),
     notificationWorkCount: z.number().int().nonnegative().optional(),
+    fromStage: z.string().max(40).optional(),
+    toStage: z.string().max(40).optional(),
+    applicationVersion: z.number().int().positive().optional(),
     parserClass: z
       .enum(["DETERMINISTIC_INTERNAL", "EXTERNAL_OPENAI"])
       .optional(),
