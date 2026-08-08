@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useWorkspaceLocale } from "../client/workspace-locale";
 
 export function WorkspaceNavigation({
   busy,
@@ -13,31 +14,58 @@ export function WorkspaceNavigation({
   collapsed: boolean;
   onSignOut: () => void;
 }) {
-  const copy = {
-    dashboard: "Dashboard",
-    jobs: "Jobs",
-    profile: "Profile",
-    workspace: "Candidate workspace",
-    openMenu: "Open workspace menu",
-    closeMenu: "Close workspace menu",
-    signOut: "Sign out",
-    signingOut: "Signing out…",
-  };
+  const locale = useWorkspaceLocale();
+  const copy =
+    locale === "vi"
+      ? {
+          dashboard: "Bảng điều khiển",
+          jobs: "Việc làm",
+          profile: "Hồ sơ",
+          workspace: "Không gian ứng viên",
+          openMenu: "Mở menu không gian làm việc",
+          closeMenu: "Đóng menu không gian làm việc",
+          signOut: "Đăng xuất",
+          signingOut: "Đang đăng xuất…",
+          savedJobs: "Việc đã lưu",
+          appliedJobs: "Việc đã ứng tuyển",
+          suggestedJobs: "Việc làm đề xuất",
+          recommendationSettings: "Cài đặt gợi ý việc làm",
+        }
+      : {
+          dashboard: "Dashboard",
+          jobs: "Jobs",
+          profile: "Profile",
+          workspace: "Candidate workspace",
+          openMenu: "Open workspace menu",
+          closeMenu: "Close workspace menu",
+          signOut: "Sign out",
+          signingOut: "Signing out…",
+          savedJobs: "Saved Jobs",
+          appliedJobs: "Applied Jobs",
+          suggestedJobs: "Suggested Jobs",
+          recommendationSettings: "Job Recommendation Settings",
+        };
   const destinations = [
     { href: "/dashboard", label: copy.dashboard, icon: "dashboard" },
     { href: "/jobs", label: copy.jobs, icon: "jobs" },
     { href: "/profile", label: copy.profile, icon: "profile" },
   ] as const;
   const jobsSubnav = [
-    { href: "/jobs/saved", label: "Saved Jobs" },
+    {
+      href: "/jobs/saved",
+      label: copy.savedJobs,
+    },
     {
       href: "/jobs/applied",
-      label: "Applied Jobs",
+      label: copy.appliedJobs,
     },
-    { href: "/jobs/matches", label: "Suggested Jobs" },
+    {
+      href: "/jobs/matches",
+      label: copy.suggestedJobs,
+    },
     {
       href: "/jobs/settings",
-      label: "Job Recommendation Settings",
+      label: copy.recommendationSettings,
     },
   ] as const;
   const pathname = usePathname() ?? "/";

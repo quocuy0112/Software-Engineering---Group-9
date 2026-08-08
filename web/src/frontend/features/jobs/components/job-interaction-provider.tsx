@@ -14,14 +14,12 @@ import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-pro
 import { savedJobOutcomeSchema } from "@/shared/contracts/jobs/actions";
 import {
   userJobStateViewSchema,
-  type AppliedJobState,
   type UserJobState,
 } from "@/shared/contracts/jobs/catalog";
 
 export type JobInteractionSeed = {
   saved: boolean;
   applied: boolean;
-  appliedJob?: AppliedJobState;
   hidden?: boolean;
 };
 
@@ -38,7 +36,7 @@ type JobInteractionContextValue = {
   records: Record<string, JobInteractionRecord>;
   registerJob: (jobId: string, seed: JobInteractionSeed) => void;
   toggleSaved: (jobId: string) => Promise<boolean>;
-  markApplied: (jobId: string, appliedJob?: AppliedJobState) => void;
+  markApplied: (jobId: string) => void;
   hideJob: (jobId: string) => void;
   undoHide: (jobId: string) => void;
   savedFilterPresets: FilterPreset[];
@@ -98,12 +96,8 @@ export function JobInteractionProvider({
       if (!active || !view) return;
       setRecords((current) => {
         const next = { ...current };
-        const ids = new Set([
-          ...Object.keys(current),
-          ...view.savedJobIds,
-          ...view.hiddenJobIds,
-          ...view.appliedJobIds,
-        ]);
+        let changed = false;
+        const ids = new Set([...view.savedJobIds, ...view.hiddenJobIds]);
         for (const jobId of ids) {
           const existing = next[jobId] ?? {
             saved: false,
@@ -112,12 +106,9 @@ export function JobInteractionProvider({
           };
           const updated = {
             ...existing,
-            saved: view.savedJobIds.includes(jobId),
-            applied: view.appliedJobIds.includes(jobId),
-            appliedJob: view.appliedJobIds.includes(jobId)
-              ? existing.appliedJob
-              : undefined,
-            hidden: view.hiddenJobIds.includes(jobId),
+            saved: existing.saved || view.savedJobIds.includes(jobId),
+            applied: existing.applied,
+            hidden: existing.hidden || view.hiddenJobIds.includes(jobId),
           };
           next[jobId] = updated;
         }
@@ -137,7 +128,6 @@ export function JobInteractionProvider({
         [jobId]: {
           saved: seed.saved,
           applied: seed.applied,
-          appliedJob: seed.appliedJob,
           hidden: seed.hidden ?? false,
         },
       };
@@ -167,7 +157,6 @@ export function JobInteractionProvider({
         [jobId]: {
           saved: outcome.saved,
           applied: state[jobId]?.applied ?? false,
-          appliedJob: state[jobId]?.appliedJob,
           hidden: state[jobId]?.hidden ?? false,
         },
       }));
@@ -177,20 +166,16 @@ export function JobInteractionProvider({
     [csrfProof, records],
   );
 
-  const markApplied = useCallback(
-    (jobId: string, appliedJob?: AppliedJobState) => {
-      setRecords((state) => ({
-        ...state,
-        [jobId]: {
-          saved: state[jobId]?.saved ?? false,
-          applied: true,
-          appliedJob: appliedJob ?? state[jobId]?.appliedJob,
-          hidden: state[jobId]?.hidden ?? false,
-        },
-      }));
-    },
-    [],
-  );
+  const markApplied = useCallback((jobId: string) => {
+    setRecords((state) => ({
+      ...state,
+      [jobId]: {
+        saved: state[jobId]?.saved ?? false,
+        applied: true,
+        hidden: state[jobId]?.hidden ?? false,
+      },
+    }));
+  }, []);
 
   const undoHide = useCallback(
     (jobId: string) => {
@@ -199,7 +184,6 @@ export function JobInteractionProvider({
         [jobId]: {
           saved: state[jobId]?.saved ?? false,
           applied: state[jobId]?.applied ?? false,
-          appliedJob: state[jobId]?.appliedJob,
           hidden: false,
         },
       }));
@@ -217,7 +201,6 @@ export function JobInteractionProvider({
         [jobId]: {
           saved: state[jobId]?.saved ?? false,
           applied: state[jobId]?.applied ?? false,
-          appliedJob: state[jobId]?.appliedJob,
           hidden: true,
         },
       }));
@@ -288,7 +271,7 @@ export function useJobInteraction(
   seed: JobInteractionSeed,
 ): JobInteractionRecord & {
   toggleSaved: () => Promise<boolean>;
-  markApplied: (appliedJob?: AppliedJobState) => void;
+  markApplied: () => void;
   hide: () => void;
   undoHide: () => void;
 } {
@@ -304,29 +287,20 @@ export function useJobInteraction(
     registerJob(jobId, {
       saved: seed.saved,
       applied: seed.applied,
-      appliedJob: seed.appliedJob,
       hidden: seed.hidden,
     });
-  }, [
-    jobId,
-    registerJob,
-    seed.applied,
-    seed.appliedJob,
-    seed.hidden,
-    seed.saved,
-  ]);
+  }, [jobId, registerJob, seed.applied, seed.hidden, seed.saved]);
 
   const record = context.records[jobId] ?? {
     saved: seed.saved,
     applied: seed.applied,
-    appliedJob: seed.appliedJob,
     hidden: seed.hidden ?? false,
   };
 
   return {
     ...record,
     toggleSaved: () => context.toggleSaved(jobId),
-    markApplied: (appliedJob) => context.markApplied(jobId, appliedJob),
+    markApplied: () => context.markApplied(jobId),
     hide: () => context.hideJob(jobId),
     undoHide: () => context.undoHide(jobId),
   };

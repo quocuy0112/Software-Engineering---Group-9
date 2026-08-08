@@ -39,7 +39,6 @@ describe("save job action", () => {
         json: async () => ({
           savedJobIds: ["job-1"],
           hiddenJobIds: [],
-          appliedJobIds: [],
         }),
       }),
     );

@@ -10,15 +10,6 @@ export const jobExperiencePreferenceSchema = z.enum([
   "5_plus_years",
 ]);
 
-export const jobApplicationStatusSchema = z.enum([
-  "submitted",
-  "viewed",
-  "screening",
-  "considering",
-  "matched",
-  "not_fit",
-]);
-
 export const jobPreferencesSchema = z
   .object({
     gender: jobGenderSchema,
@@ -46,7 +37,6 @@ export type JobGender = z.infer<typeof jobGenderSchema>;
 export type JobExperiencePreference = z.infer<
   typeof jobExperiencePreferenceSchema
 >;
-export type JobApplicationStatus = z.infer<typeof jobApplicationStatusSchema>;
 export type JobPreferences = z.infer<typeof jobPreferencesSchema>;
 
 export const defaultJobPreferences: JobPreferences = {
@@ -72,16 +62,6 @@ export const jobExperiencePreferenceOptions: ReadonlyArray<{
   { value: "3_5_years", label: "3-5 years" },
   { value: "5_plus_years", label: "5+ years" },
 ];
-
-export const jobApplicationStatusLabels: Record<JobApplicationStatus, string> =
-  {
-    submitted: "Received",
-    viewed: "Viewed",
-    screening: "Screening",
-    considering: "Considering",
-    matched: "Matched",
-    not_fit: "Not a fit",
-  };
 
 /** The 63-province list used by the candidate-facing location selector. */
 export const VIETNAM_PROVINCES_63 = [

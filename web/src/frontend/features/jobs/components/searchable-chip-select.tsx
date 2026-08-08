@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 
 export type SearchableChipOption = {
   value: string;
@@ -31,6 +32,25 @@ export function SearchableChipSelect({
   allowCustom?: boolean;
   required?: boolean;
 }) {
+  const locale = useWorkspaceLocale();
+  const copy =
+    locale === "vi"
+      ? {
+          limit: "Đã đạt giới hạn lựa chọn",
+          suggestions: "gợi ý",
+          add: "Thêm",
+          empty: "Không tìm thấy kết quả.",
+          remove: "Xóa",
+          selected: "đã chọn",
+        }
+      : {
+          limit: "Selection limit reached",
+          suggestions: "suggestions",
+          add: "Add",
+          empty: "No matches found.",
+          remove: "Remove",
+          selected: "selected",
+        };
   const fieldRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -128,7 +148,7 @@ export function SearchableChipSelect({
           aria-required={required || undefined}
           autoComplete="off"
           disabled={disabled}
-          placeholder={disabled ? "Selection limit reached" : placeholder}
+          placeholder={disabled ? copy.limit : placeholder}
           value={query}
           onFocus={() => setOpen(true)}
           onChange={(event) => {
@@ -148,7 +168,7 @@ export function SearchableChipSelect({
           id={id + "-options"}
           className="searchable-chip-options"
           role="listbox"
-          aria-label={label + " suggestions"}
+          aria-label={label + " " + copy.suggestions}
         >
           {customValue ? (
             <button
@@ -157,7 +177,7 @@ export function SearchableChipSelect({
               className="searchable-chip-option searchable-chip-option--custom"
               onClick={() => select(customValue)}
             >
-              Add &quot;{customValue}&quot;
+              {copy.add} &quot;{customValue}&quot;
             </button>
           ) : null}
           {filteredOptions.map((option) => (
@@ -172,7 +192,7 @@ export function SearchableChipSelect({
             </button>
           ))}
           {!customValue && !filteredOptions.length ? (
-            <p className="searchable-chip-empty">No matches found.</p>
+            <p className="searchable-chip-empty">{copy.empty}</p>
           ) : null}
         </div>
       ) : null}
@@ -183,7 +203,7 @@ export function SearchableChipSelect({
               <span>{labels.get(value) ?? value}</span>
               <button
                 type="button"
-                aria-label={"Remove " + (labels.get(value) ?? value)}
+                aria-label={copy.remove + " " + (labels.get(value) ?? value)}
                 onClick={() => remove(value)}
               >
                 ×
@@ -196,7 +216,8 @@ export function SearchableChipSelect({
         {String(selectedValues.length) +
           "/" +
           String(maximum) +
-          " selected" +
+          " " +
+          copy.selected +
           (helperText ? " \u00b7 " + helperText : "")}
       </small>
     </div>

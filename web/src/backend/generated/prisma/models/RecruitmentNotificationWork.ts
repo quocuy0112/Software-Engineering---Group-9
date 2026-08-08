@@ -299,7 +299,6 @@ export type RecruitmentNotificationWorkOrderByWithRelationInput = {
 export type RecruitmentNotificationWorkWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   idempotencyKey?: string
-  applicationId_audience_kind?: Prisma.RecruitmentNotificationWorkApplicationIdAudienceKindCompoundUniqueInput
   AND?: Prisma.RecruitmentNotificationWorkWhereInput | Prisma.RecruitmentNotificationWorkWhereInput[]
   OR?: Prisma.RecruitmentNotificationWorkWhereInput[]
   NOT?: Prisma.RecruitmentNotificationWorkWhereInput | Prisma.RecruitmentNotificationWorkWhereInput[]
@@ -315,7 +314,7 @@ export type RecruitmentNotificationWorkWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"RecruitmentNotificationWork"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"RecruitmentNotificationWork"> | Date | string
   application?: Prisma.XOR<Prisma.JobApplicationScalarRelationFilter, Prisma.JobApplicationWhereInput>
-}, "id" | "idempotencyKey" | "applicationId_audience_kind">
+}, "id" | "idempotencyKey">
 
 export type RecruitmentNotificationWorkOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -476,12 +475,6 @@ export type RecruitmentNotificationWorkListRelationFilter = {
 
 export type RecruitmentNotificationWorkOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
-}
-
-export type RecruitmentNotificationWorkApplicationIdAudienceKindCompoundUniqueInput = {
-  applicationId: string
-  audience: $Enums.RecruitmentNotificationAudience
-  kind: $Enums.RecruitmentNotificationKind
 }
 
 export type RecruitmentNotificationWorkCountOrderByAggregateInput = {

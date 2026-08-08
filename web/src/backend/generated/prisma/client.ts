@@ -167,6 +167,11 @@ export type AuditEvent = Prisma.AuditEventModel
  */
 export type Company = Prisma.CompanyModel
 /**
+ * Model CompanyMembership
+ * 
+ */
+export type CompanyMembership = Prisma.CompanyMembershipModel
+/**
  * Model JobPosting
  * 
  */
@@ -201,6 +206,11 @@ export type JobReport = Prisma.JobReportModel
  * 
  */
 export type JobApplication = Prisma.JobApplicationModel
+/**
+ * Model ApplicationStageEvent
+ * 
+ */
+export type ApplicationStageEvent = Prisma.ApplicationStageEventModel
 /**
  * Model ApplicationAnswer
  * 

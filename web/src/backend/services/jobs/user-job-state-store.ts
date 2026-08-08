@@ -1,11 +1,8 @@
 import "server-only";
 
-import { Prisma } from "@/backend/generated/prisma/client";
 import { prisma } from "@/backend/database/prisma";
-import { applicationContactSnapshotSchema } from "@/shared/contracts/jobs/actions";
+import type { Prisma } from "@/backend/generated/prisma/client";
 import {
-  appliedJobStateSchema,
-  type AppliedJobState,
   type JobPreferences,
   type UserJobState,
   userJobStateSchema,
@@ -34,102 +31,18 @@ export type UserJobStateMutation =
   | { action: "unsave"; jobId: string }
   | { action: "hide"; jobId: string }
   | { action: "unhide"; jobId: string }
-  | { action: "update-preferences"; jobPreferences: JobPreferences }
-  | { action: "apply"; jobId: string; appliedJob: AppliedJobState };
-
-function applicationStatus(stage: string): AppliedJobState["status"] {
-  switch (stage) {
-    case "VIEWED":
-      return "viewed";
-    case "SHORTLISTED":
-    case "INTERVIEWING":
-    case "OFFERED":
-    case "HIRED":
-      return "considering";
-    case "WAITLISTED":
-      return "matched";
-    case "OFFER_DECLINED":
-    case "REJECTED":
-      return "not_fit";
-    default:
-      return "submitted";
-  }
-}
-
-type CandidateContact = {
-  name: string;
-  email: string;
-  phone: string | null;
-};
-
-function fallbackContactSnapshot(
-  candidate: CandidateContact | null,
-): AppliedJobState["contactSnapshot"] {
-  const parsed = applicationContactSnapshotSchema.safeParse({
-    fullName: candidate?.name?.trim() || "Candidate",
-    email: candidate?.email || "candidate@example.com",
-    phone: candidate?.phone?.trim() || "0900000000",
-  });
-  return parsed.success
-    ? parsed.data
-    : {
-        fullName: "Candidate",
-        email: "candidate@example.com",
-        phone: "0900000000",
-      };
-}
-
-function projectApplication(
-  row: {
-    jobPostingId: string;
-    submittedAt: Date;
-    stage: string;
-    cvFileRef: string | null;
-    contactSnapshot: unknown;
-    aiAnalysisConsent: boolean;
-    aiMatchScore: number | null;
-  },
-  candidate: CandidateContact | null,
-): AppliedJobState {
-  const contact = applicationContactSnapshotSchema.safeParse(
-    row.contactSnapshot,
-  );
-  return appliedJobStateSchema.parse({
-    jobId: row.jobPostingId,
-    appliedAt: row.submittedAt.toISOString(),
-    status: applicationStatus(row.stage),
-    cvFileRef: row.cvFileRef,
-    contactSnapshot: contact.success
-      ? contact.data
-      : fallbackContactSnapshot(candidate),
-    aiAnalysisConsent: row.aiAnalysisConsent,
-    aiMatchScore: row.aiMatchScore,
-  });
-}
+  | { action: "update-preferences"; jobPreferences: JobPreferences };
 
 function jsonValue(value: unknown): Prisma.InputJsonValue {
   return value as Prisma.InputJsonValue;
 }
 
 export async function readUserJobState(userId: string): Promise<UserJobState> {
-  const [savedJobs, applications, workspace, account] = await Promise.all([
+  const [savedJobs, workspace] = await Promise.all([
     prisma.savedJob.findMany({
       where: { userId },
       orderBy: [{ createdAt: "asc" }, { jobPostingId: "asc" }],
       select: { jobPostingId: true },
-    }),
-    prisma.jobApplication.findMany({
-      where: { candidateUserId: userId },
-      orderBy: [{ submittedAt: "desc" }, { id: "desc" }],
-      select: {
-        jobPostingId: true,
-        submittedAt: true,
-        stage: true,
-        cvFileRef: true,
-        contactSnapshot: true,
-        aiAnalysisConsent: true,
-        aiMatchScore: true,
-      },
     }),
     prisma.userJobWorkspaceState.findUnique({
       where: { userId },
@@ -139,25 +52,8 @@ export async function readUserJobState(userId: string): Promise<UserJobState> {
         savedFilterPresets: true,
       },
     }),
-    prisma.userAccount.findUnique({
-      where: { id: userId },
-      select: {
-        name: true,
-        email: true,
-        candidateIdentity: {
-          select: { profile: { select: { phone: true } } },
-        },
-      },
-    }),
   ]);
 
-  const candidate: CandidateContact | null = account
-    ? {
-        name: account.name,
-        email: account.email,
-        phone: account.candidateIdentity?.profile?.phone ?? null,
-      }
-    : null;
   const preferences = jobPreferencesSchema.safeParse(workspace?.jobPreferences);
   const hiddenJobIds = hiddenJobIdsSchema.safeParse(workspace?.hiddenJobIds);
   const savedFilterPresets = savedFilterPresetsSchema.safeParse(
@@ -168,9 +64,6 @@ export async function readUserJobState(userId: string): Promise<UserJobState> {
     userId,
     savedJobIds: savedJobs.map((job) => job.jobPostingId),
     hiddenJobIds: hiddenJobIds.success ? hiddenJobIds.data : [],
-    appliedJobs: applications.map((application) =>
-      projectApplication(application, candidate),
-    ),
     jobPreferences: preferences.success
       ? preferences.data
       : defaultJobPreferences,
@@ -184,7 +77,6 @@ export function projectUserJobState(state: UserJobState) {
   return {
     savedJobIds: state.savedJobIds,
     hiddenJobIds: state.hiddenJobIds,
-    appliedJobIds: state.appliedJobs.map((application) => application.jobId),
   };
 }
 
@@ -252,11 +144,6 @@ export async function updateUserJobState(
       });
       break;
     }
-    case "apply":
-      // Applications are written by the application submission service. Read
-      // the authoritative JobApplication rows below instead of mirroring a
-      // client payload into a second user-state store.
-      break;
   }
 
   return readUserJobState(userId);

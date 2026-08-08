@@ -76,6 +76,7 @@ export const ModelName = {
   EmailOutbox: 'EmailOutbox',
   AuditEvent: 'AuditEvent',
   Company: 'Company',
+  CompanyMembership: 'CompanyMembership',
   JobPosting: 'JobPosting',
   JobPostingSkill: 'JobPostingSkill',
   ApplicationQuestion: 'ApplicationQuestion',
@@ -83,6 +84,7 @@ export const ModelName = {
   SavedJob: 'SavedJob',
   JobReport: 'JobReport',
   JobApplication: 'JobApplication',
+  ApplicationStageEvent: 'ApplicationStageEvent',
   ApplicationAnswer: 'ApplicationAnswer',
   RecruitmentNotificationWork: 'RecruitmentNotificationWork',
   CvAccountQuota: 'CvAccountQuota',
@@ -569,6 +571,19 @@ export const CompanyScalarFieldEnum = {
 export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
 
 
+export const CompanyMembershipScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  userId: 'userId',
+  role: 'role',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CompanyMembershipScalarFieldEnum = (typeof CompanyMembershipScalarFieldEnum)[keyof typeof CompanyMembershipScalarFieldEnum]
+
+
 export const JobPostingScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
@@ -691,7 +706,10 @@ export const JobApplicationScalarFieldEnum = {
   contactSnapshot: 'contactSnapshot',
   aiAnalysisConsent: 'aiAnalysisConsent',
   aiMatchScore: 'aiMatchScore',
+  scoringStatus: 'scoringStatus',
   stage: 'stage',
+  stageVersion: 'stageVersion',
+  lastStageChangedAt: 'lastStageChangedAt',
   coverLetter: 'coverLetter',
   profileSnapshot: 'profileSnapshot',
   cvSnapshot: 'cvSnapshot',
@@ -706,6 +724,24 @@ export const JobApplicationScalarFieldEnum = {
 } as const
 
 export type JobApplicationScalarFieldEnum = (typeof JobApplicationScalarFieldEnum)[keyof typeof JobApplicationScalarFieldEnum]
+
+
+export const ApplicationStageEventScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  fromStage: 'fromStage',
+  toStage: 'toStage',
+  actorUserId: 'actorUserId',
+  actorType: 'actorType',
+  reasonCode: 'reasonCode',
+  candidateVisibleReason: 'candidateVisibleReason',
+  candidateVisible: 'candidateVisible',
+  occurredAt: 'occurredAt',
+  applicationVersion: 'applicationVersion',
+  metadata: 'metadata'
+} as const
+
+export type ApplicationStageEventScalarFieldEnum = (typeof ApplicationStageEventScalarFieldEnum)[keyof typeof ApplicationStageEventScalarFieldEnum]
 
 
 export const ApplicationAnswerScalarFieldEnum = {
