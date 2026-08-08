@@ -29,7 +29,7 @@
     "db:verify": "npm run db:verify --workspace @smarthire/web",
     "db:seed:jobs": "npm run db:seed:jobs --workspace @smarthire/web --",
     "db:deploy": "npm run db:deploy --workspace @smarthire/web",
-    "db:reset:empty": "docker compose down -v && docker compose up -d --wait postgres",
+    "db:reset:empty": "node scripts/reset-local-database.mjs --empty",
     "db:reset": "node scripts/reset-local-database.mjs",
     "db:reset:user": "node scripts/db-reset-user.mjs",
     "dev": "node scripts/run-local-development.mjs",

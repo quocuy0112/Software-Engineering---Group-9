@@ -50,7 +50,14 @@ export function CvConfirmationReceipt({ receipt }: { receipt: Receipt }) {
           {cvFormatDateTime(locale, receipt.confirmedAt)}
         </time>
       </p>
-      <Link href="/profile">{copy.openCandidateProfile}</Link>
+      <div className={styles.links}>
+        <Link href={`/profile/cv-imports/${receipt.uploadId}`}>
+          {locale === "vi"
+            ? "\u0058em tr\u1EA1ng th\u00E1i nh\u1EADp CV"
+            : "View import status"}
+        </Link>
+        <Link href="/profile">{copy.openCandidateProfile}</Link>
+      </div>
     </section>
   );
 }

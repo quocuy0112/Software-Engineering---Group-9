@@ -263,10 +263,11 @@ export async function getCvImportResource(accountId: string, uploadId: string) {
       deleteAfter: row.deleteAfter ?? undefined,
       deletedAt: row.deletedAt,
     });
-  const consent =
-    row.parserClass === "EXTERNAL_OPENAI"
-      ? await new CvConsentService().notice(accountId, row.id)
-      : null;
+  const consentEligible =
+    row.parserClass === "EXTERNAL_OPENAI" && row.contentInaccessibleAt === null;
+  const consent = consentEligible
+    ? await new CvConsentService().notice(accountId, row.id)
+    : null;
   const consentGranted = consent?.granted ?? false;
   const scanRetriesRemaining = Math.max(0, 2 - row.candidateScanRetriesUsed);
   const parseRetriesRemaining = Math.max(0, 2 - row.candidateParseRetriesUsed);

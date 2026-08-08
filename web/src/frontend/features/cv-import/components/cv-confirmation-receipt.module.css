@@ -34,6 +34,12 @@
   overflow-wrap: anywhere;
 }
 
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
 .root a:focus-visible {
   outline: 3px solid var(--color-focus, #1d4ed8);
   outline-offset: 2px;

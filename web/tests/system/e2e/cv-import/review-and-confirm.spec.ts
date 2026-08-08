@@ -255,6 +255,11 @@ test("reviews, saves, reloads, selectively confirms, replays, and denies cross-a
   const originalResponse = await confirmationResponse;
   expect(originalResponse.status()).toBe(201);
   const originalReceipt = await originalResponse.json();
+  await owner.page.getByRole("link", { name: "View import status" }).click();
+  await expect(owner.page).toHaveURL(`/profile/cv-imports/${seeded.uploadId}`);
+  await expect(
+    owner.page.getByRole("heading", { name: "CV processing status" }),
+  ).toBeVisible();
   const confirmMs = performance.now() - confirmStartedAt;
   console.info(
     `[cv-us2-performance] ${JSON.stringify({

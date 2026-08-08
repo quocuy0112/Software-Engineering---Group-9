@@ -259,6 +259,12 @@ describe("CV draft review", () => {
     expect(screen.getByText(/candidate profile revision/i)).toHaveTextContent(
       "3",
     );
+    expect(
+      screen.getByRole("link", { name: "View import status" }),
+    ).toHaveAttribute(
+      "href",
+      `/profile/cv-imports/${cvConfirmationReceiptFixture.uploadId}`,
+    );
     expect(fetchMock).toHaveBeenCalledOnce();
     expect(fetchMock.mock.calls[0][1].headers["idempotency-key"]).toMatch(
       /^cv-confirm-/u,

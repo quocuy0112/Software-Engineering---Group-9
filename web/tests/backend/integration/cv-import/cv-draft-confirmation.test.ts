@@ -4,6 +4,7 @@ import { afterAll, afterEach, describe, expect, it } from "vitest";
 
 import { PrismaCvConfirmationRepository } from "@/backend/repositories/cv-import/prisma-cv-confirmation-repository";
 import { ConfirmCvDraftService } from "@/backend/services/cv-import/confirm-cv-draft";
+import { getCvImportResource } from "@/backend/services/cv-import/cv-import-projection";
 import {
   cleanupReviewAccounts,
   cvReviewFixtureNow,
@@ -50,6 +51,20 @@ describe.sequential("atomic CV draft confirmation", () => {
     const replay = await service.execute(input);
     expect(first.replayed).toBe(false);
     expect(replay).toEqual({ ...first, replayed: true });
+    const resource = await getCvImportResource(
+      seeded.accountId,
+      seeded.uploadId,
+    );
+    expect(resource).toMatchObject({
+      uploadId: seeded.uploadId,
+      status: "CONFIRMED",
+      stage: "COMPLETE",
+      draft: { draftId: seeded.draftId },
+      receipt: {
+        uploadId: seeded.uploadId,
+        draftId: seeded.draftId,
+      },
+    });
     const profile = await pool.query(
       `SELECT "headline", "revision" FROM "CandidateProfile" WHERE "id" = $1`,
       [seeded.profileId],
@@ -81,7 +96,9 @@ describe.sequential("atomic CV draft confirmation", () => {
       storageKey: "candidate-cv-" + seeded.uploadId,
       checksumSha256: "11".repeat(32),
     });
-    expect(savedCv.rows[0].confirmedAt).toEqual(cvReviewFixtureNow);
+    expect(savedCv.rows[0].confirmedAt).toEqual(
+      new Date(first.receipt.confirmedAt),
+    );
     const scheduled = await pool.query(
       `SELECT artifact."deleteAfter",
               artifact."deleteAfter" = receipt."confirmedAt" + interval '7 days' AS exact_window
