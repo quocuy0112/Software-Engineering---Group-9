@@ -1,5 +1,12 @@
 ## **Project Proposal: SmartHire Recruitment Platform**
 
+> **Historical document:** This proposal preserves the original PA1 model for
+> traceability. It is not the normative source for recruitment stages. Current
+> product behavior must use **Applied, Viewed, Shortlisted, Interviewing,
+> Offered, Hired, Offer Declined, Rejected, and Waitlisted** as defined in
+> `docs/vision document/vision_document.md`. AI scoring status is separate and
+> never changes recruitment stage automatically.
+
 - **Author:** Nguyễn Gia Quốc Uy
 - **Reviewer:** Nguyễn Quốc Thành, Ngô Quốc Tuấn
 - **Version History:**

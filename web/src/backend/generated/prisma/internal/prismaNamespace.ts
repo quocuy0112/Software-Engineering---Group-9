@@ -421,6 +421,7 @@ export const ModelName = {
   EmailOutbox: 'EmailOutbox',
   AuditEvent: 'AuditEvent',
   Company: 'Company',
+  CompanyMembership: 'CompanyMembership',
   JobPosting: 'JobPosting',
   JobPostingSkill: 'JobPostingSkill',
   ApplicationQuestion: 'ApplicationQuestion',
@@ -428,6 +429,7 @@ export const ModelName = {
   SavedJob: 'SavedJob',
   JobReport: 'JobReport',
   JobApplication: 'JobApplication',
+  ApplicationStageEvent: 'ApplicationStageEvent',
   ApplicationAnswer: 'ApplicationAnswer',
   RecruitmentNotificationWork: 'RecruitmentNotificationWork',
   CvAccountQuota: 'CvAccountQuota',
@@ -465,7 +467,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "auditEvent" | "company" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence"
+    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "auditEvent" | "company" | "companyMembership" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2245,6 +2247,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CompanyMembership: {
+      payload: Prisma.$CompanyMembershipPayload<ExtArgs>
+      fields: Prisma.CompanyMembershipFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CompanyMembershipFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMembershipPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CompanyMembershipFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMembershipPayload>
+        }
+        findFirst: {
+          args: Prisma.CompanyMembershipFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMembershipPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CompanyMembershipFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMembershipPayload>
+        }
+        findMany: {
+          args: Prisma.CompanyMembershipFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMembershipPayload>[]
+        }
+        create: {
+          args: Prisma.CompanyMembershipCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMembershipPayload>
+        }
+        createMany: {
+          args: Prisma.CompanyMembershipCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CompanyMembershipCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMembershipPayload>[]
+        }
+        delete: {
+          args: Prisma.CompanyMembershipDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMembershipPayload>
+        }
+        update: {
+          args: Prisma.CompanyMembershipUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMembershipPayload>
+        }
+        deleteMany: {
+          args: Prisma.CompanyMembershipDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CompanyMembershipUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CompanyMembershipUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMembershipPayload>[]
+        }
+        upsert: {
+          args: Prisma.CompanyMembershipUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMembershipPayload>
+        }
+        aggregate: {
+          args: Prisma.CompanyMembershipAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCompanyMembership>
+        }
+        groupBy: {
+          args: Prisma.CompanyMembershipGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CompanyMembershipGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CompanyMembershipCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CompanyMembershipCountAggregateOutputType> | number
+        }
+      }
+    }
     JobPosting: {
       payload: Prisma.$JobPostingPayload<ExtArgs>
       fields: Prisma.JobPostingFieldRefs
@@ -2760,6 +2836,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.JobApplicationCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.JobApplicationCountAggregateOutputType> | number
+        }
+      }
+    }
+    ApplicationStageEvent: {
+      payload: Prisma.$ApplicationStageEventPayload<ExtArgs>
+      fields: Prisma.ApplicationStageEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ApplicationStageEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApplicationStageEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ApplicationStageEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApplicationStageEventPayload>
+        }
+        findFirst: {
+          args: Prisma.ApplicationStageEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApplicationStageEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ApplicationStageEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApplicationStageEventPayload>
+        }
+        findMany: {
+          args: Prisma.ApplicationStageEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApplicationStageEventPayload>[]
+        }
+        create: {
+          args: Prisma.ApplicationStageEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApplicationStageEventPayload>
+        }
+        createMany: {
+          args: Prisma.ApplicationStageEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ApplicationStageEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApplicationStageEventPayload>[]
+        }
+        delete: {
+          args: Prisma.ApplicationStageEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApplicationStageEventPayload>
+        }
+        update: {
+          args: Prisma.ApplicationStageEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApplicationStageEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.ApplicationStageEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ApplicationStageEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ApplicationStageEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApplicationStageEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.ApplicationStageEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApplicationStageEventPayload>
+        }
+        aggregate: {
+          args: Prisma.ApplicationStageEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateApplicationStageEvent>
+        }
+        groupBy: {
+          args: Prisma.ApplicationStageEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ApplicationStageEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ApplicationStageEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ApplicationStageEventCountAggregateOutputType> | number
         }
       }
     }
@@ -4864,6 +5014,19 @@ export const CompanyScalarFieldEnum = {
 export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
 
 
+export const CompanyMembershipScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  userId: 'userId',
+  role: 'role',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CompanyMembershipScalarFieldEnum = (typeof CompanyMembershipScalarFieldEnum)[keyof typeof CompanyMembershipScalarFieldEnum]
+
+
 export const JobPostingScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
@@ -4986,7 +5149,10 @@ export const JobApplicationScalarFieldEnum = {
   contactSnapshot: 'contactSnapshot',
   aiAnalysisConsent: 'aiAnalysisConsent',
   aiMatchScore: 'aiMatchScore',
+  scoringStatus: 'scoringStatus',
   stage: 'stage',
+  stageVersion: 'stageVersion',
+  lastStageChangedAt: 'lastStageChangedAt',
   coverLetter: 'coverLetter',
   profileSnapshot: 'profileSnapshot',
   cvSnapshot: 'cvSnapshot',
@@ -5001,6 +5167,24 @@ export const JobApplicationScalarFieldEnum = {
 } as const
 
 export type JobApplicationScalarFieldEnum = (typeof JobApplicationScalarFieldEnum)[keyof typeof JobApplicationScalarFieldEnum]
+
+
+export const ApplicationStageEventScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  fromStage: 'fromStage',
+  toStage: 'toStage',
+  actorUserId: 'actorUserId',
+  actorType: 'actorType',
+  reasonCode: 'reasonCode',
+  candidateVisibleReason: 'candidateVisibleReason',
+  candidateVisible: 'candidateVisible',
+  occurredAt: 'occurredAt',
+  applicationVersion: 'applicationVersion',
+  metadata: 'metadata'
+} as const
+
+export type ApplicationStageEventScalarFieldEnum = (typeof ApplicationStageEventScalarFieldEnum)[keyof typeof ApplicationStageEventScalarFieldEnum]
 
 
 export const ApplicationAnswerScalarFieldEnum = {
@@ -5877,6 +6061,34 @@ export type ListEnumAuditResultFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'CompanyMembershipRole'
+ */
+export type EnumCompanyMembershipRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompanyMembershipRole'>
+    
+
+
+/**
+ * Reference to a field of type 'CompanyMembershipRole[]'
+ */
+export type ListEnumCompanyMembershipRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompanyMembershipRole[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CompanyMembershipStatus'
+ */
+export type EnumCompanyMembershipStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompanyMembershipStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CompanyMembershipStatus[]'
+ */
+export type ListEnumCompanyMembershipStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompanyMembershipStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'EmploymentType'
  */
 export type EnumEmploymentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmploymentType'>
@@ -6003,6 +6215,20 @@ export type ListEnumJobReportStatusFieldRefInput<$PrismaModel> = FieldRefInputTy
 
 
 /**
+ * Reference to a field of type 'ApplicationScoringStatus'
+ */
+export type EnumApplicationScoringStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApplicationScoringStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ApplicationScoringStatus[]'
+ */
+export type ListEnumApplicationScoringStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApplicationScoringStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'ApplicationStage'
  */
 export type EnumApplicationStageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApplicationStage'>
@@ -6013,6 +6239,20 @@ export type EnumApplicationStageFieldRefInput<$PrismaModel> = FieldRefInputType<
  * Reference to a field of type 'ApplicationStage[]'
  */
 export type ListEnumApplicationStageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApplicationStage[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ApplicationStageActorType'
+ */
+export type EnumApplicationStageActorTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApplicationStageActorType'>
+    
+
+
+/**
+ * Reference to a field of type 'ApplicationStageActorType[]'
+ */
+export type ListEnumApplicationStageActorTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApplicationStageActorType[]'>
     
 
 
@@ -6652,6 +6892,7 @@ export type GlobalOmitConfig = {
   emailOutbox?: Prisma.EmailOutboxOmit
   auditEvent?: Prisma.AuditEventOmit
   company?: Prisma.CompanyOmit
+  companyMembership?: Prisma.CompanyMembershipOmit
   jobPosting?: Prisma.JobPostingOmit
   jobPostingSkill?: Prisma.JobPostingSkillOmit
   applicationQuestion?: Prisma.ApplicationQuestionOmit
@@ -6659,6 +6900,7 @@ export type GlobalOmitConfig = {
   savedJob?: Prisma.SavedJobOmit
   jobReport?: Prisma.JobReportOmit
   jobApplication?: Prisma.JobApplicationOmit
+  applicationStageEvent?: Prisma.ApplicationStageEventOmit
   applicationAnswer?: Prisma.ApplicationAnswerOmit
   recruitmentNotificationWork?: Prisma.RecruitmentNotificationWorkOmit
   cvAccountQuota?: Prisma.CvAccountQuotaOmit

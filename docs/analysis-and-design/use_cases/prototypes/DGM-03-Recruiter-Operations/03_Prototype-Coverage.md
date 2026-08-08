@@ -1,5 +1,10 @@
 # Prototype Coverage & Traceability - Diagram 3 (Recruiter Operations)
 
+> **Canonical stage note:** Prototype images may retain early visual labels,
+> but implementation and acceptance review use Applied, Viewed, Shortlisted,
+> Interviewing, Offered, Hired, Offer Declined, Rejected, and Waitlisted. AI
+> scoring status is displayed separately from recruitment stage.
+
 # Student Information
 
 **Student Name:** Ngô Quốc Tuấn
@@ -88,7 +93,7 @@ This document describes in detail the use cases belonging to three domains: **Jo
 
 #### UC-PIPE-01: View Recruitment Pipeline Kanban Board
 - **Actors:** Recruiter, HR Manager, Company Owner
-- **Description:** Displays a kanban board of candidates organized by recruitment stage (Applied → Screening → Interview → Offer → Hired).
+- **Description:** Displays a Kanban board of candidates organized by the canonical recruitment stages (Applied, Viewed, Shortlisted, Interviewing, Offered, Hired, Offer Declined, Rejected, and Waitlisted).
 - **Basic Flow:** The system displays stage columns with the corresponding candidate cards.
 - **Alternative Flow:** Filter the kanban board by a specific job posting.
 - **Postcondition:** The board accurately reflects the current stage of every active candidate for the selected posting(s).

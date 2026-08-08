@@ -95,11 +95,7 @@ export function prepareApplicationSubmission(
   activeConsentVersion: string,
   now: Date,
 ) {
-  if (
-    !context.candidate.name.trim() ||
-    !context.candidate.headline?.trim() ||
-    !context.candidate.location?.trim()
-  ) {
+  if (!context.candidate.name.trim() || !context.candidate.location?.trim()) {
     throw new ApplicationRepositoryError("APPLICATION_PROFILE_INCOMPLETE");
   }
   const cv = context.cv;

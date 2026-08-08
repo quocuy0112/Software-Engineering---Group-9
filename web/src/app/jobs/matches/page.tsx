@@ -14,7 +14,7 @@ export const revalidate = 0;
 export default async function SuggestedJobsRoute() {
   const context = await getWorkspaceContext();
   if (!context) redirect("/login?returnTo=%2Fjobs%2Fmatches");
-  const snapshot = await readJobWorkspaceSnapshot();
+  const snapshot = await readJobWorkspaceSnapshot(context.userId);
   return (
     <JobsWorkspace activeTab="matches">
       <SuggestedJobsPage

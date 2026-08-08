@@ -27,7 +27,7 @@ describe.skipIf(!databaseAvailable)("transactional job application", () => {
       ).deleteJobBoardDatabaseFixture(fixture);
   });
 
-  it("commits one Applied application, answers, audit, and notification work", async () => {
+  it("commits one Applied application, initial history, audit, and notification work", async () => {
     const input = {
       candidateUserId: fixture.userIds[0]!,
       sessionId: "session-1",
@@ -69,6 +69,24 @@ describe.skipIf(!databaseAvailable)("transactional job application", () => {
         where: { applicationId: first.application.applicationId },
       }),
     ).toBe(2);
+    expect(
+      await prisma.applicationStageEvent.findMany({
+        where: { applicationId: first.application.applicationId },
+        select: {
+          fromStage: true,
+          toStage: true,
+          actorType: true,
+          applicationVersion: true,
+        },
+      }),
+    ).toEqual([
+      {
+        fromStage: null,
+        toStage: "APPLIED",
+        actorType: "CANDIDATE",
+        applicationVersion: 1,
+      },
+    ]);
     expect(
       await prisma.auditEvent.count({
         where: {

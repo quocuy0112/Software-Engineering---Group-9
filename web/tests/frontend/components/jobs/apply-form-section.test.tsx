@@ -105,10 +105,36 @@ describe("application form modal", () => {
     );
 
     expect(screen.getByRole("dialog")).toBeVisible();
+    expect(screen.getByLabelText(/select a cv from profile/i)).toBeRequired();
+    expect(screen.getByLabelText(/full name/i)).toBeRequired();
+    expect(screen.getByLabelText(/^email/i)).toBeRequired();
+    expect(screen.getByLabelText(/phone number/i)).toBeRequired();
+    expect(screen.getByLabelText(/^location/i)).toBeRequired();
+    expect(
+      screen.getByLabelText(/i consent to smarthire sharing this application/i),
+    ).toBeRequired();
+    for (const selector of [
+      ".job-application-fieldset legend .job-required-mark",
+      'label[for="application-full-name"] .job-required-mark',
+      'label[for="application-email"] .job-required-mark',
+      'label[for="application-phone"] .job-required-mark',
+      'label[for="application-location"] .job-required-mark',
+      'label[for="application-consent"] .job-required-mark',
+    ]) {
+      expect(document.querySelector(selector)).not.toBeNull();
+    }
+    expect(
+      document.querySelector(
+        'label[for="application-cover-letter"] .job-required-mark',
+      ),
+    ).toBeNull();
     const submit = screen.getByRole("button", {
       name: /submit application/i,
     });
-    expect(submit).toBeDisabled();
+    expect(submit).toBeEnabled();
+    expect(screen.getByLabelText(/select a cv from profile/i)).toHaveValue(
+      "cv-1",
+    );
     const file = new File(["cv"], "resume.docx", {
       type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     });
@@ -119,7 +145,7 @@ describe("application form modal", () => {
     expect(
       screen.getByLabelText(/new cv ready for ai import/i),
     ).not.toHaveAttribute("multiple");
-    expect(submit).toBeDisabled();
+    expect(submit).toBeEnabled();
     expect(
       screen.getByRole("button", { name: /import this cv with ai/i }),
     ).toBeVisible();
@@ -136,6 +162,69 @@ describe("application form modal", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
     expect(onOpenChange).toHaveBeenCalledWith(false);
+    vi.unstubAllGlobals();
+  });
+
+  it("marks only required employer questions", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        ...applicationForm,
+        questions: [
+          {
+            id: "required-question",
+            prompt: "Why are you a good fit?",
+            description: null,
+            kind: "TEXT",
+            required: true,
+            options: null,
+            version: 1,
+          },
+          {
+            id: "optional-question",
+            prompt: "Anything else?",
+            description: null,
+            kind: "TEXT",
+            required: false,
+            options: null,
+            version: 1,
+          },
+        ],
+      }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <ApplyFormSection
+        jobId="job-1"
+        jobTitle={applicationForm.jobTitle}
+        open
+        applied={false}
+        onOpenChange={() => undefined}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("textbox", { name: /Why are you a good fit/i }),
+      ).toBeVisible(),
+    );
+    expect(
+      screen.getByRole("textbox", { name: /Why are you a good fit/i }),
+    ).toBeRequired();
+    expect(
+      screen.getByRole("textbox", { name: /Anything else/i }),
+    ).not.toBeRequired();
+    expect(
+      document.querySelector(
+        'label[for="question-required-question"] .job-required-mark',
+      ),
+    ).not.toBeNull();
+    expect(
+      document.querySelector(
+        'label[for="question-optional-question"] .job-required-mark',
+      ),
+    ).toBeNull();
     vi.unstubAllGlobals();
   });
 
@@ -204,6 +293,60 @@ describe("application form modal", () => {
       cvFileRef: "cv-1",
       contactSnapshot: { phone: "+84912345678" },
     });
+    vi.unstubAllGlobals();
+  });
+
+  it("reloads a stale empty CV list when Apply is reopened", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ ...applicationForm, cvs: [] }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => applicationForm,
+      });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { rerender } = render(
+      <ApplyFormSection
+        jobId="job-1"
+        jobTitle={applicationForm.jobTitle}
+        open
+        applied={false}
+        onOpenChange={() => undefined}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByText("No confirmed CVs in Profile")).toBeVisible(),
+    );
+    rerender(
+      <ApplyFormSection
+        jobId="job-1"
+        jobTitle={applicationForm.jobTitle}
+        open={false}
+        applied={false}
+        onOpenChange={() => undefined}
+      />,
+    );
+    rerender(
+      <ApplyFormSection
+        jobId="job-1"
+        jobTitle={applicationForm.jobTitle}
+        open
+        applied={false}
+        onOpenChange={() => undefined}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByLabelText(/select a cv from profile/i)).toHaveValue(
+        "cv-1",
+      ),
+    );
+    expect(fetchMock).toHaveBeenCalledTimes(2);
     vi.unstubAllGlobals();
   });
 

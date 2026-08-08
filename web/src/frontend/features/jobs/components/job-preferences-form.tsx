@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { mutateWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import {
   VIETNAM_PROVINCES_63,
   jobExperiencePreferenceOptions,
@@ -30,9 +31,13 @@ function toFormState(preferences: JobPreferences): FormState {
   };
 }
 
-function formatSalaryInput(value: string) {
+function formatSalaryInput(value: string, locale: "vi" | "en") {
   const digits = value.replace(/[^\d]/gu, "");
-  return digits ? new Intl.NumberFormat("en-US").format(Number(digits)) : "";
+  return digits
+    ? new Intl.NumberFormat(locale === "vi" ? "vi-VN" : "en-US").format(
+        Number(digits),
+      )
+    : "";
 }
 
 function positionOptions(options: JobPositionOption[]): SearchableChipOption[] {
@@ -58,6 +63,97 @@ export function JobPreferencesForm({
 }) {
   const router = useRouter();
   const csrfProof = useCsrfProof();
+  const locale = useWorkspaceLocale();
+  const copy =
+    locale === "vi"
+      ? {
+          consentRequired:
+            "Bạn cần đồng ý phân tích bằng AI trước khi SmartHire có thể gợi ý việc làm.",
+          reviewInput: "Vui lòng kiểm tra lại thông tin đã nhập.",
+          updateFailed: "Không thể cập nhật nhu cầu việc làm.",
+          updated: "Đã cập nhật nhu cầu việc làm.",
+          bannerTitle: "Nhận các cơ hội phù hợp với bạn",
+          bannerDescription:
+            "Cho SmartHire biết công việc bạn mong muốn để nhận gợi ý phù hợp hơn.",
+          required: "Thông tin bắt buộc",
+          personal: "Thông tin cá nhân",
+          gender: "Giới tính",
+          female: "Nữ",
+          male: "Nam",
+          undisclosed: "Không muốn tiết lộ",
+          jobNeeds: "Nhu cầu việc làm",
+          professionalPosition: "Vị trí chuyên môn",
+          professionalPositionPlaceholder: "Tìm vị trí chuyên môn",
+          customPosition: "Vị trí khác",
+          customPositionPlaceholder:
+            "Tìm hoặc thêm vị trí chưa có trong danh mục",
+          customPositionHelper: "Có thể thêm tối đa 5 vị trí khác.",
+          skills: "Kỹ năng",
+          skillsPlaceholder: "Tìm kỹ năng",
+          experience: "Kinh nghiệm",
+          desiredSalary: "Mức lương mong muốn",
+          locations: "Tỉnh/Thành phố (trước 01/07/2025)",
+          locationsPlaceholder: "Tìm tỉnh hoặc thành phố",
+          relocation: "Tôi sẵn sàng chuyển nơi ở",
+          consent: "Đồng ý xử lý dữ liệu",
+          aiConsent:
+            "Tôi đồng ý để SmartHire sử dụng phân tích AI dựa trên CV và hoạt động tìm việc để gợi ý công việc.",
+          notificationConsent:
+            "Tôi đồng ý để SmartHire gửi thông tin về việc làm và sự kiện nghề nghiệp.",
+          updating: "Đang cập nhật…",
+          update: "Cập nhật",
+          experienceLabels: {
+            no_experience: "Chưa có kinh nghiệm",
+            under_1_year: "Dưới 1 năm",
+            "1_3_years": "1–3 năm",
+            "3_5_years": "3–5 năm",
+            "5_plus_years": "Trên 5 năm",
+          },
+        }
+      : {
+          consentRequired:
+            "AI-analysis consent is required before SmartHire can recommend jobs.",
+          reviewInput: "Please review the information you entered.",
+          updateFailed: "Could not update job preferences.",
+          updated: "Job preferences updated.",
+          bannerTitle: "Get matched to relevant opportunities",
+          bannerDescription:
+            "Tell us what you want next so SmartHire can surface better matches.",
+          required: "Required information",
+          personal: "Personal information",
+          gender: "Gender",
+          female: "Female",
+          male: "Male",
+          undisclosed: "Prefer not to say",
+          jobNeeds: "Job needs",
+          professionalPosition: "Professional Position",
+          professionalPositionPlaceholder: "Search professional positions",
+          customPosition: "Custom Position",
+          customPositionPlaceholder:
+            "Search or add a position not in the category list",
+          customPositionHelper: "Add up to 5 custom positions.",
+          skills: "Skills",
+          skillsPlaceholder: "Search skills",
+          experience: "Experience",
+          desiredSalary: "Desired Salary",
+          locations: "Province/City (pre 7/1/2025)",
+          locationsPlaceholder: "Search provinces or cities",
+          relocation: "I'm open to relocating",
+          consent: "Consent",
+          aiConsent:
+            "I agree to let SmartHire recommend jobs based on my CV and job-search activity, using AI-based analysis.",
+          notificationConsent:
+            "I agree to let SmartHire send me information about jobs and career events.",
+          updating: "Updating…",
+          update: "Update",
+          experienceLabels: {
+            no_experience: "No experience",
+            under_1_year: "Under 1 year",
+            "1_3_years": "1–3 years",
+            "3_5_years": "3–5 years",
+            "5_plus_years": "5+ years",
+          },
+        };
   const [form, setForm] = useState(() => toFormState(initialPreferences));
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
@@ -68,9 +164,7 @@ export function JobPreferencesForm({
     setError("");
     setStatus("");
     if (!form.aiAnalysisConsent) {
-      setError(
-        "AI-analysis consent is required before SmartHire can recommend jobs.",
-      );
+      setError(copy.consentRequired);
       return;
     }
     const parsed = jobPreferencesSchema.safeParse({
@@ -79,7 +173,7 @@ export function JobPreferencesForm({
         Number(form.desiredSalaryMin.replace(/[^\d]/gu, "")) || 0,
     });
     if (!parsed.success) {
-      setError("Please review the information you entered.");
+      setError(copy.reviewInput);
       return;
     }
     setPending(true);
@@ -101,20 +195,14 @@ export function JobPreferencesForm({
           message?: unknown;
         } | null;
         throw new Error(
-          typeof body?.message === "string"
-            ? body.message
-            : "Could not update job preferences.",
+          typeof body?.message === "string" ? body.message : copy.updateFailed,
         );
       }
-      setStatus("Job preferences updated.");
+      setStatus(copy.updated);
       router.push("/jobs/matches");
       router.refresh();
     } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : "Could not update job preferences.",
-      );
+      setError(caught instanceof Error ? caught.message : copy.updateFailed);
     } finally {
       setPending(false);
     }
@@ -128,14 +216,12 @@ export function JobPreferencesForm({
       <div className="job-preferences-banner">
         <span aria-hidden="true">✦</span>
         <div>
-          <strong>Get matched to relevant opportunities</strong>
-          <p>
-            Tell us what you want next so SmartHire can surface better matches.
-          </p>
+          <strong>{copy.bannerTitle}</strong>
+          <p>{copy.bannerDescription}</p>
         </div>
       </div>
       <p className="job-preferences-required">
-        <span>*</span> Required information
+        <span>*</span> {copy.required}
       </p>
       {error ? (
         <div className="job-preferences-message is-error" role="alert">
@@ -149,14 +235,14 @@ export function JobPreferencesForm({
       ) : null}
 
       <fieldset>
-        <legend>Personal information</legend>
+        <legend>{copy.personal}</legend>
         <div className="preference-field">
-          <span className="preference-label">Gender</span>
+          <span className="preference-label">{copy.gender}</span>
           <div className="preference-radio-group">
             {[
-              ["female", "Female"],
-              ["male", "Male"],
-              ["undisclosed", "Prefer not to say"],
+              ["female", copy.female],
+              ["male", copy.male],
+              ["undisclosed", copy.undisclosed],
             ].map(([value, label]) => (
               <label key={value}>
                 <input
@@ -179,12 +265,12 @@ export function JobPreferencesForm({
       </fieldset>
 
       <fieldset>
-        <legend>Job needs</legend>
+        <legend>{copy.jobNeeds}</legend>
         <div className="preference-field">
           <SearchableChipSelect
             id="professional-positions"
-            label="Professional Position"
-            placeholder="Search professional positions"
+            label={copy.professionalPosition}
+            placeholder={copy.professionalPositionPlaceholder}
             options={positionOptions(availablePositions)}
             selectedValues={form.professionalPositions}
             maximum={5}
@@ -201,13 +287,13 @@ export function JobPreferencesForm({
         <div className="preference-field">
           <SearchableChipSelect
             id="custom-positions"
-            label="Custom Position"
-            placeholder="Search or add a position not in the category list"
+            label={copy.customPosition}
+            placeholder={copy.customPositionPlaceholder}
             options={[]}
             selectedValues={form.customPositions}
             maximum={5}
             allowCustom
-            helperText="Add up to 5 custom positions."
+            helperText={copy.customPositionHelper}
             onChange={(values) =>
               setForm((current) => ({
                 ...current,
@@ -220,8 +306,8 @@ export function JobPreferencesForm({
         <div className="preference-field">
           <SearchableChipSelect
             id="skills"
-            label="Skills"
-            placeholder="Search skills"
+            label={copy.skills}
+            placeholder={copy.skillsPlaceholder}
             options={valueOptions(skillOptions)}
             selectedValues={form.skills}
             maximum={20}
@@ -237,7 +323,7 @@ export function JobPreferencesForm({
 
         <div className="preference-field">
           <label className="preference-label" htmlFor="experience-level">
-            Experience <span>*</span>
+            {copy.experience} <span>*</span>
           </label>
           <select
             id="experience-level"
@@ -253,7 +339,7 @@ export function JobPreferencesForm({
           >
             {jobExperiencePreferenceOptions.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {copy.experienceLabels[option.value]}
               </option>
             ))}
           </select>
@@ -261,13 +347,13 @@ export function JobPreferencesForm({
 
         <div className="preference-field">
           <label className="preference-label" htmlFor="desired-salary">
-            Desired Salary <span>*</span>
+            {copy.desiredSalary} <span>*</span>
           </label>
           <div className="preference-input-suffix">
             <input
               id="desired-salary"
               inputMode="numeric"
-              value={formatSalaryInput(form.desiredSalaryMin)}
+              value={formatSalaryInput(form.desiredSalaryMin, locale)}
               placeholder="15,000,000"
               onChange={(event) =>
                 setForm((current) => ({
@@ -283,8 +369,8 @@ export function JobPreferencesForm({
         <div className="preference-field">
           <SearchableChipSelect
             id="work-locations"
-            label="Province/City (pre 7/1/2025)"
-            placeholder="Search provinces or cities"
+            label={copy.locations}
+            placeholder={copy.locationsPlaceholder}
             options={valueOptions(VIETNAM_PROVINCES_63)}
             selectedValues={form.workLocations}
             maximum={63}
@@ -308,12 +394,12 @@ export function JobPreferencesForm({
               }))
             }
           />
-          I&apos;m open to relocating
+          {copy.relocation}
         </label>
       </fieldset>
 
       <fieldset>
-        <legend>Consent</legend>
+        <legend>{copy.consent}</legend>
         <label className="preference-checkbox">
           <input
             type="checkbox"
@@ -326,8 +412,7 @@ export function JobPreferencesForm({
               }))
             }
           />
-          I agree to let SmartHire recommend jobs based on my CV and job-search
-          activity, using AI-based analysis. <span>*</span>
+          {copy.aiConsent} <span>*</span>
         </label>
         <label className="preference-checkbox">
           <input
@@ -340,14 +425,13 @@ export function JobPreferencesForm({
               }))
             }
           />
-          I agree to let SmartHire send me information about jobs and career
-          events.
+          {copy.notificationConsent}
         </label>
       </fieldset>
 
       <div className="job-preferences-actions">
         <button className="dashboard-hero-cta" type="submit" disabled={pending}>
-          {pending ? "Updating..." : "Update"}
+          {pending ? copy.updating : copy.update}
         </button>
       </div>
     </form>

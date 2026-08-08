@@ -149,20 +149,6 @@ export const applicationSubmissionSchema = z
     }
   });
 
-export const localApplicationStateSchema = z
-  .object({
-    jobTitle: z.string().trim().min(1).max(200),
-    cvFileRef: z.string().min(1).max(256),
-    contactSnapshot: applicationContactSnapshotSchema,
-    answers: z.array(applicationAnswerInputSchema).max(20),
-    coverLetter: z.string().trim().max(5000).nullable(),
-    aiAnalysisConsent: z.boolean(),
-    fileName: z.string().trim().min(1).max(255),
-    fileSize: z.number().int().min(1).max(5_000_000),
-    fileType: z.string().trim().max(128),
-  })
-  .strict();
-
 export const applicationOutcomeSchema = z
   .object({
     applicationId: z.string().min(1).max(128),
@@ -185,5 +171,4 @@ export type ApplicationContactSnapshot = z.infer<
 >;
 export type ApplicationForm = z.infer<typeof applicationFormSchema>;
 export type ApplicationSubmission = z.infer<typeof applicationSubmissionSchema>;
-export type LocalApplicationState = z.infer<typeof localApplicationStateSchema>;
 export type ApplicationOutcome = z.infer<typeof applicationOutcomeSchema>;

@@ -1,6 +1,5 @@
 import { z } from "zod";
 import {
-  appliedJobStateSchema,
   jobPreferencesUpdateSchema,
   userJobStateViewSchema,
 } from "@/shared/contracts/jobs/catalog";
@@ -47,13 +46,6 @@ const mutationSchema = z.discriminatedUnion("action", [
     .object({
       action: z.literal("update-preferences"),
       jobPreferences: jobPreferencesUpdateSchema,
-    })
-    .strict(),
-  z
-    .object({
-      action: z.literal("apply"),
-      jobId: z.string().min(1).max(128),
-      appliedJob: appliedJobStateSchema,
     })
     .strict(),
 ]);

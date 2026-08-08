@@ -28,10 +28,12 @@ export type AggregateJobApplication = {
 
 export type JobApplicationAvgAggregateOutputType = {
   aiMatchScore: number | null
+  stageVersion: number | null
 }
 
 export type JobApplicationSumAggregateOutputType = {
   aiMatchScore: number | null
+  stageVersion: number | null
 }
 
 export type JobApplicationMinAggregateOutputType = {
@@ -42,7 +44,10 @@ export type JobApplicationMinAggregateOutputType = {
   cvFileRef: string | null
   aiAnalysisConsent: boolean | null
   aiMatchScore: number | null
+  scoringStatus: $Enums.ApplicationScoringStatus | null
   stage: $Enums.ApplicationStage | null
+  stageVersion: number | null
+  lastStageChangedAt: Date | null
   coverLetter: string | null
   consentVersion: string | null
   consentedAt: Date | null
@@ -61,7 +66,10 @@ export type JobApplicationMaxAggregateOutputType = {
   cvFileRef: string | null
   aiAnalysisConsent: boolean | null
   aiMatchScore: number | null
+  scoringStatus: $Enums.ApplicationScoringStatus | null
   stage: $Enums.ApplicationStage | null
+  stageVersion: number | null
+  lastStageChangedAt: Date | null
   coverLetter: string | null
   consentVersion: string | null
   consentedAt: Date | null
@@ -81,7 +89,10 @@ export type JobApplicationCountAggregateOutputType = {
   contactSnapshot: number
   aiAnalysisConsent: number
   aiMatchScore: number
+  scoringStatus: number
   stage: number
+  stageVersion: number
+  lastStageChangedAt: number
   coverLetter: number
   profileSnapshot: number
   cvSnapshot: number
@@ -99,10 +110,12 @@ export type JobApplicationCountAggregateOutputType = {
 
 export type JobApplicationAvgAggregateInputType = {
   aiMatchScore?: true
+  stageVersion?: true
 }
 
 export type JobApplicationSumAggregateInputType = {
   aiMatchScore?: true
+  stageVersion?: true
 }
 
 export type JobApplicationMinAggregateInputType = {
@@ -113,7 +126,10 @@ export type JobApplicationMinAggregateInputType = {
   cvFileRef?: true
   aiAnalysisConsent?: true
   aiMatchScore?: true
+  scoringStatus?: true
   stage?: true
+  stageVersion?: true
+  lastStageChangedAt?: true
   coverLetter?: true
   consentVersion?: true
   consentedAt?: true
@@ -132,7 +148,10 @@ export type JobApplicationMaxAggregateInputType = {
   cvFileRef?: true
   aiAnalysisConsent?: true
   aiMatchScore?: true
+  scoringStatus?: true
   stage?: true
+  stageVersion?: true
+  lastStageChangedAt?: true
   coverLetter?: true
   consentVersion?: true
   consentedAt?: true
@@ -152,7 +171,10 @@ export type JobApplicationCountAggregateInputType = {
   contactSnapshot?: true
   aiAnalysisConsent?: true
   aiMatchScore?: true
+  scoringStatus?: true
   stage?: true
+  stageVersion?: true
+  lastStageChangedAt?: true
   coverLetter?: true
   profileSnapshot?: true
   cvSnapshot?: true
@@ -262,7 +284,10 @@ export type JobApplicationGroupByOutputType = {
   contactSnapshot: runtime.JsonValue | null
   aiAnalysisConsent: boolean
   aiMatchScore: number | null
+  scoringStatus: $Enums.ApplicationScoringStatus
   stage: $Enums.ApplicationStage
+  stageVersion: number
+  lastStageChangedAt: Date
   coverLetter: string | null
   profileSnapshot: runtime.JsonValue
   cvSnapshot: runtime.JsonValue
@@ -308,7 +333,10 @@ export type JobApplicationWhereInput = {
   contactSnapshot?: Prisma.JsonNullableFilter<"JobApplication">
   aiAnalysisConsent?: Prisma.BoolFilter<"JobApplication"> | boolean
   aiMatchScore?: Prisma.IntNullableFilter<"JobApplication"> | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFilter<"JobApplication"> | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFilter<"JobApplication"> | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFilter<"JobApplication"> | number
+  lastStageChangedAt?: Prisma.DateTimeFilter<"JobApplication"> | Date | string
   coverLetter?: Prisma.StringNullableFilter<"JobApplication"> | string | null
   profileSnapshot?: Prisma.JsonFilter<"JobApplication">
   cvSnapshot?: Prisma.JsonFilter<"JobApplication">
@@ -325,6 +353,7 @@ export type JobApplicationWhereInput = {
   selectedCv?: Prisma.XOR<Prisma.CandidateCvScalarRelationFilter, Prisma.CandidateCvWhereInput>
   answers?: Prisma.ApplicationAnswerListRelationFilter
   notificationWork?: Prisma.RecruitmentNotificationWorkListRelationFilter
+  stageEvents?: Prisma.ApplicationStageEventListRelationFilter
 }
 
 export type JobApplicationOrderByWithRelationInput = {
@@ -336,7 +365,10 @@ export type JobApplicationOrderByWithRelationInput = {
   contactSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   aiAnalysisConsent?: Prisma.SortOrder
   aiMatchScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  scoringStatus?: Prisma.SortOrder
   stage?: Prisma.SortOrder
+  stageVersion?: Prisma.SortOrder
+  lastStageChangedAt?: Prisma.SortOrder
   coverLetter?: Prisma.SortOrderInput | Prisma.SortOrder
   profileSnapshot?: Prisma.SortOrder
   cvSnapshot?: Prisma.SortOrder
@@ -353,6 +385,7 @@ export type JobApplicationOrderByWithRelationInput = {
   selectedCv?: Prisma.CandidateCvOrderByWithRelationInput
   answers?: Prisma.ApplicationAnswerOrderByRelationAggregateInput
   notificationWork?: Prisma.RecruitmentNotificationWorkOrderByRelationAggregateInput
+  stageEvents?: Prisma.ApplicationStageEventOrderByRelationAggregateInput
 }
 
 export type JobApplicationWhereUniqueInput = Prisma.AtLeast<{
@@ -369,7 +402,10 @@ export type JobApplicationWhereUniqueInput = Prisma.AtLeast<{
   contactSnapshot?: Prisma.JsonNullableFilter<"JobApplication">
   aiAnalysisConsent?: Prisma.BoolFilter<"JobApplication"> | boolean
   aiMatchScore?: Prisma.IntNullableFilter<"JobApplication"> | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFilter<"JobApplication"> | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFilter<"JobApplication"> | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFilter<"JobApplication"> | number
+  lastStageChangedAt?: Prisma.DateTimeFilter<"JobApplication"> | Date | string
   coverLetter?: Prisma.StringNullableFilter<"JobApplication"> | string | null
   profileSnapshot?: Prisma.JsonFilter<"JobApplication">
   cvSnapshot?: Prisma.JsonFilter<"JobApplication">
@@ -386,6 +422,7 @@ export type JobApplicationWhereUniqueInput = Prisma.AtLeast<{
   selectedCv?: Prisma.XOR<Prisma.CandidateCvScalarRelationFilter, Prisma.CandidateCvWhereInput>
   answers?: Prisma.ApplicationAnswerListRelationFilter
   notificationWork?: Prisma.RecruitmentNotificationWorkListRelationFilter
+  stageEvents?: Prisma.ApplicationStageEventListRelationFilter
 }, "id" | "candidateUserId_jobPostingId" | "candidateUserId_idempotencyKey">
 
 export type JobApplicationOrderByWithAggregationInput = {
@@ -397,7 +434,10 @@ export type JobApplicationOrderByWithAggregationInput = {
   contactSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   aiAnalysisConsent?: Prisma.SortOrder
   aiMatchScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  scoringStatus?: Prisma.SortOrder
   stage?: Prisma.SortOrder
+  stageVersion?: Prisma.SortOrder
+  lastStageChangedAt?: Prisma.SortOrder
   coverLetter?: Prisma.SortOrderInput | Prisma.SortOrder
   profileSnapshot?: Prisma.SortOrder
   cvSnapshot?: Prisma.SortOrder
@@ -428,7 +468,10 @@ export type JobApplicationScalarWhereWithAggregatesInput = {
   contactSnapshot?: Prisma.JsonNullableWithAggregatesFilter<"JobApplication">
   aiAnalysisConsent?: Prisma.BoolWithAggregatesFilter<"JobApplication"> | boolean
   aiMatchScore?: Prisma.IntNullableWithAggregatesFilter<"JobApplication"> | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusWithAggregatesFilter<"JobApplication"> | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageWithAggregatesFilter<"JobApplication"> | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntWithAggregatesFilter<"JobApplication"> | number
+  lastStageChangedAt?: Prisma.DateTimeWithAggregatesFilter<"JobApplication"> | Date | string
   coverLetter?: Prisma.StringNullableWithAggregatesFilter<"JobApplication"> | string | null
   profileSnapshot?: Prisma.JsonWithAggregatesFilter<"JobApplication">
   cvSnapshot?: Prisma.JsonWithAggregatesFilter<"JobApplication">
@@ -448,7 +491,10 @@ export type JobApplicationCreateInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: boolean
   aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
   stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
   coverLetter?: string | null
   profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -465,6 +511,7 @@ export type JobApplicationCreateInput = {
   selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
   answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateInput = {
@@ -476,7 +523,10 @@ export type JobApplicationUncheckedCreateInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: boolean
   aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
   stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
   coverLetter?: string | null
   profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -490,6 +540,7 @@ export type JobApplicationUncheckedCreateInput = {
   updatedAt?: Date | string
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUpdateInput = {
@@ -498,7 +549,10 @@ export type JobApplicationUpdateInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -515,6 +569,7 @@ export type JobApplicationUpdateInput = {
   selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
   answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateInput = {
@@ -526,7 +581,10 @@ export type JobApplicationUncheckedUpdateInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -540,6 +598,7 @@ export type JobApplicationUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationCreateManyInput = {
@@ -551,7 +610,10 @@ export type JobApplicationCreateManyInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: boolean
   aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
   stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
   coverLetter?: string | null
   profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -571,7 +633,10 @@ export type JobApplicationUpdateManyMutationInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -594,7 +659,10 @@ export type JobApplicationUncheckedUpdateManyInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -637,7 +705,10 @@ export type JobApplicationCountOrderByAggregateInput = {
   contactSnapshot?: Prisma.SortOrder
   aiAnalysisConsent?: Prisma.SortOrder
   aiMatchScore?: Prisma.SortOrder
+  scoringStatus?: Prisma.SortOrder
   stage?: Prisma.SortOrder
+  stageVersion?: Prisma.SortOrder
+  lastStageChangedAt?: Prisma.SortOrder
   coverLetter?: Prisma.SortOrder
   profileSnapshot?: Prisma.SortOrder
   cvSnapshot?: Prisma.SortOrder
@@ -653,6 +724,7 @@ export type JobApplicationCountOrderByAggregateInput = {
 
 export type JobApplicationAvgOrderByAggregateInput = {
   aiMatchScore?: Prisma.SortOrder
+  stageVersion?: Prisma.SortOrder
 }
 
 export type JobApplicationMaxOrderByAggregateInput = {
@@ -663,7 +735,10 @@ export type JobApplicationMaxOrderByAggregateInput = {
   cvFileRef?: Prisma.SortOrder
   aiAnalysisConsent?: Prisma.SortOrder
   aiMatchScore?: Prisma.SortOrder
+  scoringStatus?: Prisma.SortOrder
   stage?: Prisma.SortOrder
+  stageVersion?: Prisma.SortOrder
+  lastStageChangedAt?: Prisma.SortOrder
   coverLetter?: Prisma.SortOrder
   consentVersion?: Prisma.SortOrder
   consentedAt?: Prisma.SortOrder
@@ -682,7 +757,10 @@ export type JobApplicationMinOrderByAggregateInput = {
   cvFileRef?: Prisma.SortOrder
   aiAnalysisConsent?: Prisma.SortOrder
   aiMatchScore?: Prisma.SortOrder
+  scoringStatus?: Prisma.SortOrder
   stage?: Prisma.SortOrder
+  stageVersion?: Prisma.SortOrder
+  lastStageChangedAt?: Prisma.SortOrder
   coverLetter?: Prisma.SortOrder
   consentVersion?: Prisma.SortOrder
   consentedAt?: Prisma.SortOrder
@@ -695,6 +773,7 @@ export type JobApplicationMinOrderByAggregateInput = {
 
 export type JobApplicationSumOrderByAggregateInput = {
   aiMatchScore?: Prisma.SortOrder
+  stageVersion?: Prisma.SortOrder
 }
 
 export type JobApplicationScalarRelationFilter = {
@@ -828,8 +907,26 @@ export type JobApplicationUncheckedUpdateManyWithoutSelectedCvNestedInput = {
   deleteMany?: Prisma.JobApplicationScalarWhereInput | Prisma.JobApplicationScalarWhereInput[]
 }
 
+export type EnumApplicationScoringStatusFieldUpdateOperationsInput = {
+  set?: $Enums.ApplicationScoringStatus
+}
+
 export type EnumApplicationStageFieldUpdateOperationsInput = {
   set?: $Enums.ApplicationStage
+}
+
+export type JobApplicationCreateNestedOneWithoutStageEventsInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutStageEventsInput, Prisma.JobApplicationUncheckedCreateWithoutStageEventsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutStageEventsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+}
+
+export type JobApplicationUpdateOneRequiredWithoutStageEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutStageEventsInput, Prisma.JobApplicationUncheckedCreateWithoutStageEventsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutStageEventsInput
+  upsert?: Prisma.JobApplicationUpsertWithoutStageEventsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobApplicationUpdateToOneWithWhereWithoutStageEventsInput, Prisma.JobApplicationUpdateWithoutStageEventsInput>, Prisma.JobApplicationUncheckedUpdateWithoutStageEventsInput>
 }
 
 export type JobApplicationCreateNestedOneWithoutAnswersInput = {
@@ -866,7 +963,10 @@ export type JobApplicationCreateWithoutCandidateInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: boolean
   aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
   stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
   coverLetter?: string | null
   profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -882,6 +982,7 @@ export type JobApplicationCreateWithoutCandidateInput = {
   selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
   answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutCandidateInput = {
@@ -892,7 +993,10 @@ export type JobApplicationUncheckedCreateWithoutCandidateInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: boolean
   aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
   stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
   coverLetter?: string | null
   profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -906,6 +1010,7 @@ export type JobApplicationUncheckedCreateWithoutCandidateInput = {
   updatedAt?: Date | string
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutCandidateInput = {
@@ -946,7 +1051,10 @@ export type JobApplicationScalarWhereInput = {
   contactSnapshot?: Prisma.JsonNullableFilter<"JobApplication">
   aiAnalysisConsent?: Prisma.BoolFilter<"JobApplication"> | boolean
   aiMatchScore?: Prisma.IntNullableFilter<"JobApplication"> | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFilter<"JobApplication"> | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFilter<"JobApplication"> | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFilter<"JobApplication"> | number
+  lastStageChangedAt?: Prisma.DateTimeFilter<"JobApplication"> | Date | string
   coverLetter?: Prisma.StringNullableFilter<"JobApplication"> | string | null
   profileSnapshot?: Prisma.JsonFilter<"JobApplication">
   cvSnapshot?: Prisma.JsonFilter<"JobApplication">
@@ -966,7 +1074,10 @@ export type JobApplicationCreateWithoutJobPostingInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: boolean
   aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
   stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
   coverLetter?: string | null
   profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -982,6 +1093,7 @@ export type JobApplicationCreateWithoutJobPostingInput = {
   selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
   answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutJobPostingInput = {
@@ -992,7 +1104,10 @@ export type JobApplicationUncheckedCreateWithoutJobPostingInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: boolean
   aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
   stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
   coverLetter?: string | null
   profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1006,6 +1121,7 @@ export type JobApplicationUncheckedCreateWithoutJobPostingInput = {
   updatedAt?: Date | string
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutJobPostingInput = {
@@ -1040,7 +1156,10 @@ export type JobApplicationCreateWithoutSelectedCvInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: boolean
   aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
   stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
   coverLetter?: string | null
   profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1056,6 +1175,7 @@ export type JobApplicationCreateWithoutSelectedCvInput = {
   jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
   answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutSelectedCvInput = {
@@ -1066,7 +1186,10 @@ export type JobApplicationUncheckedCreateWithoutSelectedCvInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: boolean
   aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
   stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
   coverLetter?: string | null
   profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1080,6 +1203,7 @@ export type JobApplicationUncheckedCreateWithoutSelectedCvInput = {
   updatedAt?: Date | string
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutSelectedCvInput = {
@@ -1108,13 +1232,144 @@ export type JobApplicationUpdateManyWithWhereWithoutSelectedCvInput = {
   data: Prisma.XOR<Prisma.JobApplicationUpdateManyMutationInput, Prisma.JobApplicationUncheckedUpdateManyWithoutSelectedCvInput>
 }
 
+export type JobApplicationCreateWithoutStageEventsInput = {
+  id?: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
+  jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
+  selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
+  answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationUncheckedCreateWithoutStageEventsInput = {
+  id?: string
+  candidateUserId: string
+  jobPostingId: string
+  selectedCvId: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationCreateOrConnectWithoutStageEventsInput = {
+  where: Prisma.JobApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutStageEventsInput, Prisma.JobApplicationUncheckedCreateWithoutStageEventsInput>
+}
+
+export type JobApplicationUpsertWithoutStageEventsInput = {
+  update: Prisma.XOR<Prisma.JobApplicationUpdateWithoutStageEventsInput, Prisma.JobApplicationUncheckedUpdateWithoutStageEventsInput>
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutStageEventsInput, Prisma.JobApplicationUncheckedCreateWithoutStageEventsInput>
+  where?: Prisma.JobApplicationWhereInput
+}
+
+export type JobApplicationUpdateToOneWithWhereWithoutStageEventsInput = {
+  where?: Prisma.JobApplicationWhereInput
+  data: Prisma.XOR<Prisma.JobApplicationUpdateWithoutStageEventsInput, Prisma.JobApplicationUncheckedUpdateWithoutStageEventsInput>
+}
+
+export type JobApplicationUpdateWithoutStageEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
+  jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
+  selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
+  answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationUncheckedUpdateWithoutStageEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobPostingId?: Prisma.StringFieldUpdateOperationsInput | string
+  selectedCvId?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+}
+
 export type JobApplicationCreateWithoutAnswersInput = {
   id?: string
   cvFileRef?: string | null
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: boolean
   aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
   stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
   coverLetter?: string | null
   profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1130,6 +1385,7 @@ export type JobApplicationCreateWithoutAnswersInput = {
   jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
   selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutAnswersInput = {
@@ -1141,7 +1397,10 @@ export type JobApplicationUncheckedCreateWithoutAnswersInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: boolean
   aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
   stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
   coverLetter?: string | null
   profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1154,6 +1413,7 @@ export type JobApplicationUncheckedCreateWithoutAnswersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutAnswersInput = {
@@ -1178,7 +1438,10 @@ export type JobApplicationUpdateWithoutAnswersInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1194,6 +1457,7 @@ export type JobApplicationUpdateWithoutAnswersInput = {
   jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
   selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutAnswersInput = {
@@ -1205,7 +1469,10 @@ export type JobApplicationUncheckedUpdateWithoutAnswersInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1218,6 +1485,7 @@ export type JobApplicationUncheckedUpdateWithoutAnswersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationCreateWithoutNotificationWorkInput = {
@@ -1226,7 +1494,10 @@ export type JobApplicationCreateWithoutNotificationWorkInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: boolean
   aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
   stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
   coverLetter?: string | null
   profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1242,6 +1513,7 @@ export type JobApplicationCreateWithoutNotificationWorkInput = {
   jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
   selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
   answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutNotificationWorkInput = {
@@ -1253,7 +1525,10 @@ export type JobApplicationUncheckedCreateWithoutNotificationWorkInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: boolean
   aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
   stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
   coverLetter?: string | null
   profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1266,6 +1541,7 @@ export type JobApplicationUncheckedCreateWithoutNotificationWorkInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutNotificationWorkInput = {
@@ -1290,7 +1566,10 @@ export type JobApplicationUpdateWithoutNotificationWorkInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1306,6 +1585,7 @@ export type JobApplicationUpdateWithoutNotificationWorkInput = {
   jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
   selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
   answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutNotificationWorkInput = {
@@ -1317,7 +1597,10 @@ export type JobApplicationUncheckedUpdateWithoutNotificationWorkInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1330,6 +1613,7 @@ export type JobApplicationUncheckedUpdateWithoutNotificationWorkInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationCreateManyCandidateInput = {
@@ -1340,7 +1624,10 @@ export type JobApplicationCreateManyCandidateInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: boolean
   aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
   stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
   coverLetter?: string | null
   profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1360,7 +1647,10 @@ export type JobApplicationUpdateWithoutCandidateInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1376,6 +1666,7 @@ export type JobApplicationUpdateWithoutCandidateInput = {
   selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
   answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutCandidateInput = {
@@ -1386,7 +1677,10 @@ export type JobApplicationUncheckedUpdateWithoutCandidateInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1400,6 +1694,7 @@ export type JobApplicationUncheckedUpdateWithoutCandidateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateManyWithoutCandidateInput = {
@@ -1410,7 +1705,10 @@ export type JobApplicationUncheckedUpdateManyWithoutCandidateInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1432,7 +1730,10 @@ export type JobApplicationCreateManyJobPostingInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: boolean
   aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
   stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
   coverLetter?: string | null
   profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1452,7 +1753,10 @@ export type JobApplicationUpdateWithoutJobPostingInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1468,6 +1772,7 @@ export type JobApplicationUpdateWithoutJobPostingInput = {
   selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
   answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutJobPostingInput = {
@@ -1478,7 +1783,10 @@ export type JobApplicationUncheckedUpdateWithoutJobPostingInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1492,6 +1800,7 @@ export type JobApplicationUncheckedUpdateWithoutJobPostingInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateManyWithoutJobPostingInput = {
@@ -1502,7 +1811,10 @@ export type JobApplicationUncheckedUpdateManyWithoutJobPostingInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1524,7 +1836,10 @@ export type JobApplicationCreateManySelectedCvInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: boolean
   aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
   stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
   coverLetter?: string | null
   profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1544,7 +1859,10 @@ export type JobApplicationUpdateWithoutSelectedCvInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1560,6 +1878,7 @@ export type JobApplicationUpdateWithoutSelectedCvInput = {
   jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
   answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutSelectedCvInput = {
@@ -1570,7 +1889,10 @@ export type JobApplicationUncheckedUpdateWithoutSelectedCvInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1584,6 +1906,7 @@ export type JobApplicationUncheckedUpdateWithoutSelectedCvInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateManyWithoutSelectedCvInput = {
@@ -1594,7 +1917,10 @@ export type JobApplicationUncheckedUpdateManyWithoutSelectedCvInput = {
   contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
   stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -1616,11 +1942,13 @@ export type JobApplicationUncheckedUpdateManyWithoutSelectedCvInput = {
 export type JobApplicationCountOutputType = {
   answers: number
   notificationWork: number
+  stageEvents: number
 }
 
 export type JobApplicationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   answers?: boolean | JobApplicationCountOutputTypeCountAnswersArgs
   notificationWork?: boolean | JobApplicationCountOutputTypeCountNotificationWorkArgs
+  stageEvents?: boolean | JobApplicationCountOutputTypeCountStageEventsArgs
 }
 
 /**
@@ -1647,6 +1975,13 @@ export type JobApplicationCountOutputTypeCountNotificationWorkArgs<ExtArgs exten
   where?: Prisma.RecruitmentNotificationWorkWhereInput
 }
 
+/**
+ * JobApplicationCountOutputType without action
+ */
+export type JobApplicationCountOutputTypeCountStageEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ApplicationStageEventWhereInput
+}
+
 
 export type JobApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1657,7 +1992,10 @@ export type JobApplicationSelect<ExtArgs extends runtime.Types.Extensions.Intern
   contactSnapshot?: boolean
   aiAnalysisConsent?: boolean
   aiMatchScore?: boolean
+  scoringStatus?: boolean
   stage?: boolean
+  stageVersion?: boolean
+  lastStageChangedAt?: boolean
   coverLetter?: boolean
   profileSnapshot?: boolean
   cvSnapshot?: boolean
@@ -1674,6 +2012,7 @@ export type JobApplicationSelect<ExtArgs extends runtime.Types.Extensions.Intern
   selectedCv?: boolean | Prisma.CandidateCvDefaultArgs<ExtArgs>
   answers?: boolean | Prisma.JobApplication$answersArgs<ExtArgs>
   notificationWork?: boolean | Prisma.JobApplication$notificationWorkArgs<ExtArgs>
+  stageEvents?: boolean | Prisma.JobApplication$stageEventsArgs<ExtArgs>
   _count?: boolean | Prisma.JobApplicationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["jobApplication"]>
 
@@ -1686,7 +2025,10 @@ export type JobApplicationSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   contactSnapshot?: boolean
   aiAnalysisConsent?: boolean
   aiMatchScore?: boolean
+  scoringStatus?: boolean
   stage?: boolean
+  stageVersion?: boolean
+  lastStageChangedAt?: boolean
   coverLetter?: boolean
   profileSnapshot?: boolean
   cvSnapshot?: boolean
@@ -1712,7 +2054,10 @@ export type JobApplicationSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   contactSnapshot?: boolean
   aiAnalysisConsent?: boolean
   aiMatchScore?: boolean
+  scoringStatus?: boolean
   stage?: boolean
+  stageVersion?: boolean
+  lastStageChangedAt?: boolean
   coverLetter?: boolean
   profileSnapshot?: boolean
   cvSnapshot?: boolean
@@ -1738,7 +2083,10 @@ export type JobApplicationSelectScalar = {
   contactSnapshot?: boolean
   aiAnalysisConsent?: boolean
   aiMatchScore?: boolean
+  scoringStatus?: boolean
   stage?: boolean
+  stageVersion?: boolean
+  lastStageChangedAt?: boolean
   coverLetter?: boolean
   profileSnapshot?: boolean
   cvSnapshot?: boolean
@@ -1752,13 +2100,14 @@ export type JobApplicationSelectScalar = {
   updatedAt?: boolean
 }
 
-export type JobApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "candidateUserId" | "jobPostingId" | "selectedCvId" | "cvFileRef" | "contactSnapshot" | "aiAnalysisConsent" | "aiMatchScore" | "stage" | "coverLetter" | "profileSnapshot" | "cvSnapshot" | "jobSnapshot" | "consentVersion" | "consentedAt" | "idempotencyKey" | "submissionBindingDigest" | "submittedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["jobApplication"]>
+export type JobApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "candidateUserId" | "jobPostingId" | "selectedCvId" | "cvFileRef" | "contactSnapshot" | "aiAnalysisConsent" | "aiMatchScore" | "scoringStatus" | "stage" | "stageVersion" | "lastStageChangedAt" | "coverLetter" | "profileSnapshot" | "cvSnapshot" | "jobSnapshot" | "consentVersion" | "consentedAt" | "idempotencyKey" | "submissionBindingDigest" | "submittedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["jobApplication"]>
 export type JobApplicationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   candidate?: boolean | Prisma.CandidateIdentityDefaultArgs<ExtArgs>
   jobPosting?: boolean | Prisma.JobPostingDefaultArgs<ExtArgs>
   selectedCv?: boolean | Prisma.CandidateCvDefaultArgs<ExtArgs>
   answers?: boolean | Prisma.JobApplication$answersArgs<ExtArgs>
   notificationWork?: boolean | Prisma.JobApplication$notificationWorkArgs<ExtArgs>
+  stageEvents?: boolean | Prisma.JobApplication$stageEventsArgs<ExtArgs>
   _count?: boolean | Prisma.JobApplicationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type JobApplicationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1780,6 +2129,7 @@ export type $JobApplicationPayload<ExtArgs extends runtime.Types.Extensions.Inte
     selectedCv: Prisma.$CandidateCvPayload<ExtArgs>
     answers: Prisma.$ApplicationAnswerPayload<ExtArgs>[]
     notificationWork: Prisma.$RecruitmentNotificationWorkPayload<ExtArgs>[]
+    stageEvents: Prisma.$ApplicationStageEventPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1790,7 +2140,10 @@ export type $JobApplicationPayload<ExtArgs extends runtime.Types.Extensions.Inte
     contactSnapshot: runtime.JsonValue | null
     aiAnalysisConsent: boolean
     aiMatchScore: number | null
+    scoringStatus: $Enums.ApplicationScoringStatus
     stage: $Enums.ApplicationStage
+    stageVersion: number
+    lastStageChangedAt: Date
     coverLetter: string | null
     profileSnapshot: runtime.JsonValue
     cvSnapshot: runtime.JsonValue
@@ -2201,6 +2554,7 @@ export interface Prisma__JobApplicationClient<T, Null = never, ExtArgs extends r
   selectedCv<T extends Prisma.CandidateCvDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CandidateCvDefaultArgs<ExtArgs>>): Prisma.Prisma__CandidateCvClient<runtime.Types.Result.GetResult<Prisma.$CandidateCvPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   answers<T extends Prisma.JobApplication$answersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$answersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationAnswerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notificationWork<T extends Prisma.JobApplication$notificationWorkArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$notificationWorkArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecruitmentNotificationWorkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  stageEvents<T extends Prisma.JobApplication$stageEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$stageEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationStageEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2238,7 +2592,10 @@ export interface JobApplicationFieldRefs {
   readonly contactSnapshot: Prisma.FieldRef<"JobApplication", 'Json'>
   readonly aiAnalysisConsent: Prisma.FieldRef<"JobApplication", 'Boolean'>
   readonly aiMatchScore: Prisma.FieldRef<"JobApplication", 'Int'>
+  readonly scoringStatus: Prisma.FieldRef<"JobApplication", 'ApplicationScoringStatus'>
   readonly stage: Prisma.FieldRef<"JobApplication", 'ApplicationStage'>
+  readonly stageVersion: Prisma.FieldRef<"JobApplication", 'Int'>
+  readonly lastStageChangedAt: Prisma.FieldRef<"JobApplication", 'DateTime'>
   readonly coverLetter: Prisma.FieldRef<"JobApplication", 'String'>
   readonly profileSnapshot: Prisma.FieldRef<"JobApplication", 'Json'>
   readonly cvSnapshot: Prisma.FieldRef<"JobApplication", 'Json'>
@@ -2696,6 +3053,30 @@ export type JobApplication$notificationWorkArgs<ExtArgs extends runtime.Types.Ex
   take?: number
   skip?: number
   distinct?: Prisma.RecruitmentNotificationWorkScalarFieldEnum | Prisma.RecruitmentNotificationWorkScalarFieldEnum[]
+}
+
+/**
+ * JobApplication.stageEvents
+ */
+export type JobApplication$stageEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ApplicationStageEvent
+   */
+  select?: Prisma.ApplicationStageEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ApplicationStageEvent
+   */
+  omit?: Prisma.ApplicationStageEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ApplicationStageEventInclude<ExtArgs> | null
+  where?: Prisma.ApplicationStageEventWhereInput
+  orderBy?: Prisma.ApplicationStageEventOrderByWithRelationInput | Prisma.ApplicationStageEventOrderByWithRelationInput[]
+  cursor?: Prisma.ApplicationStageEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ApplicationStageEventScalarFieldEnum | Prisma.ApplicationStageEventScalarFieldEnum[]
 }
 
 /**

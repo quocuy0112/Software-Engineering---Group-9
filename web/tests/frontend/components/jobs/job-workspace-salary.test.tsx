@@ -50,29 +50,6 @@ describe("workspace job-card salary display", () => {
     ["the main listing card", () => <JobCardView job={job} />],
     ["Saved Jobs", () => <SavedJobsPage jobs={[job]} />],
     [
-      "Applied Jobs",
-      () => (
-        <AppliedJobsPage
-          applications={[
-            {
-              application: {
-                jobId: job.id,
-                appliedAt: "2026-08-03T00:00:00.000Z",
-                status: "submitted",
-                contactSnapshot: {
-                  fullName: "Job Candidate",
-                  email: "candidate@example.test",
-                  phone: "0912345678",
-                },
-                aiAnalysisConsent: true,
-              },
-              job,
-            },
-          ]}
-        />
-      ),
-    ],
-    [
       "Suggested Jobs",
       () => (
         <SuggestedJobsPage
@@ -86,5 +63,36 @@ describe("workspace job-card salary display", () => {
     const salary = screen.getByText(expectedSalary);
     expect(salary).toBeVisible();
     expect(salary).not.toHaveClass("job-salary--negotiable");
+  });
+
+  it("keeps recruitment stage separate from CV analysis on Applied Jobs", () => {
+    render(
+      <AppliedJobsPage
+        applications={[
+          {
+            applicationId: "application-salary",
+            jobId: job.id,
+            jobSlug: job.slug,
+            jobTitle: job.title,
+            companyName: job.company.displayName,
+            companyLogoUrl: null,
+            location: job.location,
+            employmentType: job.employmentType,
+            workArrangement: job.workArrangement,
+            stage: "APPLIED",
+            stageVersion: 1,
+            submittedAt: "2026-08-03T00:00:00.000Z",
+            lastStageChangedAt: "2026-08-03T00:00:00.000Z",
+            jobAvailable: true,
+            scoringStatus: "COMPLETED",
+            aiMatchScore: 82,
+          },
+        ]}
+      />,
+    );
+    expect(
+      screen.getByText("Applied", { selector: ".application-stage-badge" }),
+    ).toBeVisible();
+    expect(screen.getByText("CV analysis: completed")).toBeVisible();
   });
 });

@@ -1,5 +1,11 @@
 # DGM-02 — Candidate Job Journey Prototype Coverage
 
+> **Canonical stage note:** The UC-APP-02 screenshots are early visual
+> references. Current implementation and acceptance review use Applied,
+> Viewed, Shortlisted, Interviewing, Offered, Hired, Offer Declined, Rejected,
+> and Waitlisted. “Application submitted” remains an action result, while AI
+> scoring status is displayed separately.
+
 *Performed by: Nguyen Gia Quoc Uy | Reviewed by: Group 9 | Edited by: Nguyen Gia Quoc Uy*
 **Version:** V1.0 (25/7/2026) — Initial prototype coverage
 
