@@ -159,6 +159,7 @@ describe.sequential("image-search worker pipeline", () => {
             utf8Bytes: Buffer.byteLength(recognizedText, "utf8"),
             averageConfidence: 0.99,
             minimumConfidence: 0.99,
+            partial: false,
           },
         };
       },

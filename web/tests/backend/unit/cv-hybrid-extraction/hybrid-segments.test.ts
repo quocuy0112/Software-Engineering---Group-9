@@ -46,6 +46,7 @@ function recognition(text: string, confidence: number): OcrRecognitionResult {
       utf8Bytes: Buffer.byteLength(text),
       averageConfidence: text ? confidence : null,
       minimumConfidence: text ? confidence : null,
+      partial: false,
     },
   };
 }

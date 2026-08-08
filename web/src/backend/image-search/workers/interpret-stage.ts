@@ -187,7 +187,7 @@ export class ImageSearchInterpretStage {
           ? this.dependencies.validators.external
           : this.dependencies.validators.deterministic;
       if (!validator) throw new Error("INTERPRETER_UNAVAILABLE");
-      const intent = await validator.execute({
+      const interpretedIntent = await validator.execute({
         text: source.text,
         language: source.language,
         deadline: new Date(
@@ -204,6 +204,17 @@ export class ImageSearchInterpretStage {
           .update(`image-search-safety-v1:${row.queryId}`, "utf8")
           .digest("base64url"),
       });
+      const intent = source.warnings.includes("PARTIAL_OCR")
+        ? {
+            ...interpretedIntent,
+            warnings: [
+              ...new Set([
+                ...interpretedIntent.warnings,
+                "PARTIAL_OCR_TEXT" as const,
+              ]),
+            ],
+          }
+        : interpretedIntent;
       const payload = Buffer.from(JSON.stringify(intent), "utf8");
       if (payload.byteLength > 64 * 1024)
         throw new Error("INTERPRETER_INVALID_OUTPUT");

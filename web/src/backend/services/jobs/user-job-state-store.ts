@@ -1,21 +1,30 @@
 import "server-only";
 
-import { readFile, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { prisma } from "@/backend/database/prisma";
+import type { Prisma } from "@/backend/generated/prisma/client";
 import {
-  userJobStateSchema,
   type JobPreferences,
   type UserJobState,
+  userJobStateSchema,
 } from "@/shared/contracts/jobs/catalog";
+import {
+  defaultJobPreferences,
+  jobPreferencesSchema,
+} from "@/shared/contracts/jobs/preferences";
+import { z } from "zod";
 
-const stateFilePath = resolve(
-  process.cwd(),
-  "data",
-  "jobs",
-  "user-job-state.json",
-);
-
-let pendingWrite: Promise<void> = Promise.resolve();
+const hiddenJobIdsSchema = z.array(z.string().min(1).max(128)).max(10_000);
+const savedFilterPresetsSchema = z
+  .array(
+    z
+      .object({
+        id: z.string().min(1).max(128),
+        name: z.string().min(1).max(160),
+        filters: z.record(z.string(), z.unknown()),
+      })
+      .strict(),
+  )
+  .max(100);
 
 export type UserJobStateMutation =
   | { action: "save"; jobId: string }
@@ -24,13 +33,44 @@ export type UserJobStateMutation =
   | { action: "unhide"; jobId: string }
   | { action: "update-preferences"; jobPreferences: JobPreferences };
 
-export function userJobStateFileEnabled() {
-  return process.env.NODE_ENV !== "production";
+function jsonValue(value: unknown): Prisma.InputJsonValue {
+  return value as Prisma.InputJsonValue;
 }
 
-export async function readUserJobState(): Promise<UserJobState> {
-  const text = await readFile(stateFilePath, "utf8");
-  return userJobStateSchema.parse(JSON.parse(text));
+export async function readUserJobState(userId: string): Promise<UserJobState> {
+  const [savedJobs, workspace] = await Promise.all([
+    prisma.savedJob.findMany({
+      where: { userId },
+      orderBy: [{ createdAt: "asc" }, { jobPostingId: "asc" }],
+      select: { jobPostingId: true },
+    }),
+    prisma.userJobWorkspaceState.findUnique({
+      where: { userId },
+      select: {
+        hiddenJobIds: true,
+        jobPreferences: true,
+        savedFilterPresets: true,
+      },
+    }),
+  ]);
+
+  const preferences = jobPreferencesSchema.safeParse(workspace?.jobPreferences);
+  const hiddenJobIds = hiddenJobIdsSchema.safeParse(workspace?.hiddenJobIds);
+  const savedFilterPresets = savedFilterPresetsSchema.safeParse(
+    workspace?.savedFilterPresets,
+  );
+
+  return userJobStateSchema.parse({
+    userId,
+    savedJobIds: savedJobs.map((job) => job.jobPostingId),
+    hiddenJobIds: hiddenJobIds.success ? hiddenJobIds.data : [],
+    jobPreferences: preferences.success
+      ? preferences.data
+      : defaultJobPreferences,
+    savedFilterPresets: savedFilterPresets.success
+      ? savedFilterPresets.data
+      : [],
+  });
 }
 
 export function projectUserJobState(state: UserJobState) {
@@ -40,65 +80,71 @@ export function projectUserJobState(state: UserJobState) {
   };
 }
 
-export function updateUserJobState(mutation: UserJobStateMutation) {
-  const operation = pendingWrite.then(async () => {
-    const current = await readUserJobState();
-    let next: UserJobState = current;
-
-    switch (mutation.action) {
-      case "save":
-        next = current.savedJobIds.includes(mutation.jobId)
-          ? current
-          : {
-              ...current,
-              savedJobIds: [...current.savedJobIds, mutation.jobId],
-            };
-        break;
-      case "unsave":
-        next = {
-          ...current,
-          savedJobIds: current.savedJobIds.filter(
-            (jobId) => jobId !== mutation.jobId,
-          ),
-        };
-        break;
-      case "hide":
-        next = current.hiddenJobIds.includes(mutation.jobId)
-          ? current
-          : {
-              ...current,
-              hiddenJobIds: [...current.hiddenJobIds, mutation.jobId],
-            };
-        break;
-      case "unhide":
-        next = {
-          ...current,
-          hiddenJobIds: current.hiddenJobIds.filter(
-            (jobId) => jobId !== mutation.jobId,
-          ),
-        };
-        break;
-      case "update-preferences":
-        next = {
-          ...current,
-          jobPreferences: mutation.jobPreferences,
-        };
-        break;
-    }
-
-    if (next !== current) {
-      await writeFile(
-        stateFilePath,
-        JSON.stringify(next, null, 2) + "\n",
-        "utf8",
-      );
-    }
-    return next;
+async function persistWorkspaceState(
+  userId: string,
+  state: UserJobState,
+): Promise<void> {
+  await prisma.userJobWorkspaceState.upsert({
+    where: { userId },
+    create: {
+      userId,
+      hiddenJobIds: jsonValue(state.hiddenJobIds),
+      jobPreferences: jsonValue(state.jobPreferences),
+      savedFilterPresets: jsonValue(state.savedFilterPresets),
+    },
+    update: {
+      hiddenJobIds: jsonValue(state.hiddenJobIds),
+      jobPreferences: jsonValue(state.jobPreferences),
+      savedFilterPresets: jsonValue(state.savedFilterPresets),
+    },
   });
+}
 
-  pendingWrite = operation.then(
-    () => undefined,
-    () => undefined,
-  );
-  return operation;
+export async function updateUserJobState(
+  userId: string,
+  mutation: UserJobStateMutation,
+): Promise<UserJobState> {
+  switch (mutation.action) {
+    case "save":
+      await prisma.savedJob.createMany({
+        data: { userId, jobPostingId: mutation.jobId },
+        skipDuplicates: true,
+      });
+      break;
+    case "unsave":
+      await prisma.savedJob.deleteMany({
+        where: { userId, jobPostingId: mutation.jobId },
+      });
+      break;
+    case "hide": {
+      const current = await readUserJobState(userId);
+      if (!current.hiddenJobIds.includes(mutation.jobId)) {
+        await persistWorkspaceState(userId, {
+          ...current,
+          hiddenJobIds: [...current.hiddenJobIds, mutation.jobId],
+        });
+      }
+      break;
+    }
+    case "unhide": {
+      const current = await readUserJobState(userId);
+      await persistWorkspaceState(userId, {
+        ...current,
+        hiddenJobIds: current.hiddenJobIds.filter(
+          (jobId) => jobId !== mutation.jobId,
+        ),
+      });
+      break;
+    }
+    case "update-preferences": {
+      const current = await readUserJobState(userId);
+      await persistWorkspaceState(userId, {
+        ...current,
+        jobPreferences: mutation.jobPreferences,
+      });
+      break;
+    }
+  }
+
+  return readUserJobState(userId);
 }

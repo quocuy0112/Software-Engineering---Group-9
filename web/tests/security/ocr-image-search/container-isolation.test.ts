@@ -23,7 +23,7 @@ describe("OCR container isolation", () => {
     expect(ocrService).not.toMatch(
       /DATABASE_URL|OPENAI|AWS_|CV_STORAGE|IMAGE_SEARCH_STORAGE/u,
     );
-    expect(app).toContain('os.environ.get(\n        "OCR_ENGINE_SOCKET_PATH"');
+    expect(app).toMatch(/os\.environ\.get\(\r?\n\s+"OCR_ENGINE_SOCKET_PATH"/u);
     expect(app).toContain("os.umask(0o007)");
     expect(app).toContain("path.chmod(0o660)");
     expect(app).toContain("server.run(sockets=[uds_socket])");

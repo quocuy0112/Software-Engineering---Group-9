@@ -64,6 +64,7 @@ export const ModelName = {
   CandidateProfileSkill: 'CandidateProfileSkill',
   SocialLink: 'SocialLink',
   AccountPreferences: 'AccountPreferences',
+  UserJobWorkspaceState: 'UserJobWorkspaceState',
   EmailChangeRequest: 'EmailChangeRequest',
   PasswordChangeAttemptWindow: 'PasswordChangeAttemptWindow',
   PasswordChangeOperation: 'PasswordChangeOperation',
@@ -311,6 +312,18 @@ export const AccountPreferencesScalarFieldEnum = {
 } as const
 
 export type AccountPreferencesScalarFieldEnum = (typeof AccountPreferencesScalarFieldEnum)[keyof typeof AccountPreferencesScalarFieldEnum]
+
+
+export const UserJobWorkspaceStateScalarFieldEnum = {
+  userId: 'userId',
+  hiddenJobIds: 'hiddenJobIds',
+  jobPreferences: 'jobPreferences',
+  savedFilterPresets: 'savedFilterPresets',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserJobWorkspaceStateScalarFieldEnum = (typeof UserJobWorkspaceStateScalarFieldEnum)[keyof typeof UserJobWorkspaceStateScalarFieldEnum]
 
 
 export const EmailChangeRequestScalarFieldEnum = {

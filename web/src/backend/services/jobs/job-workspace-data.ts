@@ -268,7 +268,7 @@ export async function readJobWorkspaceSnapshot(
 ): Promise<JobWorkspaceSnapshot> {
   const [catalog, state, appliedJobIds] = await Promise.all([
     readCatalog(),
-    readUserJobState(),
+    readUserJobState(candidateUserId),
     new PrismaApplicationTrackingRepository().listAppliedJobIds(
       candidateUserId,
     ),

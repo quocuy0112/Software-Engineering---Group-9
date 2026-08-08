@@ -19,7 +19,7 @@ type OcrPayload = Readonly<{
   schemaVersion: "search-ocr-text-v1";
   text: string;
   language: "VI" | "EN" | "BILINGUAL" | "UNKNOWN";
-  warnings: readonly "LOW_CONFIDENCE"[];
+  warnings: readonly ("LOW_CONFIDENCE" | "PARTIAL_OCR")[];
 }>;
 
 export class ConsumeImageSearchResultService {

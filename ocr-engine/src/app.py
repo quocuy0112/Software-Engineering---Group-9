@@ -120,7 +120,11 @@ def create_app(engine: RecognitionEngine) -> FastAPI:
         if not image_bytes.startswith(b"\x89PNG\r\n\x1a\n"):
             return _error("INVALID_REQUEST", 400)
         try:
-            outcome = engine.recognize(image_bytes, deadline=deadline)
+            outcome = engine.recognize(
+                image_bytes,
+                deadline=deadline,
+                purpose=purpose,
+            )
             lines = normalize_engine_lines(
                 outcome["lines"],
                 width=outcome["width"],
@@ -154,6 +158,7 @@ def create_app(engine: RecognitionEngine) -> FastAPI:
                             else None
                         ),
                         "minimumConfidence": min(confidences) if confidences else None,
+                        "partial": bool(outcome.get("partial", False)),
                     },
                 }
             )
