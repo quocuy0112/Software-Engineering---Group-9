@@ -27,9 +27,16 @@ class FakeEngine(RecognitionEngine):
     def assert_ready(self) -> EngineManifest:
         return self.manifest
 
-    def recognize(self, image_bytes: bytes, *, deadline: datetime):
+    def recognize(
+        self,
+        image_bytes: bytes,
+        *,
+        deadline: datetime,
+        purpose: str = "CV_IMPORT",
+    ):
         assert image_bytes == FIXTURE_PNG
         assert deadline > datetime.now(UTC)
+        assert purpose == "CV_IMPORT"
         return {
             "width": 1,
             "height": 1,
@@ -69,6 +76,7 @@ def test_recognition_contract_is_strict_and_bounded() -> None:
     body = response.json()
     parsed = RecognitionResponse.model_validate(body)
     assert parsed.schema_version == "ocr-lines-v1"
+    assert parsed.summary.partial is False
     assert parsed.summary.utf8_bytes == len("Xin chào OCR".encode("utf-8"))
     assert parsed.lines[0].id == "line-0"
     assert set(body) == {

@@ -74,6 +74,7 @@ class RecognitionSummary(ContractModel):
     minimum_confidence: Annotated[
         float | None, Field(ge=0, le=1, allow_inf_nan=False)
     ]
+    partial: bool = False
 
 
 class RecognitionResponse(ContractModel):

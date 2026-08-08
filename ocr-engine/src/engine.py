@@ -26,6 +26,13 @@ from .limits import (
 )
 
 
+SEARCH_DETECTION_SIDE_LIMIT = 640
+SEARCH_MAX_REGIONS = 3
+SEARCH_REGION_ASPECT_BUDGET = 35.0
+SEARCH_MAX_REGION_ASPECT_RATIO = 20.0
+SEARCH_MIN_RECOGNITION_SECONDS = 1.25
+
+
 def file_sha256(path: Path) -> str:
     digest = sha256()
     with path.open("rb") as source:
@@ -97,7 +104,13 @@ class RecognitionEngine(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def recognize(self, image_bytes: bytes, *, deadline: datetime) -> dict[str, Any]:
+    def recognize(
+        self,
+        image_bytes: bytes,
+        *,
+        deadline: datetime,
+        purpose: str = "CV_IMPORT",
+    ) -> dict[str, Any]:
         raise NotImplementedError
 
 
@@ -201,7 +214,98 @@ class PaddleOcrOnnxEngine(RecognitionEngine):
             raise RuntimeError("ENGINE_NOT_READY")
         return self._manifest
 
-    def recognize(self, image_bytes: bytes, *, deadline: datetime) -> dict[str, Any]:
+    @staticmethod
+    def _search_regions(
+        crops: list[np.ndarray], polygons: list[Any]
+    ) -> tuple[list[tuple[np.ndarray, Any]], bool]:
+        valid: list[tuple[np.ndarray, Any, float]] = []
+        for crop, polygon in zip(crops, polygons, strict=False):
+            if crop.size == 0 or crop.shape[0] < 1 or crop.shape[1] < 1:
+                continue
+            valid.append((crop, polygon, crop.shape[1] / float(crop.shape[0])))
+        if not valid:
+            return [], False
+
+        selected: list[tuple[np.ndarray, Any]] = []
+        spent = 0.0
+        for index, (crop, polygon, aspect_ratio) in enumerate(valid):
+            if len(selected) >= SEARCH_MAX_REGIONS:
+                break
+            if index == 0 and aspect_ratio > SEARCH_MAX_REGION_ASPECT_RATIO:
+                maximum_width = max(
+                    1, round(crop.shape[0] * SEARCH_MAX_REGION_ASPECT_RATIO)
+                )
+                selected.append((crop[:, :maximum_width], polygon))
+                spent = SEARCH_MAX_REGION_ASPECT_RATIO
+                continue
+            if aspect_ratio > SEARCH_MAX_REGION_ASPECT_RATIO:
+                continue
+            if selected and spent + aspect_ratio > SEARCH_REGION_ASPECT_BUDGET:
+                continue
+            selected.append((crop, polygon))
+            spent += aspect_ratio
+        return selected, len(selected) < len(valid) or (
+            valid[0][2] > SEARCH_MAX_REGION_ASPECT_RATIO
+        )
+
+    def _recognize_search(
+        self, image_array: np.ndarray, *, deadline: datetime
+    ) -> tuple[list[dict[str, Any]], bool]:
+        pipeline = self._pipeline
+        paddlex_pipeline = getattr(pipeline, "paddlex_pipeline", None)
+        inner = getattr(paddlex_pipeline, "_pipeline", None)
+        if inner is None:
+            raise RuntimeError("ENGINE_NOT_READY")
+        detection_parameters = inner.get_text_det_params(
+            SEARCH_DETECTION_SIDE_LIMIT,
+            "max",
+            SEARCH_DETECTION_SIDE_LIMIT,
+            None,
+            None,
+            None,
+        )
+        detections = list(inner.text_det_model([image_array], **detection_parameters))
+        if datetime.now(UTC) >= deadline:
+            raise TimeoutError("DEADLINE_EXCEEDED")
+        if not detections:
+            return [], False
+        polygons = list(inner._sort_boxes(detections[0]["dt_polys"]))
+        crops = list(inner._crop_by_polys(image_array, polygons))
+        selected, partial = self._search_regions(crops, polygons)
+        if not selected:
+            return [], partial
+        if (deadline - datetime.now(UTC)).total_seconds() < SEARCH_MIN_RECOGNITION_SECONDS:
+            raise TimeoutError("DEADLINE_EXCEEDED")
+        recognitions = list(
+            inner.text_rec_model(
+                [crop for crop, _ in selected],
+                batch_size=len(selected),
+                return_word_box=False,
+            )
+        )
+        if datetime.now(UTC) >= deadline:
+            raise TimeoutError("DEADLINE_EXCEEDED")
+        lines: list[dict[str, Any]] = []
+        for recognition, (_, polygon) in zip(recognitions, selected, strict=False):
+            text = str(recognition["rec_text"]).strip()
+            if not text:
+                continue
+            lines.append(
+                {
+                    "text": text,
+                    "confidence": float(recognition["rec_score"]),
+                    "polygon": np.asarray(polygon).tolist(),
+                }
+            )
+        return lines, partial
+
+    def recognize(
+        self,
+        image_bytes: bytes,
+        *,
+        deadline: datetime,
+        purpose: str = "CV_IMPORT",
+    ) -> dict[str, Any]:
         if datetime.now(UTC) >= deadline:
             raise TimeoutError("DEADLINE_EXCEEDED")
         pipeline = self._pipeline
@@ -214,10 +318,18 @@ class PaddleOcrOnnxEngine(RecognitionEngine):
                 raise ValueError("INVALID_REQUEST")
             if width < 1 or height < 1 or width * height > MAX_DECODED_PIXELS:
                 raise ValueError("PIXEL_LIMIT_EXCEEDED")
-            predictions = list(pipeline.predict(np.asarray(image.convert("RGB"))))
+            image_array = np.asarray(image.convert("RGB"))
+            if purpose == "JOB_IMAGE_SEARCH":
+                raw_lines, partial = self._recognize_search(
+                    image_array, deadline=deadline
+                )
+                predictions: list[Any] = []
+            else:
+                predictions = list(pipeline.predict(image_array))
+                raw_lines = []
+                partial = False
         if datetime.now(UTC) >= deadline:
             raise TimeoutError("DEADLINE_EXCEEDED")
-        raw_lines: list[dict[str, Any]] = []
         for prediction in predictions:
             payload = getattr(prediction, "json", prediction)
             if callable(payload):
@@ -238,4 +350,5 @@ class PaddleOcrOnnxEngine(RecognitionEngine):
             "height": height,
             "detectedOrientationDegrees": 0,
             "lines": normalize_engine_lines(raw_lines, width=width, height=height),
+            "partial": partial,
         }
