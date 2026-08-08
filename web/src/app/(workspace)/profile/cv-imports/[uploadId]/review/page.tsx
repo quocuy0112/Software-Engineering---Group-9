@@ -71,7 +71,7 @@ export default async function CvDraftReviewPage({
       <header className={styles.header}>
         <Link
           className={styles.backLink}
-          href={`/profile/cv-imports/${uploadId}`}
+          href={`/profile/cv-imports/${resource.uploadId}`}
         >
           <span aria-hidden="true">←</span>{" "}
           {vi ? "Quay lại trạng thái nhập" : "Back to import status"}

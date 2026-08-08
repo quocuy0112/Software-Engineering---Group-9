@@ -16,17 +16,64 @@ function initialDisplayName(originalName: string | null, fallback: string) {
   return value.slice(0, 200);
 }
 
-/**
- * A confirmed CV import has completed the parser/review flow and is therefore
- * eligible for the retained Profile CV library consumed by Apply. The
- * application repository reads only CandidateCv; this projection keeps the
- * temporary import lifecycle out of the application transaction itself.
- */
-export async function ensureCandidateCvLibrary(
+type ConfirmedCvImport = Readonly<{
+  id: string;
+  declaredMediaType: string;
+  actualBytes: number | null;
+  sourceSha256: Uint8Array | null;
+  confirmedAt: Date | null;
+  displayFilenameCiphertext: string | null;
+}>;
+
+async function confirmedCvImports(
   userId: string,
-  db: typeof prisma = prisma,
-) {
-  const imports = await db.cvUpload.findMany({
+  db: typeof prisma,
+): Promise<ConfirmedCvImport[]> {
+  // PrismaPg currently exposes PostgreSQL bytea values as objects that the
+  // generated client cannot deserialize into Bytes. Encode the checksum in
+  // PostgreSQL and reconstruct it here so one bad projection cannot leave a
+  // confirmed import without its CandidateCv row.
+  if (typeof (db as { $queryRaw?: unknown }).$queryRaw === "function") {
+    const rows = await db.$queryRaw<
+      Array<{
+        id: string;
+        declaredMediaType: string;
+        actualBytes: number | null;
+        sourceSha256Hex: string | null;
+        confirmedAt: Date | null;
+        displayFilenameCiphertext: string | null;
+      }>
+    >`
+      SELECT upload."id",
+             upload."declaredMediaType",
+             upload."actualBytes",
+             encode(upload."sourceSha256", 'hex') AS "sourceSha256Hex",
+             upload."confirmedAt",
+             upload."displayFilenameCiphertext"
+        FROM "CvUpload" upload
+       WHERE upload."accountId" = ${userId}
+         AND upload."parserClass" IN ('DETERMINISTIC_INTERNAL', 'EXTERNAL_OPENAI')
+         AND upload."status" = 'CONFIRMED'
+         AND upload."confirmedAt" IS NOT NULL
+         AND upload."actualBytes" IS NOT NULL
+         AND upload."sourceSha256" IS NOT NULL
+         AND upload."declaredMediaType" IN (
+           'application/pdf',
+           'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+         )
+       ORDER BY upload."confirmedAt" DESC, upload."id" DESC
+       LIMIT 50
+    `;
+    return rows.map((row) => ({
+      ...row,
+      sourceSha256: row.sourceSha256Hex
+        ? Buffer.from(row.sourceSha256Hex, "hex")
+        : null,
+    }));
+  }
+
+  // Lightweight test doubles do not implement Prisma's tagged raw-query API.
+  return db.cvUpload.findMany({
     where: {
       accountId: userId,
       parserClass: {
@@ -54,6 +101,19 @@ export async function ensureCandidateCvLibrary(
       displayFilenameCiphertext: true,
     },
   });
+}
+
+/**
+ * A confirmed CV import has completed the parser/review flow and is therefore
+ * eligible for the retained Profile CV library consumed by Apply. The
+ * application repository reads only CandidateCv; this projection keeps the
+ * temporary import lifecycle out of the application transaction itself.
+ */
+export async function ensureCandidateCvLibrary(
+  userId: string,
+  db: typeof prisma = prisma,
+) {
+  const imports = await confirmedCvImports(userId, db);
 
   const legacyRows = imports.length
     ? await db.candidateCv.findMany({

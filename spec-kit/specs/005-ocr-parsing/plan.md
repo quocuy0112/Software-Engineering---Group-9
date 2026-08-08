@@ -190,6 +190,20 @@ versioned unit manifest rather than failing immediately on image-only content:
    startup cleanup removes stale attempt directories. The durable source
    document permits safe lease retry without retaining raster artifacts.
 
+### Confirmed CV status projection
+
+This is the implementation design for FR-056. Feature 004's confirmed import
+remains owner-readable through the persisted
+`uploadId`, even after temporary CV content becomes inaccessible. The status route
+returns the content-free lifecycle state and immutable confirmation receipt; it
+does not reconstruct editable draft content. External OpenAI consent notices and
+challenges are materialized only while the temporary import content is accessible
+(`contentInaccessibleAt IS NULL`). Once confirmation sets that boundary, the
+projection skips consent challenge issuance so a valid `CONFIRMED` import cannot
+be mistaken for a missing resource. The review route may remain unavailable after
+confirmation because editable draft comparison is an `EDITABLE`/`REVIEW_READY`
+capability, not a status-page fallback.
+
 `OcrProcessingAttempt` and `OcrUnitOutcome` contain only state, counts,
 confidence aggregates, versions, unit locations, safe failures, and timing. Raw
 text exists only inside the encrypted Feature 004 extraction artifact and draft
@@ -619,6 +633,10 @@ returns recognized lines only.
   worker crash recovery.
 - Draft tests prove warnings/provenance, no Profile write before confirmation,
   exact revision conflicts, idempotent atomic confirmation, and rollback.
+- Confirmed external-AI imports remain readable through the canonical status route
+  and immutable receipt after `contentInaccessibleAt` is set; projection tests
+  prove that no new consent challenge is issued and that draft comparison remains
+  unavailable after confirmation.
 
 ### Search behavior
 

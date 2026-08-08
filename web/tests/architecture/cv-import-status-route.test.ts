@@ -11,6 +11,13 @@ describe("CV import status route identity", () => {
       ),
       "utf8",
     );
+    const review = await readFile(
+      resolve(
+        process.cwd(),
+        "src/app/(workspace)/profile/cv-imports/[uploadId]/review/page.tsx",
+      ),
+      "utf8",
+    );
     const list = await readFile(
       resolve(
         process.cwd(),
@@ -30,6 +37,9 @@ describe("CV import status route identity", () => {
     expect(route).toContain("getCvImportResource(context.userId, parsed.data)");
     expect(route).toContain("<CvImportStatus");
     expect(route).toContain("<CvConfirmationReceipt");
+    expect(review).toContain(
+      "href={`/profile/cv-imports/${resource.uploadId}`}",
+    );
     expect(route).toContain('export const dynamic = "force-dynamic"');
     expect(list).toContain("/profile/cv-imports/${item.uploadId}");
     expect(status).toContain('current.status === "REVIEW_READY"');

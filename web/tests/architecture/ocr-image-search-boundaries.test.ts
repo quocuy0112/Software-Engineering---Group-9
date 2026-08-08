@@ -17,6 +17,24 @@ async function files(root: string): Promise<string[]> {
 const source = resolve(process.cwd(), "src");
 
 describe("Feature 005 architecture boundaries", () => {
+  it("preserves scanner signatures when resetting the local database", async () => {
+    const [resetScript, rootPackage] = await Promise.all([
+      readFile(
+        resolve(process.cwd(), "../scripts/reset-local-database.mjs"),
+        "utf8",
+      ),
+      readFile(resolve(process.cwd(), "../package.json"), "utf8"),
+    ]);
+    expect(resetScript).toContain('run(docker, ["compose", "down"]);');
+    expect(resetScript).toContain(
+      'run(docker, ["volume", "rm", postgresVolume]);',
+    );
+    expect(resetScript).not.toContain('["compose", "down", "-v"]');
+    expect(JSON.parse(rootPackage).scripts["db:reset:empty"]).toBe(
+      "node scripts/reset-local-database.mjs --empty",
+    );
+  });
+
   it("keeps image-search routes thin and free of Prisma, storage, OCR, scanner, and providers", async () => {
     for (const path of await files(
       resolve(source, "app/api/jobs/image-searches"),

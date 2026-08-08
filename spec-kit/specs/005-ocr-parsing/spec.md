@@ -33,6 +33,11 @@ editable structured filters for deterministic job retrieval."
   Only in the current in-memory browser interaction; the server copy is deleted
   immediately, and reload, navigation, cancellation, or a newer query discards
   the browser copy.
+- Q: What must happen when a Candidate revisits an external-AI CV import after
+  confirmation? A: The confirmed import remains readable through its persisted
+  upload identifier and exposes its immutable receipt without draft content. The
+  status projection does not issue a new consent challenge after the temporary
+  content becomes inaccessible.
 
 ## User Scenarios & Testing _(mandatory)_
 
@@ -78,6 +83,10 @@ standalone image CV upload is still rejected.
 5. **Given** a Candidate attempts to upload a standalone PNG or JPEG as a CV,
    **When** the upload is validated, **Then** it is rejected and the existing
    PDF/DOCX-only CV boundary remains unchanged.
+6. **Given** a Candidate confirms an EXTERNAL_OPENAI CV import, **When** the
+   Candidate returns to import status, **Then** the status and confirmation receipt
+   remain available through the canonical upload identifier without a new consent
+   challenge, while the editable draft route remains unavailable after confirmation.
 
 ---
 
@@ -330,6 +339,12 @@ hard deadline occurs.
 - **FR-021**: OCR-derived CV source, text, draft content, and provenance MUST use
   the same access controls and retention/deletion deadlines as the corresponding
   Feature 004 temporary artifacts.
+- **FR-056**: After a Candidate confirms a Feature 004 CV import, the status and
+  immutable confirmation receipt MUST remain readable through the persisted upload
+  identifier, including for `EXTERNAL_OPENAI` imports. The status projection MUST
+  NOT issue a new external-consent challenge when the temporary import content is
+  already inaccessible (`contentInaccessibleAt` is set), and the editable draft
+  route MUST remain unavailable after confirmation.
 
 #### Image-Assisted Job Search
 

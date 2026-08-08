@@ -250,7 +250,8 @@
 - [ ] T139 Execute the approved usability protocol with at least 30 representative participants, at least 15 per viewport cohort, require at least 27 complete first-attempt successes, and store only anonymized aggregate counts/environment/sign-off in `docs/testing/evidence/feature-005-image-search-usability-results.md`
 - [x] T140 [P] Add pinned Python/npm dependency, model checksum/license, image provenance, SBOM, vulnerability, and browser-bundle inspection gates in `scripts/verify-ocr-supply-chain.mjs`
 - [x] T141 Add feature-flag rollout/rollback verification proving admissions and external dispatch stop while cleanup, reconciliation, native CV, and manual search remain active in `web/tests/backend/integration/ocr-image-search/feature-rollout-rollback.test.ts`
-- [ ] T142 Perform final release sign-off only after T131-T141 evidence exists: run formatting/lint/typecheck/build/focused suites, verify quickstart evidence links, and close applicable release items in `spec-kit/specs/005-ocr-parsing/checklists/requirements.md`
+- [x] T143 [US1] Add FR-056 regression coverage for confirmed EXTERNAL_OPENAI imports: status/receipt projection skips consent challenge after `contentInaccessibleAt`, canonical upload-id navigation remains available, and editable draft access remains unavailable after confirmation in `web/src/backend/services/cv-import/cv-import-projection.ts`, `web/src/app/(workspace)/profile/cv-imports/[uploadId]/review/page.tsx`, `web/src/frontend/features/cv-import/components/cv-confirmation-receipt.tsx`, `web/tests/backend/integration/cv-import/cv-draft-confirmation.test.ts`, `web/tests/architecture/cv-import-status-route.test.ts`, `web/tests/frontend/components/cv-import/cv-draft-review.test.tsx`, and `web/tests/system/e2e/cv-import/review-and-confirm.spec.ts`
+- [ ] T142 Perform final release sign-off only after T131-T141 and T143 evidence exists: run formatting/lint/typecheck/build/focused suites, verify quickstart evidence links, and close applicable release items in `spec-kit/specs/005-ocr-parsing/checklists/requirements.md`
 
 ---
 
@@ -264,7 +265,7 @@
 - **Phase 4 - US2 (T062-T101)**: Starts after Phase 2. Hard-deadline transitions and cleanup/reconciliation T079-T081 structurally precede admission T082-T083; no image bytes may be admitted earlier.
 - **Phase 5 - US3 (T102-T114)**: Its failure tests can start after Phase 2; full acceptance requires the relevant US1/US2 happy paths to exist.
 - **Phase 6 - US4 (T115-T130)**: Its advanced consent/canary tests can start after Phase 2; external dispatch integrates only after the complete US2 lifecycle exists.
-- **Phase 7 - Polish (T131-T142)**: Starts after the selected story implementations; release evidence requires all four stories.
+- **Phase 7 - Polish (T131-T143)**: Starts after the selected story implementations; release evidence requires all four stories and the confirmed-import status regression.
 
 ### User Story Dependency Graph
 
@@ -284,7 +285,7 @@ US1 T039-T061                 US2 T062-T101
    US3 T102-T114      US4 T115-T130
           +--------+--------+
                    v
-             Polish T131-T142
+             Polish T131-T143
 ```
 
 ### Within Each User Story
@@ -357,7 +358,7 @@ Join points: T122 -> T123/T124/T126; all advanced privacy controls -> T121
 
 - After Phase 2, separate developers can own US1 and US2 concurrently because they share only stable foundational ports and persistence.
 - US3 failure-injection fixtures and US4 security/canary suites can be authored while US1/US2 implementation proceeds, then bound to the completed paths.
-- Quality, performance, accessibility, protocol, and supply-chain tasks T131-T138/T140 are largely parallel after functional stability; usability execution T139 follows protocol T138.
+- Quality, performance, accessibility, protocol, supply-chain, and confirmed-import regression tasks T131-T138/T140/T143 are largely parallel after functional stability; usability execution T139 follows protocol T138.
 
 ---
 
@@ -399,6 +400,9 @@ Join points: T122 -> T123/T124/T126; all advanced privacy controls -> T121
 - `[P]` means different files and no unfinished dependency; it does not waive review of shared contracts or generated files.
 - Do not commit real CVs, job posters, user content, model secrets, storage keys, or provider payloads as fixtures or evidence.
 - Preserve Feature 003 deterministic retrieval/ranking and Feature 004 PDF/DOCX admission/confirmation as authoritative baselines.
+- Keep confirmed CV status/receipt projections readable by `uploadId` after temporary
+  content becomes inaccessible; do not re-issue external consent for the completed
+  import, and keep editable draft comparison unavailable after confirmation.
 - Keep `cv-segments-v1` for native-sufficient documents; use v2 only for hybrid extraction.
 - Search content is processing data, never persistent search history; `deleteBy = admittedAt + 15 minutes` is immutable and cleanup remains active during rollback.
 - Every external-dispatch task remains disabled until exact consent and production privacy/ZDR gates are implemented and tested.

@@ -6,6 +6,39 @@ import {
 } from "@/backend/services/profile/candidate-cv-library";
 
 describe("candidate CV library", () => {
+  it("decodes confirmed import checksums selected through the PrismaPg-safe query", async () => {
+    const upsert = vi.fn().mockResolvedValue({});
+    const queryRaw = vi.fn().mockResolvedValue([
+      {
+        id: "upload-openai-raw-1",
+        declaredMediaType: "application/pdf",
+        actualBytes: 2048,
+        sourceSha256Hex: "ab".repeat(32),
+        confirmedAt: new Date("2026-08-07T00:00:00.000Z"),
+        displayFilenameCiphertext: null,
+      },
+    ]);
+    const db = {
+      $queryRaw: queryRaw,
+      candidateCv: {
+        findMany: vi.fn().mockResolvedValue([]),
+        upsert,
+      },
+    } as never;
+
+    await ensureCandidateCvLibrary("user-1", db);
+
+    expect(queryRaw).toHaveBeenCalledOnce();
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.objectContaining({
+          id: "candidate-cv-upload-openai-raw-1",
+          checksumSha256: "ab".repeat(32),
+        }),
+      }),
+    );
+  });
+
   it("projects confirmed deterministic and OpenAI imports into retained CV options", async () => {
     const upsert = vi.fn().mockResolvedValue({});
     const candidateFindMany = vi.fn().mockResolvedValue([]);
