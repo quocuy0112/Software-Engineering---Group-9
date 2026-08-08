@@ -14,19 +14,21 @@ flowchart TD
     %% Actors Declaration
     V["👤 <b>Visitor</b><br/>[Person]<br/><br/>Browse and search public jobs,<br/>including image-assisted search,<br/>or register an account"]:::person
     C["👤 <b>Candidate</b><br/>[Person]<br/><br/>Manage profile, import CV with OCR,<br/>search/apply for jobs,<br/>and track applications"]:::person
+    R["👤 <b>Recruiter / Company Member</b><br/>[Person]<br/><br/>Uses the implemented recruiter API<br/>to update candidate application stages"]:::person
 
     %% Internal System Declaration
     SH["<b>SmartHire Platform</b><br/>[Software System]<br/><br/>Candidate identity/profile, CV import,<br/>job discovery, application tracking,<br/>and optional AI-assisted processing"]:::system
 
     %% External Systems Declaration
     EM["<b>Email Delivery Provider</b><br/>[External System — optional]<br/>Resend API or SMTP<br/><br/>Transactional email delivery"]:::external
-    ST["<b>AWS S3 & KMS (Adapter)</b><br/>[External System]<br/>S3 + SSE-KMS adapter implemented;<br/>external AWS infrastructure not<br/>provisioned/evidenced"]:::external
+    ST["<b>AWS S3 & KMS</b><br/>[External System — optional]<br/><br/>Cloud artifact storage<br/>and key management"]:::external
     AI["<b>OpenAI Responses API</b><br/>[External System — optional]<br/><br/>Consent-gated CV parsing and<br/>image-search intent interpretation"]:::external
     AV["<b>ClamAV Definition Service</b><br/>[External System]<br/>Freshclam<br/><br/>Malware signature updates<br/>for internal scanner"]:::external
 
     %% Communication Flow
     V -. "Browse/search jobs, use image-assisted<br/>search, and register [HTTPS]" .-> SH
     C -. "Manage profile, import/review CV,<br/>search, apply, and track [HTTPS]" .-> SH
+    R -. "Update candidate application stages<br/>through implemented recruiter API [HTTPS]" .-> SH
 
     SH -. "Send transactional message<br/>[HTTPS or SMTP]" .-> EM
     SH -. "Read/write artifacts & preflight checks<br/>[AWS API / HTTPS]" .-> ST
@@ -42,13 +44,14 @@ _Performed by: Lưu Chí Hải | Reviewed by: Nguyễn Gia Quốc Uy, Nguyễn Q
 
 - **Visitor:** Uses the platform to browse, filter, and view public job postings; may use image-assisted search to propose filters; and can register to become a Candidate.
 - **Candidate:** Creates and reuses a professional profile, imports PDF/DOCX CVs through native-first extraction and purpose-specific OCR, reviews proposed profile data, searches for suitable jobs, submits applications, and tracks application status.
+- **Recruiter / Company Member:** Uses the implemented, membership-authorized recruiter API to transition candidate application stages. This is a narrowly scoped backend/API capability; a complete recruiter portal or broader recruiter workflow is not represented as implemented.
 
-> **Scope note:** Full **Company Member / Recruiter**, **Platform Administrator**, and **Operator** experiences are excluded because complete actor-facing workflows for job-post management, recruitment pipeline administration, platform monitoring, moderation, and company verification are not part of the implemented Features 001–005 baseline documented here, and may be included in PA5.
+> **Scope note:** Broader **Company Member / Recruiter**, **Platform Administrator**, and **Operator** experiences are excluded because complete actor-facing workflows for job-post management, recruitment pipeline administration, platform monitoring, moderation, and company verification are not part of the implemented Features 001–005 baseline documented here, and may be included in PA5.
 
 **B. What data does SmartHire send to or receive from External Systems?**
 
 - **Email Delivery Provider (Resend API / SMTP):** When a non-capture adapter is configured, the Email Worker sends the minimum recipient and transactional message data required for delivery through the Resend HTTPS API or SMTP. The local default does not call this external system and writes messages to Local Mail Capture instead.
-- **AWS S3 & KMS (Adapter):** SmartHire's backend code is programmed to push CV files (PDF/DOCX format) and search artifacts to this storage system using Server-Side Encryption (SSE-KMS).
+- **AWS S3 & KMS:** SmartHire can use this external system for CV and search artifact storage with Server-Side Encryption (SSE-KMS).
 
 > **Deployment note:** The S3 + SSE-KMS adapter and preflight checks are implemented, but external AWS infrastructure is not provisioned in this repository. `.env.example` defaults to `filesystem`, and no Terraform or CloudFormation files create the required bucket, KMS key, or IAM role.
 
