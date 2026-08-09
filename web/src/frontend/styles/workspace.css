@@ -288,17 +288,22 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  display: flex;
+  display: grid;
   width: 100%;
   min-height: var(--sh-topbar-height);
+  grid-template-columns: max-content minmax(280px, 1fr) max-content;
   align-items: center;
-  justify-content: space-between;
   gap: var(--sh-space-4);
   padding: var(--sh-space-2) var(--sh-space-6);
   border-bottom: 1px solid var(--sh-color-border-subtle);
   background: color-mix(in srgb, var(--sh-color-surface-card) 94%, transparent);
   box-shadow: 0 1px 0 rgb(15 23 42 / 2%);
   backdrop-filter: blur(14px);
+}
+
+.workspace-header > .global-image-search {
+  width: 100%;
+  justify-self: center;
 }
 
 .workspace-header-actions {
@@ -984,7 +989,15 @@
 
   .workspace-header {
     position: static;
+    grid-template-columns: minmax(0, 1fr) max-content;
+    padding-block: var(--sh-space-3);
     padding-inline: var(--sh-space-4);
+  }
+
+  .workspace-header > .global-image-search {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    max-width: none;
   }
 
   .workspace-header-actions {

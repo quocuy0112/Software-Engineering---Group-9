@@ -7,7 +7,6 @@ import { serverEnvironment } from "@/backend/env/runtime";
 import { ThemeProvider } from "@/frontend/providers/theme-provider";
 import "./globals.css";
 import { Toaster } from "sonner";
-import { GlobalImageSearch } from "@/frontend/features/jobs/image-search/components/global-image-search";
 import "@/frontend/features/jobs/image-search/styles/image-search.css";
 
 export const metadata: Metadata = {
@@ -49,7 +48,6 @@ export default function RootLayout({
       </head>
       <body suppressHydrationWarning>
         <ThemeProvider>
-          <GlobalImageSearch />
           {children}
           <Toaster
             className="app-toaster"

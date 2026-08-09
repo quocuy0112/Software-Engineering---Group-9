@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { SmartHireBrand } from "@/frontend/components/ui/smarthire-brand";
 import { ThemeToggle } from "@/frontend/components/ui/theme-toggle";
+import { GlobalImageSearch } from "@/frontend/features/jobs/image-search/components/global-image-search";
 
 export function JobBoardHeader({ authenticated }: { authenticated: boolean }) {
   return (
     <header className="job-board-header">
       <div className="job-board-header-inner">
         <SmartHireBrand className="job-board-brand" />
+        <GlobalImageSearch />
 
         <div className="job-board-header-actions">
           <nav className="job-board-navigation" aria-label="Job board">

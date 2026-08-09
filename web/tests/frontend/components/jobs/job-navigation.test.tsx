@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { describe, expect, it, vi } from "vitest";
@@ -14,6 +20,12 @@ vi.mock("next/navigation", () => ({
 describe("job board navigation", () => {
   it("gives visitors direct browse and authentication paths", () => {
     render(<JobBoardHeader authenticated={false} />);
+
+    expect(
+      within(screen.getByRole("banner")).getByRole("search", {
+        name: "Global job search",
+      }),
+    ).toBeVisible();
 
     expect(screen.getByRole("link", { name: /browse jobs/i })).toHaveAttribute(
       "href",
@@ -105,7 +117,7 @@ describe("job board navigation", () => {
     );
 
     expect(styles).toContain(
-      "max-height: calc(\n    100dvh - var(--sh-topbar-height) - var(--sh-space-8)\n  );",
+      "max-height: calc(100dvh - var(--sh-topbar-height) - var(--sh-space-8));",
     );
     expect(styles).toContain("overflow-y: auto;");
     expect(styles).toContain("scrollbar-width: thin;");

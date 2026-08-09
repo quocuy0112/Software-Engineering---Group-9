@@ -1,12 +1,11 @@
 .global-image-search {
-  position: fixed;
+  position: relative;
   z-index: 70;
-  top: 10px;
-  left: 50%;
-  width: min(680px, calc(100vw - 32px));
+  width: 100%;
+  min-width: 0;
+  max-width: 680px;
   color: var(--sh-color-text-primary);
   font-family: var(--sh-font-family);
-  transform: translateX(-50%);
 }
 
 .global-image-search-bar {
@@ -637,8 +636,7 @@
 
 @media (max-width: 480px) {
   .global-image-search {
-    top: 8px;
-    width: calc(100vw - 16px);
+    max-width: none;
   }
 
   .global-image-search-panel {
