@@ -30,6 +30,10 @@ describe("Feature 005 architecture boundaries", () => {
       'run(docker, ["volume", "rm", postgresVolume]);',
     );
     expect(resetScript).not.toContain('["compose", "down", "-v"]');
+    expect(resetScript).toContain(
+      '"db:migrate",\n  "--workspace",\n  "@smarthire/web"',
+    );
+    expect(resetScript).not.toContain('runNpm(["run", "db:deploy"]);');
     expect(JSON.parse(rootPackage).scripts["db:reset:empty"]).toBe(
       "node scripts/reset-local-database.mjs --empty",
     );
