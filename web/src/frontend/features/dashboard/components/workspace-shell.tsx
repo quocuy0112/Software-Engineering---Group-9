@@ -9,6 +9,7 @@ import { CsrfProofProvider } from "@/frontend/features/authentication/client/csr
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
 import { SmartHireBrand } from "@/frontend/components/ui/smarthire-brand";
 import { ThemeToggle } from "@/frontend/components/ui/theme-toggle";
+import { GlobalImageSearch } from "@/frontend/features/jobs/image-search/components/global-image-search";
 import {
   ACCOUNT_NAME_UPDATED_EVENT,
   type AccountNameUpdatedDetail,
@@ -183,6 +184,9 @@ function WorkspaceShellContent({
               <p className="workspace-topbar-kicker">{copy.workspace}</p>
               <p className="workspace-topbar-title">{copy.greeting}</p>
             </div>
+            {contentMode === "job-board" ? (
+              <GlobalImageSearch csrfProof={csrfProof} />
+            ) : null}
             <div className="workspace-header-actions">
               <ThemeToggle compact />
               <Link

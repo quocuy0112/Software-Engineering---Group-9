@@ -5,6 +5,7 @@ import {
   SmartHireMark,
 } from "@/frontend/components/ui/smarthire-brand";
 import { ThemeToggle } from "@/frontend/components/ui/theme-toggle";
+import { GlobalImageSearch } from "@/frontend/features/jobs/image-search/components/global-image-search";
 
 type HomePageViewProps = {
   context: {
@@ -28,11 +29,12 @@ export function HomePageView({ context }: HomePageViewProps) {
   return (
     <main className="home-page">
       <section className="home-visitor" aria-labelledby="home-title">
+        <div className="home-visitor-topbar">
+          <SmartHireBrand className="home-brand" />
+          <GlobalImageSearch />
+          <ThemeToggle compact />
+        </div>
         <div className="home-visitor-copy">
-          <div className="home-visitor-topbar">
-            <SmartHireBrand className="home-brand" />
-            <ThemeToggle compact />
-          </div>
           <p className="home-eyebrow">BUILD YOUR NEXT CHAPTER</p>
           <h1 id="home-title">
             Your talent deserves

@@ -17,6 +17,53 @@ async function files(root: string): Promise<string[]> {
 const source = resolve(process.cwd(), "src");
 
 describe("Feature 005 architecture boundaries", () => {
+  it("mounts job search inside supported headers instead of the root or authentication shell", async () => {
+    const [
+      rootLayout,
+      authLayout,
+      publicHome,
+      homeHeader,
+      jobHeader,
+      workspaceShell,
+    ] = await Promise.all([
+      readFile(resolve(source, "app/layout.tsx"), "utf8"),
+      readFile(resolve(source, "app/(auth)/layout.tsx"), "utf8"),
+      readFile(
+        resolve(source, "frontend/features/home/components/home-page-view.tsx"),
+        "utf8",
+      ),
+      readFile(
+        resolve(
+          source,
+          "frontend/features/home/components/home-authenticated-actions.tsx",
+        ),
+        "utf8",
+      ),
+      readFile(
+        resolve(
+          source,
+          "frontend/features/jobs/components/job-board-header.tsx",
+        ),
+        "utf8",
+      ),
+      readFile(
+        resolve(
+          source,
+          "frontend/features/dashboard/components/workspace-shell.tsx",
+        ),
+        "utf8",
+      ),
+    ]);
+
+    expect(rootLayout).not.toContain("<GlobalImageSearch");
+    expect(authLayout).not.toContain("<GlobalImageSearch");
+    expect(publicHome).toContain("<GlobalImageSearch");
+    expect(homeHeader).toContain("<GlobalImageSearch");
+    expect(jobHeader).toContain("<GlobalImageSearch");
+    expect(workspaceShell).toContain('contentMode === "job-board"');
+    expect(workspaceShell).toContain("<GlobalImageSearch");
+  });
+
   it("preserves scanner signatures when resetting the local database", async () => {
     const [resetScript, rootPackage] = await Promise.all([
       readFile(

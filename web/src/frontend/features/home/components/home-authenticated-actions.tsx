@@ -8,6 +8,7 @@ import { postWithCurrentCsrf } from "@/frontend/features/authentication/client/c
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
 import { SmartHireBrand } from "@/frontend/components/ui/smarthire-brand";
 import { ThemeToggle } from "@/frontend/components/ui/theme-toggle";
+import { GlobalImageSearch } from "@/frontend/features/jobs/image-search/components/global-image-search";
 
 export function HomeAuthenticatedActions({
   profile,
@@ -49,6 +50,7 @@ export function HomeAuthenticatedActions({
     <div className="home-authenticated">
       <header className="home-header">
         <SmartHireBrand className="home-brand" />
+        <GlobalImageSearch csrfProof={csrfProof} />
         <div className="home-header-actions">
           <ThemeToggle compact />
           <div className="home-account">

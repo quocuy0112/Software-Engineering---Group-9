@@ -86,21 +86,22 @@ function criteriaFromLocation(): ManualSearchContext {
   };
 }
 
-export function GlobalImageSearch() {
-  const csrfProof = useCsrfProof();
+export function GlobalImageSearch({ csrfProof }: { csrfProof?: string } = {}) {
+  const contextCsrfProof = useCsrfProof();
+  const activeCsrfProof = csrfProof ?? contextCsrfProof;
   const criteria = useMemo(() => criteriaFromLocation(), []);
   const [externalConsent, setExternalConsent] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [query, setQuery] = useState("");
   const search = useImageSearch({
     currentCriteria: criteria,
-    csrfProof,
+    csrfProof: activeCsrfProof,
   });
   const busy = search.phase === "UPLOADING" || search.phase === "PROCESSING";
   const showPanel = panelOpen || search.phase !== "IDLE";
 
   return (
-    <header
+    <div
       id="global-image-search"
       className="global-image-search"
       data-phase={search.phase.toLowerCase()}
@@ -245,6 +246,6 @@ export function GlobalImageSearch() {
           />
         </div>
       ) : null}
-    </header>
+    </div>
   );
 }
