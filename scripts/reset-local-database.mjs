@@ -52,8 +52,16 @@ if (emptyOnly) {
   process.exit(0);
 }
 
-console.log("Applying available migrations...");
-runNpm(["run", "db:deploy"]);
+console.log("Generating and applying local migrations...");
+runNpm([
+  "run",
+  "db:migrate",
+  "--workspace",
+  "@smarthire/web",
+  "--",
+  "--name",
+  "smarthire",
+]);
 
 console.log("Importing the split local company and job fixtures...");
 runNpm(["run", "db:seed:jobs"]);
