@@ -28,4 +28,14 @@ describe("admin architecture boundaries", () => {
     expect(source).toContain("ScopedCssBaseline");
     expect(readFileSync("src/app/globals.css", "utf8")).not.toContain("MuiCssBaseline");
   });
+
+  it("mounts React Admin only in the browser", () => {
+    const source = readFileSync(
+      "src/frontend/features/admin/app/admin-console-client.tsx",
+      "utf8",
+    );
+    expect(source).toContain('"use client"');
+    expect(source).toContain("ssr: false");
+    expect(source).toContain('import("./admin-app")');
+  });
 });

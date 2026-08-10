@@ -4,19 +4,28 @@ import { Alert, Box, Button, TextField, Typography } from "@mui/material";
 
 export function AdminTwoFactorPage(props: { onComplete: () => void }) {
   const [error, setError] = useState(false);
+  const [pending, setPending] = useState(false);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (pending) return;
     setError(false);
+    setPending(true);
     const code = String(new FormData(event.currentTarget).get("code") ?? "");
-    const response = await fetch("/api/admin/auth/two-factor", {
-      method: "POST",
-      credentials: "same-origin",
-      cache: "no-store",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ code, factor: "totp" }),
-    });
-    if (!response.ok) return setError(true);
-    props.onComplete();
+    try {
+      const response = await fetch("/api/admin/auth/two-factor", {
+        method: "POST",
+        credentials: "same-origin",
+        cache: "no-store",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ code, factor: "totp" }),
+      });
+      if (!response.ok) return setError(true);
+      props.onComplete();
+    } catch {
+      setError(true);
+    } finally {
+      setPending(false);
+    }
   }
   return (
     <Box
@@ -37,8 +46,8 @@ export function AdminTwoFactorPage(props: { onComplete: () => void }) {
         required
         autoFocus
       />
-      <Button type="submit" variant="contained">
-        Verify and designate this session
+      <Button type="submit" variant="contained" disabled={pending}>
+        {pending ? "Verifying…" : "Verify and designate this session"}
       </Button>
     </Box>
   );

@@ -25,6 +25,30 @@ import { ModerationReviewShow } from "../moderation/moderation-review-show";
 
 const theme = createTheme({
   palette: { mode: "light", primary: { main: "#155eef" } },
+  components: {
+    MuiInputBase: {
+      styleOverrides: {
+        input: {
+          "&&:focus-visible": {
+            outline: "none",
+            outlineOffset: 0,
+            boxShadow: "none",
+          },
+        },
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        select: {
+          "&&:focus-visible": {
+            outline: "none",
+            outlineOffset: 0,
+            boxShadow: "none",
+          },
+        },
+      },
+    },
+  },
 });
 const store = memoryStore();
 const queryClient = createAdminQueryClient();

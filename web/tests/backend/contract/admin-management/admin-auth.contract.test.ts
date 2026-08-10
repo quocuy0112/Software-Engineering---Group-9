@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { adminNoStoreHeaders } from "@/backend/admin/http/admin-route";
 
 describe("admin authentication contract", () => {
   const provider = readFileSync(
@@ -23,4 +24,28 @@ describe("admin authentication contract", () => {
       expect(source).toContain("admin");
     },
   );
+
+  it("scopes the pre-authentication cookie to the admin factor route", () => {
+    const service = readFileSync(
+      "src/backend/admin/authorization/admin-auth-service.ts",
+      "utf8",
+    );
+    const route = readFileSync(
+      "src/app/api/admin/auth/two-factor/route.ts",
+      "utf8",
+    );
+    expect(service).toContain("ADMIN_PRE_AUTH_COOKIE_PATH");
+    expect(service).toContain("preAuthCookiePath: ADMIN_PRE_AUTH_COOKIE_PATH");
+    expect(route).toContain("clearPreAuthCookie(ADMIN_PRE_AUTH_COOKIE_PATH)");
+  });
+
+  it("preserves separate session and challenge Set-Cookie headers", () => {
+    const source = new Headers();
+    source.append("set-cookie", "smarthire.session=session-value; Path=/");
+    source.append(
+      "set-cookie",
+      "smarthire.pre-auth=; Path=/api/admin/auth/two-factor; Max-Age=0",
+    );
+    expect(adminNoStoreHeaders(source).getSetCookie()).toHaveLength(2);
+  });
 });

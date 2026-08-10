@@ -1,6 +1,5 @@
 "use client";
 import {
-  BooleanField,
   BooleanInput,
   Datagrid,
   DateField,
@@ -11,6 +10,7 @@ import {
   TextInput,
 } from "react-admin";
 import { CurrentListSnapshotDifference } from "../dashboard/snapshot-difference-notice";
+import { AccessRolesField, AccessRolesLegend } from "./access-roles-field";
 
 const filters = [
   <TextInput
@@ -54,14 +54,14 @@ export function AccountList() {
       sort={{ field: "createdAt", order: "DESC" }}
     >
       <CurrentListSnapshotDifference />
+      <AccessRolesLegend />
       <Datagrid bulkActionButtons={false} rowClick="show">
         <TextField source="id" label="Account reference" />
         <TextField source="displayName" />
         <TextField source="maskedEmail" />
         <TextField source="state" />
         <DateField source="createdAt" showTime />
-        <TextField source="activeMembershipCount" />
-        <BooleanField source="hasActiveAdministratorGrant" />
+        <AccessRolesField label="Access roles" />
       </Datagrid>
     </List>
   );

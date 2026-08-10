@@ -50,6 +50,7 @@
     "admin:worker:probe": "npm run admin:worker:probe --workspace @smarthire/web",
     "admin:evidence:check": "npm run admin:evidence:check --workspace @smarthire/web",
     "admin:provision": "npm run admin:provision --workspace @smarthire/web --",
+    "admin:revoke": "npm run admin:revoke --workspace @smarthire/web --",
     "admin:moderation:migration:verify": "npm run admin:moderation:migration:verify --workspace @smarthire/web",
     "image-search:storage:preflight": "npm run image-search:storage:preflight --workspace @smarthire/web",
     "ocr:corpus:evaluate": "npm run ocr:corpus:evaluate --workspace @smarthire/web",

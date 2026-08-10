@@ -9,7 +9,7 @@ export function AdminLayout(props: LayoutProps) {
       <Box
         id="admin-console-root"
         sx={{
-          "& :focus-visible": {
+          "& :focus-visible:not(.MuiInputBase-input):not(.MuiSelect-select)": {
             outline: "3px solid #155eef",
             outlineOffset: 2,
           },

@@ -84,6 +84,7 @@ export class AccountListService {
         take: input.perPage,
         orderBy: [{ createdAt: "desc" }, { id: "asc" }],
         include: {
+          candidateIdentity: { select: { userId: true } },
           _count: {
             select: { companyMemberships: { where: { status: "ACTIVE" } } },
           },
@@ -108,6 +109,7 @@ export class AccountListService {
         maskedEmail: maskEmail(row.email),
         state: row.state,
         createdAt: row.createdAt.toISOString(),
+        hasCandidateIdentity: row.candidateIdentity !== null,
         activeMembershipCount: row._count.companyMemberships,
         hasActiveAdministratorGrant: row.platformAdministratorGrants.length > 0,
       })),

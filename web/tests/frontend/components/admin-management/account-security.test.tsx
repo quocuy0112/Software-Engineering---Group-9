@@ -1,11 +1,48 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { RecordContextProvider } from "react-admin";
 import { describe, expect, it, vi } from "vitest";
 import { AccountStateDialog } from "@/frontend/features/admin/accounts/account-state-dialog";
 import { SessionRevocationDialog } from "@/frontend/features/admin/accounts/session-revocation-dialog";
 import { NotificationDeliveryStatus } from "@/frontend/features/admin/accounts/notification-delivery-status";
 import { StaleConflictPanel } from "@/frontend/features/admin/shared/stale-conflict-panel";
+import {
+  AccessRolesField,
+  AccessRolesLegend,
+} from "@/frontend/features/admin/accounts/access-roles-field";
 
 describe("account security components", () => {
+  it("shows compact, labelled Candidate, Recruiter, and Admin access roles", () => {
+    render(
+      <>
+        <AccessRolesLegend />
+        <RecordContextProvider
+          value={{
+            id: "account-1",
+            displayName: "Account One",
+            maskedEmail: "a***@example.test",
+            state: "ACTIVE",
+            createdAt: "2026-08-10T00:00:00.000Z",
+            hasCandidateIdentity: true,
+            activeMembershipCount: 2,
+            hasActiveAdministratorGrant: true,
+          }}
+        >
+          <AccessRolesField />
+        </RecordContextProvider>
+      </>,
+    );
+    expect(screen.getByLabelText("Access role legend")).toHaveTextContent(
+      "C = Candidate",
+    );
+    expect(screen.getByLabelText("Candidate")).toHaveTextContent("C");
+    expect(
+      screen.getByLabelText("Recruiter, 2 active companies"),
+    ).toHaveTextContent("R·2");
+    expect(screen.getByLabelText("Platform Administrator")).toHaveTextContent(
+      "A",
+    );
+  });
+
   it("names the exact target and disables an incomplete destructive action", () => {
     render(
       <SessionRevocationDialog

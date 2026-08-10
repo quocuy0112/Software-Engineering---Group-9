@@ -394,7 +394,7 @@ full address, session credential, or factor data.
 | FR ID  | React Admin approach                                                                                                                                                                                                                                                            | Standard CRUD or Custom Component                    | Notes/Flags                                                                               |
 | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | FR-001 | Register separate `administrator-grants`, `accounts`, `candidate-identities`, and `company-memberships` domain resources backed by separate models/projections.                                                                                                                 | Server model + read-only resource registration       | React Admin resource names do not merge roles.                                            |
-| FR-002 | Expose no grant create/edit/delete provider method or UI; grant provisioning is an audited out-of-band operations command.                                                                                                                                                      | Server-only invariant                                | Client-supplied roles are rejected by all schemas.                                        |
+| FR-002 | Expose no grant create/edit/delete provider method or UI; grant provisioning and revocation are audited out-of-band terminal commands.                                                                                                                                          | Server-only invariant                                | Client-supplied roles are rejected by all schemas.                                        |
 | FR-003 | Exact-host `proxy.ts` routing plus startup origin validation and per-route host enforcement.                                                                                                                                                                                    | Custom host boundary                                 | Unknown host returns no admin shell/payload.                                              |
 | FR-004 | `authProvider` login/checkAuth/checkError/logout adapters; admin two-factor page; `AdminAuthorityGate`; `SensitiveActionDialog` step-up.                                                                                                                                        | Custom authentication components                     | Better Auth remains exclusive; server enforces 15-minute proof.                           |
 | FR-005 | Every provider method calls an explicit route whose request boundary derives actor/session and checks authority before projection/service use.                                                                                                                                  | Server-only authorization                            | React Admin `canAccess` is display-only.                                                  |
@@ -675,12 +675,13 @@ web/
 |   |-- reconcile-migration-names.mjs
 |   |-- run-admin-worker.mjs
 |   |-- provision-platform-administrator.mjs
+|   |-- revoke-platform-administrator.mjs
 |   `-- measure-admin-management-performance.mjs
 |-- src/
 |   |-- proxy.ts
 |   |-- app/
-|   |   |-- (admin-console)/__admin/page.tsx
-|   |   |-- (recruiter-entitlement)/__recruiter/page.tsx
+|   |   |-- (admin-console)/admin-console/page.tsx
+|   |   |-- (recruiter-entitlement)/recruiter-entitlement/page.tsx
 |   |   |-- api/admin/
 |   |   |   |-- auth/{context,login,two-factor,step-up,logout}/route.ts
 |   |   |   |-- dashboard/route.ts

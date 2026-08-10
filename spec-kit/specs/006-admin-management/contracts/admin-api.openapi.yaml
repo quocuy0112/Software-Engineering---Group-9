@@ -1085,6 +1085,7 @@ components:
           maskedEmail,
           accountState,
           createdAt,
+          hasCandidateIdentity,
           activeMembershipCount,
           hasActiveAdministratorGrant,
         ]
@@ -1094,6 +1095,7 @@ components:
         maskedEmail: { type: string }
         accountState: { type: string }
         createdAt: { type: string, format: date-time }
+        hasCandidateIdentity: { type: boolean }
         activeMembershipCount: { type: integer, minimum: 0 }
         hasActiveAdministratorGrant: { type: boolean }
     AccountSecurity:

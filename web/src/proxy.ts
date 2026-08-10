@@ -6,6 +6,15 @@ const local = {
   recruiter: "console.recruiter.localhost:3001",
 };
 
+export const INTERNAL_ADMIN_ROUTE = "/admin-console";
+export const INTERNAL_RECRUITER_ROUTE = "/recruiter-entitlement";
+
+function isInternalShellPath(pathname: string) {
+  return [INTERNAL_ADMIN_ROUTE, INTERNAL_RECRUITER_ROUTE].some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+}
+
 function expectedHost(kind: "candidate" | "admin" | "recruiter") {
   const configured =
     kind === "candidate"
@@ -21,16 +30,23 @@ export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   if (pathname.startsWith("/api/")) return NextResponse.next();
   if (host === expectedHost("admin")) {
+    if (isInternalShellPath(pathname))
+      return new NextResponse(null, { status: 404 });
     const url = request.nextUrl.clone();
-    url.pathname = `/__admin${pathname === "/" ? "" : pathname}`;
+    url.pathname = `${INTERNAL_ADMIN_ROUTE}${pathname === "/" ? "" : pathname}`;
     return NextResponse.rewrite(url);
   }
   if (host === expectedHost("recruiter")) {
+    if (isInternalShellPath(pathname))
+      return new NextResponse(null, { status: 404 });
     const url = request.nextUrl.clone();
-    url.pathname = `/__recruiter${pathname === "/" ? "" : pathname}`;
+    url.pathname = `${INTERNAL_RECRUITER_ROUTE}${pathname === "/" ? "" : pathname}`;
     return NextResponse.rewrite(url);
   }
-  if (host === expectedHost("candidate")) return NextResponse.next();
+  if (host === expectedHost("candidate"))
+    return isInternalShellPath(pathname)
+      ? new NextResponse(null, { status: 404 })
+      : NextResponse.next();
   return new NextResponse(null, { status: 404 });
 }
 

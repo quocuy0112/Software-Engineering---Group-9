@@ -105,6 +105,18 @@ Provision a grant only from a controlled operator shell:
 npm run admin:provision -- <verified-active-account-email>
 ```
 
+Revoke a grant from the same controlled operator shell:
+
+```powershell
+npm run admin:revoke -- <administrator-account-email>
+```
+
+Revocation retains the grant record in `REVOKED` state, revokes only its
+designated administration session, clears its administration two-factor proof,
+and leaves the underlying Candidate account available. Running
+`admin:provision` later reactivates the retained grant but does not restore the
+old administration session; password and two-factor sign-in are required again.
+
 ## 5. Run the Feature Locally
 
 Start the application:

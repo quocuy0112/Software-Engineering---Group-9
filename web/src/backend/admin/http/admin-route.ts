@@ -4,14 +4,21 @@ import { AdminBoundaryError } from "@/backend/security/admin-request-boundary";
 import { AdminCommandConflict } from "@/backend/repositories/admin/prisma-admin-command-repository";
 
 export function adminNoStoreHeaders(extra: HeadersInit = {}) {
-  return new Headers({
+  const headers = new Headers({
     "cache-control": "no-store, max-age=0",
     pragma: "no-cache",
     "x-content-type-options": "nosniff",
     "referrer-policy": "no-referrer",
     "x-robots-tag": "noindex, nofollow, noarchive",
-    ...Object.fromEntries(new Headers(extra)),
   });
+  const supplied = extra instanceof Headers ? extra : new Headers(extra);
+  supplied.forEach((value, key) => {
+    if (key !== "set-cookie") headers.set(key, value);
+  });
+  for (const cookie of supplied.getSetCookie()) {
+    headers.append("set-cookie", cookie);
+  }
+  return headers;
 }
 
 export async function parseAdminJson<T>(

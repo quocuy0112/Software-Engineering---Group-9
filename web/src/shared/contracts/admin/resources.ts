@@ -18,6 +18,7 @@ export const accountListItemSchema = z
     maskedEmail: z.string().max(320),
     state: adminAccountStateSchema,
     createdAt: adminTimestampSchema,
+    hasCandidateIdentity: z.boolean(),
     activeMembershipCount: z.number().int().nonnegative(),
     hasActiveAdministratorGrant: z.boolean(),
   })

@@ -1,4 +1,5 @@
 export { AdminApp } from "./app/admin-app";
+export { AdminConsoleClient } from "./app/admin-console-client";
 export { adminAuthProvider } from "./app/auth-provider";
 export { adminDataProvider } from "./app/data-provider";
 export { AdminDashboard } from "./dashboard/admin-dashboard";

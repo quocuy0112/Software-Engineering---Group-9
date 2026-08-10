@@ -75,7 +75,7 @@ migration, contract, authorization-boundary, and architecture tests.
 - [X] T022 [P] Implement closed-surface React Admin auth/data provider bases, memory-only store, zero-retention QueryClient, CSRF binding, safe error mapping, and cache purge in `web/src/frontend/features/admin/app/auth-provider.ts`, `web/src/frontend/features/admin/app/data-provider.ts`, and `web/src/frontend/features/admin/app/query-client.ts` (FR-004–FR-006, FR-020, FR-059, FR-060)
 - [X] T023 Implement the client-only React Admin shell after T022, contain the MUI theme/reset inside the admin mount, preserve the primary Tailwind/shadcn baseline, register closed resources, and add accessible layout/status/loading/empty/error states in `web/src/frontend/features/admin/app/admin-app.tsx`, `web/src/frontend/features/admin/layout/admin-layout.tsx`, and `web/src/frontend/features/admin/shared/safe-status-field.tsx` (FR-001, FR-007, FR-038, FR-059, FR-060)
 - [X] T024 [P] Implement separately leased snapshot, evidence, verification-deadline, notification, and retention loops with isolated readiness in `web/src/backend/admin/workers/admin-worker-runtime.ts` and `web/src/backend/admin/workers/admin-worker-entry.ts` (FR-010, FR-021, FR-022, FR-026–FR-028, FR-058)
-- [X] T025 Add controlled Feature 006 data provisioning with no browser grant path in `web/scripts/provision-platform-administrator.mjs` and `web/tests/fixtures/admin-management/seed.ts` (FR-002, FR-009)
+- [X] T025 Add controlled Feature 006 grant provisioning and revocation with no browser grant path in `web/scripts/provision-platform-administrator.mjs`, `web/scripts/revoke-platform-administrator.mjs`, and `web/tests/fixtures/admin-management/seed.ts` (FR-002, FR-009)
 
 **Checkpoint**: Migrations apply safely; shared contract and boundary tests fail
 closed; React Admin has no generic privileged CRUD surface; the worker can start
@@ -112,7 +112,7 @@ session may see console content and failed proof changes no business state.
 - [X] T034 [US1] Complete the React Admin authProvider lifecycle and presentation-only access hints in `web/src/frontend/features/admin/app/auth-provider.ts` (FR-004–FR-006, FR-060)
 - [X] T035 [P] [US1] Build AdminLoginPage, AdminTwoFactorPage, and reusable StepUpDialog without creating or storing a second browser credential in `web/src/frontend/features/admin/auth/admin-login-page.tsx`, `web/src/frontend/features/admin/auth/admin-two-factor-page.tsx`, and `web/src/frontend/features/admin/auth/step-up-dialog.tsx` (FR-004, FR-007)
 - [X] T036 [P] [US1] Build AdminAuthorityGate with route-change revalidation and pre-render query/store purge on authority loss in `web/src/frontend/features/admin/auth/admin-authority-gate.tsx` (FR-005, FR-006, FR-008, FR-060)
-- [X] T037 [US1] Mount the client-only console only behind the rewritten exact admin host and add a generic non-enumerating denial page in `web/src/app/(admin-console)/__admin/page.tsx` and `web/src/app/(admin-console)/__admin/unavailable/page.tsx` (FR-003, FR-006, FR-007)
+- [X] T037 [US1] Mount the client-only console only behind the rewritten exact admin host and add a generic non-enumerating denial page in `web/src/app/(admin-console)/admin-console/page.tsx` and `web/src/app/(admin-console)/admin-console/unavailable/page.tsx` (FR-003, FR-006, FR-007)
 - [X] T038 [US1] Record allowlisted admin access changes and denied privileged attempts without credentials or protected payloads in `web/src/backend/admin/authorization/admin-access-audit.ts` (FR-008, SC-013)
 - [X] T039 [US1] Document audited ordinary bootstrap, suspension, revocation, expiry, and last-usable-admin prevention procedures while explicitly excluding emergency recovery and break-glass operations in `docs/runbooks/platform-administrator-grants.md` (FR-002, FR-009)
 
@@ -150,7 +150,7 @@ allowlisted rows, and performance target.
 - [X] T047 [P] [US2] Implement dashboard and account-list Route Handlers with required independent `calculatedAt` and `stateDefinitionVersion` metadata in `web/src/app/api/admin/dashboard/route.ts` and `web/src/app/api/admin/accounts/route.ts` (FR-010–FR-014)
 - [X] T048 [US2] Add `getDashboardSnapshot` and allowlisted `accounts.getList` mappings without React Admin cache authority in `web/src/frontend/features/admin/app/data-provider.ts` (FR-010, FR-013, FR-014)
 - [X] T049 [P] [US2] Build AdminDashboard, MetricCard, and SnapshotDifferenceNotice with exact units, timestamps, age statement, and canonical drill-down navigation in `web/src/frontend/features/admin/dashboard/admin-dashboard.tsx`, `web/src/frontend/features/admin/dashboard/metric-card.tsx`, and `web/src/frontend/features/admin/dashboard/snapshot-difference-notice.tsx` (FR-010, FR-011, FR-012)
-- [X] T050 [P] [US2] Build the account List/DataTable with exact filters, 25/50/100 paging, locked ordering, masked-email projection, and accessible states in `web/src/frontend/features/admin/accounts/account-list.tsx` (FR-013, FR-014)
+- [X] T050 [P] [US2] Build the account List/DataTable with exact filters, 25/50/100 paging, locked ordering, masked-email projection, and accessible compact C/R/A access-role badges in `web/src/frontend/features/admin/accounts/account-list.tsx` and `web/src/frontend/features/admin/accounts/access-roles-field.tsx` (FR-013, FR-014)
 
 **Checkpoint**: User Story 2 independently proves correct periodic aggregates,
 current drill-down behavior, allowlisted account discovery, and SC-002/SC-003
@@ -361,7 +361,7 @@ Manager capability or route exists.
 - [X] T129 [US7] Implement current account/company/membership/role entitlement queries and selected-company revalidation without accepting admin grants in `web/src/backend/admin/memberships/recruiter-entitlement-service.ts` (FR-043, FR-055, FR-056)
 - [X] T130 [US7] Implement the exact recruiter-origin entitlement Route Handler with non-private safe projections in `web/src/app/api/recruiter/entitlement/route.ts` (FR-054–FR-057)
 - [X] T131 [P] [US7] Build the explicit-company RecruiterEntitlementComingNextPage containing only Candidate Dashboard and Employer Verification destinations in `web/src/frontend/features/recruiter-entitlement/recruiter-entitlement-coming-next-page.tsx` (FR-056, FR-057)
-- [X] T132 [US7] Mount only the limited entitlement page behind the exact recruiter host rewrite in `web/src/app/(recruiter-entitlement)/__recruiter/page.tsx` (FR-054–FR-057)
+- [X] T132 [US7] Mount only the limited entitlement page behind the exact recruiter host rewrite in `web/src/app/(recruiter-entitlement)/recruiter-entitlement/page.tsx` (FR-054–FR-057)
 
 **Checkpoint**: User Story 7 is independently functional as an entitlement
 boundary and coming-next page; it contains no recruiter dashboard, job,

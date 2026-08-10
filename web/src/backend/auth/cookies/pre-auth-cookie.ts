@@ -2,6 +2,8 @@ import "server-only";
 import {
   identityCookiePolicy,
   clearCookieAttributes,
+  PRE_AUTH_COOKIE_PATH,
+  type PreAuthCookiePath,
 } from "@/backend/security/cookies";
 import { serverEnvironment } from "@/backend/env/runtime";
 
@@ -44,16 +46,21 @@ function serialize(
     .filter(Boolean)
     .join("; ");
 }
-export function setPreAuthCookie(value: string) {
+export function setPreAuthCookie(
+  value: string,
+  path: PreAuthCookiePath = PRE_AUTH_COOKIE_PATH,
+) {
   const p = identityCookiePolicy(serverEnvironment);
-  return serialize(p.preAuth.name, value, p.preAuth.attributes);
+  return serialize(p.preAuth.name, value, { ...p.preAuth.attributes, path });
 }
-export function clearPreAuthCookie() {
+export function clearPreAuthCookie(
+  path: PreAuthCookiePath = PRE_AUTH_COOKIE_PATH,
+) {
   const p = identityCookiePolicy(serverEnvironment);
   return serialize(
     p.preAuth.name,
     "",
-    clearCookieAttributes(p.preAuth.attributes),
+    clearCookieAttributes({ ...p.preAuth.attributes, path }),
   );
 }
 export function readPreAuthCookie(headers: Headers) {

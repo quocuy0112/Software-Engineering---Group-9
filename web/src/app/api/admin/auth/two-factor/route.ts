@@ -12,6 +12,7 @@ import {
   adminJson,
   adminNoStoreHeaders,
 } from "@/backend/admin/http/admin-route";
+import { ADMIN_PRE_AUTH_COOKIE_PATH } from "@/backend/security/cookies";
 
 export async function POST(request: Request) {
   if (!validateSameOrigin(request, configuredOrigins().admin))
@@ -31,6 +32,6 @@ export async function POST(request: Request) {
     return adminJson({ code: "UNAUTHORIZED" }, { status: 401 });
   const headers = adminNoStoreHeaders();
   headers.append("set-cookie", sessionCookie);
-  headers.append("set-cookie", clearPreAuthCookie());
+  headers.append("set-cookie", clearPreAuthCookie(ADMIN_PRE_AUTH_COOKIE_PATH));
   return adminJson({ authenticated: true }, { headers });
 }

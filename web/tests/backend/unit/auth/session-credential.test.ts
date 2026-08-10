@@ -6,7 +6,12 @@ import {
   identityCookiePolicy,
   PRE_AUTH_COOKIE_MAX_AGE_SECONDS,
   PRE_AUTH_COOKIE_PATH,
+  ADMIN_PRE_AUTH_COOKIE_PATH,
 } from "@/backend/security/cookies";
+import {
+  clearPreAuthCookie,
+  setPreAuthCookie,
+} from "@/backend/auth/cookies/pre-auth-cookie";
 import {
   authCookiePolicy,
   betterAuthCookieOptions,
@@ -99,6 +104,15 @@ describe("exclusive browser-session credential", () => {
     });
     expect(local.preAuth.attributes).not.toHaveProperty("domain");
     expect(local.preAuth.name).not.toBe(local.session.name);
+  });
+
+  it("uses the dedicated narrow path for an administrator challenge", () => {
+    expect(setPreAuthCookie("challenge", ADMIN_PRE_AUTH_COOKIE_PATH)).toContain(
+      `Path=${ADMIN_PRE_AUTH_COOKIE_PATH}`,
+    );
+    expect(clearPreAuthCookie(ADMIN_PRE_AUTH_COOKIE_PATH)).toContain(
+      `Path=${ADMIN_PRE_AUTH_COOKIE_PATH}`,
+    );
   });
 
   it("contains no JWT browser plugin or second session owner", async () => {

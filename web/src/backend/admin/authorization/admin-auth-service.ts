@@ -6,6 +6,7 @@ import { CompleteTwoFactorService } from "@/backend/services/two-factor/complete
 import { BetterAuthGateway } from "@/backend/auth/better-auth/better-auth-gateway";
 import { AdministratorSessionService } from "./administrator-session-service";
 import { AdminRequestBoundary } from "@/backend/security/admin-request-boundary";
+import { ADMIN_PRE_AUTH_COOKIE_PATH } from "@/backend/security/cookies";
 
 export const adminLoginSchema = z.object({
   email: z
@@ -18,11 +19,6 @@ export const adminFactorSchema = z.object({
   code: z.string().regex(/^\d{6}$/u),
   factor: z.literal("totp").default("totp"),
 });
-
-function sessionToken(cookie: string) {
-  const first = cookie.split(";", 1)[0] ?? "";
-  return decodeURIComponent(first.slice(first.indexOf("=") + 1));
-}
 
 export class AdminAuthService {
   async context(authority: { userId: string }) {
@@ -57,6 +53,7 @@ export class AdminAuthService {
     return new LoginWithPasswordService().execute(data, {
       headers: request.headers,
       subject: "admin-origin",
+      preAuthCookiePath: ADMIN_PRE_AUTH_COOKIE_PATH,
     });
   }
 
@@ -69,13 +66,13 @@ export class AdminAuthService {
       "totp",
     );
     if (!result || "rateLimited" in result) return null;
-    const session = await prisma.session.findUnique({
-      where: { token: sessionToken(result.sessionCookie) },
-      select: { id: true, userId: true },
+    const sessionHeaders = new Headers({
+      cookie: result.sessionCookie.split(";", 1)[0] ?? "",
     });
+    const session = await new BetterAuthGateway().getSession(sessionHeaders);
     if (!session) return null;
     await new AdministratorSessionService().designate({
-      sessionId: session.id,
+      sessionId: session.sessionId,
       userId: session.userId,
     });
     return result.sessionCookie;

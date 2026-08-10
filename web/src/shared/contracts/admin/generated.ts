@@ -1,6 +1,6 @@
 // Generated from Feature 006 OpenAPI. Do not edit by hand.
 export const adminContractVersion = "0.2.0" as const;
-export const adminContractSha256 = "097a7ed2ba500787a98f431a3687cd3002f7fea28eaadf73a400c1b82b264bdd" as const;
+export const adminContractSha256 = "ab605fc522d0fbc460104364f1124a775a596957933b818120eb47d1c921b53a" as const;
 export const adminContractPaths = [
   "/api/admin/auth/context",
   "/api/admin/auth/login",

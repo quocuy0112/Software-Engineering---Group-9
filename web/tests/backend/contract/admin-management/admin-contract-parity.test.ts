@@ -25,6 +25,7 @@ describe("Feature 006 contract parity", () => {
         maskedEmail: "c***@example.test",
         state: "ACTIVE",
         createdAt: "2026-08-10T00:00:00.000Z",
+        hasCandidateIdentity: true,
         activeMembershipCount: 0,
         hasActiveAdministratorGrant: false,
         passwordHash: "must-never-pass",

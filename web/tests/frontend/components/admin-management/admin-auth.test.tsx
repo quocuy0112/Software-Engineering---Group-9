@@ -1,8 +1,9 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { AdminTwoFactorPage } from "@/frontend/features/admin/auth/admin-two-factor-page";
 import { StepUpDialog } from "@/frontend/features/admin/auth/step-up-dialog";
 describe("admin authentication UI", () => {
+  afterEach(() => vi.restoreAllMocks());
   it("names the initial factor input and designation action", () => {
     render(<AdminTwoFactorPage onComplete={vi.fn()} />);
     expect(
@@ -14,6 +15,30 @@ describe("admin authentication UI", () => {
     expect(
       screen.getByRole("button", { name: "Verify and designate this session" }),
     ).toBeVisible();
+  });
+  it("prevents duplicate factor submissions while verification is pending", async () => {
+    let finishRequest: ((response: Response) => void) | undefined;
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(
+      () =>
+        new Promise<Response>((resolve) => {
+          finishRequest = resolve;
+        }),
+    );
+    const onComplete = vi.fn();
+    render(<AdminTwoFactorPage onComplete={onComplete} />);
+    fireEvent.change(
+      screen.getByRole("textbox", { name: /Six-digit authenticator code/u }),
+      { target: { value: "123456" } },
+    );
+    const button = screen.getByRole("button", {
+      name: "Verify and designate this session",
+    });
+    fireEvent.click(button);
+    expect(screen.getByRole("button", { name: "Verifying…" })).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "Verifying…" }));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    finishRequest?.(Response.json({ authenticated: true }));
+    await waitFor(() => expect(onComplete).toHaveBeenCalledTimes(1));
   });
   it("uses a labelled modal for sensitive-action step-up", () => {
     render(<StepUpDialog open onCancel={vi.fn()} onVerified={vi.fn()} />);

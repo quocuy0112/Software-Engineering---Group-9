@@ -18,6 +18,7 @@
     "admin:contracts": "node scripts/generate-admin-contracts.mjs --check",
     "admin:evidence:check": "node scripts/check-admin-evidence-readiness.mjs",
     "admin:provision": "node --conditions=react-server --import tsx scripts/provision-platform-administrator.mjs",
+    "admin:revoke": "node --conditions=react-server --import tsx scripts/revoke-platform-administrator.mjs",
     "admin:moderation:migration:verify": "node --conditions=react-server --import tsx scripts/verify-moderation-report-migration.mjs",
     "image-search:storage:preflight": "node --conditions=react-server --import tsx scripts/check-image-search-production-storage.mjs",
     "ocr:corpus:evaluate": "node scripts/evaluate-ocr-corpus.mjs",
