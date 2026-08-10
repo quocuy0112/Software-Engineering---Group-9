@@ -7,18 +7,29 @@ import { Client } from "pg";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const app = resolve(root, "web");
 const prismaCli = resolve(root, "node_modules/prisma/build/index.js");
-const composeEnv = Object.fromEntries(
-  (await readFile(resolve(root, ".env"), "utf8"))
-    .split(/\r?\n/)
-    .filter(Boolean)
-    .map((line) => line.split(/=(.*)/s).slice(0, 2)),
-);
-const appEnv = Object.fromEntries(
-  (await readFile(resolve(app, ".env.local"), "utf8"))
-    .split(/\r?\n/)
-    .filter(Boolean)
-    .map((line) => line.split(/=(.*)/s).slice(0, 2)),
-);
+async function readEnvFile(filePath) {
+  try {
+    return Object.fromEntries(
+      (await readFile(filePath, "utf8"))
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter((line) => line && !line.startsWith("#"))
+        .map((line) => line.split(/=(.*)/s).slice(0, 2)),
+    );
+  } catch (error) {
+    if (error?.code === "ENOENT") return {};
+    throw error;
+  }
+}
+
+const composeEnv = {
+  ...(await readEnvFile(resolve(root, ".env"))),
+  ...process.env,
+};
+const appEnv = {
+  ...(await readEnvFile(resolve(app, ".env.local"))),
+  ...process.env,
+};
 const verifyDatabase = "smarthire_migration_verify";
 const shadowDatabase = "smarthire_migration_shadow";
 const upgradeDatabase = "smarthire_migration_upgrade_verify";
@@ -37,7 +48,12 @@ const cvBaselineMigrations = [
 ];
 
 function databaseUrlFor(database) {
-  const url = new URL(appEnv.DIRECT_URL);
+  const directUrl = appEnv.DIRECT_URL ?? appEnv.DATABASE_URL;
+  if (!directUrl)
+    throw new Error(
+      "DIRECT_URL or DATABASE_URL must be configured for migration verification.",
+    );
+  const url = new URL(directUrl);
   url.pathname = `/${database}`;
   return url;
 }
@@ -78,6 +94,53 @@ function databaseTool(tool, ...args) {
     composeEnv.POSTGRES_USER,
     ...args,
   ]);
+}
+function quoteIdentifier(identifier) {
+  return `"${identifier.replaceAll('"', '""')}"`;
+}
+const usesComposePostgres = Boolean(
+  composeEnv.POSTGRES_USER && composeEnv.POSTGRES_DB,
+);
+async function withAdminClient(work) {
+  const client = new Client({
+    connectionString: databaseUrlFor("postgres").toString(),
+  });
+  await client.connect();
+  try {
+    return await work(client);
+  } finally {
+    await client.end();
+  }
+}
+async function ensureDatabaseReady() {
+  if (usesComposePostgres) {
+    compose(["config", "--quiet"]);
+    databaseTool("pg_isready", "-d", composeEnv.POSTGRES_DB);
+    return;
+  }
+  await withAdminClient((client) => client.query("SELECT 1"));
+}
+async function createDatabase(database) {
+  if (usesComposePostgres) {
+    databaseTool("createdb", database);
+    return;
+  }
+  await withAdminClient((client) =>
+    client.query(`CREATE DATABASE ${quoteIdentifier(database)}`),
+  );
+}
+async function dropDatabase(database) {
+  if (usesComposePostgres) {
+    databaseTool("dropdb", "--if-exists", database);
+    return;
+  }
+  await withAdminClient(async (client) => {
+    await client.query(
+      "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = $1 AND pid <> pg_backend_pid()",
+      [database],
+    );
+    await client.query(`DROP DATABASE IF EXISTS ${quoteIdentifier(database)}`);
+  });
 }
 function prisma(args, input, targetEnvironment = environment) {
   return run(process.execPath, [prismaCli, ...args], {
@@ -300,20 +363,19 @@ async function verifyFeatureFourUpgrade() {
   );
 }
 
-compose(["config", "--quiet"]);
-databaseTool("pg_isready", "-d", composeEnv.POSTGRES_DB);
+await ensureDatabaseReady();
 for (const database of [
   verifyDatabase,
   shadowDatabase,
   upgradeDatabase,
   cvUpgradeDatabase,
 ])
-  databaseTool("dropdb", "--if-exists", database);
+  await dropDatabase(database);
 try {
-  databaseTool("createdb", verifyDatabase);
-  databaseTool("createdb", shadowDatabase);
-  databaseTool("createdb", upgradeDatabase);
-  databaseTool("createdb", cvUpgradeDatabase);
+  await createDatabase(verifyDatabase);
+  await createDatabase(shadowDatabase);
+  await createDatabase(upgradeDatabase);
+  await createDatabase(cvUpgradeDatabase);
   prisma(["migrate", "deploy"]);
   prisma(["migrate", "status"]);
   prisma([
@@ -338,7 +400,7 @@ try {
     cvUpgradeDatabase,
   ]) {
     try {
-      databaseTool("dropdb", "--if-exists", database);
+      await dropDatabase(database);
     } catch {
       console.error(`Could not remove temporary database ${database}.`);
     }
