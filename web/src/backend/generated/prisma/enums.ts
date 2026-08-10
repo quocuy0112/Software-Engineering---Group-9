@@ -112,7 +112,14 @@ export const EmailKind = {
   RESET_PASSWORD: 'RESET_PASSWORD',
   PASSWORD_CHANGED: 'PASSWORD_CHANGED',
   SECURITY_ALERT: 'SECURITY_ALERT',
-  APPLICATION_STAGE_CHANGED: 'APPLICATION_STAGE_CHANGED'
+  APPLICATION_STAGE_CHANGED: 'APPLICATION_STAGE_CHANGED',
+  VERIFICATION_RECEIVED: 'VERIFICATION_RECEIVED',
+  VERIFICATION_CHANGES_REQUESTED: 'VERIFICATION_CHANGES_REQUESTED',
+  VERIFICATION_APPROVED: 'VERIFICATION_APPROVED',
+  VERIFICATION_REJECTED: 'VERIFICATION_REJECTED',
+  VERIFICATION_CANCELLED: 'VERIFICATION_CANCELLED',
+  VERIFICATION_DELAYED: 'VERIFICATION_DELAYED',
+  VERIFICATION_EXPIRED: 'VERIFICATION_EXPIRED'
 } as const
 
 export type EmailKind = (typeof EmailKind)[keyof typeof EmailKind]
@@ -310,10 +317,157 @@ export type CompanyMembershipRole = (typeof CompanyMembershipRole)[keyof typeof 
 
 export const CompanyMembershipStatus = {
   ACTIVE: 'ACTIVE',
-  SUSPENDED: 'SUSPENDED'
+  SUSPENDED: 'SUSPENDED',
+  REMOVED: 'REMOVED'
 } as const
 
 export type CompanyMembershipStatus = (typeof CompanyMembershipStatus)[keyof typeof CompanyMembershipStatus]
+
+
+export const AdministratorGrantState = {
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED',
+  REVOKED: 'REVOKED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type AdministratorGrantState = (typeof AdministratorGrantState)[keyof typeof AdministratorGrantState]
+
+
+export const CompanyVerificationState = {
+  UNVERIFIED: 'UNVERIFIED',
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE'
+} as const
+
+export type CompanyVerificationState = (typeof CompanyVerificationState)[keyof typeof CompanyVerificationState]
+
+
+export const RecruiterVerificationState = {
+  PENDING_CHECKS: 'PENDING_CHECKS',
+  PENDING_REVIEW: 'PENDING_REVIEW',
+  CHANGES_REQUESTED: 'CHANGES_REQUESTED',
+  RESUBMITTED: 'RESUBMITTED',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  CANCELLED: 'CANCELLED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type RecruiterVerificationState = (typeof RecruiterVerificationState)[keyof typeof RecruiterVerificationState]
+
+
+export const VerificationCheckState = {
+  PENDING: 'PENDING',
+  PASS: 'PASS',
+  FAIL: 'FAIL',
+  INDETERMINATE: 'INDETERMINATE'
+} as const
+
+export type VerificationCheckState = (typeof VerificationCheckState)[keyof typeof VerificationCheckState]
+
+
+export const VerificationDecisionKind = {
+  REQUEST_CHANGES: 'REQUEST_CHANGES',
+  APPROVE: 'APPROVE',
+  REJECT: 'REJECT'
+} as const
+
+export type VerificationDecisionKind = (typeof VerificationDecisionKind)[keyof typeof VerificationDecisionKind]
+
+
+export const CompanyAccessPrerequisiteKind = {
+  INVITATION: 'INVITATION',
+  OWNER_APPROVAL: 'OWNER_APPROVAL'
+} as const
+
+export type CompanyAccessPrerequisiteKind = (typeof CompanyAccessPrerequisiteKind)[keyof typeof CompanyAccessPrerequisiteKind]
+
+
+export const CompanyAccessPrerequisiteState = {
+  AVAILABLE: 'AVAILABLE',
+  USED: 'USED',
+  REVOKED: 'REVOKED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type CompanyAccessPrerequisiteState = (typeof CompanyAccessPrerequisiteState)[keyof typeof CompanyAccessPrerequisiteState]
+
+
+export const AdminReasonCategory = {
+  SECURITY_COMPROMISE: 'SECURITY_COMPROMISE',
+  POLICY_VIOLATION: 'POLICY_VIOLATION',
+  USER_REQUEST: 'USER_REQUEST',
+  VERIFICATION_FAILURE: 'VERIFICATION_FAILURE',
+  INCIDENT_RESOLVED: 'INCIDENT_RESOLVED',
+  ACCESS_CLEANUP: 'ACCESS_CLEANUP',
+  OTHER: 'OTHER'
+} as const
+
+export type AdminReasonCategory = (typeof AdminReasonCategory)[keyof typeof AdminReasonCategory]
+
+
+export const SecurityNotificationStatus = {
+  PENDING: 'PENDING',
+  RETRYING: 'RETRYING',
+  DELIVERED: 'DELIVERED',
+  MANUAL_INTERVENTION_REQUIRED: 'MANUAL_INTERVENTION_REQUIRED'
+} as const
+
+export type SecurityNotificationStatus = (typeof SecurityNotificationStatus)[keyof typeof SecurityNotificationStatus]
+
+
+export const SecurityNotificationFailureCategory = {
+  DESTINATION_REJECTED: 'DESTINATION_REJECTED',
+  DESTINATION_DISABLED: 'DESTINATION_DISABLED',
+  CONTENT_INVALID: 'CONTENT_INVALID',
+  POLICY_REFUSED: 'POLICY_REFUSED',
+  TEMPORARY_UNAVAILABLE: 'TEMPORARY_UNAVAILABLE',
+  ATTEMPTS_EXHAUSTED: 'ATTEMPTS_EXHAUSTED'
+} as const
+
+export type SecurityNotificationFailureCategory = (typeof SecurityNotificationFailureCategory)[keyof typeof SecurityNotificationFailureCategory]
+
+
+export const ModerationTargetType = {
+  JOB: 'JOB',
+  COMPANY: 'COMPANY',
+  MEMBERSHIP: 'MEMBERSHIP',
+  CANDIDATE: 'CANDIDATE'
+} as const
+
+export type ModerationTargetType = (typeof ModerationTargetType)[keyof typeof ModerationTargetType]
+
+
+export const ModerationReportCategory = {
+  FRAUD_OR_IMPERSONATION: 'FRAUD_OR_IMPERSONATION',
+  MISLEADING_CONTENT: 'MISLEADING_CONTENT',
+  DISCRIMINATION_OR_HARASSMENT: 'DISCRIMINATION_OR_HARASSMENT',
+  ABUSE_OR_THREATS: 'ABUSE_OR_THREATS',
+  SPAM_OR_DUPLICATE: 'SPAM_OR_DUPLICATE',
+  PRIVACY_OR_DATA_MISUSE: 'PRIVACY_OR_DATA_MISUSE',
+  OTHER: 'OTHER'
+} as const
+
+export type ModerationReportCategory = (typeof ModerationReportCategory)[keyof typeof ModerationReportCategory]
+
+
+export const ModerationPriority = {
+  NORMAL: 'NORMAL',
+  HIGH: 'HIGH',
+  CRITICAL: 'CRITICAL'
+} as const
+
+export type ModerationPriority = (typeof ModerationPriority)[keyof typeof ModerationPriority]
+
+
+export const ModerationReportState = {
+  PENDING_REVIEW: 'PENDING_REVIEW',
+  RESOLVED: 'RESOLVED',
+  DISMISSED: 'DISMISSED'
+} as const
+
+export type ModerationReportState = (typeof ModerationReportState)[keyof typeof ModerationReportState]
 
 
 export const ApplicationStageActorType = {

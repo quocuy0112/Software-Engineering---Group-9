@@ -239,6 +239,7 @@ export type SessionWhereInput = {
   revokedAt?: Prisma.DateTimeNullableFilter<"Session"> | Date | string | null
   revocationReason?: Prisma.StringNullableFilter<"Session"> | string | null
   user?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
+  administratorPolicies?: Prisma.AdministratorSessionPolicyListRelationFilter
 }
 
 export type SessionOrderByWithRelationInput = {
@@ -255,6 +256,7 @@ export type SessionOrderByWithRelationInput = {
   revokedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   revocationReason?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserAccountOrderByWithRelationInput
+  administratorPolicies?: Prisma.AdministratorSessionPolicyOrderByRelationAggregateInput
 }
 
 export type SessionWhereUniqueInput = Prisma.AtLeast<{
@@ -274,6 +276,7 @@ export type SessionWhereUniqueInput = Prisma.AtLeast<{
   revokedAt?: Prisma.DateTimeNullableFilter<"Session"> | Date | string | null
   revocationReason?: Prisma.StringNullableFilter<"Session"> | string | null
   user?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
+  administratorPolicies?: Prisma.AdministratorSessionPolicyListRelationFilter
 }, "id" | "token">
 
 export type SessionOrderByWithAggregationInput = {
@@ -325,6 +328,7 @@ export type SessionCreateInput = {
   revokedAt?: Date | string | null
   revocationReason?: string | null
   user: Prisma.UserAccountCreateNestedOneWithoutSessionsInput
+  administratorPolicies?: Prisma.AdministratorSessionPolicyCreateNestedManyWithoutDesignatedSessionInput
 }
 
 export type SessionUncheckedCreateInput = {
@@ -340,6 +344,7 @@ export type SessionUncheckedCreateInput = {
   absoluteExpiresAt: Date | string
   revokedAt?: Date | string | null
   revocationReason?: string | null
+  administratorPolicies?: Prisma.AdministratorSessionPolicyUncheckedCreateNestedManyWithoutDesignatedSessionInput
 }
 
 export type SessionUpdateInput = {
@@ -355,6 +360,7 @@ export type SessionUpdateInput = {
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revocationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserAccountUpdateOneRequiredWithoutSessionsNestedInput
+  administratorPolicies?: Prisma.AdministratorSessionPolicyUpdateManyWithoutDesignatedSessionNestedInput
 }
 
 export type SessionUncheckedUpdateInput = {
@@ -370,6 +376,7 @@ export type SessionUncheckedUpdateInput = {
   absoluteExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revocationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  administratorPolicies?: Prisma.AdministratorSessionPolicyUncheckedUpdateManyWithoutDesignatedSessionNestedInput
 }
 
 export type SessionCreateManyInput = {
@@ -471,6 +478,11 @@ export type SessionMinOrderByAggregateInput = {
   revocationReason?: Prisma.SortOrder
 }
 
+export type SessionNullableScalarRelationFilter = {
+  is?: Prisma.SessionWhereInput | null
+  isNot?: Prisma.SessionWhereInput | null
+}
+
 export type SessionCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.SessionCreateWithoutUserInput, Prisma.SessionUncheckedCreateWithoutUserInput> | Prisma.SessionCreateWithoutUserInput[] | Prisma.SessionUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.SessionCreateOrConnectWithoutUserInput | Prisma.SessionCreateOrConnectWithoutUserInput[]
@@ -513,6 +525,22 @@ export type SessionUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.SessionScalarWhereInput | Prisma.SessionScalarWhereInput[]
 }
 
+export type SessionCreateNestedOneWithoutAdministratorPoliciesInput = {
+  create?: Prisma.XOR<Prisma.SessionCreateWithoutAdministratorPoliciesInput, Prisma.SessionUncheckedCreateWithoutAdministratorPoliciesInput>
+  connectOrCreate?: Prisma.SessionCreateOrConnectWithoutAdministratorPoliciesInput
+  connect?: Prisma.SessionWhereUniqueInput
+}
+
+export type SessionUpdateOneWithoutAdministratorPoliciesNestedInput = {
+  create?: Prisma.XOR<Prisma.SessionCreateWithoutAdministratorPoliciesInput, Prisma.SessionUncheckedCreateWithoutAdministratorPoliciesInput>
+  connectOrCreate?: Prisma.SessionCreateOrConnectWithoutAdministratorPoliciesInput
+  upsert?: Prisma.SessionUpsertWithoutAdministratorPoliciesInput
+  disconnect?: Prisma.SessionWhereInput | boolean
+  delete?: Prisma.SessionWhereInput | boolean
+  connect?: Prisma.SessionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SessionUpdateToOneWithWhereWithoutAdministratorPoliciesInput, Prisma.SessionUpdateWithoutAdministratorPoliciesInput>, Prisma.SessionUncheckedUpdateWithoutAdministratorPoliciesInput>
+}
+
 export type SessionCreateWithoutUserInput = {
   id: string
   token: string
@@ -525,6 +553,7 @@ export type SessionCreateWithoutUserInput = {
   absoluteExpiresAt: Date | string
   revokedAt?: Date | string | null
   revocationReason?: string | null
+  administratorPolicies?: Prisma.AdministratorSessionPolicyCreateNestedManyWithoutDesignatedSessionInput
 }
 
 export type SessionUncheckedCreateWithoutUserInput = {
@@ -539,6 +568,7 @@ export type SessionUncheckedCreateWithoutUserInput = {
   absoluteExpiresAt: Date | string
   revokedAt?: Date | string | null
   revocationReason?: string | null
+  administratorPolicies?: Prisma.AdministratorSessionPolicyUncheckedCreateNestedManyWithoutDesignatedSessionInput
 }
 
 export type SessionCreateOrConnectWithoutUserInput = {
@@ -585,6 +615,82 @@ export type SessionScalarWhereInput = {
   revocationReason?: Prisma.StringNullableFilter<"Session"> | string | null
 }
 
+export type SessionCreateWithoutAdministratorPoliciesInput = {
+  id: string
+  token: string
+  expiresAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ipAddress?: string | null
+  userAgent?: string | null
+  lastActivityAt?: Date | string
+  absoluteExpiresAt: Date | string
+  revokedAt?: Date | string | null
+  revocationReason?: string | null
+  user: Prisma.UserAccountCreateNestedOneWithoutSessionsInput
+}
+
+export type SessionUncheckedCreateWithoutAdministratorPoliciesInput = {
+  id: string
+  token: string
+  userId: string
+  expiresAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ipAddress?: string | null
+  userAgent?: string | null
+  lastActivityAt?: Date | string
+  absoluteExpiresAt: Date | string
+  revokedAt?: Date | string | null
+  revocationReason?: string | null
+}
+
+export type SessionCreateOrConnectWithoutAdministratorPoliciesInput = {
+  where: Prisma.SessionWhereUniqueInput
+  create: Prisma.XOR<Prisma.SessionCreateWithoutAdministratorPoliciesInput, Prisma.SessionUncheckedCreateWithoutAdministratorPoliciesInput>
+}
+
+export type SessionUpsertWithoutAdministratorPoliciesInput = {
+  update: Prisma.XOR<Prisma.SessionUpdateWithoutAdministratorPoliciesInput, Prisma.SessionUncheckedUpdateWithoutAdministratorPoliciesInput>
+  create: Prisma.XOR<Prisma.SessionCreateWithoutAdministratorPoliciesInput, Prisma.SessionUncheckedCreateWithoutAdministratorPoliciesInput>
+  where?: Prisma.SessionWhereInput
+}
+
+export type SessionUpdateToOneWithWhereWithoutAdministratorPoliciesInput = {
+  where?: Prisma.SessionWhereInput
+  data: Prisma.XOR<Prisma.SessionUpdateWithoutAdministratorPoliciesInput, Prisma.SessionUncheckedUpdateWithoutAdministratorPoliciesInput>
+}
+
+export type SessionUpdateWithoutAdministratorPoliciesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  token?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  absoluteExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revocationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user?: Prisma.UserAccountUpdateOneRequiredWithoutSessionsNestedInput
+}
+
+export type SessionUncheckedUpdateWithoutAdministratorPoliciesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  token?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  absoluteExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revocationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
 export type SessionCreateManyUserInput = {
   id: string
   token: string
@@ -611,6 +717,7 @@ export type SessionUpdateWithoutUserInput = {
   absoluteExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revocationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  administratorPolicies?: Prisma.AdministratorSessionPolicyUpdateManyWithoutDesignatedSessionNestedInput
 }
 
 export type SessionUncheckedUpdateWithoutUserInput = {
@@ -625,6 +732,7 @@ export type SessionUncheckedUpdateWithoutUserInput = {
   absoluteExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revocationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  administratorPolicies?: Prisma.AdministratorSessionPolicyUncheckedUpdateManyWithoutDesignatedSessionNestedInput
 }
 
 export type SessionUncheckedUpdateManyWithoutUserInput = {
@@ -642,6 +750,35 @@ export type SessionUncheckedUpdateManyWithoutUserInput = {
 }
 
 
+/**
+ * Count Type SessionCountOutputType
+ */
+
+export type SessionCountOutputType = {
+  administratorPolicies: number
+}
+
+export type SessionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  administratorPolicies?: boolean | SessionCountOutputTypeCountAdministratorPoliciesArgs
+}
+
+/**
+ * SessionCountOutputType without action
+ */
+export type SessionCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SessionCountOutputType
+   */
+  select?: Prisma.SessionCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * SessionCountOutputType without action
+ */
+export type SessionCountOutputTypeCountAdministratorPoliciesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AdministratorSessionPolicyWhereInput
+}
+
 
 export type SessionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -657,6 +794,8 @@ export type SessionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   revokedAt?: boolean
   revocationReason?: boolean
   user?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
+  administratorPolicies?: boolean | Prisma.Session$administratorPoliciesArgs<ExtArgs>
+  _count?: boolean | Prisma.SessionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["session"]>
 
 export type SessionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -709,6 +848,8 @@ export type SessionSelectScalar = {
 export type SessionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "token" | "userId" | "expiresAt" | "createdAt" | "updatedAt" | "ipAddress" | "userAgent" | "lastActivityAt" | "absoluteExpiresAt" | "revokedAt" | "revocationReason", ExtArgs["result"]["session"]>
 export type SessionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
+  administratorPolicies?: boolean | Prisma.Session$administratorPoliciesArgs<ExtArgs>
+  _count?: boolean | Prisma.SessionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SessionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
@@ -721,6 +862,7 @@ export type $SessionPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   name: "Session"
   objects: {
     user: Prisma.$UserAccountPayload<ExtArgs>
+    administratorPolicies: Prisma.$AdministratorSessionPolicyPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1130,6 +1272,7 @@ readonly fields: SessionFieldRefs;
 export interface Prisma__SessionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserAccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccountDefaultArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  administratorPolicies<T extends Prisma.Session$administratorPoliciesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Session$administratorPoliciesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AdministratorSessionPolicyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1569,6 +1712,30 @@ export type SessionDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Sessions to delete.
    */
   limit?: number
+}
+
+/**
+ * Session.administratorPolicies
+ */
+export type Session$administratorPoliciesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AdministratorSessionPolicy
+   */
+  select?: Prisma.AdministratorSessionPolicySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AdministratorSessionPolicy
+   */
+  omit?: Prisma.AdministratorSessionPolicyOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdministratorSessionPolicyInclude<ExtArgs> | null
+  where?: Prisma.AdministratorSessionPolicyWhereInput
+  orderBy?: Prisma.AdministratorSessionPolicyOrderByWithRelationInput | Prisma.AdministratorSessionPolicyOrderByWithRelationInput[]
+  cursor?: Prisma.AdministratorSessionPolicyWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AdministratorSessionPolicyScalarFieldEnum | Prisma.AdministratorSessionPolicyScalarFieldEnum[]
 }
 
 /**

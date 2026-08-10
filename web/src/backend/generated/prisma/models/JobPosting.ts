@@ -1055,14 +1055,6 @@ export type JobPostingUncheckedUpdateManyWithoutCompanyNestedInput = {
   deleteMany?: Prisma.JobPostingScalarWhereInput | Prisma.JobPostingScalarWhereInput[]
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type EnumEmploymentTypeFieldUpdateOperationsInput = {
   set?: $Enums.EmploymentType
 }

@@ -96,7 +96,6 @@ export function JobInteractionProvider({
       if (!active || !view) return;
       setRecords((current) => {
         const next = { ...current };
-        let changed = false;
         const ids = new Set([...view.savedJobIds, ...view.hiddenJobIds]);
         for (const jobId of ids) {
           const existing = next[jobId] ?? {

@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const reuseExistingServer = process.env.PLAYWRIGHT_REUSE_SERVER === "1";
+const appOnlyServer = process.env.PLAYWRIGHT_APP_ONLY === "1";
 
 export default defineConfig({
   testDir: "./tests/system/e2e",
@@ -8,7 +9,9 @@ export default defineConfig({
   // serialize them to keep browser evidence deterministic.
   workers: 1,
   webServer: {
-    command: "node ../scripts/run-local-development.mjs",
+    command: appOnlyServer
+      ? "npm run dev"
+      : "node ../scripts/run-local-development.mjs",
     url: "http://localhost:3001",
     reuseExistingServer,
     env: { EMAIL_ADAPTER: "capture" },

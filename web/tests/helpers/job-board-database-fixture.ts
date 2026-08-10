@@ -266,6 +266,15 @@ export async function deleteJobBoardDatabaseFixture(
   await prisma.emailOutbox.deleteMany({
     where: { userId: { in: fixture.userIds } },
   });
+  await prisma.moderationReport.deleteMany({
+    where: {
+      OR: [
+        { reporterUserId: { in: fixture.userIds } },
+        { jobReference: { in: jobIds } },
+        { applicationReference: { in: applicationIds } },
+      ],
+    },
+  });
   await prisma.applicationAnswer.deleteMany({
     where: { applicationId: { in: applicationIds } },
   });

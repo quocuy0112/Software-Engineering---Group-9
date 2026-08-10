@@ -177,8 +177,39 @@ services:
       - ocr_runtime:/run/smarthire-ocr
     tmpfs:
       - /tmp:size=128m,mode=1770,uid=1000,gid=1000
+  admin-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.admin-worker
+    image: smarthire-admin-worker:local
+    restart: "no"
+    env_file:
+      - .env
+      - web/.env.local
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+      DIRECT_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+      ADMIN_WORKER_ENABLED: ${ADMIN_WORKER_ENABLED:-true}
+      ADMIN_EVIDENCE_STORAGE_ROOT: /app/.local/admin-evidence
+      ADMIN_CLAMD_SOCKET_PATH: /run/clamav/clamd.sock
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clamav:
+        condition: service_healthy
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - admin_evidence:/app/.local/admin-evidence
+      - clamav_runtime:/run/clamav
+    tmpfs:
+      - /tmp:size=128m,mode=1770,uid=1000,gid=1000
 volumes:
   postgres_data:
   clamav_signatures:
   clamav_runtime:
   ocr_runtime:
+  admin_evidence:

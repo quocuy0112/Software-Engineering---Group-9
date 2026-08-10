@@ -1,0 +1,8 @@
+FROM node:24.18.0-bookworm-slim
+WORKDIR /app
+COPY package.json package-lock.json ./
+COPY web/package.json web/package.json
+RUN npm ci --workspace @smarthire/web
+COPY web web
+USER node
+CMD ["npm", "run", "admin:worker", "--workspace", "@smarthire/web"]

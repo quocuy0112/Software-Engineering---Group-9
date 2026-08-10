@@ -1,9 +1,9 @@
 # Quickstart: Feature 006 Administration Management
 
 This guide is the implementation and verification handoff for Feature 006. It
-does not alter the approved feature specification. Commands marked **planned**
-must be added during implementation before this guide is used as a release
-gate.
+does not alter the approved feature specification. All commands below are
+runnable; environment-gated journeys report `NOT RUN` rather than being counted
+as passes when their controlled fixtures or external approvals are absent.
 
 ## 1. Prerequisites
 
@@ -32,10 +32,8 @@ npm run db:validate
 npm run db:deploy
 ```
 
-Before implementation begins, pin React Admin and its compatible MUI peer
-dependencies in `web/package.json` and commit the lockfile. The implementation
-must use the React Admin version selected in `research.md`; it must not use a
-floating dependency range.
+React Admin 5.15.1 and its compatible MUI, Emotion, and React Router peers are
+pinned in `web/package.json` and the root lockfile.
 
 ## 3. Required Local Configuration
 
@@ -54,6 +52,13 @@ The local environment must fail closed when any production-required evidence
 protection setting is absent. A development-only storage adapter may be used
 only when it preserves authorization checks, private object access, retention,
 and audit behavior.
+
+Run the release readiness gate after supplying the named policy approvals and
+upstream prerequisite deployment record:
+
+```powershell
+npm run admin:evidence:check
+```
 
 ## 4. Prepare Test Data
 
@@ -76,6 +81,12 @@ The provisioning path is operational tooling, not an admin-console feature.
 It must never permit a browser client to grant itself Platform Administrator
 access.
 
+Provision a grant only from a controlled operator shell:
+
+```powershell
+npm run admin:provision -- --user-id <existing-user-id> --operator <operator-reference>
+```
+
 ## 5. Run the Feature Locally
 
 Start the application:
@@ -84,10 +95,9 @@ Start the application:
 npm run dev
 ```
 
-During implementation, add and document this planned worker command:
-
 ```powershell
 npm run admin:worker
+npm run admin:worker:probe
 ```
 
 The worker must process dashboard snapshots, verification safety checks and
@@ -110,8 +120,6 @@ npm run test
 npm run build
 ```
 
-During implementation, add these planned focused gates and wire them into CI:
-
 ```powershell
 npm run test:admin-management
 npm run test:admin-management:e2e
@@ -122,6 +130,13 @@ The focused suite must include unit, contract, integration, accessibility,
 architecture-boundary, security, concurrency, worker, and system tests. It
 must validate the OpenAPI contract and the React Admin provider contract
 against the same fixtures.
+
+`test:admin-management:e2e` requires `ADMIN_E2E_READY=1` plus the controlled
+identities described in section 4. `perf:admin-management` requires
+`ADMIN_PERF_ORIGIN` and an administrator cookie in `ADMIN_PERF_AUTH_COOKIE` and
+runs the 15-minute, 10-concurrent-account harness. CI runs the deterministic
+performance evaluator self-test; a release still requires the full target-
+environment run.
 
 ## 7. Acceptance Walkthrough
 
@@ -224,3 +239,7 @@ Attach these artifacts to the Feature 006 release record:
 - accessibility automation and keyboard walkthrough results;
 - evidence-protection and notification retry/dead-letter test output;
 - confirmation that no Recruiter Manager capabilities were introduced.
+
+Record actual outcomes, timestamps, environment references, and external
+blockers in `release-validation.md`. A skipped, gated, or manually unexecuted
+journey is not a pass.

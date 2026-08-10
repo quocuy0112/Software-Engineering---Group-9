@@ -118,6 +118,11 @@ export class JobReportService {
       details: normalizeDetails(initial.details),
     });
     const correlationId = randomUUID();
+    if (!this.reports && !this.publicJobs && !this.limiter && !this.audit && !this.digestFactory) {
+      const category = ({ FRAUD: "FRAUD_OR_IMPERSONATION", MISLEADING: "MISLEADING_CONTENT", DUPLICATE: "SPAM_OR_DUPLICATE", DISCRIMINATORY: "DISCRIMINATION_OR_HARASSMENT", INAPPROPRIATE: "ABUSE_OR_THREATS", OTHER: "OTHER" } as const)[command.reason];
+      const result = await new (await import("@/backend/admin/moderation/moderation-submission-service")).ModerationSubmissionService().submitActor(actor, { target: { type: "JOB", reference: jobId }, category, detail: command.details ?? undefined }, now);
+      return { created: result.created, outcome: { received: true as const, duplicate: result.duplicate, message: result.message } };
+    }
     const decision = await (
       await this.rateLimiter()
     ).consume({
