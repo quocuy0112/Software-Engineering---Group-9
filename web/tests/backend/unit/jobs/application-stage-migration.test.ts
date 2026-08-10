@@ -7,14 +7,14 @@ describe("canonical application tracking migration", () => {
     const metadataSql = await readFile(
       resolve(
         process.cwd(),
-        "prisma/migrations/20260807081414_smarthire/migration.sql",
+        "prisma/migrations/013_application_metadata/migration.sql",
       ),
       "utf8",
     );
     const trackingSql = await readFile(
       resolve(
         process.cwd(),
-        "prisma/migrations/20260808090000_canonical_application_tracking/migration.sql",
+        "prisma/migrations/014_canonical_application_tracking/migration.sql",
       ),
       "utf8",
     );
@@ -36,12 +36,12 @@ describe("canonical application tracking migration", () => {
     expect(metadataSql).toContain(
       'CREATE INDEX "JobApplication_candidateUserId_aiAnalysisConsent_idx"',
     );
-    expect(trackingSql).toContain(
-      'UPDATE "JobApplication"\nSET "scoringStatus"',
+    expect(trackingSql).toMatch(
+      /UPDATE "JobApplication"\r?\nSET "scoringStatus"/u,
     );
     expect(
-      "20260807081414_smarthire".localeCompare(
-        "20260808090000_canonical_application_tracking",
+      "013_application_metadata".localeCompare(
+        "014_canonical_application_tracking",
       ),
     ).toBeLessThan(0);
   });

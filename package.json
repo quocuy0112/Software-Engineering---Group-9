@@ -27,6 +27,8 @@
     "db:logs": "docker compose logs -f postgres",
     "db:status": "docker compose ps postgres",
     "db:verify": "npm run db:verify --workspace @smarthire/web",
+    "db:migrations:check": "npm run db:migrations:check --workspace @smarthire/web",
+    "db:migrations:reconcile-names": "npm run db:migrations:reconcile-names --workspace @smarthire/web --",
     "db:seed:jobs": "npm run db:seed:jobs --workspace @smarthire/web --",
     "db:deploy": "npm run db:deploy --workspace @smarthire/web",
     "db:reset:empty": "node scripts/reset-local-database.mjs --empty",

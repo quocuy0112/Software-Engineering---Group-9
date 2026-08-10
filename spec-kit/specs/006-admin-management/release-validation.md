@@ -20,7 +20,7 @@ infrastructure. A skipped or unexecuted journey is not recorded as a pass.
 | OpenAPI/runtime drift | PASS | `npm run admin:contracts`: 32 paths, version 0.2.0, `drift=false`, SHA-256 `097a7ed2ba500787a98f431a3687cd3002f7fea28eaadf73a400c1b82b264bdd`. |
 | Admin worker probe | PASS | `npm run admin:worker:probe` exited successfully. |
 | Moderation migration parity | PASS | `npm run admin:moderation:migration:verify`: legacy 0, generalized 0, missing 0. |
-| Prisma schema | PASS | `npm run db:validate` and `npm run db:status`: schema valid; 20 migrations; database up to date. |
+| Prisma schema and migration history | PASS | `npm run db:migrations:check`, `npm run db:verify`, `npm run db:status`, and `npm run db:deploy`: sequential `001`–`020` naming, fresh/upgrade paths and drift checks passed, local history reconciled by checksum, and no migration is pending. |
 | Dependency advisories | PASS | `npm audit --json --package-lock-only`: 0 vulnerabilities at every severity. |
 | Performance evaluator | PASS (self-test only) | 100 samples, 0 errors, p95 250 ms, usable-within-two-seconds rate 100%. This is not the target-environment SC-002 run. |
 | Scope boundary | PASS | Included in the focused suite; no excluded Recruiter Manager, deletion, grant UI, automated enforcement, AI decision, or export surface detected. |

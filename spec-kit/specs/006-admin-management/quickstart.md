@@ -29,11 +29,29 @@ npm run env:init
 npm run env:check
 npm run db:up
 npm run db:validate
+npm run db:migrations:check
 npm run db:deploy
 ```
 
 React Admin 5.15.1 and its compatible MUI, Emotion, and React Router peers are
 pinned in `web/package.json` and the root lockfile.
+
+Migration directories use one repository-wide `NNN_snake_case` sequence. The
+Feature 006 migrations are `016_admin_management` through
+`020_verification_outbox_event_unique`. Environments that applied the former
+timestamp-prefixed names must reconcile history once, before deployment:
+
+```powershell
+npm run db:migrations:reconcile-names -- --apply
+npm run db:migrations:check
+npm run db:deploy
+```
+
+The reconciliation command verifies every migration SQL checksum before it
+renames only the corresponding `_prisma_migrations` history entry. It never
+executes migration SQL and is idempotent. Do not manually edit migration
+history or run `db:deploy` between pulling the renamed folders and completing
+the reconciliation.
 
 ## 3. Required Local Configuration
 
@@ -84,7 +102,7 @@ access.
 Provision a grant only from a controlled operator shell:
 
 ```powershell
-npm run admin:provision -- --user-id <existing-user-id> --operator <operator-reference>
+npm run admin:provision -- <verified-active-account-email>
 ```
 
 ## 5. Run the Feature Locally

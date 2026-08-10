@@ -42,6 +42,7 @@ jobs:
           node-version: 24.18.0
           cache: npm
       - run: npm ci
+      - run: npm run db:migrations:check
       - run: npm run db:deploy
       - run: npm run db:verify
       - run: npm run admin:contracts --workspace @smarthire/web

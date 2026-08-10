@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 describe("Feature 006 additive migration", () => {
   const migration = readFileSync(
-    "prisma/migrations/20260810090000_admin_management/migration.sql",
+    "prisma/migrations/016_admin_management/migration.sql",
     "utf8",
   );
 
@@ -32,7 +32,7 @@ describe("Feature 006 additive migration", () => {
     );
     expect(
       readFileSync(
-        "prisma/migrations/20260810130000_verification_outbox_event_unique/migration.sql",
+        "prisma/migrations/020_verification_outbox_event_unique/migration.sql",
         "utf8",
       ),
     ).toContain("EmailOutbox_verification_event_unique");

@@ -87,6 +87,8 @@ function prisma(args, input, targetEnvironment = environment) {
   });
 }
 
+run(process.execPath, [resolve(app, "scripts/check-migration-sequence.mjs")]);
+
 async function expectConstraintRejection(client, statement, constraint) {
   await client.query("BEGIN");
   let rejected = false;

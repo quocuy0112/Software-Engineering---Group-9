@@ -56,6 +56,8 @@
     "db:generate": "prisma generate",
     "db:status": "prisma migrate status",
     "db:verify": "node ../scripts/verify-migrations.mjs",
+    "db:migrations:check": "node scripts/check-migration-sequence.mjs",
+    "db:migrations:reconcile-names": "node scripts/reconcile-migration-names.mjs",
     "db:seed:jobs": "tsx scripts/seed-development-jobs.ts",
     "db:deploy": "prisma migrate deploy",
     "db:migrate": "prisma migrate dev",

@@ -665,8 +665,14 @@ Dockerfile.admin-worker
 web/
 |-- prisma/
 |   |-- schema.prisma
-|   `-- migrations/<next>_admin_management/
+|   |-- migrations/016_admin_management/
+|   |-- migrations/017_admin_account_version/
+|   |-- migrations/018_moderation_priority_alignment/
+|   |-- migrations/019_evidence_processing_lease/
+|   `-- migrations/020_verification_outbox_event_unique/
 |-- scripts/
+|   |-- check-migration-sequence.mjs
+|   |-- reconcile-migration-names.mjs
 |   |-- run-admin-worker.mjs
 |   |-- provision-platform-administrator.mjs
 |   `-- measure-admin-management-performance.mjs
