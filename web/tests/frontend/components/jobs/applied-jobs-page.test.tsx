@@ -41,6 +41,23 @@ const applications = applicationStageSchema.options.map(application);
 describe("AppliedJobsPage", () => {
   afterEach(() => vi.unstubAllGlobals());
 
+  it("uses the company logo field with a monogram fallback", () => {
+    render(
+      <AppliedJobsPage
+        applications={[
+          {
+            ...applications[0]!,
+            companyName: "Compass Capital",
+            companyLogoUrl: "https://example.com/compass-capital/logo.png",
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("CC")).toBeVisible();
+    expect(document.querySelector(".application-company-mark img")).toBeNull();
+  });
+
   it("renders all canonical stages without legacy recruitment labels", () => {
     render(<AppliedJobsPage applications={applications} />);
     expect(document.querySelectorAll(".application-stage-badge")).toHaveLength(

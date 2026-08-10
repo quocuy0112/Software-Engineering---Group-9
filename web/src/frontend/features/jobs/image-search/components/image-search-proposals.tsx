@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 
 import {
   searchIntentSchema,
@@ -22,6 +23,20 @@ const fieldLabels: Record<SearchIntent["proposals"][number]["field"], string> =
     postedWithinDays: "Posted within",
   };
 
+const fieldLabelsVi: typeof fieldLabels = {
+  q: "Chức danh hoặc từ khóa",
+  location: "Địa điểm",
+  employmentType: "Loại công việc",
+  experienceLevel: "Cấp độ kinh nghiệm",
+  workArrangement: "Hình thức làm việc",
+  skills: "Kỹ năng",
+  salaryMin: "Lương tối thiểu",
+  salaryMax: "Lương tối đa",
+  salaryCurrency: "Đơn vị tiền tệ",
+  salaryPeriod: "Kỳ trả lương",
+  postedWithinDays: "Thời gian đăng",
+};
+
 function visibleValue(proposal: SearchIntent["proposals"][number]) {
   if (proposal.stringValue !== null) return proposal.stringValue;
   if (proposal.numberValue !== null) return String(proposal.numberValue);
@@ -37,6 +52,8 @@ export function ImageSearchProposals({
   onApply(intent: SearchIntent): void;
   onClear(): void;
 }) {
+  const vi = useWorkspaceLocale() === "vi";
+  const labels = vi ? fieldLabelsVi : fieldLabels;
   const [draft, setDraft] = useState(intent);
   const [error, setError] = useState("");
   const selectedCount = draft.proposals.filter(
@@ -72,21 +89,33 @@ export function ImageSearchProposals({
       aria-labelledby="image-search-proposals-heading"
     >
       <div className="image-search-proposal-heading">
-        <h3 id="image-search-proposals-heading">Review suggested filters</h3>
-        <span>{draft.proposals.length} found</span>
+        <h3 id="image-search-proposals-heading">
+          {vi ? "Xem lại bộ lọc gợi ý" : "Review suggested filters"}
+        </h3>
+        <span>
+          {vi
+            ? `Tìm thấy ${draft.proposals.length}`
+            : `${draft.proposals.length} found`}
+        </span>
       </div>
       <p>
-        Every filter is optional. Edit, remove, or reverse selections before
-        searching.
+        {vi
+          ? "Mọi bộ lọc đều không bắt buộc. Hãy chỉnh sửa, xóa hoặc đảo lựa chọn trước khi tìm."
+          : "Every filter is optional. Edit, remove, or reverse selections before searching."}
       </p>
       {uncertainOccupation ? (
         <p className="image-search-occupation-confirmation">
-          This may be a “{visibleValue(uncertainOccupation)}” role. Is that what
-          you want to search for? Select it below if the suggestion is correct.
+          {vi
+            ? `Đây có thể là vị trí “${visibleValue(uncertainOccupation)}”. Hãy chọn bên dưới nếu gợi ý này đúng.`
+            : `This may be a “${visibleValue(uncertainOccupation)}” role. Is that what you want to search for? Select it below if the suggestion is correct.`}
         </p>
       ) : null}
       {!draft.proposals.length ? (
-        <p>No supported job-search filters were found in the image.</p>
+        <p>
+          {vi
+            ? "Không tìm thấy bộ lọc việc làm được hỗ trợ trong hình ảnh."
+            : "No supported job-search filters were found in the image."}
+        </p>
       ) : null}
       <ul className="image-search-proposals">
         {draft.proposals.map((proposal) => (
@@ -106,10 +135,14 @@ export function ImageSearchProposals({
                   }))
                 }
               />
-              {fieldLabels[proposal.field]}
+              {labels[proposal.field]}
             </label>
             <input
-              aria-label={`Edit ${proposal.field} proposal`}
+              aria-label={
+                vi
+                  ? `Chỉnh sửa gợi ý ${labels[proposal.field]}`
+                  : `Edit ${proposal.field} proposal`
+              }
               value={visibleValue(proposal)}
               onChange={(event) => update(proposal.id, event.target.value)}
             />
@@ -117,15 +150,24 @@ export function ImageSearchProposals({
               className={`image-confidence image-confidence-${proposal.confidence >= 0.9 ? "high" : "review"}`}
             >
               {proposal.confidence >= 0.9
-                ? "High confidence"
-                : "Review suggested"}
+                ? vi
+                  ? "Độ tin cậy cao"
+                  : "High confidence"
+                : vi
+                  ? "Nên xem lại"
+                  : "Review suggested"}
             </span>
             <small>
-              Source: {proposal.evidence.map((item) => item.text).join(" · ")}
+              {vi ? "Nguồn" : "Source"}:{" "}
+              {proposal.evidence.map((item) => item.text).join(" · ")}
             </small>
             <button
               type="button"
-              aria-label={`Remove ${proposal.field}`}
+              aria-label={
+                vi
+                  ? `Xóa ${labels[proposal.field]}`
+                  : `Remove ${proposal.field}`
+              }
               onClick={() =>
                 setDraft((current) => ({
                   ...current,
@@ -135,7 +177,7 @@ export function ImageSearchProposals({
                 }))
               }
             >
-              Remove
+              {vi ? "Xóa" : "Remove"}
             </button>
           </li>
         ))}
@@ -154,13 +196,13 @@ export function ImageSearchProposals({
             }))
           }
         >
-          Reverse selections
+          {vi ? "Đảo lựa chọn" : "Reverse selections"}
         </button>
         <button
           type="button"
           onClick={() => setDraft({ ...draft, proposals: [] })}
         >
-          Clear proposals
+          {vi ? "Xóa tất cả gợi ý" : "Clear proposals"}
         </button>
         <button
           className="image-search-apply-button"
@@ -175,17 +217,21 @@ export function ImageSearchProposals({
               })),
             });
             if (!parsed.success) {
-              setError("Review edited values before applying filters.");
+              setError(
+                vi
+                  ? "Hãy kiểm tra các giá trị đã chỉnh sửa trước khi áp dụng."
+                  : "Review edited values before applying filters.",
+              );
               return;
             }
             setError("");
             onApply(draft);
           }}
         >
-          Apply selected filters
+          {vi ? "Áp dụng bộ lọc đã chọn" : "Apply selected filters"}
         </button>
         <button type="button" onClick={onClear}>
-          Close
+          {vi ? "Đóng" : "Close"}
         </button>
       </div>
     </section>

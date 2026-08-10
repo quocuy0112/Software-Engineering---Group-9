@@ -53,7 +53,7 @@ export function ApplicationDetailPage({
         >
           <div className="application-panel-heading">
             <div>
-              <p className="workspace-kicker">CURRENT PROGRESS</p>
+              <p className="workspace-kicker">Current progress</p>
               <h2 id="application-history-title">Application timeline</h2>
             </div>
             <p>{applicationStageNextStep[application.stage]}</p>
@@ -82,7 +82,7 @@ export function ApplicationDetailPage({
         </section>
 
         <aside className="application-detail-panel application-submission-summary">
-          <p className="workspace-kicker">SUBMITTED APPLICATION</p>
+          <p className="workspace-kicker">Submitted application</p>
           <h2>Application details</h2>
           <dl>
             <div>

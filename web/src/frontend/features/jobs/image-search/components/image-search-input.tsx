@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 
 export function ImageSearchInput({
   disabled,
@@ -9,6 +10,7 @@ export function ImageSearchInput({
   disabled: boolean;
   onSelect(file: File): void;
 }) {
+  const vi = useWorkspaceLocale() === "vi";
   const input = useRef<HTMLInputElement>(null);
   return (
     <div className="image-search-input">
@@ -17,7 +19,7 @@ export function ImageSearchInput({
         id="global-image-search-file"
         className="image-search-file-input"
         type="file"
-        aria-label="Job poster image"
+        aria-label={vi ? "Hình ảnh tin tuyển dụng" : "Job poster image"}
         accept="image/png,image/jpeg,.png,.jpg,.jpeg"
         disabled={disabled}
         onChange={(event) => {
@@ -38,8 +40,14 @@ export function ImageSearchInput({
           </svg>
         </span>
         <span>
-          <strong>Choose a job poster</strong>
-          <small>PNG or JPEG · up to 5 MB · maximum 20 MP</small>
+          <strong>
+            {vi ? "Chọn hình ảnh tin tuyển dụng" : "Choose a job poster"}
+          </strong>
+          <small>
+            {vi
+              ? "PNG hoặc JPEG · tối đa 5 MB · tối đa 20 MP"
+              : "PNG or JPEG · up to 5 MB · maximum 20 MP"}
+          </small>
         </span>
       </label>
     </div>

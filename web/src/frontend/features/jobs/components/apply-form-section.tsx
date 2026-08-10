@@ -95,6 +95,7 @@ function InlineApplicationForm({
   contactDraft,
   onContactChange,
   onSubmitted,
+  onBusyChange,
 }: {
   form: ApplicationForm;
   onProfileSaved: (profile: {
@@ -104,6 +105,7 @@ function InlineApplicationForm({
   contactDraft: ApplicationContactSnapshot | null;
   onContactChange: (contact: ApplicationContactSnapshot) => void;
   onSubmitted: (outcome: ApplicationOutcome) => void;
+  onBusyChange: (busy: boolean) => void;
 }) {
   const csrfProof = useCsrfProof();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -140,6 +142,18 @@ function InlineApplicationForm({
   const [errors, setErrors] = useState<FieldErrors>({});
   const [cvSelectionError, setCvSelectionError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const formBusy = pending || locationSaving || cvSaving;
+
+  useEffect(() => {
+    onBusyChange(formBusy);
+  }, [formBusy, onBusyChange]);
+
+  useEffect(
+    () => () => {
+      onBusyChange(false);
+    },
+    [onBusyChange],
+  );
 
   function updateContact(next: ApplicationContactSnapshot) {
     setContact(next);
@@ -860,16 +874,17 @@ export function ApplyFormSection({
   const [loadError, setLoadError] = useState<string | null>(null);
   const dialogRef = useRef<HTMLElement>(null);
   const [closing, setClosing] = useState(false);
+  const [applicationBusy, setApplicationBusy] = useState(false);
   const [contactDraft, setContactDraft] =
     useState<ApplicationContactSnapshot | null>(null);
   const wasOpenRef = useRef(false);
 
   const handleModalClose = useCallback(() => {
-    if (closing) return;
+    if (closing || applicationBusy) return;
     setClosing(true);
     onOpenChange(false);
     setClosing(false);
-  }, [closing, onOpenChange]);
+  }, [applicationBusy, closing, onOpenChange]);
 
   useEffect(() => {
     const reopened = open && !wasOpenRef.current;
@@ -888,12 +903,42 @@ export function ApplyFormSection({
     document.body.style.overflow = "hidden";
     const focusTimer = window.setTimeout(() => dialogRef.current?.focus(), 0);
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        handleModalClose();
+        return;
+      }
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>(
+          "button:not(:disabled), [href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex='-1'])",
+        ),
+      );
+      if (!focusable.length) {
+        event.preventDefault();
+        dialogRef.current.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable.at(-1)!;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+
     return () => {
       window.clearTimeout(focusTimer);
+      document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = previousOverflow;
       previousFocus?.focus();
     };
-  }, [open]);
+  }, [handleModalClose, open]);
 
   useEffect(() => {
     if (!open || applied || form || outcome || loadError) return;
@@ -964,7 +1009,14 @@ export function ApplyFormSection({
   const headingId = "job-apply-heading-" + jobId;
 
   return (
-    <div id="apply" className="job-apply-modal-backdrop" role="presentation">
+    <div
+      id="apply"
+      className="job-apply-modal-backdrop"
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) handleModalClose();
+      }}
+    >
       <section
         ref={dialogRef}
         className="job-apply-modal"
@@ -975,7 +1027,7 @@ export function ApplyFormSection({
       >
         <header className="job-apply-modal-header">
           <div>
-            <p className="panel-kicker">APPLY</p>
+            <p className="panel-kicker">Apply</p>
             <h2 id={headingId}>Apply for {jobTitle}</h2>
             <p>Complete your application on SmartHire.</p>
           </div>
@@ -983,12 +1035,22 @@ export function ApplyFormSection({
             type="button"
             className="job-icon-button"
             aria-label="Close application form"
-            disabled={closing}
+            disabled={closing || applicationBusy}
+            aria-describedby={
+              applicationBusy ? "job-apply-close-hint" : undefined
+            }
             onClick={() => void handleModalClose()}
           >
             ×
           </button>
         </header>
+
+        {applicationBusy ? (
+          <p id="job-apply-close-hint" className="sr-only">
+            Please wait for the current application action to finish before
+            closing.
+          </p>
+        ) : null}
 
         <div className="job-apply-modal-body">
           {open && !form && !outcome && !applied && !loadError ? (
@@ -1027,6 +1089,7 @@ export function ApplyFormSection({
               contactDraft={contactDraft}
               onContactChange={handleContactChange}
               onSubmitted={handleSubmitted}
+              onBusyChange={setApplicationBusy}
             />
           ) : null}
         </div>

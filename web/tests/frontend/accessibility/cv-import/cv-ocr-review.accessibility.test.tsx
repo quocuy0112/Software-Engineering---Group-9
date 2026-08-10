@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { CvEvidence } from "@/frontend/features/cv-import/components/cv-evidence";
@@ -20,8 +20,9 @@ describe("Candidate OCR review accessibility", () => {
       />,
     );
     expect(
-      screen.getByRole("alert", { name: "OCR evidence requires review" }),
+      screen.getByRole("alert", { name: "Recognized text requires review" }),
     ).toBeVisible();
+    fireEvent.click(screen.getByText("Data source details"));
     expect(screen.getByText(/DOCX body 3/u)).toBeVisible();
   });
 });

@@ -1,11 +1,18 @@
 "use client";
 
 import { useTheme } from "@/frontend/providers/theme-provider";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 
 export function ThemeToggle({ compact = false }: { compact?: boolean }) {
   const { theme, toggleTheme } = useTheme();
+  const locale = useWorkspaceLocale();
   const switchingTo = theme === "dark" ? "light" : "dark";
-  const label = `Switch to ${switchingTo} mode`;
+  const label =
+    locale === "vi"
+      ? theme === "dark"
+        ? "Chuyển sang giao diện sáng"
+        : "Chuyển sang giao diện tối"
+      : `Switch to ${switchingTo} mode`;
 
   return (
     <button
@@ -27,7 +34,13 @@ export function ThemeToggle({ compact = false }: { compact?: boolean }) {
         )}
       </svg>
       <span className={compact ? "sr-only" : "theme-toggle-label"}>
-        {theme === "dark" ? "Light mode" : "Dark mode"}
+        {locale === "vi"
+          ? theme === "dark"
+            ? "Giao diện sáng"
+            : "Giao diện tối"
+          : theme === "dark"
+            ? "Light mode"
+            : "Dark mode"}
       </span>
     </button>
   );

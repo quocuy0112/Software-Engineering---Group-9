@@ -77,7 +77,7 @@ function QuickViewIcon() {
 }
 
 const hoverActionClassName =
-  "job-icon-button job-card-hover-action opacity-0 transition-[opacity,transform] duration-150 group-hover:opacity-100 group-focus-within:opacity-100";
+  "job-icon-button job-card-hover-action transition-[opacity,transform] duration-150";
 
 export function JobCardHeader({
   job,

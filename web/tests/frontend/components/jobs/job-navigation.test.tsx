@@ -100,7 +100,7 @@ describe("job board navigation", () => {
     expect(source).toContain('className="jobs-fixed-region"');
     expect(source).toContain('className="job-filter-column"');
     expect(source).toContain('className="job-results"');
-    expect(source).toContain("tabIndex={0}");
+    expect(source).not.toContain("tabIndex={0}");
     expect(styles).toContain(".job-list");
     expect(styles).not.toContain(
       '.job-board-public-main .jobs-page,\n  .workspace-content[data-content-mode="job-board"] > .jobs-page',
@@ -122,7 +122,9 @@ describe("job board navigation", () => {
     expect(styles).toContain("overflow-y: auto;");
     expect(styles).toContain("scrollbar-width: thin;");
     expect(styles).toContain(".job-filter-column::-webkit-scrollbar {");
-    expect(styles).toContain("max-height: min(70dvh, 40rem);");
+    expect(styles).toContain(".job-filter-mobile-trigger");
+    expect(styles).toContain(".job-filter-drawer");
+    expect(styles).toContain("max-height: min(88dvh, 52rem);");
   });
 
   it("uses the Next.js apply query to open the detail-page modal", async () => {

@@ -122,6 +122,43 @@
   font-size: var(--sh-font-size-body-sm);
 }
 
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sh-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.steps li {
+  display: grid;
+  gap: var(--sh-space-1);
+  padding: var(--sh-space-3);
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-color-surface-tinted);
+}
+
+.steps strong {
+  color: var(--sh-color-brand-primary);
+  font-size: var(--sh-font-size-label);
+}
+
+.steps span,
+.actionHint {
+  color: var(--sh-color-text-secondary);
+  font-size: var(--sh-font-size-caption);
+  line-height: var(--sh-line-height-body-sm);
+}
+
+.actionHint {
+  margin: 0;
+  padding: var(--sh-space-3);
+  border-inline-start: 3px solid var(--sh-color-info);
+  background: var(--sh-color-info-bg);
+}
+
 .completion input[type="checkbox"] {
   width: 20px;
   height: 20px;
@@ -193,6 +230,10 @@
 
   .actions button {
     width: 100%;
+  }
+
+  .steps {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -28,6 +28,23 @@
   margin: 0;
 }
 
+.technicalDetails {
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-color-surface-tinted);
+}
+
+.technicalDetails summary {
+  font-weight: var(--sh-font-weight-semibold);
+  cursor: pointer;
+}
+
+.technicalDetails p {
+  margin: 0.4rem 0 0;
+  overflow-wrap: anywhere;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .root {
     scroll-behavior: auto;

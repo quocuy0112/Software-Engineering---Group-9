@@ -165,7 +165,7 @@ describe("CV upload and authoritative status UI", () => {
     expect(clear).toHaveBeenCalled();
   });
 
-  it("keeps polling successful responses and redirects as soon as the draft is ready", async () => {
+  it("keeps polling successful responses and lets the candidate open a ready draft", async () => {
     vi.useFakeTimers();
     const loadStatus = vi
       .fn()
@@ -217,13 +217,13 @@ describe("CV upload and authoritative status UI", () => {
       "success",
     );
 
+    expect(screen.getByRole("link", { name: /review draft/i })).toHaveAttribute(
+      "href",
+      "/profile/cv-imports/upload_polling_1234/review",
+    );
     await act(async () => vi.advanceTimersByTimeAsync(320));
-    expect(navigation.prefetch).toHaveBeenCalledWith(
-      "/profile/cv-imports/upload_polling_1234/review",
-    );
-    expect(navigation.replace).toHaveBeenCalledWith(
-      "/profile/cv-imports/upload_polling_1234/review",
-    );
+    expect(navigation.prefetch).not.toHaveBeenCalled();
+    expect(navigation.replace).not.toHaveBeenCalled();
   });
 
   it("keeps a confirmed import on the status route and renders its completed state", () => {

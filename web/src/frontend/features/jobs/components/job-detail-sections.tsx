@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import type { JobDetail } from "@/shared/contracts/jobs/discovery";
 import {
@@ -145,13 +144,10 @@ export function JobDetailOverview({ job }: { job: JobDetail }) {
       <div className="job-detail-overview-header">
         <SectionHeading
           headingId="overview-heading"
-          eyebrow="OVERVIEW"
+          eyebrow="Overview"
           title="Overview"
           copy="The essentials at a glance before you dive into the role."
         />
-        <Link className="job-similar-jobs-link" href="/jobs">
-          Send me similar jobs
-        </Link>
       </div>
 
       <div

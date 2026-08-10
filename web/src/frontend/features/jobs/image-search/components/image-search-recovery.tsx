@@ -1,6 +1,7 @@
 "use client";
 
 import type { ImageSearchFallbackReason } from "../client/use-image-search";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 
 const fallbackContent: Record<
   ImageSearchFallbackReason,
@@ -41,8 +42,32 @@ export function ImageSearchRecovery({
   onRetry(): void;
   onManual(): void;
 }) {
+  const vi = useWorkspaceLocale() === "vi";
   if (fallbackReason) {
-    const content = fallbackContent[fallbackReason];
+    const content = vi
+      ? {
+          LOW_CONFIDENCE: {
+            heading: "Văn bản trong ảnh chưa đủ rõ",
+            description:
+              "Không có bộ lọc nào được thêm. Hãy thử một hình ảnh rõ hơn.",
+          },
+          INTERPRETER_UNAVAILABLE: {
+            heading: "Chưa thể đề xuất bộ lọc",
+            description:
+              "Không có văn bản nhận dạng nào được thêm vào tìm kiếm của bạn.",
+          },
+          INTERPRETER_INVALID_OUTPUT: {
+            heading: "Cần thử lại để tạo bộ lọc",
+            description:
+              "Kết quả chưa thể chuyển thành bộ lọc được hỗ trợ. Tìm kiếm hiện tại vẫn giữ nguyên.",
+          },
+          UNKNOWN: {
+            heading: "Không tìm thấy bộ lọc phù hợp",
+            description:
+              "Hình ảnh này không tạo được bộ lọc được hỗ trợ. Tìm kiếm hiện tại vẫn giữ nguyên.",
+          },
+        }[fallbackReason]
+      : fallbackContent[fallbackReason];
     return (
       <div
         role="status"
@@ -51,10 +76,10 @@ export function ImageSearchRecovery({
         <h3>{content.heading}</h3>
         <p>{content.description}</p>
         <button type="button" onClick={onRetry}>
-          Try another image
+          {vi ? "Thử hình ảnh khác" : "Try another image"}
         </button>
         <button type="button" onClick={() => onManual()}>
-          Continue to Find jobs
+          {vi ? "Tiếp tục tìm việc" : "Continue to Find jobs"}
         </button>
       </div>
     );
@@ -73,15 +98,27 @@ export function ImageSearchRecovery({
       role="alert"
       className="image-search-recovery image-search-recovery-error"
     >
-      <h3>Image search unavailable</h3>
+      <h3>
+        {vi
+          ? "Tìm kiếm bằng hình ảnh chưa khả dụng"
+          : "Image search unavailable"}
+      </h3>
       <p>{error}</p>
-      {retryLabel ? <p>Try again after {retryLabel}.</p> : null}
-      <p>Ordinary text search is still available.</p>
+      {retryLabel ? (
+        <p>
+          {vi ? `Thử lại sau ${retryLabel}.` : `Try again after ${retryLabel}.`}
+        </p>
+      ) : null}
+      <p>
+        {vi
+          ? "Bạn vẫn có thể tìm kiếm bằng văn bản."
+          : "Ordinary text search is still available."}
+      </p>
       <button type="button" onClick={onRetry}>
-        Try another image
+        {vi ? "Thử hình ảnh khác" : "Try another image"}
       </button>
       <button type="button" onClick={() => onManual()}>
-        Search manually
+        {vi ? "Tìm kiếm thủ công" : "Search manually"}
       </button>
     </div>
   );

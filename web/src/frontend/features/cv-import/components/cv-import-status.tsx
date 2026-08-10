@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type {
@@ -182,7 +181,6 @@ export function CvImportStatus({
   loadStatus?: () => Promise<StatusResource>;
   csrfProof?: string;
 }) {
-  const router = useRouter();
   const locale = useWorkspaceLocale();
   const copy = cvCopy(locale);
   const [current, setCurrent] = useState(resource);
@@ -262,16 +260,6 @@ export function CvImportStatus({
       if (timer) clearTimeout(timer);
     };
   }, [current.pollingAfterMs, locale, refreshStatus]);
-
-  const reviewUrl =
-    current.status === "REVIEW_READY" ? (current.draft?.reviewUrl ?? null) : null;
-
-  useEffect(() => {
-    if (!reviewUrl) return;
-    router.prefetch(reviewUrl);
-    const redirect = setTimeout(() => router.replace(reviewUrl), 320);
-    return () => clearTimeout(redirect);
-  }, [reviewUrl, router]);
 
   const requestRetry = useCallback(async () => {
     if (!csrfProof)
@@ -469,9 +457,31 @@ export function CvImportStatus({
       >
         <strong>{label}</strong>
         {current.stage
-          ? ` — ${cvParserLabel(locale, current.parserClass ?? "DETERMINISTIC_INTERNAL")}, ${copy.status.stage} ${cvStageLabel(locale, activeStage)}.`
+          ? ` — ${copy.status.stage} ${cvStageLabel(locale, activeStage)}.`
           : `. ${copy.status.contentUnavailable}`}
       </p>
+      {current.stage ? (
+        <details className={styles.technicalDetails}>
+          <summary>
+            {locale === "vi" ? "Chi tiết xử lý" : "Processing details"}
+          </summary>
+          <dl>
+            <div>
+              <dt>{locale === "vi" ? "Phương thức" : "Method"}</dt>
+              <dd>
+                {cvParserLabel(
+                  locale,
+                  current.parserClass ?? "DETERMINISTIC_INTERNAL",
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt>{locale === "vi" ? "Mã bản nhập" : "Import reference"}</dt>
+              <dd>{current.uploadId}</dd>
+            </div>
+          </dl>
+        </details>
+      ) : null}
       {aiStatus ? (
         <div
           key={`${current.status}:${aiStatus.tone}`}

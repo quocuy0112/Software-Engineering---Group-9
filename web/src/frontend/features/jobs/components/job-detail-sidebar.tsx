@@ -156,7 +156,6 @@ function SidebarCardHeading({
 export function CompanyCard({ job }: { job: JobDetail }) {
   const company = resolveSidebarCompany(job.company);
   const rating = company.rating;
-  const companyPageHref = company.websiteUrl ?? "#company";
 
   return (
     <details
@@ -168,7 +167,7 @@ export function CompanyCard({ job }: { job: JobDetail }) {
         <span className="job-sidebar-company-heading">
           <SidebarCompanyLogo company={company} large />
           <span className="job-company-accordion-copy">
-            <span className="panel-kicker">THE COMPANY</span>
+            <span className="panel-kicker">The company</span>
             <span
               id="company-card-heading"
               className="job-company-accordion-title"
@@ -239,14 +238,16 @@ export function CompanyCard({ job }: { job: JobDetail }) {
           </div>
         </dl>
 
-        <a
-          className="job-company-profile-button"
-          href={companyPageHref}
-          target={company.websiteUrl ? "_blank" : undefined}
-          rel={company.websiteUrl ? "noreferrer" : undefined}
-        >
-          View company page <span aria-hidden="true">→</span>
-        </a>
+        {company.websiteUrl ? (
+          <a
+            className="job-company-profile-button"
+            href={company.websiteUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Visit company website <span aria-hidden="true">→</span>
+          </a>
+        ) : null}
       </div>
     </details>
   );
@@ -283,7 +284,7 @@ export function GeneralInfoCard({ job }: { job: JobDetail }) {
       aria-labelledby="general-information-heading"
     >
       <SidebarCardHeading
-        eyebrow="AT A GLANCE"
+        eyebrow="At a glance"
         title="General information"
         mark="▦"
         headingId="general-information-heading"
@@ -365,7 +366,7 @@ export function SimilarJobsCard({ job }: { job: JobDetail }) {
       aria-labelledby="similar-jobs-heading"
     >
       <SidebarCardHeading
-        eyebrow="EXPLORE MORE"
+        eyebrow="Explore more"
         title="Similar jobs"
         mark="↗"
         headingId="similar-jobs-heading"
@@ -398,7 +399,7 @@ export function ReportJobWidget({ job }: { job: JobDetail }) {
           !
         </span>
         <div>
-          <p className="panel-kicker">SAFETY CHECK</p>
+          <p className="panel-kicker">Safety check</p>
           <h2 id="report-this-job-heading">Report this job</h2>
         </div>
       </div>

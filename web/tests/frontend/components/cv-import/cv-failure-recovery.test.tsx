@@ -128,6 +128,7 @@ describe("CV failure recovery", () => {
     expect(screen.getByRole("alert")).toHaveTextContent(
       resource.failure!.message,
     );
+    fireEvent.click(screen.getByText(/technical details/i));
     expect(screen.getByText(expectedCode)).toBeVisible();
     expect(
       screen.getByRole("link", { name: /upload a replacement cv/i }),
