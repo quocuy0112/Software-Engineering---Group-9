@@ -43,12 +43,16 @@ command.
 
 ### `companies`
 
-- Read-only safe reference/list for verification/membership filters.
+- `getList` returns only opaque company reference plus public display name for
+  authorized verification/membership filters, together with current calculation
+  time and the required dashboard state-definition version.
 - No company lifecycle/profile mutation.
 
 ### `company-memberships`
 
 - `getList`/safe `getOne` only.
+- `getList` always returns current `calculatedAt` and the required
+  `stateDefinitionVersion` from the shared DashboardDefinition.
 - Generic update/delete unsupported; lifecycle uses custom commands.
 
 ### `verification-requests`
@@ -86,10 +90,15 @@ type SafeListResult<T> = {
   total: number;
   meta: {
     calculatedAt: string;
-    stateDefinitionVersion?: string;
+    stateDefinitionVersion: string;
   };
 };
 ```
+
+`stateDefinitionVersion` is mandatory for `accounts`, `companies`,
+`company-memberships`, `verification-requests`, and `moderation-reports`. A
+missing or mismatched value is a contract failure; the provider never substitutes
+a client-side definition.
 
 The server allowlists filters and locks the required deterministic ordering.
 Unsupported `perPage`, sort, filter, unknown field, or malformed reference

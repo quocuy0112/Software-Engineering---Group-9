@@ -54,6 +54,11 @@ idempotency, and version conflicts.
 units, membership/account/request/report state predicates, and canonical list
 filters. Snapshot generation and live list repositories must import this module.
 
+The account, company-reference, company-membership, verification-request, and
+moderation-report list contracts always return their current `calculatedAt` and
+the same required `stateDefinitionVersion`. Missing or mismatched versions fail
+contract validation rather than falling back to client definitions.
+
 `SnapshotService.current()` returns an unexpired snapshot age ≤60 seconds or
 SNAPSHOT_UNAVAILABLE. Worker recomputes every 30 seconds and can accept an
 immediate recalculation request without letting callers block on it.
@@ -68,6 +73,11 @@ immediate recalculation request without letting callers block on it.
 
 No Feature 006 method creates an invitation or OWNER approval. Missing/unavailable
 authority is a hard denial, never a fallback to tax-ID match.
+
+Deployment readiness must verify a named upstream company-access owner, contract
+version, target-environment producer endpoint/state source, and passing
+producer/consumer integration test. Existing-company approval remains disabled
+until all four are present.
 
 ## BusinessEvidenceStorage
 
@@ -93,9 +103,14 @@ cannot move a terminal/superseded request to PENDING_REVIEW.
 
 ## VerificationService
 
-Commands: submit (Candidate), cancel (Candidate), resubmit (Candidate), assign
-(Admin), request changes, reject, approve. Each command validates actor, exact
-state/version, evidence, resubmission count, and relationship prerequisite.
+Commands: submit (Candidate), cancel (Candidate), resubmit (Candidate), request
+changes, reject, and approve. Each command validates actor, exact state/version,
+evidence, resubmission count, and relationship prerequisite.
+
+Feature 006 does not expose the `assign` command. `assignedAdminUserId` is
+nullable read-only workload metadata used only by the queue filter; a future
+workload-routing contract may populate it. Feature 006 commands are submit,
+cancel, resubmit, request changes, reject, and approve.
 
 New/existing company approval writes Company/Membership/request/history/audit/
 notification as one transaction. Timed transitions are idempotent worker
@@ -118,6 +133,20 @@ only allowlisted template fields, dispatches through the replaceable existing
 email provider, classifies exact safe failure category, and schedules attempts at
 immediate/+1m/+5m/+30m/+2h. Permanent failure, attempt-5 failure, or 24-hour
 deadline sets MANUAL_INTERVENTION_REQUIRED. It never changes originating state.
+
+SecurityNotificationWork is created for account suspension/reinstatement,
+all-session revocation, and administrator-driven membership suspension,
+restoration, or removal. Single-session revocation and moderation-only commands
+create none. Verification approval/request-changes/rejection creates the
+separate applicant Notification Work required by FR-037 by atomically inserting
+one idempotent row into the existing `EmailOutbox`. Accepted submission or
+resubmission receipt, applicant cancellation, and worker delay/expiry milestones
+use that same existing outbox authority. Their idempotency identity binds the
+request, submission version or milestone, resulting state, and notification
+kind. The existing email worker performs later delivery; these applicant rows
+do not use the FR-022 retry/manual-intervention projection. Report-linked access
+enforcement reuses the underlying account/membership notification and the link
+does not duplicate it.
 
 ## AuditWriter
 

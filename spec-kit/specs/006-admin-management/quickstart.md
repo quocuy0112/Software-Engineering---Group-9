@@ -44,6 +44,12 @@ origins above. Do not derive an allowed origin from an arbitrary request host.
 Configure separate protected-storage credentials, malware-scanner access,
 notification delivery, and the audit-retention policy.
 
+Before production validation, approve
+`docs/policies/business-license-evidence.md` with named Legal, Security, and
+Operations owners, and record the upstream Company Access Prerequisite producer
+contract/version. Existing-company approval must remain disabled until its
+producer/consumer integration test passes in the target environment.
+
 The local environment must fail closed when any production-required evidence
 protection setting is absent. A development-only storage adapter may be used
 only when it preserves authorization checks, private object access, retention,
@@ -136,8 +142,10 @@ against the same fixtures.
 
 1. Change source data, wait for the snapshot worker, and confirm the displayed
    `calculatedAt` is no more than 60 seconds old.
-2. Drill from every aggregate into its filtered list and verify that both
-   responses carry the same state-definition version and snapshot identity.
+2. Drill from every aggregate into its filtered list and verify that every list
+   returns its own `calculatedAt`, requires the same state-definition version as
+   the snapshot, and receives the originating snapshot ID/count only through
+   in-memory navigation context.
 3. Force source data to change between the total and drill-down; confirm the
    console preserves or labels the original snapshot rather than presenting
    mismatched values as current.
@@ -167,7 +175,13 @@ against the same fixtures.
 3. Exercise approve, request-changes, reject, cancel, resubmit, duplicate-tax-
    identifier, transient failure, permanent failure, and the 24-hour delayed
    safety-check transition.
-4. Confirm concurrent approval produces one Company and one OWNER membership,
+4. For every accepted submission/resubmission receipt, cancellation,
+   request-changes, rejection, approval, delay, and expiry event, confirm the
+   state/history/audit effects and exactly one idempotent applicant row in the
+   existing `EmailOutbox` commit together; retry each event and confirm no
+   duplicate outbox row is created. Confirm these rows do not create
+   `SecurityNotificationWork` or expose FR-022 manual-intervention fields.
+5. Confirm concurrent approval produces one Company and one OWNER membership,
    with the loser receiving the current terminal state.
 
 ### Moderation and Notifications
@@ -177,7 +191,8 @@ against the same fixtures.
 2. Submit a duplicate report within 24 hours and confirm the same neutral
    acknowledgement is returned without creating a second open report.
 3. Assign, note, resolve, and dismiss reports while preserving private details
-   and immutable history.
+   and immutable history; confirm these moderation-only records create no
+   Notification Work and notify no report target.
 4. Force security-notification delivery failure through all retry attempts;
    confirm the original security action remains effective and the console
    exposes `MANUAL_INTERVENTION_REQUIRED` without leaking notification content

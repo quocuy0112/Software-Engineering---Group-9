@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: SmartHire Feature 006 Administration API
-  version: 0.1.0
+  version: 0.2.0
   description: >-
     Explicit same-origin contracts for React Admin, Candidate employer
     verification/report submission, and the recruiter entitlement boundary.
@@ -14,6 +14,7 @@ tags:
   - name: Dashboard
   - name: Accounts
   - name: Verification
+  - name: Companies
   - name: Memberships
   - name: Moderation
   - name: RecruiterEntitlement
@@ -304,7 +305,12 @@ paths:
             schema: { type: string, pattern: "^[0-9]{10}$" },
           }
         - { name: applicantId, in: query, schema: { type: string } }
-        - { name: assigneeId, in: query, schema: { type: string } }
+        - {
+            name: assigneeId,
+            in: query,
+            description: Read-only workload metadata filter; use UNASSIGNED for null assignment. Feature 006 exposes no verification-assignment mutation.,
+            schema: { type: string, maxLength: 128 },
+          }
       responses:
         "200":
           {
@@ -486,6 +492,87 @@ paths:
           "423": { $ref: "#/components/responses/ActionBlocked" },
           "428": { $ref: "#/components/responses/StepUpRequired" },
         }
+  /api/admin/companies:
+    get:
+      tags: [Companies]
+      operationId: listAdminCompanyReferences
+      x-react-admin-resource: companies
+      x-react-admin-method: getList
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Page" }
+        - { $ref: "#/components/parameters/PerPage" }
+        - { name: search, in: query, schema: { type: string, maxLength: 160 } }
+        - {
+            name: companyId,
+            in: query,
+            schema: { type: string, maxLength: 128 },
+          }
+      responses:
+        "200":
+          description: Authorized safe company references for administration filters
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CompanyReferenceList" }
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/AuthorityDenied" }
+  /api/admin/company-memberships:
+    get:
+      tags: [Memberships]
+      operationId: listAdminCompanyMemberships
+      x-react-admin-resource: company-memberships
+      x-react-admin-method: getList
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Page" }
+        - { $ref: "#/components/parameters/PerPage" }
+        - {
+            name: accountId,
+            in: query,
+            schema: { type: string, maxLength: 128 },
+          }
+        - {
+            name: companyId,
+            in: query,
+            schema: { type: string, maxLength: 128 },
+          }
+        - {
+            name: role,
+            in: query,
+            schema: { $ref: "#/components/schemas/CompanyMembershipRole" },
+          }
+        - {
+            name: state,
+            in: query,
+            schema: { $ref: "#/components/schemas/CompanyMembershipState" },
+          }
+      responses:
+        "200":
+          description: Current company-scoped membership list using dashboard state definitions
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CompanyMembershipList" }
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/AuthorityDenied" }
+  /api/admin/company-memberships/{membershipId}:
+    get:
+      tags: [Memberships]
+      operationId: getAdminCompanyMembership
+      x-react-admin-resource: company-memberships
+      x-react-admin-method: getOne
+      security: [{ cookieAuth: [] }]
+      parameters: [{ $ref: "#/components/parameters/MembershipId" }]
+      responses:
+        "200":
+          description: Authorized company-scoped membership detail
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CompanyMembershipRecord" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/AuthorityDenied" }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
   /api/admin/company-memberships/{membershipId}/{action}:
     post:
       tags: [Memberships]
@@ -494,12 +581,7 @@ paths:
       x-react-admin-method: suspendMembership|restoreMembership|removeMembership
       security: [{ cookieAuth: [] }]
       parameters:
-        - {
-            name: membershipId,
-            in: path,
-            required: true,
-            schema: { type: string },
-          }
+        - { $ref: "#/components/parameters/MembershipId" }
         - {
             name: action,
             in: path,
@@ -804,6 +886,13 @@ components:
         required: true,
         schema: { type: string, maxLength: 128 },
       }
+    MembershipId:
+      {
+        name: membershipId,
+        in: path,
+        required: true,
+        schema: { type: string, maxLength: 128 },
+      }
     CsrfProof:
       {
         name: X-CSRF-Token,
@@ -976,7 +1065,7 @@ components:
     AccountList:
       type: object
       additionalProperties: false
-      required: [data, total, calculatedAt]
+      required: [data, total, calculatedAt, stateDefinitionVersion]
       properties:
         data:
           {
@@ -985,6 +1074,7 @@ components:
           }
         total: { type: integer, minimum: 0 }
         calculatedAt: { type: string, format: date-time }
+        stateDefinitionVersion: { type: string, minLength: 1, maxLength: 64 }
     AccountListRow:
       type: object
       additionalProperties: false
@@ -1154,6 +1244,58 @@ components:
     CompanyMembershipRole:
       { enum: [OWNER, HR_MANAGER, RECRUITER, HIRING_MANAGER] }
     CompanyMembershipState: { enum: [ACTIVE, SUSPENDED, REMOVED] }
+    CompanyReferenceList:
+      type: object
+      additionalProperties: false
+      required: [data, total, calculatedAt, stateDefinitionVersion]
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/CompanyReference" }
+        total: { type: integer, minimum: 0 }
+        calculatedAt: { type: string, format: date-time }
+        stateDefinitionVersion: { type: string, minLength: 1, maxLength: 64 }
+    CompanyReference:
+      type: object
+      additionalProperties: false
+      required: [id, displayName]
+      properties:
+        id: { type: string, maxLength: 128 }
+        displayName: { type: string, minLength: 1, maxLength: 200 }
+    CompanyMembershipList:
+      type: object
+      additionalProperties: false
+      required: [data, total, calculatedAt, stateDefinitionVersion]
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/CompanyMembershipRecord" }
+        total: { type: integer, minimum: 0 }
+        calculatedAt: { type: string, format: date-time }
+        stateDefinitionVersion: { type: string, minLength: 1, maxLength: 64 }
+    CompanyMembershipRecord:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          id,
+          accountId,
+          companyId,
+          companyDisplayName,
+          role,
+          state,
+          stateChangedAt,
+          version,
+        ]
+      properties:
+        id: { type: string, maxLength: 128 }
+        accountId: { type: string, maxLength: 128 }
+        companyId: { type: string, maxLength: 128 }
+        companyDisplayName: { type: string, minLength: 1, maxLength: 200 }
+        role: { $ref: "#/components/schemas/CompanyMembershipRole" }
+        state: { $ref: "#/components/schemas/CompanyMembershipState" }
+        stateChangedAt: { type: string, format: date-time }
+        version: { type: integer, minimum: 0 }
     ReportCategory:
       {
         enum:
@@ -1182,7 +1324,7 @@ components:
     GenericList:
       type: object
       additionalProperties: false
-      required: [data, total, calculatedAt]
+      required: [data, total, calculatedAt, stateDefinitionVersion]
       properties:
         {
           data: { type: array, items: { type: object } },

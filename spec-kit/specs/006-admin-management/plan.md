@@ -81,15 +81,15 @@ and the representative dataset/concurrency profile from SC-002
 
 _Gate evaluated before research and re-checked after design._
 
-| Gate                                                | Design evidence                                                                                                                                                                                                     | Status |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| I. Human-controlled recruitment                     | Administrators make all verification, moderation, and enforcement decisions; a report never changes recruitment state and no AI decision is introduced.                                                             | Pass   |
-| II. Security, privacy, tenant isolation             | Better Auth remains exclusive; authorization is server-side; company membership is company-scoped; evidence/rationales use private purpose-specific retention; React Admin uses memory-only state and no telemetry. | Pass   |
-| III. Deterministic core and explainable AI          | Feature 006 adds no AI. All state transitions, counts, priorities, quotas, and decisions are deterministic and versioned.                                                                                           | Pass   |
-| IV. State, audit, data integrity                    | PostgreSQL transactions bind critical state, audit, and notification work; version checks/idempotency prevent conflicts; append-only histories preserve outcomes.                                                   | Pass   |
-| V. Scope discipline/P0 completeness                 | The plan covers administration and the recruiter entitlement boundary only; company-team creation, Recruiter Manager, deletion, export, and full job moderation remain excluded.                                    | Pass   |
-| VI. Measurable quality/accessibility                | P95, hard deadlines, keyboard completion, focus, non-color labels, axe, screen-reader, privacy, and concurrency qualification are explicit.                                                                         | Pass   |
-| VII. Maintainable/provider-independent architecture | App Router → service → repository/provider separation remains; React Admin adapters do not own business rules; scanner, storage, email, and document rendering retain replaceable boundaries.                       | Pass   |
+| Gate                                                | Design evidence                                                                                                                                                                                                                                                | Status |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| I. Human-controlled recruitment                     | Administrators make all verification, moderation, and enforcement decisions; a report never changes recruitment state and no AI decision is introduced.                                                                                                        | Pass   |
+| II. Security, privacy, tenant isolation             | Better Auth remains exclusive; authorization is server-side; company membership is company-scoped; evidence/rationales use private purpose-specific retention; React Admin uses memory-only state and no telemetry.                                            | Pass   |
+| III. Deterministic core and explainable AI          | Feature 006 adds no AI. All state transitions, counts, priorities, quotas, and decisions are deterministic and versioned.                                                                                                                                      | Pass   |
+| IV. State, audit, data integrity                    | PostgreSQL transactions bind critical state, audit, and notification work; version checks/idempotency prevent conflicts; append-only histories preserve outcomes.                                                                                              | Pass   |
+| V. Scope discipline/P0 completeness                 | The plan covers administration and the recruiter entitlement boundary only; company-team creation, Recruiter Manager, deletion, export, and full job moderation remain excluded.                                                                               | Pass   |
+| VI. Measurable quality/accessibility                | P95, hard deadlines, keyboard completion, focus, non-color labels, axe, screen-reader, privacy, and concurrency qualification are explicit.                                                                                                                    | Pass   |
+| VII. Maintainable/provider-independent architecture | The primary application remains Next.js/TypeScript with its Tailwind/shadcn baseline; React Admin/MUI is an isolated admin-console presentation adapter, does not replace shared product UI or business boundaries, and external providers remain replaceable. | Pass   |
 
 No constitutional violation blocks planning.
 
@@ -140,6 +140,16 @@ security-configured QueryClient. No guesser, generic catch-all CRUD provider,
 bulk delete, export, editable grid, optimistic mutation, or undoable mutation is
 enabled.
 
+**Constitutional UI decision**: React Admin/MUI is limited to the isolated
+administration-console subtree because React Admin requires its own component
+primitives. The repository's primary Next.js/TypeScript application and
+Tailwind/shadcn design baseline remain authoritative for shared navigation,
+Candidate pages, recruiter-entitlement pages, typography, tokens, and all
+non-admin product UI. MUI global resets and theme leakage are contained inside
+the admin mount; no shared business component is rewritten around MUI. An
+architecture test enforces this boundary. This additive adapter interpretation
+satisfies Principle VII without treating MUI as a replacement primary frontend.
+
 Registered resources preserve domain identity:
 
 | React Admin resource    | Domain meaning                                                  | Exposed operations                                                                                          |
@@ -160,6 +170,12 @@ Relations use stable opaque references (`accountId`, `companyId`,
 are deliberately separate custom methods where FR-014/FR-015/FR-027/FR-053
 require different field allowlists. React Admin never receives a flattened
 `recruiter` object or a document storage locator.
+
+The read contract includes a safe `companies.getList`,
+`company-memberships.getList`, and `company-memberships.getOne`. Company rows
+contain only opaque company reference and public display name for authorized
+filter contexts. Membership reads are company-scoped projections; lifecycle
+changes remain separate commands.
 
 ### Authentication and authorization integration
 
@@ -233,8 +249,11 @@ at most 60 seconds old. The plan therefore does not introduce a new TTL.
 - Snapshot generation and each live drill-down import the same server-side
   versioned metric-definition module. The browser never reconstructs totals.
 - A card navigation stores the originating snapshot ID/count only in memory.
-  The target list runs a current query, returns its own calculation time, and
-  shows the required source-change notice whenever the current total differs.
+  Every account, verification, membership, and moderation target list runs a
+  current query and MUST return its own `calculatedAt` plus the required
+  `stateDefinitionVersion`. Each corresponding repository imports the same
+  `DashboardDefinition`; the UI rejects a missing/mismatched definition version
+  and shows the required source-change notice whenever the current total differs.
 - Database indexes and aggregate queries are qualified against SC-002's full
   dataset and concurrency profile. React Admin client caching is not counted as
   dashboard computation performance.
@@ -246,7 +265,10 @@ buttons open a custom `SensitiveActionDialog` with exact reason category,
 FR-048-normalized 10–500-character rationale, target/company summary, current
 state version, explicit confirmation, and step-up state. Session rows contain
 only the FR-015/Key Entity allowlist. The service executes invariants and writes
-state, audit, rationale, and notification work transactionally.
+state, audit, and rationale transactionally. Account suspension, reinstatement,
+and all-session revocation also create exactly one SecurityNotificationWork in
+that transaction. Single-session revocation creates no FR-022 security
+notification, as fixed by FR-058.
 
 `PrivilegedActionRationale` stores application-encrypted text separately from
 the audit event, linked only by correlation reference. Reads require a new
@@ -267,6 +289,12 @@ filters/order. Review is a custom Show route because it joins current facts,
 company/membership matches, invitation/OWNER prerequisite state, versioned
 evidence, submission history, decision history, and outage state.
 
+Verification assignment is nullable read-only workload metadata in Feature 006.
+The queue supports the FR-029 assignment filter, including `UNASSIGNED`, but this
+feature exposes no assignment mutation because no acceptance requirement defines
+one. A future workload-routing feature may populate the field through its own
+authorized contract without changing verification decisions.
+
 `ProtectedEvidenceViewer` calls a same-origin byte-stream endpoint after fresh
 step-up. The server revalidates the request and evidence state before every open
 or download. PDF bytes render from an in-memory ArrayBuffer through the existing
@@ -277,10 +305,23 @@ the operational state required by FR-028.
 
 Approval/change/reject buttons use custom pessimistic commands. New-company
 approval establishes Company + OWNER membership + request outcome + audit +
-notification in one transaction. Existing-company approval locks and consumes
-the exact valid invitation or fulfills the exact request-specific active OWNER
-approval in the same transaction. The `CompanyRelationshipPrerequisiteGateway`
-has no bypass path.
+one applicant Notification Work row in the existing `EmailOutbox` in one
+transaction. Request-changes and rejection likewise commit request state,
+decision history, audit, and exactly one applicant `EmailOutbox` row together.
+Existing-company approval locks and consumes the exact valid invitation or
+fulfills the exact request-specific active OWNER approval in that same
+transaction. Applicant submission/resubmission receipt, applicant cancellation,
+and worker-driven delay/expiry transitions each create exactly one idempotent
+applicant `EmailOutbox` row in the transaction that accepts the lifecycle event.
+The `CompanyRelationshipPrerequisiteGateway` has no bypass path.
+
+The existing email worker dispatches these FR-037 applicant outbox rows through
+the provider-independent email boundary. They do not use
+`SecurityNotificationWork`, do not inherit FR-022's administrator-visible
+manual-intervention projection, and cannot roll back their originating state
+after commit. Event-specific idempotency keys prevent duplicate work during
+request retries, concurrent decisions, worker lease recovery, or deadline
+reconciliation.
 
 ### Moderation design
 
@@ -297,6 +338,12 @@ investigation note, RESOLVED, DISMISSED, and enforcement linkage use versioned,
 pessimistic commands. Terminal reports have no reopen command. The report API
 projects reporter/investigation data only after current Platform Administrator
 authorization.
+
+Moderation-only assignment, note, resolution, dismissal, and enforcement-link
+records do not create NotificationWork and never notify the report target.
+Separately confirmed account or membership enforcement uses the underlying
+account/membership command transaction and its FR-022 notification; linking the
+result does not create a duplicate notification.
 
 ### Accessibility and UX design
 
@@ -329,6 +376,9 @@ Worker responsibilities are isolated by purpose and idempotency key:
 - refresh dashboard snapshots every 30 seconds;
 - scan and produce safe previews for business evidence;
 - apply request delay/expiry and viewer-outage milestones once;
+- enqueue exactly one existing `EmailOutbox` row with each accepted verification
+  receipt, cancellation, administrator decision, delay, or expiry lifecycle
+  event; the existing email worker owns later applicant delivery;
 - dispatch security notifications on the exact five-attempt schedule and mark
   permanent/exhausted work `MANUAL_INTERVENTION_REQUIRED` by 24 hours;
 - delete expired rationales and evidence within their hard deadlines;
@@ -341,70 +391,70 @@ full address, session credential, or factor data.
 
 ## Requirement-to-Implementation Traceability Table
 
-| FR ID  | React Admin approach                                                                                                                                                 | Standard CRUD or Custom Component                    | Notes/Flags                                                              |
-| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------ |
-| FR-001 | Register separate `administrator-grants`, `accounts`, `candidate-identities`, and `company-memberships` domain resources backed by separate models/projections.      | Server model + read-only resource registration       | React Admin resource names do not merge roles.                           |
-| FR-002 | Expose no grant create/edit/delete provider method or UI; grant provisioning is an audited out-of-band operations command.                                           | Server-only invariant                                | Client-supplied roles are rejected by all schemas.                       |
-| FR-003 | Exact-host `proxy.ts` routing plus startup origin validation and per-route host enforcement.                                                                         | Custom host boundary                                 | Unknown host returns no admin shell/payload.                             |
-| FR-004 | `authProvider` login/checkAuth/checkError/logout adapters; admin two-factor page; `AdminAuthorityGate`; `SensitiveActionDialog` step-up.                             | Custom authentication components                     | Better Auth remains exclusive; server enforces 15-minute proof.          |
-| FR-005 | Every provider method calls an explicit route whose request boundary derives actor/session and checks authority before projection/service use.                       | Server-only authorization                            | React Admin `canAccess` is display-only.                                 |
-| FR-006 | Auth boundary returns empty non-enumerating denial envelopes and clears memory on denied/expired/revoked/cross-origin errors.                                        | Custom error/auth handling                           | No counts, existence, documents, reports, or audit payload on denial.    |
-| FR-007 | Custom React Admin Layout/theme, accessible navigation, focus management, labels, non-color statuses, desktop density.                                               | Custom component                                     | Defaults are foundations, not automatic compliance.                      |
-| FR-008 | `checkAuth`/server authority on next request; denied privileged attempts and grant changes write allowlisted audit events.                                           | Server-only + authority gate                         | No client permission cache is authoritative.                             |
-| FR-009 | Account action service rejects self-suspension and any action leaving no usable administrator; UI also disables with explanation.                                    | Custom action + server invariant                     | Server lock/check is authoritative under concurrency.                    |
-| FR-010 | `AdminDashboard` calls `getDashboardSnapshot`; worker refreshes every 30 seconds and endpoint displays only age `<=60s`.                                             | Custom dashboard                                     | Snapshot, not live aggregate or RA cache.                                |
-| FR-011 | `MetricCard` requires unit metadata and labels recruiter-enabled accounts as overlapping Candidate identities.                                                       | Custom dashboard field                               | Unit comes from server snapshot contract.                                |
-| FR-012 | Snapshot and drill-down share a versioned server definition module; `SnapshotDifferenceNotice` compares originating count with current result/timestamps.            | Custom dashboard/list integration                    | Exact notice shown on mismatch.                                          |
-| FR-013 | `accounts` List with exact filters, 25/100 pagination, and locked server sort/tie-break.                                                                             | Standard List/DataTable + custom filter schema       | Unsupported sort/page size rejected server-side.                         |
-| FR-014 | Account-list repository returns the exact allowlist and server-masked email; DataTable has only those columns.                                                       | Standard read projection                             | Detail fields use a separate custom query to prevent cache overexposure. |
-| FR-015 | `AccountSecurityShow` fetches a dedicated projection with safe account, membership, and session fields.                                                              | Custom Show page                                     | Not generic account edit/show cache.                                     |
-| FR-016 | `SessionRevocationDialog` captures exact category, normalized 10–500 rationale, explicit confirmation, step-up, and expected version.                                | Custom command                                       | One/all session commands are not delete CRUD.                            |
-| FR-017 | Session repository/projector excludes token, full address, factor data, codes, and raw headers; UI has no hidden fields.                                             | Server projection + custom table                     | Privacy canary tests response and DOM.                                   |
-| FR-018 | `SuspendAccountDialog` invokes pessimistic `suspendAccount`; service revokes all sessions/challenges and blocks new auth atomically.                                 | Custom command                                       | No generic account update.                                               |
-| FR-019 | `ReinstateAccountDialog` invokes pessimistic `reinstateAccount`; service preserves revoked sessions and independent state.                                           | Custom command                                       | UI refetches account/memberships after commit.                           |
-| FR-020 | Commands carry idempotency key and expected version; service locks current state; conflict component shows safe latest state and requires retry.                     | Custom conflict workflow                             | No optimistic/undoable mode.                                             |
-| FR-021 | `PrivilegedActionRationale` encrypted record is separate from AuditEvent; custom fresh-step-up detail; worker enforces 365-day + 24-hour deletion.                   | Custom protected detail + worker                     | Rationale absent from notification/audit/telemetry.                      |
-| FR-022 | Nested `NotificationDeliveryStatus` shows allowed states/times/category; durable worker executes exact retry/dead-letter rules.                                      | Custom read status + worker                          | Original action never rolls back after delivery failure.                 |
-| FR-023 | No route/provider/action exists for deletion, erasure, reuse, reset, factor bypass, or Candidate profile editing.                                                    | Scope guard                                          | Architecture tests enforce missing capabilities.                         |
-| FR-024 | Candidate-side submission API creates request; existing-company path validates typed invitation/OWNER prerequisite; admin review displays safe validity state.       | Custom Candidate flow + custom admin review          | Prerequisite producer is a blocking external dependency.                 |
-| FR-025 | Candidate contract normalizes/requires exact 10 ASCII digits and enforces PDF/PNG/JPEG 1–5,000,000 bytes before work creation.                                       | Custom submission validation                         | Rechecked server-side; admin UI cannot bypass.                           |
-| FR-026 | Admin worker isolates evidence and runs four checks; state/milestone scheduler applies 15-minute delay and 24-hour expiry.                                           | Custom worker pipeline                               | Unsafe/indeterminate evidence never gets a review projection.            |
-| FR-027 | `ProtectedEvidenceViewer` and authenticated byte-stream/download routes; purpose-specific encrypted store; retention cleanup.                                        | Custom protected viewer                              | `<ImageField>`/`<FileField>` are prohibited because they require URLs.   |
-| FR-028 | Verification service implements the exact state machine; worker owns timed expiry; UI exposes actions only for current state and disables on viewer outage.          | Custom state-machine UI + worker                     | RESUBMITTED is transactional/non-actionable.                             |
-| FR-029 | `verification-requests` List with exact filters, 25/100 paging, and locked oldest-first order.                                                                       | Standard List/DataTable + custom filters             | Rows contain no document content.                                        |
-| FR-030 | `VerificationReviewShow` composes safe facts, matches, prerequisite, checked evidence, submissions, and decision history.                                            | Custom Show page                                     | Multiple projections; not flat CRUD.                                     |
-| FR-031 | `VerificationDecisionPanel` implements change/reject/approve forms, categories, role allowlist, private note normalization, and resubmission limit.                  | Custom commands/forms                                | All commands pessimistic and step-up protected.                          |
-| FR-032 | New-company approval service transaction creates verified ACTIVE Company, OWNER Membership, terminal request, notification work, and audit.                          | Server transaction + custom command                  | UI receives result only after commit.                                    |
-| FR-033 | Existing-company approval transaction revalidates/consumes invitation or fulfills request-specific OWNER approval and creates/restores exact role.                   | Server transaction + custom command                  | No tax-ID-only grant path.                                               |
-| FR-034 | Unique normalized tax identifier, unique active request/membership constraints, idempotency records, row locks, and version checks.                                  | Server-only integrity                                | Retry/concurrency qualification required.                                |
-| FR-035 | Repository constraints and precondition service prevent duplicate active request/authority; UI renders authoritative outcome.                                        | Server-only integrity                                | No duplicate create method in provider.                                  |
-| FR-036 | Read-only decision history projection with allowlisted actor/version/state/category/time/result fields.                                                              | Custom history component                             | Evidence/note/session data excluded server-side.                         |
-| FR-037 | Durable applicant notification templates include state/time/next action and omit private signals, notes, storage, and admin identity.                                | Server worker/template                               | Admin UI shows only safe delivery state.                                 |
-| FR-038 | `company-memberships` is a first-class company-scoped resource related to `accounts` and `companies`; no `recruiters` resource exists.                               | Standard relation + custom actions                   | Candidate identity is never replaced.                                    |
-| FR-039 | `SuspendMembershipDialog` captures reason/rationale/confirmation/step-up and calls versioned command for one membership.                                             | Custom command                                       | Company ID and role shown explicitly.                                    |
-| FR-040 | `RestoreMembershipDialog` calls dedicated service restoring prior approved role only.                                                                                | Custom command                                       | Does not edit role or other memberships.                                 |
-| FR-041 | `RemoveMembershipDialog` requires stronger confirmation and dedicated terminal command.                                                                              | Custom command                                       | REMOVED is preserved; no delete CRUD.                                    |
-| FR-042 | Membership services update one locked membership and assert account/Candidate/other membership states unchanged.                                                     | Server-only invariant                                | Multi-company integration tests.                                         |
-| FR-043 | Recruiter entitlement and every future company command use current account/company/membership/role checks.                                                           | Server-only boundary                                 | React Admin grant never substitutes.                                     |
-| FR-044 | Membership service locks active OWNER set and rejects removal/suspension of the last active OWNER.                                                                   | Server invariant + disabled UI state                 | Concurrent OWNER actions tested.                                         |
-| FR-045 | Versioned membership commands write audit and return current safe state on stale conflict.                                                                           | Custom conflict workflow                             | No silent overwrite.                                                     |
-| FR-046 | Generalized `moderation-reports` resource preserves target/relationship context; submission service enforces OWNER/HR versus direct application authority rules.     | Standard admin List + custom submission/server rules | Existing job reports migrate into the same queue.                        |
-| FR-047 | Non-public report submission boundary rechecks ACTIVE account/membership/company/application authorization and uses one unavailable response.                        | Server-only authorization                            | No target-existence field in failure.                                    |
-| FR-048 | Candidate/recruiter report form and service enforce category, exact normalization, limits, dedupe, 10/24h quota, neutral receipt, and retry duration.                | Custom submission flow                               | Admin console only consumes accepted reports.                            |
-| FR-049 | Report creation service has no dependency on enforcement/job/application/scoring mutation services.                                                                  | Architecture boundary                                | Contract test proves only report/admission/audit writes.                 |
-| FR-050 | `moderation-reports` List/DataTable implements exact filters, computed priority, 25/100 paging, and locked priority/age/reference sort.                              | Standard List shell + custom priority field          | Server owns priority definitions.                                        |
-| FR-051 | `ModerationReviewShow` with assignment, investigation note, resolve, dismiss, and separately confirmed enforcement link commands.                                    | Custom workflow                                      | No generic edit and no reopen command.                                   |
-| FR-052 | Commands carry report version; append-only state/action history preserves allowlisted references only.                                                               | Custom conflict/history component                    | Unavailable/deleted target does not break history.                       |
-| FR-053 | Report detail repository requires current administrator authority and projects no data to target; reporter API returns only receipt/status.                          | Server-only privacy + custom detail                  | React Admin memory purged on authority loss.                             |
-| FR-054 | Exact recruiter host routing/startup validation mirrors admin origin checks.                                                                                         | Custom host boundary (non-RA page)                   | No full recruiter console is built.                                      |
-| FR-055 | Recruiter entitlement endpoint accepts only ACTIVE account with active membership and ignores admin grant.                                                           | Server-only authorization                            | Candidate-only/suspended membership gets denied state.                   |
-| FR-056 | Limited entitlement page makes selected active company explicit; endpoint returns only authorized safe company options and rechecks selection.                       | Custom limited Next.js page                          | No company-private dashboard/data actions.                               |
-| FR-057 | Coming-next page exposes exactly Candidate Dashboard and Employer Verification destinations and no Recruiter Manager operations.                                     | Custom limited Next.js page                          | Explicit scope guard tests links/routes.                                 |
-| FR-058 | Service transaction commits state transition, AuditEvent, idempotent NotificationWork, and rationale reference together or rolls back.                               | Server-only transaction                              | Delivery occurs after commit and cannot reverse it.                      |
-| FR-059 | Shared React Admin state components cover loading, empty, success, validation, stale conflict, and failure; all writes pessimistic.                                  | Custom UX primitives                                 | Query state is never authoritative business state.                       |
-| FR-060 | `AdminAuthorityGate`, memoryStore, zero inactive cache retention, no-store responses, full purge on auth error/logout, safe URLs/logs.                               | Custom security boundary                             | Back/forward/reload must recheck before content render.                  |
-| FR-061 | Add regression suites proving existing Candidate/auth/profile/CV/search/application/session-self-service behavior is unchanged except lawful denial.                 | Test/architecture guard                              | React Admin bundle and routes stay isolated to admin host.               |
-| FR-062 | Initial admin 2FA transaction designates current Better Auth Session and revokes prior designated Session within 2 seconds; candidate-only sessions remain ordinary. | Custom auth service + two-device tests               | Included because finalized spec contains FR-062.                         |
+| FR ID  | React Admin approach                                                                                                                                                                                                                                                            | Standard CRUD or Custom Component                    | Notes/Flags                                                                               |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| FR-001 | Register separate `administrator-grants`, `accounts`, `candidate-identities`, and `company-memberships` domain resources backed by separate models/projections.                                                                                                                 | Server model + read-only resource registration       | React Admin resource names do not merge roles.                                            |
+| FR-002 | Expose no grant create/edit/delete provider method or UI; grant provisioning is an audited out-of-band operations command.                                                                                                                                                      | Server-only invariant                                | Client-supplied roles are rejected by all schemas.                                        |
+| FR-003 | Exact-host `proxy.ts` routing plus startup origin validation and per-route host enforcement.                                                                                                                                                                                    | Custom host boundary                                 | Unknown host returns no admin shell/payload.                                              |
+| FR-004 | `authProvider` login/checkAuth/checkError/logout adapters; admin two-factor page; `AdminAuthorityGate`; `SensitiveActionDialog` step-up.                                                                                                                                        | Custom authentication components                     | Better Auth remains exclusive; server enforces 15-minute proof.                           |
+| FR-005 | Every provider method calls an explicit route whose request boundary derives actor/session and checks authority before projection/service use.                                                                                                                                  | Server-only authorization                            | React Admin `canAccess` is display-only.                                                  |
+| FR-006 | Auth boundary returns empty non-enumerating denial envelopes and clears memory on denied/expired/revoked/cross-origin errors.                                                                                                                                                   | Custom error/auth handling                           | No counts, existence, documents, reports, or audit payload on denial.                     |
+| FR-007 | Custom React Admin Layout/theme, accessible navigation, focus management, labels, non-color statuses, desktop density.                                                                                                                                                          | Custom component                                     | Defaults are foundations, not automatic compliance.                                       |
+| FR-008 | `checkAuth`/server authority on next request; denied privileged attempts and grant changes write allowlisted audit events.                                                                                                                                                      | Server-only + authority gate                         | No client permission cache is authoritative.                                              |
+| FR-009 | Account action service rejects self-suspension and any action leaving no usable administrator; UI also disables with explanation.                                                                                                                                               | Custom action + server invariant                     | Server lock/check is authoritative under concurrency.                                     |
+| FR-010 | `AdminDashboard` calls `getDashboardSnapshot`; worker refreshes every 30 seconds and endpoint displays only age `<=60s`.                                                                                                                                                        | Custom dashboard                                     | Snapshot, not live aggregate or RA cache.                                                 |
+| FR-011 | `MetricCard` requires unit metadata and labels recruiter-enabled accounts as overlapping Candidate identities.                                                                                                                                                                  | Custom dashboard field                               | Unit comes from server snapshot contract.                                                 |
+| FR-012 | Snapshot and drill-down share a versioned server definition module; `SnapshotDifferenceNotice` compares originating count with current result/timestamps.                                                                                                                       | Custom dashboard/list integration                    | Exact notice shown on mismatch.                                                           |
+| FR-013 | `accounts` List with exact filters, 25/100 pagination, and locked server sort/tie-break.                                                                                                                                                                                        | Standard List/DataTable + custom filter schema       | Unsupported sort/page size rejected server-side.                                          |
+| FR-014 | Account-list repository returns the exact allowlist and server-masked email; DataTable has only those columns.                                                                                                                                                                  | Standard read projection                             | Detail fields use a separate custom query to prevent cache overexposure.                  |
+| FR-015 | `AccountSecurityShow` fetches a dedicated projection with safe account, membership, and session fields.                                                                                                                                                                         | Custom Show page                                     | Not generic account edit/show cache.                                                      |
+| FR-016 | `SessionRevocationDialog` captures exact category, normalized 10–500 rationale, explicit confirmation, step-up, and expected version.                                                                                                                                           | Custom command                                       | One/all session commands are not delete CRUD.                                             |
+| FR-017 | Session repository/projector excludes token, full address, factor data, codes, and raw headers; UI has no hidden fields.                                                                                                                                                        | Server projection + custom table                     | Privacy canary tests response and DOM.                                                    |
+| FR-018 | `SuspendAccountDialog` invokes pessimistic `suspendAccount`; service revokes all sessions/challenges and blocks new auth atomically.                                                                                                                                            | Custom command                                       | No generic account update.                                                                |
+| FR-019 | `ReinstateAccountDialog` invokes pessimistic `reinstateAccount`; service preserves revoked sessions and independent state.                                                                                                                                                      | Custom command                                       | UI refetches account/memberships after commit.                                            |
+| FR-020 | Commands carry idempotency key and expected version; service locks current state; conflict component shows safe latest state and requires retry.                                                                                                                                | Custom conflict workflow                             | No optimistic/undoable mode.                                                              |
+| FR-021 | `PrivilegedActionRationale` encrypted record is separate from AuditEvent; custom fresh-step-up detail; worker enforces 365-day + 24-hour deletion.                                                                                                                              | Custom protected detail + worker                     | Rationale absent from notification/audit/telemetry.                                       |
+| FR-022 | Nested `NotificationDeliveryStatus` shows allowed states/times/category; durable worker executes exact retry/dead-letter rules.                                                                                                                                                 | Custom read status + worker                          | Original action never rolls back after delivery failure.                                  |
+| FR-023 | No route/provider/action exists for deletion, erasure, reuse, reset, factor bypass, or Candidate profile editing.                                                                                                                                                               | Scope guard                                          | Architecture tests enforce missing capabilities.                                          |
+| FR-024 | Candidate-side submission API creates request; existing-company path validates typed invitation/OWNER prerequisite; admin review displays safe validity state.                                                                                                                  | Custom Candidate flow + custom admin review          | Prerequisite producer is a blocking external dependency.                                  |
+| FR-025 | Candidate contract normalizes/requires exact 10 ASCII digits and enforces PDF/PNG/JPEG 1–5,000,000 bytes before work creation.                                                                                                                                                  | Custom submission validation                         | Rechecked server-side; admin UI cannot bypass.                                            |
+| FR-026 | Admin worker isolates evidence and runs four checks; state/milestone scheduler applies 15-minute delay and 24-hour expiry.                                                                                                                                                      | Custom worker pipeline                               | Unsafe/indeterminate evidence never gets a review projection.                             |
+| FR-027 | `ProtectedEvidenceViewer` and authenticated byte-stream/download routes; purpose-specific encrypted store; retention cleanup.                                                                                                                                                   | Custom protected viewer                              | `<ImageField>`/`<FileField>` are prohibited because they require URLs.                    |
+| FR-028 | Verification service implements the exact state machine; worker owns timed expiry; UI exposes actions only for current state and disables on viewer outage.                                                                                                                     | Custom state-machine UI + worker                     | RESUBMITTED is transactional/non-actionable.                                              |
+| FR-029 | `verification-requests` List with exact filters, 25/100 paging, and locked oldest-first order.                                                                                                                                                                                  | Standard List/DataTable + custom filters             | Rows contain no document content.                                                         |
+| FR-030 | `VerificationReviewShow` composes safe facts, matches, prerequisite, checked evidence, submissions, and decision history.                                                                                                                                                       | Custom Show page                                     | Multiple projections; not flat CRUD.                                                      |
+| FR-031 | `VerificationDecisionPanel` implements change/reject/approve forms, categories, role allowlist, private note normalization, and resubmission limit.                                                                                                                             | Custom commands/forms                                | All commands pessimistic and step-up protected.                                           |
+| FR-032 | New-company approval service transaction creates verified ACTIVE Company, OWNER Membership, terminal request, notification work, and audit.                                                                                                                                     | Server transaction + custom command                  | UI receives result only after commit.                                                     |
+| FR-033 | Existing-company approval transaction revalidates/consumes invitation or fulfills request-specific OWNER approval and creates/restores exact role.                                                                                                                              | Server transaction + custom command                  | No tax-ID-only grant path.                                                                |
+| FR-034 | Unique normalized tax identifier, unique active request/membership constraints, idempotency records, row locks, and version checks.                                                                                                                                             | Server-only integrity                                | Retry/concurrency qualification required.                                                 |
+| FR-035 | Repository constraints and precondition service prevent duplicate active request/authority; UI renders authoritative outcome.                                                                                                                                                   | Server-only integrity                                | No duplicate create method in provider.                                                   |
+| FR-036 | Read-only decision history projection with allowlisted actor/version/state/category/time/result fields.                                                                                                                                                                         | Custom history component                             | Evidence/note/session data excluded server-side.                                          |
+| FR-037 | Accepted receipt, cancellation, administrator-decision, delay, and expiry transitions atomically enqueue exactly one idempotent row in the existing `EmailOutbox`; typed templates include state/time/next action and omit private signals, notes, storage, and admin identity. | Server transaction + existing email worker/template  | Separate from FR-022 `SecurityNotificationWork`; delivery cannot reverse committed state. |
+| FR-038 | `company-memberships` is a first-class company-scoped resource related to `accounts` and `companies`; no `recruiters` resource exists.                                                                                                                                          | Standard relation + custom actions                   | Candidate identity is never replaced.                                                     |
+| FR-039 | `SuspendMembershipDialog` captures reason/rationale/confirmation/step-up and calls versioned command for one membership.                                                                                                                                                        | Custom command                                       | Company ID and role shown explicitly.                                                     |
+| FR-040 | `RestoreMembershipDialog` calls dedicated service restoring prior approved role only.                                                                                                                                                                                           | Custom command                                       | Does not edit role or other memberships.                                                  |
+| FR-041 | `RemoveMembershipDialog` requires stronger confirmation and dedicated terminal command.                                                                                                                                                                                         | Custom command                                       | REMOVED is preserved; no delete CRUD.                                                     |
+| FR-042 | Membership services update one locked membership and assert account/Candidate/other membership states unchanged.                                                                                                                                                                | Server-only invariant                                | Multi-company integration tests.                                                          |
+| FR-043 | Recruiter entitlement and every future company command use current account/company/membership/role checks.                                                                                                                                                                      | Server-only boundary                                 | React Admin grant never substitutes.                                                      |
+| FR-044 | Membership service locks active OWNER set and rejects removal/suspension of the last active OWNER.                                                                                                                                                                              | Server invariant + disabled UI state                 | Concurrent OWNER actions tested.                                                          |
+| FR-045 | Versioned membership commands write audit and return current safe state on stale conflict.                                                                                                                                                                                      | Custom conflict workflow                             | No silent overwrite.                                                                      |
+| FR-046 | Generalized `moderation-reports` resource preserves target/relationship context; submission service enforces OWNER/HR versus direct application authority rules.                                                                                                                | Standard admin List + custom submission/server rules | Existing job reports migrate into the same queue.                                         |
+| FR-047 | Non-public report submission boundary rechecks ACTIVE account/membership/company/application authorization and uses one unavailable response.                                                                                                                                   | Server-only authorization                            | No target-existence field in failure.                                                     |
+| FR-048 | Candidate/recruiter report form and service enforce category, exact normalization, limits, dedupe, 10/24h quota, neutral receipt, and retry duration.                                                                                                                           | Custom submission flow                               | Admin console only consumes accepted reports.                                             |
+| FR-049 | Report creation service has no dependency on enforcement/job/application/scoring mutation services.                                                                                                                                                                             | Architecture boundary                                | Contract test proves only report/admission/audit writes.                                  |
+| FR-050 | `moderation-reports` List/DataTable implements exact filters, computed priority, 25/100 paging, and locked priority/age/reference sort.                                                                                                                                         | Standard List shell + custom priority field          | Server owns priority definitions.                                                         |
+| FR-051 | `ModerationReviewShow` with assignment, investigation note, resolve, dismiss, and separately confirmed enforcement link commands.                                                                                                                                               | Custom workflow                                      | No generic edit and no reopen command.                                                    |
+| FR-052 | Commands carry report version; append-only state/action history preserves allowlisted references only.                                                                                                                                                                          | Custom conflict/history component                    | Unavailable/deleted target does not break history.                                        |
+| FR-053 | Report detail repository requires current administrator authority and projects no data to target; reporter API returns only receipt/status.                                                                                                                                     | Server-only privacy + custom detail                  | React Admin memory purged on authority loss.                                              |
+| FR-054 | Exact recruiter host routing/startup validation mirrors admin origin checks.                                                                                                                                                                                                    | Custom host boundary (non-RA page)                   | No full recruiter console is built.                                                       |
+| FR-055 | Recruiter entitlement endpoint accepts only ACTIVE account with active membership and ignores admin grant.                                                                                                                                                                      | Server-only authorization                            | Candidate-only/suspended membership gets denied state.                                    |
+| FR-056 | Limited entitlement page makes selected active company explicit; endpoint returns only authorized safe company options and rechecks selection.                                                                                                                                  | Custom limited Next.js page                          | No company-private dashboard/data actions.                                                |
+| FR-057 | Coming-next page exposes exactly Candidate Dashboard and Employer Verification destinations and no Recruiter Manager operations.                                                                                                                                                | Custom limited Next.js page                          | Explicit scope guard tests links/routes.                                                  |
+| FR-058 | The enumerated account, all-session, and membership commands use `SecurityNotificationWork`; verification approval/request-changes/rejection use the existing `EmailOutbox`. Each command commits state, AuditEvent, and exactly one idempotent Notification Work row together. | Server-only transaction                              | Single-session/moderation exclusions remain; delivery never reverses commit.              |
+| FR-059 | Shared React Admin state components cover loading, empty, success, validation, stale conflict, and failure; all writes pessimistic.                                                                                                                                             | Custom UX primitives                                 | Query state is never authoritative business state.                                        |
+| FR-060 | `AdminAuthorityGate`, memoryStore, zero inactive cache retention, no-store responses, full purge on auth error/logout, safe URLs/logs.                                                                                                                                          | Custom security boundary                             | Back/forward/reload must recheck before content render.                                   |
+| FR-061 | Add regression suites proving existing Candidate/auth/profile/CV/search/application/session-self-service behavior is unchanged except lawful denial.                                                                                                                            | Test/architecture guard                              | React Admin bundle and routes stay isolated to admin host.                                |
+| FR-062 | Initial admin 2FA transaction designates current Better Auth Session and revokes prior designated Session within 2 seconds; candidate-only sessions remain ordinary.                                                                                                            | Custom auth service + two-device tests               | Included because finalized spec contains FR-062.                                          |
 
 ## Custom Components Required
 
@@ -457,31 +507,33 @@ All items below are beyond typical React Admin list/create/edit/show CRUD:
    60-second maximum snapshot age. This plan uses 30-second background refresh
    and refuses to show a snapshot older than 60 seconds. No spec change is
    needed unless stakeholders want a stricter maximum.
-2. **Blocking dependency—existing-company relationship prerequisite**: The
-   approved spec requires an unexpired/unrevoked/unused invitation or exact active
-   OWNER approval, but the current repository has no authoritative producer for
-   either. Feature 006 can define validation/consumption and persistence
-   contracts, but invitation creation and OWNER approval UI remain out of scope.
-   Assign a prerequisite feature/owner before existing-company approval can be
-   accepted as complete; do not add a bypass to Feature 006.
+2. **Resolved delivery gate—existing-company relationship prerequisite**: The
+   Company Access Prerequisite producer is owned by the separate company-access
+   workflow. Feature 006 defines a versioned producer/consumer contract,
+   readiness check, and integration test, but creates no invitations or OWNER
+   approval UI. Existing-company approval remains disabled and Feature 006 MUST
+   NOT be declared complete until that producer passes the contract in the target
+   environment. A missing producer is a failed release gate, never a tax-ID-only
+   fallback.
 3. **Operations ownership for administrator grants**: The spec deliberately puts
    public/admin-console grant management and break-glass procedures out of scope.
-   Deployment still needs an approved operator and runbook for bootstrap,
-   suspension, revocation, and expiry of grant records. The plan provides an
+   Deployment requires an approved operator and ordinary runbook for bootstrap,
+   suspension, revocation, expiry, and last-usable-admin prevention. Emergency
+   recovery and break-glass procedures remain excluded. The plan provides an
    audited out-of-band command only; product UI remains excluded.
 4. **Production origins and hosting identifiers**: The spec requires exactly one
    admin and recruiter origin per non-local environment but does not name them.
    Operations must provide the exact HTTPS values before deployment. Wildcards
    and runtime discovery are not allowed.
-5. **Legal evidence policy approval**: FR-027 fixes technical access/deletion
-   deadlines, while the Dependencies section still requires legal handling under
-   Vietnamese personal-data rules. Confirm storage region, encryption key owner,
-   incident access, and the event that marks company verification “no longer
-   active” before production. This does not authorize changing FR-027 deadlines.
+5. **Resolved production gate—legal evidence policy**: The implementation must
+   create `docs/policies/business-license-evidence.md` and obtain named Legal,
+   Security, and Operations approvals for storage region, encryption-key owner,
+   incident access, applicant/reviewer access, deletion evidence, and the event
+   that marks company verification inactive. Deployment preflight fails when the
+   approved policy version is absent. The policy cannot change FR-027 deadlines.
 
-None of these flags permits changing `spec.md` during planning. Items 2–5 are
-delivery/operations dependencies; only a future stakeholder decision that
-changes observable behavior would require a new clarification amendment.
+Items 2–5 are explicit delivery/operations gates. They require no further
+product choice and cannot be bypassed during implementation.
 
 ## Out of Scope Confirmation
 
@@ -517,7 +569,9 @@ The detailed model is in [data-model.md](./data-model.md). Principal changes are
 - migrate existing Job Report data into a generalized Moderation Report plus
   admission/history records;
 - add privileged rationale, security notification work, administrator command
-  idempotency, and dashboard snapshot models;
+  idempotency, and dashboard snapshot models; reuse the existing `EmailOutbox`
+  as applicant Notification Work with event-specific idempotency and verification
+  lifecycle correlation;
 - reuse existing Session and AuditEvent authorities without copying credentials
   or free text into new audit/session columns.
 
@@ -542,6 +596,11 @@ OpenAPI/Zod/client type generation must agree in CI. Server output schemas strip
 unknown fields and are projection-specific; a model field is never automatically
 serializable merely because it exists.
 
+The OpenAPI contains 32 Feature 006 paths, including safe company-reference and
+company-membership list/detail reads. Every dashboard drill-down list requires
+`calculatedAt` and `stateDefinitionVersion`; these fields are not optional
+provider metadata.
+
 ## Migration, Rollout, and Recovery
 
 1. Add enums/models/indexes/constraints in an additive migration; preserve all
@@ -554,9 +613,10 @@ serializable merely because it exists.
    with stable references/category mapping, dual-read verification, then switch
    Feature 003 submission and the admin queue to the new authority. No report is
    dropped or made enforcing during migration.
-5. Deploy evidence storage, worker, cleanup, notification retry, and dashboard
-   snapshot generation with admin-origin admission disabled. Verify private
-   storage/ClamAV/email readiness and hard-deadline fake-clock tests.
+5. Approve the versioned business-license evidence policy, then deploy evidence
+   storage, worker, cleanup, notification retry, and dashboard snapshot generation
+   with admin-origin admission disabled. Verify policy version, private
+   storage/ClamAV/email readiness, and hard-deadline fake-clock tests.
 6. Provision at least two test Platform Administrator grants out of band; enable
    the admin origin only after two-device session, step-up, lockout prevention,
    audit, privacy, and SC-002 performance gates pass.
@@ -576,7 +636,7 @@ serializable merely because it exists.
 
 ```text
 spec-kit/specs/006-admin-management/
-|-- spec.md                         # authoritative, unchanged by /plan
+|-- spec.md                         # authoritative feature requirements
 |-- plan.md
 |-- research.md
 |-- data-model.md
@@ -585,13 +645,18 @@ spec-kit/specs/006-admin-management/
 |   |-- admin-api.openapi.yaml
 |   |-- react-admin-provider.md
 |   `-- internal-contracts.md
-|-- checklists/requirements.md      # unchanged by /plan
-`-- tasks.md                        # generated later by /speckit-tasks
+|-- checklists/requirements.md      # specification quality validation
+`-- tasks.md                        # dependency-ordered implementation work
 ```
 
 ### Source Code (repository root)
 
 ```text
+docs/
+|-- dependencies/company-access-prerequisite.md
+|-- policies/business-license-evidence.md
+`-- runbooks/platform-administrator-grants.md
+
 package.json
 package-lock.json
 compose.yaml
@@ -614,8 +679,9 @@ web/
 |   |   |   |-- auth/{context,login,two-factor,step-up,logout}/route.ts
 |   |   |   |-- dashboard/route.ts
 |   |   |   |-- accounts/{route.ts,[accountId]/...}
+|   |   |   |-- companies/route.ts
 |   |   |   |-- verification-requests/{route.ts,[requestId]/...}
-|   |   |   |-- company-memberships/[membershipId]/.../route.ts
+|   |   |   |-- company-memberships/{route.ts,[membershipId]/...}
 |   |   |   |-- moderation-reports/{route.ts,[reportId]/...}
 |   |   |   `-- audit-events/[correlationId]/route.ts
 |   |   `-- api/recruiter/entitlement/route.ts
@@ -684,8 +750,11 @@ No standalone admin backend, second database, or recruiter application is added.
   addresses, factor data, raw evidence/locator, report text outside authorized
   detail, rationale outside its protected response, or privileged identifiers in
   URLs/persistent browser storage.
-- Fake-clock tests prove exact rationale/evidence inaccessibility/deletion and
-  notification retry/dead-letter deadlines under failure/restart/reconciliation.
+- Fake-clock tests prove exact rationale/evidence inaccessibility/deletion,
+  security-notification retry/dead-letter deadlines under
+  failure/restart/reconciliation, and exactly-one applicant `EmailOutbox` rows
+  for accepted verification receipts, cancellations, administrator decisions,
+  delays, and expiries.
 
 ### Domain behavior
 
@@ -763,7 +832,8 @@ rephrasing or replacing the approved expected outcome.
 ## Post-Design Constitution Re-check
 
 The Phase 1 design remains compliant. React Admin is presentation scaffolding,
-not authority; Better Auth remains the only session owner; PostgreSQL preserves
+not authority, and its contained MUI subtree does not replace the primary
+Next.js/TypeScript Tailwind/shadcn baseline; Better Auth remains the only session owner; PostgreSQL preserves
 transactional state and tenant-scoped memberships; no AI or autonomous decision
 enters the workflow; private evidence/rationale and in-memory browser state meet
 privacy boundaries; exact quality/deadline tests are defined; and all providers

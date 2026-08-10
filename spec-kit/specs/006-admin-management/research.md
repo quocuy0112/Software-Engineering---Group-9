@@ -12,6 +12,11 @@ the exact administration origin. Pin the resolved React Admin, Material UI,
 Emotion, React Router, and TanStack Query dependency graph in `package-lock.json`
 and reject peer-version drift in CI.
 
+React Admin/MUI is an isolated presentation adapter for the admin subtree. It
+does not replace the repository's primary Next.js/TypeScript and Tailwind/shadcn
+baseline for shared, Candidate, or recruiter-entitlement UI; MUI global styling
+is contained at the admin mount and enforced by an architecture test.
+
 **Rationale**: The current React Admin package declares React 18/19 compatibility.
 Its official Next.js guide states that React Admin is an SPA and must be loaded
 without server-side rendering because it depends on browser-only routing, MUI,
@@ -43,6 +48,13 @@ Node/TypeScript worker convention for verification safety processing, dashboard
 snapshot refresh, lifecycle deadlines, security-notification retry, and
 rationale cleanup. Use the existing provider-independent email, malware scanner,
 private storage, and audit boundaries.
+
+Verification applicant notifications reuse the existing durable `EmailOutbox`
+as their Notification Work authority. Each accepted verification lifecycle
+event writes exactly one idempotent outbox row in the same PostgreSQL transaction
+as its state/history/audit effects. `SecurityNotificationWork` remains a
+separate Feature 006 authority only for the FR-022 access-notification retry and
+administrator-visible manual-intervention contract.
 
 **Rationale**: These are already constitutional and repository baselines. The
 feature requires transactional state/audit/notification outcomes and multiple
@@ -284,11 +296,13 @@ calling business services.
 - Separate admin and recruiter backend deployments were rejected because they
   would multiply session/configuration and consistency boundaries.
 
-## Remaining dependency risk
+## Resolved external delivery gate
 
 The repository does not yet contain the invitation/OWNER-approval authority
 required by FR-024/FR-030/FR-033. Feature 006 will define and consume a typed
 `CompanyRelationshipPrerequisiteGateway`, but it will not create invitations or
-OWNER-approval UI. An authoritative producer must exist before the
-existing-company approval path can pass acceptance; this is a delivery dependency,
-not permission to weaken or bypass the requirement.
+OWNER-approval UI. The separate company-access workflow owns the producer.
+Existing-company approval remains disabled, and Feature 006 cannot be declared
+complete, until the named producer version and target-environment
+producer/consumer contract test pass; this gate never permits a tax-ID-only
+bypass.

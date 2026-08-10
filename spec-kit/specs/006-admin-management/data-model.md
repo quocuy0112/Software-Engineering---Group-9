@@ -203,6 +203,10 @@ the producer is unavailable.
 | `version`                                                                  | concurrency integer                                                 |
 | `createdAt`, `updatedAt`                                                   | timestamps                                                          |
 
+`assignedAdminUserId` is read-only workload metadata in Feature 006. The admin
+queue can filter by a specific value or `UNASSIGNED`, but this feature defines no
+assignment transition or mutation endpoint.
+
 At most one active request per applicant and normalized tax identifier across
 PENDING_CHECKS, PENDING_REVIEW, CHANGES_REQUESTED, and RESUBMITTED. Terminal
 requests do not block a new permitted request.
@@ -370,6 +374,38 @@ intervention. Attempt 5 failure or deadline also enters manual intervention.
 Originating action state never references notification delivery as a rollback
 condition after commit.
 
+Rows are created for account suspension/reinstatement, all-session revocation,
+and administrator-driven membership suspension/restoration/removal. A
+single-session revocation and moderation-only assignment/note/terminal/link
+command creates no SecurityNotificationWork. Verification
+approval/request-changes/rejection uses applicant Notification Work with the
+FR-037 content boundary. A report-linked account/membership enforcement action
+uses its underlying action row and does not create a duplicate notification.
+
+### Applicant Notification Work (existing `EmailOutbox`)
+
+Feature 006 reuses the existing durable `EmailOutbox` rather than creating a
+second applicant-delivery queue. A verification notification row contains its
+existing unique idempotency key, applicant recipient relation, typed template
+kind/payload, delivery state, attempt metadata, and timestamps. The payload is
+limited to the FR-037 resulting state, decision/event time, and next available
+applicant action.
+
+Exactly one row is created for each accepted submission or resubmission receipt,
+applicant cancellation, administrator request-changes/rejection/approval, and
+worker delay/expiry milestone. Its idempotency key is derived from the immutable
+verification request reference, submission version or lifecycle milestone,
+resulting state, and notification kind. The originating request transition,
+decision history and audit when required, and outbox row MUST commit in the same
+PostgreSQL transaction. A retry, concurrent reviewer, recovered worker lease,
+or deadline reconciliation therefore returns the existing outcome and cannot
+create a second row.
+
+These rows use the existing email-worker delivery policy. They are not
+`SecurityNotificationWork`, do not expose FR-022 delivery fields in account or
+audit views, and delivery failure after commit never reverses verification
+state, company state, or membership authority.
+
 ### AdminCommandReceipt
 
 Stores actor Session/grant subject digest, command kind, target reference,
@@ -416,6 +452,7 @@ ModerationReport 1---* ModerationPrivateNote
 
 AuditEvent 1---0..1 PrivilegedActionRationale (correlation only)
 AuditEvent 1---0..1 SecurityNotificationWork (correlation only)
+RecruiterVerificationRequest 1---* EmailOutbox (verification lifecycle correlation)
 ```
 
 ## Migration and integrity gates
