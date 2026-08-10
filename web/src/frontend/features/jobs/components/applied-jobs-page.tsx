@@ -14,6 +14,7 @@ import {
 } from "@/shared/contracts/jobs/applications";
 import { EmptyState } from "./job-empty-state";
 import { ApplicationStageBadge } from "./application-stage-badge";
+import { CompanyAvatar } from "./company-avatar";
 
 type GroupFilter = "ALL" | ApplicationStageGroup;
 
@@ -31,14 +32,6 @@ function formatDate(value: string) {
     month: "short",
     year: "numeric",
   }).format(new Date(value));
-}
-
-function companyInitials(companyName: string) {
-  return companyName
-    .split(/\s+/u)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
 }
 
 function groupCount(
@@ -115,9 +108,12 @@ export function ApplicationCard({
 
   return (
     <article className="application-tracking-card">
-      <div className="application-company-mark" aria-hidden="true">
-        {companyInitials(application.companyName)}
-      </div>
+      <CompanyAvatar
+        name={application.companyName}
+        imageUrl={application.companyLogoUrl}
+        size="lg"
+        className="application-company-mark"
+      />
       <div className="application-card-main">
         <div className="application-card-title-row">
           <div>
@@ -233,7 +229,7 @@ export function AppliedJobsPage({
     >
       <header className="jobs-workspace-heading applications-heading">
         <div>
-          <p className="workspace-kicker">CANDIDATE WORKSPACE</p>
+          <p className="workspace-kicker">Candidate workspace</p>
           <h1 id="applied-jobs-heading">My applications</h1>
           <p>Follow every application and see what happens next.</p>
         </div>

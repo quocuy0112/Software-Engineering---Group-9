@@ -3,6 +3,7 @@ import "@fontsource/be-vietnam-pro/400.css";
 import "@fontsource/be-vietnam-pro/500.css";
 import "@fontsource/be-vietnam-pro/600.css";
 import "@fontsource/be-vietnam-pro/700.css";
+import "@fontsource-variable/manrope/wght.css";
 import { serverEnvironment } from "@/backend/env/runtime";
 import { ThemeProvider } from "@/frontend/providers/theme-provider";
 import "./globals.css";

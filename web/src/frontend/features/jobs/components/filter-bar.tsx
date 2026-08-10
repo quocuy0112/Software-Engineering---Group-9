@@ -797,7 +797,7 @@ export function FilterBar({
         >
           <div className="job-advanced-heading">
             <div>
-              <p className="panel-kicker">REFINE THE SIGNAL</p>
+              <p className="panel-kicker">Refine the signal</p>
               <h2>Advanced filters</h2>
             </div>
             <button type="button" onClick={clearAll}>
@@ -871,7 +871,7 @@ export function FilterBar({
             <div className="job-bottom-sheet-handle" aria-hidden="true" />
             <header>
               <div>
-                <p className="panel-kicker">PERSONALIZE THE LIST</p>
+                <p className="panel-kicker">Personalize the list</p>
                 <h2 id="mobile-filters-title">Filters &amp; Sort</h2>
               </div>
               <button
@@ -918,7 +918,7 @@ export function FilterBar({
             aria-modal="true"
             aria-labelledby="save-filter-title"
           >
-            <p className="panel-kicker">SAVE FILTER</p>
+            <p className="panel-kicker">Save filter</p>
             <h2 id="save-filter-title">Name this search</h2>
             <p>
               Saved searches are separate from applying a filter; this list is

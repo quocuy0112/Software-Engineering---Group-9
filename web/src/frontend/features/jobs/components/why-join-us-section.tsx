@@ -10,7 +10,7 @@ export function WhyJoinUsSection({ job }: { job: JobDetail }) {
     <section className="job-why-join" aria-labelledby="why-join-heading">
       <div className="job-section-heading-row">
         <div>
-          <p className="panel-kicker">THE SMART HIRE SIGNAL</p>
+          <p className="panel-kicker">The Smart Hire signal</p>
           <h2 id="why-join-heading">Why you&apos;ll love working here</h2>
         </div>
         <span className="job-section-heading-mark" aria-hidden="true">

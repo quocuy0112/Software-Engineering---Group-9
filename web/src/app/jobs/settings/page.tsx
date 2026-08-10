@@ -14,13 +14,13 @@ export default async function JobSettingsRoute() {
   const copy =
     context.initialLocale === "vi"
       ? {
-          kicker: "KHÔNG GIAN ỨNG VIÊN",
+          kicker: "Không gian ứng viên",
           title: "Cài đặt gợi ý việc làm",
           description:
             "Cập nhật nhu cầu để SmartHire tìm các cơ hội phù hợp với bạn.",
         }
       : {
-          kicker: "CANDIDATE WORKSPACE",
+          kicker: "Candidate workspace",
           title: "Job Recommendation Settings",
           description:
             "Update your preferences so SmartHire can find relevant opportunities for you.",

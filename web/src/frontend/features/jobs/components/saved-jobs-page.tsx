@@ -40,7 +40,7 @@ export function SavedJobsPage({ jobs }: { jobs: JobCard[] }) {
     >
       <header className="jobs-workspace-heading">
         <div>
-          <p className="workspace-kicker">CANDIDATE WORKSPACE</p>
+          <p className="workspace-kicker">Candidate workspace</p>
           <h1 id="saved-jobs-heading">Saved Jobs</h1>
           <p>Keep track of opportunities you want to revisit.</p>
         </div>

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { CvEvidence } from "@/frontend/features/cv-import/components/cv-evidence";
@@ -19,6 +19,7 @@ describe("Candidate OCR evidence", () => {
         }}
       />,
     );
+    fireEvent.click(screen.getByText("Data source details"));
     expect(screen.getByText("Source: PDF page 2")).toBeVisible();
     expect(screen.getByRole("alert")).toHaveTextContent(
       "material native ocr conflict",

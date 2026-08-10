@@ -145,7 +145,7 @@ export function JobBoardExperience({
           <>
             <header className="job-results-heading">
               <div>
-                <p className="panel-kicker">OPEN ROLES, CLEAR SIGNAL</p>
+                <p className="panel-kicker">Open roles, clear signal</p>
                 <h2 id="job-results-heading">
                   {visibleJobs.length} matching jobs
                 </h2>

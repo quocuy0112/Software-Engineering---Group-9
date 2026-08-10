@@ -72,7 +72,7 @@ export function RelatedJobsCarousel({
     >
       <div className="job-related-heading">
         <div>
-          <p className="panel-kicker">KEEP EXPLORING</p>
+          <p className="panel-kicker">Keep exploring</p>
           <h2 id="related-jobs-heading">{title}</h2>
         </div>
         <Link className="job-related-see-more" href="/jobs">

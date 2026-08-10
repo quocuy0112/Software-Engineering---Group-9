@@ -53,7 +53,7 @@ export function SuggestedJobsPage({
     >
       <header className="jobs-workspace-heading jobs-workspace-heading--wide">
         <div>
-          <p className="workspace-kicker">CANDIDATE WORKSPACE</p>
+          <p className="workspace-kicker">Candidate workspace</p>
           <h1 id="matches-heading">Suggested Jobs</h1>
           <p>
             Recommendations are based on the preferences, skills, and experience

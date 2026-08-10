@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 
 type CompanyAvatarProps = {
@@ -27,6 +28,30 @@ function avatarTone(name: string) {
   return avatarTones[Math.abs(hash) % avatarTones.length];
 }
 
+function companyInitials(name: string) {
+  return name
+    .split(/\s+/u)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => Array.from(part)[0] ?? "")
+    .join("")
+    .toLocaleUpperCase();
+}
+
+function displayableImageSource(value: string | null | undefined) {
+  const source = value?.trim();
+  if (!source) return null;
+
+  // The application image policy permits same-origin and inline raster images.
+  // Avoid rendering remote placeholders as broken images while preserving a
+  // deterministic monogram for companies without a displayable logo.
+  if (source.startsWith("/") && !source.startsWith("//")) return source;
+  if (/^data:image\/(?:avif|gif|jpeg|png|webp);base64,/iu.test(source)) {
+    return source;
+  }
+  return null;
+}
+
 export function CompanyAvatar({
   name,
   imageUrl,
@@ -35,7 +60,7 @@ export function CompanyAvatar({
   loading = "lazy",
 }: CompanyAvatarProps) {
   const displayName = name?.trim() || "Company";
-  const source = imageUrl?.trim() || null;
+  const source = displayableImageSource(imageUrl);
   const [failedSource, setFailedSource] = useState<string | null>(null);
   const showImage = Boolean(source && source !== failedSource);
   const classes = ["company-avatar", "company-avatar--" + size, className]
@@ -49,14 +74,17 @@ export function CompanyAvatar({
       aria-hidden="true"
     >
       {showImage ? (
-        <img
-          src={source ?? undefined}
+        <Image
+          src={source!}
           alt=""
+          width={56}
+          height={56}
           loading={loading}
+          unoptimized={source?.startsWith("data:") ?? false}
           onError={() => setFailedSource(source)}
         />
       ) : (
-        <span>{displayName.slice(0, 1).toUpperCase()}</span>
+        <span>{companyInitials(displayName)}</span>
       )}
     </span>
   );

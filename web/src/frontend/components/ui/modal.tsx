@@ -22,6 +22,13 @@ export function Modal({
   const titleId = useId();
   const descriptionId = useId();
   const dialogRef = useRef<HTMLElement>(null);
+  const onCloseRef = useRef(onClose);
+  const busyRef = useRef(busy);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+    busyRef.current = busy;
+  }, [busy, onClose]);
 
   useEffect(() => {
     if (!open) return;
@@ -38,9 +45,9 @@ export function Modal({
     }, 0);
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape" && !busy) {
+      if (event.key === "Escape" && !busyRef.current) {
         event.preventDefault();
-        onClose();
+        onCloseRef.current();
         return;
       }
 
@@ -73,7 +80,7 @@ export function Modal({
       document.body.style.overflow = previousOverflow;
       returnTarget?.focus();
     };
-  }, [busy, onClose, open]);
+  }, [open]);
 
   if (!open) return null;
 

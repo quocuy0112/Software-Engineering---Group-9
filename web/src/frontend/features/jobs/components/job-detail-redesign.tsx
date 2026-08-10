@@ -232,9 +232,6 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
               >
                 {formatSalary(job.salary)}
               </strong>
-              <Link href="/jobs?tool=salary-market">
-                View market salary for this position
-              </Link>
             </div>
 
             <div className="job-detail-action-row" aria-label="Job actions">

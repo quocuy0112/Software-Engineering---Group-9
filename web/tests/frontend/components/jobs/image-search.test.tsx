@@ -7,8 +7,12 @@ import { ImageSearchProgress } from "@/frontend/features/jobs/image-search/compo
 import { ImageSearchProposals } from "@/frontend/features/jobs/image-search/components/image-search-proposals";
 import { ImageSearchRecovery } from "@/frontend/features/jobs/image-search/components/image-search-recovery";
 import { ImageSearchFeedback } from "@/frontend/features/jobs/image-search/components/image-search-feedback";
-import { GlobalImageSearch } from "@/frontend/features/jobs/image-search/components/global-image-search";
+import {
+  GlobalImageSearch,
+  jobTextSearchHref,
+} from "@/frontend/features/jobs/image-search/components/global-image-search";
 import type { SearchIntent } from "@/shared/contracts/jobs/search-intent";
+import { WorkspaceLocaleProvider } from "@/frontend/features/dashboard/client/workspace-locale";
 
 const toast = vi.hoisted(() => ({
   error: vi.fn(),
@@ -78,7 +82,7 @@ describe("image-assisted job-search controls", () => {
     ).toBeVisible();
     expect(
       screen.getByPlaceholderText("Search jobs, skills, or companies"),
-    ).toHaveValue("");
+    ).toHaveValue("Sidebar keyword");
     expect(
       screen.getByRole("button", { name: "Search jobs from an image" }),
     ).toBeVisible();
@@ -92,6 +96,35 @@ describe("image-assisted job-search controls", () => {
     fireEvent.click(screen.getByRole("checkbox"));
     expect(file).toBeEnabled();
     window.history.replaceState(null, "", "/");
+  });
+
+  it("keeps the complete image-search panel in Vietnamese when selected", () => {
+    window.history.replaceState(null, "", "/jobs");
+    render(
+      <WorkspaceLocaleProvider initialLocale="vi">
+        <GlobalImageSearch />
+      </WorkspaceLocaleProvider>,
+    );
+
+    expect(
+      screen.getByPlaceholderText("Tìm công việc, kỹ năng hoặc công ty"),
+    ).toBeVisible();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Tìm việc bằng hình ảnh" }),
+    );
+    expect(screen.getByText("Đồng ý xử lý hình ảnh (bắt buộc)")).toBeVisible();
+    expect(
+      screen.getByText("Hình ảnh được xử lý riêng tư và tạm thời"),
+    ).toBeVisible();
+  });
+
+  it("replaces only the keyword and keeps active filters from the header", () => {
+    expect(
+      jobTextSearchHref(
+        "https://smarthire.test/jobs?q=old&location=Da%20Nang&workArrangement=REMOTE&cursor=next",
+        "product designer",
+      ),
+    ).toBe("/jobs?q=product+designer&location=Da+Nang&workArrangement=REMOTE");
   });
 
   it("accepts a PNG/JPEG file through the accessible labeled input", () => {

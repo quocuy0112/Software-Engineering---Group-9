@@ -29,6 +29,24 @@
   font-weight: 700;
 }
 
+.technicalDetails {
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid currentcolor;
+  border-radius: 0.4rem;
+  background: color-mix(in srgb, currentcolor 5%, transparent);
+}
+
+.technicalDetails summary {
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.technicalDetails p {
+  margin: 0.45rem 0 0;
+}
+
 .counter,
 .status {
   font-weight: 650;

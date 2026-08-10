@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { currentCsrfProof } from "@/frontend/features/authentication/client/current-csrf-proof";
+import { Modal } from "@/frontend/components/ui/modal";
 import {
   jobReportInputSchema,
   jobReportOutcomeSchema,
@@ -104,73 +105,66 @@ export function ReportJobDialog({
         Report job
       </button>
       {message ? <span role="status">{message}</span> : null}
-      {open ? (
-        <div className="job-dialog-backdrop">
-          <div
-            className="job-dialog"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="report-job-title"
-          >
-            <h2 id="report-job-title">Report this job</h2>
-            <p>
-              Your report is private and will be reviewed by authorized
-              moderators. It does not automatically remove the job.
-            </p>
-            <form
-              className="job-form-grid"
-              aria-label="Report this job"
-              onSubmit={submit}
+      <Modal
+        open={open}
+        title="Report this job"
+        description="Your report is private and reviewed by authorized moderators. It does not automatically remove the job."
+        busy={pending}
+        onClose={close}
+      >
+        <form
+          className="job-form-grid"
+          aria-label="Report this job"
+          onSubmit={submit}
+        >
+          <label>
+            Reason
+            <select
+              data-autofocus
+              required
+              value={reason}
+              onChange={(event) => setReason(event.target.value)}
             >
-              <label>
-                Reason
-                <select
-                  required
-                  value={reason}
-                  onChange={(event) => setReason(event.target.value)}
-                >
-                  <option value="" disabled>
-                    Select a reason
-                  </option>
-                  {reasons.map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              {reason ? (
-                <label>
-                  Details{" "}
-                  {detailsRequired.has(reason) ? "(required)" : "(optional)"}
-                  <textarea
-                    aria-describedby="report-detail-help"
-                    required={detailsRequired.has(reason)}
-                    minLength={detailsRequired.has(reason) ? 20 : undefined}
-                    maxLength={2000}
-                    rows={5}
-                    value={details}
-                    onChange={(event) => setDetails(event.target.value)}
-                  />
-                  <span id="report-detail-help">
-                    Do not include passwords, CV content, or unnecessary
-                    personal data.
-                  </span>
-                </label>
-              ) : null}
-              {error ? <div role="alert">{error}</div> : null}
-              <div className="job-actions">
-                <button type="submit" disabled={pending}>
-                  {pending ? "Submitting report…" : "Submit report"}
-                </button>
-                <button type="button" disabled={pending} onClick={close}>
-                  Cancel
-                </button>
-              </div>
-            </form>
+              <option value="" disabled>
+                Select a reason
+              </option>
+              {reasons.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          {reason ? (
+            <label>
+              Details{" "}
+              {detailsRequired.has(reason) ? "(required)" : "(optional)"}
+              <textarea
+                aria-describedby="report-detail-help"
+                required={detailsRequired.has(reason)}
+                minLength={detailsRequired.has(reason) ? 20 : undefined}
+                maxLength={2000}
+                rows={5}
+                value={details}
+                onChange={(event) => setDetails(event.target.value)}
+              />
+              <span id="report-detail-help">
+                Do not include passwords, CV content, or unnecessary personal
+                data.
+              </span>
+            </label>
+          ) : null}
+          {error ? <div role="alert">{error}</div> : null}
+          <div className="job-actions">
+            <button type="submit" disabled={pending}>
+              {pending ? "Submitting report…" : "Submit report"}
+            </button>
+            <button type="button" disabled={pending} onClick={close}>
+              Cancel
+            </button>
           </div>
-        </div>
-      ) : null}
+        </form>
+      </Modal>
     </>
   );
 }

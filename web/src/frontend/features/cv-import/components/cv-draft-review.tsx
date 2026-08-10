@@ -400,6 +400,7 @@ export function CvDraftReview({
     if (
       !review.conflict &&
       !hadConflict.current &&
+      !review.pending &&
       showValidation &&
       (issues.length || !acknowledged) &&
       validation.fieldErrors.length === 0 &&
@@ -411,6 +412,7 @@ export function CvDraftReview({
     issues.length,
     review.conflict,
     review.fieldErrors.length,
+    review.pending,
     showValidation,
     validation.fieldErrors.length,
   ]);
@@ -659,6 +661,36 @@ export function CvDraftReview({
         "action" in decision &&
         decision.action !== "SKIP",
     ).length;
+  const saveDisabled =
+    Boolean(review.pending) || !review.dirty || Boolean(review.conflict);
+  const confirmDisabled =
+    Boolean(review.pending) || review.dirty || Boolean(review.conflict);
+  const saveHint = review.pending
+    ? locale === "vi"
+      ? "Vui lòng chờ thao tác hiện tại hoàn tất."
+      : "Wait for the current action to finish."
+    : review.conflict
+      ? locale === "vi"
+        ? "Xử lý xung đột bản xem xét trước khi lưu."
+        : "Resolve the review conflict before saving."
+      : !review.dirty
+        ? locale === "vi"
+          ? "Mọi thay đổi hiện tại đã được lưu."
+          : "All current changes are already saved."
+        : null;
+  const confirmHint = review.pending
+    ? locale === "vi"
+      ? "Vui lòng chờ thao tác hiện tại hoàn tất."
+      : "Wait for the current action to finish."
+    : review.conflict
+      ? locale === "vi"
+        ? "Xử lý xung đột bản xem xét trước khi xác nhận."
+        : "Resolve the review conflict before confirming."
+      : review.dirty
+        ? locale === "vi"
+          ? "Lưu bản xem xét ở bước 2 trước khi xác nhận."
+          : "Save the review in step 2 before confirming."
+        : null;
   return (
     <form
       ref={form}
@@ -757,6 +789,37 @@ export function CvDraftReview({
             ? `Đã chọn ${selectedCount} thay đổi được đề xuất; các mục bỏ qua vẫn giữ nguyên.`
             : `${selectedCount} proposed changes selected; skipped items remain unchanged.`}
         </p>
+        <ol
+          className={styles.steps}
+          aria-label={
+            locale === "vi" ? "Các bước hoàn tất" : "Completion steps"
+          }
+        >
+          <li>
+            <strong>{locale === "vi" ? "1. Xem xét" : "1. Review"}</strong>
+            <span>
+              {locale === "vi"
+                ? "Chọn nội dung cần thêm, thay thế hoặc bỏ qua."
+                : "Choose what to add, replace, or skip."}
+            </span>
+          </li>
+          <li>
+            <strong>{locale === "vi" ? "2. Lưu" : "2. Save"}</strong>
+            <span>
+              {locale === "vi"
+                ? "Lưu các lựa chọn và nội dung vừa chỉnh sửa."
+                : "Save your selections and edits."}
+            </span>
+          </li>
+          <li>
+            <strong>{locale === "vi" ? "3. Xác nhận" : "3. Confirm"}</strong>
+            <span>
+              {locale === "vi"
+                ? "Đánh dấu hai xác nhận bên dưới rồi hoàn tất."
+                : "Check both acknowledgements below, then finish."}
+            </span>
+          </li>
+        </ol>
         <label>
           <input
             type="checkbox"
@@ -785,11 +848,8 @@ export function CvDraftReview({
         <div className={styles.actions}>
           <button
             type="button"
-            disabled={
-              Boolean(review.pending) ||
-              !review.dirty ||
-              Boolean(review.conflict)
-            }
+            disabled={saveDisabled}
+            aria-describedby={saveHint ? "cv-review-save-hint" : undefined}
             onClick={() => void save()}
           >
             {review.pending === "save"
@@ -802,10 +862,9 @@ export function CvDraftReview({
           </button>
           <button
             type="button"
-            disabled={
-              Boolean(review.pending) ||
-              review.dirty ||
-              Boolean(review.conflict)
+            disabled={confirmDisabled}
+            aria-describedby={
+              confirmHint ? "cv-review-confirm-hint" : undefined
             }
             onClick={() => void confirm()}
           >
@@ -818,6 +877,20 @@ export function CvDraftReview({
                 : "Confirm selected changes"}
           </button>
         </div>
+        {saveHint ? (
+          <p id="cv-review-save-hint" className={styles.actionHint}>
+            <strong>{locale === "vi" ? "Nút Lưu:" : "Save button:"}</strong>{" "}
+            {saveHint}
+          </p>
+        ) : null}
+        {confirmHint ? (
+          <p id="cv-review-confirm-hint" className={styles.actionHint}>
+            <strong>
+              {locale === "vi" ? "Nút Xác nhận:" : "Confirm button:"}
+            </strong>{" "}
+            {confirmHint}
+          </p>
+        ) : null}
       </section>
     </form>
   );

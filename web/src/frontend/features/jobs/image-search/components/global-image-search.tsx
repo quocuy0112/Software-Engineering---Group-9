@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import type { ManualSearchContext } from "@/shared/contracts/jobs/image-search";
 import { applyImageSearchIntent } from "../client/apply-image-search-intent";
 import { useImageSearch } from "../client/use-image-search";
@@ -86,13 +87,26 @@ function criteriaFromLocation(): ManualSearchContext {
   };
 }
 
+export function jobTextSearchHref(href: string, query: string) {
+  const parameters = new URL(href, "http://localhost").searchParams;
+  parameters.delete("cursor");
+  const value = query.trim();
+  if (value) parameters.set("q", value.slice(0, 200));
+  else parameters.delete("q");
+  return parameters.size ? `/jobs?${parameters.toString()}` : "/jobs";
+}
+
 export function GlobalImageSearch({ csrfProof }: { csrfProof?: string } = {}) {
+  const locale = useWorkspaceLocale();
+  const vi = locale === "vi";
   const contextCsrfProof = useCsrfProof();
   const activeCsrfProof = csrfProof ?? contextCsrfProof;
   const criteria = useMemo(() => criteriaFromLocation(), []);
   const [externalConsent, setExternalConsent] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(() => criteria.q);
+  const cameraButton = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
   const search = useImageSearch({
     currentCriteria: criteria,
     csrfProof: activeCsrfProof,
@@ -100,12 +114,33 @@ export function GlobalImageSearch({ csrfProof }: { csrfProof?: string } = {}) {
   const busy = search.phase === "UPLOADING" || search.phase === "PROCESSING";
   const showPanel = panelOpen || search.phase !== "IDLE";
 
+  useEffect(() => {
+    if (!showPanel) return;
+    const keydown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || busy) return;
+      event.preventDefault();
+      setPanelOpen(false);
+      setExternalConsent(false);
+      search.clear();
+      cameraButton.current?.focus();
+    };
+    document.addEventListener("keydown", keydown);
+    return () => document.removeEventListener("keydown", keydown);
+  }, [busy, search, showPanel]);
+
+  const closePanel = () => {
+    setPanelOpen(false);
+    setExternalConsent(false);
+    search.clear();
+    cameraButton.current?.focus();
+  };
+
   return (
     <div
       id="global-image-search"
       className="global-image-search"
       data-phase={search.phase.toLowerCase()}
-      aria-label="Global job search"
+      aria-label={vi ? "Tìm kiếm việc làm toàn cục" : "Global job search"}
     >
       <ImageSearchFeedback
         phase={search.phase}
@@ -118,21 +153,21 @@ export function GlobalImageSearch({ csrfProof }: { csrfProof?: string } = {}) {
       <form
         className="global-image-search-bar"
         role="search"
-        aria-label="Global job search"
+        aria-label={vi ? "Tìm kiếm việc làm toàn cục" : "Global job search"}
         onSubmit={(event) => {
           event.preventDefault();
-          const value = query.trim();
-          const parameters = new URLSearchParams();
-          if (value) parameters.set("q", value.slice(0, 200));
           window.location.assign(
-            parameters.size ? `/jobs?${parameters.toString()}` : "/jobs",
+            jobTextSearchHref(window.location.href, query),
           );
         }}
       >
         <button
+          ref={cameraButton}
           className="global-image-search-camera-button"
           type="button"
-          aria-label="Search jobs from an image"
+          aria-label={
+            vi ? "Tìm việc bằng hình ảnh" : "Search jobs from an image"
+          }
           aria-controls="global-image-search-panel"
           aria-expanded={showPanel}
           onClick={() => setPanelOpen((open) => !open)}
@@ -145,20 +180,26 @@ export function GlobalImageSearch({ csrfProof }: { csrfProof?: string } = {}) {
           </span>
         </button>
         <label className="sr-only" htmlFor="global-job-search-query">
-          Search jobs, skills, or companies
+          {vi
+            ? "Tìm công việc, kỹ năng hoặc công ty"
+            : "Search jobs, skills, or companies"}
         </label>
         <input
           id="global-job-search-query"
           type="search"
           value={query}
           maxLength={200}
-          placeholder="Search jobs, skills, or companies"
+          placeholder={
+            vi
+              ? "Tìm công việc, kỹ năng hoặc công ty"
+              : "Search jobs, skills, or companies"
+          }
           onChange={(event) => setQuery(event.currentTarget.value)}
         />
         <button
           className="global-image-search-submit"
           type="submit"
-          aria-label="Search jobs"
+          aria-label={vi ? "Tìm việc" : "Search jobs"}
         >
           <span aria-hidden="true">
             <svg viewBox="0 0 20 20" role="img">
@@ -170,24 +211,32 @@ export function GlobalImageSearch({ csrfProof }: { csrfProof?: string } = {}) {
       </form>
       {showPanel ? (
         <div
+          ref={panel}
           id="global-image-search-panel"
           className="global-image-search-panel"
+          role="dialog"
+          aria-modal="false"
+          aria-label={
+            vi ? "Tìm việc bằng hình ảnh" : "Search jobs from an image"
+          }
         >
           <div className="global-image-search-panel-heading">
             <div>
-              <strong>Search jobs from an image</strong>
-              <p>Turn a job poster into editable search filters.</p>
+              <strong>
+                {vi ? "Tìm việc bằng hình ảnh" : "Search jobs from an image"}
+              </strong>
+              <p>
+                {vi
+                  ? "Chuyển áp phích tuyển dụng thành các bộ lọc có thể chỉnh sửa."
+                  : "Turn a job poster into editable search filters."}
+              </p>
             </div>
             <button
               className="global-image-search-close"
               type="button"
-              aria-label="Close image search"
+              aria-label={vi ? "Đóng tìm kiếm hình ảnh" : "Close image search"}
               disabled={busy}
-              onClick={() => {
-                setPanelOpen(false);
-                setExternalConsent(false);
-                search.clear();
-              }}
+              onClick={closePanel}
             >
               <span aria-hidden="true">&#215;</span>
             </button>
@@ -209,8 +258,9 @@ export function GlobalImageSearch({ csrfProof }: { csrfProof?: string } = {}) {
           />
           {!externalConsent ? (
             <p className="image-search-consent-required" role="status">
-              Agree to the OpenAI text-processing notice before choosing an
-              image.
+              {vi
+                ? "Đồng ý với thông báo xử lý văn bản trước khi chọn hình ảnh."
+                : "Agree to the text-processing notice before choosing an image."}
             </p>
           ) : null}
           {busy ? (

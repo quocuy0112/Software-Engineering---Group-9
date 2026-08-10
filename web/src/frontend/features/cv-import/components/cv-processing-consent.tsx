@@ -121,16 +121,25 @@ export function CvProcessingConsent({
               : notice.processingPurpose}
           </dd>
         </div>
-        <div>
-          <dt>{copy.versions}</dt>
-          <dd>
-            {locale === "vi" ? "Đồng ý" : "Consent"}{" "}
-            {CV_EXTERNAL_CONSENT_TEXT_VERSION};{" "}
-            {locale === "vi" ? "thông báo xử lý" : "processing notice"}{" "}
-            {CV_PROCESSING_NOTICES.EXTERNAL_OPENAI.noticeVersion}
-          </dd>
-        </div>
       </dl>
+      <details className={styles.technicalDetails}>
+        <summary>
+          {locale === "vi"
+            ? "Chi tiết kỹ thuật và phiên bản"
+            : "Technical and version details"}
+        </summary>
+        <dl>
+          <div>
+            <dt>{copy.versions}</dt>
+            <dd>
+              {locale === "vi" ? "Đồng ý" : "Consent"}{" "}
+              {CV_EXTERNAL_CONSENT_TEXT_VERSION};{" "}
+              {locale === "vi" ? "thông báo xử lý" : "processing notice"}{" "}
+              {CV_PROCESSING_NOTICES.EXTERNAL_OPENAI.noticeVersion}
+            </dd>
+          </div>
+        </dl>
+      </details>
 
       {notice.granted ? (
         <div className={styles.granted}>

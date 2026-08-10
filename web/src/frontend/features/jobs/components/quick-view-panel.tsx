@@ -9,6 +9,7 @@ import { QuickSkillChips } from "./quick-skill-chips";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
 import { SaveJobAction } from "./save-job-action";
 import { jobWhyHighlights } from "./job-detail-data";
+import { CompanyAvatar } from "./company-avatar";
 
 function experienceLabel(value: string) {
   return value
@@ -94,7 +95,7 @@ export function QuickViewPanel({
       >
         <header className="job-quick-view-header">
           <div>
-            <p className="panel-kicker">QUICK VIEW</p>
+            <p className="panel-kicker">Quick view</p>
             <p className="job-quick-view-counter">
               {index + 1} of {jobs.length} jobs
             </p>
@@ -111,11 +112,13 @@ export function QuickViewPanel({
 
         <div className="job-quick-view-scroll">
           <div className="job-quick-view-company">
-            <span className="job-company-logo is-large">
-              <span aria-hidden="true">
-                {job.company.displayName.slice(0, 1).toUpperCase()}
-              </span>
-            </span>
+            <CompanyAvatar
+              name={job.company.displayName}
+              imageUrl={job.company.logoUrl}
+              size="lg"
+              className="job-company-logo is-large"
+              loading="eager"
+            />
             <div>
               <p className="job-company-name">{job.company.displayName}</p>
               <span className="job-verified-inline">
@@ -154,7 +157,7 @@ export function QuickViewPanel({
           >
             <div className="job-quick-view-block-heading">
               <p className="panel-kicker" id="quick-skills-heading">
-                QUICK SKILL CHIPS
+                Quick skill chips
               </p>
               <span aria-hidden="true">◎</span>
             </div>

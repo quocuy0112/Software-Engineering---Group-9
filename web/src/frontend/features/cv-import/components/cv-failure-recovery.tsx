@@ -197,9 +197,16 @@ export function CvFailureRecovery({
               )
             : null}
         </p>
-        <p className={styles.code}>
-          {copy.safeCode}: <code>{resource.failure?.code}</code>
-        </p>
+        {resource.failure?.code ? (
+          <details className={styles.technicalDetails}>
+            <summary>
+              {locale === "vi" ? "Chi tiết kỹ thuật" : "Technical details"}
+            </summary>
+            <p className={styles.code}>
+              {copy.safeCode}: <code>{resource.failure.code}</code>
+            </p>
+          </details>
+        ) : null}
       </div>
 
       {details ? (

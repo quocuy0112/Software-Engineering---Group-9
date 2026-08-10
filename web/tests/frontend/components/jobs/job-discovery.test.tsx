@@ -5,6 +5,7 @@ import {
   JobCardView,
 } from "@/frontend/features/jobs/components/job-card";
 import { JobSearchForm } from "@/frontend/features/jobs/components/job-search-form";
+import { CompanyAvatar } from "@/frontend/features/jobs/components/company-avatar";
 import JobsLoading from "@/app/jobs/loading";
 
 const job = {
@@ -39,6 +40,30 @@ const job = {
 };
 
 describe("job discovery presentation", () => {
+  it("uses a stable company monogram instead of a broken remote logo", () => {
+    render(
+      <CompanyAvatar
+        name="Compass Capital"
+        imageUrl="https://example.com/compass-capital/logo.png"
+      />,
+    );
+
+    expect(screen.getByText("CC")).toBeVisible();
+    expect(document.querySelector("img")).toBeNull();
+  });
+
+  it("falls back to the company monogram when a local logo fails", () => {
+    render(
+      <CompanyAvatar name="Smart Hire" imageUrl="/logos/smart-hire.png" />,
+    );
+
+    const logo = document.querySelector("img");
+    expect(logo).not.toBeNull();
+    fireEvent.error(logo!);
+    expect(screen.getByText("SH")).toBeVisible();
+    expect(document.querySelector("img")).toBeNull();
+  });
+
   it("renders a semantic result with its stable detail link", () => {
     render(<JobCardView job={job} />);
     expect(
@@ -66,14 +91,14 @@ describe("job discovery presentation", () => {
     );
   });
 
-  it("keeps secondary actions hover-only and preserves action order", () => {
+  it("keeps secondary actions visible and preserves action order", () => {
     render(<JobCardView job={job} variant="grid" />);
 
     for (const name of ["Quick view", "Hide job"]) {
-      expect(screen.getByRole("button", { name })).toHaveClass(
+      expect(screen.getByRole("button", { name })).toHaveClass("duration-150");
+      expect(screen.getByRole("button", { name })).not.toHaveClass(
         "opacity-0",
         "group-hover:opacity-100",
-        "duration-150",
       );
     }
 
@@ -95,6 +120,7 @@ describe("job discovery presentation", () => {
 
   it("exposes labeled filters and a clear action", () => {
     render(<JobSearchForm criteria={{ q: "TypeScript" }} />);
+    expect(screen.getByText("Refine search")).toBeVisible();
     expect(screen.getByLabelText(/keywords/i)).toHaveValue("TypeScript");
     expect(screen.getByLabelText(/maximum salary/i)).toBeVisible();
     expect(screen.getByRole("option", { name: "3 days" })).toBeInTheDocument();
@@ -106,6 +132,25 @@ describe("job discovery presentation", () => {
       "href",
       "/jobs",
     );
+  });
+
+  it("shows removable active filters and opens the mobile drawer accessibly", () => {
+    render(
+      <JobSearchForm
+        criteria={{ q: "TypeScript", location: "Da Nang", sort: "NEWEST" }}
+      />,
+    );
+    expect(
+      screen.getByRole("link", { name: /remove filter keyword: typescript/i }),
+    ).toHaveAttribute("href", "/jobs?location=Da+Nang&sort=NEWEST");
+
+    const trigger = screen.getByRole("button", { name: /filters3/i });
+    fireEvent.click(trigger);
+    expect(screen.getByRole("dialog", { name: "Filters" })).toBeVisible();
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(
+      screen.queryByRole("dialog", { name: "Filters" }),
+    ).not.toBeInTheDocument();
   });
 
   it("presents the loading state with the informational blue tone", () => {

@@ -102,6 +102,7 @@ describe("CV external consent and retention controls", () => {
     expect(screen.getByText("Purpose").nextElementSibling).toHaveTextContent(
       /create a private cv review draft/i,
     );
+    fireEvent.click(screen.getByText(/technical and version details/i));
     expect(screen.getByText(/cv-external-consent\.v1/i)).toBeVisible();
     expect(screen.getByText(/cv-processing\.v1/i)).toBeVisible();
     const acceptance = screen.getByRole("checkbox", {
