@@ -110,7 +110,7 @@ npm start
 
 | Command                                                            | Purpose                                                          |
 | -------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `npm run dev`                                                       | Supervise web, email worker, Compose CV worker, and ClamAV       |
+| `npm run dev`                                                       | Supervise web, email worker, Compose CV/admin workers, and ClamAV       |
 | `npm run dev:web`                                                    | Start only Next.js on port 3001                                  |
 | `npm start`                                                          | Start an already-built production server                        |
 | `npm run email:worker`                                                | Start only the email outbox worker                               |

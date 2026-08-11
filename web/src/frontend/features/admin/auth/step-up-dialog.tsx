@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { currentAdminCsrfToken } from "../app/auth-provider";
 import {
   Alert,
   Button,
@@ -19,12 +20,15 @@ export function StepUpDialog(props: {
   const [failed, setFailed] = useState(false);
   async function verify() {
     setFailed(false);
+    const headers = new Headers({ "content-type": "application/json" });
+    const csrfToken = currentAdminCsrfToken();
+    if (csrfToken) headers.set("x-csrf-token", csrfToken);
     const response = await fetch("/api/admin/auth/step-up", {
       method: "POST",
       credentials: "same-origin",
       cache: "no-store",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ code, factor: "totp" }),
+      headers,
+      body: JSON.stringify({ code: code.trim(), factor: "totp" }),
     });
     if (!response.ok) return setFailed(true);
     setCode("");
@@ -52,6 +56,7 @@ export function StepUpDialog(props: {
             pattern: "[0-9]{6}",
             maxLength: 6,
           }}
+          autoComplete="one-time-code"
           autoFocus
           fullWidth
         />

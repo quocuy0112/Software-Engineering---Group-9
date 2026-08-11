@@ -28,6 +28,8 @@ import {
 } from "../client/workspace-locale";
 import { WorkspaceNavigation } from "./workspace-navigation";
 
+import { RecruiterHeaderAction } from "@/frontend/features/recruiter-header/components/recruiter-header-action";
+import type { RecruiterHeaderStatus } from "@/shared/contracts/recruiter-header-status";
 const SIDEBAR_MINIMUM_WIDTH = 220;
 const SIDEBAR_WIDTH_STEP = 16;
 const SIDEBAR_MAXIMUM_FALLBACK_WIDTH = 360;
@@ -38,12 +40,14 @@ function clampSidebarWidth(width: number, maximumWidth: number) {
 
 export function WorkspaceShell({
   children,
+  initialRecruiterStatus,
   csrfProof,
   profile = { name: "SmartHire member", email: "" },
   initialLocale = "en",
   contentMode = "default",
 }: {
   children: React.ReactNode;
+  initialRecruiterStatus?: RecruiterHeaderStatus | null;
   csrfProof: string;
   profile?: {
     name: string;
@@ -57,6 +61,7 @@ export function WorkspaceShell({
     <WorkspaceLocaleProvider initialLocale={initialLocale}>
       <WorkspaceShellContent
         csrfProof={csrfProof}
+        initialRecruiterStatus={initialRecruiterStatus}
         profile={profile}
         contentMode={contentMode}
       >
@@ -68,11 +73,13 @@ export function WorkspaceShell({
 
 function WorkspaceShellContent({
   children,
+  initialRecruiterStatus,
   csrfProof,
   profile,
   contentMode,
 }: {
   children: React.ReactNode;
+  initialRecruiterStatus?: RecruiterHeaderStatus | null;
   csrfProof: string;
   profile: {
     name: string;
@@ -329,6 +336,11 @@ function WorkspaceShellContent({
                 className="workspace-account-chip"
                 href="/profile"
                 aria-label={copy.openProfile}
+                title={
+                  workspaceProfile.name +
+                  " — " +
+                  (workspaceProfile.email || copy.manageProfile)
+                }
               >
                 <span className="workspace-account-avatar" aria-hidden="true">
                   {avatar ? (
@@ -351,6 +363,7 @@ function WorkspaceShellContent({
                   <small>{workspaceProfile.email || copy.manageProfile}</small>
                 </span>
               </Link>
+              <RecruiterHeaderAction initialStatus={initialRecruiterStatus} />
             </div>
           </header>
           <div className="workspace-status">

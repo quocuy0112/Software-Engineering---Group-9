@@ -130,6 +130,7 @@ async function shutdown(exitCode, reason) {
         "compose",
         "stop",
         "cv-worker",
+        "admin-worker",
         "image-search-worker",
         "ocr-engine",
         "clamav",
@@ -165,14 +166,17 @@ async function main() {
   start("web", "dev:web");
   start("email worker", "email:worker");
 
-  const cvBuild = await runCommand("building CV worker image", "docker", [
-    "compose",
-    "build",
-    "cv-worker",
-  ]);
+  const cvBuild = await runCommand(
+    "building CV and admin worker images",
+    "docker",
+    ["compose", "build", "cv-worker", "admin-worker"],
+  );
   if (!cvBuild.ok) {
     if (!shutdownPromise) {
-      await shutdown(cvBuild.exitCode, "CV worker image build failed");
+      await shutdown(
+        cvBuild.exitCode,
+        "CV and admin worker image build failed",
+      );
     }
     return;
   }
@@ -194,7 +198,7 @@ async function main() {
 
   if (shutdownPromise) return;
 
-  const composeServices = ["postgres", "clamav", "cv-worker"];
+  const composeServices = ["postgres", "clamav", "cv-worker", "admin-worker"];
   if (optionalBuild.ok) {
     composeServices.push("ocr-engine", "image-search-worker");
   }

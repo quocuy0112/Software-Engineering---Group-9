@@ -13,8 +13,12 @@ import { requireSession } from "./session/require-session";
  * result, so the Better Auth session is validated once per request. Only
  * display-safe account fields cross into the client shell.
  */
+import { isCandidateRequestHost } from "@/backend/auth/candidate-host-boundary";
+import { getRecruiterHeaderStatusService } from "@/backend/recruiter-header/recruiter-header-status-service-factory";
+
 export const getWorkspaceContext = cache(async () => {
-  const current = await requireSession(await headers());
+  const requestHeaders = await headers();
+  const current = await requireSession(requestHeaders);
   if (!current) return null;
 
   const account = await prisma.userAccount.findUnique({
@@ -38,6 +42,16 @@ export const getWorkspaceContext = cache(async () => {
   });
   if (!account) return null;
 
+  let initialRecruiterStatus;
+  try {
+    if (isCandidateRequestHost(requestHeaders)) {
+      initialRecruiterStatus =
+        await getRecruiterHeaderStatusService().resolveForUser(current.userId);
+    }
+  } catch {
+    initialRecruiterStatus = undefined;
+  }
+
   return {
     userId: current.userId,
     sessionId: current.sessionId,
@@ -54,5 +68,6 @@ export const getWorkspaceContext = cache(async () => {
         ? ("vi" as const)
         : ("en" as const),
     recoveryCompleted: account.fullAccountRecoveryOperations.length > 0,
+    initialRecruiterStatus,
   };
 });

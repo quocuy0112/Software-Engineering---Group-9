@@ -10,7 +10,9 @@ export function AdminTwoFactorPage(props: { onComplete: () => void }) {
     if (pending) return;
     setError(false);
     setPending(true);
-    const code = String(new FormData(event.currentTarget).get("code") ?? "");
+    const code = String(
+      new FormData(event.currentTarget).get("code") ?? "",
+    ).trim();
     try {
       const response = await fetch("/api/admin/auth/two-factor", {
         method: "POST",
@@ -44,6 +46,7 @@ export function AdminTwoFactorPage(props: { onComplete: () => void }) {
         label="Six-digit authenticator code"
         inputProps={{ inputMode: "numeric", pattern: "[0-9]{6}", maxLength: 6 }}
         required
+        autoComplete="one-time-code"
         autoFocus
       />
       <Button type="submit" variant="contained" disabled={pending}>

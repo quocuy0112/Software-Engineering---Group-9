@@ -58,6 +58,7 @@ function Review() {
         requestId={record.id}
         version={record.version}
         state={record.state}
+        requestedRole={record.requestedRole}
         resubmissionCount={record.resubmissionCount}
         disabled={
           !evidence?.accessible || Boolean(record.viewerUnavailableSince)

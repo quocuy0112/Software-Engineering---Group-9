@@ -29,6 +29,7 @@ web/.env.local
 web/.local/mail/
 # Encrypted CV artifacts are ephemeral and must be removed by the retention job.
 web/.local/cv-storage/
+web/.private-admin-evidence/
 mail-output/
 email-preview/
 

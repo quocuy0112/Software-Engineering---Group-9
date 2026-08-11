@@ -14,6 +14,7 @@ export default async function JobsLayout({
   if (context) {
     return (
       <WorkspaceShell
+        initialRecruiterStatus={context.initialRecruiterStatus}
         csrfProof={context.csrfProof}
         profile={context.account}
         initialLocale={context.initialLocale}

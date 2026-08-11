@@ -12,7 +12,7 @@ describe("employer verification components", () => {
     );
     render(<EmployerVerificationPage />);
     expect(
-      screen.getByRole("heading", { name: "Employer verification" }),
+      screen.getByRole("heading", { name: "Recruiter application" }),
     ).toBeVisible();
     expect(screen.getByLabelText("Vietnamese tax identifier")).toHaveAttribute(
       "pattern",
@@ -22,6 +22,14 @@ describe("employer verification components", () => {
       "accept",
       "application/pdf,image/png,image/jpeg",
     );
+    expect(screen.queryByLabelText("Requested role")).not.toBeInTheDocument();
+    expect(screen.getByDisplayValue("RECRUITER")).toHaveAttribute(
+      "type",
+      "hidden",
+    );
+    expect(
+      screen.getByRole("button", { name: "Submit recruiter application" }),
+    ).toBeVisible();
   });
 
   it("disables review when evidence is not qualified or accessible", () => {
@@ -34,6 +42,23 @@ describe("employer verification components", () => {
       />,
     );
     expect(screen.getByText(/Decisions are disabled/u)).toBeVisible();
+  });
+
+  it("exposes an explicit recruiter approval action for reviewable requests", () => {
+    render(
+      <VerificationDecisionPanel
+        requestId="r1"
+        version={1}
+        state="PENDING_REVIEW"
+        requestedRole="RECRUITER"
+        resubmissionCount={0}
+        disabled={false}
+        onDone={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: "Approve recruiter" }),
+    ).toBeEnabled();
   });
 
   it("keeps terminal requests non-actionable", () => {
