@@ -33,7 +33,7 @@ export function AccountStateDialog(props: {
     reasonCategory: string;
     explanation: string;
     confirmation: true;
-  }) => Promise<void>;
+  }) => Promise<boolean | void>;
 }) {
   const [category, setCategory] = useState("");
   const [explanation, setExplanation] = useState("");
@@ -42,12 +42,12 @@ export function AccountStateDialog(props: {
   async function confirm() {
     setBusy(true);
     try {
-      await props.onConfirm({
+      const committed = await props.onConfirm({
         reasonCategory: category,
         explanation,
         confirmation: true,
       });
-      props.onClose();
+      if (committed !== false) props.onClose();
     } finally {
       setBusy(false);
     }

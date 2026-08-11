@@ -20,9 +20,12 @@ export function StepUpDialog(props: {
   const [failed, setFailed] = useState(false);
   async function verify() {
     setFailed(false);
-    const headers = new Headers({ "content-type": "application/json" });
     const csrfToken = currentAdminCsrfToken();
-    if (csrfToken) headers.set("x-csrf-token", csrfToken);
+    if (!csrfToken) return setFailed(true);
+    const headers = new Headers({
+      "content-type": "application/json",
+      "x-csrf-token": csrfToken,
+    });
     const response = await fetch("/api/admin/auth/step-up", {
       method: "POST",
       credentials: "same-origin",

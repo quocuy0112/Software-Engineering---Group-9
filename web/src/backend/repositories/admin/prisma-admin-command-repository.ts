@@ -29,8 +29,11 @@ function digest(value: unknown) {
 export class PrismaAdminCommandRepository {
   async execute<T extends { version?: number }>(
     identity: AdminCommandIdentity,
-    operation: (tx: Prisma.TransactionClient, correlationId: string) => Promise<T>,
-  ): Promise<T> {
+    operation: (
+      tx: Prisma.TransactionClient,
+      correlationId: string,
+    ) => Promise<T>,
+  ): Promise<T & { correlationId: string; replayed?: boolean }> {
     const actorSubjectDigest = digest({
       userId: identity.actorUserId,
       sessionId: identity.actorSessionId,
@@ -58,7 +61,7 @@ export class PrismaAdminCommandRepository {
           version: existing.resultingVersion ?? undefined,
           correlationId: existing.correlationId,
           replayed: true,
-        } as unknown as T;
+        } as unknown as T & { correlationId: string; replayed: true };
       }
       const correlationId = crypto.randomUUID();
       const result = await operation(tx, correlationId);

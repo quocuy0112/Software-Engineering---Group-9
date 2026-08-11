@@ -2,10 +2,8 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AdminTwoFactorPage } from "@/frontend/features/admin/auth/admin-two-factor-page";
 import { StepUpDialog } from "@/frontend/features/admin/auth/step-up-dialog";
+import { adminAuthProvider } from "@/frontend/features/admin/app/auth-provider";
 
-vi.mock("@/frontend/features/admin/app/auth-provider", () => ({
-  currentAdminCsrfToken: () => "csrf-proof",
-}));
 describe("admin authentication UI", () => {
   afterEach(() => vi.restoreAllMocks());
   it("names the initial factor input and designation action", () => {
@@ -44,10 +42,14 @@ describe("admin authentication UI", () => {
     finishRequest?.(Response.json({ authenticated: true }));
     await waitFor(() => expect(onComplete).toHaveBeenCalledTimes(1));
   });
-  it("sends the current CSRF proof with a valid step-up code", async () => {
+  it("binds sensitive-action step-up to the authenticated CSRF proof", async () => {
     const fetchMock = vi
       .spyOn(globalThis, "fetch")
-      .mockResolvedValue(Response.json({ verified: true }));
+      .mockResolvedValueOnce(
+        Response.json({ accountId: "admin-1", csrfToken: "csrf-proof" }),
+      )
+      .mockResolvedValueOnce(Response.json({ verified: true }));
+    await adminAuthProvider.checkAuth?.({});
     const onVerified = vi.fn();
     render(<StepUpDialog open onCancel={vi.fn()} onVerified={onVerified} />);
     fireEvent.change(
@@ -56,7 +58,7 @@ describe("admin authentication UI", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Verify" }));
     await waitFor(() => expect(onVerified).toHaveBeenCalledTimes(1));
-    const init = fetchMock.mock.calls[0]?.[1];
+    const init = fetchMock.mock.calls[1]?.[1];
     expect(new Headers(init?.headers).get("x-csrf-token")).toBe("csrf-proof");
     expect(JSON.parse(String(init?.body))).toEqual({
       code: "123456",

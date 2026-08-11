@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Alert, Box, Button, MenuItem, TextField } from "@mui/material";
 import { adminDataProvider } from "../app/data-provider";
 import { StepUpDialog } from "../auth/step-up-dialog";
+import { createAdminOperationIdController } from "../shared/admin-operation-id";
 
 const roleChoices = [
   "OWNER",
@@ -35,6 +36,8 @@ export function VerificationDecisionPanel(props: {
   const [stepUp, setStepUp] = useState(false);
   const [stepUpAction, setStepUpAction] = useState<DecisionAction>("approve");
   const [error, setError] = useState("");
+  const operation = useRef(createAdminOperationIdController());
+
   async function submit(nextAction: DecisionAction = action) {
     const body =
       nextAction === "request-changes"
@@ -52,8 +55,9 @@ export function VerificationDecisionPanel(props: {
         `/api/admin/verification-requests/${encodeURIComponent(props.requestId)}/${nextAction}`,
         body,
         props.version,
-        crypto.randomUUID(),
+        operation.current.current(),
       );
+      operation.current.complete();
       props.onDone();
     } catch (e) {
       if (
@@ -61,9 +65,13 @@ export function VerificationDecisionPanel(props: {
       ) {
         setStepUpAction(nextAction);
         setStepUp(true);
-      } else setError("The decision did not commit. Refresh current state.");
+      } else {
+        if ((e as { status?: number }).status) operation.current.complete();
+        setError("The decision did not commit. Refresh current state.");
+      }
     }
   }
+
   if (props.state !== "PENDING_REVIEW")
     return (
       <Alert severity="info">
@@ -72,6 +80,7 @@ export function VerificationDecisionPanel(props: {
           : "This request is not currently actionable."}
       </Alert>
     );
+
   return (
     <Box sx={{ display: "grid", gap: 2 }}>
       {error && <Alert severity="warning">{error}</Alert>}
@@ -79,7 +88,10 @@ export function VerificationDecisionPanel(props: {
         variant="contained"
         color="success"
         disabled={props.disabled}
-        onClick={() => void submit("approve")}
+        onClick={() => {
+          operation.current.begin();
+          void submit("approve");
+        }}
       >
         Approve recruiter
       </Button>
@@ -87,7 +99,10 @@ export function VerificationDecisionPanel(props: {
         select
         label="Decision"
         value={action}
-        onChange={(e) => setAction(e.target.value as DecisionAction)}
+        onChange={(e) => {
+          operation.current.cancel();
+          setAction(e.target.value as DecisionAction);
+        }}
       >
         <MenuItem
           value="request-changes"
@@ -163,13 +178,19 @@ export function VerificationDecisionPanel(props: {
           props.disabled ||
           (action !== "approve" && Array.from(text.trim()).length < 10)
         }
-        onClick={() => void submit()}
+        onClick={() => {
+          operation.current.begin();
+          void submit();
+        }}
       >
         {action === "approve" ? "Confirm approve" : `Confirm ${action}`}
       </Button>
       <StepUpDialog
         open={stepUp}
-        onCancel={() => setStepUp(false)}
+        onCancel={() => {
+          operation.current.cancel();
+          setStepUp(false);
+        }}
         onVerified={() => {
           setStepUp(false);
           void submit(stepUpAction);

@@ -51,6 +51,10 @@ export const dashboardDefinition = Object.freeze({
     unit: "REPORTS",
     filter: { moderationState: "PENDING_REVIEW" },
   },
+  securityNotificationsManualIntervention: {
+    unit: "NOTIFICATIONS",
+    filter: { notificationStatus: "MANUAL_INTERVENTION_REQUIRED" },
+  },
 } as const);
 
 export type DashboardMetricKey = keyof typeof dashboardDefinition;

@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -21,11 +22,8 @@ describe("Feature 006 release performance thresholds", () => {
     ),
     "utf8",
   );
-  const notification = readFileSync(
-    resolve(
-      process.cwd(),
-      "src/backend/admin/notifications/security-notification-dispatcher.ts",
-    ),
+  const emailWorker = readFileSync(
+    resolve(process.cwd(), "src/backend/email/workers/email-outbox.ts"),
     "utf8",
   );
 
@@ -48,6 +46,41 @@ describe("Feature 006 release performance thresholds", () => {
       "30 * 60_000",
       "2 * 60 * 60_000",
     ])
-      expect(notification).toContain(marker);
+      expect(emailWorker).toContain(marker);
+  });
+
+  it("reports provider latency, retries, manual intervention, and commit-to-SENT", () => {
+    const run = spawnSync(
+      process.execPath,
+      [
+        resolve(
+          process.cwd(),
+          "scripts/measure-admin-management-performance.mjs",
+        ),
+        "--self-test",
+      ],
+      { encoding: "utf8" },
+    );
+    expect(run.status, run.stderr).toBe(0);
+    const report = JSON.parse(run.stdout).reliability;
+    expect(report.providerLatency).toMatchObject({
+      sampleCount: 9,
+      p50Ms: 12,
+      p95Ms: 17,
+      p99Ms: 17,
+    });
+    expect(report.retryCountByEventKind).toEqual({
+      ACCOUNT_SUSPENDED: 4,
+      VERIFICATION_APPROVED: 2,
+    });
+    expect(report.manualInterventionRequiredRate).toBeCloseTo(1 / 3);
+    expect(report.commitToSent).toMatchObject({
+      sampleCount: 2,
+      meanMs: 41,
+    });
+    expect(report.sessionEnforcement).toMatchObject({
+      sampleCount: 1,
+      withinTwoSecondsRate: 1,
+    });
   });
 });

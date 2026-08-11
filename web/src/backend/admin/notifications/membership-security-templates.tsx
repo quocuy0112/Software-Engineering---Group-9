@@ -1,22 +1,29 @@
 import { Body, Container, Heading, Html, Text } from "@react-email/components";
-export function MembershipSecurityEmail(props: {
-  companyReference: string;
-  resultingState: string;
+import type { AdminSecurityEventKind } from "./notification-events";
+
+export type MembershipSecurityNotice = {
+  eventKind: Extract<
+    AdminSecurityEventKind,
+    "MEMBERSHIP_SUSPENDED" | "MEMBERSHIP_RESTORED" | "MEMBERSHIP_REMOVED"
+  >;
+  companyDisplayName: string;
+  resultingState: "ACTIVE" | "SUSPENDED" | "REMOVED";
   occurredAt: string;
-}) {
+};
+
+export function membershipSecurityEmailText(props: MembershipSecurityNotice) {
+  return `Your company membership for ${props.companyDisplayName} is now ${props.resultingState}. Effective at ${props.occurredAt}.`;
+}
+
+export function MembershipSecurityEmail(props: MembershipSecurityNotice) {
   return (
     <Html>
       <Body>
         <Container>
-          <Heading>Company access changed</Heading>
-          <Text>
-            Your access for company reference {props.companyReference} is now{" "}
-            {props.resultingState}.
-          </Text>
-          <Text>
-            Effective at {props.occurredAt}. Visit account security if you need
-            help.
-          </Text>
+          <Heading>Company membership changed</Heading>
+          <Text>Company: {props.companyDisplayName}</Text>
+          <Text>Membership state: {props.resultingState}</Text>
+          <Text>Effective at {props.occurredAt}.</Text>
         </Container>
       </Body>
     </Html>

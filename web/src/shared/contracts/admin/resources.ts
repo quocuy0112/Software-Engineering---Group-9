@@ -108,6 +108,7 @@ export const dashboardSnapshotSchema = z
           "MEMBERSHIPS",
           "REQUESTS",
           "REPORTS",
+          "NOTIFICATIONS",
         ]),
       }),
     ),

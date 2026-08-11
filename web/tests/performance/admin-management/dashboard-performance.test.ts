@@ -17,8 +17,15 @@ describe("SC-002 dashboard performance harness", () => {
     );
     expect(run.status, run.stderr).toBe(0);
     const report = JSON.parse(run.stdout);
-    expect(report.usableWithinTwoSecondsRate).toBeGreaterThanOrEqual(0.95);
-    expect(report.p95Ms).toBeLessThanOrEqual(2_000);
-    expect(report.errorRate).toBeLessThan(0.01);
+    expect(report.dashboard.usableWithinTwoSecondsRate).toBeGreaterThanOrEqual(
+      0.95,
+    );
+    expect(report.dashboard.p95Ms).toBeLessThanOrEqual(2_000);
+    expect(report.dashboard.errorRate).toBeLessThan(0.01);
+    expect(report.dashboard).toMatchObject({
+      p50Ms: expect.any(Number),
+      p99Ms: expect.any(Number),
+      maxMs: expect.any(Number),
+    });
   });
 });

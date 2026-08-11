@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Alert, Box, Button, Chip, Typography } from "@mui/material";
 import { Show, useRecordContext, useRefresh } from "react-admin";
 import { adminDataProvider, membershipCommandPath } from "../app/data-provider";
@@ -10,6 +10,7 @@ import {
 } from "./membership-action-dialog";
 import { StaleConflictPanel } from "../shared/stale-conflict-panel";
 import { StepUpDialog } from "../auth/step-up-dialog";
+import { createAdminOperationIdController } from "../shared/admin-operation-id";
 type Membership = {
   id: string;
   companyId: string;
@@ -38,6 +39,7 @@ function Panel() {
     explanation: string;
     confirmation: true;
   }>();
+  const operation = useRef(createAdminOperationIdController());
   if (!record) return null;
   const current = record;
   const target = `${record.accountDisplayName} in ${record.company.legalName} as ${record.role}`;
@@ -53,17 +55,23 @@ function Panel() {
         membershipCommandPath(current.id, action),
         value,
         current.version,
-        crypto.randomUUID(),
+        operation.current.current(),
       );
+      operation.current.complete();
       refresh();
+      return true;
     } catch (error) {
-      if ((error as { status?: number }).status === 409) setConflict(true);
-      else if (
+      if ((error as { status?: number }).status === 409) {
+        setConflict(true);
+        operation.current.complete();
+        return false;
+      } else if (
         (error as { body?: { code?: string } }).body?.code ===
         "STEP_UP_REQUIRED"
-      )
+      ) {
         setStepUp(true);
-      else throw error;
+        return false;
+      } else throw error;
     }
   }
   return (
@@ -97,15 +105,33 @@ function Panel() {
       )}
       <Box sx={{ display: "flex", gap: 1 }}>
         {record.state === "ACTIVE" && (
-          <Button onClick={() => setAction("suspend")}>Suspend</Button>
+          <Button
+            onClick={() => {
+              operation.current.begin();
+              setAction("suspend");
+            }}
+          >
+            Suspend
+          </Button>
         )}
         {record.state === "SUSPENDED" && (
-          <Button onClick={() => setAction("restore")}>
+          <Button
+            onClick={() => {
+              operation.current.begin();
+              setAction("restore");
+            }}
+          >
             Restore {record.priorApprovedRole}
           </Button>
         )}
         {record.state !== "REMOVED" && (
-          <Button color="error" onClick={() => setAction("remove")}>
+          <Button
+            color="error"
+            onClick={() => {
+              operation.current.begin();
+              setAction("remove");
+            }}
+          >
             Remove
           </Button>
         )}
@@ -114,7 +140,10 @@ function Panel() {
         <SuspendMembershipDialog
           open
           targetLabel={target}
-          onClose={() => setAction(undefined)}
+          onClose={() => {
+            operation.current.cancel();
+            setAction(undefined);
+          }}
           onConfirm={submit}
         />
       )}
@@ -122,7 +151,10 @@ function Panel() {
         <RestoreMembershipDialog
           open
           targetLabel={target}
-          onClose={() => setAction(undefined)}
+          onClose={() => {
+            operation.current.cancel();
+            setAction(undefined);
+          }}
           onConfirm={submit}
         />
       )}
@@ -131,13 +163,21 @@ function Panel() {
           open
           targetLabel={target}
           confirmationText={record.id}
-          onClose={() => setAction(undefined)}
+          onClose={() => {
+            operation.current.cancel();
+            setAction(undefined);
+          }}
           onConfirm={submit}
         />
       )}
       <StepUpDialog
         open={stepUp}
-        onCancel={() => setStepUp(false)}
+        onCancel={() => {
+          operation.current.cancel();
+          setPending(undefined);
+          setAction(undefined);
+          setStepUp(false);
+        }}
         onVerified={() => {
           setStepUp(false);
           if (pending) void submit(pending);

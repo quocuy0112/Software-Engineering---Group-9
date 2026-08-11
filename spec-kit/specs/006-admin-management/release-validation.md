@@ -1,64 +1,119 @@
 # Feature 006 Release Validation
 
-**Validation date**: 2026-08-10  
-**Branch**: `006-admin-management`  
-**Environment**: Local Windows development workspace, PostgreSQL at
-`localhost:55432`
+**Validation date**: 2026-08-11
 
-This record distinguishes implemented automated coverage from release journeys
-that require controlled identities, external approvals, or production-like
-infrastructure. A skipped or unexecuted journey is not recorded as a pass.
+**Branch**: `006-admin-management`
+
+**Environment**: Local Windows workspace, PostgreSQL at `localhost:55432`,
+Node.js 24.18.0, 16 logical CPUs, 29.86 GB RAM
+
+This record separates executed automated evidence from manual or production
+readiness checks. A skipped, unexecuted, or fixture-invalid journey is not
+recorded as a pass.
+
+## Phase 6 Email E2E Evidence
+
+The suites were executed serially in dependency order with
+`ADMIN_E2E_READY=1`: T056, then T074, then T097. Both desktop Chromium and the
+320 px mobile project ran.
+
+| Task                  | Result | Evidence                                                                                                                                                                                   |
+| --------------------- | -----: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| T056 account security |   PASS | 6/6; real TOTP/step-up, stable operation ID across retry, suspend/reinstate content, revoke-one/revoke-all cardinality, provider success, permanent failure, and one alert across restart. |
+| T074 verification     |   PASS | 6/6; encrypted filesystem storage, asynchronous SAFE/UNSAFE scanner, all seven event kinds, transient/permanent provider paths, and one winner for concurrent approval.                    |
+| T097 membership       |   PASS | 4/4; exactly one company-scoped email per suspend/restore/remove, stale rejection, last-OWNER protection, and Candidate/multi-company isolation.                                           |
+
+**Total**: 16/16 passed, 0 skipped.
+
+## T140 Performance and Reliability Report
+
+The target run used exactly 10 independent administrator sessions and a fixture
+containing 10,000 accounts, 1,000 companies, 5,000 memberships, and 1,000 open
+review items. It ran for 900,000 ms with one interaction per second per
+administrator. The fixture cleanup removed all 10,000 fixture accounts after
+measurement.
+
+| Metric                              |                      Result |                        Target |
+| ----------------------------------- | --------------------------: | ----------------------------: |
+| Dashboard/list samples              |                       8,922 |                 15-minute run |
+| p50 / p95 / p99                     | 157.75 / 311.64 / 663.62 ms |               p95 <= 2,000 ms |
+| Maximum                             |                 2,000.36 ms | reported, not percentile gate |
+| Usable within two seconds           |                     99.989% |                        >= 95% |
+| Errors                              |                      0 (0%) |                          < 1% |
+| Session enforcement p50 / p95 / max | 353.67 / 376.61 / 376.61 ms |              100% <= 2,000 ms |
+
+The first unpaced diagnostic run intentionally remains documented: it generated
+approximately 904,000 requests and failed with 98.34% connection/runtime errors.
+The harness was corrected to model ten active administrators with an explicit
+one-second interaction interval; no errors were excluded from the passing run.
+
+Email reliability evidence came from 28 E2E deliveries and 48 provider
+attempts across all 13 supported `eventKind` values.
+
+| Reliability metric                     |                                                                                                        Result |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------: |
+| Provider latency p50 / p95 / p99 / max |                                         0.0035 / 0.0058 / 0.0066 / 0.0066 ms (in-process controlled provider) |
+| Retry count                            | `ACCOUNT_SUSPENDED=8`, `VERIFICATION_RECEIPT=4`, `VERIFICATION_EXPIRED=8`; all other covered event kinds `=0` |
+| `MANUAL_INTERVENTION_REQUIRED`         |                                                                                                 2/28 (7.143%) |
+| Commit-to-`SENT`                       |                                                                   24 samples; mean 5,813.46 ms; p95 12,480 ms |
+| Revoke-all enforcement                 |                                                                                        4/4 within two seconds |
+
+T140 also passed the focused Feature 006 suite: 55 files and 152 tests, including
+qualification, 15/24/72-hour deadlines, worker resilience, contracts, security,
+architecture, and performance thresholds.
 
 ## Automated Gates
 
-| Gate | Result | Evidence |
-|---|---:|---|
-| TypeScript typecheck | PASS | `npm run typecheck` completed with no diagnostics. |
-| Lint | PASS | `npm run lint` completed with no diagnostics. |
-| Production build | PASS | `npm run build` compiled, typechecked, and generated 72 routes/pages. |
-| Feature 006 focused suite | PASS | `npm run test:admin-management -- --reporter=verbose`: 48 files and 106 tests passed. |
-| OpenAPI/runtime drift | PASS | `npm run admin:contracts`: 32 paths, version 0.2.0, `drift=false`, SHA-256 `097a7ed2ba500787a98f431a3687cd3002f7fea28eaadf73a400c1b82b264bdd`. |
-| Admin worker probe | PASS | `npm run admin:worker:probe` exited successfully. |
-| Moderation migration parity | PASS | `npm run admin:moderation:migration:verify`: legacy 0, generalized 0, missing 0. |
-| Prisma schema and migration history | PASS | `npm run db:migrations:check`, `npm run db:verify`, `npm run db:status`, and `npm run db:deploy`: sequential `001`–`020` naming, fresh/upgrade paths and drift checks passed, local history reconciled by checksum, and no migration is pending. |
-| Dependency advisories | PASS | `npm audit --json --package-lock-only`: 0 vulnerabilities at every severity. |
-| Performance evaluator | PASS (self-test only) | 100 samples, 0 errors, p95 250 ms, usable-within-two-seconds rate 100%. This is not the target-environment SC-002 run. |
-| Scope boundary | PASS | Included in the focused suite; no excluded Recruiter Manager, deletion, grant UI, automated enforcement, AI decision, or export surface detected. |
+| Gate                                 |                 Result | Evidence                                                                                                                       |
+| ------------------------------------ | ---------------------: | ------------------------------------------------------------------------------------------------------------------------------ |
+| TypeScript                           |                   PASS | `npm run typecheck`.                                                                                                           |
+| Production build                     |                   PASS | 73 pages/routes generated.                                                                                                     |
+| Focused Feature 006 suite            |                   PASS | 55 files, 152 tests.                                                                                                           |
+| Email Phase 6 E2E                    |                   PASS | 16/16, no skip.                                                                                                                |
+| OpenAPI/runtime drift                |                   PASS | 32 paths, version 0.2.0, drift false, SHA-256 `eee0a1d48d1e5a0b6a308d4545235a4f40620f527f4217c6c1045b08685d00a7`.              |
+| Admin worker probe                   |                   PASS | Process exited successfully.                                                                                                   |
+| Migration sequence/status            |                   PASS | 21 sequential migrations; local schema up to date.                                                                             |
+| Fresh/upgrade migration verification |                   PASS | Docker fresh, Feature 001 upgrade, and Feature 004 upgrade/drift/constraint paths passed.                                      |
+| Moderation migration parity          |                   PASS | legacy 0, generalized 0, missing 0.                                                                                            |
+| Lint                                 | BLOCKED (pre-existing) | Only `profile-social-links-form.tsx:326` fails `react-hooks/rules-of-hooks`; all changed Feature 006 files pass targeted lint. |
 
-The protected-evidence pipeline is included in the focused result: encrypted
-private storage, real scanner abstraction, magic-type validation, structural
-decode, normalized server-side preview, authorization checks, and public-locator
-privacy tests passed. PDF/native rendering is kept outside browser bundles.
+The requested separate GitHub issue for the pre-existing lint defect could not
+be created from this environment because GitHub CLI is not installed and no
+connected browser session is available. The defect was not modified in this
+change set.
 
-## Release Journeys and Manual Evidence
+## T144 Quickstart Acceptance
 
-| Journey/evidence | Result | Required follow-up |
-|---|---:|---|
-| Authenticated Feature 006 Playwright journeys | NOT RUN | Provision the section 4 identities and set `ADMIN_E2E_READY=1`. The suite defines 13 desktop tests; 11 stateful tests remain fixture-gated. |
-| Unauthenticated Playwright smoke tests | BLOCKED | Playwright resolves the tests, but the expected Chromium headless executable is unavailable in the managed runtime even after `playwright install chromium` returned success. Re-run on an agent with a writable Playwright browser cache. |
-| Full 15-minute, 10-admin performance run | NOT RUN | Supply `ADMIN_PERF_ORIGIN`, `ADMIN_PERF_AUTH_COOKIE`, and the representative dataset, then run `npm run perf:admin-management`. |
-| Administrator two-minute usability protocol | NOT RUN | Execute `web/tests/usability/admin-management/account-security-protocol.md` with representative administrators. |
-| Verification three-minute usability protocol | NOT RUN | Execute `web/tests/usability/admin-management/verification-review-protocol.md`. |
-| NVDA/Firefox and VoiceOver/Safari smoke | NOT RUN | Execute `web/tests/accessibility/admin-management/manual-screen-reader-protocol.md` and attach the completed evidence sheets. |
-| Evidence policy approvals/readiness | BLOCKED | Named Legal, Security, and Operations approvals plus production storage/scanner/encryption/retention configuration have not been supplied. `npm run admin:evidence:check` must fail closed until they are present. |
-| Existing-company prerequisite | BLOCKED | Record the upstream owner, contract version, environment, and passing integration evidence in `docs/dependencies/company-access-prerequisite.md`. Existing-company approval remains disabled until ready. |
-| Feature 004 Docker compatibility gates | BLOCKED | Local Docker/ClamAV/Docker Scout access is unavailable. These repository-wide checks are outside Feature 006 but remain mandatory for a release. |
-| Entire repository `npm test` | FAIL / PRE-EXISTING | The run exceeded 300 seconds and reported unrelated CV-retention, profile-account, Docker/ClamAV, and legacy architecture failures. Feature 006's focused suite passed independently; repository-wide release remains blocked until owners resolve or re-baseline those failures. |
+T144 was started only after T140 passed. The full admin Playwright directory was
+executed without changing the out-of-scope T030/T112/T127/T138 tests. The run
+is **not a pass**:
 
-## SC-001–SC-018 Evidence Status
+- 10 accessibility cases navigated to an undefined admin origin and rendered
+  a 404 rather than an authenticated workflow.
+- 2 moderation cases rendered the same 404 and did not exercise moderation.
+- 2 signed-out authentication assertions failed because the expected regex is
+  case-sensitive while the rendered heading is “Platform administrator sign
+  in”.
+- The 16 T056/T074/T097 cases retained their independent passing runs and no
+  failure artifacts were produced for those suites.
+- Recruiter boundary smoke cases produced no failure artifacts, but the full
+  T127 controlled multi-company journey remains separately owned.
 
-- SC-001, SC-003–SC-007, SC-009–SC-013, and SC-015–SC-018 have passing
-  deterministic contract, unit, integration, security, concurrency, or worker
-  evidence in the focused suite.
-- SC-002 has a passing evaluator self-test, but the required target-environment
-  15-minute run is not complete.
-- SC-008 requires the unexecuted three-minute verification usability protocol.
-- SC-014 has passing component-level automated accessibility checks; its full
-  keyboard Playwright and manual screen-reader evidence is not complete.
+These failures are not patched here because T030/T112/T127/T138 are outside the
+email-fix scope. Manual administrator/verification usability protocols and
+NVDA/Firefox plus VoiceOver/Safari evidence also remain unexecuted.
+
+## Production Readiness Blockers
+
+`npm run admin:evidence:check` correctly failed closed in the local environment.
+Missing production evidence includes exact HTTPS origins, named Legal/Security/
+Operations approvals, a 32-byte evidence key, private scanner socket, enabled
+delivery/worker configuration, fixed retention configuration, a private storage
+root, and the company-access prerequisite owner/version/environment record.
 
 ## Release Decision
 
-**NOT READY FOR RELEASE.** Implementation and focused automated gates are
-green, but the authenticated browser journeys, target-environment performance
-run, manual usability/accessibility evidence, evidence-policy approvals, and
-upstream prerequisite readiness must be completed before T144 can be closed.
+**NOT READY FOR RELEASE.** Phase 6 and T140 are complete and green. T144 remains
+open because full authenticated accessibility/moderation/auth acceptance,
+manual usability/screen-reader evidence, the pre-existing lint gate, and
+production evidence-policy/prerequisite approvals are not complete.

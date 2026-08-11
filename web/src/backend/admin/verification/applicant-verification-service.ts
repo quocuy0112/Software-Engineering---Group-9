@@ -9,6 +9,7 @@ import {
 import { FilesystemPrivateBusinessEvidenceStorage } from "@/backend/storage/business-evidence/filesystem";
 import { S3PrivateBusinessEvidenceStorage } from "@/backend/storage/business-evidence/s3";
 import { CompanyRelationshipPrerequisiteGateway } from "./company-relationship-prerequisite-gateway";
+import { buildVerificationOutbox } from "@/backend/admin/notifications/verification-outbox";
 function storage() {
   return process.env.ADMIN_EVIDENCE_STORAGE_ADAPTER === "s3"
     ? new S3PrivateBusinessEvidenceStorage()
@@ -18,25 +19,20 @@ function receiptData(
   requestId: string,
   userId: string,
   state: string,
-  kind: "VERIFICATION_RECEIVED" | "VERIFICATION_CANCELLED",
-  submissionVersion = 1,
+  eventKind: "VERIFICATION_RECEIPT" | "VERIFICATION_CANCELLED",
+  resultingVersion: number,
+  occurredAt: Date,
 ) {
-  return {
-    kind,
+  return buildVerificationOutbox({
+    requestId,
     userId,
-    verificationRequestId: requestId,
-    recipientRef: userId,
-    templateVersion: "verification-v1",
-    payloadRef: {
-      requestId,
-      resultingState: state,
-      nextAction:
-        state === "CANCELLED" ? "SUBMIT_NEW_REQUEST" : "WAIT_FOR_REVIEW",
-    },
-    idempotencyKey: `verification:${requestId}:${kind.toLowerCase()}:v${submissionVersion}`,
-    status: "PENDING" as const,
-    nextAttemptAt: new Date(),
-  };
+    eventKind,
+    resultingState: state,
+    resultingVersion,
+    occurredAt,
+    nextAction:
+      state === "CANCELLED" ? "SUBMIT_NEW_REQUEST" : "WAIT_FOR_REVIEW",
+  });
 }
 export class ApplicantVerificationService {
   async list(request: Request) {
@@ -127,7 +123,9 @@ export class ApplicantVerificationService {
             requestId,
             session.userId,
             "PENDING_CHECKS",
-            "VERIFICATION_RECEIVED",
+            "VERIFICATION_RECEIPT",
+            row.version,
+            now,
           ),
         });
         return { requestId: row.id, state: row.state, version: row.version };
@@ -175,6 +173,8 @@ export class ApplicantVerificationService {
           session.userId,
           "CANCELLED",
           "VERIFICATION_CANCELLED",
+          updated.version,
+          now,
         ),
       });
       return {
@@ -254,8 +254,9 @@ export class ApplicantVerificationService {
             requestId,
             session.userId,
             "PENDING_CHECKS",
-            "VERIFICATION_RECEIVED",
-            version,
+            "VERIFICATION_RECEIPT",
+            result.version,
+            now,
           ),
         });
         return { requestId, state: result.state, version: result.version };

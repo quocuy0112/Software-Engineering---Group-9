@@ -47,6 +47,12 @@ import {
   applicationStageSchema,
 } from "@/shared/contracts/jobs/applications";
 import { EmailDeliveryError, type EmailService } from "../email-service";
+import { renderFeature006Email } from "@/backend/admin/notifications/renderer-registry";
+import {
+  alertSecurityNotificationDead,
+  selectedSecurityNotificationOpsAlertAdapter,
+  type SecurityNotificationOpsAlertAdapter,
+} from "@/backend/admin/notifications/security-notification-ops-alert";
 const protector = new TokenProtector();
 const emailChangeProofs = new EmailChangeProofProtector();
 const recipientProtector = new ProtectedOutboxRecipient();
@@ -82,6 +88,16 @@ export function retryAt(attempts: number, now: Date, random = Math.random) {
     now.getTime() + Math.round(baseSeconds * (0.9 + random() * 0.2)) * 1000,
   );
 }
+const FEATURE_006_RETRY_DELAYS_MS = [
+  60_000,
+  5 * 60_000,
+  30 * 60_000,
+  2 * 60 * 60_000,
+] as const;
+export function feature006RetryAt(attempts: number, now: Date) {
+  const delay = FEATURE_006_RETRY_DELAYS_MS[Math.max(0, attempts - 1)];
+  return new Date(now.getTime() + (delay ?? 0));
+}
 export async function deliverClaimedOutbox(
   row: ClaimedOutbox,
   owner: string,
@@ -89,7 +105,38 @@ export async function deliverClaimedOutbox(
   repository = new PrismaOutboxRepository(),
   now = new Date(),
   random = Math.random,
+  opsAlertAdapter: SecurityNotificationOpsAlertAdapter = selectedSecurityNotificationOpsAlertAdapter(),
 ): Promise<boolean> {
+  const feature006Delivery =
+    row.templateVersion === "admin-security-v1" ||
+    row.templateVersion === "verification-v1" ||
+    /^email-delivery:(account|membership|verification):/u.test(
+      row.idempotencyKey,
+    );
+  const deliveryDeadline = feature006Delivery
+    ? new Date(row.createdAt.getTime() + 24 * 60 * 60_000)
+    : undefined;
+  if (deliveryDeadline && now >= deliveryDeadline) {
+    const failure = await repository.markFailure({
+      id: row.id,
+      owner,
+      attempts: 5,
+      code: "DELIVERY_DEADLINE_EXCEEDED",
+      retryable: false,
+      nextAttemptAt: now,
+      kind: row.kind,
+      now,
+      deliveryDeadline,
+    });
+    if (failure.dead)
+      await alertSecurityNotificationDead(
+        row.id,
+        opsAlertAdapter,
+        undefined,
+        now,
+      ).catch(() => false);
+    return false;
+  }
   try {
     const payload = row.payloadRef as { protectedToken?: string };
     let subject: string;
@@ -102,7 +149,19 @@ export async function deliverClaimedOutbox(
       protectedCancellationProof?: string;
       holdEndsAt?: string;
     };
-    if (row.templateVersion === "application-stage-changed.v1") {
+    if (
+      row.templateVersion === "admin-security-v1" ||
+      row.templateVersion === "verification-v1"
+    ) {
+      const rendered = await renderFeature006Email({
+        templateVersion: row.templateVersion,
+        payloadRef: row.payloadRef,
+        appUrl: serverEnvironment.NEXT_PUBLIC_APP_URL,
+      });
+      subject = rendered.subject;
+      html = rendered.html;
+      text = rendered.text;
+    } else if (row.templateVersion === "application-stage-changed.v1") {
       const stagePayload = row.payloadRef as {
         applicationId?: string;
         stage?: string;
@@ -251,15 +310,26 @@ export async function deliverClaimedOutbox(
     );
   } catch (error) {
     const retryable = !(error instanceof EmailDeliveryError) || error.retryable;
-    await repository.markFailure({
+    const failure = await repository.markFailure({
       id: row.id,
       owner,
       attempts: row.attempts,
       code: safeErrorCode(error),
       retryable,
-      nextAttemptAt: retryAt(row.attempts, now, random),
+      nextAttemptAt: feature006Delivery
+        ? feature006RetryAt(row.attempts, now)
+        : retryAt(row.attempts, now, random),
       kind: row.kind,
+      now,
+      deliveryDeadline,
     });
+    if (failure.dead)
+      await alertSecurityNotificationDead(
+        row.id,
+        opsAlertAdapter,
+        undefined,
+        now,
+      ).catch(() => false);
     return false;
   }
 }
