@@ -23,6 +23,7 @@ function query(request: Request) {
     postedWithinDays: value("postedWithinDays"),
     sort: value("sort"),
     cursor: value("cursor"),
+    page: value("page"),
     limit: value("limit"),
   };
 }

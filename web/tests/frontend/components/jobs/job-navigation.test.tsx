@@ -110,9 +110,36 @@ describe("job board navigation", () => {
     );
   });
 
-  it("bounds the Filters sidebar and gives it a subtle internal scrollbar", async () => {
+  it("uses compact numeric pagination for job results", async () => {
+    const source = await readFile(
+      resolve(process.cwd(), "src/app/jobs/page.tsx"),
+      "utf8",
+    );
     const styles = await readFile(
       resolve(process.cwd(), "src/frontend/features/jobs/styles/job-board.css"),
+      "utf8",
+    );
+
+    expect(source).toContain("function pageNumbers");
+    expect(source).toContain("currentPage - 1");
+    expect(source).toContain("currentPage + 1");
+    expect(source).toContain("result.totalPages > 1");
+    expect(source).toContain("pageHref(paginationParams, result.totalPages)");
+    expect(source).toContain('className="job-pagination-progress"');
+    expect(styles).toContain(".job-pagination-pages {");
+    expect(styles).toContain("overflow-x: auto;");
+  });
+
+  it("keeps the Filters sidebar independently scrollable", async () => {
+    const styles = await readFile(
+      resolve(process.cwd(), "src/frontend/features/jobs/styles/job-board.css"),
+      "utf8",
+    );
+    const formSource = await readFile(
+      resolve(
+        process.cwd(),
+        "src/frontend/features/jobs/components/job-search-form.tsx",
+      ),
       "utf8",
     );
 
@@ -122,6 +149,7 @@ describe("job board navigation", () => {
     expect(styles).toContain("overflow-y: auto;");
     expect(styles).toContain("scrollbar-width: thin;");
     expect(styles).toContain(".job-filter-column::-webkit-scrollbar {");
+    expect(formSource).toContain('filterColumn.addEventListener("wheel"');
     expect(styles).toContain(".job-filter-mobile-trigger");
     expect(styles).toContain(".job-filter-drawer");
     expect(styles).toContain("max-height: min(88dvh, 52rem);");
