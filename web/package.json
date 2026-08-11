@@ -65,7 +65,10 @@
     "db:seed:jobs": "tsx scripts/seed-development-jobs.ts",
     "db:deploy": "prisma migrate deploy",
     "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "test:recruiter-header": "vitest run tests/shared/unit/contracts/recruiter-header-status.test.ts tests/backend/unit/auth/candidate-host-boundary.test.ts tests/backend/unit/recruiter-header tests/backend/contract/recruiter-header tests/backend/integration/recruiter-header tests/frontend/components/recruiter-header tests/frontend/accessibility/recruiter-header tests/architecture/recruiter-header-boundaries.test.ts tests/security/recruiter-header tests/performance/recruiter-header --passWithNoTests",
+    "test:recruiter-header:e2e": "playwright test tests/system/e2e/recruiter-header",
+    "perf:recruiter-header": "node scripts/measure-recruiter-header-performance.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-iam": "3.1101.0",

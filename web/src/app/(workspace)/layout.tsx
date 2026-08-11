@@ -9,6 +9,12 @@ export default async function WorkspaceLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { headers } = await import("next/headers");
+  const { notFound } = await import("next/navigation");
+  const { isCandidateRequestHost } =
+    await import("@/backend/auth/candidate-host-boundary");
+  if (!isCandidateRequestHost(await headers())) notFound();
+
   const context = await getWorkspaceContext();
   if (!context) redirect("/login?returnTo=%2Fdashboard");
 
@@ -17,6 +23,7 @@ export default async function WorkspaceLayout({
       csrfProof={context.csrfProof}
       profile={context.account}
       initialLocale={context.initialLocale}
+      initialRecruiterStatus={context.initialRecruiterStatus}
     >
       {children}
     </WorkspaceShell>

@@ -1,0 +1,192 @@
+openapi: 3.1.0
+info:
+  title: SmartHire Recruiter Header Status API
+  version: 0.1.0
+  description: >-
+    Read-only Candidate-workspace contract for the four-state recruiter header
+    action. Cookie authentication uses the existing Better Auth session. This
+    endpoint covers later refreshes; the initial server projection is outside
+    this HTTP contract but uses the same exact Candidate-host precondition.
+servers:
+  - url: http://localhost:3001
+    description: Local Candidate origin
+tags:
+  - name: RecruiterHeader
+paths:
+  /api/recruiter/header-status:
+    get:
+      tags: [RecruiterHeader]
+      operationId: getRecruiterHeaderStatus
+      summary: Resolve the current Candidate header recruiter action
+      description: >-
+        Returns a minimal derived projection. The response contains no account,
+        company, membership, request, role, evidence, or session identifier and
+        every success or safe-error outcome is served with Cache-Control:
+        no-store. Exact Candidate-host validation occurs before session or
+        status access.
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Current confirmed recruiter header projection
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecruiterHeaderStatus"
+              examples:
+                neverApplied:
+                  value:
+                    state: NEVER_APPLIED
+                    destinationKind: EMPLOYER_VERIFICATION
+                    href: /dashboard/employer-verification
+                    observedAt: 2026-08-11T10:00:00+07:00
+                pending:
+                  value:
+                    state: PENDING_REVIEW
+                    destinationKind: NONE
+                    href: null
+                    observedAt: 2026-08-11T10:00:00+07:00
+                rejected:
+                  value:
+                    state: REJECTED
+                    destinationKind: EMPLOYER_VERIFICATION
+                    href: /dashboard/employer-verification
+                    observedAt: 2026-08-11T10:00:00+07:00
+                approved:
+                  value:
+                    state: APPROVED
+                    destinationKind: RECRUITER_WORKSPACE
+                    href: http://console.recruiter.localhost:3001
+                    observedAt: 2026-08-11T10:00:00+07:00
+        "401":
+          description: Existing Candidate session is absent or no longer valid
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecruiterHeaderError"
+              example:
+                code: UNAUTHORIZED
+        "404":
+          description: Request was not sent to the exact configured Candidate host
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecruiterHeaderError"
+              example:
+                code: UNAVAILABLE
+        "503":
+          description: Authoritative status could not be confirmed
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecruiterHeaderError"
+              example:
+                code: STATUS_UNAVAILABLE
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: better-auth.session_token
+      description: Existing server-controlled Better Auth session cookie
+  schemas:
+    RecruiterHeaderState:
+      type: string
+      enum:
+        - NEVER_APPLIED
+        - PENDING_REVIEW
+        - REJECTED
+        - APPROVED
+    RecruiterHeaderDestinationKind:
+      type: string
+      enum:
+        - NONE
+        - EMPLOYER_VERIFICATION
+        - RECRUITER_WORKSPACE
+    RecruiterHeaderStatus:
+      type: object
+      additionalProperties: false
+      required:
+        - state
+        - destinationKind
+        - href
+        - observedAt
+      properties:
+        state:
+          $ref: "#/components/schemas/RecruiterHeaderState"
+        destinationKind:
+          $ref: "#/components/schemas/RecruiterHeaderDestinationKind"
+        href:
+          type:
+            - string
+            - "null"
+          description: >-
+            Null only for PENDING_REVIEW. Candidate destinations are relative;
+            recruiter destinations use the exact configured recruiter origin.
+        observedAt:
+          type: string
+          format: date-time
+      allOf:
+        - if:
+            properties:
+              state:
+                const: PENDING_REVIEW
+          then:
+            properties:
+              destinationKind:
+                const: NONE
+              href:
+                type: "null"
+        - if:
+            properties:
+              state:
+                enum: [NEVER_APPLIED, REJECTED]
+          then:
+            properties:
+              destinationKind:
+                const: EMPLOYER_VERIFICATION
+              href:
+                type: string
+                const: /dashboard/employer-verification
+        - if:
+            properties:
+              state:
+                const: APPROVED
+          then:
+            properties:
+              destinationKind:
+                const: RECRUITER_WORKSPACE
+              href:
+                type: string
+                format: uri
+    RecruiterHeaderError:
+      type: object
+      additionalProperties: false
+      required: [code]
+      properties:
+        code:
+          type: string
+          enum:
+            - UNAUTHORIZED
+            - UNAVAILABLE
+            - STATUS_UNAVAILABLE

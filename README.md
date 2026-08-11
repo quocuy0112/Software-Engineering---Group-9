@@ -96,6 +96,7 @@ For isolated debugging, run:
 npm run dev:web
 npm run email:worker
 docker compose up --build postgres clamav cv-worker
+docker compose up -d --build postgres clamav ocr-engine cv-worker image-search-worker
 ```
 
 To evaluate production-like navigation rather than development compilation, stop the development server and run:
@@ -109,7 +110,7 @@ npm start
 
 | Command                                                            | Purpose                                                          |
 | -------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `npm run dev`                                                       | Supervise web, email worker, Compose CV worker, and ClamAV       |
+| `npm run dev`                                                       | Supervise web, email worker, Compose CV/admin workers, and ClamAV       |
 | `npm run dev:web`                                                    | Start only Next.js on port 3001                                  |
 | `npm start`                                                          | Start an already-built production server                        |
 | `npm run email:worker`                                                | Start only the email outbox worker                               |

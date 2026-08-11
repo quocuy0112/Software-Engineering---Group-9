@@ -46,6 +46,7 @@ export function VerificationRequestList() {
       <Datagrid bulkActionButtons={false} rowClick="show">
         <TextField source="id" />
         <TextField source="companyName" />
+        <TextField source="requestedRole" />
         <TextField source="normalizedTaxIdentifier" />
         <TextField source="state" />
         <TextField source="submissionVersion" />

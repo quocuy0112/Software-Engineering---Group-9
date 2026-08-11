@@ -97,13 +97,15 @@ export function EmployerVerificationPage() {
   return (
     <main className="mx-auto grid max-w-3xl gap-8 p-6">
       <section>
-        <h1 className="text-3xl font-semibold">Employer verification</h1>
+        <h1 className="text-3xl font-semibold">Recruiter application</h1>
         <p>
-          Submit one PDF, PNG, or JPEG business license from 1 byte through 5
-          MB. Documents remain private and are safety checked before review.
+          Apply to become a recruiter by submitting one PDF, PNG, or JPEG
+          business license from 1 byte through 5 MB. Documents remain private
+          and are safety checked before review.
         </p>
         {message && <p role="status">{message}</p>}
         <form onSubmit={submit} className="grid gap-4">
+          <input type="hidden" name="requestedRole" value="RECRUITER" />
           <label>
             Legal company name
             <input name="companyName" required maxLength={240} />
@@ -119,15 +121,6 @@ export function EmployerVerificationPage() {
             />
           </label>
           <label>
-            Requested role
-            <select name="requestedRole" defaultValue="RECRUITER">
-              <option>OWNER</option>
-              <option>HR_MANAGER</option>
-              <option>RECRUITER</option>
-              <option>HIRING_MANAGER</option>
-            </select>
-          </label>
-          <label>
             Business license
             <input
               name="document"
@@ -136,11 +129,11 @@ export function EmployerVerificationPage() {
               required
             />
           </label>
-          <button type="submit">Submit for verification</button>
+          <button type="submit">Submit recruiter application</button>
         </form>
       </section>
       <section>
-        <h2 className="text-2xl font-semibold">Your requests</h2>
+        <h2 className="text-2xl font-semibold">Your recruiter applications</h2>
         {items.length ? (
           <ul>
             {items.map((item) => (

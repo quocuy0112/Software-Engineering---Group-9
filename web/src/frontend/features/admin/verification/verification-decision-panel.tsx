@@ -4,29 +4,45 @@ import { Alert, Box, Button, MenuItem, TextField } from "@mui/material";
 import { adminDataProvider } from "../app/data-provider";
 import { StepUpDialog } from "../auth/step-up-dialog";
 import { createAdminOperationIdController } from "../shared/admin-operation-id";
+
+const roleChoices = [
+  "OWNER",
+  "HR_MANAGER",
+  "RECRUITER",
+  "HIRING_MANAGER",
+] as const;
+type DecisionAction = "request-changes" | "reject" | "approve";
+type MembershipRole = (typeof roleChoices)[number];
+
 export function VerificationDecisionPanel(props: {
   requestId: string;
   version: number;
   state: string;
   resubmissionCount: number;
+  requestedRole?: string;
   disabled: boolean;
   onDone: () => void;
 }) {
-  const [action, setAction] = useState<
-    "request-changes" | "reject" | "approve"
-  >("request-changes");
+  const initialRole = roleChoices.includes(
+    props.requestedRole as MembershipRole,
+  )
+    ? (props.requestedRole as MembershipRole)
+    : "RECRUITER";
+  const [action, setAction] = useState<DecisionAction>("request-changes");
   const [text, setText] = useState("");
   const [category, setCategory] = useState("DOCUMENT_UNREADABLE");
-  const [role, setRole] = useState("RECRUITER");
+  const [role, setRole] = useState<MembershipRole>(initialRole);
   const [note, setNote] = useState("");
   const [stepUp, setStepUp] = useState(false);
+  const [stepUpAction, setStepUpAction] = useState<DecisionAction>("approve");
   const [error, setError] = useState("");
   const operation = useRef(createAdminOperationIdController());
-  async function submit() {
+
+  async function submit(nextAction: DecisionAction = action) {
     const body =
-      action === "request-changes"
+      nextAction === "request-changes"
         ? { confirmation: true, guidance: text, privateNote: note || undefined }
-        : action === "reject"
+        : nextAction === "reject"
           ? {
               confirmation: true,
               category,
@@ -36,7 +52,7 @@ export function VerificationDecisionPanel(props: {
           : { confirmation: true, role, privateNote: note || undefined };
     try {
       await adminDataProvider.command(
-        `/api/admin/verification-requests/${encodeURIComponent(props.requestId)}/${action}`,
+        `/api/admin/verification-requests/${encodeURIComponent(props.requestId)}/${nextAction}`,
         body,
         props.version,
         operation.current.current(),
@@ -44,28 +60,48 @@ export function VerificationDecisionPanel(props: {
       operation.current.complete();
       props.onDone();
     } catch (e) {
-      if ((e as { body?: { code?: string } }).body?.code === "STEP_UP_REQUIRED")
+      if (
+        (e as { body?: { code?: string } }).body?.code === "STEP_UP_REQUIRED"
+      ) {
+        setStepUpAction(nextAction);
         setStepUp(true);
-      else {
+      } else {
         if ((e as { status?: number }).status) operation.current.complete();
         setError("The decision did not commit. Refresh current state.");
       }
     }
   }
+
   if (props.state !== "PENDING_REVIEW")
     return (
-      <Alert severity="info">This request is not currently actionable.</Alert>
+      <Alert severity="info">
+        {props.state === "PENDING_CHECKS"
+          ? "Safety checks are still running. Approve recruiter becomes available when this request reaches Pending review."
+          : "This request is not currently actionable."}
+      </Alert>
     );
+
   return (
     <Box sx={{ display: "grid", gap: 2 }}>
       {error && <Alert severity="warning">{error}</Alert>}
+      <Button
+        variant="contained"
+        color="success"
+        disabled={props.disabled}
+        onClick={() => {
+          operation.current.begin();
+          void submit("approve");
+        }}
+      >
+        Approve recruiter
+      </Button>
       <TextField
         select
         label="Decision"
         value={action}
         onChange={(e) => {
           operation.current.cancel();
-          setAction(e.target.value as never);
+          setAction(e.target.value as DecisionAction);
         }}
       >
         <MenuItem
@@ -104,9 +140,9 @@ export function VerificationDecisionPanel(props: {
           select
           label="Approved role"
           value={role}
-          onChange={(e) => setRole(e.target.value)}
+          onChange={(e) => setRole(e.target.value as MembershipRole)}
         >
-          {["OWNER", "HR_MANAGER", "RECRUITER", "HIRING_MANAGER"].map((v) => (
+          {roleChoices.map((v) => (
             <MenuItem key={v} value={v}>
               {v}
             </MenuItem>
@@ -137,6 +173,7 @@ export function VerificationDecisionPanel(props: {
       />
       <Button
         variant="contained"
+        color={action === "approve" ? "success" : "primary"}
         disabled={
           props.disabled ||
           (action !== "approve" && Array.from(text.trim()).length < 10)
@@ -146,7 +183,7 @@ export function VerificationDecisionPanel(props: {
           void submit();
         }}
       >
-        Confirm {action}
+        {action === "approve" ? "Confirm approve" : `Confirm ${action}`}
       </Button>
       <StepUpDialog
         open={stepUp}
@@ -156,7 +193,7 @@ export function VerificationDecisionPanel(props: {
         }}
         onVerified={() => {
           setStepUp(false);
-          void submit();
+          void submit(stepUpAction);
         }}
       />
     </Box>
