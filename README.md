@@ -96,6 +96,7 @@ For isolated debugging, run:
 npm run dev:web
 npm run email:worker
 docker compose up --build postgres clamav cv-worker
+docker compose up -d --build postgres clamav ocr-engine cv-worker image-search-worker
 ```
 
 To evaluate production-like navigation rather than development compilation, stop the development server and run:
