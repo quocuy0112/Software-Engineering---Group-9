@@ -25,6 +25,13 @@ type SearchOcrText = Readonly<{
   warnings: readonly ("LOW_CONFIDENCE" | "PARTIAL_OCR")[];
 }>;
 
+export function searchOcrRequiresReview(input: {
+  averageConfidence: number | null;
+  partial: boolean;
+}) {
+  return input.partial || (input.averageConfidence ?? 0) < 0.6;
+}
+
 function detectLanguage(text: string): SearchOcrText["language"] {
   const vietnamese =
     /[\u0102\u0103\u0110\u0111\u0128\u0129\u0168\u0169\u01A0-\u01B0\u1EA0-\u1EF9]/u.test(
@@ -202,6 +209,7 @@ export class ImageSearchOcrStage {
         .join("\n");
       if (!text) throw new Error("OCR_LOW_CONFIDENCE");
       const lowConfidence = (recognition.summary.averageConfidence ?? 0) < 0.6;
+      const reviewRequired = searchOcrRequiresReview(recognition.summary);
       const payload: SearchOcrText = {
         schemaVersion: "search-ocr-text-v1",
         text,
@@ -246,9 +254,9 @@ export class ImageSearchOcrStage {
             },
           },
           data: {
-            status: lowConfidence ? "PARTIAL_REVIEW_REQUIRED" : "SUCCEEDED",
-            succeededUnitCount: lowConfidence ? 0 : 1,
-            reviewUnitCount: lowConfidence ? 1 : 0,
+            status: reviewRequired ? "PARTIAL_REVIEW_REQUIRED" : "SUCCEEDED",
+            succeededUnitCount: reviewRequired ? 0 : 1,
+            reviewUnitCount: reviewRequired ? 1 : 0,
             outputLineCount: recognition.summary.lineCount,
             outputUtf8Bytes: Buffer.byteLength(text, "utf8"),
             completedAt: commitNow,
@@ -264,7 +272,7 @@ export class ImageSearchOcrStage {
             unitKey: "search-image-1",
             ordinal: 0,
             kind: "SEARCH_IMAGE",
-            status: lowConfidence ? "LOW_CONFIDENCE" : "OCR_SUCCEEDED",
+            status: reviewRequired ? "LOW_CONFIDENCE" : "OCR_SUCCEEDED",
             sourceMethod: "OCR",
             anchorQuality: "NOT_APPLICABLE",
             averageConfidence: recognition.summary.averageConfidence,
@@ -292,7 +300,7 @@ export class ImageSearchOcrStage {
           },
           select: { id: true },
         });
-        if (lowConfidence) {
+        if (reviewRequired) {
           await transaction.searchImageQuery.update({
             where: { id: claim.queryId },
             data: {

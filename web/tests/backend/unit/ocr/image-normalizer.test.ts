@@ -67,7 +67,7 @@ describe("SharpImageNormalizer", () => {
       downscaled: false,
       normalizer: "sharp",
       normalizerVersion: "0.35.3",
-      rulesVersion: "search-image-normalize-v1",
+      rulesVersion: "search-image-normalize-v2",
     });
     const metadata = await sharp(result.bytes).metadata();
     expect(metadata.format).toBe("png");
@@ -75,6 +75,38 @@ describe("SharpImageNormalizer", () => {
     expect(metadata.orientation).toBeUndefined();
     expect(metadata.exif).toBeUndefined();
     expect(metadata.icc).toBeUndefined();
+  });
+
+  it("downscales large job-search screenshots without enlarging small inputs", async () => {
+    const source = await sharp({
+      create: {
+        width: 2_239,
+        height: 1_425,
+        channels: 3,
+        background: { r: 245, g: 245, b: 245 },
+      },
+    })
+      .png()
+      .toBuffer();
+    const normalizer = new SharpImageNormalizer({
+      assertCleanAssessment: async () => undefined,
+    });
+
+    const result = await normalizer.normalize(
+      request(source, {
+        declaredFormat: "png",
+        source: Readable.from([source]),
+      }),
+    );
+
+    expect(result).toMatchObject({
+      width: 1_600,
+      height: 1_018,
+      sourceDecodedPixels: 2_239 * 1_425,
+      normalizedPixels: 1_600 * 1_018,
+      downscaled: true,
+      rulesVersion: "search-image-normalize-v2",
+    });
   });
 
   it("rejects signature/decoder disagreement, trailing polyglot bytes, and decoded-pixel excess", async () => {
