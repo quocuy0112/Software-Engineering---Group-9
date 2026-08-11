@@ -9,6 +9,7 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
+import { currentAdminCsrfToken } from "../app/auth-provider";
 
 export function StepUpDialog(props: {
   open: boolean;
@@ -19,11 +20,16 @@ export function StepUpDialog(props: {
   const [failed, setFailed] = useState(false);
   async function verify() {
     setFailed(false);
+    const csrfToken = currentAdminCsrfToken();
+    if (!csrfToken) return setFailed(true);
     const response = await fetch("/api/admin/auth/step-up", {
       method: "POST",
       credentials: "same-origin",
       cache: "no-store",
-      headers: { "content-type": "application/json" },
+      headers: {
+        "content-type": "application/json",
+        "x-csrf-token": csrfToken,
+      },
       body: JSON.stringify({ code, factor: "totp" }),
     });
     if (!response.ok) return setFailed(true);

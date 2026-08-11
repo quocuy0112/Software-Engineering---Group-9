@@ -1058,6 +1058,7 @@ model EmailOutbox {
   emailChangeOldAddressFor      EmailChangeRequest?           @relation("EmailChangeOldAddressOutbox")
   passwordChangeNotificationFor PasswordChangeOperation?      @relation("PasswordChangeNotificationOutbox")
   verificationRequest           RecruiterVerificationRequest? @relation(fields: [verificationRequestId], references: [id], onDelete: SetNull)
+  securityNotificationWork      SecurityNotificationWork?
 
   @@index([status, nextAttemptAt])
   @@index([leaseExpiresAt])
@@ -1372,6 +1373,9 @@ model SecurityNotificationWork {
   nextAttemptAt            DateTime?
   deliveryDeadline         DateTime
   failureCategory          SecurityNotificationFailureCategory?
+  emailOutboxId            String?                              @unique
+  emailOutbox              EmailOutbox?                         @relation(fields: [emailOutboxId], references: [id], onDelete: SetNull)
+  opsAlertedAt             DateTime?
   leaseOwner               String?
   leaseExpiresAt           DateTime?
   createdAt                DateTime                             @default(now())

@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Alert, Box, Button, MenuItem, TextField } from "@mui/material";
 import { adminDataProvider } from "../app/data-provider";
 import { StepUpDialog } from "../auth/step-up-dialog";
+import { createAdminOperationIdController } from "../shared/admin-operation-id";
 export function VerificationDecisionPanel(props: {
   requestId: string;
   version: number;
@@ -20,6 +21,7 @@ export function VerificationDecisionPanel(props: {
   const [note, setNote] = useState("");
   const [stepUp, setStepUp] = useState(false);
   const [error, setError] = useState("");
+  const operation = useRef(createAdminOperationIdController());
   async function submit() {
     const body =
       action === "request-changes"
@@ -37,13 +39,17 @@ export function VerificationDecisionPanel(props: {
         `/api/admin/verification-requests/${encodeURIComponent(props.requestId)}/${action}`,
         body,
         props.version,
-        crypto.randomUUID(),
+        operation.current.current(),
       );
+      operation.current.complete();
       props.onDone();
     } catch (e) {
       if ((e as { body?: { code?: string } }).body?.code === "STEP_UP_REQUIRED")
         setStepUp(true);
-      else setError("The decision did not commit. Refresh current state.");
+      else {
+        if ((e as { status?: number }).status) operation.current.complete();
+        setError("The decision did not commit. Refresh current state.");
+      }
     }
   }
   if (props.state !== "PENDING_REVIEW")
@@ -57,7 +63,10 @@ export function VerificationDecisionPanel(props: {
         select
         label="Decision"
         value={action}
-        onChange={(e) => setAction(e.target.value as never)}
+        onChange={(e) => {
+          operation.current.cancel();
+          setAction(e.target.value as never);
+        }}
       >
         <MenuItem
           value="request-changes"
@@ -132,13 +141,19 @@ export function VerificationDecisionPanel(props: {
           props.disabled ||
           (action !== "approve" && Array.from(text.trim()).length < 10)
         }
-        onClick={submit}
+        onClick={() => {
+          operation.current.begin();
+          void submit();
+        }}
       >
         Confirm {action}
       </Button>
       <StepUpDialog
         open={stepUp}
-        onCancel={() => setStepUp(false)}
+        onCancel={() => {
+          operation.current.cancel();
+          setStepUp(false);
+        }}
         onVerified={() => {
           setStepUp(false);
           void submit();

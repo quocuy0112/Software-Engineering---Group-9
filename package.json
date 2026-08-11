@@ -52,6 +52,7 @@
     "admin:provision": "npm run admin:provision --workspace @smarthire/web --",
     "admin:revoke": "npm run admin:revoke --workspace @smarthire/web --",
     "admin:moderation:migration:verify": "npm run admin:moderation:migration:verify --workspace @smarthire/web",
+    "admin:notifications:reconcile": "npm run admin:notifications:reconcile --workspace @smarthire/web --",
     "image-search:storage:preflight": "npm run image-search:storage:preflight --workspace @smarthire/web",
     "ocr:corpus:evaluate": "npm run ocr:corpus:evaluate --workspace @smarthire/web",
     "perf:image-search": "npm run perf:image-search --workspace @smarthire/web",

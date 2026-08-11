@@ -24,7 +24,7 @@ type Props = {
   open: boolean;
   targetLabel: string;
   onClose: () => void;
-  onConfirm: (value: Command) => Promise<void>;
+  onConfirm: (value: Command) => Promise<boolean | void>;
 };
 
 export function SuspendMembershipDialog(props: Props) {
@@ -119,12 +119,12 @@ export function RemoveMembershipDialog(
           onClick={async () => {
             setBusy(true);
             try {
-              await props.onConfirm({
+              const committed = await props.onConfirm({
                 reasonCategory: category,
                 explanation,
                 confirmation: true,
               });
-              props.onClose();
+              if (committed !== false) props.onClose();
             } finally {
               setBusy(false);
             }

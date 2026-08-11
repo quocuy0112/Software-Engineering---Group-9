@@ -37,4 +37,24 @@ describe("Feature 006 additive migration", () => {
       ),
     ).toContain("EmailOutbox_verification_event_unique");
   });
+
+  it("adds provider-truth notification linkage without rewriting old keys", () => {
+    const providerTruthMigration = readFileSync(
+      "prisma/migrations/021_security_notification_provider_truth/migration.sql",
+      "utf8",
+    );
+    const reconciliation = readFileSync(
+      "scripts/reconcile-security-notifications.mjs",
+      "utf8",
+    );
+    expect(providerTruthMigration).toContain('ADD COLUMN "emailOutboxId"');
+    expect(providerTruthMigration).toContain('ADD COLUMN "opsAlertedAt"');
+    expect(providerTruthMigration).not.toMatch(/^\s*UPDATE\s/imu);
+    expect(reconciliation).toContain("'security-work:' || work.\"id\"");
+    expect(reconciliation).toContain("WHEN 'SENT' THEN 'DELIVERED'");
+    expect(reconciliation).toContain("NO_LEGACY_OUTBOX_MATCH");
+    expect(reconciliation).not.toMatch(
+      /SET\s+"idempotencyKey"|UPDATE\s+"EmailOutbox"/u,
+    );
+  });
 });

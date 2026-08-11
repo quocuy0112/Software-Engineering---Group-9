@@ -3,6 +3,11 @@ import type { Prisma } from "@/backend/generated/prisma/client";
 import { AuditWriter } from "@/backend/admin/audit/audit-writer";
 import { PrivilegedRationaleService } from "@/backend/admin/rationales/privileged-rationale-service";
 import { PrismaSecurityNotificationRepository } from "@/backend/repositories/admin/prisma-security-notification-repository";
+import {
+  membershipBusinessEventKey,
+  securityNotificationIdempotencyKey,
+  type AdminSecurityEventKind,
+} from "@/backend/admin/notifications/notification-events";
 export async function recordMembershipCommand(
   tx: Prisma.TransactionClient,
   input: {
@@ -12,6 +17,7 @@ export async function recordMembershipCommand(
     targetUserId: string;
     membershipId: string;
     companyId: string;
+    companyDisplayName: string;
     action:
       | "admin.membership_suspended"
       | "admin.membership_restored"
@@ -63,12 +69,30 @@ export async function recordMembershipCommand(
     },
   });
   await new PrismaSecurityNotificationRepository(tx).enqueue({
-    idempotencyKey: `security:${input.correlationId}`,
+    idempotencyKey: securityNotificationIdempotencyKey(
+      membershipBusinessEventKey(
+        input.membershipId,
+        (input.action === "admin.membership_suspended"
+          ? "MEMBERSHIP_SUSPENDED"
+          : input.action === "admin.membership_restored"
+            ? "MEMBERSHIP_RESTORED"
+            : "MEMBERSHIP_REMOVED") satisfies Extract<
+          AdminSecurityEventKind,
+          "MEMBERSHIP_SUSPENDED" | "MEMBERSHIP_RESTORED" | "MEMBERSHIP_REMOVED"
+        >,
+        input.version,
+      ),
+    ),
     originatingCorrelationId: input.correlationId,
     targetUserId: input.targetUserId,
-    kind: input.action,
+    kind:
+      input.action === "admin.membership_suspended"
+        ? "MEMBERSHIP_SUSPENDED"
+        : input.action === "admin.membership_restored"
+          ? "MEMBERSHIP_RESTORED"
+          : "MEMBERSHIP_REMOVED",
     payloadRef: {
-      companyReference: input.companyId,
+      companyDisplayName: input.companyDisplayName,
       resultingState: input.resultingState,
       occurredAt: input.occurredAt.toISOString(),
     },

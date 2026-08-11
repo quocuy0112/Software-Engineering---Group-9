@@ -1059,7 +1059,7 @@ components:
         count: { type: integer, minimum: 0 }
         unit:
           {
-            enum: [PEOPLE, ACCOUNTS, COMPANIES, MEMBERSHIPS, REQUESTS, REPORTS],
+            enum: [PEOPLE, ACCOUNTS, COMPANIES, MEMBERSHIPS, REQUESTS, REPORTS, NOTIFICATIONS],
           }
         filterKey: { type: string }
     AccountList:

@@ -6545,6 +6545,8 @@ export const SecurityNotificationWorkScalarFieldEnum = {
   nextAttemptAt: 'nextAttemptAt',
   deliveryDeadline: 'deliveryDeadline',
   failureCategory: 'failureCategory',
+  emailOutboxId: 'emailOutboxId',
+  opsAlertedAt: 'opsAlertedAt',
   leaseOwner: 'leaseOwner',
   leaseExpiresAt: 'leaseExpiresAt',
   createdAt: 'createdAt',

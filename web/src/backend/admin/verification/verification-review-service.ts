@@ -6,36 +6,12 @@ import {
 } from "@/backend/repositories/admin/prisma-admin-command-repository";
 import { AuditWriter } from "@/backend/admin/audit/audit-writer";
 import { PrismaVerificationRepository } from "@/backend/repositories/admin/prisma-verification-repository";
+import { buildVerificationOutbox } from "@/backend/admin/notifications/verification-outbox";
 type Base = {
   expectedVersion: number;
   idempotencyKey: string;
   privateNote?: string;
 };
-function notification(
-  requestId: string,
-  userId: string,
-  kind: "VERIFICATION_CHANGES_REQUESTED" | "VERIFICATION_REJECTED",
-  state: string,
-  nextAction: string,
-  now: Date,
-) {
-  return {
-    kind,
-    userId,
-    verificationRequestId: requestId,
-    recipientRef: userId,
-    templateVersion: "verification-v1",
-    payloadRef: {
-      requestId,
-      resultingState: state,
-      decisionTime: now.toISOString(),
-      nextAction,
-    },
-    idempotencyKey: `verification:${requestId}:${kind.toLowerCase()}:v1`,
-    status: "PENDING" as const,
-    nextAttemptAt: now,
-  };
-}
 export class VerificationReviewService {
   list(input: {
     page: number;
@@ -143,16 +119,21 @@ export class VerificationReviewService {
           },
         });
         await tx.emailOutbox.create({
-          data: notification(
-            row.id,
-            row.applicantUserId,
-            action === "changes"
-              ? "VERIFICATION_CHANGES_REQUESTED"
-              : "VERIFICATION_REJECTED",
+          data: buildVerificationOutbox({
+            requestId: row.id,
+            userId: row.applicantUserId,
+            eventKind:
+              action === "changes"
+                ? "VERIFICATION_CHANGES_REQUESTED"
+                : "VERIFICATION_REJECTED",
             resultingState,
-            action === "changes" ? "RESUBMIT_OR_CANCEL" : "SUBMIT_NEW_REQUEST",
-            now,
-          ),
+            resultingVersion: version,
+            occurredAt: now,
+            nextAction:
+              action === "changes"
+                ? "RESUBMIT_OR_CANCEL"
+                : "SUBMIT_NEW_REQUEST",
+          }),
         });
         return { version, state: resultingState };
       },

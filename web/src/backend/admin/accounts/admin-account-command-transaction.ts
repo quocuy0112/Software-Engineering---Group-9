@@ -3,6 +3,11 @@ import type { Prisma } from "@/backend/generated/prisma/client";
 import { AuditWriter } from "@/backend/admin/audit/audit-writer";
 import { PrivilegedRationaleService } from "@/backend/admin/rationales/privileged-rationale-service";
 import { PrismaSecurityNotificationRepository } from "@/backend/repositories/admin/prisma-security-notification-repository";
+import {
+  accountBusinessEventKey,
+  securityNotificationIdempotencyKey,
+  type AdminSecurityEventKind,
+} from "@/backend/admin/notifications/notification-events";
 
 export async function recordAccountCommand(
   tx: Prisma.TransactionClient,
@@ -20,6 +25,7 @@ export async function recordAccountCommand(
     explanation: string;
     priorState: string;
     resultingState: string;
+    resultingVersion: number;
     occurredAt: Date;
     notify: boolean;
   },
@@ -45,12 +51,26 @@ export async function recordAccountCommand(
     explanation: input.explanation,
     actionAt: input.occurredAt,
   });
-  if (input.notify)
+  if (input.notify) {
+    const eventKind: Extract<
+      AdminSecurityEventKind,
+      "ACCOUNT_SUSPENDED" | "ACCOUNT_REINSTATED" | "ALL_SESSIONS_REVOKED"
+    > =
+      input.action === "admin.account_suspended"
+        ? "ACCOUNT_SUSPENDED"
+        : input.action === "admin.account_reinstated"
+          ? "ACCOUNT_REINSTATED"
+          : "ALL_SESSIONS_REVOKED";
+    const businessEventKey = accountBusinessEventKey(
+      input.targetUserId,
+      eventKind,
+      input.resultingVersion,
+    );
     await new PrismaSecurityNotificationRepository(tx).enqueue({
-      idempotencyKey: `security:${input.correlationId}`,
+      idempotencyKey: securityNotificationIdempotencyKey(businessEventKey),
       originatingCorrelationId: input.correlationId,
       targetUserId: input.targetUserId,
-      kind: input.action,
+      kind: eventKind,
       payloadRef: {
         resultingState: input.resultingState,
         occurredAt: input.occurredAt.toISOString(),
@@ -60,4 +80,5 @@ export async function recordAccountCommand(
       nextAttemptAt: input.occurredAt,
       deliveryDeadline: new Date(input.occurredAt.getTime() + 24 * 60 * 60_000),
     });
+  }
 }

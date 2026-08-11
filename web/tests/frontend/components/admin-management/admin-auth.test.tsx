@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AdminTwoFactorPage } from "@/frontend/features/admin/auth/admin-two-factor-page";
 import { StepUpDialog } from "@/frontend/features/admin/auth/step-up-dialog";
+import { adminAuthProvider } from "@/frontend/features/admin/app/auth-provider";
 describe("admin authentication UI", () => {
   afterEach(() => vi.restoreAllMocks());
   it("names the initial factor input and designation action", () => {
@@ -46,5 +47,26 @@ describe("admin authentication UI", () => {
       screen.getByRole("dialog", { name: "Confirm sensitive action" }),
     ).toBeVisible();
     expect(screen.getByRole("button", { name: "Verify" })).toBeDisabled();
+  });
+  it("binds sensitive-action step-up to the authenticated CSRF proof", async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(
+        Response.json({ accountId: "admin-1", csrfToken: "csrf-proof" }),
+      )
+      .mockResolvedValueOnce(Response.json({ verified: true }));
+    await adminAuthProvider.checkAuth?.({});
+    const onVerified = vi.fn();
+    render(<StepUpDialog open onCancel={vi.fn()} onVerified={onVerified} />);
+    fireEvent.change(
+      screen.getByRole("textbox", { name: /Six-digit authenticator code/u }),
+      { target: { value: "123456" } },
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Verify" }));
+    await waitFor(() => expect(onVerified).toHaveBeenCalledTimes(1));
+    const stepUpInit = fetchMock.mock.calls[1]?.[1];
+    expect(new Headers(stepUpInit?.headers).get("x-csrf-token")).toBe(
+      "csrf-proof",
+    );
   });
 });
