@@ -33,6 +33,7 @@ export type NormalizedJobSearch = {
   postedWithinDays?: number;
   sort: "RELEVANCE" | "NEWEST" | "SALARY_DESC";
   cursor?: import("./search-normalization").JobSearchCursor;
+  page?: number;
   limit: number;
 };
 export type {

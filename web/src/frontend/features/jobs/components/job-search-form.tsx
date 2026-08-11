@@ -221,6 +221,7 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const drawer = useRef<HTMLElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
+  const form = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -259,6 +260,32 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
       returnTarget?.focus();
     };
   }, [mobileOpen]);
+
+  useEffect(() => {
+    const filterColumn =
+      form.current?.closest<HTMLElement>(".job-filter-column");
+    if (!filterColumn) return;
+
+    const scrollFilterColumn = (event: WheelEvent) => {
+      const maximumScrollTop =
+        filterColumn.scrollHeight - filterColumn.clientHeight;
+      if (!event.deltaY || maximumScrollTop <= 0) return;
+
+      const nextScrollTop = Math.max(
+        0,
+        Math.min(maximumScrollTop, filterColumn.scrollTop + event.deltaY),
+      );
+      if (nextScrollTop === filterColumn.scrollTop) return;
+
+      event.preventDefault();
+      filterColumn.scrollTop = nextScrollTop;
+    };
+
+    filterColumn.addEventListener("wheel", scrollFilterColumn, {
+      passive: false,
+    });
+    return () => filterColumn.removeEventListener("wheel", scrollFilterColumn);
+  }, []);
 
   return (
     <div className="job-filter-shell" data-mobile-open={mobileOpen}>
@@ -312,6 +339,7 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
         tabIndex={mobileOpen ? -1 : undefined}
       >
         <form
+          ref={form}
           className="job-panel job-filter-form"
           role="search"
           aria-label={vi ? "Tìm kiếm việc làm" : "Job search"}

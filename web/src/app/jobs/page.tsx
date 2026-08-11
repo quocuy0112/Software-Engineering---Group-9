@@ -12,6 +12,21 @@ type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
+function pageNumbers(currentPage: number, totalPages: number) {
+  const first = Math.max(1, currentPage - 1);
+  const last = Math.min(totalPages, currentPage + 1);
+  return Array.from({ length: last - first + 1 }, (_, index) => first + index);
+}
+
+function pageHref(params: URLSearchParams, page: number) {
+  const next = new URLSearchParams(params);
+  next.delete("cursor");
+  next.delete("page");
+  if (page > 1) next.set("page", String(page));
+  const search = next.toString();
+  return search ? `/jobs?${search}` : "/jobs";
+}
+
 function query(input: Record<string, string | string[] | undefined>) {
   const array = (name: string) => {
     const value = input[name];
@@ -43,6 +58,7 @@ function query(input: Record<string, string | string[] | undefined>) {
       : input.postedWithinDays,
     sort: Array.isArray(input.sort) ? input.sort[0] : input.sort,
     cursor: Array.isArray(input.cursor) ? input.cursor[0] : input.cursor,
+    page: Array.isArray(input.page) ? input.page[0] : input.page,
     limit: Array.isArray(input.limit) ? input.limit[0] : input.limit,
   };
 }
@@ -69,7 +85,11 @@ export default async function JobsPage({ searchParams }: PageProps) {
         tryAgain: "Không thể tải danh sách lúc này",
         clearRetry: "Xóa bộ lọc và thử lại",
         retry: "Thử tải lại",
-        loadMore: "Xem thêm việc làm",
+        firstPage: "Trang đầu",
+        previousPage: "Trang trước",
+        nextPage: "Trang sau",
+        lastPage: "Trang cuối",
+        page: "Trang",
         empty: "Không có việc làm phù hợp",
         emptyCopy:
           "Hãy nới rộng địa điểm, mức lương hoặc thời gian đăng để xem thêm cơ hội.",
@@ -94,7 +114,11 @@ export default async function JobsPage({ searchParams }: PageProps) {
         tryAgain: "The job list is temporarily unavailable",
         clearRetry: "Clear filters and retry",
         retry: "Try loading again",
-        loadMore: "Load more jobs",
+        firstPage: "First page",
+        previousPage: "Previous page",
+        nextPage: "Next page",
+        lastPage: "Last page",
+        page: "Page",
         empty: "No jobs match these criteria",
         emptyCopy:
           "Try widening the location, salary, or posted-date range to see more opportunities.",
@@ -141,16 +165,14 @@ export default async function JobsPage({ searchParams }: PageProps) {
       error = "Jobs could not be loaded. Try again in a moment.";
     }
   }
-  const next = new URLSearchParams();
+  const paginationParams = new URLSearchParams();
   for (const [key, value] of Object.entries(raw)) {
     for (const item of Array.isArray(value) ? value : value ? [value] : [])
-      next.append(key, item);
+      paginationParams.append(key, item);
   }
-  if (result?.nextCursor) next.set("cursor", result.nextCursor);
   return (
     <div className="jobs-page">
       <div className="jobs-fixed-region">
-        <JobsWorkspaceNav activeTab="search" />
         <header className="page-heading jobs-heading">
           <div>
             <p className="workspace-kicker">{copy.kicker}</p>
@@ -167,6 +189,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
             </span>
           ) : null}
         </header>
+        <JobsWorkspaceNav activeTab="search" />
       </div>
 
       <div className="jobs-grid">
@@ -176,19 +199,9 @@ export default async function JobsPage({ searchParams }: PageProps) {
 
         <section className="job-results" aria-labelledby="job-results-heading">
           <header className="job-results-header">
-            <div>
-              <p className="panel-kicker">{copy.results}</p>
-              <h2 id="job-results-heading">
-                {error
-                  ? copy.loadFailed
-                  : `${result?.total ?? 0} ${copy.opportunities}`}
-              </h2>
-            </div>
-            {!error && result ? (
-              <p aria-live="polite">
-                {copy.showing} {result.items.length} {copy.of} {result.total}
-              </p>
-            ) : null}
+            <p className="panel-kicker" id="job-results-heading">
+              {error ? copy.loadFailed : copy.results}
+            </p>
           </header>
 
           {error ? (
@@ -216,7 +229,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
                 href={
                   Object.keys(fieldErrors).length
                     ? "/jobs"
-                    : `/jobs?${next.toString()}`
+                    : pageHref(paginationParams, 1)
                 }
               >
                 {Object.keys(fieldErrors).length ? copy.clearRetry : copy.retry}
@@ -225,10 +238,127 @@ export default async function JobsPage({ searchParams }: PageProps) {
           ) : result && result.items.length ? (
             <>
               <JobResultsList jobs={result.items} />
-              {result.nextCursor ? (
-                <div className="job-pagination">
-                  <Link href={`/jobs?${next.toString()}`}>{copy.loadMore}</Link>
-                </div>
+              {result.totalPages > 1 ? (
+                <nav className="job-pagination" aria-label="Job result pages">
+                  {result.page === 1 ? (
+                    <span
+                      className="job-pagination-control is-disabled"
+                      aria-disabled="true"
+                    >
+                      <span aria-hidden="true">«</span>
+                      <span className="job-pagination-control-label">
+                        {copy.firstPage}
+                      </span>
+                    </span>
+                  ) : (
+                    <Link
+                      className="job-pagination-control"
+                      href={pageHref(paginationParams, 1)}
+                      aria-label={copy.firstPage}
+                    >
+                      <span aria-hidden="true">«</span>
+                      <span className="job-pagination-control-label">
+                        {copy.firstPage}
+                      </span>
+                    </Link>
+                  )}
+                  {result.page === 1 ? (
+                    <span
+                      className="job-pagination-control is-disabled"
+                      aria-disabled="true"
+                    >
+                      <span aria-hidden="true">‹</span>
+                      <span className="job-pagination-control-label">
+                        {copy.previousPage}
+                      </span>
+                    </span>
+                  ) : (
+                    <Link
+                      className="job-pagination-control"
+                      href={pageHref(paginationParams, result.page - 1)}
+                      aria-label={copy.previousPage}
+                    >
+                      <span aria-hidden="true">‹</span>
+                      <span className="job-pagination-control-label">
+                        {copy.previousPage}
+                      </span>
+                    </Link>
+                  )}
+                  <div className="job-pagination-pages">
+                    <ol>
+                      {pageNumbers(result.page, result.totalPages).map(
+                        (page) => (
+                          <li key={page}>
+                            {page === result.page ? (
+                              <span
+                                className="job-pagination-page is-current"
+                                aria-current="page"
+                                aria-label={`${copy.page} ${page}`}
+                              >
+                                {page}
+                              </span>
+                            ) : (
+                              <Link
+                                className="job-pagination-page"
+                                href={pageHref(paginationParams, page)}
+                                aria-label={`${copy.page} ${page}`}
+                              >
+                                {page}
+                              </Link>
+                            )}
+                          </li>
+                        ),
+                      )}
+                    </ol>
+                  </div>
+                  {result.page === result.totalPages ? (
+                    <span
+                      className="job-pagination-control is-disabled"
+                      aria-disabled="true"
+                    >
+                      <span className="job-pagination-control-label">
+                        {copy.nextPage}
+                      </span>
+                      <span aria-hidden="true">›</span>
+                    </span>
+                  ) : (
+                    <Link
+                      className="job-pagination-control"
+                      href={pageHref(paginationParams, result.page + 1)}
+                      aria-label={copy.nextPage}
+                    >
+                      <span className="job-pagination-control-label">
+                        {copy.nextPage}
+                      </span>
+                      <span aria-hidden="true">›</span>
+                    </Link>
+                  )}
+                  {result.page === result.totalPages ? (
+                    <span
+                      className="job-pagination-control is-disabled"
+                      aria-disabled="true"
+                    >
+                      <span className="job-pagination-control-label">
+                        {copy.lastPage}
+                      </span>
+                      <span aria-hidden="true">»</span>
+                    </span>
+                  ) : (
+                    <Link
+                      className="job-pagination-control"
+                      href={pageHref(paginationParams, result.totalPages)}
+                      aria-label={copy.lastPage}
+                    >
+                      <span className="job-pagination-control-label">
+                        {copy.lastPage}
+                      </span>
+                      <span aria-hidden="true">»</span>
+                    </Link>
+                  )}
+                  <p className="job-pagination-progress" aria-live="polite">
+                    {copy.page} {result.page} / {result.totalPages}
+                  </p>
+                </nav>
               ) : null}
             </>
           ) : (

@@ -196,6 +196,9 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
       ? Prisma.sql`(similarity(j."normalizedTitle", ${query}) * 3 + similarity(j."searchDocumentNormalized", ${query}))`
       : Prisma.sql`0::double precision`;
     const cursor = cursorClause(input, score);
+    const offset = cursor
+      ? Prisma.empty
+      : Prisma.sql`OFFSET ${((input.page ?? 1) - 1) * input.limit}`;
     const where = Prisma.join(clauses, " AND ");
     const order =
       input.sort === "SALARY_DESC"
@@ -212,6 +215,7 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
         WHERE ${where} ${cursor ? Prisma.sql`AND ${cursor}` : Prisma.empty}
         ORDER BY ${order}
         LIMIT ${input.limit + 1}
+        ${offset}
       `),
       prisma.$queryRaw<Array<{ count: number }>>(Prisma.sql`
         SELECT COUNT(*)::int AS count FROM "JobPosting" j WHERE ${where}
