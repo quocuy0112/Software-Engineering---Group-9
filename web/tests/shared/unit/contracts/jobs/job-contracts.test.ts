@@ -119,6 +119,8 @@ describe("job board transport contracts", () => {
         items: [card],
         total: 1,
         nextCursor: null,
+        page: 1,
+        totalPages: 1,
         criteria: {},
       }).items[0]?.title,
     ).toBe("Lập trình viên");

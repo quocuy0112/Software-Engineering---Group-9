@@ -131,6 +131,7 @@ export function parseJobSearchCriteria(raw: unknown): NormalizedJobSearch {
     cursor: parsed.cursor
       ? decodeJobCursor(parsed.cursor, parsed.sort)
       : undefined,
+    page: parsed.page,
     limit: parsed.limit,
   };
 }
@@ -314,6 +315,8 @@ export class JobDiscoveryService {
       items: result.rows.map((row) => card(row, actor, now)),
       total: result.total,
       nextCursor: result.nextCursor,
+      page: criteria.page ?? 1,
+      totalPages: Math.ceil(result.total / criteria.limit),
       criteria: {
         q: criteria.normalizedQuery,
         searchBy: criteria.searchBy,
@@ -328,6 +331,7 @@ export class JobDiscoveryService {
         salaryPeriod: criteria.salaryPeriod,
         postedWithinDays: criteria.postedWithinDays,
         sort: criteria.sort,
+        page: criteria.page ?? 1,
         limit: criteria.limit,
       },
     };

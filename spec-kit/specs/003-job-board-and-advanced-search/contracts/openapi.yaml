@@ -90,6 +90,9 @@ paths:
         - name: cursor
           in: query
           schema: { type: string, maxLength: 1024 }
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 10000, default: 1 }
         - name: limit
           in: query
           schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
@@ -395,7 +398,7 @@ components:
     JobSearchResponse:
       type: object
       additionalProperties: false
-      required: [items, total, nextCursor, criteria]
+      required: [items, total, nextCursor, page, totalPages, criteria]
       properties:
         items:
           type: array
@@ -403,6 +406,8 @@ components:
           items: { $ref: "#/components/schemas/JobCard" }
         total: { type: integer, minimum: 0 }
         nextCursor: { type: [string, "null"] }
+        page: { type: integer, minimum: 1 }
+        totalPages: { type: integer, minimum: 0 }
         criteria:
           type: object
           additionalProperties: true

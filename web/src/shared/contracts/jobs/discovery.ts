@@ -72,6 +72,10 @@ export const jobSearchQuerySchema = z
       omitEmptyControlValue,
       z.string().max(1024).optional(),
     ),
+    page: z.preprocess(
+      omitEmptyControlValue,
+      z.coerce.number().int().min(1).max(10_000).default(1),
+    ),
     limit: z.preprocess(
       omitEmptyControlValue,
       z.coerce.number().int().min(1).max(50).default(20),
@@ -180,6 +184,8 @@ export const jobSearchResponseSchema = z
     items: z.array(jobCardSchema).max(50),
     total: z.number().int().nonnegative(),
     nextCursor: z.string().nullable(),
+    page: z.number().int().positive(),
+    totalPages: z.number().int().nonnegative(),
     criteria: z.record(z.string(), z.unknown()),
   })
   .strict();
