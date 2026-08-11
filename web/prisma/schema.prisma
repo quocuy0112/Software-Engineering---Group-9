@@ -84,6 +84,13 @@ enum EmailKind {
   PASSWORD_CHANGED
   SECURITY_ALERT
   APPLICATION_STAGE_CHANGED
+  VERIFICATION_RECEIVED
+  VERIFICATION_CHANGES_REQUESTED
+  VERIFICATION_APPROVED
+  VERIFICATION_REJECTED
+  VERIFICATION_CANCELLED
+  VERIFICATION_DELAYED
+  VERIFICATION_EXPIRED
 }
 
 enum PreferenceLanguage {
@@ -225,6 +232,111 @@ enum CompanyMembershipRole {
 enum CompanyMembershipStatus {
   ACTIVE
   SUSPENDED
+  REMOVED
+}
+
+enum AdministratorGrantState {
+  ACTIVE
+  SUSPENDED
+  REVOKED
+  EXPIRED
+}
+
+enum CompanyVerificationState {
+  UNVERIFIED
+  ACTIVE
+  INACTIVE
+}
+
+enum RecruiterVerificationState {
+  PENDING_CHECKS
+  PENDING_REVIEW
+  CHANGES_REQUESTED
+  RESUBMITTED
+  APPROVED
+  REJECTED
+  CANCELLED
+  EXPIRED
+}
+
+enum VerificationCheckState {
+  PENDING
+  PASS
+  FAIL
+  INDETERMINATE
+}
+
+enum VerificationDecisionKind {
+  REQUEST_CHANGES
+  APPROVE
+  REJECT
+}
+
+enum CompanyAccessPrerequisiteKind {
+  INVITATION
+  OWNER_APPROVAL
+}
+
+enum CompanyAccessPrerequisiteState {
+  AVAILABLE
+  USED
+  REVOKED
+  EXPIRED
+}
+
+enum AdminReasonCategory {
+  SECURITY_COMPROMISE
+  POLICY_VIOLATION
+  USER_REQUEST
+  VERIFICATION_FAILURE
+  INCIDENT_RESOLVED
+  ACCESS_CLEANUP
+  OTHER
+}
+
+enum SecurityNotificationStatus {
+  PENDING
+  RETRYING
+  DELIVERED
+  MANUAL_INTERVENTION_REQUIRED
+}
+
+enum SecurityNotificationFailureCategory {
+  DESTINATION_REJECTED
+  DESTINATION_DISABLED
+  CONTENT_INVALID
+  POLICY_REFUSED
+  TEMPORARY_UNAVAILABLE
+  ATTEMPTS_EXHAUSTED
+}
+
+enum ModerationTargetType {
+  JOB
+  COMPANY
+  MEMBERSHIP
+  CANDIDATE
+}
+
+enum ModerationReportCategory {
+  FRAUD_OR_IMPERSONATION
+  MISLEADING_CONTENT
+  DISCRIMINATION_OR_HARASSMENT
+  ABUSE_OR_THREATS
+  SPAM_OR_DUPLICATE
+  PRIVACY_OR_DATA_MISUSE
+  OTHER
+}
+
+enum ModerationPriority {
+  NORMAL
+  HIGH
+  CRITICAL
+}
+
+enum ModerationReportState {
+  PENDING_REVIEW
+  RESOLVED
+  DISMISSED
 }
 
 enum ApplicationStageActorType {
@@ -474,6 +586,7 @@ model UserAccount {
   emailVerified                 Boolean                        @default(false)
   image                         String?
   state                         AccountState                   @default(PENDING_VERIFICATION)
+  version                       Int                            @default(1)
   twoFactorEnabled              Boolean                        @default(false)
   stateChangedAt                DateTime                       @default(now())
   deletedAt                     DateTime?
@@ -509,6 +622,9 @@ model UserAccount {
   imageSearchQueries            SearchImageQuery[]
   imageSearchConsents           SearchProcessingConsent[]
   companyMemberships            CompanyMembership[]
+  platformAdministratorGrants   PlatformAdministratorGrant[]
+  recruiterVerificationRequests RecruiterVerificationRequest[]
+  submittedModerationReports    ModerationReport[]             @relation("ModerationReporter")
 
   @@index([state, id])
   @@map("user")
@@ -536,19 +652,20 @@ model AuthProviderAccount {
 }
 
 model Session {
-  id                String      @id
-  token             String      @unique
-  userId            String
-  expiresAt         DateTime
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
-  ipAddress         String?
-  userAgent         String?
-  lastActivityAt    DateTime    @default(now())
-  absoluteExpiresAt DateTime
-  revokedAt         DateTime?
-  revocationReason  String?
-  user              UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                    String                       @id
+  token                 String                       @unique
+  userId                String
+  expiresAt             DateTime
+  createdAt             DateTime                     @default(now())
+  updatedAt             DateTime                     @updatedAt
+  ipAddress             String?
+  userAgent             String?
+  lastActivityAt        DateTime                     @default(now())
+  absoluteExpiresAt     DateTime
+  revokedAt             DateTime?
+  revocationReason      String?
+  user                  UserAccount                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  administratorPolicies AdministratorSessionPolicy[]
 
   @@index([userId, expiresAt])
   @@index([userId, lastActivityAt])
@@ -915,33 +1032,36 @@ model RateLimitBucket {
 }
 
 model EmailOutbox {
-  id                            String                   @id @default(cuid())
+  id                            String                        @id @default(cuid())
   kind                          EmailKind
   userId                        String?
   securityTokenId               String?
+  verificationRequestId         String?
   recipientRef                  String
   recipientCiphertext           String?
   recipientPurpose              String?
   templateVersion               String
   payloadRef                    Json
-  idempotencyKey                String                   @unique
-  status                        OutboxStatus             @default(PENDING)
-  attempts                      Int                      @default(0)
+  idempotencyKey                String                        @unique
+  status                        OutboxStatus                  @default(PENDING)
+  attempts                      Int                           @default(0)
   leaseOwner                    String?
   leaseExpiresAt                DateTime?
-  nextAttemptAt                 DateTime                 @default(now())
+  nextAttemptAt                 DateTime                      @default(now())
   providerMessageId             String?
   safeErrorCode                 String?
-  createdAt                     DateTime                 @default(now())
-  updatedAt                     DateTime                 @updatedAt
-  user                          UserAccount?             @relation(fields: [userId], references: [id], onDelete: SetNull)
-  securityToken                 SecurityToken?           @relation(fields: [securityTokenId], references: [id], onDelete: SetNull)
-  emailChangeVerificationFor    EmailChangeRequest?      @relation("EmailChangeVerificationOutbox")
-  emailChangeOldAddressFor      EmailChangeRequest?      @relation("EmailChangeOldAddressOutbox")
-  passwordChangeNotificationFor PasswordChangeOperation? @relation("PasswordChangeNotificationOutbox")
+  createdAt                     DateTime                      @default(now())
+  updatedAt                     DateTime                      @updatedAt
+  user                          UserAccount?                  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  securityToken                 SecurityToken?                @relation(fields: [securityTokenId], references: [id], onDelete: SetNull)
+  emailChangeVerificationFor    EmailChangeRequest?           @relation("EmailChangeVerificationOutbox")
+  emailChangeOldAddressFor      EmailChangeRequest?           @relation("EmailChangeOldAddressOutbox")
+  passwordChangeNotificationFor PasswordChangeOperation?      @relation("PasswordChangeNotificationOutbox")
+  verificationRequest           RecruiterVerificationRequest? @relation(fields: [verificationRequestId], references: [id], onDelete: SetNull)
 
   @@index([status, nextAttemptAt])
   @@index([leaseExpiresAt])
+  @@index([verificationRequestId, kind])
 }
 
 model AuditEvent {
@@ -967,40 +1087,365 @@ model AuditEvent {
 }
 
 model Company {
-  id                String              @id @default(cuid())
-  slug              String              @unique
-  legalName         String
-  displayName       String
-  logoUrl           String?
-  websiteUrl        String?
-  publicDescription String?
-  publicLocation    String?
-  size              String?
-  industry          String?
-  address           String?
-  verifiedAt        DateTime?
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  jobPostings       JobPosting[]
-  memberships       CompanyMembership[]
+  id                            String                         @id @default(cuid())
+  slug                          String                         @unique
+  legalName                     String
+  displayName                   String
+  logoUrl                       String?
+  websiteUrl                    String?
+  publicDescription             String?
+  publicLocation                String?
+  size                          String?
+  industry                      String?
+  address                       String?
+  verifiedAt                    DateTime?
+  normalizedTaxIdentifier       String?                        @unique
+  verificationState             CompanyVerificationState       @default(UNVERIFIED)
+  verificationInactiveAt        DateTime?
+  createdAt                     DateTime                       @default(now())
+  updatedAt                     DateTime                       @updatedAt
+  jobPostings                   JobPosting[]
+  memberships                   CompanyMembership[]
+  recruiterVerificationRequests RecruiterVerificationRequest[]
+  accessPrerequisites           CompanyAccessPrerequisite[]
 
   @@index([verifiedAt, id])
 }
 
 model CompanyMembership {
-  id        String                  @id @default(cuid())
-  companyId String
-  userId    String
-  role      CompanyMembershipRole
-  status    CompanyMembershipStatus @default(ACTIVE)
-  createdAt DateTime                @default(now())
-  updatedAt DateTime                @updatedAt
-  company   Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  user      UserAccount             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String                     @id @default(cuid())
+  companyId         String
+  userId            String
+  role              CompanyMembershipRole
+  status            CompanyMembershipStatus    @default(ACTIVE)
+  priorApprovedRole CompanyMembershipRole?
+  version           Int                        @default(1)
+  stateChangedAt    DateTime                   @default(now())
+  removedAt         DateTime?
+  createdAt         DateTime                   @default(now())
+  updatedAt         DateTime                   @updatedAt
+  company           Company                    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user              UserAccount                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  history           CompanyMembershipHistory[]
 
   @@unique([companyId, userId])
   @@index([userId, status])
   @@index([companyId, role, status])
+}
+
+model PlatformAdministratorGrant {
+  id             String                      @id @default(cuid())
+  userId         String
+  state          AdministratorGrantState     @default(ACTIVE)
+  expiresAt      DateTime?
+  stateChangedAt DateTime                    @default(now())
+  version        Int                         @default(1)
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime                    @updatedAt
+  user           UserAccount                 @relation(fields: [userId], references: [id], onDelete: Restrict)
+  sessionPolicy  AdministratorSessionPolicy?
+
+  @@unique([userId])
+  @@index([state, expiresAt])
+}
+
+model AdministratorSessionPolicy {
+  grantId                String                     @id
+  designatedSessionId    String?                    @unique
+  initialTwoFactorAt     DateTime?
+  latestTwoFactorProofAt DateTime?
+  designationVersion     Int                        @default(0)
+  createdAt              DateTime                   @default(now())
+  updatedAt              DateTime                   @updatedAt
+  grant                  PlatformAdministratorGrant @relation(fields: [grantId], references: [id], onDelete: Cascade)
+  designatedSession      Session?                   @relation(fields: [designatedSessionId], references: [id], onDelete: SetNull)
+
+  @@index([latestTwoFactorProofAt])
+}
+
+model CompanyMembershipHistory {
+  id              String                  @id @default(cuid())
+  membershipId    String
+  actorUserId     String
+  priorStatus     CompanyMembershipStatus
+  resultingStatus CompanyMembershipStatus
+  priorRole       CompanyMembershipRole
+  resultingRole   CompanyMembershipRole
+  version         Int
+  correlationId   String
+  occurredAt      DateTime                @default(now())
+  membership      CompanyMembership       @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+
+  @@unique([membershipId, version])
+  @@index([actorUserId, occurredAt])
+}
+
+model CompanyAccessPrerequisite {
+  id                          String                         @id @default(cuid())
+  kind                        CompanyAccessPrerequisiteKind
+  state                       CompanyAccessPrerequisiteState @default(AVAILABLE)
+  requestId                   String?
+  applicantUserId             String
+  companyId                   String
+  role                        CompanyMembershipRole
+  approvedByOwnerMembershipId String?
+  expiresAt                   DateTime?
+  usedAt                      DateTime?
+  usedByRequestId             String?
+  version                     Int                            @default(1)
+  createdAt                   DateTime                       @default(now())
+  updatedAt                   DateTime                       @updatedAt
+  company                     Company                        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, applicantUserId, state])
+  @@index([requestId])
+}
+
+model RecruiterVerificationRequest {
+  id                       String                        @id @default(cuid())
+  applicantUserId          String
+  submittedCompanyName     String
+  normalizedTaxIdentifier  String
+  targetCompanyId          String?
+  requestedRole            CompanyMembershipRole
+  prerequisiteId           String?
+  state                    RecruiterVerificationState    @default(PENDING_CHECKS)
+  currentEvidenceId        String?
+  currentSubmissionVersion Int                           @default(1)
+  resubmissionCount        Int                           @default(0)
+  assignedAdminUserId      String?
+  changesRequestedAt       DateTime?
+  delayedAt                DateTime?
+  expiredAt                DateTime?
+  cancelledAt              DateTime?
+  decidedAt                DateTime?
+  viewerUnavailableSince   DateTime?
+  viewerEscalatedAt        DateTime?
+  viewerDelayNotifiedAt    DateTime?
+  version                  Int                           @default(1)
+  createdAt                DateTime                      @default(now())
+  updatedAt                DateTime                      @updatedAt
+  applicant                UserAccount                   @relation(fields: [applicantUserId], references: [id], onDelete: Restrict)
+  targetCompany            Company?                      @relation(fields: [targetCompanyId], references: [id], onDelete: Restrict)
+  evidence                 BusinessLicenseEvidence[]
+  safetyAttempts           VerificationSafetyAttempt[]
+  decisions                VerificationDecisionHistory[]
+  notes                    VerificationPrivateNote[]
+  notifications            EmailOutbox[]
+
+  @@index([state, createdAt, id])
+  @@index([normalizedTaxIdentifier, state])
+  @@index([applicantUserId, normalizedTaxIdentifier, state])
+  @@index([assignedAdminUserId, state])
+}
+
+model BusinessLicenseEvidence {
+  id                    String                       @id @default(cuid())
+  requestId             String
+  submissionVersion     Int
+  declaredMediaType     String
+  detectedMediaType     String?
+  byteSize              Int
+  sourceSha256          String
+  storageAdapter        String
+  storageLocator        String
+  encryptionKeyVersion  Int
+  iv                    String
+  authenticationTag     String
+  malwareStatus         VerificationCheckState       @default(PENDING)
+  typeStatus            VerificationCheckState       @default(PENDING)
+  structureStatus       VerificationCheckState       @default(PENDING)
+  previewStatus         VerificationCheckState       @default(PENDING)
+  reviewableAt          DateTime?
+  contentInaccessibleAt DateTime?
+  deleteAfter           DateTime?
+  deletedAt             DateTime?
+  supersededAt          DateTime?
+  processingLeaseOwner  String?
+  processingLeaseExpiry DateTime?
+  createdAt             DateTime                     @default(now())
+  updatedAt             DateTime                     @updatedAt
+  request               RecruiterVerificationRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@unique([requestId, submissionVersion])
+  @@index([deleteAfter, deletedAt])
+  @@index([processingLeaseExpiry])
+}
+
+model VerificationSafetyAttempt {
+  id              String                       @id @default(cuid())
+  requestId       String
+  evidenceId      String
+  malwareStatus   VerificationCheckState
+  typeStatus      VerificationCheckState
+  structureStatus VerificationCheckState
+  previewStatus   VerificationCheckState
+  policyVersions  Json
+  safeFailureCode String?
+  attemptCount    Int                          @default(0)
+  leaseOwner      String?
+  leaseExpiresAt  DateTime?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime                     @default(now())
+  updatedAt       DateTime                     @updatedAt
+  request         RecruiterVerificationRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([leaseExpiresAt])
+  @@index([requestId, evidenceId])
+}
+
+model VerificationDecisionHistory {
+  id                String                       @id @default(cuid())
+  requestId         String
+  submissionVersion Int
+  actorAdminUserId  String
+  priorState        RecruiterVerificationState
+  resultingState    RecruiterVerificationState
+  decisionKind      VerificationDecisionKind
+  rejectionCategory String?
+  approvedRole      CompanyMembershipRole?
+  result            AuditResult
+  correlationId     String
+  decidedAt         DateTime                     @default(now())
+  request           RecruiterVerificationRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId, decidedAt])
+  @@index([actorAdminUserId, decidedAt])
+}
+
+model VerificationPrivateNote {
+  id                String                       @id @default(cuid())
+  requestId         String
+  authorAdminUserId String
+  normalizedText    String
+  createdAt         DateTime                     @default(now())
+  request           RecruiterVerificationRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId, createdAt])
+}
+
+model PrivilegedActionRationale {
+  id                   String    @id @default(cuid())
+  correlationId        String    @unique
+  ciphertext           String
+  iv                   String
+  authenticationTag    String
+  encryptionKeyVersion Int
+  inaccessibleAt       DateTime
+  deleteAfter          DateTime
+  deletedAt            DateTime?
+  deleteAttempts       Int       @default(0)
+  safeFailureCode      String?
+  createdAt            DateTime  @default(now())
+
+  @@index([deleteAfter, deletedAt])
+}
+
+model AdminCommandReceipt {
+  id                   String   @id @default(cuid())
+  actorSubjectDigest   String
+  commandKind          String
+  targetReference      String
+  idempotencyKey       String
+  normalizedBodyDigest String
+  resultCode           String
+  resultingVersion     Int?
+  correlationId        String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@unique([actorSubjectDigest, idempotencyKey])
+  @@index([correlationId])
+}
+
+model SecurityNotificationWork {
+  id                       String                               @id @default(cuid())
+  idempotencyKey           String                               @unique
+  originatingCorrelationId String
+  targetUserId             String
+  kind                     String
+  payloadRef               Json
+  status                   SecurityNotificationStatus           @default(PENDING)
+  attemptCount             Int                                  @default(0)
+  lastAttemptAt            DateTime?
+  nextAttemptAt            DateTime?
+  deliveryDeadline         DateTime
+  failureCategory          SecurityNotificationFailureCategory?
+  leaseOwner               String?
+  leaseExpiresAt           DateTime?
+  createdAt                DateTime                             @default(now())
+  updatedAt                DateTime                             @updatedAt
+
+  @@index([status, nextAttemptAt])
+  @@index([deliveryDeadline])
+  @@index([originatingCorrelationId])
+}
+
+model AdminDashboardSnapshot {
+  id                     String   @id @default(cuid())
+  calculatedAt           DateTime
+  expiresAt              DateTime
+  stateDefinitionVersion String
+  metrics                Json
+  createdAt              DateTime @default(now())
+
+  @@index([expiresAt, calculatedAt(sort: Desc)])
+}
+
+model ModerationReport {
+  id                     String                    @id @default(cuid())
+  reporterUserId         String
+  targetType             ModerationTargetType
+  targetReference        String
+  companyReference       String?
+  jobReference           String?
+  applicationReference   String?
+  qualifyingRelationship Json
+  category               ModerationReportCategory
+  normalizedDetail       String?
+  priority               ModerationPriority        @default(NORMAL)
+  state                  ModerationReportState     @default(PENDING_REVIEW)
+  assignedAdminUserId    String?
+  unresolvedKey          String?                   @unique
+  version                Int                       @default(1)
+  terminalAt             DateTime?
+  createdAt              DateTime                  @default(now())
+  updatedAt              DateTime                  @updatedAt
+  reporter               UserAccount               @relation("ModerationReporter", fields: [reporterUserId], references: [id], onDelete: Restrict)
+  history                ModerationReportHistory[]
+  notes                  ModerationPrivateNote[]
+
+  @@index([state, priority, createdAt, id])
+  @@index([reporterUserId, createdAt(sort: Desc)])
+  @@index([targetType, targetReference])
+}
+
+model ModerationReportHistory {
+  id                       String                @id @default(cuid())
+  reportId                 String
+  actorAdminUserId         String
+  action                   String
+  priorState               ModerationReportState
+  resultingState           ModerationReportState
+  resultingVersion         Int
+  enforcementCorrelationId String?
+  occurredAt               DateTime              @default(now())
+  report                   ModerationReport      @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@unique([reportId, resultingVersion])
+  @@index([actorAdminUserId, occurredAt])
+}
+
+model ModerationPrivateNote {
+  id                String           @id @default(cuid())
+  reportId          String
+  authorAdminUserId String
+  normalizedText    String
+  createdAt         DateTime         @default(now())
+  report            ModerationReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId, createdAt])
 }
 
 model JobPosting {

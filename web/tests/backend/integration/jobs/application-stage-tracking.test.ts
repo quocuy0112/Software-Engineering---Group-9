@@ -47,6 +47,7 @@ describe.skipIf(!databaseAvailable)(
           companyId: fixture.company.id,
           userId: fixture.userIds[1]!,
           role: "RECRUITER",
+          priorApprovedRole: "RECRUITER",
         },
       });
     });

@@ -1,0 +1,37 @@
+// Generated from Feature 006 OpenAPI. Do not edit by hand.
+export const adminContractVersion = "0.2.0" as const;
+export const adminContractSha256 = "ab605fc522d0fbc460104364f1124a775a596957933b818120eb47d1c921b53a" as const;
+export const adminContractPaths = [
+  "/api/admin/auth/context",
+  "/api/admin/auth/login",
+  "/api/admin/auth/two-factor",
+  "/api/admin/auth/step-up",
+  "/api/admin/auth/logout",
+  "/api/admin/dashboard",
+  "/api/admin/accounts",
+  "/api/admin/accounts/{accountId}/security",
+  "/api/admin/accounts/{accountId}/sessions/{sessionReference}/revoke",
+  "/api/admin/accounts/{accountId}/sessions/revoke-all",
+  "/api/admin/accounts/{accountId}/suspend",
+  "/api/admin/accounts/{accountId}/reinstate",
+  "/api/admin/actions/{correlationId}/rationale",
+  "/api/admin/verification-requests",
+  "/api/admin/verification-requests/{requestId}",
+  "/api/admin/verification-requests/{requestId}/evidence/{evidenceId}/preview",
+  "/api/admin/verification-requests/{requestId}/evidence/{evidenceId}/download",
+  "/api/admin/verification-requests/{requestId}/request-changes",
+  "/api/admin/verification-requests/{requestId}/reject",
+  "/api/admin/verification-requests/{requestId}/approve",
+  "/api/admin/companies",
+  "/api/admin/company-memberships",
+  "/api/admin/company-memberships/{membershipId}",
+  "/api/admin/company-memberships/{membershipId}/{action}",
+  "/api/admin/moderation-reports",
+  "/api/admin/moderation-reports/{reportId}",
+  "/api/admin/moderation-reports/{reportId}/{action}",
+  "/api/admin/audit-events/{correlationId}",
+  "/api/recruiter/entitlement",
+  "/api/employer-verifications",
+  "/api/employer-verifications/{requestId}/{action}",
+  "/api/moderation-reports"
+] as const;

@@ -77,6 +77,22 @@ export const ModelName = {
   AuditEvent: 'AuditEvent',
   Company: 'Company',
   CompanyMembership: 'CompanyMembership',
+  PlatformAdministratorGrant: 'PlatformAdministratorGrant',
+  AdministratorSessionPolicy: 'AdministratorSessionPolicy',
+  CompanyMembershipHistory: 'CompanyMembershipHistory',
+  CompanyAccessPrerequisite: 'CompanyAccessPrerequisite',
+  RecruiterVerificationRequest: 'RecruiterVerificationRequest',
+  BusinessLicenseEvidence: 'BusinessLicenseEvidence',
+  VerificationSafetyAttempt: 'VerificationSafetyAttempt',
+  VerificationDecisionHistory: 'VerificationDecisionHistory',
+  VerificationPrivateNote: 'VerificationPrivateNote',
+  PrivilegedActionRationale: 'PrivilegedActionRationale',
+  AdminCommandReceipt: 'AdminCommandReceipt',
+  SecurityNotificationWork: 'SecurityNotificationWork',
+  AdminDashboardSnapshot: 'AdminDashboardSnapshot',
+  ModerationReport: 'ModerationReport',
+  ModerationReportHistory: 'ModerationReportHistory',
+  ModerationPrivateNote: 'ModerationPrivateNote',
   JobPosting: 'JobPosting',
   JobPostingSkill: 'JobPostingSkill',
   ApplicationQuestion: 'ApplicationQuestion',
@@ -133,6 +149,7 @@ export const UserAccountScalarFieldEnum = {
   emailVerified: 'emailVerified',
   image: 'image',
   state: 'state',
+  version: 'version',
   twoFactorEnabled: 'twoFactorEnabled',
   stateChangedAt: 'stateChangedAt',
   deletedAt: 'deletedAt',
@@ -512,6 +529,7 @@ export const EmailOutboxScalarFieldEnum = {
   kind: 'kind',
   userId: 'userId',
   securityTokenId: 'securityTokenId',
+  verificationRequestId: 'verificationRequestId',
   recipientRef: 'recipientRef',
   recipientCiphertext: 'recipientCiphertext',
   recipientPurpose: 'recipientPurpose',
@@ -564,6 +582,9 @@ export const CompanyScalarFieldEnum = {
   industry: 'industry',
   address: 'address',
   verifiedAt: 'verifiedAt',
+  normalizedTaxIdentifier: 'normalizedTaxIdentifier',
+  verificationState: 'verificationState',
+  verificationInactiveAt: 'verificationInactiveAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -577,11 +598,308 @@ export const CompanyMembershipScalarFieldEnum = {
   userId: 'userId',
   role: 'role',
   status: 'status',
+  priorApprovedRole: 'priorApprovedRole',
+  version: 'version',
+  stateChangedAt: 'stateChangedAt',
+  removedAt: 'removedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type CompanyMembershipScalarFieldEnum = (typeof CompanyMembershipScalarFieldEnum)[keyof typeof CompanyMembershipScalarFieldEnum]
+
+
+export const PlatformAdministratorGrantScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  state: 'state',
+  expiresAt: 'expiresAt',
+  stateChangedAt: 'stateChangedAt',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlatformAdministratorGrantScalarFieldEnum = (typeof PlatformAdministratorGrantScalarFieldEnum)[keyof typeof PlatformAdministratorGrantScalarFieldEnum]
+
+
+export const AdministratorSessionPolicyScalarFieldEnum = {
+  grantId: 'grantId',
+  designatedSessionId: 'designatedSessionId',
+  initialTwoFactorAt: 'initialTwoFactorAt',
+  latestTwoFactorProofAt: 'latestTwoFactorProofAt',
+  designationVersion: 'designationVersion',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AdministratorSessionPolicyScalarFieldEnum = (typeof AdministratorSessionPolicyScalarFieldEnum)[keyof typeof AdministratorSessionPolicyScalarFieldEnum]
+
+
+export const CompanyMembershipHistoryScalarFieldEnum = {
+  id: 'id',
+  membershipId: 'membershipId',
+  actorUserId: 'actorUserId',
+  priorStatus: 'priorStatus',
+  resultingStatus: 'resultingStatus',
+  priorRole: 'priorRole',
+  resultingRole: 'resultingRole',
+  version: 'version',
+  correlationId: 'correlationId',
+  occurredAt: 'occurredAt'
+} as const
+
+export type CompanyMembershipHistoryScalarFieldEnum = (typeof CompanyMembershipHistoryScalarFieldEnum)[keyof typeof CompanyMembershipHistoryScalarFieldEnum]
+
+
+export const CompanyAccessPrerequisiteScalarFieldEnum = {
+  id: 'id',
+  kind: 'kind',
+  state: 'state',
+  requestId: 'requestId',
+  applicantUserId: 'applicantUserId',
+  companyId: 'companyId',
+  role: 'role',
+  approvedByOwnerMembershipId: 'approvedByOwnerMembershipId',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  usedByRequestId: 'usedByRequestId',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CompanyAccessPrerequisiteScalarFieldEnum = (typeof CompanyAccessPrerequisiteScalarFieldEnum)[keyof typeof CompanyAccessPrerequisiteScalarFieldEnum]
+
+
+export const RecruiterVerificationRequestScalarFieldEnum = {
+  id: 'id',
+  applicantUserId: 'applicantUserId',
+  submittedCompanyName: 'submittedCompanyName',
+  normalizedTaxIdentifier: 'normalizedTaxIdentifier',
+  targetCompanyId: 'targetCompanyId',
+  requestedRole: 'requestedRole',
+  prerequisiteId: 'prerequisiteId',
+  state: 'state',
+  currentEvidenceId: 'currentEvidenceId',
+  currentSubmissionVersion: 'currentSubmissionVersion',
+  resubmissionCount: 'resubmissionCount',
+  assignedAdminUserId: 'assignedAdminUserId',
+  changesRequestedAt: 'changesRequestedAt',
+  delayedAt: 'delayedAt',
+  expiredAt: 'expiredAt',
+  cancelledAt: 'cancelledAt',
+  decidedAt: 'decidedAt',
+  viewerUnavailableSince: 'viewerUnavailableSince',
+  viewerEscalatedAt: 'viewerEscalatedAt',
+  viewerDelayNotifiedAt: 'viewerDelayNotifiedAt',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RecruiterVerificationRequestScalarFieldEnum = (typeof RecruiterVerificationRequestScalarFieldEnum)[keyof typeof RecruiterVerificationRequestScalarFieldEnum]
+
+
+export const BusinessLicenseEvidenceScalarFieldEnum = {
+  id: 'id',
+  requestId: 'requestId',
+  submissionVersion: 'submissionVersion',
+  declaredMediaType: 'declaredMediaType',
+  detectedMediaType: 'detectedMediaType',
+  byteSize: 'byteSize',
+  sourceSha256: 'sourceSha256',
+  storageAdapter: 'storageAdapter',
+  storageLocator: 'storageLocator',
+  encryptionKeyVersion: 'encryptionKeyVersion',
+  iv: 'iv',
+  authenticationTag: 'authenticationTag',
+  malwareStatus: 'malwareStatus',
+  typeStatus: 'typeStatus',
+  structureStatus: 'structureStatus',
+  previewStatus: 'previewStatus',
+  reviewableAt: 'reviewableAt',
+  contentInaccessibleAt: 'contentInaccessibleAt',
+  deleteAfter: 'deleteAfter',
+  deletedAt: 'deletedAt',
+  supersededAt: 'supersededAt',
+  processingLeaseOwner: 'processingLeaseOwner',
+  processingLeaseExpiry: 'processingLeaseExpiry',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BusinessLicenseEvidenceScalarFieldEnum = (typeof BusinessLicenseEvidenceScalarFieldEnum)[keyof typeof BusinessLicenseEvidenceScalarFieldEnum]
+
+
+export const VerificationSafetyAttemptScalarFieldEnum = {
+  id: 'id',
+  requestId: 'requestId',
+  evidenceId: 'evidenceId',
+  malwareStatus: 'malwareStatus',
+  typeStatus: 'typeStatus',
+  structureStatus: 'structureStatus',
+  previewStatus: 'previewStatus',
+  policyVersions: 'policyVersions',
+  safeFailureCode: 'safeFailureCode',
+  attemptCount: 'attemptCount',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VerificationSafetyAttemptScalarFieldEnum = (typeof VerificationSafetyAttemptScalarFieldEnum)[keyof typeof VerificationSafetyAttemptScalarFieldEnum]
+
+
+export const VerificationDecisionHistoryScalarFieldEnum = {
+  id: 'id',
+  requestId: 'requestId',
+  submissionVersion: 'submissionVersion',
+  actorAdminUserId: 'actorAdminUserId',
+  priorState: 'priorState',
+  resultingState: 'resultingState',
+  decisionKind: 'decisionKind',
+  rejectionCategory: 'rejectionCategory',
+  approvedRole: 'approvedRole',
+  result: 'result',
+  correlationId: 'correlationId',
+  decidedAt: 'decidedAt'
+} as const
+
+export type VerificationDecisionHistoryScalarFieldEnum = (typeof VerificationDecisionHistoryScalarFieldEnum)[keyof typeof VerificationDecisionHistoryScalarFieldEnum]
+
+
+export const VerificationPrivateNoteScalarFieldEnum = {
+  id: 'id',
+  requestId: 'requestId',
+  authorAdminUserId: 'authorAdminUserId',
+  normalizedText: 'normalizedText',
+  createdAt: 'createdAt'
+} as const
+
+export type VerificationPrivateNoteScalarFieldEnum = (typeof VerificationPrivateNoteScalarFieldEnum)[keyof typeof VerificationPrivateNoteScalarFieldEnum]
+
+
+export const PrivilegedActionRationaleScalarFieldEnum = {
+  id: 'id',
+  correlationId: 'correlationId',
+  ciphertext: 'ciphertext',
+  iv: 'iv',
+  authenticationTag: 'authenticationTag',
+  encryptionKeyVersion: 'encryptionKeyVersion',
+  inaccessibleAt: 'inaccessibleAt',
+  deleteAfter: 'deleteAfter',
+  deletedAt: 'deletedAt',
+  deleteAttempts: 'deleteAttempts',
+  safeFailureCode: 'safeFailureCode',
+  createdAt: 'createdAt'
+} as const
+
+export type PrivilegedActionRationaleScalarFieldEnum = (typeof PrivilegedActionRationaleScalarFieldEnum)[keyof typeof PrivilegedActionRationaleScalarFieldEnum]
+
+
+export const AdminCommandReceiptScalarFieldEnum = {
+  id: 'id',
+  actorSubjectDigest: 'actorSubjectDigest',
+  commandKind: 'commandKind',
+  targetReference: 'targetReference',
+  idempotencyKey: 'idempotencyKey',
+  normalizedBodyDigest: 'normalizedBodyDigest',
+  resultCode: 'resultCode',
+  resultingVersion: 'resultingVersion',
+  correlationId: 'correlationId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AdminCommandReceiptScalarFieldEnum = (typeof AdminCommandReceiptScalarFieldEnum)[keyof typeof AdminCommandReceiptScalarFieldEnum]
+
+
+export const SecurityNotificationWorkScalarFieldEnum = {
+  id: 'id',
+  idempotencyKey: 'idempotencyKey',
+  originatingCorrelationId: 'originatingCorrelationId',
+  targetUserId: 'targetUserId',
+  kind: 'kind',
+  payloadRef: 'payloadRef',
+  status: 'status',
+  attemptCount: 'attemptCount',
+  lastAttemptAt: 'lastAttemptAt',
+  nextAttemptAt: 'nextAttemptAt',
+  deliveryDeadline: 'deliveryDeadline',
+  failureCategory: 'failureCategory',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SecurityNotificationWorkScalarFieldEnum = (typeof SecurityNotificationWorkScalarFieldEnum)[keyof typeof SecurityNotificationWorkScalarFieldEnum]
+
+
+export const AdminDashboardSnapshotScalarFieldEnum = {
+  id: 'id',
+  calculatedAt: 'calculatedAt',
+  expiresAt: 'expiresAt',
+  stateDefinitionVersion: 'stateDefinitionVersion',
+  metrics: 'metrics',
+  createdAt: 'createdAt'
+} as const
+
+export type AdminDashboardSnapshotScalarFieldEnum = (typeof AdminDashboardSnapshotScalarFieldEnum)[keyof typeof AdminDashboardSnapshotScalarFieldEnum]
+
+
+export const ModerationReportScalarFieldEnum = {
+  id: 'id',
+  reporterUserId: 'reporterUserId',
+  targetType: 'targetType',
+  targetReference: 'targetReference',
+  companyReference: 'companyReference',
+  jobReference: 'jobReference',
+  applicationReference: 'applicationReference',
+  qualifyingRelationship: 'qualifyingRelationship',
+  category: 'category',
+  normalizedDetail: 'normalizedDetail',
+  priority: 'priority',
+  state: 'state',
+  assignedAdminUserId: 'assignedAdminUserId',
+  unresolvedKey: 'unresolvedKey',
+  version: 'version',
+  terminalAt: 'terminalAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ModerationReportScalarFieldEnum = (typeof ModerationReportScalarFieldEnum)[keyof typeof ModerationReportScalarFieldEnum]
+
+
+export const ModerationReportHistoryScalarFieldEnum = {
+  id: 'id',
+  reportId: 'reportId',
+  actorAdminUserId: 'actorAdminUserId',
+  action: 'action',
+  priorState: 'priorState',
+  resultingState: 'resultingState',
+  resultingVersion: 'resultingVersion',
+  enforcementCorrelationId: 'enforcementCorrelationId',
+  occurredAt: 'occurredAt'
+} as const
+
+export type ModerationReportHistoryScalarFieldEnum = (typeof ModerationReportHistoryScalarFieldEnum)[keyof typeof ModerationReportHistoryScalarFieldEnum]
+
+
+export const ModerationPrivateNoteScalarFieldEnum = {
+  id: 'id',
+  reportId: 'reportId',
+  authorAdminUserId: 'authorAdminUserId',
+  normalizedText: 'normalizedText',
+  createdAt: 'createdAt'
+} as const
+
+export type ModerationPrivateNoteScalarFieldEnum = (typeof ModerationPrivateNoteScalarFieldEnum)[keyof typeof ModerationPrivateNoteScalarFieldEnum]
 
 
 export const JobPostingScalarFieldEnum = {

@@ -166,10 +166,12 @@ accounts exist, pass the ID explicitly. If the database has no accounts, the
 command completes as a no-op.
 
 The account-scoped workspace state is introduced by the committed migration
-`20260808090000_user_job_workspace_state`. The preceding
-`20260807081414_smarthire` migration remains part of the normal migration
-history. Both are applied automatically when they are pending; they are not
-re-created on every command.
+`015_user_job_workspace_state`. The preceding `013_application_metadata` and
+`014_canonical_application_tracking` migrations remain part of the normal
+migration history. All migration folders use one continuous
+`NNN_snake_case` sequence and are applied automatically when pending; they are
+not re-created on every command. Run `npm run db:migrations:check` to validate
+the naming sequence.
 
 ## Quality Checks
 

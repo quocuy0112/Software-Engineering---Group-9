@@ -18,6 +18,7 @@ import {
 } from "@/backend/auth/cookies/pre-auth-cookie";
 import { SessionService } from "../session/session-service";
 import { noStoreHeaders } from "@/backend/security/response-headers";
+import type { PreAuthCookiePath } from "@/backend/security/cookies";
 export const GENERIC_LOGIN_ERROR = "Email or password is incorrect.";
 const cookieValue = (line: string) =>
   line.slice(line.indexOf("=") + 1, line.indexOf(";"));
@@ -33,7 +34,12 @@ export class LoginWithPasswordService {
   ) {}
   async execute(
     data: LoginData,
-    request: { headers: Headers; subject: string; now?: Date },
+    request: {
+      headers: Headers;
+      subject: string;
+      now?: Date;
+      preAuthCookiePath?: PreAuthCookiePath;
+    },
   ) {
     const now = request.now ?? new Date(),
       cid = randomUUID();
@@ -151,7 +157,10 @@ export class LoginWithPasswordService {
         challenge = await this.challenges.create(account.id, binding, now);
       headers.append(
         "Set-Cookie",
-        setPreAuthCookie(encodePreAuth(challenge.token, binding)),
+        setPreAuthCookie(
+          encodePreAuth(challenge.token, binding),
+          request.preAuthCookiePath,
+        ),
       );
       await this.record("login.succeeded", "SUCCESS", cid, now, account.id);
       return new Response(

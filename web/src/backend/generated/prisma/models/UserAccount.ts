@@ -20,8 +20,18 @@ export type UserAccountModel = runtime.Types.Result.DefaultSelection<Prisma.$Use
 
 export type AggregateUserAccount = {
   _count: UserAccountCountAggregateOutputType | null
+  _avg: UserAccountAvgAggregateOutputType | null
+  _sum: UserAccountSumAggregateOutputType | null
   _min: UserAccountMinAggregateOutputType | null
   _max: UserAccountMaxAggregateOutputType | null
+}
+
+export type UserAccountAvgAggregateOutputType = {
+  version: number | null
+}
+
+export type UserAccountSumAggregateOutputType = {
+  version: number | null
 }
 
 export type UserAccountMinAggregateOutputType = {
@@ -32,6 +42,7 @@ export type UserAccountMinAggregateOutputType = {
   emailVerified: boolean | null
   image: string | null
   state: $Enums.AccountState | null
+  version: number | null
   twoFactorEnabled: boolean | null
   stateChangedAt: Date | null
   deletedAt: Date | null
@@ -47,6 +58,7 @@ export type UserAccountMaxAggregateOutputType = {
   emailVerified: boolean | null
   image: string | null
   state: $Enums.AccountState | null
+  version: number | null
   twoFactorEnabled: boolean | null
   stateChangedAt: Date | null
   deletedAt: Date | null
@@ -62,6 +74,7 @@ export type UserAccountCountAggregateOutputType = {
   emailVerified: number
   image: number
   state: number
+  version: number
   twoFactorEnabled: number
   stateChangedAt: number
   deletedAt: number
@@ -71,6 +84,14 @@ export type UserAccountCountAggregateOutputType = {
 }
 
 
+export type UserAccountAvgAggregateInputType = {
+  version?: true
+}
+
+export type UserAccountSumAggregateInputType = {
+  version?: true
+}
+
 export type UserAccountMinAggregateInputType = {
   id?: true
   name?: true
@@ -79,6 +100,7 @@ export type UserAccountMinAggregateInputType = {
   emailVerified?: true
   image?: true
   state?: true
+  version?: true
   twoFactorEnabled?: true
   stateChangedAt?: true
   deletedAt?: true
@@ -94,6 +116,7 @@ export type UserAccountMaxAggregateInputType = {
   emailVerified?: true
   image?: true
   state?: true
+  version?: true
   twoFactorEnabled?: true
   stateChangedAt?: true
   deletedAt?: true
@@ -109,6 +132,7 @@ export type UserAccountCountAggregateInputType = {
   emailVerified?: true
   image?: true
   state?: true
+  version?: true
   twoFactorEnabled?: true
   stateChangedAt?: true
   deletedAt?: true
@@ -155,6 +179,18 @@ export type UserAccountAggregateArgs<ExtArgs extends runtime.Types.Extensions.In
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: UserAccountAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: UserAccountSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: UserAccountMinAggregateInputType
@@ -185,6 +221,8 @@ export type UserAccountGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   _count?: UserAccountCountAggregateInputType | true
+  _avg?: UserAccountAvgAggregateInputType
+  _sum?: UserAccountSumAggregateInputType
   _min?: UserAccountMinAggregateInputType
   _max?: UserAccountMaxAggregateInputType
 }
@@ -197,12 +235,15 @@ export type UserAccountGroupByOutputType = {
   emailVerified: boolean
   image: string | null
   state: $Enums.AccountState
+  version: number
   twoFactorEnabled: boolean
   stateChangedAt: Date
   deletedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: UserAccountCountAggregateOutputType | null
+  _avg: UserAccountAvgAggregateOutputType | null
+  _sum: UserAccountSumAggregateOutputType | null
   _min: UserAccountMinAggregateOutputType | null
   _max: UserAccountMaxAggregateOutputType | null
 }
@@ -233,6 +274,7 @@ export type UserAccountWhereInput = {
   emailVerified?: Prisma.BoolFilter<"UserAccount"> | boolean
   image?: Prisma.StringNullableFilter<"UserAccount"> | string | null
   state?: Prisma.EnumAccountStateFilter<"UserAccount"> | $Enums.AccountState
+  version?: Prisma.IntFilter<"UserAccount"> | number
   twoFactorEnabled?: Prisma.BoolFilter<"UserAccount"> | boolean
   stateChangedAt?: Prisma.DateTimeFilter<"UserAccount"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"UserAccount"> | Date | string | null
@@ -268,6 +310,9 @@ export type UserAccountWhereInput = {
   imageSearchQueries?: Prisma.SearchImageQueryListRelationFilter
   imageSearchConsents?: Prisma.SearchProcessingConsentListRelationFilter
   companyMemberships?: Prisma.CompanyMembershipListRelationFilter
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantListRelationFilter
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestListRelationFilter
+  submittedModerationReports?: Prisma.ModerationReportListRelationFilter
 }
 
 export type UserAccountOrderByWithRelationInput = {
@@ -278,6 +323,7 @@ export type UserAccountOrderByWithRelationInput = {
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   state?: Prisma.SortOrder
+  version?: Prisma.SortOrder
   twoFactorEnabled?: Prisma.SortOrder
   stateChangedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -313,6 +359,9 @@ export type UserAccountOrderByWithRelationInput = {
   imageSearchQueries?: Prisma.SearchImageQueryOrderByRelationAggregateInput
   imageSearchConsents?: Prisma.SearchProcessingConsentOrderByRelationAggregateInput
   companyMemberships?: Prisma.CompanyMembershipOrderByRelationAggregateInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantOrderByRelationAggregateInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestOrderByRelationAggregateInput
+  submittedModerationReports?: Prisma.ModerationReportOrderByRelationAggregateInput
 }
 
 export type UserAccountWhereUniqueInput = Prisma.AtLeast<{
@@ -326,6 +375,7 @@ export type UserAccountWhereUniqueInput = Prisma.AtLeast<{
   emailVerified?: Prisma.BoolFilter<"UserAccount"> | boolean
   image?: Prisma.StringNullableFilter<"UserAccount"> | string | null
   state?: Prisma.EnumAccountStateFilter<"UserAccount"> | $Enums.AccountState
+  version?: Prisma.IntFilter<"UserAccount"> | number
   twoFactorEnabled?: Prisma.BoolFilter<"UserAccount"> | boolean
   stateChangedAt?: Prisma.DateTimeFilter<"UserAccount"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"UserAccount"> | Date | string | null
@@ -361,6 +411,9 @@ export type UserAccountWhereUniqueInput = Prisma.AtLeast<{
   imageSearchQueries?: Prisma.SearchImageQueryListRelationFilter
   imageSearchConsents?: Prisma.SearchProcessingConsentListRelationFilter
   companyMemberships?: Prisma.CompanyMembershipListRelationFilter
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantListRelationFilter
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestListRelationFilter
+  submittedModerationReports?: Prisma.ModerationReportListRelationFilter
 }, "id" | "email" | "normalizedEmail">
 
 export type UserAccountOrderByWithAggregationInput = {
@@ -371,14 +424,17 @@ export type UserAccountOrderByWithAggregationInput = {
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   state?: Prisma.SortOrder
+  version?: Prisma.SortOrder
   twoFactorEnabled?: Prisma.SortOrder
   stateChangedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserAccountCountOrderByAggregateInput
+  _avg?: Prisma.UserAccountAvgOrderByAggregateInput
   _max?: Prisma.UserAccountMaxOrderByAggregateInput
   _min?: Prisma.UserAccountMinOrderByAggregateInput
+  _sum?: Prisma.UserAccountSumOrderByAggregateInput
 }
 
 export type UserAccountScalarWhereWithAggregatesInput = {
@@ -392,6 +448,7 @@ export type UserAccountScalarWhereWithAggregatesInput = {
   emailVerified?: Prisma.BoolWithAggregatesFilter<"UserAccount"> | boolean
   image?: Prisma.StringNullableWithAggregatesFilter<"UserAccount"> | string | null
   state?: Prisma.EnumAccountStateWithAggregatesFilter<"UserAccount"> | $Enums.AccountState
+  version?: Prisma.IntWithAggregatesFilter<"UserAccount"> | number
   twoFactorEnabled?: Prisma.BoolWithAggregatesFilter<"UserAccount"> | boolean
   stateChangedAt?: Prisma.DateTimeWithAggregatesFilter<"UserAccount"> | Date | string
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"UserAccount"> | Date | string | null
@@ -407,6 +464,7 @@ export type UserAccountCreateInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -442,6 +500,9 @@ export type UserAccountCreateInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateInput = {
@@ -452,6 +513,7 @@ export type UserAccountUncheckedCreateInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -487,6 +549,9 @@ export type UserAccountUncheckedCreateInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUpdateInput = {
@@ -497,6 +562,7 @@ export type UserAccountUpdateInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -532,6 +598,9 @@ export type UserAccountUpdateInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateInput = {
@@ -542,6 +611,7 @@ export type UserAccountUncheckedUpdateInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -577,6 +647,9 @@ export type UserAccountUncheckedUpdateInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateManyInput = {
@@ -587,6 +660,7 @@ export type UserAccountCreateManyInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -602,6 +676,7 @@ export type UserAccountUpdateManyMutationInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -617,6 +692,7 @@ export type UserAccountUncheckedUpdateManyInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -632,11 +708,16 @@ export type UserAccountCountOrderByAggregateInput = {
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   state?: Prisma.SortOrder
+  version?: Prisma.SortOrder
   twoFactorEnabled?: Prisma.SortOrder
   stateChangedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type UserAccountAvgOrderByAggregateInput = {
+  version?: Prisma.SortOrder
 }
 
 export type UserAccountMaxOrderByAggregateInput = {
@@ -647,6 +728,7 @@ export type UserAccountMaxOrderByAggregateInput = {
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   state?: Prisma.SortOrder
+  version?: Prisma.SortOrder
   twoFactorEnabled?: Prisma.SortOrder
   stateChangedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -662,11 +744,16 @@ export type UserAccountMinOrderByAggregateInput = {
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   state?: Prisma.SortOrder
+  version?: Prisma.SortOrder
   twoFactorEnabled?: Prisma.SortOrder
   stateChangedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type UserAccountSumOrderByAggregateInput = {
+  version?: Prisma.SortOrder
 }
 
 export type UserAccountScalarRelationFilter = {
@@ -693,6 +780,14 @@ export type NullableStringFieldUpdateOperationsInput = {
 
 export type EnumAccountStateFieldUpdateOperationsInput = {
   set?: $Enums.AccountState
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -931,6 +1026,48 @@ export type UserAccountUpdateOneRequiredWithoutCompanyMembershipsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutCompanyMembershipsInput, Prisma.UserAccountUpdateWithoutCompanyMembershipsInput>, Prisma.UserAccountUncheckedUpdateWithoutCompanyMembershipsInput>
 }
 
+export type UserAccountCreateNestedOneWithoutPlatformAdministratorGrantsInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutPlatformAdministratorGrantsInput, Prisma.UserAccountUncheckedCreateWithoutPlatformAdministratorGrantsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutPlatformAdministratorGrantsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutPlatformAdministratorGrantsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutPlatformAdministratorGrantsInput, Prisma.UserAccountUncheckedCreateWithoutPlatformAdministratorGrantsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutPlatformAdministratorGrantsInput
+  upsert?: Prisma.UserAccountUpsertWithoutPlatformAdministratorGrantsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutPlatformAdministratorGrantsInput, Prisma.UserAccountUpdateWithoutPlatformAdministratorGrantsInput>, Prisma.UserAccountUncheckedUpdateWithoutPlatformAdministratorGrantsInput>
+}
+
+export type UserAccountCreateNestedOneWithoutRecruiterVerificationRequestsInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutRecruiterVerificationRequestsInput, Prisma.UserAccountUncheckedCreateWithoutRecruiterVerificationRequestsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutRecruiterVerificationRequestsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutRecruiterVerificationRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutRecruiterVerificationRequestsInput, Prisma.UserAccountUncheckedCreateWithoutRecruiterVerificationRequestsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutRecruiterVerificationRequestsInput
+  upsert?: Prisma.UserAccountUpsertWithoutRecruiterVerificationRequestsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutRecruiterVerificationRequestsInput, Prisma.UserAccountUpdateWithoutRecruiterVerificationRequestsInput>, Prisma.UserAccountUncheckedUpdateWithoutRecruiterVerificationRequestsInput>
+}
+
+export type UserAccountCreateNestedOneWithoutSubmittedModerationReportsInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSubmittedModerationReportsInput, Prisma.UserAccountUncheckedCreateWithoutSubmittedModerationReportsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSubmittedModerationReportsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutSubmittedModerationReportsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSubmittedModerationReportsInput, Prisma.UserAccountUncheckedCreateWithoutSubmittedModerationReportsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSubmittedModerationReportsInput
+  upsert?: Prisma.UserAccountUpsertWithoutSubmittedModerationReportsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutSubmittedModerationReportsInput, Prisma.UserAccountUpdateWithoutSubmittedModerationReportsInput>, Prisma.UserAccountUncheckedUpdateWithoutSubmittedModerationReportsInput>
+}
+
 export type UserAccountCreateNestedOneWithoutSavedJobsInput = {
   create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSavedJobsInput, Prisma.UserAccountUncheckedCreateWithoutSavedJobsInput>
   connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSavedJobsInput
@@ -1139,6 +1276,7 @@ export type UserAccountCreateWithoutAccountsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -1173,6 +1311,9 @@ export type UserAccountCreateWithoutAccountsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutAccountsInput = {
@@ -1183,6 +1324,7 @@ export type UserAccountUncheckedCreateWithoutAccountsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -1217,6 +1359,9 @@ export type UserAccountUncheckedCreateWithoutAccountsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutAccountsInput = {
@@ -1243,6 +1388,7 @@ export type UserAccountUpdateWithoutAccountsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1277,6 +1423,9 @@ export type UserAccountUpdateWithoutAccountsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutAccountsInput = {
@@ -1287,6 +1436,7 @@ export type UserAccountUncheckedUpdateWithoutAccountsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1321,6 +1471,9 @@ export type UserAccountUncheckedUpdateWithoutAccountsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutSessionsInput = {
@@ -1331,6 +1484,7 @@ export type UserAccountCreateWithoutSessionsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -1365,6 +1519,9 @@ export type UserAccountCreateWithoutSessionsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutSessionsInput = {
@@ -1375,6 +1532,7 @@ export type UserAccountUncheckedCreateWithoutSessionsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -1409,6 +1567,9 @@ export type UserAccountUncheckedCreateWithoutSessionsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutSessionsInput = {
@@ -1435,6 +1596,7 @@ export type UserAccountUpdateWithoutSessionsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1469,6 +1631,9 @@ export type UserAccountUpdateWithoutSessionsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSessionsInput = {
@@ -1479,6 +1644,7 @@ export type UserAccountUncheckedUpdateWithoutSessionsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1513,6 +1679,9 @@ export type UserAccountUncheckedUpdateWithoutSessionsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutVerificationsInput = {
@@ -1523,6 +1692,7 @@ export type UserAccountCreateWithoutVerificationsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -1557,6 +1727,9 @@ export type UserAccountCreateWithoutVerificationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutVerificationsInput = {
@@ -1567,6 +1740,7 @@ export type UserAccountUncheckedCreateWithoutVerificationsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -1601,6 +1775,9 @@ export type UserAccountUncheckedCreateWithoutVerificationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutVerificationsInput = {
@@ -1627,6 +1804,7 @@ export type UserAccountUpdateWithoutVerificationsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1661,6 +1839,9 @@ export type UserAccountUpdateWithoutVerificationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutVerificationsInput = {
@@ -1671,6 +1852,7 @@ export type UserAccountUncheckedUpdateWithoutVerificationsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1705,6 +1887,9 @@ export type UserAccountUncheckedUpdateWithoutVerificationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutTwoFactorInput = {
@@ -1715,6 +1900,7 @@ export type UserAccountCreateWithoutTwoFactorInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -1749,6 +1935,9 @@ export type UserAccountCreateWithoutTwoFactorInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutTwoFactorInput = {
@@ -1759,6 +1948,7 @@ export type UserAccountUncheckedCreateWithoutTwoFactorInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -1793,6 +1983,9 @@ export type UserAccountUncheckedCreateWithoutTwoFactorInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutTwoFactorInput = {
@@ -1819,6 +2012,7 @@ export type UserAccountUpdateWithoutTwoFactorInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1853,6 +2047,9 @@ export type UserAccountUpdateWithoutTwoFactorInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutTwoFactorInput = {
@@ -1863,6 +2060,7 @@ export type UserAccountUncheckedUpdateWithoutTwoFactorInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1897,6 +2095,9 @@ export type UserAccountUncheckedUpdateWithoutTwoFactorInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutCandidateIdentityInput = {
@@ -1907,6 +2108,7 @@ export type UserAccountCreateWithoutCandidateIdentityInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -1941,6 +2143,9 @@ export type UserAccountCreateWithoutCandidateIdentityInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutCandidateIdentityInput = {
@@ -1951,6 +2156,7 @@ export type UserAccountUncheckedCreateWithoutCandidateIdentityInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -1985,6 +2191,9 @@ export type UserAccountUncheckedCreateWithoutCandidateIdentityInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutCandidateIdentityInput = {
@@ -2011,6 +2220,7 @@ export type UserAccountUpdateWithoutCandidateIdentityInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2045,6 +2255,9 @@ export type UserAccountUpdateWithoutCandidateIdentityInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCandidateIdentityInput = {
@@ -2055,6 +2268,7 @@ export type UserAccountUncheckedUpdateWithoutCandidateIdentityInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2089,6 +2303,9 @@ export type UserAccountUncheckedUpdateWithoutCandidateIdentityInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutPreferencesInput = {
@@ -2099,6 +2316,7 @@ export type UserAccountCreateWithoutPreferencesInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -2133,6 +2351,9 @@ export type UserAccountCreateWithoutPreferencesInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutPreferencesInput = {
@@ -2143,6 +2364,7 @@ export type UserAccountUncheckedCreateWithoutPreferencesInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -2177,6 +2399,9 @@ export type UserAccountUncheckedCreateWithoutPreferencesInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutPreferencesInput = {
@@ -2203,6 +2428,7 @@ export type UserAccountUpdateWithoutPreferencesInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2237,6 +2463,9 @@ export type UserAccountUpdateWithoutPreferencesInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPreferencesInput = {
@@ -2247,6 +2476,7 @@ export type UserAccountUncheckedUpdateWithoutPreferencesInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2281,6 +2511,9 @@ export type UserAccountUncheckedUpdateWithoutPreferencesInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutJobWorkspaceStateInput = {
@@ -2291,6 +2524,7 @@ export type UserAccountCreateWithoutJobWorkspaceStateInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -2325,6 +2559,9 @@ export type UserAccountCreateWithoutJobWorkspaceStateInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutJobWorkspaceStateInput = {
@@ -2335,6 +2572,7 @@ export type UserAccountUncheckedCreateWithoutJobWorkspaceStateInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -2369,6 +2607,9 @@ export type UserAccountUncheckedCreateWithoutJobWorkspaceStateInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutJobWorkspaceStateInput = {
@@ -2395,6 +2636,7 @@ export type UserAccountUpdateWithoutJobWorkspaceStateInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2429,6 +2671,9 @@ export type UserAccountUpdateWithoutJobWorkspaceStateInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutJobWorkspaceStateInput = {
@@ -2439,6 +2684,7 @@ export type UserAccountUncheckedUpdateWithoutJobWorkspaceStateInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2473,6 +2719,9 @@ export type UserAccountUncheckedUpdateWithoutJobWorkspaceStateInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutEmailChangeRequestsInput = {
@@ -2483,6 +2732,7 @@ export type UserAccountCreateWithoutEmailChangeRequestsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -2517,6 +2767,9 @@ export type UserAccountCreateWithoutEmailChangeRequestsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutEmailChangeRequestsInput = {
@@ -2527,6 +2780,7 @@ export type UserAccountUncheckedCreateWithoutEmailChangeRequestsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -2561,6 +2815,9 @@ export type UserAccountUncheckedCreateWithoutEmailChangeRequestsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutEmailChangeRequestsInput = {
@@ -2587,6 +2844,7 @@ export type UserAccountUpdateWithoutEmailChangeRequestsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2621,6 +2879,9 @@ export type UserAccountUpdateWithoutEmailChangeRequestsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutEmailChangeRequestsInput = {
@@ -2631,6 +2892,7 @@ export type UserAccountUncheckedUpdateWithoutEmailChangeRequestsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2665,6 +2927,9 @@ export type UserAccountUncheckedUpdateWithoutEmailChangeRequestsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordChangeAttemptWindowInput = {
@@ -2675,6 +2940,7 @@ export type UserAccountCreateWithoutPasswordChangeAttemptWindowInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -2709,6 +2975,9 @@ export type UserAccountCreateWithoutPasswordChangeAttemptWindowInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordChangeAttemptWindowInput = {
@@ -2719,6 +2988,7 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeAttemptWindowInput = 
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -2753,6 +3023,9 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeAttemptWindowInput = 
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordChangeAttemptWindowInput = {
@@ -2779,6 +3052,7 @@ export type UserAccountUpdateWithoutPasswordChangeAttemptWindowInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2813,6 +3087,9 @@ export type UserAccountUpdateWithoutPasswordChangeAttemptWindowInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordChangeAttemptWindowInput = {
@@ -2823,6 +3100,7 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeAttemptWindowInput = 
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2857,6 +3135,9 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeAttemptWindowInput = 
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordChangeOperationsInput = {
@@ -2867,6 +3148,7 @@ export type UserAccountCreateWithoutPasswordChangeOperationsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -2901,6 +3183,9 @@ export type UserAccountCreateWithoutPasswordChangeOperationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordChangeOperationsInput = {
@@ -2911,6 +3196,7 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeOperationsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -2945,6 +3231,9 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeOperationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordChangeOperationsInput = {
@@ -2971,6 +3260,7 @@ export type UserAccountUpdateWithoutPasswordChangeOperationsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3005,6 +3295,9 @@ export type UserAccountUpdateWithoutPasswordChangeOperationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordChangeOperationsInput = {
@@ -3015,6 +3308,7 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeOperationsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3049,6 +3343,9 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeOperationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutSecurityTokensInput = {
@@ -3059,6 +3356,7 @@ export type UserAccountCreateWithoutSecurityTokensInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -3093,6 +3391,9 @@ export type UserAccountCreateWithoutSecurityTokensInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutSecurityTokensInput = {
@@ -3103,6 +3404,7 @@ export type UserAccountUncheckedCreateWithoutSecurityTokensInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -3137,6 +3439,9 @@ export type UserAccountUncheckedCreateWithoutSecurityTokensInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutSecurityTokensInput = {
@@ -3163,6 +3468,7 @@ export type UserAccountUpdateWithoutSecurityTokensInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3197,6 +3503,9 @@ export type UserAccountUpdateWithoutSecurityTokensInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSecurityTokensInput = {
@@ -3207,6 +3516,7 @@ export type UserAccountUncheckedUpdateWithoutSecurityTokensInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3241,6 +3551,9 @@ export type UserAccountUncheckedUpdateWithoutSecurityTokensInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordResetOperationsInput = {
@@ -3251,6 +3564,7 @@ export type UserAccountCreateWithoutPasswordResetOperationsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -3285,6 +3599,9 @@ export type UserAccountCreateWithoutPasswordResetOperationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordResetOperationsInput = {
@@ -3295,6 +3612,7 @@ export type UserAccountUncheckedCreateWithoutPasswordResetOperationsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -3329,6 +3647,9 @@ export type UserAccountUncheckedCreateWithoutPasswordResetOperationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordResetOperationsInput = {
@@ -3355,6 +3676,7 @@ export type UserAccountUpdateWithoutPasswordResetOperationsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3389,6 +3711,9 @@ export type UserAccountUpdateWithoutPasswordResetOperationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordResetOperationsInput = {
@@ -3399,6 +3724,7 @@ export type UserAccountUncheckedUpdateWithoutPasswordResetOperationsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3433,6 +3759,9 @@ export type UserAccountUncheckedUpdateWithoutPasswordResetOperationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutFullAccountRecoveryOperationsInput = {
@@ -3443,6 +3772,7 @@ export type UserAccountCreateWithoutFullAccountRecoveryOperationsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -3477,6 +3807,9 @@ export type UserAccountCreateWithoutFullAccountRecoveryOperationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutFullAccountRecoveryOperationsInput = {
@@ -3487,6 +3820,7 @@ export type UserAccountUncheckedCreateWithoutFullAccountRecoveryOperationsInput 
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -3521,6 +3855,9 @@ export type UserAccountUncheckedCreateWithoutFullAccountRecoveryOperationsInput 
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutFullAccountRecoveryOperationsInput = {
@@ -3547,6 +3884,7 @@ export type UserAccountUpdateWithoutFullAccountRecoveryOperationsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3581,6 +3919,9 @@ export type UserAccountUpdateWithoutFullAccountRecoveryOperationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutFullAccountRecoveryOperationsInput = {
@@ -3591,6 +3932,7 @@ export type UserAccountUncheckedUpdateWithoutFullAccountRecoveryOperationsInput 
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3625,6 +3967,9 @@ export type UserAccountUncheckedUpdateWithoutFullAccountRecoveryOperationsInput 
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutChallengesInput = {
@@ -3635,6 +3980,7 @@ export type UserAccountCreateWithoutChallengesInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -3669,6 +4015,9 @@ export type UserAccountCreateWithoutChallengesInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutChallengesInput = {
@@ -3679,6 +4028,7 @@ export type UserAccountUncheckedCreateWithoutChallengesInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -3713,6 +4063,9 @@ export type UserAccountUncheckedCreateWithoutChallengesInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutChallengesInput = {
@@ -3739,6 +4092,7 @@ export type UserAccountUpdateWithoutChallengesInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3773,6 +4127,9 @@ export type UserAccountUpdateWithoutChallengesInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutChallengesInput = {
@@ -3783,6 +4140,7 @@ export type UserAccountUncheckedUpdateWithoutChallengesInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3817,6 +4175,9 @@ export type UserAccountUncheckedUpdateWithoutChallengesInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutOutboxInput = {
@@ -3827,6 +4188,7 @@ export type UserAccountCreateWithoutOutboxInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -3861,6 +4223,9 @@ export type UserAccountCreateWithoutOutboxInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutOutboxInput = {
@@ -3871,6 +4236,7 @@ export type UserAccountUncheckedCreateWithoutOutboxInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -3905,6 +4271,9 @@ export type UserAccountUncheckedCreateWithoutOutboxInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutOutboxInput = {
@@ -3931,6 +4300,7 @@ export type UserAccountUpdateWithoutOutboxInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3965,6 +4335,9 @@ export type UserAccountUpdateWithoutOutboxInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutOutboxInput = {
@@ -3975,6 +4348,7 @@ export type UserAccountUncheckedUpdateWithoutOutboxInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4009,6 +4383,9 @@ export type UserAccountUncheckedUpdateWithoutOutboxInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutCompanyMembershipsInput = {
@@ -4019,6 +4396,7 @@ export type UserAccountCreateWithoutCompanyMembershipsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -4053,6 +4431,9 @@ export type UserAccountCreateWithoutCompanyMembershipsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutCompanyMembershipsInput = {
@@ -4063,6 +4444,7 @@ export type UserAccountUncheckedCreateWithoutCompanyMembershipsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -4097,6 +4479,9 @@ export type UserAccountUncheckedCreateWithoutCompanyMembershipsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutCompanyMembershipsInput = {
@@ -4123,6 +4508,7 @@ export type UserAccountUpdateWithoutCompanyMembershipsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4157,6 +4543,9 @@ export type UserAccountUpdateWithoutCompanyMembershipsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCompanyMembershipsInput = {
@@ -4167,6 +4556,7 @@ export type UserAccountUncheckedUpdateWithoutCompanyMembershipsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4201,6 +4591,633 @@ export type UserAccountUncheckedUpdateWithoutCompanyMembershipsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+}
+
+export type UserAccountCreateWithoutPlatformAdministratorGrantsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+}
+
+export type UserAccountUncheckedCreateWithoutPlatformAdministratorGrantsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+}
+
+export type UserAccountCreateOrConnectWithoutPlatformAdministratorGrantsInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutPlatformAdministratorGrantsInput, Prisma.UserAccountUncheckedCreateWithoutPlatformAdministratorGrantsInput>
+}
+
+export type UserAccountUpsertWithoutPlatformAdministratorGrantsInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutPlatformAdministratorGrantsInput, Prisma.UserAccountUncheckedUpdateWithoutPlatformAdministratorGrantsInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutPlatformAdministratorGrantsInput, Prisma.UserAccountUncheckedCreateWithoutPlatformAdministratorGrantsInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutPlatformAdministratorGrantsInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutPlatformAdministratorGrantsInput, Prisma.UserAccountUncheckedUpdateWithoutPlatformAdministratorGrantsInput>
+}
+
+export type UserAccountUpdateWithoutPlatformAdministratorGrantsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutPlatformAdministratorGrantsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+}
+
+export type UserAccountCreateWithoutRecruiterVerificationRequestsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+}
+
+export type UserAccountUncheckedCreateWithoutRecruiterVerificationRequestsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+}
+
+export type UserAccountCreateOrConnectWithoutRecruiterVerificationRequestsInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutRecruiterVerificationRequestsInput, Prisma.UserAccountUncheckedCreateWithoutRecruiterVerificationRequestsInput>
+}
+
+export type UserAccountUpsertWithoutRecruiterVerificationRequestsInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutRecruiterVerificationRequestsInput, Prisma.UserAccountUncheckedUpdateWithoutRecruiterVerificationRequestsInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutRecruiterVerificationRequestsInput, Prisma.UserAccountUncheckedCreateWithoutRecruiterVerificationRequestsInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutRecruiterVerificationRequestsInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutRecruiterVerificationRequestsInput, Prisma.UserAccountUncheckedUpdateWithoutRecruiterVerificationRequestsInput>
+}
+
+export type UserAccountUpdateWithoutRecruiterVerificationRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutRecruiterVerificationRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+}
+
+export type UserAccountCreateWithoutSubmittedModerationReportsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+}
+
+export type UserAccountUncheckedCreateWithoutSubmittedModerationReportsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+}
+
+export type UserAccountCreateOrConnectWithoutSubmittedModerationReportsInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSubmittedModerationReportsInput, Prisma.UserAccountUncheckedCreateWithoutSubmittedModerationReportsInput>
+}
+
+export type UserAccountUpsertWithoutSubmittedModerationReportsInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutSubmittedModerationReportsInput, Prisma.UserAccountUncheckedUpdateWithoutSubmittedModerationReportsInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSubmittedModerationReportsInput, Prisma.UserAccountUncheckedCreateWithoutSubmittedModerationReportsInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutSubmittedModerationReportsInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutSubmittedModerationReportsInput, Prisma.UserAccountUncheckedUpdateWithoutSubmittedModerationReportsInput>
+}
+
+export type UserAccountUpdateWithoutSubmittedModerationReportsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutSubmittedModerationReportsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
 }
 
 export type UserAccountCreateWithoutSavedJobsInput = {
@@ -4211,6 +5228,7 @@ export type UserAccountCreateWithoutSavedJobsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -4245,6 +5263,9 @@ export type UserAccountCreateWithoutSavedJobsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutSavedJobsInput = {
@@ -4255,6 +5276,7 @@ export type UserAccountUncheckedCreateWithoutSavedJobsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -4289,6 +5311,9 @@ export type UserAccountUncheckedCreateWithoutSavedJobsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutSavedJobsInput = {
@@ -4315,6 +5340,7 @@ export type UserAccountUpdateWithoutSavedJobsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4349,6 +5375,9 @@ export type UserAccountUpdateWithoutSavedJobsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSavedJobsInput = {
@@ -4359,6 +5388,7 @@ export type UserAccountUncheckedUpdateWithoutSavedJobsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4393,6 +5423,9 @@ export type UserAccountUncheckedUpdateWithoutSavedJobsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutJobReportsInput = {
@@ -4403,6 +5436,7 @@ export type UserAccountCreateWithoutJobReportsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -4437,6 +5471,9 @@ export type UserAccountCreateWithoutJobReportsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutJobReportsInput = {
@@ -4447,6 +5484,7 @@ export type UserAccountUncheckedCreateWithoutJobReportsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -4481,6 +5519,9 @@ export type UserAccountUncheckedCreateWithoutJobReportsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutJobReportsInput = {
@@ -4507,6 +5548,7 @@ export type UserAccountUpdateWithoutJobReportsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4541,6 +5583,9 @@ export type UserAccountUpdateWithoutJobReportsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutJobReportsInput = {
@@ -4551,6 +5596,7 @@ export type UserAccountUncheckedUpdateWithoutJobReportsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4585,6 +5631,9 @@ export type UserAccountUncheckedUpdateWithoutJobReportsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutCvQuotaInput = {
@@ -4595,6 +5644,7 @@ export type UserAccountCreateWithoutCvQuotaInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -4629,6 +5679,9 @@ export type UserAccountCreateWithoutCvQuotaInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvQuotaInput = {
@@ -4639,6 +5692,7 @@ export type UserAccountUncheckedCreateWithoutCvQuotaInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -4673,6 +5727,9 @@ export type UserAccountUncheckedCreateWithoutCvQuotaInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvQuotaInput = {
@@ -4699,6 +5756,7 @@ export type UserAccountUpdateWithoutCvQuotaInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4733,6 +5791,9 @@ export type UserAccountUpdateWithoutCvQuotaInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvQuotaInput = {
@@ -4743,6 +5804,7 @@ export type UserAccountUncheckedUpdateWithoutCvQuotaInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4777,6 +5839,9 @@ export type UserAccountUncheckedUpdateWithoutCvQuotaInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutCvUploadsInput = {
@@ -4787,6 +5852,7 @@ export type UserAccountCreateWithoutCvUploadsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -4821,6 +5887,9 @@ export type UserAccountCreateWithoutCvUploadsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvUploadsInput = {
@@ -4831,6 +5900,7 @@ export type UserAccountUncheckedCreateWithoutCvUploadsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -4865,6 +5935,9 @@ export type UserAccountUncheckedCreateWithoutCvUploadsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvUploadsInput = {
@@ -4891,6 +5964,7 @@ export type UserAccountUpdateWithoutCvUploadsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4925,6 +5999,9 @@ export type UserAccountUpdateWithoutCvUploadsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvUploadsInput = {
@@ -4935,6 +6012,7 @@ export type UserAccountUncheckedUpdateWithoutCvUploadsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4969,6 +6047,9 @@ export type UserAccountUncheckedUpdateWithoutCvUploadsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutCvStoredArtifactsInput = {
@@ -4979,6 +6060,7 @@ export type UserAccountCreateWithoutCvStoredArtifactsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -5013,6 +6095,9 @@ export type UserAccountCreateWithoutCvStoredArtifactsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvStoredArtifactsInput = {
@@ -5023,6 +6108,7 @@ export type UserAccountUncheckedCreateWithoutCvStoredArtifactsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -5057,6 +6143,9 @@ export type UserAccountUncheckedCreateWithoutCvStoredArtifactsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvStoredArtifactsInput = {
@@ -5083,6 +6172,7 @@ export type UserAccountUpdateWithoutCvStoredArtifactsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5117,6 +6207,9 @@ export type UserAccountUpdateWithoutCvStoredArtifactsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvStoredArtifactsInput = {
@@ -5127,6 +6220,7 @@ export type UserAccountUncheckedUpdateWithoutCvStoredArtifactsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5161,6 +6255,9 @@ export type UserAccountUncheckedUpdateWithoutCvStoredArtifactsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutCvScanAssessmentsInput = {
@@ -5171,6 +6268,7 @@ export type UserAccountCreateWithoutCvScanAssessmentsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -5205,6 +6303,9 @@ export type UserAccountCreateWithoutCvScanAssessmentsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvScanAssessmentsInput = {
@@ -5215,6 +6316,7 @@ export type UserAccountUncheckedCreateWithoutCvScanAssessmentsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -5249,6 +6351,9 @@ export type UserAccountUncheckedCreateWithoutCvScanAssessmentsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvScanAssessmentsInput = {
@@ -5275,6 +6380,7 @@ export type UserAccountUpdateWithoutCvScanAssessmentsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5309,6 +6415,9 @@ export type UserAccountUpdateWithoutCvScanAssessmentsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvScanAssessmentsInput = {
@@ -5319,6 +6428,7 @@ export type UserAccountUncheckedUpdateWithoutCvScanAssessmentsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5353,6 +6463,9 @@ export type UserAccountUncheckedUpdateWithoutCvScanAssessmentsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutCvExtractionsInput = {
@@ -5363,6 +6476,7 @@ export type UserAccountCreateWithoutCvExtractionsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -5397,6 +6511,9 @@ export type UserAccountCreateWithoutCvExtractionsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvExtractionsInput = {
@@ -5407,6 +6524,7 @@ export type UserAccountUncheckedCreateWithoutCvExtractionsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -5441,6 +6559,9 @@ export type UserAccountUncheckedCreateWithoutCvExtractionsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvExtractionsInput = {
@@ -5467,6 +6588,7 @@ export type UserAccountUpdateWithoutCvExtractionsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5501,6 +6623,9 @@ export type UserAccountUpdateWithoutCvExtractionsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvExtractionsInput = {
@@ -5511,6 +6636,7 @@ export type UserAccountUncheckedUpdateWithoutCvExtractionsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5545,6 +6671,9 @@ export type UserAccountUncheckedUpdateWithoutCvExtractionsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutCvParseJobsInput = {
@@ -5555,6 +6684,7 @@ export type UserAccountCreateWithoutCvParseJobsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -5589,6 +6719,9 @@ export type UserAccountCreateWithoutCvParseJobsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvParseJobsInput = {
@@ -5599,6 +6732,7 @@ export type UserAccountUncheckedCreateWithoutCvParseJobsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -5633,6 +6767,9 @@ export type UserAccountUncheckedCreateWithoutCvParseJobsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvParseJobsInput = {
@@ -5659,6 +6796,7 @@ export type UserAccountUpdateWithoutCvParseJobsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5693,6 +6831,9 @@ export type UserAccountUpdateWithoutCvParseJobsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvParseJobsInput = {
@@ -5703,6 +6844,7 @@ export type UserAccountUncheckedUpdateWithoutCvParseJobsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5737,6 +6879,9 @@ export type UserAccountUncheckedUpdateWithoutCvParseJobsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutCvRetryRequestsInput = {
@@ -5747,6 +6892,7 @@ export type UserAccountCreateWithoutCvRetryRequestsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -5781,6 +6927,9 @@ export type UserAccountCreateWithoutCvRetryRequestsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvRetryRequestsInput = {
@@ -5791,6 +6940,7 @@ export type UserAccountUncheckedCreateWithoutCvRetryRequestsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -5825,6 +6975,9 @@ export type UserAccountUncheckedCreateWithoutCvRetryRequestsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvRetryRequestsInput = {
@@ -5851,6 +7004,7 @@ export type UserAccountUpdateWithoutCvRetryRequestsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5885,6 +7039,9 @@ export type UserAccountUpdateWithoutCvRetryRequestsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvRetryRequestsInput = {
@@ -5895,6 +7052,7 @@ export type UserAccountUncheckedUpdateWithoutCvRetryRequestsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5929,6 +7087,9 @@ export type UserAccountUncheckedUpdateWithoutCvRetryRequestsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutCvDraftsInput = {
@@ -5939,6 +7100,7 @@ export type UserAccountCreateWithoutCvDraftsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -5973,6 +7135,9 @@ export type UserAccountCreateWithoutCvDraftsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvDraftsInput = {
@@ -5983,6 +7148,7 @@ export type UserAccountUncheckedCreateWithoutCvDraftsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -6017,6 +7183,9 @@ export type UserAccountUncheckedCreateWithoutCvDraftsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvDraftsInput = {
@@ -6043,6 +7212,7 @@ export type UserAccountUpdateWithoutCvDraftsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6077,6 +7247,9 @@ export type UserAccountUpdateWithoutCvDraftsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvDraftsInput = {
@@ -6087,6 +7260,7 @@ export type UserAccountUncheckedUpdateWithoutCvDraftsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6121,6 +7295,9 @@ export type UserAccountUncheckedUpdateWithoutCvDraftsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutCvConsentEventsInput = {
@@ -6131,6 +7308,7 @@ export type UserAccountCreateWithoutCvConsentEventsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -6165,6 +7343,9 @@ export type UserAccountCreateWithoutCvConsentEventsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvConsentEventsInput = {
@@ -6175,6 +7356,7 @@ export type UserAccountUncheckedCreateWithoutCvConsentEventsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -6209,6 +7391,9 @@ export type UserAccountUncheckedCreateWithoutCvConsentEventsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvConsentEventsInput = {
@@ -6235,6 +7420,7 @@ export type UserAccountUpdateWithoutCvConsentEventsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6269,6 +7455,9 @@ export type UserAccountUpdateWithoutCvConsentEventsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvConsentEventsInput = {
@@ -6279,6 +7468,7 @@ export type UserAccountUncheckedUpdateWithoutCvConsentEventsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6313,6 +7503,9 @@ export type UserAccountUncheckedUpdateWithoutCvConsentEventsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutCvConfirmationsInput = {
@@ -6323,6 +7516,7 @@ export type UserAccountCreateWithoutCvConfirmationsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -6357,6 +7551,9 @@ export type UserAccountCreateWithoutCvConfirmationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvConfirmationsInput = {
@@ -6367,6 +7564,7 @@ export type UserAccountUncheckedCreateWithoutCvConfirmationsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -6401,6 +7599,9 @@ export type UserAccountUncheckedCreateWithoutCvConfirmationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvConfirmationsInput = {
@@ -6427,6 +7628,7 @@ export type UserAccountUpdateWithoutCvConfirmationsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6461,6 +7663,9 @@ export type UserAccountUpdateWithoutCvConfirmationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvConfirmationsInput = {
@@ -6471,6 +7676,7 @@ export type UserAccountUncheckedUpdateWithoutCvConfirmationsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6505,6 +7711,9 @@ export type UserAccountUncheckedUpdateWithoutCvConfirmationsInput = {
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutImageSearchQueriesInput = {
@@ -6515,6 +7724,7 @@ export type UserAccountCreateWithoutImageSearchQueriesInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -6549,6 +7759,9 @@ export type UserAccountCreateWithoutImageSearchQueriesInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutImageSearchQueriesInput = {
@@ -6559,6 +7772,7 @@ export type UserAccountUncheckedCreateWithoutImageSearchQueriesInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -6593,6 +7807,9 @@ export type UserAccountUncheckedCreateWithoutImageSearchQueriesInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutImageSearchQueriesInput = {
@@ -6619,6 +7836,7 @@ export type UserAccountUpdateWithoutImageSearchQueriesInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6653,6 +7871,9 @@ export type UserAccountUpdateWithoutImageSearchQueriesInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutImageSearchQueriesInput = {
@@ -6663,6 +7884,7 @@ export type UserAccountUncheckedUpdateWithoutImageSearchQueriesInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6697,6 +7919,9 @@ export type UserAccountUncheckedUpdateWithoutImageSearchQueriesInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountCreateWithoutImageSearchConsentsInput = {
@@ -6707,6 +7932,7 @@ export type UserAccountCreateWithoutImageSearchConsentsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -6741,6 +7967,9 @@ export type UserAccountCreateWithoutImageSearchConsentsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountUncheckedCreateWithoutImageSearchConsentsInput = {
@@ -6751,6 +7980,7 @@ export type UserAccountUncheckedCreateWithoutImageSearchConsentsInput = {
   emailVerified?: boolean
   image?: string | null
   state?: $Enums.AccountState
+  version?: number
   twoFactorEnabled?: boolean
   stateChangedAt?: Date | string
   deletedAt?: Date | string | null
@@ -6785,6 +8015,9 @@ export type UserAccountUncheckedCreateWithoutImageSearchConsentsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserAccountCreateOrConnectWithoutImageSearchConsentsInput = {
@@ -6811,6 +8044,7 @@ export type UserAccountUpdateWithoutImageSearchConsentsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6845,6 +8079,9 @@ export type UserAccountUpdateWithoutImageSearchConsentsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutImageSearchConsentsInput = {
@@ -6855,6 +8092,7 @@ export type UserAccountUncheckedUpdateWithoutImageSearchConsentsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6889,6 +8127,9 @@ export type UserAccountUncheckedUpdateWithoutImageSearchConsentsInput = {
   cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
   imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
   companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 
@@ -6921,6 +8162,9 @@ export type UserAccountCountOutputType = {
   imageSearchQueries: number
   imageSearchConsents: number
   companyMemberships: number
+  platformAdministratorGrants: number
+  recruiterVerificationRequests: number
+  submittedModerationReports: number
 }
 
 export type UserAccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -6948,6 +8192,9 @@ export type UserAccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   imageSearchQueries?: boolean | UserAccountCountOutputTypeCountImageSearchQueriesArgs
   imageSearchConsents?: boolean | UserAccountCountOutputTypeCountImageSearchConsentsArgs
   companyMemberships?: boolean | UserAccountCountOutputTypeCountCompanyMembershipsArgs
+  platformAdministratorGrants?: boolean | UserAccountCountOutputTypeCountPlatformAdministratorGrantsArgs
+  recruiterVerificationRequests?: boolean | UserAccountCountOutputTypeCountRecruiterVerificationRequestsArgs
+  submittedModerationReports?: boolean | UserAccountCountOutputTypeCountSubmittedModerationReportsArgs
 }
 
 /**
@@ -7128,6 +8375,27 @@ export type UserAccountCountOutputTypeCountCompanyMembershipsArgs<ExtArgs extend
   where?: Prisma.CompanyMembershipWhereInput
 }
 
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountPlatformAdministratorGrantsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlatformAdministratorGrantWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountRecruiterVerificationRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RecruiterVerificationRequestWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountSubmittedModerationReportsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ModerationReportWhereInput
+}
+
 
 export type UserAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -7137,6 +8405,7 @@ export type UserAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   emailVerified?: boolean
   image?: boolean
   state?: boolean
+  version?: boolean
   twoFactorEnabled?: boolean
   stateChangedAt?: boolean
   deletedAt?: boolean
@@ -7172,6 +8441,9 @@ export type UserAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   imageSearchQueries?: boolean | Prisma.UserAccount$imageSearchQueriesArgs<ExtArgs>
   imageSearchConsents?: boolean | Prisma.UserAccount$imageSearchConsentsArgs<ExtArgs>
   companyMemberships?: boolean | Prisma.UserAccount$companyMembershipsArgs<ExtArgs>
+  platformAdministratorGrants?: boolean | Prisma.UserAccount$platformAdministratorGrantsArgs<ExtArgs>
+  recruiterVerificationRequests?: boolean | Prisma.UserAccount$recruiterVerificationRequestsArgs<ExtArgs>
+  submittedModerationReports?: boolean | Prisma.UserAccount$submittedModerationReportsArgs<ExtArgs>
   _count?: boolean | Prisma.UserAccountCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userAccount"]>
 
@@ -7183,6 +8455,7 @@ export type UserAccountSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   emailVerified?: boolean
   image?: boolean
   state?: boolean
+  version?: boolean
   twoFactorEnabled?: boolean
   stateChangedAt?: boolean
   deletedAt?: boolean
@@ -7198,6 +8471,7 @@ export type UserAccountSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   emailVerified?: boolean
   image?: boolean
   state?: boolean
+  version?: boolean
   twoFactorEnabled?: boolean
   stateChangedAt?: boolean
   deletedAt?: boolean
@@ -7213,6 +8487,7 @@ export type UserAccountSelectScalar = {
   emailVerified?: boolean
   image?: boolean
   state?: boolean
+  version?: boolean
   twoFactorEnabled?: boolean
   stateChangedAt?: boolean
   deletedAt?: boolean
@@ -7220,7 +8495,7 @@ export type UserAccountSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "normalizedEmail" | "emailVerified" | "image" | "state" | "twoFactorEnabled" | "stateChangedAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["userAccount"]>
+export type UserAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "normalizedEmail" | "emailVerified" | "image" | "state" | "version" | "twoFactorEnabled" | "stateChangedAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["userAccount"]>
 export type UserAccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | Prisma.UserAccount$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.UserAccount$sessionsArgs<ExtArgs>
@@ -7252,6 +8527,9 @@ export type UserAccountInclude<ExtArgs extends runtime.Types.Extensions.Internal
   imageSearchQueries?: boolean | Prisma.UserAccount$imageSearchQueriesArgs<ExtArgs>
   imageSearchConsents?: boolean | Prisma.UserAccount$imageSearchConsentsArgs<ExtArgs>
   companyMemberships?: boolean | Prisma.UserAccount$companyMembershipsArgs<ExtArgs>
+  platformAdministratorGrants?: boolean | Prisma.UserAccount$platformAdministratorGrantsArgs<ExtArgs>
+  recruiterVerificationRequests?: boolean | Prisma.UserAccount$recruiterVerificationRequestsArgs<ExtArgs>
+  submittedModerationReports?: boolean | Prisma.UserAccount$submittedModerationReportsArgs<ExtArgs>
   _count?: boolean | Prisma.UserAccountCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserAccountIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -7290,6 +8568,9 @@ export type $UserAccountPayload<ExtArgs extends runtime.Types.Extensions.Interna
     imageSearchQueries: Prisma.$SearchImageQueryPayload<ExtArgs>[]
     imageSearchConsents: Prisma.$SearchProcessingConsentPayload<ExtArgs>[]
     companyMemberships: Prisma.$CompanyMembershipPayload<ExtArgs>[]
+    platformAdministratorGrants: Prisma.$PlatformAdministratorGrantPayload<ExtArgs>[]
+    recruiterVerificationRequests: Prisma.$RecruiterVerificationRequestPayload<ExtArgs>[]
+    submittedModerationReports: Prisma.$ModerationReportPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -7299,6 +8580,7 @@ export type $UserAccountPayload<ExtArgs extends runtime.Types.Extensions.Interna
     emailVerified: boolean
     image: string | null
     state: $Enums.AccountState
+    version: number
     twoFactorEnabled: boolean
     stateChangedAt: Date
     deletedAt: Date | null
@@ -7728,6 +9010,9 @@ export interface Prisma__UserAccountClient<T, Null = never, ExtArgs extends runt
   imageSearchQueries<T extends Prisma.UserAccount$imageSearchQueriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$imageSearchQueriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SearchImageQueryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   imageSearchConsents<T extends Prisma.UserAccount$imageSearchConsentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$imageSearchConsentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SearchProcessingConsentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   companyMemberships<T extends Prisma.UserAccount$companyMembershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$companyMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CompanyMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  platformAdministratorGrants<T extends Prisma.UserAccount$platformAdministratorGrantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$platformAdministratorGrantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlatformAdministratorGrantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  recruiterVerificationRequests<T extends Prisma.UserAccount$recruiterVerificationRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$recruiterVerificationRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecruiterVerificationRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  submittedModerationReports<T extends Prisma.UserAccount$submittedModerationReportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$submittedModerationReportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModerationReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7764,6 +9049,7 @@ export interface UserAccountFieldRefs {
   readonly emailVerified: Prisma.FieldRef<"UserAccount", 'Boolean'>
   readonly image: Prisma.FieldRef<"UserAccount", 'String'>
   readonly state: Prisma.FieldRef<"UserAccount", 'AccountState'>
+  readonly version: Prisma.FieldRef<"UserAccount", 'Int'>
   readonly twoFactorEnabled: Prisma.FieldRef<"UserAccount", 'Boolean'>
   readonly stateChangedAt: Prisma.FieldRef<"UserAccount", 'DateTime'>
   readonly deletedAt: Prisma.FieldRef<"UserAccount", 'DateTime'>
@@ -8849,6 +10135,78 @@ export type UserAccount$companyMembershipsArgs<ExtArgs extends runtime.Types.Ext
   take?: number
   skip?: number
   distinct?: Prisma.CompanyMembershipScalarFieldEnum | Prisma.CompanyMembershipScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.platformAdministratorGrants
+ */
+export type UserAccount$platformAdministratorGrantsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlatformAdministratorGrant
+   */
+  select?: Prisma.PlatformAdministratorGrantSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlatformAdministratorGrant
+   */
+  omit?: Prisma.PlatformAdministratorGrantOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlatformAdministratorGrantInclude<ExtArgs> | null
+  where?: Prisma.PlatformAdministratorGrantWhereInput
+  orderBy?: Prisma.PlatformAdministratorGrantOrderByWithRelationInput | Prisma.PlatformAdministratorGrantOrderByWithRelationInput[]
+  cursor?: Prisma.PlatformAdministratorGrantWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlatformAdministratorGrantScalarFieldEnum | Prisma.PlatformAdministratorGrantScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.recruiterVerificationRequests
+ */
+export type UserAccount$recruiterVerificationRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RecruiterVerificationRequest
+   */
+  select?: Prisma.RecruiterVerificationRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RecruiterVerificationRequest
+   */
+  omit?: Prisma.RecruiterVerificationRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecruiterVerificationRequestInclude<ExtArgs> | null
+  where?: Prisma.RecruiterVerificationRequestWhereInput
+  orderBy?: Prisma.RecruiterVerificationRequestOrderByWithRelationInput | Prisma.RecruiterVerificationRequestOrderByWithRelationInput[]
+  cursor?: Prisma.RecruiterVerificationRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RecruiterVerificationRequestScalarFieldEnum | Prisma.RecruiterVerificationRequestScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.submittedModerationReports
+ */
+export type UserAccount$submittedModerationReportsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ModerationReport
+   */
+  select?: Prisma.ModerationReportSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ModerationReport
+   */
+  omit?: Prisma.ModerationReportOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ModerationReportInclude<ExtArgs> | null
+  where?: Prisma.ModerationReportWhereInput
+  orderBy?: Prisma.ModerationReportOrderByWithRelationInput | Prisma.ModerationReportOrderByWithRelationInput[]
+  cursor?: Prisma.ModerationReportWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ModerationReportScalarFieldEnum | Prisma.ModerationReportScalarFieldEnum[]
 }
 
 /**

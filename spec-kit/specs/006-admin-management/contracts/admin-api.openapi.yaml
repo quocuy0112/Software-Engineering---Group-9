@@ -1,0 +1,1365 @@
+openapi: 3.1.0
+info:
+  title: SmartHire Feature 006 Administration API
+  version: 0.2.0
+  description: >-
+    Explicit same-origin contracts for React Admin, Candidate employer
+    verification/report submission, and the recruiter entitlement boundary.
+    Cookie authentication refers to the existing Better Auth Session mechanism.
+servers:
+  - url: http://console.admin.localhost:3001
+    description: Local administration origin
+tags:
+  - name: AdminAuth
+  - name: Dashboard
+  - name: Accounts
+  - name: Verification
+  - name: Companies
+  - name: Memberships
+  - name: Moderation
+  - name: RecruiterEntitlement
+  - name: CandidateSubmission
+paths:
+  /api/admin/auth/context:
+    get:
+      tags: [AdminAuth]
+      operationId: getAdminAuthContext
+      security: [{ cookieAuth: [] }]
+      responses:
+        "200":
+          description: Current authorized administrator context; never includes session ID or factor proof
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminAuthContext" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/AuthorityDenied" }
+  /api/admin/auth/login:
+    post:
+      tags: [AdminAuth]
+      operationId: adminLogin
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [email, password]
+              properties:
+                email: { type: string, format: email, maxLength: 320 }
+                password: { type: string, minLength: 1, maxLength: 1024 }
+      responses:
+        "200":
+          description: Existing Better Auth cookie set or two-factor continuation required
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [result]
+                properties:
+                  result: { enum: [AUTHENTICATED, TWO_FACTOR_REQUIRED] }
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+  /api/admin/auth/two-factor:
+    post:
+      tags: [AdminAuth]
+      operationId: completeAdminTwoFactor
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/FactorProof" }
+      responses:
+        "200":
+          description: Existing Better Auth session designated for administration
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminAuthContext" }
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/AuthorityDenied" }
+  /api/admin/auth/step-up:
+    post:
+      tags: [AdminAuth]
+      operationId: stepUpAdminSession
+      security: [{ cookieAuth: [] }]
+      requestBody: { $ref: "#/components/requestBodies/FactorProof" }
+      responses:
+        "200":
+          description: Proof refreshed for the same designated session
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [freshUntil]
+                properties: { freshUntil: { type: string, format: date-time } }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/AuthorityDenied" }
+  /api/admin/auth/logout:
+    post:
+      tags: [AdminAuth]
+      operationId: adminLogout
+      security: [{ cookieAuth: [] }]
+      parameters: [{ $ref: "#/components/parameters/CsrfProof" }]
+      responses:
+        "204": { description: Current Better Auth session signed out }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+  /api/admin/dashboard:
+    get:
+      tags: [Dashboard]
+      operationId: getAdminDashboardSnapshot
+      x-react-admin-method: getDashboardSnapshot
+      security: [{ cookieAuth: [] }]
+      responses:
+        "200":
+          description: Unexpired periodic snapshot
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DashboardSnapshot" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/AuthorityDenied" }
+        "503": { $ref: "#/components/responses/SnapshotUnavailable" }
+  /api/admin/accounts:
+    get:
+      tags: [Accounts]
+      operationId: listAdminAccounts
+      x-react-admin-resource: accounts
+      x-react-admin-method: getList
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Page" }
+        - { $ref: "#/components/parameters/PerPage" }
+        - { name: q, in: query, schema: { type: string, maxLength: 320 } }
+        - { name: accountState, in: query, schema: { type: string } }
+        - { name: recruiterEnabled, in: query, schema: { type: boolean } }
+        - {
+            name: membershipRole,
+            in: query,
+            schema: { $ref: "#/components/schemas/CompanyMembershipRole" },
+          }
+        - {
+            name: membershipState,
+            in: query,
+            schema: { $ref: "#/components/schemas/CompanyMembershipState" },
+          }
+      responses:
+        "200":
+          description: Exact FR-014 projection
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AccountList" }
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/AuthorityDenied" }
+  /api/admin/accounts/{accountId}/security:
+    get:
+      tags: [Accounts]
+      operationId: getAdminAccountSecurity
+      x-react-admin-method: getAccountSecurity
+      security: [{ cookieAuth: [] }]
+      parameters: [{ $ref: "#/components/parameters/AccountId" }]
+      responses:
+        "200":
+          description: Exact FR-015 safe detail
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AccountSecurity" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/AuthorityDenied" }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+  /api/admin/accounts/{accountId}/sessions/{sessionReference}/revoke:
+    post:
+      tags: [Accounts]
+      operationId: revokeAdminTargetSession
+      x-react-admin-method: revokeSession
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/AccountId" }
+        - {
+            name: sessionReference,
+            in: path,
+            required: true,
+            schema: { type: string, maxLength: 128 },
+          }
+        - { $ref: "#/components/parameters/CsrfProof" }
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+        - { $ref: "#/components/parameters/IfMatch" }
+      requestBody: { $ref: "#/components/requestBodies/Reason" }
+      responses:
+        {
+          "200": { $ref: "#/components/responses/CommandSucceeded" },
+          "409": { $ref: "#/components/responses/StateConflict" },
+          "428": { $ref: "#/components/responses/StepUpRequired" },
+        }
+  /api/admin/accounts/{accountId}/sessions/revoke-all:
+    post:
+      tags: [Accounts]
+      operationId: revokeAllAdminTargetSessions
+      x-react-admin-method: revokeAllSessions
+      security: [{ cookieAuth: [] }]
+      parameters:
+        [
+          { $ref: "#/components/parameters/AccountId" },
+          { $ref: "#/components/parameters/CsrfProof" },
+          { $ref: "#/components/parameters/IdempotencyKey" },
+          { $ref: "#/components/parameters/IfMatch" },
+        ]
+      requestBody: { $ref: "#/components/requestBodies/Reason" }
+      responses:
+        {
+          "200": { $ref: "#/components/responses/CommandSucceeded" },
+          "409": { $ref: "#/components/responses/StateConflict" },
+          "428": { $ref: "#/components/responses/StepUpRequired" },
+        }
+  /api/admin/accounts/{accountId}/suspend:
+    post:
+      tags: [Accounts]
+      operationId: suspendAdminTargetAccount
+      x-react-admin-method: suspendAccount
+      security: [{ cookieAuth: [] }]
+      parameters:
+        [
+          { $ref: "#/components/parameters/AccountId" },
+          { $ref: "#/components/parameters/CsrfProof" },
+          { $ref: "#/components/parameters/IdempotencyKey" },
+          { $ref: "#/components/parameters/IfMatch" },
+        ]
+      requestBody: { $ref: "#/components/requestBodies/Reason" }
+      responses:
+        {
+          "200": { $ref: "#/components/responses/CommandSucceeded" },
+          "409": { $ref: "#/components/responses/StateConflict" },
+          "423": { $ref: "#/components/responses/ActionBlocked" },
+          "428": { $ref: "#/components/responses/StepUpRequired" },
+        }
+  /api/admin/accounts/{accountId}/reinstate:
+    post:
+      tags: [Accounts]
+      operationId: reinstateAdminTargetAccount
+      x-react-admin-method: reinstateAccount
+      security: [{ cookieAuth: [] }]
+      parameters:
+        [
+          { $ref: "#/components/parameters/AccountId" },
+          { $ref: "#/components/parameters/CsrfProof" },
+          { $ref: "#/components/parameters/IdempotencyKey" },
+          { $ref: "#/components/parameters/IfMatch" },
+        ]
+      requestBody: { $ref: "#/components/requestBodies/Reason" }
+      responses:
+        {
+          "200": { $ref: "#/components/responses/CommandSucceeded" },
+          "409": { $ref: "#/components/responses/StateConflict" },
+          "428": { $ref: "#/components/responses/StepUpRequired" },
+        }
+  /api/admin/actions/{correlationId}/rationale:
+    get:
+      tags: [Accounts]
+      operationId: getPrivilegedActionRationale
+      x-react-admin-method: getPrivilegedRationale
+      security: [{ cookieAuth: [] }]
+      parameters:
+        [
+          {
+            name: correlationId,
+            in: path,
+            required: true,
+            schema: { type: string, maxLength: 128 },
+          },
+        ]
+      responses:
+        "200":
+          description: Fresh-step-up protected rationale
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [correlationId, rationale, availableUntil]
+                properties:
+                  correlationId: { type: string }
+                  rationale: { type: string, minLength: 10, maxLength: 500 }
+                  availableUntil: { type: string, format: date-time }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+        "428": { $ref: "#/components/responses/StepUpRequired" }
+  /api/admin/verification-requests:
+    get:
+      tags: [Verification]
+      operationId: listVerificationRequests
+      x-react-admin-resource: verification-requests
+      x-react-admin-method: getList
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Page" }
+        - { $ref: "#/components/parameters/PerPage" }
+        - {
+            name: state,
+            in: query,
+            schema: { $ref: "#/components/schemas/VerificationState" },
+          }
+        - { name: age, in: query, schema: { type: string } }
+        - { name: companyId, in: query, schema: { type: string } }
+        - {
+            name: taxIdentifier,
+            in: query,
+            schema: { type: string, pattern: "^[0-9]{10}$" },
+          }
+        - { name: applicantId, in: query, schema: { type: string } }
+        - {
+            name: assigneeId,
+            in: query,
+            description: Read-only workload metadata filter; use UNASSIGNED for null assignment. Feature 006 exposes no verification-assignment mutation.,
+            schema: { type: string, maxLength: 128 },
+          }
+      responses:
+        "200":
+          {
+            description: Review queue without document content,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/GenericList" } },
+              },
+          }
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+  /api/admin/verification-requests/{requestId}:
+    get:
+      tags: [Verification]
+      operationId: getVerificationReview
+      x-react-admin-method: getVerificationReview
+      security: [{ cookieAuth: [] }]
+      parameters: [{ $ref: "#/components/parameters/RequestId" }]
+      responses:
+        "200":
+          {
+            description: Safe composed review detail,
+            content:
+              {
+                application/json:
+                  {
+                    schema: { $ref: "#/components/schemas/VerificationReview" },
+                  },
+              },
+          }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+  /api/admin/verification-requests/{requestId}/evidence/{evidenceId}/preview:
+    get:
+      tags: [Verification]
+      operationId: previewVerificationEvidence
+      x-react-admin-method: openEvidence
+      security: [{ cookieAuth: [] }]
+      parameters:
+        [
+          { $ref: "#/components/parameters/RequestId" },
+          { $ref: "#/components/parameters/EvidenceId" },
+        ]
+      responses:
+        "200":
+          {
+            description: Authorized no-store preview bytes,
+            content:
+              {
+                application/pdf:
+                  { schema: { type: string, contentEncoding: binary } },
+                image/png:
+                  { schema: { type: string, contentEncoding: binary } },
+                image/jpeg:
+                  { schema: { type: string, contentEncoding: binary } },
+              },
+          }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+        "428": { $ref: "#/components/responses/StepUpRequired" }
+        "503": { $ref: "#/components/responses/ViewerUnavailable" }
+  /api/admin/verification-requests/{requestId}/evidence/{evidenceId}/download:
+    get:
+      tags: [Verification]
+      operationId: downloadVerificationEvidence
+      x-react-admin-method: downloadEvidence
+      security: [{ cookieAuth: [] }]
+      parameters:
+        [
+          { $ref: "#/components/parameters/RequestId" },
+          { $ref: "#/components/parameters/EvidenceId" },
+        ]
+      responses:
+        "200":
+          {
+            description: Authorized no-store attachment bytes,
+            content:
+              {
+                application/octet-stream:
+                  { schema: { type: string, contentEncoding: binary } },
+              },
+          }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+        "428": { $ref: "#/components/responses/StepUpRequired" }
+  /api/admin/verification-requests/{requestId}/request-changes:
+    post:
+      tags: [Verification]
+      operationId: requestVerificationChanges
+      x-react-admin-method: requestVerificationChanges
+      security: [{ cookieAuth: [] }]
+      parameters:
+        [
+          { $ref: "#/components/parameters/RequestId" },
+          { $ref: "#/components/parameters/CsrfProof" },
+          { $ref: "#/components/parameters/IdempotencyKey" },
+          { $ref: "#/components/parameters/IfMatch" },
+        ]
+      requestBody:
+        {
+          required: true,
+          content:
+            {
+              application/json:
+                { schema: { $ref: "#/components/schemas/ChangeRequestInput" } },
+            },
+        }
+      responses:
+        {
+          "200": { $ref: "#/components/responses/CommandSucceeded" },
+          "409": { $ref: "#/components/responses/StateConflict" },
+          "428": { $ref: "#/components/responses/StepUpRequired" },
+        }
+  /api/admin/verification-requests/{requestId}/reject:
+    post:
+      tags: [Verification]
+      operationId: rejectVerificationRequest
+      x-react-admin-method: rejectVerification
+      security: [{ cookieAuth: [] }]
+      parameters:
+        [
+          { $ref: "#/components/parameters/RequestId" },
+          { $ref: "#/components/parameters/CsrfProof" },
+          { $ref: "#/components/parameters/IdempotencyKey" },
+          { $ref: "#/components/parameters/IfMatch" },
+        ]
+      requestBody:
+        {
+          required: true,
+          content:
+            {
+              application/json:
+                { schema: { $ref: "#/components/schemas/RejectionInput" } },
+            },
+        }
+      responses:
+        {
+          "200": { $ref: "#/components/responses/CommandSucceeded" },
+          "409": { $ref: "#/components/responses/StateConflict" },
+          "428": { $ref: "#/components/responses/StepUpRequired" },
+        }
+  /api/admin/verification-requests/{requestId}/approve:
+    post:
+      tags: [Verification]
+      operationId: approveVerificationRequest
+      x-react-admin-method: approveVerification
+      security: [{ cookieAuth: [] }]
+      parameters:
+        [
+          { $ref: "#/components/parameters/RequestId" },
+          { $ref: "#/components/parameters/CsrfProof" },
+          { $ref: "#/components/parameters/IdempotencyKey" },
+          { $ref: "#/components/parameters/IfMatch" },
+        ]
+      requestBody:
+        {
+          required: true,
+          content:
+            {
+              application/json:
+                {
+                  schema:
+                    {
+                      type: object,
+                      additionalProperties: false,
+                      required: [role],
+                      properties:
+                        {
+                          role:
+                            {
+                              $ref: "#/components/schemas/CompanyMembershipRole",
+                            },
+                        },
+                    },
+                },
+            },
+        }
+      responses:
+        {
+          "200": { $ref: "#/components/responses/CommandSucceeded" },
+          "409": { $ref: "#/components/responses/StateConflict" },
+          "423": { $ref: "#/components/responses/ActionBlocked" },
+          "428": { $ref: "#/components/responses/StepUpRequired" },
+        }
+  /api/admin/companies:
+    get:
+      tags: [Companies]
+      operationId: listAdminCompanyReferences
+      x-react-admin-resource: companies
+      x-react-admin-method: getList
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Page" }
+        - { $ref: "#/components/parameters/PerPage" }
+        - { name: search, in: query, schema: { type: string, maxLength: 160 } }
+        - {
+            name: companyId,
+            in: query,
+            schema: { type: string, maxLength: 128 },
+          }
+      responses:
+        "200":
+          description: Authorized safe company references for administration filters
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CompanyReferenceList" }
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/AuthorityDenied" }
+  /api/admin/company-memberships:
+    get:
+      tags: [Memberships]
+      operationId: listAdminCompanyMemberships
+      x-react-admin-resource: company-memberships
+      x-react-admin-method: getList
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Page" }
+        - { $ref: "#/components/parameters/PerPage" }
+        - {
+            name: accountId,
+            in: query,
+            schema: { type: string, maxLength: 128 },
+          }
+        - {
+            name: companyId,
+            in: query,
+            schema: { type: string, maxLength: 128 },
+          }
+        - {
+            name: role,
+            in: query,
+            schema: { $ref: "#/components/schemas/CompanyMembershipRole" },
+          }
+        - {
+            name: state,
+            in: query,
+            schema: { $ref: "#/components/schemas/CompanyMembershipState" },
+          }
+      responses:
+        "200":
+          description: Current company-scoped membership list using dashboard state definitions
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CompanyMembershipList" }
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/AuthorityDenied" }
+  /api/admin/company-memberships/{membershipId}:
+    get:
+      tags: [Memberships]
+      operationId: getAdminCompanyMembership
+      x-react-admin-resource: company-memberships
+      x-react-admin-method: getOne
+      security: [{ cookieAuth: [] }]
+      parameters: [{ $ref: "#/components/parameters/MembershipId" }]
+      responses:
+        "200":
+          description: Authorized company-scoped membership detail
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CompanyMembershipRecord" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/AuthorityDenied" }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+  /api/admin/company-memberships/{membershipId}/{action}:
+    post:
+      tags: [Memberships]
+      operationId: changeCompanyMembershipLifecycle
+      description: Action path is one of suspend, restore, or remove; generic update/delete is not exposed.
+      x-react-admin-method: suspendMembership|restoreMembership|removeMembership
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/MembershipId" }
+        - {
+            name: action,
+            in: path,
+            required: true,
+            schema: { enum: [suspend, restore, remove] },
+          }
+        - { $ref: "#/components/parameters/CsrfProof" }
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+        - { $ref: "#/components/parameters/IfMatch" }
+      requestBody: { $ref: "#/components/requestBodies/Reason" }
+      responses:
+        {
+          "200": { $ref: "#/components/responses/CommandSucceeded" },
+          "409": { $ref: "#/components/responses/StateConflict" },
+          "423": { $ref: "#/components/responses/ActionBlocked" },
+          "428": { $ref: "#/components/responses/StepUpRequired" },
+        }
+  /api/admin/moderation-reports:
+    get:
+      tags: [Moderation]
+      operationId: listModerationReports
+      x-react-admin-resource: moderation-reports
+      x-react-admin-method: getList
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Page" }
+        - { $ref: "#/components/parameters/PerPage" }
+        - { name: targetType, in: query, schema: { type: string } }
+        - {
+            name: category,
+            in: query,
+            schema: { $ref: "#/components/schemas/ReportCategory" },
+          }
+        - {
+            name: priority,
+            in: query,
+            schema: { enum: [CRITICAL, HIGH, NORMAL] },
+          }
+        - {
+            name: state,
+            in: query,
+            schema: { enum: [PENDING_REVIEW, RESOLVED, DISMISSED] },
+          }
+        - { name: companyId, in: query, schema: { type: string } }
+        - { name: age, in: query, schema: { type: string } }
+        - { name: assigneeId, in: query, schema: { type: string } }
+      responses:
+        "200":
+          {
+            description: Private prioritized queue,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/GenericList" } },
+              },
+          }
+  /api/admin/moderation-reports/{reportId}:
+    get:
+      tags: [Moderation]
+      operationId: getModerationReport
+      x-react-admin-method: getModerationReport
+      security: [{ cookieAuth: [] }]
+      parameters: [{ $ref: "#/components/parameters/ReportId" }]
+      responses:
+        "200":
+          {
+            description: Authorized private review detail,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/ModerationReview" } },
+              },
+          }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+  /api/admin/moderation-reports/{reportId}/{action}:
+    post:
+      tags: [Moderation]
+      operationId: changeModerationReport
+      description: Action is assign, note, resolve, dismiss, or link-enforcement. Terminal reports cannot reopen.
+      x-react-admin-method: assignReport|addReportNote|resolveReport|dismissReport|linkEnforcement
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/ReportId" }
+        - {
+            name: action,
+            in: path,
+            required: true,
+            schema:
+              { enum: [assign, note, resolve, dismiss, link-enforcement] },
+          }
+        - { $ref: "#/components/parameters/CsrfProof" }
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+        - { $ref: "#/components/parameters/IfMatch" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                assigneeAdminUserId: { type: [string, "null"] }
+                note: { type: string, maxLength: 2000 }
+                enforcementCorrelationId: { type: string, maxLength: 128 }
+      responses:
+        {
+          "200": { $ref: "#/components/responses/CommandSucceeded" },
+          "409": { $ref: "#/components/responses/StateConflict" },
+          "428": { $ref: "#/components/responses/StepUpRequired" },
+        }
+  /api/admin/audit-events/{correlationId}:
+    get:
+      tags: [Accounts]
+      operationId: getAdminAuditCorrelation
+      security: [{ cookieAuth: [] }]
+      parameters:
+        [
+          {
+            name: correlationId,
+            in: path,
+            required: true,
+            schema: { type: string },
+          },
+        ]
+      responses:
+        "200":
+          {
+            description: Allowlisted correlated audit and notification status,
+            content: { application/json: { schema: { type: object } } },
+          }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+  /api/recruiter/entitlement:
+    get:
+      tags: [RecruiterEntitlement]
+      operationId: getRecruiterEntitlement
+      security: [{ cookieAuth: [] }]
+      responses:
+        "200":
+          description: Active safe company contexts or exact coming-next destinations
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RecruiterEntitlement" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/AuthorityDenied" }
+  /api/employer-verifications:
+    post:
+      tags: [CandidateSubmission]
+      operationId: submitEmployerVerification
+      security: [{ cookieAuth: [] }]
+      parameters:
+        [
+          { $ref: "#/components/parameters/CsrfProof" },
+          { $ref: "#/components/parameters/IdempotencyKey" },
+        ]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [companyName, taxIdentifier, document]
+              properties:
+                companyName: { type: string, minLength: 1, maxLength: 240 }
+                taxIdentifier: { type: string, pattern: "^[0-9]{10}$" }
+                requestedRole:
+                  { $ref: "#/components/schemas/CompanyMembershipRole" }
+                prerequisiteId: { type: string }
+                document:
+                  {
+                    type: string,
+                    contentMediaType: application/octet-stream,
+                    maxLength: 5000000,
+                  }
+      responses:
+        "201":
+          {
+            description: Private PENDING_CHECKS request,
+            content: { application/json: { schema: { type: object } } },
+          }
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "409": { $ref: "#/components/responses/StateConflict" }
+  /api/employer-verifications/{requestId}/{action}:
+    post:
+      tags: [CandidateSubmission]
+      operationId: changeApplicantVerificationRequest
+      description: Applicant-only cancel or resubmit. Resubmit includes a replacement document and moves atomically through RESUBMITTED to PENDING_CHECKS.
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/RequestId" }
+        - {
+            name: action,
+            in: path,
+            required: true,
+            schema: { enum: [cancel, resubmit] },
+          }
+        - { $ref: "#/components/parameters/CsrfProof" }
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+        - { $ref: "#/components/parameters/IfMatch" }
+      responses:
+        {
+          "200": { $ref: "#/components/responses/CommandSucceeded" },
+          "409": { $ref: "#/components/responses/StateConflict" },
+        }
+  /api/moderation-reports:
+    post:
+      tags: [CandidateSubmission]
+      operationId: submitModerationReport
+      security: [{ cookieAuth: [] }]
+      parameters:
+        [
+          { $ref: "#/components/parameters/CsrfProof" },
+          { $ref: "#/components/parameters/IdempotencyKey" },
+        ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [targetContext, category]
+              properties:
+                targetContext:
+                  {
+                    type: object,
+                    description: Server-validated public-job/company/application relationship reference,
+                  }
+                category: { $ref: "#/components/schemas/ReportCategory" }
+                detail: { type: string, maxLength: 2000 }
+      responses:
+        "202":
+          description: Neutral accepted-or-duplicate acknowledgement
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [message]
+                properties:
+                  {
+                    message:
+                      {
+                        const: "Thanks. Your concern was received for review.",
+                      },
+                  }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+        "429":
+          {
+            description: Account quota reached; safe remaining retry duration only,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/SafeError" } },
+              },
+          }
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: smarthire.session
+      description: Existing Better Auth opaque HttpOnly cookie; production name uses approved __Host- prefix.
+  parameters:
+    Page:
+      {
+        name: page,
+        in: query,
+        schema: { type: integer, minimum: 1, default: 1 },
+      }
+    PerPage:
+      {
+        name: perPage,
+        in: query,
+        schema: { type: integer, enum: [25, 50, 100], default: 25 },
+      }
+    AccountId:
+      {
+        name: accountId,
+        in: path,
+        required: true,
+        schema: { type: string, maxLength: 128 },
+      }
+    RequestId:
+      {
+        name: requestId,
+        in: path,
+        required: true,
+        schema: { type: string, maxLength: 128 },
+      }
+    EvidenceId:
+      {
+        name: evidenceId,
+        in: path,
+        required: true,
+        schema: { type: string, maxLength: 128 },
+      }
+    ReportId:
+      {
+        name: reportId,
+        in: path,
+        required: true,
+        schema: { type: string, maxLength: 128 },
+      }
+    MembershipId:
+      {
+        name: membershipId,
+        in: path,
+        required: true,
+        schema: { type: string, maxLength: 128 },
+      }
+    CsrfProof:
+      {
+        name: X-CSRF-Token,
+        in: header,
+        required: true,
+        schema: { type: string, maxLength: 256 },
+      }
+    IdempotencyKey:
+      {
+        name: Idempotency-Key,
+        in: header,
+        required: true,
+        schema: { type: string, format: uuid },
+      }
+    IfMatch:
+      {
+        name: If-Match,
+        in: header,
+        required: true,
+        schema: { type: string, pattern: '^"[0-9]+"$' },
+      }
+  requestBodies:
+    FactorProof:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            required: [method, code]
+            properties:
+              method: { enum: [TOTP, BACKUP_CODE] }
+              code: { type: string, minLength: 1, maxLength: 128 }
+    Reason:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ReasonInput" }
+  responses:
+    CommandSucceeded:
+      description: Authoritative committed result
+      content:
+        {
+          application/json:
+            { schema: { $ref: "#/components/schemas/CommandResult" } },
+        }
+    AuthenticationRequired:
+      description: No current usable Better Auth/admin session
+      content:
+        {
+          application/json:
+            { schema: { $ref: "#/components/schemas/SafeError" } },
+        }
+    AuthorityDenied:
+      description: Current actor/origin/grant/designation not authorized; no target payload
+      content:
+        {
+          application/json:
+            { schema: { $ref: "#/components/schemas/SafeError" } },
+        }
+    ValidationFailed:
+      description: Strict input validation failed
+      content:
+        {
+          application/json:
+            { schema: { $ref: "#/components/schemas/SafeError" } },
+        }
+    ResourceUnavailable:
+      description: Unknown or unauthorized resource with identical non-enumerating shape
+      content:
+        {
+          application/json:
+            { schema: { $ref: "#/components/schemas/SafeError" } },
+        }
+    StateConflict:
+      description: Reviewed version is stale; current safe authorized projection may be included
+      content:
+        {
+          application/json:
+            { schema: { $ref: "#/components/schemas/SafeError" } },
+        }
+    ActionBlocked:
+      description: Self/last-admin/last-owner or other explicit invariant blocked action
+      content:
+        {
+          application/json:
+            { schema: { $ref: "#/components/schemas/SafeError" } },
+        }
+    StepUpRequired:
+      description: Sensitive action requires a new proof; no business change
+      content:
+        {
+          application/json:
+            { schema: { $ref: "#/components/schemas/SafeError" } },
+        }
+    SnapshotUnavailable:
+      description: No snapshot age <=60 seconds; expired counts are not returned
+      content:
+        {
+          application/json:
+            { schema: { $ref: "#/components/schemas/SafeError" } },
+        }
+    ViewerUnavailable:
+      description: Cleared evidence cannot currently be opened; decisions disabled
+      content:
+        {
+          application/json:
+            { schema: { $ref: "#/components/schemas/SafeError" } },
+        }
+  schemas:
+    SafeError:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code: { type: string, maxLength: 64 }
+        message: { type: string, maxLength: 240 }
+        correlationReference: { type: string, maxLength: 128 }
+        retryAfterSeconds: { type: integer, minimum: 1 }
+        fieldErrors:
+          {
+            type: object,
+            additionalProperties: { type: string, maxLength: 160 },
+          }
+        currentSafeState: { type: object }
+    AdminAuthContext:
+      type: object
+      additionalProperties: false
+      required: [identity, freshUntil, csrfProof]
+      properties:
+        identity:
+          {
+            type: object,
+            required: [id, displayName],
+            properties: { id: { type: string }, displayName: { type: string } },
+          }
+        freshUntil: { type: string, format: date-time }
+        csrfProof:
+          {
+            type: string,
+            description: Memory-only session-bound mutation proof,
+          }
+    DashboardSnapshot:
+      type: object
+      additionalProperties: false
+      required:
+        [snapshotId, calculatedAt, expiresAt, stateDefinitionVersion, metrics]
+      properties:
+        snapshotId: { type: string }
+        calculatedAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+        stateDefinitionVersion: { type: string }
+        metrics:
+          {
+            type: array,
+            items: { $ref: "#/components/schemas/DashboardMetric" },
+          }
+    DashboardMetric:
+      type: object
+      additionalProperties: false
+      required: [key, count, unit, filterKey]
+      properties:
+        key: { type: string }
+        count: { type: integer, minimum: 0 }
+        unit:
+          {
+            enum: [PEOPLE, ACCOUNTS, COMPANIES, MEMBERSHIPS, REQUESTS, REPORTS],
+          }
+        filterKey: { type: string }
+    AccountList:
+      type: object
+      additionalProperties: false
+      required: [data, total, calculatedAt, stateDefinitionVersion]
+      properties:
+        data:
+          {
+            type: array,
+            items: { $ref: "#/components/schemas/AccountListRow" },
+          }
+        total: { type: integer, minimum: 0 }
+        calculatedAt: { type: string, format: date-time }
+        stateDefinitionVersion: { type: string, minLength: 1, maxLength: 64 }
+    AccountListRow:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          id,
+          displayName,
+          maskedEmail,
+          accountState,
+          createdAt,
+          hasCandidateIdentity,
+          activeMembershipCount,
+          hasActiveAdministratorGrant,
+        ]
+      properties:
+        id: { type: string }
+        displayName: { type: string }
+        maskedEmail: { type: string }
+        accountState: { type: string }
+        createdAt: { type: string, format: date-time }
+        hasCandidateIdentity: { type: boolean }
+        activeMembershipCount: { type: integer, minimum: 0 }
+        hasActiveAdministratorGrant: { type: boolean }
+    AccountSecurity:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          id,
+          displayName,
+          maskedEmail,
+          accountState,
+          stateChangedAt,
+          createdAt,
+          version,
+          memberships,
+          sessions,
+          notificationWork,
+        ]
+      properties:
+        id: { type: string }
+        displayName: { type: string }
+        maskedEmail: { type: string }
+        accountState: { type: string }
+        stateChangedAt: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+        version: { type: integer, minimum: 0 }
+        memberships: { type: array, items: { type: object } }
+        sessions:
+          { type: array, items: { $ref: "#/components/schemas/SafeSession" } }
+        notificationWork:
+          {
+            type: array,
+            items: { $ref: "#/components/schemas/NotificationStatus" },
+          }
+    SafeSession:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          sessionReference,
+          deviceDescription,
+          createdAt,
+          lastActivityAt,
+          expiresAt,
+          revocationState,
+        ]
+      properties:
+        sessionReference: { type: string }
+        deviceDescription: { type: string }
+        approximateLocation: { type: string }
+        createdAt: { type: string, format: date-time }
+        lastActivityAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+        revocationState: { enum: [ACTIVE, REVOKED, EXPIRED] }
+    NotificationStatus:
+      type: object
+      additionalProperties: false
+      required: [status, attemptCount, deadline]
+      properties:
+        status:
+          { enum: [PENDING, RETRYING, DELIVERED, MANUAL_INTERVENTION_REQUIRED] }
+        attemptCount: { type: integer, minimum: 0, maximum: 5 }
+        lastAttemptAt: { type: string, format: date-time }
+        nextAttemptAt: { type: string, format: date-time }
+        deadline: { type: string, format: date-time }
+        failureCategory: { type: string }
+    ReasonInput:
+      type: object
+      additionalProperties: false
+      required: [category, rationale]
+      properties:
+        category:
+          {
+            enum:
+              [
+                SECURITY_COMPROMISE,
+                POLICY_VIOLATION,
+                USER_REQUEST,
+                VERIFICATION_FAILURE,
+                INCIDENT_RESOLVED,
+                ACCESS_CLEANUP,
+                OTHER,
+              ],
+          }
+        rationale: { type: string, minLength: 10, maxLength: 500 }
+    CommandResult:
+      type: object
+      additionalProperties: false
+      required: [correlationReference, resultingState, resultingVersion]
+      properties:
+        correlationReference: { type: string }
+        resultingState: { type: string }
+        resultingVersion: { type: integer, minimum: 0 }
+        safeProjection: { type: object }
+    VerificationState:
+      enum:
+        [
+          PENDING_CHECKS,
+          PENDING_REVIEW,
+          CHANGES_REQUESTED,
+          RESUBMITTED,
+          APPROVED,
+          REJECTED,
+          CANCELLED,
+          EXPIRED,
+        ]
+    VerificationReview:
+      type: object
+      description: Projection contains only FR-030 facts, safe matches/prerequisite, checked current evidence metadata, histories, outage state, and action availability.
+      required: [id, state, version]
+      properties:
+        {
+          id: { type: string },
+          state: { $ref: "#/components/schemas/VerificationState" },
+          version: { type: integer },
+          evidence: { type: object },
+          actionAvailability: { type: object },
+        }
+    ChangeRequestInput:
+      type: object
+      additionalProperties: false
+      required: [guidance]
+      properties:
+        {
+          guidance: { type: string, minLength: 10, maxLength: 500 },
+          privateNote: { type: string, maxLength: 2000 },
+        }
+    RejectionInput:
+      type: object
+      additionalProperties: false
+      required: [category, visibleReason]
+      properties:
+        category:
+          {
+            enum:
+              [
+                DOCUMENT_UNREADABLE,
+                TAX_ID_MISMATCH,
+                DOCUMENT_EXPIRED,
+                COMPANY_INFORMATION_MISMATCH,
+                DUPLICATE_OR_CONFLICTING_REQUEST,
+                POLICY_INELIGIBLE,
+                OTHER,
+              ],
+          }
+        visibleReason: { type: string, minLength: 10, maxLength: 500 }
+        privateNote: { type: string, maxLength: 2000 }
+    CompanyMembershipRole:
+      { enum: [OWNER, HR_MANAGER, RECRUITER, HIRING_MANAGER] }
+    CompanyMembershipState: { enum: [ACTIVE, SUSPENDED, REMOVED] }
+    CompanyReferenceList:
+      type: object
+      additionalProperties: false
+      required: [data, total, calculatedAt, stateDefinitionVersion]
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/CompanyReference" }
+        total: { type: integer, minimum: 0 }
+        calculatedAt: { type: string, format: date-time }
+        stateDefinitionVersion: { type: string, minLength: 1, maxLength: 64 }
+    CompanyReference:
+      type: object
+      additionalProperties: false
+      required: [id, displayName]
+      properties:
+        id: { type: string, maxLength: 128 }
+        displayName: { type: string, minLength: 1, maxLength: 200 }
+    CompanyMembershipList:
+      type: object
+      additionalProperties: false
+      required: [data, total, calculatedAt, stateDefinitionVersion]
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/CompanyMembershipRecord" }
+        total: { type: integer, minimum: 0 }
+        calculatedAt: { type: string, format: date-time }
+        stateDefinitionVersion: { type: string, minLength: 1, maxLength: 64 }
+    CompanyMembershipRecord:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          id,
+          accountId,
+          companyId,
+          companyDisplayName,
+          role,
+          state,
+          stateChangedAt,
+          version,
+        ]
+      properties:
+        id: { type: string, maxLength: 128 }
+        accountId: { type: string, maxLength: 128 }
+        companyId: { type: string, maxLength: 128 }
+        companyDisplayName: { type: string, minLength: 1, maxLength: 200 }
+        role: { $ref: "#/components/schemas/CompanyMembershipRole" }
+        state: { $ref: "#/components/schemas/CompanyMembershipState" }
+        stateChangedAt: { type: string, format: date-time }
+        version: { type: integer, minimum: 0 }
+    ReportCategory:
+      {
+        enum:
+          [
+            FRAUD_OR_IMPERSONATION,
+            MISLEADING_CONTENT,
+            DISCRIMINATION_OR_HARASSMENT,
+            ABUSE_OR_THREATS,
+            SPAM_OR_DUPLICATE,
+            PRIVACY_OR_DATA_MISUSE,
+            OTHER,
+          ],
+      }
+    ModerationReview:
+      type: object
+      description: Authorized private report, qualifying context, assignment, notes, immutable history, version, and action availability.
+      required: [id, status, version]
+      properties:
+        {
+          id: { type: string },
+          status: { enum: [PENDING_REVIEW, RESOLVED, DISMISSED] },
+          version: { type: integer },
+          targetContext: { type: object },
+          history: { type: array, items: { type: object } },
+        }
+    GenericList:
+      type: object
+      additionalProperties: false
+      required: [data, total, calculatedAt, stateDefinitionVersion]
+      properties:
+        {
+          data: { type: array, items: { type: object } },
+          total: { type: integer, minimum: 0 },
+          calculatedAt: { type: string, format: date-time },
+          stateDefinitionVersion: { type: string },
+        }
+    RecruiterEntitlement:
+      type: object
+      additionalProperties: false
+      required: [status, companies, destinations]
+      properties:
+        status: { enum: [ENTITLED_COMING_NEXT, NO_ACTIVE_MEMBERSHIP] }
+        companies:
+          {
+            type: array,
+            items:
+              {
+                type: object,
+                required: [companyReference, publicDisplayName, role],
+                properties:
+                  {
+                    companyReference: { type: string },
+                    publicDisplayName: { type: string },
+                    role:
+                      { $ref: "#/components/schemas/CompanyMembershipRole" },
+                  },
+              },
+          }
+        destinations:
+          {
+            type: array,
+            minItems: 2,
+            maxItems: 2,
+            items: { enum: [CANDIDATE_DASHBOARD, EMPLOYER_VERIFICATION] },
+          }

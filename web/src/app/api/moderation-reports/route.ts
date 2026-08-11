@@ -1,0 +1,2 @@
+import { adminJson, adminRouteError } from "@/backend/admin/http/admin-route"; import { ModerationSubmissionService } from "@/backend/admin/moderation/moderation-submission-service";
+export async function POST(request: Request) { try { return adminJson(await new ModerationSubmissionService().submitRequest(request, await request.json()), { status: 202 }); } catch (error) { return adminRouteError(error); } }

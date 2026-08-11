@@ -172,6 +172,86 @@ export type Company = Prisma.CompanyModel
  */
 export type CompanyMembership = Prisma.CompanyMembershipModel
 /**
+ * Model PlatformAdministratorGrant
+ * 
+ */
+export type PlatformAdministratorGrant = Prisma.PlatformAdministratorGrantModel
+/**
+ * Model AdministratorSessionPolicy
+ * 
+ */
+export type AdministratorSessionPolicy = Prisma.AdministratorSessionPolicyModel
+/**
+ * Model CompanyMembershipHistory
+ * 
+ */
+export type CompanyMembershipHistory = Prisma.CompanyMembershipHistoryModel
+/**
+ * Model CompanyAccessPrerequisite
+ * 
+ */
+export type CompanyAccessPrerequisite = Prisma.CompanyAccessPrerequisiteModel
+/**
+ * Model RecruiterVerificationRequest
+ * 
+ */
+export type RecruiterVerificationRequest = Prisma.RecruiterVerificationRequestModel
+/**
+ * Model BusinessLicenseEvidence
+ * 
+ */
+export type BusinessLicenseEvidence = Prisma.BusinessLicenseEvidenceModel
+/**
+ * Model VerificationSafetyAttempt
+ * 
+ */
+export type VerificationSafetyAttempt = Prisma.VerificationSafetyAttemptModel
+/**
+ * Model VerificationDecisionHistory
+ * 
+ */
+export type VerificationDecisionHistory = Prisma.VerificationDecisionHistoryModel
+/**
+ * Model VerificationPrivateNote
+ * 
+ */
+export type VerificationPrivateNote = Prisma.VerificationPrivateNoteModel
+/**
+ * Model PrivilegedActionRationale
+ * 
+ */
+export type PrivilegedActionRationale = Prisma.PrivilegedActionRationaleModel
+/**
+ * Model AdminCommandReceipt
+ * 
+ */
+export type AdminCommandReceipt = Prisma.AdminCommandReceiptModel
+/**
+ * Model SecurityNotificationWork
+ * 
+ */
+export type SecurityNotificationWork = Prisma.SecurityNotificationWorkModel
+/**
+ * Model AdminDashboardSnapshot
+ * 
+ */
+export type AdminDashboardSnapshot = Prisma.AdminDashboardSnapshotModel
+/**
+ * Model ModerationReport
+ * 
+ */
+export type ModerationReport = Prisma.ModerationReportModel
+/**
+ * Model ModerationReportHistory
+ * 
+ */
+export type ModerationReportHistory = Prisma.ModerationReportHistoryModel
+/**
+ * Model ModerationPrivateNote
+ * 
+ */
+export type ModerationPrivateNote = Prisma.ModerationPrivateNoteModel
+/**
  * Model JobPosting
  * 
  */

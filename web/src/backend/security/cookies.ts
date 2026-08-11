@@ -15,6 +15,17 @@ type CookieEnvironment = Pick<
 export const PRE_AUTH_COOKIE_PATH =
   "/api/identity/two-factor/complete" as const;
 
+/**
+ * Admin sign-in completes the same non-authenticating challenge through its
+ * own origin-scoped route. Keeping a distinct narrow path lets the browser
+ * deliver the challenge without exposing it to unrelated admin endpoints.
+ */
+export const ADMIN_PRE_AUTH_COOKIE_PATH = "/api/admin/auth/two-factor" as const;
+
+export type PreAuthCookiePath =
+  | typeof PRE_AUTH_COOKIE_PATH
+  | typeof ADMIN_PRE_AUTH_COOKIE_PATH;
+
 /** Maximum challenge-cookie lifetime: five minutes, matching the AuthenticationChallenge expiry. */
 export const PRE_AUTH_COOKIE_MAX_AGE_SECONDS = 5 * 60;
 

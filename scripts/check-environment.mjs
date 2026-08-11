@@ -508,6 +508,27 @@ if (await canAccess("web/.env.local")) {
     connectivity.status === 0,
     "Prisma connects through generated DATABASE_URL/DIRECT_URL",
   );
+
+  const adminReadinessRequired =
+    appEnvironment.APP_ENV === "production" ||
+    appEnvironment.ADMIN_WORKER_ENABLED === "true";
+  if (adminReadinessRequired) {
+    const adminReadiness = spawnSync(
+      process.execPath,
+      [resolve(root, "web/scripts/check-admin-evidence-readiness.mjs")],
+      {
+        cwd: resolve(root, "web"),
+        env: { ...process.env, ...rootEnvironment, ...appEnvironment },
+        encoding: "utf8",
+      },
+    );
+    check(
+      adminReadiness.status === 0,
+      "Feature 006 evidence, origin, policy, worker, and prerequisite readiness",
+    );
+    if (adminReadiness.status !== 0 && adminReadiness.stdout)
+      console.error(adminReadiness.stdout.trim());
+  }
 }
 if (failures.length) {
   console.error(`Environment check failed (${failures.length} checks).`);
