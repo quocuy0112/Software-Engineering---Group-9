@@ -670,6 +670,13 @@ does not include raw extracted text, a source download, hidden skipped content,
 provider payloads, or internal IDs beyond owned Profile entry IDs needed for
 replace choices.
 
+If the draft has no saved review payload, the view contains server-derived
+initial decisions: `ADD` for absent or unmatched Profile data, `REPLACE` for a
+populated scalar or one normalized collection match, and `SKIP` only for an
+ambiguous collection match or an existing skill that has no replacement
+operation. A saved review payload is returned unchanged. Initial decisions are
+non-mutating until the candidate completes the normal confirmation command.
+
 Every save submits the complete bounded editable/review payload and uses
 compare-and-swap. A stale draft returns `409 DRAFT_REVISION_CONFLICT` and safe
 latest comparison metadata containing only the draft/Profile revisions and

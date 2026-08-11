@@ -242,11 +242,15 @@ to a shared test environment.
    A status-refresh failure must say background processing may continue and
    retry automatically. Reload during processing; the server state must recover.
 5. Open review. Confirm current Profile data is live, each proposal shows its
-   provenance/confidence availability, and duplicate hints do not auto-select.
+   provenance/confidence availability, an absent or unmatched value defaults to
+   Add, and a populated scalar or uniquely matched collection entry defaults to
+   Replace. Confirm an ambiguous collection match or existing duplicate skill
+   defaults to Skip and no default has changed Candidate Profile yet.
 6. Edit proposals and select scalar fields individually, structured entries as
    whole entries, and skills individually. For a scalar with no current Profile
    value, confirm only Add and Skip are offered; for a populated scalar, confirm
-   only Replace and Skip are offered. Save the complete review.
+   only Replace and Skip are offered. Save the complete review, reload it, and
+   confirm the saved choices are preserved rather than recalculated.
    - Before the valid save, enter one invalid date/URL or required value. Confirm
      no PATCH is sent for locally detectable invalid input, edits remain on the
      page, a brief error toast and persistent summary appear, and the exact

@@ -52,6 +52,18 @@ describe.sequential("owned CV draft comparison", () => {
     expect(result?.currentProfile.experiences.map(({ id }) => id)).toEqual([
       "owned-target-fixture",
     ]);
+    expect(result?.reviewDecisions).toMatchObject({
+      reviewComplete: false,
+      scalars: [{ proposalId: "proposal_headline_fixture", action: "REPLACE" }],
+      experiences: [
+        {
+          proposalId: "proposal_experience_fixture",
+          action: "ADD",
+          targetId: null,
+        },
+      ],
+      skills: [{ proposalId: "proposal_skill_fixture", action: "ADD" }],
+    });
     const stored = await pool.query(
       `SELECT "proposalPayload"::text AS proposals FROM "CvDraft" WHERE "id" = $1`,
       [seeded.draftId],
@@ -60,6 +72,44 @@ describe.sequential("owned CV draft comparison", () => {
     expect(JSON.stringify(result)).not.toMatch(
       /source text|storageLocator|liveProfile/u,
     );
+  });
+
+  it("defaults matching collection entries to replace and preserves saved choices", async () => {
+    const client = await pool.connect();
+    const unsaved = await seedReviewDraft(client, "default-replace");
+    const saved = await seedReviewDraft(client, "saved-choice", {
+      reviewSaved: true,
+    });
+    accounts.push(unsaved.accountId, saved.accountId);
+    await client.query(
+      `INSERT INTO "ProfileExperience" ("id", "profileId", "position", "title", "company", "startDate", "endDate", "isCurrent", "createdAt", "updatedAt")
+       VALUES ('matching-target-fixture', $1, 0, '  ENGINEER ', 'example laboratory', DATE '2020-01-01', DATE '2021-01-01', false, $2, $2)`,
+      [unsaved.profileId, new Date("2026-08-01T08:00:00.000Z")],
+    );
+    await client.query(
+      `UPDATE "CandidateProfile" SET "headline" = 'Existing headline' WHERE "id" = $1`,
+      [saved.profileId],
+    );
+    client.release();
+
+    const repository = new PrismaCvDraftQueryRepository();
+    const unsavedResult = await repository.getOwnedComparison(
+      unsaved.accountId,
+      unsaved.draftId,
+    );
+    const savedResult = await repository.getOwnedComparison(
+      saved.accountId,
+      saved.draftId,
+    );
+
+    expect(unsavedResult?.reviewDecisions.experiences).toEqual([
+      {
+        proposalId: "proposal_experience_fixture",
+        action: "REPLACE",
+        targetId: "matching-target-fixture",
+      },
+    ]);
+    expect(savedResult?.reviewDecisions.scalars[0]?.action).toBe("ADD");
   });
 
   it("makes foreign, expired, and inaccessible drafts unavailable", async () => {

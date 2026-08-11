@@ -56,6 +56,16 @@ These 11 focused tests supplement rather than replace the original T090 matrix.
 They confirm that a rejected save does not increment the draft revision or hide
 the actionable field from the candidate.
 
+## 2026-08-11 Profile-aware default-decision addendum
+
+The focused owned-comparison integration suite passed **1 file and 5 tests with
+0 failures** after initial draft decisions changed from blanket Skip to live
+Profile-aware defaults. Coverage proves that an empty scalar, unmatched
+experience, and new skill default to Add; a populated scalar and uniquely
+normalized matching experience default to Replace with the owned target; and a
+previously saved candidate choice remains unchanged. The defaults are returned
+only when no review payload exists and do not mutate Candidate Profile.
+
 ## Local timing evidence
 
 The browser observations are one serialized warm-path sample per required

@@ -31,6 +31,12 @@
 
 ## Notes
 
+- The 2026-08-11 US2 default-decision refinement makes first-open review
+  efficient without bypassing human confirmation: absent/unmatched data starts
+  at Add, populated scalars and uniquely matched collection entries start at
+  Replace, ambiguous matches and existing skills remain Skip, and any saved
+  candidate decision takes precedence. FR-051/FR-052, the comparison contract,
+  plan, data model, quickstart, T069/T076, and US2 evidence are synchronized.
 - The 2026-08-02 US2 synchronization refinement makes the existing review
   requirements explicit: scalar actions depend on the authoritative current
   Profile value, duplicate proposed skills/social links are field-addressable,

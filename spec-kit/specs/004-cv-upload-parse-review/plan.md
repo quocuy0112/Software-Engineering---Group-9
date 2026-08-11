@@ -385,6 +385,15 @@ per scalar field, per experience/education/social-link entry, and per skill.
 Structured entry fields can be edited but the entry is selected atomically. The
 review derives valid scalar choices from that live Profile snapshot: an empty
 field exposes `ADD`/`SKIP`, while a populated field exposes `REPLACE`/`SKIP`.
+When no review payload has been saved, the server builds Profile-aware initial
+decisions from the same live snapshot: unmatched values and entries default to
+`ADD`; populated scalars and collection entries with exactly one normalized
+match default to `REPLACE` with that owned target. Multiple collection matches
+and existing skills default to `SKIP` because collection replacement would be
+ambiguous and skills have no replace operation. Persisted candidate decisions
+are returned unchanged and are never recalculated. These defaults do not write
+Candidate Profile; only the existing explicit confirmation transaction applies
+them.
 The repository re-evaluates the same rule against the authoritative Profile in
 the save transaction and returns an `ACTION_MISMATCH` attached to the exact
 `reviewDecisions.scalars.{index}.action` path if the submitted choice is stale

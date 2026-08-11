@@ -464,6 +464,13 @@ identity, source digest, storage locator, provider prompt/response, or token.
 - skill action: `ADD` or `SKIP`;
 - review completion flag and the server-derived non-content manifest version.
 
+When `reviewPayload` is null, the comparison projection derives initial actions
+from the live Profile: absent scalars and unmatched entries use `ADD`, populated
+scalars and uniquely normalized matching collection entries use `REPLACE`, and
+ambiguous collection matches or existing skills use `SKIP`. This projection is
+non-mutating. Once `reviewPayload` exists, its candidate-saved decisions remain
+authoritative and are not replaced by newly derived defaults.
+
 `provenancePayload` maps proposal IDs to verified segment IDs, document
 page/paragraph locations, optional normalized confidence, and capped derived
 context. Missing provenance is explicit. Source text is not copied wholesale.

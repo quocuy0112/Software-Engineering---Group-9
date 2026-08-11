@@ -1130,6 +1130,12 @@ components:
           $ref: "#/components/schemas/CvEditableProposals"
         reviewDecisions:
           $ref: "#/components/schemas/CvReviewDecisions"
+          description: >-
+            Candidate-saved decisions when a review payload exists. Otherwise,
+            server-derived initial decisions default absent or unmatched data
+            to ADD and populated scalars or uniquely matched collection entries
+            to REPLACE; ambiguous collection matches and existing skills
+            default to SKIP. These defaults do not mutate Candidate Profile.
         expiresAt:
           $ref: "#/components/schemas/UtcTimestamp"
 

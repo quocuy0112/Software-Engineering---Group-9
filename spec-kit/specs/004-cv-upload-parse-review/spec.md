@@ -141,7 +141,12 @@ only selected valid changes are applied as one complete profile revision.
    social-link entry, and per individual skill. A scalar whose current Profile
    value is empty offers add or skip; a scalar whose current Profile value is
    already populated offers replace or skip. A structured entry can be edited
-   before selection but is selected as one unit.
+   before selection but is selected as one unit. Before any review decisions
+   have been saved, each proposal defaults to add when no matching Profile data
+   exists and to replace when exactly one authoritative Profile value or entry
+   already exists. An ambiguous collection match and an existing duplicate
+   skill default to skip because no safe replacement target is available. A
+   saved candidate choice always takes precedence over these initial defaults.
 2. **Given** proposed experience, education, skill, or social-link data that
    resembles an existing Profile entry, or a proposed skill or social link that
    duplicates another proposal in the same draft, **When** the candidate reviews
@@ -528,13 +533,20 @@ dispatch, access, cancellation, and deletion follow the recorded choices.
   experience, education, and social-link collections MUST be selected per entry,
   and skills individually, before confirmation. A structured entry MAY be edited
   before selection, but its nested properties MUST be selected and applied as
-  one entry rather than independently. The server MUST reject a decision that
+  one entry rather than independently. For a draft with no saved review payload,
+  the initial decision MUST default to add for an absent value or unmatched
+  entry and replace for a populated scalar or exactly one normalized matching
+  collection entry. Multiple matching collection targets and a skill already
+  present in the Profile MUST default to skip because they cannot be replaced
+  safely without another candidate choice. Once saved, candidate decisions MUST
+  be preserved rather than recalculated. The server MUST reject a decision that
   no longer matches the authoritative current Profile state.
 - **FR-052**: Possible duplicate experiences, education entries, skills, and
   links against the current Profile, plus duplicate proposed skills and social
   links within the same draft, MUST be identified using the approved
   normalization rules but MUST NOT be merged, removed, or replaced without the
-  candidate's explicit choice.
+  candidate's confirmation. An initial add or replace default is a review aid
+  only and MUST NOT mutate Candidate Profile before confirmation.
 - **FR-053**: Candidate edits to a draft MUST satisfy the same normalization,
   safe-text, length, date, URL, collection-limit, and required-value rules that
   apply to direct Candidate Profile entry. A rejected save MUST return stable,
