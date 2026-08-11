@@ -1,6 +1,8 @@
 import { Buffer } from "node:buffer";
 import sharp, { type Metadata, type OutputInfo } from "sharp";
 
+const JOB_IMAGE_SEARCH_MAX_DIMENSION = 1_600;
+
 export type ImageNormalizationPurpose = "DOCX_BODY_IMAGE" | "JOB_IMAGE_SEARCH";
 
 export type ImageNormalizationRequest = Readonly<{
@@ -28,7 +30,7 @@ export type ImageNormalizationResult = Readonly<{
   downscaled: boolean;
   normalizer: "sharp";
   normalizerVersion: "0.35.3";
-  rulesVersion: "search-image-normalize-v1" | "docx-image-normalize-v1";
+  rulesVersion: "search-image-normalize-v2" | "docx-image-normalize-v1";
 }>;
 
 type Dependencies = Readonly<{
@@ -135,14 +137,24 @@ export class SharpImageNormalizer implements ImageNormalizer {
     const autoOriented = ![undefined, 1].includes(metadata.orientation);
     let result: { data: Buffer; info: OutputInfo };
     try {
-      result = await sharp(source, {
+      let pipeline = sharp(source, {
         animated: false,
         failOn: "error",
         limitInputPixels: input.maximumDecodedPixels,
       })
         .rotate()
         .flatten({ background: { r: 255, g: 255, b: 255 } })
-        .toColourspace("srgb")
+        .toColourspace("srgb");
+      if (input.purpose === "JOB_IMAGE_SEARCH") {
+        pipeline = pipeline.resize({
+          width: JOB_IMAGE_SEARCH_MAX_DIMENSION,
+          height: JOB_IMAGE_SEARCH_MAX_DIMENSION,
+          fit: "inside",
+          withoutEnlargement: true,
+          kernel: sharp.kernel.lanczos3,
+        });
+      }
+      result = await pipeline
         .png({ compressionLevel: 9, adaptiveFiltering: false })
         .toBuffer({ resolveWithObject: true });
     } catch {
@@ -169,7 +181,7 @@ export class SharpImageNormalizer implements ImageNormalizer {
       normalizerVersion: "0.35.3",
       rulesVersion:
         input.purpose === "JOB_IMAGE_SEARCH"
-          ? "search-image-normalize-v1"
+          ? "search-image-normalize-v2"
           : "docx-image-normalize-v1",
     };
   }
