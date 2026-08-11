@@ -27,10 +27,20 @@ from .limits import (
 
 
 SEARCH_DETECTION_SIDE_LIMIT = 640
-SEARCH_MAX_REGIONS = 3
-SEARCH_REGION_ASPECT_BUDGET = 35.0
-SEARCH_MAX_REGION_ASPECT_RATIO = 20.0
+SEARCH_MAX_REGIONS_CEILING = 40
+SEARCH_REGION_ASPECT_BUDGET_FLOOR = 35.0
+SEARCH_REGION_ASPECT_BUDGET_CEILING = 240.0
+# PaddleX caps dynamic recognition width at 3200 pixels for a 48-pixel-high
+# input (ratio 66.67). Keep a small safety margin without truncating ordinary
+# long poster lines and associating fragment text with a full-line polygon.
+SEARCH_MAX_REGION_ASPECT_RATIO = 64.0
 SEARCH_MIN_RECOGNITION_SECONDS = 1.25
+# Conservative initial calibration from the pinned Linux/ONNX CPU profile:
+# 219.35 aspect units took 3.43 seconds (0.0156 s/unit). The initial value adds
+# about 15% headroom. Production aggregate telemetry should replace it when a
+# representative sample exists.
+SEARCH_TIME_PER_ASPECT_UNIT_SECONDS = 0.018
+SEARCH_RECOGNITION_BATCH_SIZE = 5
 
 
 def file_sha256(path: Path) -> str:
@@ -215,8 +225,42 @@ class PaddleOcrOnnxEngine(RecognitionEngine):
         return self._manifest
 
     @staticmethod
+    def _region_budget_from_deadline(
+        *, deadline: datetime, now: datetime | None = None
+    ) -> tuple[float, int]:
+        """Convert remaining request time to bounded recognition work.
+
+        The floor preserves useful recall for ordinary requests. An already
+        exhausted recognition window returns no work instead of allowing the
+        floor to force a batch past the hard deadline.
+        """
+        now = now or datetime.now(UTC)
+        remaining_seconds = (deadline - now).total_seconds()
+        if remaining_seconds <= SEARCH_MIN_RECOGNITION_SECONDS:
+            return 0.0, 0
+        recognition_budget_seconds = (
+            remaining_seconds - SEARCH_MIN_RECOGNITION_SECONDS
+        )
+        aspect_budget = recognition_budget_seconds / (
+            SEARCH_TIME_PER_ASPECT_UNIT_SECONDS
+        )
+        aspect_budget = max(
+            SEARCH_REGION_ASPECT_BUDGET_FLOOR,
+            min(aspect_budget, SEARCH_REGION_ASPECT_BUDGET_CEILING),
+        )
+        max_regions = min(
+            SEARCH_MAX_REGIONS_CEILING,
+            max(3, int(aspect_budget / 4)),
+        )
+        return aspect_budget, max_regions
+
+    @staticmethod
     def _search_regions(
-        crops: list[np.ndarray], polygons: list[Any]
+        crops: list[np.ndarray],
+        polygons: list[Any],
+        *,
+        aspect_budget: float,
+        max_regions: int,
     ) -> tuple[list[tuple[np.ndarray, Any]], bool]:
         valid: list[tuple[np.ndarray, Any, float]] = []
         for crop, polygon in zip(crops, polygons, strict=False):
@@ -229,7 +273,7 @@ class PaddleOcrOnnxEngine(RecognitionEngine):
         selected: list[tuple[np.ndarray, Any]] = []
         spent = 0.0
         for index, (crop, polygon, aspect_ratio) in enumerate(valid):
-            if len(selected) >= SEARCH_MAX_REGIONS:
+            if len(selected) >= max_regions:
                 break
             if index == 0 and aspect_ratio > SEARCH_MAX_REGION_ASPECT_RATIO:
                 maximum_width = max(
@@ -240,7 +284,7 @@ class PaddleOcrOnnxEngine(RecognitionEngine):
                 continue
             if aspect_ratio > SEARCH_MAX_REGION_ASPECT_RATIO:
                 continue
-            if selected and spent + aspect_ratio > SEARCH_REGION_ASPECT_BUDGET:
+            if selected and spent + aspect_ratio > aspect_budget:
                 continue
             selected.append((crop, polygon))
             spent += aspect_ratio
@@ -271,32 +315,63 @@ class PaddleOcrOnnxEngine(RecognitionEngine):
             return [], False
         polygons = list(inner._sort_boxes(detections[0]["dt_polys"]))
         crops = list(inner._crop_by_polys(image_array, polygons))
-        selected, partial = self._search_regions(crops, polygons)
+        aspect_budget, max_regions = self._region_budget_from_deadline(
+            deadline=deadline
+        )
+        selected, partial = self._search_regions(
+            crops,
+            polygons,
+            aspect_budget=aspect_budget,
+            max_regions=max_regions,
+        )
         if not selected:
+            if datetime.now(UTC) >= deadline or max_regions == 0:
+                raise TimeoutError("DEADLINE_EXCEEDED")
             return [], partial
         if (deadline - datetime.now(UTC)).total_seconds() < SEARCH_MIN_RECOGNITION_SECONDS:
             raise TimeoutError("DEADLINE_EXCEEDED")
-        recognitions = list(
-            inner.text_rec_model(
-                [crop for crop, _ in selected],
-                batch_size=len(selected),
-                return_word_box=False,
-            )
-        )
-        if datetime.now(UTC) >= deadline:
-            raise TimeoutError("DEADLINE_EXCEEDED")
+
         lines: list[dict[str, Any]] = []
-        for recognition, (_, polygon) in zip(recognitions, selected, strict=False):
-            text = str(recognition["rec_text"]).strip()
-            if not text:
-                continue
-            lines.append(
-                {
-                    "text": text,
-                    "confidence": float(recognition["rec_score"]),
-                    "polygon": np.asarray(polygon).tolist(),
-                }
+        processed_regions = 0
+        for offset in range(0, len(selected), SEARCH_RECOGNITION_BATCH_SIZE):
+            batch = selected[offset : offset + SEARCH_RECOGNITION_BATCH_SIZE]
+            batch_aspect = sum(
+                crop.shape[1] / float(crop.shape[0]) for crop, _ in batch
             )
+            estimated_seconds = max(
+                SEARCH_MIN_RECOGNITION_SECONDS,
+                batch_aspect * SEARCH_TIME_PER_ASPECT_UNIT_SECONDS,
+            )
+            if (deadline - datetime.now(UTC)).total_seconds() < estimated_seconds:
+                partial = True
+                break
+            recognitions = list(
+                inner.text_rec_model(
+                    [crop for crop, _ in batch],
+                    batch_size=len(batch),
+                    return_word_box=False,
+                )
+            )
+            if datetime.now(UTC) >= deadline:
+                raise TimeoutError("DEADLINE_EXCEEDED")
+            processed_regions += min(len(recognitions), len(batch))
+            if len(recognitions) != len(batch):
+                partial = True
+            for recognition, (_, polygon) in zip(
+                recognitions, batch, strict=False
+            ):
+                text = str(recognition["rec_text"]).strip()
+                if not text:
+                    continue
+                lines.append(
+                    {
+                        "text": text,
+                        "confidence": float(recognition["rec_score"]),
+                        "polygon": np.asarray(polygon).tolist(),
+                    }
+                )
+        if processed_regions < len(selected):
+            partial = True
         return lines, partial
 
     def recognize(

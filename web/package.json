@@ -13,6 +13,7 @@
     "ocr:check": "node scripts/check-ocr-engine.mjs",
     "image-search:worker": "node --conditions=react-server --import tsx scripts/run-image-search-worker.mjs",
     "image-search:worker:probe": "node scripts/run-image-search-worker.mjs --probe",
+    "image-search:inspect": "node --conditions=react-server --import tsx scripts/inspect-image-search.mjs",
     "admin:worker": "node --conditions=react-server --import tsx scripts/run-admin-worker.mjs",
     "admin:worker:probe": "node scripts/check-admin-worker.mjs",
     "admin:contracts": "node scripts/generate-admin-contracts.mjs --check",

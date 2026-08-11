@@ -4,6 +4,7 @@ import json
 from datetime import UTC, datetime, timedelta
 from hashlib import sha256
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -122,6 +123,100 @@ def test_search_regions_bound_work_and_mark_partial_output() -> None:
         np.zeros((10, 100, 3), dtype=np.uint8),
         np.zeros((10, 180, 3), dtype=np.uint8),
     ]
-    selected, partial = PaddleOcrOnnxEngine._search_regions(crops, polygons)
-    assert [crop.shape[1] for crop, _ in selected] == [200, 100]
+    selected, partial = PaddleOcrOnnxEngine._search_regions(
+        crops,
+        polygons,
+        aspect_budget=35.0,
+        max_regions=3,
+    )
+    assert [crop.shape[1] for crop, _ in selected] == [300]
     assert partial is True
+
+
+def test_search_region_budget_scales_with_remaining_deadline() -> None:
+    now = datetime(2026, 8, 11, tzinfo=UTC)
+    ordinary = PaddleOcrOnnxEngine._region_budget_from_deadline(
+        deadline=now + timedelta(seconds=3), now=now
+    )
+    spare_time = PaddleOcrOnnxEngine._region_budget_from_deadline(
+        deadline=now + timedelta(seconds=6), now=now
+    )
+    exhausted = PaddleOcrOnnxEngine._region_budget_from_deadline(
+        deadline=now + timedelta(seconds=1), now=now
+    )
+
+    assert ordinary[0] == pytest.approx(97.22222222222223)
+    assert ordinary[1] == 24
+    assert spare_time == (240.0, 40)
+    assert exhausted == (0.0, 0)
+
+
+def test_search_regions_use_dynamic_budget_beyond_three_lines() -> None:
+    crops = [np.zeros((10, 40, 3), dtype=np.uint8) for _ in range(8)]
+    polygons = [
+        [[0, row * 10], [40, row * 10], [40, row * 10 + 9], [0, row * 10 + 9]]
+        for row in range(8)
+    ]
+
+    selected, partial = PaddleOcrOnnxEngine._search_regions(
+        crops,
+        polygons,
+        aspect_budget=35.0,
+        max_regions=8,
+    )
+
+    assert len(selected) == 8
+    assert partial is False
+
+
+def test_search_recognition_runs_bounded_batches_in_reading_order() -> None:
+    polygons = [
+        [[0, row * 10], [40, row * 10], [40, row * 10 + 9], [0, row * 10 + 9]]
+        for row in range(12)
+    ]
+    crops = [np.zeros((10, 40, 3), dtype=np.uint8) for _ in polygons]
+    batch_sizes: list[int] = []
+
+    class InnerPipeline:
+        @staticmethod
+        def get_text_det_params(*_args: object) -> dict[str, object]:
+            return {}
+
+        @staticmethod
+        def text_det_model(*_args: object, **_kwargs: object):
+            return [{"dt_polys": polygons}]
+
+        @staticmethod
+        def _sort_boxes(items: object) -> object:
+            return items
+
+        @staticmethod
+        def _crop_by_polys(_image: object, _polygons: object) -> object:
+            return crops
+
+        @staticmethod
+        def text_rec_model(
+            batch: list[np.ndarray], *, batch_size: int, return_word_box: bool
+        ):
+            assert return_word_box is False
+            assert batch_size == len(batch)
+            batch_sizes.append(batch_size)
+            start = sum(batch_sizes[:-1])
+            return [
+                {"rec_text": f"line {start + index}", "rec_score": 0.95}
+                for index in range(len(batch))
+            ]
+
+    engine = PaddleOcrOnnxEngine.__new__(PaddleOcrOnnxEngine)
+    engine._pipeline = SimpleNamespace(
+        paddlex_pipeline=SimpleNamespace(_pipeline=InnerPipeline())
+    )
+
+    lines, partial = engine._recognize_search(
+        np.zeros((120, 40, 3), dtype=np.uint8),
+        deadline=datetime.now(UTC) + timedelta(seconds=10),
+    )
+
+    assert batch_sizes == [5, 5, 2]
+    assert [line["text"] for line in lines] == [f"line {index}" for index in range(12)]
+    assert partial is False
