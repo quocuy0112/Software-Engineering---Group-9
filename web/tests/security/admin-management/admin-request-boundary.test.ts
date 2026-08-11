@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { resolve } from "node:path";
 import { classifyOrigin, configuredOrigins } from "@/backend/admin/origins";
 
 const environment = {
@@ -8,7 +9,10 @@ const environment = {
   ADMIN_ORIGIN: "http://console.admin.localhost:3001",
   RECRUITER_ORIGIN: "http://console.recruiter.localhost:3001",
   ADMIN_EVIDENCE_STORAGE_ADAPTER: "filesystem",
-  ADMIN_EVIDENCE_STORAGE_ROOT: "D:/test/admin-evidence",
+  ADMIN_EVIDENCE_STORAGE_ROOT: resolve(
+    process.cwd(),
+    ".local/admin-evidence-test",
+  ),
 } as const;
 
 describe("exact product origins", () => {
