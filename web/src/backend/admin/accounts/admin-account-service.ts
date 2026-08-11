@@ -192,6 +192,7 @@ export class AdminAccountService {
           explanation: command.explanation,
           priorState,
           resultingState,
+          resultingVersion: account.version + 1,
           occurredAt: now,
           notify,
         });

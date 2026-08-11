@@ -20,6 +20,7 @@ export class PrismaAdminDashboardRepository {
       suspendedMemberships,
       pendingVerification,
       pendingModeration,
+      manualNotificationIntervention,
     ] = await Promise.all([
       prisma.userAccount.count({
         where: { state: "ACTIVE", candidateIdentity: { isNot: null } },
@@ -49,6 +50,9 @@ export class PrismaAdminDashboardRepository {
         },
       }),
       prisma.moderationReport.count({ where: { state: "PENDING_REVIEW" } }),
+      prisma.securityNotificationWork.count({
+        where: { status: "MANUAL_INTERVENTION_REQUIRED" },
+      }),
     ]);
     const roleCount = Object.fromEntries(
       roles.map((row) => [row.role, row._count._all]),
@@ -65,6 +69,7 @@ export class PrismaAdminDashboardRepository {
       suspendedMemberships,
       pendingVerificationRequests: pendingVerification,
       pendingModerationReports: pendingModeration,
+      securityNotificationsManualIntervention: manualNotificationIntervention,
     };
     return Object.fromEntries(
       (Object.keys(dashboardDefinition) as DashboardMetricKey[]).map((key) => [

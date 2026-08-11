@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/backend/database/prisma";
 import { AdminAccountService } from "@/backend/admin/accounts/admin-account-service";
+import { runSecurityNotificationCycle } from "@/backend/admin/workers/security-notification-loop";
 
 const suffix = crypto.randomUUID();
 const targetId = `account-command-${suffix}`;
@@ -57,6 +58,9 @@ describe("authoritative account commands", () => {
     await prisma.securityNotificationWork.deleteMany({
       where: { targetUserId: targetId },
     });
+    await prisma.emailOutbox.deleteMany({
+      where: { idempotencyKey: { contains: targetId } },
+    });
     await prisma.privilegedActionRationale.deleteMany({
       where: { correlationId: { in: correlations } },
     });
@@ -107,5 +111,33 @@ describe("authoritative account commands", () => {
       (await prisma.userAccount.findUniqueOrThrow({ where: { id: targetId } }))
         .state,
     ).toBe("ACTIVE");
+  });
+
+  it("replays one stable admin operation without duplicate audit, work, or email", async () => {
+    const stableOperation = command(1);
+    const service = new AdminAccountService();
+    const first = await service.suspend(authority, targetId, stableOperation);
+    const replay = await service.suspend(authority, targetId, stableOperation);
+    expect(replay.correlationId).toBe(first.correlationId);
+    expect(replay.replayed).toBe(true);
+    expect(
+      await prisma.auditEvent.count({
+        where: {
+          correlationId: first.correlationId,
+          action: "admin.account_suspended",
+        },
+      }),
+    ).toBe(1);
+    expect(
+      await prisma.securityNotificationWork.count({
+        where: { originatingCorrelationId: first.correlationId },
+      }),
+    ).toBe(1);
+    await runSecurityNotificationCycle(new Date());
+    expect(
+      await prisma.emailOutbox.count({
+        where: { idempotencyKey: { contains: targetId } },
+      }),
+    ).toBe(1);
   });
 });

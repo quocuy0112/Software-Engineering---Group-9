@@ -6,6 +6,7 @@ import {
 } from "@/backend/repositories/admin/prisma-admin-command-repository";
 import { CompanyRelationshipPrerequisiteGateway } from "./company-relationship-prerequisite-gateway";
 import { AuditWriter } from "@/backend/admin/audit/audit-writer";
+import { buildVerificationOutbox } from "@/backend/admin/notifications/verification-outbox";
 type Command = {
   expectedVersion: number;
   idempotencyKey: string;
@@ -38,6 +39,7 @@ export class VerificationApprovalTransaction {
       async (tx, correlationId) => {
         const row = await tx.recruiterVerificationRequest.findUnique({
           where: { id: requestId },
+          include: { targetCompany: { select: { displayName: true } } },
         });
         if (!row) throw new Error("TARGET_UNAVAILABLE");
         if (row.version !== command.expectedVersion)
@@ -69,6 +71,7 @@ export class VerificationApprovalTransaction {
         if (claimed.count !== 1)
           throw new AdminCommandConflict("STALE_CONFLICT", version);
         let companyId = row.targetCompanyId;
+        let companyDisplayName = row.targetCompany?.displayName;
         let role = command.role;
         let prerequisiteId: string | undefined;
         if (companyId) {
@@ -95,6 +98,7 @@ export class VerificationApprovalTransaction {
             },
           });
           companyId = company.id;
+          companyDisplayName = company.displayName;
         }
         const existingMembership = await tx.companyMembership.findUnique({
           where: {
@@ -183,22 +187,17 @@ export class VerificationApprovalTransaction {
           },
         });
         await tx.emailOutbox.create({
-          data: {
-            kind: "VERIFICATION_APPROVED",
+          data: buildVerificationOutbox({
+            requestId: row.id,
             userId: row.applicantUserId,
-            verificationRequestId: row.id,
-            recipientRef: row.applicantUserId,
-            templateVersion: "verification-v1",
-            payloadRef: {
-              requestId: row.id,
-              resultingState: "APPROVED",
-              decisionTime: now.toISOString(),
-              nextAction: "OPEN_RECRUITER_WORKSPACE",
-            },
-            idempotencyKey: `verification:${row.id}:approved:v1`,
-            status: "PENDING",
-            nextAttemptAt: now,
-          },
+            eventKind: "VERIFICATION_APPROVED",
+            resultingState: "APPROVED",
+            resultingVersion: version,
+            occurredAt: now,
+            nextAction: "OPEN_RECRUITER_WORKSPACE",
+            companyDisplayName: companyDisplayName!,
+            approvedMembershipRole: role,
+          }),
         });
         return { version, state: "APPROVED", companyId, role };
       },

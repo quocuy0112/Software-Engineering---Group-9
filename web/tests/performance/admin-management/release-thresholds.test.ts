@@ -21,11 +21,8 @@ describe("Feature 006 release performance thresholds", () => {
     ),
     "utf8",
   );
-  const notification = readFileSync(
-    resolve(
-      process.cwd(),
-      "src/backend/admin/notifications/security-notification-dispatcher.ts",
-    ),
+  const emailWorker = readFileSync(
+    resolve(process.cwd(), "src/backend/email/workers/email-outbox.ts"),
     "utf8",
   );
 
@@ -48,6 +45,6 @@ describe("Feature 006 release performance thresholds", () => {
       "30 * 60_000",
       "2 * 60 * 60_000",
     ])
-      expect(notification).toContain(marker);
+      expect(emailWorker).toContain(marker);
   });
 });

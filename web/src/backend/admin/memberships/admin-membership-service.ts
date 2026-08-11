@@ -50,6 +50,7 @@ export class AdminMembershipService {
       async (tx, correlationId) => {
         const row = await tx.companyMembership.findUnique({
           where: { id: membershipId },
+          include: { company: { select: { displayName: true } } },
         });
         if (!row) throw new Error("TARGET_UNAVAILABLE");
         if (row.version !== command.expectedVersion)
@@ -118,6 +119,7 @@ export class AdminMembershipService {
           targetUserId: row.userId,
           membershipId: row.id,
           companyId: row.companyId,
+          companyDisplayName: row.company.displayName,
           action: auditAction,
           reasonCategory: command.reasonCategory,
           explanation: command.explanation,

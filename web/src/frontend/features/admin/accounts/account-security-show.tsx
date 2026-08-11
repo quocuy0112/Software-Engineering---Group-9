@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Box, Button, Chip, Typography } from "@mui/material";
 import { Show, useRecordContext, useRefresh } from "react-admin";
 import { accountCommandPath, adminDataProvider } from "../app/data-provider";
@@ -10,6 +10,7 @@ import { NotificationDeliveryStatus } from "./notification-delivery-status";
 import { StaleConflictPanel } from "../shared/stale-conflict-panel";
 import { StepUpDialog } from "../auth/step-up-dialog";
 import { PrivilegedRationaleDetail } from "./privileged-rationale-detail";
+import { createAdminOperationIdController } from "../shared/admin-operation-id";
 
 type RecordShape = {
   id: string;
@@ -55,6 +56,7 @@ function Content() {
     explanation: string;
     confirmation: true;
   }>();
+  const operation = useRef(createAdminOperationIdController());
   const refresh = useRefresh();
   if (!record) return null;
   const current = record;
@@ -75,17 +77,23 @@ function Content() {
         path,
         value,
         current.version,
-        crypto.randomUUID(),
+        operation.current.current(),
       );
+      operation.current.complete();
       refresh();
+      return true;
     } catch (error) {
-      if ((error as { status?: number }).status === 409) setConflict(true);
-      else if (
+      if ((error as { status?: number }).status === 409) {
+        setConflict(true);
+        operation.current.complete();
+        return false;
+      } else if (
         (error as { body?: { code?: string } }).body?.code ===
         "STEP_UP_REQUIRED"
-      )
+      ) {
         setStepUp(true);
-      else throw error;
+        return false;
+      } else throw error;
     }
   }
   return (
@@ -115,15 +123,22 @@ function Content() {
         <Button
           color="error"
           variant="contained"
-          onClick={() =>
+          onClick={() => {
+            operation.current.begin();
             setAction({
               kind: record.state === "ACTIVE" ? "suspend" : "reinstate",
-            })
-          }
+            });
+          }}
         >
           {record.state === "ACTIVE" ? "Suspend account" : "Reinstate account"}
         </Button>
-        <Button color="error" onClick={() => setAction({ kind: "revoke-all" })}>
+        <Button
+          color="error"
+          onClick={() => {
+            operation.current.begin();
+            setAction({ kind: "revoke-all" });
+          }}
+        >
           Revoke all sessions
         </Button>
       </Box>
@@ -140,7 +155,10 @@ function Content() {
       </Typography>
       <SafeSessionTable
         sessions={record.sessions}
-        onRevoke={(session) => setAction({ kind: "revoke-one", session })}
+        onRevoke={(session) => {
+          operation.current.begin();
+          setAction({ kind: "revoke-one", session });
+        }}
       />
       <Typography component="h2" variant="h6">
         Security notifications
@@ -172,7 +190,10 @@ function Content() {
         <SessionRevocationDialog
           open
           targetLabel={`${action.session?.deviceDescription} for ${record.displayName}`}
-          onClose={() => setAction(undefined)}
+          onClose={() => {
+            operation.current.cancel();
+            setAction(undefined);
+          }}
           onConfirm={execute}
         />
       ) : action ? (
@@ -193,13 +214,21 @@ function Content() {
                 : "Revoke all"
           }
           targetLabel={`${record.displayName} (${record.id})`}
-          onClose={() => setAction(undefined)}
+          onClose={() => {
+            operation.current.cancel();
+            setAction(undefined);
+          }}
           onConfirm={execute}
         />
       ) : null}
       <StepUpDialog
         open={stepUp}
-        onCancel={() => setStepUp(false)}
+        onCancel={() => {
+          operation.current.cancel();
+          setPending(undefined);
+          setAction(undefined);
+          setStepUp(false);
+        }}
         onVerified={() => {
           setStepUp(false);
           if (pending) void execute(pending);

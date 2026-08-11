@@ -8,7 +8,7 @@ export function SessionRevocationDialog(props: {
     reasonCategory: string;
     explanation: string;
     confirmation: true;
-  }) => Promise<void>;
+  }) => Promise<boolean | void>;
 }) {
   return (
     <AccountStateDialog

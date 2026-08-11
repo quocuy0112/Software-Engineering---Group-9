@@ -1,19 +1,66 @@
-import { Body, Container, Heading, Html, Text } from "@react-email/components";
-export function AccountSecurityEmail(props: {
-  resultingState: string;
+import {
+  Body,
+  Container,
+  Heading,
+  Html,
+  Link,
+  Text,
+} from "@react-email/components";
+import type { AdminSecurityEventKind } from "./notification-events";
+
+export type AccountSecurityNotice = {
+  eventKind: Extract<
+    AdminSecurityEventKind,
+    "ACCOUNT_SUSPENDED" | "ACCOUNT_REINSTATED" | "ALL_SESSIONS_REVOKED"
+  >;
+  resultingState: "ACTIVE" | "SUSPENDED";
   occurredAt: string;
-}) {
+  supportUrl: string;
+};
+
+export function accountSecurityEmailText(props: AccountSecurityNotice) {
+  if (props.eventKind === "ACCOUNT_SUSPENDED")
+    return `Your SmartHire account is SUSPENDED effective ${props.occurredAt}. All sessions have been revoked. Contact support or submit an appeal: ${props.supportUrl}`;
+  if (props.eventKind === "ACCOUNT_REINSTATED")
+    return `Your SmartHire account is ACTIVE effective ${props.occurredAt}. Sign in again because old sessions are not restored. Company memberships suspended separately are not restored automatically. Support: ${props.supportUrl}`;
+  return `All SmartHire sessions were revoked effective ${props.occurredAt}. Sign in again to continue. If this was unexpected, contact support: ${props.supportUrl}`;
+}
+
+export function AccountSecurityEmail(props: AccountSecurityNotice) {
+  const suspended = props.eventKind === "ACCOUNT_SUSPENDED";
+  const reinstated = props.eventKind === "ACCOUNT_REINSTATED";
   return (
     <Html>
       <Body>
         <Container>
-          <Heading>Account security changed</Heading>
+          <Heading>
+            {suspended
+              ? "Your SmartHire account was suspended"
+              : reinstated
+                ? "Your SmartHire account is active"
+                : "Your SmartHire sessions were revoked"}
+          </Heading>
           <Text>
-            Your account security state is now {props.resultingState}.
+            {suspended || reinstated
+              ? `Account state: ${props.resultingState}. Effective at ${props.occurredAt}.`
+              : `All sessions were revoked at ${props.occurredAt}.`}
           </Text>
+          {suspended && <Text>All existing sessions have been revoked.</Text>}
+          {reinstated && (
+            <>
+              <Text>Sign in again; old sessions are not restored.</Text>
+              <Text>
+                Company memberships suspended separately are not restored
+                automatically.
+              </Text>
+            </>
+          )}
+          {!suspended && !reinstated && <Text>Sign in again to continue.</Text>}
           <Text>
-            Effective at {props.occurredAt}. Review account security or contact
-            support if unexpected.
+            <Link href={props.supportUrl}>
+              Contact support or submit an appeal
+            </Link>{" "}
+            if this change was unexpected.
           </Text>
         </Container>
       </Body>

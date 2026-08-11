@@ -6,6 +6,7 @@ import {
   protectedRecipientPurposes,
   type ProtectedRecipientPurpose,
 } from "@/backend/security/protected-recipient/protected-outbox-recipient";
+import { reconcileSecurityNotificationForOutbox } from "@/backend/admin/notifications/security-notification-status";
 type OutboxClient =
   | Pick<typeof prisma, "emailOutbox">
   | Prisma.TransactionClient;
@@ -145,15 +146,19 @@ export class PrismaOutboxRepository {
     });
   }
   async markSent(id: string, owner: string, providerMessageId: string) {
-    return prisma.emailOutbox.updateMany({
-      where: { id, leaseOwner: owner, status: "PROCESSING" },
-      data: {
-        status: "SENT",
-        leaseOwner: null,
-        leaseExpiresAt: null,
-        providerMessageId,
-        safeErrorCode: null,
-      },
+    return prisma.$transaction(async (tx) => {
+      const changed = await tx.emailOutbox.updateMany({
+        where: { id, leaseOwner: owner, status: "PROCESSING" },
+        data: {
+          status: "SENT",
+          leaseOwner: null,
+          leaseExpiresAt: null,
+          providerMessageId,
+          safeErrorCode: null,
+        },
+      });
+      if (changed.count) await reconcileSecurityNotificationForOutbox(tx, id);
+      return changed;
     });
   }
   async markFailure(input: {
@@ -164,8 +169,16 @@ export class PrismaOutboxRepository {
     retryable: boolean;
     nextAttemptAt: Date;
     kind: EmailKind;
+    now?: Date;
+    deliveryDeadline?: Date;
   }) {
-    const dead = !input.retryable || input.attempts >= 5;
+    const dead =
+      !input.retryable ||
+      input.attempts >= 5 ||
+      Boolean(
+        input.deliveryDeadline &&
+        (input.now ?? new Date()) >= input.deliveryDeadline,
+      );
     return prisma.$transaction(async (tx) => {
       const changed = await tx.emailOutbox.updateMany({
         where: { id: input.id, leaseOwner: input.owner, status: "PROCESSING" },
@@ -177,6 +190,8 @@ export class PrismaOutboxRepository {
           safeErrorCode: input.code,
         },
       });
+      if (changed.count)
+        await reconcileSecurityNotificationForOutbox(tx, input.id);
       if (
         changed.count &&
         dead &&

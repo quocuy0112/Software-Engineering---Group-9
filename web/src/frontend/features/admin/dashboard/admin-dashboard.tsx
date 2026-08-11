@@ -21,6 +21,8 @@ const labels: Record<string, string> = {
   suspendedMemberships: "Suspended memberships",
   pendingVerificationRequests: "Pending verifications",
   pendingModerationReports: "Pending reports",
+  securityNotificationsManualIntervention:
+    "Security notifications requiring manual intervention",
 };
 
 export function AdminDashboard() {
@@ -63,15 +65,18 @@ export function AdminDashboard() {
             {...metric}
             calculatedAt={snapshot.calculatedAt}
             onOpen={() => {
-              const path = key.includes("Verification")
-                ? "/verification-requests"
-                : key.includes("Moderation")
-                  ? "/moderation-reports"
-                  : key.includes("Membership") || key.includes("members")
-                    ? "/company-memberships"
-                    : "/accounts";
+              const path =
+                key === "securityNotificationsManualIntervention"
+                  ? "/accounts?notificationStatus=MANUAL_INTERVENTION_REQUIRED"
+                  : key.includes("Verification")
+                    ? "/verification-requests"
+                    : key.includes("Moderation")
+                      ? "/moderation-reports"
+                      : key.includes("Membership") || key.includes("members")
+                        ? "/company-memberships"
+                        : "/accounts";
               redirect(
-                `${path}?sourceCount=${metric.value}&sourceAt=${encodeURIComponent(snapshot.calculatedAt)}`,
+                `${path}${path.includes("?") ? "&" : "?"}sourceCount=${metric.value}&sourceAt=${encodeURIComponent(snapshot.calculatedAt)}`,
               );
             }}
           />

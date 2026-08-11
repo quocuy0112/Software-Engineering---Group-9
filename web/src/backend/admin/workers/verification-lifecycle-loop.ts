@@ -5,32 +5,26 @@ import { FilesystemPrivateBusinessEvidenceStorage } from "@/backend/storage/busi
 import { S3PrivateBusinessEvidenceStorage } from "@/backend/storage/business-evidence/s3";
 import type { Prisma } from "@/backend/generated/prisma/client";
 import { randomUUID } from "node:crypto";
+import { buildVerificationOutbox } from "@/backend/admin/notifications/verification-outbox";
 
 function outbox(
   requestId: string,
   userId: string,
-  kind: "VERIFICATION_DELAYED" | "VERIFICATION_EXPIRED",
+  eventKind: "VERIFICATION_DELAYED" | "VERIFICATION_EXPIRED",
+  resultingVersion: number,
   now: Date,
-  milestone: string,
 ) {
-  return {
-    kind,
+  return buildVerificationOutbox({
+    requestId,
     userId,
-    verificationRequestId: requestId,
-    recipientRef: userId,
-    templateVersion: "verification-v1",
-    payloadRef: {
-      requestId,
-      resultingState:
-        kind === "VERIFICATION_EXPIRED" ? "EXPIRED" : "PROCESSING_DELAYED",
-      decisionTime: now.toISOString(),
-      nextAction:
-        kind === "VERIFICATION_EXPIRED" ? "SUBMIT_NEW_REQUEST" : "WAIT",
-    },
-    idempotencyKey: `verification:${requestId}:${milestone}:v1`,
-    status: "PENDING" as const,
-    nextAttemptAt: now,
-  };
+    eventKind,
+    resultingState:
+      eventKind === "VERIFICATION_EXPIRED" ? "EXPIRED" : "PROCESSING_DELAYED",
+    resultingVersion,
+    occurredAt: now,
+    nextAction:
+      eventKind === "VERIFICATION_EXPIRED" ? "SUBMIT_NEW_REQUEST" : "WAIT",
+  });
 }
 
 async function makeEvidenceInaccessible(
@@ -156,15 +150,21 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
           await makeEvidenceInaccessible(tx, row.id, now);
           await tx.emailOutbox.upsert({
             where: {
-              idempotencyKey: `verification:${row.id}:checks-expired:v1`,
+              idempotencyKey: outbox(
+                row.id,
+                row.applicantUserId,
+                "VERIFICATION_EXPIRED",
+                row.version + 1,
+                now,
+              ).idempotencyKey,
             },
             update: {},
             create: outbox(
               row.id,
               row.applicantUserId,
               "VERIFICATION_EXPIRED",
+              row.version + 1,
               now,
-              "checks-expired",
             ),
           });
         }
@@ -183,14 +183,22 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
           data: { delayedAt: now },
         });
         await tx.emailOutbox.upsert({
-          where: { idempotencyKey: `verification:${row.id}:checks-delayed:v1` },
+          where: {
+            idempotencyKey: outbox(
+              row.id,
+              row.applicantUserId,
+              "VERIFICATION_DELAYED",
+              row.version,
+              now,
+            ).idempotencyKey,
+          },
           update: {},
           create: outbox(
             row.id,
             row.applicantUserId,
             "VERIFICATION_DELAYED",
+            row.version,
             now,
-            "checks-delayed",
           ),
         });
       });
@@ -216,15 +224,21 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
             await makeEvidenceInaccessible(tx, row.id, now);
             await tx.emailOutbox.upsert({
               where: {
-                idempotencyKey: `verification:${row.id}:viewer-expired:v1`,
+                idempotencyKey: outbox(
+                  row.id,
+                  row.applicantUserId,
+                  "VERIFICATION_EXPIRED",
+                  row.version + 1,
+                  now,
+                ).idempotencyKey,
               },
               update: {},
               create: outbox(
                 row.id,
                 row.applicantUserId,
                 "VERIFICATION_EXPIRED",
+                row.version + 1,
                 now,
-                "viewer-expired",
               ),
             });
           }
@@ -238,15 +252,21 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
           });
           await tx.emailOutbox.upsert({
             where: {
-              idempotencyKey: `verification:${row.id}:viewer-delayed:v1`,
+              idempotencyKey: outbox(
+                row.id,
+                row.applicantUserId,
+                "VERIFICATION_DELAYED",
+                row.version,
+                now,
+              ).idempotencyKey,
             },
             update: {},
             create: outbox(
               row.id,
               row.applicantUserId,
               "VERIFICATION_DELAYED",
+              row.version,
               now,
-              "viewer-delayed",
             ),
           });
         });
@@ -277,15 +297,21 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
           await makeEvidenceInaccessible(tx, row.id, now);
           await tx.emailOutbox.upsert({
             where: {
-              idempotencyKey: `verification:${row.id}:changes-expired:v1`,
+              idempotencyKey: outbox(
+                row.id,
+                row.applicantUserId,
+                "VERIFICATION_EXPIRED",
+                row.version + 1,
+                now,
+              ).idempotencyKey,
             },
             update: {},
             create: outbox(
               row.id,
               row.applicantUserId,
               "VERIFICATION_EXPIRED",
+              row.version + 1,
               now,
-              "changes-expired",
             ),
           });
         }

@@ -1,0 +1,59 @@
+import "server-only";
+import type { Prisma } from "@/backend/generated/prisma/client";
+import {
+  emailDeliveryIdempotencyKey,
+  verificationBusinessEventKey,
+  type CompanyMembershipRole,
+  type VerificationEventKind,
+} from "./notification-events";
+
+const databaseKind = {
+  VERIFICATION_APPROVED: "VERIFICATION_APPROVED",
+  VERIFICATION_RECEIPT: "VERIFICATION_RECEIVED",
+  VERIFICATION_CHANGES_REQUESTED: "VERIFICATION_CHANGES_REQUESTED",
+  VERIFICATION_REJECTED: "VERIFICATION_REJECTED",
+  VERIFICATION_CANCELLED: "VERIFICATION_CANCELLED",
+  VERIFICATION_DELAYED: "VERIFICATION_DELAYED",
+  VERIFICATION_EXPIRED: "VERIFICATION_EXPIRED",
+} as const;
+
+export function buildVerificationOutbox(input: {
+  requestId: string;
+  userId: string;
+  eventKind: VerificationEventKind;
+  resultingState: string;
+  resultingVersion: number;
+  occurredAt: Date;
+  nextAction: string;
+  companyDisplayName?: string;
+  approvedMembershipRole?: CompanyMembershipRole;
+}): Prisma.EmailOutboxUncheckedCreateInput {
+  const businessEventKey = verificationBusinessEventKey(
+    input.requestId,
+    input.eventKind,
+    input.resultingVersion,
+  );
+  return {
+    kind: databaseKind[input.eventKind],
+    userId: input.userId,
+    verificationRequestId: input.requestId,
+    recipientRef: input.userId,
+    templateVersion: "verification-v1",
+    payloadRef: {
+      eventKind: input.eventKind,
+      requestId: input.requestId,
+      resultingState: input.resultingState,
+      occurredAt: input.occurredAt.toISOString(),
+      nextAction: input.nextAction,
+      ...(input.companyDisplayName
+        ? { companyDisplayName: input.companyDisplayName }
+        : {}),
+      ...(input.approvedMembershipRole
+        ? { approvedMembershipRole: input.approvedMembershipRole }
+        : {}),
+    },
+    idempotencyKey: emailDeliveryIdempotencyKey(businessEventKey),
+    status: "PENDING",
+    nextAttemptAt: input.occurredAt,
+  };
+}

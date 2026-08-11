@@ -46,6 +46,8 @@ export type SecurityNotificationWorkMinAggregateOutputType = {
   nextAttemptAt: Date | null
   deliveryDeadline: Date | null
   failureCategory: $Enums.SecurityNotificationFailureCategory | null
+  emailOutboxId: string | null
+  opsAlertedAt: Date | null
   leaseOwner: string | null
   leaseExpiresAt: Date | null
   createdAt: Date | null
@@ -64,6 +66,8 @@ export type SecurityNotificationWorkMaxAggregateOutputType = {
   nextAttemptAt: Date | null
   deliveryDeadline: Date | null
   failureCategory: $Enums.SecurityNotificationFailureCategory | null
+  emailOutboxId: string | null
+  opsAlertedAt: Date | null
   leaseOwner: string | null
   leaseExpiresAt: Date | null
   createdAt: Date | null
@@ -83,6 +87,8 @@ export type SecurityNotificationWorkCountAggregateOutputType = {
   nextAttemptAt: number
   deliveryDeadline: number
   failureCategory: number
+  emailOutboxId: number
+  opsAlertedAt: number
   leaseOwner: number
   leaseExpiresAt: number
   createdAt: number
@@ -111,6 +117,8 @@ export type SecurityNotificationWorkMinAggregateInputType = {
   nextAttemptAt?: true
   deliveryDeadline?: true
   failureCategory?: true
+  emailOutboxId?: true
+  opsAlertedAt?: true
   leaseOwner?: true
   leaseExpiresAt?: true
   createdAt?: true
@@ -129,6 +137,8 @@ export type SecurityNotificationWorkMaxAggregateInputType = {
   nextAttemptAt?: true
   deliveryDeadline?: true
   failureCategory?: true
+  emailOutboxId?: true
+  opsAlertedAt?: true
   leaseOwner?: true
   leaseExpiresAt?: true
   createdAt?: true
@@ -148,6 +158,8 @@ export type SecurityNotificationWorkCountAggregateInputType = {
   nextAttemptAt?: true
   deliveryDeadline?: true
   failureCategory?: true
+  emailOutboxId?: true
+  opsAlertedAt?: true
   leaseOwner?: true
   leaseExpiresAt?: true
   createdAt?: true
@@ -254,6 +266,8 @@ export type SecurityNotificationWorkGroupByOutputType = {
   nextAttemptAt: Date | null
   deliveryDeadline: Date
   failureCategory: $Enums.SecurityNotificationFailureCategory | null
+  emailOutboxId: string | null
+  opsAlertedAt: Date | null
   leaseOwner: string | null
   leaseExpiresAt: Date | null
   createdAt: Date
@@ -296,10 +310,13 @@ export type SecurityNotificationWorkWhereInput = {
   nextAttemptAt?: Prisma.DateTimeNullableFilter<"SecurityNotificationWork"> | Date | string | null
   deliveryDeadline?: Prisma.DateTimeFilter<"SecurityNotificationWork"> | Date | string
   failureCategory?: Prisma.EnumSecurityNotificationFailureCategoryNullableFilter<"SecurityNotificationWork"> | $Enums.SecurityNotificationFailureCategory | null
+  emailOutboxId?: Prisma.StringNullableFilter<"SecurityNotificationWork"> | string | null
+  opsAlertedAt?: Prisma.DateTimeNullableFilter<"SecurityNotificationWork"> | Date | string | null
   leaseOwner?: Prisma.StringNullableFilter<"SecurityNotificationWork"> | string | null
   leaseExpiresAt?: Prisma.DateTimeNullableFilter<"SecurityNotificationWork"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"SecurityNotificationWork"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SecurityNotificationWork"> | Date | string
+  emailOutbox?: Prisma.XOR<Prisma.EmailOutboxNullableScalarRelationFilter, Prisma.EmailOutboxWhereInput> | null
 }
 
 export type SecurityNotificationWorkOrderByWithRelationInput = {
@@ -315,15 +332,19 @@ export type SecurityNotificationWorkOrderByWithRelationInput = {
   nextAttemptAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deliveryDeadline?: Prisma.SortOrder
   failureCategory?: Prisma.SortOrderInput | Prisma.SortOrder
+  emailOutboxId?: Prisma.SortOrderInput | Prisma.SortOrder
+  opsAlertedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   leaseOwner?: Prisma.SortOrderInput | Prisma.SortOrder
   leaseExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  emailOutbox?: Prisma.EmailOutboxOrderByWithRelationInput
 }
 
 export type SecurityNotificationWorkWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   idempotencyKey?: string
+  emailOutboxId?: string
   AND?: Prisma.SecurityNotificationWorkWhereInput | Prisma.SecurityNotificationWorkWhereInput[]
   OR?: Prisma.SecurityNotificationWorkWhereInput[]
   NOT?: Prisma.SecurityNotificationWorkWhereInput | Prisma.SecurityNotificationWorkWhereInput[]
@@ -337,11 +358,13 @@ export type SecurityNotificationWorkWhereUniqueInput = Prisma.AtLeast<{
   nextAttemptAt?: Prisma.DateTimeNullableFilter<"SecurityNotificationWork"> | Date | string | null
   deliveryDeadline?: Prisma.DateTimeFilter<"SecurityNotificationWork"> | Date | string
   failureCategory?: Prisma.EnumSecurityNotificationFailureCategoryNullableFilter<"SecurityNotificationWork"> | $Enums.SecurityNotificationFailureCategory | null
+  opsAlertedAt?: Prisma.DateTimeNullableFilter<"SecurityNotificationWork"> | Date | string | null
   leaseOwner?: Prisma.StringNullableFilter<"SecurityNotificationWork"> | string | null
   leaseExpiresAt?: Prisma.DateTimeNullableFilter<"SecurityNotificationWork"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"SecurityNotificationWork"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SecurityNotificationWork"> | Date | string
-}, "id" | "idempotencyKey">
+  emailOutbox?: Prisma.XOR<Prisma.EmailOutboxNullableScalarRelationFilter, Prisma.EmailOutboxWhereInput> | null
+}, "id" | "idempotencyKey" | "emailOutboxId">
 
 export type SecurityNotificationWorkOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -356,6 +379,8 @@ export type SecurityNotificationWorkOrderByWithAggregationInput = {
   nextAttemptAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deliveryDeadline?: Prisma.SortOrder
   failureCategory?: Prisma.SortOrderInput | Prisma.SortOrder
+  emailOutboxId?: Prisma.SortOrderInput | Prisma.SortOrder
+  opsAlertedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   leaseOwner?: Prisma.SortOrderInput | Prisma.SortOrder
   leaseExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -383,6 +408,8 @@ export type SecurityNotificationWorkScalarWhereWithAggregatesInput = {
   nextAttemptAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SecurityNotificationWork"> | Date | string | null
   deliveryDeadline?: Prisma.DateTimeWithAggregatesFilter<"SecurityNotificationWork"> | Date | string
   failureCategory?: Prisma.EnumSecurityNotificationFailureCategoryNullableWithAggregatesFilter<"SecurityNotificationWork"> | $Enums.SecurityNotificationFailureCategory | null
+  emailOutboxId?: Prisma.StringNullableWithAggregatesFilter<"SecurityNotificationWork"> | string | null
+  opsAlertedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SecurityNotificationWork"> | Date | string | null
   leaseOwner?: Prisma.StringNullableWithAggregatesFilter<"SecurityNotificationWork"> | string | null
   leaseExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SecurityNotificationWork"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"SecurityNotificationWork"> | Date | string
@@ -402,10 +429,12 @@ export type SecurityNotificationWorkCreateInput = {
   nextAttemptAt?: Date | string | null
   deliveryDeadline: Date | string
   failureCategory?: $Enums.SecurityNotificationFailureCategory | null
+  opsAlertedAt?: Date | string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailOutbox?: Prisma.EmailOutboxCreateNestedOneWithoutSecurityNotificationWorkInput
 }
 
 export type SecurityNotificationWorkUncheckedCreateInput = {
@@ -421,6 +450,8 @@ export type SecurityNotificationWorkUncheckedCreateInput = {
   nextAttemptAt?: Date | string | null
   deliveryDeadline: Date | string
   failureCategory?: $Enums.SecurityNotificationFailureCategory | null
+  emailOutboxId?: string | null
+  opsAlertedAt?: Date | string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
   createdAt?: Date | string
@@ -440,10 +471,12 @@ export type SecurityNotificationWorkUpdateInput = {
   nextAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveryDeadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   failureCategory?: Prisma.NullableEnumSecurityNotificationFailureCategoryFieldUpdateOperationsInput | $Enums.SecurityNotificationFailureCategory | null
+  opsAlertedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailOutbox?: Prisma.EmailOutboxUpdateOneWithoutSecurityNotificationWorkNestedInput
 }
 
 export type SecurityNotificationWorkUncheckedUpdateInput = {
@@ -459,6 +492,8 @@ export type SecurityNotificationWorkUncheckedUpdateInput = {
   nextAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveryDeadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   failureCategory?: Prisma.NullableEnumSecurityNotificationFailureCategoryFieldUpdateOperationsInput | $Enums.SecurityNotificationFailureCategory | null
+  emailOutboxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  opsAlertedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -478,6 +513,8 @@ export type SecurityNotificationWorkCreateManyInput = {
   nextAttemptAt?: Date | string | null
   deliveryDeadline: Date | string
   failureCategory?: $Enums.SecurityNotificationFailureCategory | null
+  emailOutboxId?: string | null
+  opsAlertedAt?: Date | string | null
   leaseOwner?: string | null
   leaseExpiresAt?: Date | string | null
   createdAt?: Date | string
@@ -497,6 +534,7 @@ export type SecurityNotificationWorkUpdateManyMutationInput = {
   nextAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveryDeadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   failureCategory?: Prisma.NullableEnumSecurityNotificationFailureCategoryFieldUpdateOperationsInput | $Enums.SecurityNotificationFailureCategory | null
+  opsAlertedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -516,10 +554,17 @@ export type SecurityNotificationWorkUncheckedUpdateManyInput = {
   nextAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveryDeadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   failureCategory?: Prisma.NullableEnumSecurityNotificationFailureCategoryFieldUpdateOperationsInput | $Enums.SecurityNotificationFailureCategory | null
+  emailOutboxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  opsAlertedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type SecurityNotificationWorkNullableScalarRelationFilter = {
+  is?: Prisma.SecurityNotificationWorkWhereInput | null
+  isNot?: Prisma.SecurityNotificationWorkWhereInput | null
 }
 
 export type SecurityNotificationWorkCountOrderByAggregateInput = {
@@ -535,6 +580,8 @@ export type SecurityNotificationWorkCountOrderByAggregateInput = {
   nextAttemptAt?: Prisma.SortOrder
   deliveryDeadline?: Prisma.SortOrder
   failureCategory?: Prisma.SortOrder
+  emailOutboxId?: Prisma.SortOrder
+  opsAlertedAt?: Prisma.SortOrder
   leaseOwner?: Prisma.SortOrder
   leaseExpiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -557,6 +604,8 @@ export type SecurityNotificationWorkMaxOrderByAggregateInput = {
   nextAttemptAt?: Prisma.SortOrder
   deliveryDeadline?: Prisma.SortOrder
   failureCategory?: Prisma.SortOrder
+  emailOutboxId?: Prisma.SortOrder
+  opsAlertedAt?: Prisma.SortOrder
   leaseOwner?: Prisma.SortOrder
   leaseExpiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -575,6 +624,8 @@ export type SecurityNotificationWorkMinOrderByAggregateInput = {
   nextAttemptAt?: Prisma.SortOrder
   deliveryDeadline?: Prisma.SortOrder
   failureCategory?: Prisma.SortOrder
+  emailOutboxId?: Prisma.SortOrder
+  opsAlertedAt?: Prisma.SortOrder
   leaseOwner?: Prisma.SortOrder
   leaseExpiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -585,12 +636,140 @@ export type SecurityNotificationWorkSumOrderByAggregateInput = {
   attemptCount?: Prisma.SortOrder
 }
 
+export type SecurityNotificationWorkCreateNestedOneWithoutEmailOutboxInput = {
+  create?: Prisma.XOR<Prisma.SecurityNotificationWorkCreateWithoutEmailOutboxInput, Prisma.SecurityNotificationWorkUncheckedCreateWithoutEmailOutboxInput>
+  connectOrCreate?: Prisma.SecurityNotificationWorkCreateOrConnectWithoutEmailOutboxInput
+  connect?: Prisma.SecurityNotificationWorkWhereUniqueInput
+}
+
+export type SecurityNotificationWorkUncheckedCreateNestedOneWithoutEmailOutboxInput = {
+  create?: Prisma.XOR<Prisma.SecurityNotificationWorkCreateWithoutEmailOutboxInput, Prisma.SecurityNotificationWorkUncheckedCreateWithoutEmailOutboxInput>
+  connectOrCreate?: Prisma.SecurityNotificationWorkCreateOrConnectWithoutEmailOutboxInput
+  connect?: Prisma.SecurityNotificationWorkWhereUniqueInput
+}
+
+export type SecurityNotificationWorkUpdateOneWithoutEmailOutboxNestedInput = {
+  create?: Prisma.XOR<Prisma.SecurityNotificationWorkCreateWithoutEmailOutboxInput, Prisma.SecurityNotificationWorkUncheckedCreateWithoutEmailOutboxInput>
+  connectOrCreate?: Prisma.SecurityNotificationWorkCreateOrConnectWithoutEmailOutboxInput
+  upsert?: Prisma.SecurityNotificationWorkUpsertWithoutEmailOutboxInput
+  disconnect?: Prisma.SecurityNotificationWorkWhereInput | boolean
+  delete?: Prisma.SecurityNotificationWorkWhereInput | boolean
+  connect?: Prisma.SecurityNotificationWorkWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SecurityNotificationWorkUpdateToOneWithWhereWithoutEmailOutboxInput, Prisma.SecurityNotificationWorkUpdateWithoutEmailOutboxInput>, Prisma.SecurityNotificationWorkUncheckedUpdateWithoutEmailOutboxInput>
+}
+
+export type SecurityNotificationWorkUncheckedUpdateOneWithoutEmailOutboxNestedInput = {
+  create?: Prisma.XOR<Prisma.SecurityNotificationWorkCreateWithoutEmailOutboxInput, Prisma.SecurityNotificationWorkUncheckedCreateWithoutEmailOutboxInput>
+  connectOrCreate?: Prisma.SecurityNotificationWorkCreateOrConnectWithoutEmailOutboxInput
+  upsert?: Prisma.SecurityNotificationWorkUpsertWithoutEmailOutboxInput
+  disconnect?: Prisma.SecurityNotificationWorkWhereInput | boolean
+  delete?: Prisma.SecurityNotificationWorkWhereInput | boolean
+  connect?: Prisma.SecurityNotificationWorkWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SecurityNotificationWorkUpdateToOneWithWhereWithoutEmailOutboxInput, Prisma.SecurityNotificationWorkUpdateWithoutEmailOutboxInput>, Prisma.SecurityNotificationWorkUncheckedUpdateWithoutEmailOutboxInput>
+}
+
 export type EnumSecurityNotificationStatusFieldUpdateOperationsInput = {
   set?: $Enums.SecurityNotificationStatus
 }
 
 export type NullableEnumSecurityNotificationFailureCategoryFieldUpdateOperationsInput = {
   set?: $Enums.SecurityNotificationFailureCategory | null
+}
+
+export type SecurityNotificationWorkCreateWithoutEmailOutboxInput = {
+  id?: string
+  idempotencyKey: string
+  originatingCorrelationId: string
+  targetUserId: string
+  kind: string
+  payloadRef: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.SecurityNotificationStatus
+  attemptCount?: number
+  lastAttemptAt?: Date | string | null
+  nextAttemptAt?: Date | string | null
+  deliveryDeadline: Date | string
+  failureCategory?: $Enums.SecurityNotificationFailureCategory | null
+  opsAlertedAt?: Date | string | null
+  leaseOwner?: string | null
+  leaseExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type SecurityNotificationWorkUncheckedCreateWithoutEmailOutboxInput = {
+  id?: string
+  idempotencyKey: string
+  originatingCorrelationId: string
+  targetUserId: string
+  kind: string
+  payloadRef: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.SecurityNotificationStatus
+  attemptCount?: number
+  lastAttemptAt?: Date | string | null
+  nextAttemptAt?: Date | string | null
+  deliveryDeadline: Date | string
+  failureCategory?: $Enums.SecurityNotificationFailureCategory | null
+  opsAlertedAt?: Date | string | null
+  leaseOwner?: string | null
+  leaseExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type SecurityNotificationWorkCreateOrConnectWithoutEmailOutboxInput = {
+  where: Prisma.SecurityNotificationWorkWhereUniqueInput
+  create: Prisma.XOR<Prisma.SecurityNotificationWorkCreateWithoutEmailOutboxInput, Prisma.SecurityNotificationWorkUncheckedCreateWithoutEmailOutboxInput>
+}
+
+export type SecurityNotificationWorkUpsertWithoutEmailOutboxInput = {
+  update: Prisma.XOR<Prisma.SecurityNotificationWorkUpdateWithoutEmailOutboxInput, Prisma.SecurityNotificationWorkUncheckedUpdateWithoutEmailOutboxInput>
+  create: Prisma.XOR<Prisma.SecurityNotificationWorkCreateWithoutEmailOutboxInput, Prisma.SecurityNotificationWorkUncheckedCreateWithoutEmailOutboxInput>
+  where?: Prisma.SecurityNotificationWorkWhereInput
+}
+
+export type SecurityNotificationWorkUpdateToOneWithWhereWithoutEmailOutboxInput = {
+  where?: Prisma.SecurityNotificationWorkWhereInput
+  data: Prisma.XOR<Prisma.SecurityNotificationWorkUpdateWithoutEmailOutboxInput, Prisma.SecurityNotificationWorkUncheckedUpdateWithoutEmailOutboxInput>
+}
+
+export type SecurityNotificationWorkUpdateWithoutEmailOutboxInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  originatingCorrelationId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadRef?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumSecurityNotificationStatusFieldUpdateOperationsInput | $Enums.SecurityNotificationStatus
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  nextAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryDeadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  failureCategory?: Prisma.NullableEnumSecurityNotificationFailureCategoryFieldUpdateOperationsInput | $Enums.SecurityNotificationFailureCategory | null
+  opsAlertedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type SecurityNotificationWorkUncheckedUpdateWithoutEmailOutboxInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  originatingCorrelationId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadRef?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.EnumSecurityNotificationStatusFieldUpdateOperationsInput | $Enums.SecurityNotificationStatus
+  attemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  nextAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryDeadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  failureCategory?: Prisma.NullableEnumSecurityNotificationFailureCategoryFieldUpdateOperationsInput | $Enums.SecurityNotificationFailureCategory | null
+  opsAlertedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -608,10 +787,13 @@ export type SecurityNotificationWorkSelect<ExtArgs extends runtime.Types.Extensi
   nextAttemptAt?: boolean
   deliveryDeadline?: boolean
   failureCategory?: boolean
+  emailOutboxId?: boolean
+  opsAlertedAt?: boolean
   leaseOwner?: boolean
   leaseExpiresAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  emailOutbox?: boolean | Prisma.SecurityNotificationWork$emailOutboxArgs<ExtArgs>
 }, ExtArgs["result"]["securityNotificationWork"]>
 
 export type SecurityNotificationWorkSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -627,10 +809,13 @@ export type SecurityNotificationWorkSelectCreateManyAndReturn<ExtArgs extends ru
   nextAttemptAt?: boolean
   deliveryDeadline?: boolean
   failureCategory?: boolean
+  emailOutboxId?: boolean
+  opsAlertedAt?: boolean
   leaseOwner?: boolean
   leaseExpiresAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  emailOutbox?: boolean | Prisma.SecurityNotificationWork$emailOutboxArgs<ExtArgs>
 }, ExtArgs["result"]["securityNotificationWork"]>
 
 export type SecurityNotificationWorkSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -646,10 +831,13 @@ export type SecurityNotificationWorkSelectUpdateManyAndReturn<ExtArgs extends ru
   nextAttemptAt?: boolean
   deliveryDeadline?: boolean
   failureCategory?: boolean
+  emailOutboxId?: boolean
+  opsAlertedAt?: boolean
   leaseOwner?: boolean
   leaseExpiresAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  emailOutbox?: boolean | Prisma.SecurityNotificationWork$emailOutboxArgs<ExtArgs>
 }, ExtArgs["result"]["securityNotificationWork"]>
 
 export type SecurityNotificationWorkSelectScalar = {
@@ -665,17 +853,30 @@ export type SecurityNotificationWorkSelectScalar = {
   nextAttemptAt?: boolean
   deliveryDeadline?: boolean
   failureCategory?: boolean
+  emailOutboxId?: boolean
+  opsAlertedAt?: boolean
   leaseOwner?: boolean
   leaseExpiresAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type SecurityNotificationWorkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "idempotencyKey" | "originatingCorrelationId" | "targetUserId" | "kind" | "payloadRef" | "status" | "attemptCount" | "lastAttemptAt" | "nextAttemptAt" | "deliveryDeadline" | "failureCategory" | "leaseOwner" | "leaseExpiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["securityNotificationWork"]>
+export type SecurityNotificationWorkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "idempotencyKey" | "originatingCorrelationId" | "targetUserId" | "kind" | "payloadRef" | "status" | "attemptCount" | "lastAttemptAt" | "nextAttemptAt" | "deliveryDeadline" | "failureCategory" | "emailOutboxId" | "opsAlertedAt" | "leaseOwner" | "leaseExpiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["securityNotificationWork"]>
+export type SecurityNotificationWorkInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  emailOutbox?: boolean | Prisma.SecurityNotificationWork$emailOutboxArgs<ExtArgs>
+}
+export type SecurityNotificationWorkIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  emailOutbox?: boolean | Prisma.SecurityNotificationWork$emailOutboxArgs<ExtArgs>
+}
+export type SecurityNotificationWorkIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  emailOutbox?: boolean | Prisma.SecurityNotificationWork$emailOutboxArgs<ExtArgs>
+}
 
 export type $SecurityNotificationWorkPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "SecurityNotificationWork"
-  objects: {}
+  objects: {
+    emailOutbox: Prisma.$EmailOutboxPayload<ExtArgs> | null
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     idempotencyKey: string
@@ -689,6 +890,8 @@ export type $SecurityNotificationWorkPayload<ExtArgs extends runtime.Types.Exten
     nextAttemptAt: Date | null
     deliveryDeadline: Date
     failureCategory: $Enums.SecurityNotificationFailureCategory | null
+    emailOutboxId: string | null
+    opsAlertedAt: Date | null
     leaseOwner: string | null
     leaseExpiresAt: Date | null
     createdAt: Date
@@ -1087,6 +1290,7 @@ readonly fields: SecurityNotificationWorkFieldRefs;
  */
 export interface Prisma__SecurityNotificationWorkClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  emailOutbox<T extends Prisma.SecurityNotificationWork$emailOutboxArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SecurityNotificationWork$emailOutboxArgs<ExtArgs>>): Prisma.Prisma__EmailOutboxClient<runtime.Types.Result.GetResult<Prisma.$EmailOutboxPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1128,6 +1332,8 @@ export interface SecurityNotificationWorkFieldRefs {
   readonly nextAttemptAt: Prisma.FieldRef<"SecurityNotificationWork", 'DateTime'>
   readonly deliveryDeadline: Prisma.FieldRef<"SecurityNotificationWork", 'DateTime'>
   readonly failureCategory: Prisma.FieldRef<"SecurityNotificationWork", 'SecurityNotificationFailureCategory'>
+  readonly emailOutboxId: Prisma.FieldRef<"SecurityNotificationWork", 'String'>
+  readonly opsAlertedAt: Prisma.FieldRef<"SecurityNotificationWork", 'DateTime'>
   readonly leaseOwner: Prisma.FieldRef<"SecurityNotificationWork", 'String'>
   readonly leaseExpiresAt: Prisma.FieldRef<"SecurityNotificationWork", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"SecurityNotificationWork", 'DateTime'>
@@ -1149,6 +1355,10 @@ export type SecurityNotificationWorkFindUniqueArgs<ExtArgs extends runtime.Types
    */
   omit?: Prisma.SecurityNotificationWorkOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SecurityNotificationWorkInclude<ExtArgs> | null
+  /**
    * Filter, which SecurityNotificationWork to fetch.
    */
   where: Prisma.SecurityNotificationWorkWhereUniqueInput
@@ -1167,6 +1377,10 @@ export type SecurityNotificationWorkFindUniqueOrThrowArgs<ExtArgs extends runtim
    */
   omit?: Prisma.SecurityNotificationWorkOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SecurityNotificationWorkInclude<ExtArgs> | null
+  /**
    * Filter, which SecurityNotificationWork to fetch.
    */
   where: Prisma.SecurityNotificationWorkWhereUniqueInput
@@ -1184,6 +1398,10 @@ export type SecurityNotificationWorkFindFirstArgs<ExtArgs extends runtime.Types.
    * Omit specific fields from the SecurityNotificationWork
    */
   omit?: Prisma.SecurityNotificationWorkOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SecurityNotificationWorkInclude<ExtArgs> | null
   /**
    * Filter, which SecurityNotificationWork to fetch.
    */
@@ -1233,6 +1451,10 @@ export type SecurityNotificationWorkFindFirstOrThrowArgs<ExtArgs extends runtime
    */
   omit?: Prisma.SecurityNotificationWorkOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SecurityNotificationWorkInclude<ExtArgs> | null
+  /**
    * Filter, which SecurityNotificationWork to fetch.
    */
   where?: Prisma.SecurityNotificationWorkWhereInput
@@ -1280,6 +1502,10 @@ export type SecurityNotificationWorkFindManyArgs<ExtArgs extends runtime.Types.E
    * Omit specific fields from the SecurityNotificationWork
    */
   omit?: Prisma.SecurityNotificationWorkOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SecurityNotificationWorkInclude<ExtArgs> | null
   /**
    * Filter, which SecurityNotificationWorks to fetch.
    */
@@ -1329,6 +1555,10 @@ export type SecurityNotificationWorkCreateArgs<ExtArgs extends runtime.Types.Ext
    */
   omit?: Prisma.SecurityNotificationWorkOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SecurityNotificationWorkInclude<ExtArgs> | null
+  /**
    * The data needed to create a SecurityNotificationWork.
    */
   data: Prisma.XOR<Prisma.SecurityNotificationWorkCreateInput, Prisma.SecurityNotificationWorkUncheckedCreateInput>
@@ -1362,6 +1592,10 @@ export type SecurityNotificationWorkCreateManyAndReturnArgs<ExtArgs extends runt
    */
   data: Prisma.SecurityNotificationWorkCreateManyInput | Prisma.SecurityNotificationWorkCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SecurityNotificationWorkIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1376,6 +1610,10 @@ export type SecurityNotificationWorkUpdateArgs<ExtArgs extends runtime.Types.Ext
    * Omit specific fields from the SecurityNotificationWork
    */
   omit?: Prisma.SecurityNotificationWorkOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SecurityNotificationWorkInclude<ExtArgs> | null
   /**
    * The data needed to update a SecurityNotificationWork.
    */
@@ -1428,6 +1666,10 @@ export type SecurityNotificationWorkUpdateManyAndReturnArgs<ExtArgs extends runt
    * Limit how many SecurityNotificationWorks to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SecurityNotificationWorkIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1442,6 +1684,10 @@ export type SecurityNotificationWorkUpsertArgs<ExtArgs extends runtime.Types.Ext
    * Omit specific fields from the SecurityNotificationWork
    */
   omit?: Prisma.SecurityNotificationWorkOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SecurityNotificationWorkInclude<ExtArgs> | null
   /**
    * The filter to search for the SecurityNotificationWork to update in case it exists.
    */
@@ -1469,6 +1715,10 @@ export type SecurityNotificationWorkDeleteArgs<ExtArgs extends runtime.Types.Ext
    */
   omit?: Prisma.SecurityNotificationWorkOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SecurityNotificationWorkInclude<ExtArgs> | null
+  /**
    * Filter which SecurityNotificationWork to delete.
    */
   where: Prisma.SecurityNotificationWorkWhereUniqueInput
@@ -1489,6 +1739,25 @@ export type SecurityNotificationWorkDeleteManyArgs<ExtArgs extends runtime.Types
 }
 
 /**
+ * SecurityNotificationWork.emailOutbox
+ */
+export type SecurityNotificationWork$emailOutboxArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmailOutbox
+   */
+  select?: Prisma.EmailOutboxSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmailOutbox
+   */
+  omit?: Prisma.EmailOutboxOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmailOutboxInclude<ExtArgs> | null
+  where?: Prisma.EmailOutboxWhereInput
+}
+
+/**
  * SecurityNotificationWork without action
  */
 export type SecurityNotificationWorkDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1500,4 +1769,8 @@ export type SecurityNotificationWorkDefaultArgs<ExtArgs extends runtime.Types.Ex
    * Omit specific fields from the SecurityNotificationWork
    */
   omit?: Prisma.SecurityNotificationWorkOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SecurityNotificationWorkInclude<ExtArgs> | null
 }

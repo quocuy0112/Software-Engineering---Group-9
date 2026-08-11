@@ -21,6 +21,7 @@
     "admin:provision": "node --conditions=react-server --import tsx scripts/provision-platform-administrator.mjs",
     "admin:revoke": "node --conditions=react-server --import tsx scripts/revoke-platform-administrator.mjs",
     "admin:moderation:migration:verify": "node --conditions=react-server --import tsx scripts/verify-moderation-report-migration.mjs",
+    "admin:notifications:reconcile": "node scripts/reconcile-security-notifications.mjs",
     "image-search:storage:preflight": "node --conditions=react-server --import tsx scripts/check-image-search-production-storage.mjs",
     "ocr:corpus:evaluate": "node scripts/evaluate-ocr-corpus.mjs",
     "ocr:corpus:generate": "node scripts/generate-ocr-corpus.mjs",
