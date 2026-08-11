@@ -4,6 +4,7 @@ import { EvidenceSafetyPipeline } from "@/backend/admin/verification/evidence-sa
 import { FilesystemPrivateBusinessEvidenceStorage } from "@/backend/storage/business-evidence/filesystem";
 import { S3PrivateBusinessEvidenceStorage } from "@/backend/storage/business-evidence/s3";
 import type { Prisma } from "@/backend/generated/prisma/client";
+import type { PrivateBusinessEvidenceStorage } from "@/backend/storage/business-evidence/private-business-evidence-storage";
 import { randomUUID } from "node:crypto";
 import { buildVerificationOutbox } from "@/backend/admin/notifications/verification-outbox";
 
@@ -41,7 +42,16 @@ async function makeEvidenceInaccessible(
   });
 }
 
-export async function runEvidenceSafetyCycle(now = new Date(), limit = 10) {
+export type EvidenceSafetyCycleDependencies = {
+  pipeline?: EvidenceSafetyPipeline;
+  storageFor?: (adapter: string) => PrivateBusinessEvidenceStorage;
+};
+
+export async function runEvidenceSafetyCycle(
+  now = new Date(),
+  limit = 10,
+  dependencies: EvidenceSafetyCycleDependencies = {},
+) {
   const leaseOwner = `evidence:${randomUUID()}`;
   const requests = await prisma.recruiterVerificationRequest.findMany({
     where: { state: "PENDING_CHECKS", currentEvidenceId: { not: null } },
@@ -69,15 +79,15 @@ export async function runEvidenceSafetyCycle(now = new Date(), limit = 10) {
     });
     if (claimed.count !== 1) continue;
     try {
-      const adapter =
-        evidence.storageAdapter === "s3"
+      const adapter = dependencies.storageFor
+        ? dependencies.storageFor(evidence.storageAdapter)
+        : evidence.storageAdapter === "s3"
           ? new S3PrivateBusinessEvidenceStorage()
           : new FilesystemPrivateBusinessEvidenceStorage();
       const bytes = await adapter.read(evidence.storageLocator, evidence);
-      const result = await new EvidenceSafetyPipeline().inspect(
-        bytes,
-        evidence.declaredMediaType,
-      );
+      const result = await (
+        dependencies.pipeline ?? new EvidenceSafetyPipeline()
+      ).inspect(bytes, evidence.declaredMediaType);
       await prisma.$transaction(async (tx) => {
         await tx.verificationSafetyAttempt.create({
           data: {

@@ -162,9 +162,16 @@ must validate the OpenAPI contract and the React Admin provider contract
 against the same fixtures.
 
 `test:admin-management:e2e` requires `ADMIN_E2E_READY=1` plus the controlled
-identities described in section 4. `perf:admin-management` requires
-`ADMIN_PERF_ORIGIN` and an administrator cookie in `ADMIN_PERF_AUTH_COOKIE` and
-runs the 15-minute, 10-concurrent-account harness. CI runs the deterministic
+identities described in section 4. Set `ADMIN_E2E_RELIABILITY_EVIDENCE` to an
+NDJSON path while running T056, T074, and T097 to retain provider, retry,
+commit-to-SENT, and session-enforcement measurements. Run
+`perf:admin-management:reliability` with that same path in
+`ADMIN_PERF_RELIABILITY_EVIDENCE` to produce the T140 reliability report.
+
+`perf:admin-management` requires `ADMIN_PERF_ORIGIN`, exactly ten independently
+authenticated administrator cookies encoded as a JSON string array in
+`ADMIN_PERF_AUTH_COOKIES`, and `ADMIN_PERF_RELIABILITY_EVIDENCE`. It runs the
+15-minute, 10-concurrent-administrator harness. CI runs the deterministic
 performance evaluator self-test; a release still requires the full target-
 environment run.
 
