@@ -3,7 +3,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { postWithCurrentCsrf } from "@/frontend/features/authentication/client/current-csrf-proof";
 import { CsrfProofProvider } from "@/frontend/features/authentication/client/csrf-proof-context";
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
@@ -20,6 +27,14 @@ import {
   type WorkspaceLocale,
 } from "../client/workspace-locale";
 import { WorkspaceNavigation } from "./workspace-navigation";
+
+const SIDEBAR_MINIMUM_WIDTH = 220;
+const SIDEBAR_WIDTH_STEP = 16;
+const SIDEBAR_MAXIMUM_FALLBACK_WIDTH = 360;
+
+function clampSidebarWidth(width: number, maximumWidth: number) {
+  return Math.min(Math.max(width, SIDEBAR_MINIMUM_WIDTH), maximumWidth);
+}
 
 export function WorkspaceShell({
   children,
@@ -72,7 +87,18 @@ function WorkspaceShellContent({
   const [navigating, startNavigation] = useTransition();
   const [status, setStatus] = useState("");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_MINIMUM_WIDTH);
+  const [sidebarMaximumWidth, setSidebarMaximumWidth] = useState(
+    SIDEBAR_MAXIMUM_FALLBACK_WIDTH,
+  );
+  const [sidebarResizing, setSidebarResizing] = useState(false);
   const [nameOverride, setNameOverride] = useState<string | null>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
+  const sidebarResizeSession = useRef<{
+    pointerId: number;
+    startX: number;
+    startWidth: number;
+  } | null>(null);
 
   useEffect(() => {
     const synchronizeName = (event: Event) => {
@@ -86,6 +112,45 @@ function WorkspaceShellContent({
     return () =>
       window.removeEventListener(ACCOUNT_NAME_UPDATED_EVENT, synchronizeName);
   }, [router]);
+
+  useEffect(() => {
+    const sidebar = sidebarRef.current;
+    if (!sidebar) return;
+
+    const updateMaximumWidth = () => {
+      if (sidebar.dataset.collapsed === "true") return;
+      const itemWidths = Array.from(
+        sidebar.querySelectorAll<HTMLElement>(
+          ".workspace-navigation a, .workspace-navigation button",
+        ),
+        (item) => item.scrollWidth,
+      );
+      const widthSizer = sidebar.querySelector<HTMLElement>(
+        ".workspace-sidebar-width-sizer",
+      );
+      const sidebarStyles = window.getComputedStyle(sidebar);
+      const horizontalPadding =
+        (Number.parseFloat(sidebarStyles.paddingLeft) || 0) +
+        (Number.parseFloat(sidebarStyles.paddingRight) || 0);
+      const maximumWidth = Math.max(
+        SIDEBAR_MINIMUM_WIDTH,
+        Math.ceil(
+          Math.max(0, ...itemWidths, widthSizer?.scrollWidth ?? 0) +
+            horizontalPadding,
+        ),
+      );
+
+      setSidebarMaximumWidth(maximumWidth);
+      setSidebarWidth((width) => clampSidebarWidth(width, maximumWidth));
+    };
+
+    const animationFrame = window.requestAnimationFrame(updateMaximumWidth);
+    window.addEventListener("resize", updateMaximumWidth);
+    return () => {
+      window.cancelAnimationFrame(animationFrame);
+      window.removeEventListener("resize", updateMaximumWidth);
+    };
+  }, [locale]);
 
   const workspaceProfile = nameOverride
     ? { ...profile, name: nameOverride }
@@ -142,16 +207,72 @@ function WorkspaceShellContent({
     }
   }
 
+  function startSidebarResize(event: ReactPointerEvent<HTMLDivElement>) {
+    if (sidebarCollapsed) return;
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    sidebarResizeSession.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startWidth: sidebarWidth,
+    };
+    setSidebarResizing(true);
+  }
+
+  function resizeSidebar(event: ReactPointerEvent<HTMLDivElement>) {
+    const session = sidebarResizeSession.current;
+    if (!session || session.pointerId !== event.pointerId) return;
+    setSidebarWidth(
+      clampSidebarWidth(
+        session.startWidth + event.clientX - session.startX,
+        sidebarMaximumWidth,
+      ),
+    );
+  }
+
+  function finishSidebarResize(event: ReactPointerEvent<HTMLDivElement>) {
+    if (sidebarResizeSession.current?.pointerId !== event.pointerId) return;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    sidebarResizeSession.current = null;
+    setSidebarResizing(false);
+  }
+
+  function resizeSidebarWithKeyboard(
+    event: React.KeyboardEvent<HTMLDivElement>,
+  ) {
+    let targetWidth: number | null = null;
+    if (event.key === "ArrowLeft")
+      targetWidth = sidebarWidth - SIDEBAR_WIDTH_STEP;
+    if (event.key === "ArrowRight")
+      targetWidth = sidebarWidth + SIDEBAR_WIDTH_STEP;
+    if (event.key === "Home") targetWidth = SIDEBAR_MINIMUM_WIDTH;
+    if (event.key === "End") targetWidth = sidebarMaximumWidth;
+    if (targetWidth === null) return;
+
+    event.preventDefault();
+    setSidebarWidth(clampSidebarWidth(targetWidth, sidebarMaximumWidth));
+  }
+
   return (
     <main className="workspace-page" lang={locale}>
       <div
         className="workspace-layout"
         data-sidebar-collapsed={sidebarCollapsed}
+        data-sidebar-resizing={sidebarResizing}
+        style={
+          {
+            "--sh-sidebar-expanded-width": `${sidebarWidth}px`,
+          } as CSSProperties
+        }
       >
         <aside
+          ref={sidebarRef}
           className="workspace-sidebar"
           aria-label={copy.sidebar}
           data-collapsed={sidebarCollapsed}
+          data-resizing={sidebarResizing}
         >
           <div className="workspace-sidebar-header">
             <div className="workspace-sidebar-brand">
@@ -172,6 +293,21 @@ function WorkspaceShellContent({
               </svg>
             </button>
           </div>
+          <div
+            className="workspace-sidebar-resize-handle"
+            role="separator"
+            tabIndex={sidebarCollapsed ? -1 : 0}
+            aria-label="Resize workspace sidebar"
+            aria-orientation="vertical"
+            aria-valuemin={SIDEBAR_MINIMUM_WIDTH}
+            aria-valuemax={sidebarMaximumWidth}
+            aria-valuenow={sidebarWidth}
+            onPointerDown={startSidebarResize}
+            onPointerMove={resizeSidebar}
+            onPointerUp={finishSidebarResize}
+            onPointerCancel={finishSidebarResize}
+            onKeyDown={resizeSidebarWithKeyboard}
+          />
           <WorkspaceNavigation
             busy={busy || navigating}
             collapsed={sidebarCollapsed}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { useRef, useState } from "react";
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 import type {
@@ -178,9 +179,58 @@ export function ProfileSocialLinksForm({
     keyName: "fieldKey",
   });
   const links = useWatch({ control, name: "socialLinks" }) ?? [];
+  const [quickLink, setQuickLink] = useState("");
+  const [quickLinkError, setQuickLinkError] = useState("");
+  const quickLinkInputRef = useRef<HTMLInputElement>(null);
 
   useServerFormReconciliation({ socialLinks: profile.socialLinks }, reset);
   useUnsavedChangesGuard(isDirty);
+
+  const quickCopy =
+    locale === "vi"
+      ? {
+          label: "Liên kết hồ sơ hoặc website",
+          placeholder: "Dán https://linkedin.com/in/ban",
+          add: "Thêm liên kết",
+          invalid: "Hãy nhập một liên kết http:// hoặc https:// hoàn chỉnh.",
+          duplicate: "Liên kết này đã có trong danh sách.",
+        }
+      : {
+          label: "Profile or website link",
+          placeholder: "Paste https://linkedin.com/in/your-name",
+          add: "Add link",
+          invalid: "Enter a complete http:// or https:// link.",
+          duplicate: "This link is already in your list.",
+        };
+
+  function addQuickLink() {
+    const url = quickLink.trim();
+    if (!isCompleteSocialUrl(url)) {
+      setQuickLinkError(quickCopy.invalid);
+      quickLinkInputRef.current?.focus();
+      return;
+    }
+    if (
+      links.some(
+        (link) =>
+          link.url.trim().toLocaleLowerCase() === url.toLocaleLowerCase(),
+      )
+    ) {
+      setQuickLinkError(quickCopy.duplicate);
+      quickLinkInputRef.current?.focus();
+      return;
+    }
+
+    append({ url });
+    setQuickLink("");
+    setQuickLinkError("");
+  }
+
+  function usePlatformTemplate(prefix: string) {
+    setQuickLink(prefix);
+    setQuickLinkError("");
+    quickLinkInputRef.current?.focus();
+  }
 
   return (
     <form
@@ -215,6 +265,44 @@ export function ProfileSocialLinksForm({
           <h3 id="social-picker-title">{copy.pickerTitle}</h3>
           <p>{copy.pickerCopy}</p>
         </div>
+        <div className="social-link-quick-add">
+          <label htmlFor="profile-social-quick-add">{quickCopy.label}</label>
+          <div>
+            <input
+              ref={quickLinkInputRef}
+              id="profile-social-quick-add"
+              type="url"
+              maxLength={2_048}
+              placeholder={quickCopy.placeholder}
+              value={quickLink}
+              aria-invalid={Boolean(quickLinkError)}
+              aria-describedby={
+                quickLinkError ? "profile-social-quick-add-error" : undefined
+              }
+              onChange={(event) => {
+                setQuickLink(event.target.value);
+                setQuickLinkError("");
+              }}
+              onKeyDown={(event) => {
+                if (event.key !== "Enter") return;
+                event.preventDefault();
+                addQuickLink();
+              }}
+            />
+            <button
+              type="button"
+              disabled={fields.length >= 10}
+              onClick={addQuickLink}
+            >
+              {quickCopy.add}
+            </button>
+          </div>
+          {quickLinkError ? (
+            <p id="profile-social-quick-add-error" role="alert">
+              {quickLinkError}
+            </p>
+          ) : null}
+        </div>
         <div className="social-platform-grid">
           {socialPlatforms.map((platform) => {
             const added = links.some(
@@ -232,10 +320,10 @@ export function ProfileSocialLinksForm({
                       : `Thêm hồ sơ ${platform.name}`
                     : added
                       ? `${platform.name} profile added`
-                      : `Add ${platform.name} profile`
+                      : `Use ${platform.name} template`
                 }
                 disabled={fields.length >= 10 || added}
-                onClick={() => append({ url: platform.prefix })}
+                onClick={() => usePlatformTemplate(platform.prefix)}
               >
                 <span className="social-platform-mark" aria-hidden="true">
                   <SocialPlatformIcon name={platform.id} />
@@ -266,9 +354,20 @@ export function ProfileSocialLinksForm({
             >
               <input type="hidden" {...register(`socialLinks.${index}.id`)} />
               <label htmlFor={`profile-social-${index}`}>
-                {platform
-                  ? `${platform.name} URL`
-                  : `${copy.generic} ${index + 1}`}
+                {platform ? (
+                  <span className="social-link-row-platform">
+                    <span
+                      className="social-platform-mark"
+                      data-platform={platform.id}
+                      aria-hidden="true"
+                    >
+                      <SocialPlatformIcon name={platform.id} />
+                    </span>
+                    {platform.name} URL
+                  </span>
+                ) : (
+                  `${copy.generic} ${index + 1}`
+                )}
               </label>
               <input
                 id={`profile-social-${index}`}
@@ -336,8 +435,12 @@ export function ProfileSocialLinksForm({
                       : `Remove social link ${index + 1}`
                   }
                   onClick={() => remove(index)}
+                  className="social-link-remove"
                 >
-                  {copy.remove}
+                  <svg aria-hidden="true" viewBox="0 0 24 24">
+                    <path d="M4 7h16M9.5 11v6M14.5 11v6M9 7V4.5h6V7m-8 0 .7 12h8.6L17 7" />
+                  </svg>
+                  <span>{copy.remove}</span>
                 </button>
               </div>
             </li>
@@ -351,7 +454,7 @@ export function ProfileSocialLinksForm({
             locale === "vi" ? "Thêm liên kết xã hội" : "Add social link"
           }
           disabled={fields.length >= 10}
-          onClick={() => append({ url: "" })}
+          onClick={() => quickLinkInputRef.current?.focus()}
         >
           {copy.addWebsite}
         </button>
