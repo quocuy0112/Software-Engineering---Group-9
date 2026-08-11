@@ -127,6 +127,15 @@ export function WorkspaceNavigation({
         aria-label={copy.workspace}
         data-open={menuOpen}
       >
+        <span className="workspace-sidebar-width-sizer" aria-hidden="true">
+          {[
+            ...destinations.map((destination) => destination.label),
+            ...jobsSubnav.map((subnav) => subnav.label),
+            copy.signOut,
+          ].map((label) => (
+            <span key={label}>{label}</span>
+          ))}
+        </span>
         <p className="workspace-nav-label">{copy.workspace}</p>
         <div className="workspace-navigation-scroll">
           {destinations.map((destination) => {

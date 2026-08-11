@@ -284,16 +284,41 @@
   line-height: var(--sh-line-height-caption);
 }
 
+.social-link-quick-add {
+  margin-top: var(--sh-space-4);
+}
+
+.social-link-quick-add > label {
+  display: block;
+  margin-bottom: var(--sh-space-2);
+  color: var(--sh-color-text-primary);
+  font-size: var(--sh-font-size-label);
+  font-weight: var(--sh-font-weight-semibold);
+}
+
+.social-link-quick-add > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  gap: var(--sh-space-2);
+}
+
+.social-link-quick-add > p {
+  margin: var(--sh-space-2) 0 0;
+  color: var(--sh-color-error);
+  font-size: var(--sh-font-size-caption);
+  line-height: var(--sh-line-height-caption);
+}
+
 .social-platform-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--sh-space-3);
+  grid-template-columns: repeat(auto-fit, minmax(124px, 1fr));
+  gap: var(--sh-space-2);
   margin-top: var(--sh-space-4);
 }
 
 .professional-profile-page .social-platform-grid button {
   min-width: 0;
-  min-height: 72px;
+  min-height: 52px;
   justify-content: flex-start;
   gap: var(--sh-space-3);
   padding: var(--sh-space-2) var(--sh-space-3);
@@ -345,18 +370,22 @@
   stroke: none;
 }
 
+.social-platform-mark[data-platform="linkedin"],
 [data-platform="linkedin"] .social-platform-mark {
   background: #0a66c2;
 }
 
+.social-platform-mark[data-platform="github"],
 [data-platform="github"] .social-platform-mark {
   background: #181717;
 }
 
+.social-platform-mark[data-platform="facebook"],
 [data-platform="facebook"] .social-platform-mark {
   background: #1877f2;
 }
 
+.social-platform-mark[data-platform="instagram"],
 [data-platform="instagram"] .social-platform-mark {
   background: linear-gradient(135deg, #833ab4, #e1306c 58%, #fcb045);
   font-size: var(--sh-font-size-h3);
@@ -375,7 +404,7 @@
 }
 
 .social-platform-grid small {
-  margin-top: 2px;
+  margin-top: 1px;
   color: var(--sh-color-text-muted);
   font-size: var(--sh-font-size-caption);
   font-weight: var(--sh-font-weight-medium);
@@ -386,6 +415,19 @@
 }
 
 .social-link-row input[type="url"] {
+  font-size: var(--sh-font-size-body-sm);
+}
+
+.social-link-row-platform {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--sh-space-2);
+}
+
+.social-link-row-platform .social-platform-mark {
+  width: 36px;
+  height: 36px;
   font-size: var(--sh-font-size-body-sm);
 }
 
@@ -497,6 +539,26 @@
   background: var(--sh-color-info-bg);
 }
 
+.professional-profile-row-actions .social-link-remove {
+  color: var(--sh-color-error);
+}
+
+.professional-profile-row-actions .social-link-remove:hover:not(:disabled) {
+  border-color: var(--sh-color-error);
+  color: var(--sh-color-error);
+  background: var(--sh-color-error-bg);
+}
+
+.social-link-remove svg {
+  width: var(--sh-icon-size-md);
+  height: var(--sh-icon-size-md);
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
 .profile-suggestions {
   padding: var(--sh-space-3);
   border: 1px solid var(--sh-color-border-subtle);
@@ -546,6 +608,10 @@
 
   .social-platform-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .social-link-quick-add > div {
+    grid-template-columns: 1fr;
   }
 }
 

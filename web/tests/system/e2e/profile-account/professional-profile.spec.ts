@@ -113,10 +113,10 @@ test("saves a complete owned profile, reports stale writes, and keeps XSS inert"
   await education.getByLabel("End date").fill("2024-01-01");
   await page.getByRole("button", { name: "Save education" }).click();
 
-  await page.getByRole("button", { name: "Add social link" }).click();
   await page
-    .getByLabel("Social link 1", { exact: true })
+    .getByLabel("Profile or website link", { exact: true })
     .fill("https://github.com/example");
+  await page.getByRole("button", { name: "Add link" }).click();
   await page.getByRole("button", { name: "Save social links" }).click();
   await page.reload();
   await expect(page.getByLabel("Headline")).toHaveValue("Engineer");

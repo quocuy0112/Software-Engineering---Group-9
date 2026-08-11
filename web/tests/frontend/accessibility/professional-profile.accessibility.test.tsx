@@ -71,21 +71,31 @@ describe("professional profile accessibility", () => {
     ).toHaveAttribute("type", "checkbox");
 
     fireEvent.click(screen.getByRole("button", { name: "Add social link" }));
-    expect(screen.getByLabelText("Social link 1")).toHaveAttribute(
-      "type",
-      "url",
+    expect(screen.getByLabelText("Profile or website link")).toHaveFocus();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Use GitHub template" }),
     );
+    expect(screen.getByLabelText("Profile or website link")).toHaveValue(
+      "https://github.com/",
+    );
+    fireEvent.change(screen.getByLabelText("Profile or website link"), {
+      target: { value: "https://github.com/example" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Add link" }));
+    expect(screen.getByLabelText("GitHub URL")).toHaveAttribute("type", "url");
     expect(
       screen.getByRole("button", { name: "Remove social link 1" }),
     ).toHaveAttribute("type", "button");
 
-    fireEvent.click(screen.getByRole("button", { name: "Add GitHub profile" }));
-    expect(screen.getByLabelText("GitHub URL")).toHaveValue(
-      "https://github.com/",
-    );
     expect(
       screen.getByRole("button", { name: "GitHub profile added" }),
     ).toBeDisabled();
+    expect(
+      document.querySelector(
+        '.social-link-row-platform .social-platform-mark[data-platform="github"] svg',
+      ),
+    ).toHaveAttribute("viewBox", "0 0 24 24");
   });
 
   it("uses explicit text and ARIA semantics instead of color-only state", () => {

@@ -271,6 +271,37 @@ describe("identity navigation shells", () => {
     expect(screen.getByRole("button", { name: "Sign out" })).toBeVisible();
   });
 
+  it("lets an expanded desktop sidebar grow before collapsing it to icons", () => {
+    render(
+      <WorkspaceShell csrfProof="proof">
+        <h1>Dashboard</h1>
+      </WorkspaceShell>,
+    );
+
+    const sidebar = screen.getByRole("complementary", {
+      name: "Workspace sidebar",
+    });
+    const resizeHandle = screen.getByRole("separator", {
+      name: "Resize workspace sidebar",
+    });
+
+    expect(resizeHandle).toHaveAttribute("aria-valuemin", "220");
+    expect(
+      sidebar.querySelector(".workspace-sidebar-width-sizer"),
+    ).toHaveTextContent("Job Recommendation Settings");
+    fireEvent.keyDown(resizeHandle, { key: "ArrowRight" });
+    expect(sidebar.parentElement).toHaveStyle(
+      "--sh-sidebar-expanded-width: 236px",
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Collapse workspace sidebar" }),
+    );
+    expect(sidebar.parentElement).toHaveStyle(
+      "--sh-sidebar-expanded-width: 236px",
+    );
+  });
+
   it("keeps the sidebar frame width synchronized with the collapsed grid track", async () => {
     const css = await readFile(
       resolve(process.cwd(), "src/frontend/styles/workspace.css"),
