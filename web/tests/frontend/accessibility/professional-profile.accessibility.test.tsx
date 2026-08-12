@@ -23,6 +23,7 @@ const emptyProfile = {
 };
 
 const account = {
+  id: "8fc8b912-baad-4be8-8c49-f8f9323f6255",
   name: "Candidate Example",
   email: "candidate@example.com",
   memberSince: "July 31, 2026",
@@ -114,6 +115,9 @@ describe("professional profile accessibility", () => {
     expect(
       screen.queryByRole("region", { name: "Save feedback" }),
     ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Copy account ID" }),
+    ).toHaveAttribute("type", "button");
   });
 
   it("renders recognizable filled brand marks for each social platform", () => {

@@ -651,6 +651,7 @@ model UserAccount {
   targetedMessagingReports      MessagingReport[]                  @relation("MessagingTarget")
 
   @@index([state, id])
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "user_name_trgm_idx")
   @@map("user")
 }
 

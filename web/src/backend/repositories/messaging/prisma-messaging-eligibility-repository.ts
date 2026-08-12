@@ -1,12 +1,18 @@
 import "server-only";
 import { prisma } from "@/backend/database/prisma";
+import { buildParticipantSearchFilter } from "@/backend/messaging/search/participant-search";
 import type {
   EligibleContext,
   SafeParticipant,
 } from "@/shared/contracts/messaging/common";
 import type { EligibleParticipant } from "@/shared/contracts/messaging/conversations";
 
-const recruitingRoles = ["OWNER", "HR_MANAGER", "RECRUITER", "HIRING_MANAGER"] as const;
+const recruitingRoles = [
+  "OWNER",
+  "HR_MANAGER",
+  "RECRUITER",
+  "HIRING_MANAGER",
+] as const;
 
 type EligiblePage = { items: EligibleParticipant[]; nextCursor: string | null };
 
@@ -16,7 +22,9 @@ function pushContext(
   context: EligibleContext,
 ) {
   const row = rows.get(participant.id) ?? { participant, contexts: [] };
-  if (!row.contexts.some((candidate) => candidate.reference === context.reference)) {
+  if (
+    !row.contexts.some((candidate) => candidate.reference === context.reference)
+  ) {
     row.contexts.push(context);
   }
   rows.set(participant.id, row);
@@ -34,7 +42,7 @@ export class PrismaMessagingEligibilityRepository {
     const query = input.q?.trim();
     const participantFilter = {
       state: "ACTIVE" as const,
-      ...(query ? { name: { contains: query, mode: "insensitive" as const } } : {}),
+      ...buildParticipantSearchFilter(query),
     };
     const [candidateApplications, recruiterApplications, connections] =
       await Promise.all([
@@ -55,7 +63,9 @@ export class PrismaMessagingEligibilityRepository {
                         role: { in: [...recruitingRoles] },
                         user: participantFilter,
                       },
-                      select: { user: { select: { id: true, name: true, image: true } } },
+                      select: {
+                        user: { select: { id: true, name: true, image: true } },
+                      },
                     },
                   },
                 },
@@ -80,7 +90,11 @@ export class PrismaMessagingEligibilityRepository {
           },
           select: {
             id: true,
-            candidate: { select: { user: { select: { id: true, name: true, image: true } } } },
+            candidate: {
+              select: {
+                user: { select: { id: true, name: true, image: true } },
+              },
+            },
             jobPosting: {
               select: {
                 title: true,
@@ -93,8 +107,14 @@ export class PrismaMessagingEligibilityRepository {
           where: {
             state: "ACCEPTED",
             OR: [
-              { participantLowId: input.userId, participantHigh: participantFilter },
-              { participantHighId: input.userId, participantLow: participantFilter },
+              {
+                participantLowId: input.userId,
+                participantHigh: participantFilter,
+              },
+              {
+                participantHighId: input.userId,
+                participantLow: participantFilter,
+              },
             ],
           },
           select: {
@@ -159,6 +179,8 @@ export class PrismaMessagingEligibilityRepository {
 
   async findEligibleProfile(userId: string, targetUserId: string) {
     const page = await this.list({ userId, q: undefined, limit: 10_000 });
-    return page.items.find((item) => item.participant.id === targetUserId) ?? null;
+    return (
+      page.items.find((item) => item.participant.id === targetUserId) ?? null
+    );
   }
 }
