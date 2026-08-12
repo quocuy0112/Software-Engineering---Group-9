@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { AccountPreferences } from "@/shared/contracts/account/preferences";
 import {
   getTimezoneOptions,
@@ -20,6 +20,108 @@ function supportsTimezone(timezone: string): boolean {
   }
 }
 
+function timezoneSearchText(value: string) {
+  return value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+}
+
+function TimezonePicker({
+  value,
+  options,
+  describedBy,
+  onChange,
+}: {
+  value: string;
+  options: TimezoneOption[];
+  describedBy: string;
+  onChange: (timezone: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const selected = options.find((option) => option.value === value);
+  const matches = useMemo(() => {
+    const search = timezoneSearchText(query.trim());
+    return options.filter((option) =>
+      timezoneSearchText(`${option.label} ${option.value}`).includes(search),
+    );
+  }, [options, query]);
+  const visibleOptions = matches.slice(0, 8);
+
+  function choose(timezone: string) {
+    onChange(timezone);
+    setOpen(false);
+    setQuery("");
+  }
+
+  return (
+    <div className="account-timezone-picker">
+      <input
+        id="preference-timezone"
+        type="search"
+        role="combobox"
+        autoComplete="off"
+        value={open ? query : (selected?.label ?? value)}
+        placeholder="GMT+07:00 · Asia/Ho_Chi_Minh"
+        aria-autocomplete="list"
+        aria-haspopup="listbox"
+        aria-controls="preference-timezone-options"
+        aria-expanded={open}
+        aria-describedby={describedBy}
+        onFocus={() => {
+          setOpen(true);
+          setQuery("");
+        }}
+        onBlur={() => window.setTimeout(() => setOpen(false), 120)}
+        onChange={(event) => {
+          setOpen(true);
+          setQuery(event.target.value);
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            setOpen(false);
+            setQuery("");
+          }
+          if (event.key === "Enter" && visibleOptions[0]) {
+            event.preventDefault();
+            choose(visibleOptions[0].value);
+          }
+        }}
+      />
+      <button
+        className="account-timezone-toggle"
+        type="button"
+        aria-label="Toggle timezone list"
+        aria-expanded={open}
+        onMouseDown={(event) => event.preventDefault()}
+        onClick={() => {
+          setOpen((current) => !current);
+          setQuery("");
+        }}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+      {open ? (
+        <div className="account-timezone-results" id="preference-timezone-options">
+          <ul role="listbox" aria-label="Timezone options">
+            {visibleOptions.map((option) => (
+              <li key={option.value} role="option" aria-selected={option.value === value}>
+                <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => choose(option.value)}>
+                  {option.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+          {matches.length > visibleOptions.length ? (
+            <p>Keep typing to narrow {matches.length} timezones.</p>
+          ) : null}
+          {!visibleOptions.length ? <p>No matching timezone.</p> : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function AccountPreferencesForm({
   preferences,
   saving,
@@ -31,13 +133,11 @@ export function AccountPreferencesForm({
   onChange: (preferences: AccountPreferences) => void;
   onSave: () => Promise<boolean>;
 }) {
-  const [timezoneOptions, setTimezoneOptions] = useState<TimezoneOption[]>([]);
   const initialTimezone = useRef(preferences.timezone);
+  const [timezoneOptions] = useState<TimezoneOption[]>(() =>
+    getTimezoneOptions([initialTimezone.current]),
+  );
   const locale = useWorkspaceLocale();
-
-  useEffect(() => {
-    setTimezoneOptions(getTimezoneOptions([initialTimezone.current]));
-  }, []);
 
   const copy =
     locale === "vi"
@@ -75,6 +175,7 @@ export function AccountPreferencesForm({
       <div className="account-preferences-fields">
         <label htmlFor="preference-language">{copy.language}</label>
         <select
+          className="account-preferences-select"
           id="preference-language"
           value={preferences.language}
           aria-describedby="interface-language-guidance"
@@ -93,36 +194,22 @@ export function AccountPreferencesForm({
         </p>
 
         <label htmlFor="preference-timezone">{copy.timezone}</label>
-        <input
-          id="preference-timezone"
-          list="preference-timezones"
-          maxLength={100}
+        <TimezonePicker
           value={preferences.timezone}
-          placeholder="GMT+07:00 · Asia/Ho_Chi_Minh"
-          aria-describedby={
+          options={timezoneOptions}
+          describedBy={
             preferences.timezoneSupported
               ? "timezone-guidance timezone-list-guidance"
               : "timezone-unsupported-guidance timezone-list-guidance"
           }
-          onChange={(event) =>
+          onChange={(timezone) =>
             onChange({
               ...preferences,
-              timezone: event.target.value,
-              timezoneSupported: supportsTimezone(event.target.value),
+              timezone,
+              timezoneSupported: supportsTimezone(timezone),
             })
           }
         />
-        <datalist id="preference-timezones">
-          {timezoneOptions.map((timezone) => (
-            <option
-              value={timezone.value}
-              label={timezone.label}
-              key={timezone.value}
-            >
-              {timezone.label}
-            </option>
-          ))}
-        </datalist>
         <p id="timezone-list-guidance" className="preference-guidance">
           {timezoneListHint}
         </p>

@@ -302,11 +302,19 @@ function WorkspaceShellContent({
             aria-valuemin={SIDEBAR_MINIMUM_WIDTH}
             aria-valuemax={sidebarMaximumWidth}
             aria-valuenow={sidebarWidth}
+            aria-valuetext={`${sidebarWidth}px of ${sidebarMaximumWidth}px`}
+            aria-description="Drag to resize. Double-click to reset the default width."
+            title="Drag to resize. Double-click to reset the default width."
             onPointerDown={startSidebarResize}
             onPointerMove={resizeSidebar}
             onPointerUp={finishSidebarResize}
             onPointerCancel={finishSidebarResize}
             onKeyDown={resizeSidebarWithKeyboard}
+            onDoubleClick={() =>
+              setSidebarWidth(
+                clampSidebarWidth(SIDEBAR_MINIMUM_WIDTH, sidebarMaximumWidth),
+              )
+            }
           />
           <WorkspaceNavigation
             busy={busy || navigating}

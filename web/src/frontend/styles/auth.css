@@ -57,10 +57,11 @@
 .home-eyebrow {
   margin: 0;
   color: var(--sh-color-brand-primary);
+  font-family: var(--sh-font-family-label);
   font-size: var(--sh-font-size-label);
-  font-weight: var(--sh-font-weight-semibold);
+  font-weight: 750;
   line-height: 18px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.105em;
   text-transform: uppercase;
 }
 

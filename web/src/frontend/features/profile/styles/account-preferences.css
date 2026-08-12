@@ -70,6 +70,7 @@
 
 .account-preferences-form select,
 .account-preferences-form input[type="text"],
+.account-preferences-form input[type="search"],
 .account-preferences-form input[list] {
   width: 100%;
   max-width: 100%;
@@ -81,6 +82,114 @@
   background: var(--sh-color-surface-card);
   font: inherit;
   box-shadow: var(--sh-shadow-control);
+}
+
+.account-preferences-form .account-preferences-select {
+  appearance: none;
+  padding-right: 2.75rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364758b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--sh-space-3) center;
+  background-size: 1rem;
+}
+
+.account-preferences-form #preference-timezone {
+  width: min(100%, 30rem);
+  min-height: 2.75rem;
+  padding-block: 0.55rem;
+  font-size: var(--sh-font-size-body-sm);
+}
+
+.account-timezone-picker {
+  position: relative;
+  width: min(100%, 30rem);
+}
+
+.account-timezone-picker #preference-timezone {
+  width: 100%;
+  padding-right: 2.75rem;
+}
+
+.account-timezone-toggle {
+  position: absolute;
+  top: 50%;
+  right: var(--sh-space-2);
+  display: inline-grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  color: var(--sh-color-text-muted);
+  background: transparent;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.account-timezone-toggle svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.account-timezone-picker:focus-within .account-timezone-toggle {
+  color: var(--sh-color-brand-primary);
+}
+
+.account-timezone-results {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + var(--sh-space-1));
+  right: 0;
+  left: 0;
+  max-height: 19rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  border: 1px solid var(--sh-color-border-default);
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-floating);
+}
+
+.account-timezone-results ul {
+  margin: 0;
+  padding: var(--sh-space-1);
+  list-style: none;
+}
+
+.account-timezone-results button {
+  display: block;
+  width: 100%;
+  min-height: 2.5rem;
+  padding: var(--sh-space-2) var(--sh-space-3);
+  overflow: hidden;
+  border: 0;
+  border-radius: calc(var(--sh-radius-sm) - 2px);
+  color: var(--sh-color-text-primary);
+  background: transparent;
+  font: inherit;
+  font-size: var(--sh-font-size-body-sm);
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.account-timezone-results button:hover,
+.account-timezone-results li[aria-selected="true"] button {
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+}
+
+.account-timezone-results > p {
+  margin: 0;
+  padding: 0 var(--sh-space-3) var(--sh-space-3);
+  color: var(--sh-color-text-muted);
+  font-size: var(--sh-font-size-caption);
 }
 
 .account-preferences-form select:hover:not(:disabled),
