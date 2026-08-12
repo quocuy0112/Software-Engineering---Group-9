@@ -153,6 +153,8 @@ describe("job board navigation", () => {
     expect(styles).toContain(".job-filter-mobile-trigger");
     expect(styles).toContain(".job-filter-drawer");
     expect(styles).toContain("max-height: min(88dvh, 52rem);");
+    expect(styles).toContain(".job-filter-actions {");
+    expect(styles).toContain("position: sticky;");
   });
 
   it("uses the Next.js apply query to open the detail-page modal", async () => {

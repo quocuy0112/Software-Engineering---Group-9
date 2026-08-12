@@ -60,6 +60,17 @@ describe("employer verification contract", () => {
     ).toBe(false);
   });
 
+  it("accepts recruiter applications only", () => {
+    for (const requestedRole of ["OWNER", "HR_MANAGER", "HIRING_MANAGER"]) {
+      expect(
+        verificationSubmissionSchema.safeParse({
+          companyName: "Example Company",
+          taxIdentifier: "0123456789",
+          requestedRole,
+        }).success,
+      ).toBe(false);
+    }
+  });
   it("constrains queue filters and every administrator decision payload", () => {
     expect(
       verificationListFilterSchema.safeParse({

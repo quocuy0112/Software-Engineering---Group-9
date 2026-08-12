@@ -48,6 +48,7 @@ export class PrismaVerificationRepository {
         id: row.id,
         applicantAccountId: row.applicantUserId,
         companyName: row.submittedCompanyName,
+        requestedRole: row.requestedRole,
         normalizedTaxIdentifier: row.normalizedTaxIdentifier,
         state: row.state,
         submissionVersion: row.currentSubmissionVersion,

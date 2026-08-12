@@ -16,7 +16,10 @@ export const adminLoginSchema = z.object({
   password: z.string().min(1).max(200),
 });
 export const adminFactorSchema = z.object({
-  code: z.string().regex(/^\d{6}$/u),
+  code: z
+    .string()
+    .trim()
+    .regex(/^\d{6}$/u),
   factor: z.literal("totp").default("totp"),
 });
 

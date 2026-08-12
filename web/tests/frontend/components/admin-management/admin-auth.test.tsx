@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { AdminTwoFactorPage } from "@/frontend/features/admin/auth/admin-two-factor-page";
 import { StepUpDialog } from "@/frontend/features/admin/auth/step-up-dialog";
 import { adminAuthProvider } from "@/frontend/features/admin/app/auth-provider";
+
 describe("admin authentication UI", () => {
   afterEach(() => vi.restoreAllMocks());
   it("names the initial factor input and designation action", () => {
@@ -41,13 +42,6 @@ describe("admin authentication UI", () => {
     finishRequest?.(Response.json({ authenticated: true }));
     await waitFor(() => expect(onComplete).toHaveBeenCalledTimes(1));
   });
-  it("uses a labelled modal for sensitive-action step-up", () => {
-    render(<StepUpDialog open onCancel={vi.fn()} onVerified={vi.fn()} />);
-    expect(
-      screen.getByRole("dialog", { name: "Confirm sensitive action" }),
-    ).toBeVisible();
-    expect(screen.getByRole("button", { name: "Verify" })).toBeDisabled();
-  });
   it("binds sensitive-action step-up to the authenticated CSRF proof", async () => {
     const fetchMock = vi
       .spyOn(globalThis, "fetch")
@@ -64,9 +58,18 @@ describe("admin authentication UI", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Verify" }));
     await waitFor(() => expect(onVerified).toHaveBeenCalledTimes(1));
-    const stepUpInit = fetchMock.mock.calls[1]?.[1];
-    expect(new Headers(stepUpInit?.headers).get("x-csrf-token")).toBe(
-      "csrf-proof",
-    );
+    const init = fetchMock.mock.calls[1]?.[1];
+    expect(new Headers(init?.headers).get("x-csrf-token")).toBe("csrf-proof");
+    expect(JSON.parse(String(init?.body))).toEqual({
+      code: "123456",
+      factor: "totp",
+    });
+  });
+  it("uses a labelled modal for sensitive-action step-up", () => {
+    render(<StepUpDialog open onCancel={vi.fn()} onVerified={vi.fn()} />);
+    expect(
+      screen.getByRole("dialog", { name: "Confirm sensitive action" }),
+    ).toBeVisible();
+    expect(screen.getByRole("button", { name: "Verify" })).toBeDisabled();
   });
 });

@@ -9,6 +9,7 @@ import {
   isSalaryNegotiable,
 } from "@/shared/utils/jobs/job-display";
 import { CompanyAvatar } from "./company-avatar";
+import { JobMetaIcon } from "./job-meta-icon";
 import { QuickViewPanel } from "./quick-view-panel";
 import { useOptionalJobInteraction } from "./job-interaction-provider";
 import { SaveJobAction } from "./save-job-action";
@@ -136,7 +137,10 @@ export function JobCardBody({ job }: { job: JobCardData }) {
       <h2 id={"job-" + job.id} className="job-card-title">
         <Link href={"/jobs/" + job.slug}>{job.title}</Link>
       </h2>
-      <p className="job-card-location">{job.location}</p>
+      <p className="job-card-location">
+        <JobMetaIcon name="location" aria-hidden="true" />
+        <span>{job.location}</span>
+      </p>
       <div className="job-card-tags" aria-label="Job tags">
         {secondaryTags.map((tag) => (
           <span className="job-card-tag" key={tag}>

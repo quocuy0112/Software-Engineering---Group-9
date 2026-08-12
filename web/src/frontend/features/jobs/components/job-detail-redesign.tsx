@@ -7,6 +7,7 @@ import { formatSalary } from "@/shared/utils/jobs/job-display";
 import { ApplyFormSection } from "./apply-form-section";
 import { CompanyLogo, JobDetailSidebar } from "./job-detail-sidebar";
 import { JobDetailOverview, JobDetailSections } from "./job-detail-sections";
+import { JobMetaIcon } from "./job-meta-icon";
 import { QuickSkillChips } from "./quick-skill-chips";
 import { RelatedJobsCarousel } from "./related-jobs-carousel";
 import { SaveJobAction } from "./save-job-action";
@@ -182,7 +183,7 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
             >
               <div className="job-detail-quick-info-item">
                 <span className="job-detail-quick-info-icon" aria-hidden="true">
-                  ⌖
+                  <JobMetaIcon name="location" />
                 </span>
                 <span>
                   <span className="job-detail-quick-info-label">Location</span>
@@ -191,7 +192,7 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
               </div>
               <div className="job-detail-quick-info-item">
                 <span className="job-detail-quick-info-icon" aria-hidden="true">
-                  ✦
+                  <JobMetaIcon name="experience" />
                 </span>
                 <span>
                   <span className="job-detail-quick-info-label">
@@ -206,7 +207,7 @@ export function JobDetailPage({ job }: { job: JobDetail }) {
               </div>
               <div className="job-detail-quick-info-item">
                 <span className="job-detail-quick-info-icon" aria-hidden="true">
-                  ◷
+                  <JobMetaIcon name="deadline" />
                 </span>
                 <span>
                   <span className="job-detail-quick-info-label">

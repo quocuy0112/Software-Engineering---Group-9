@@ -190,6 +190,10 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
       DIRECT_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
       ADMIN_WORKER_ENABLED: ${ADMIN_WORKER_ENABLED:-true}
+      # The shared local env file contains a Windows host path. The worker
+      # runs in Linux, so keep validation and any accidental access container-local.
+      CV_STORAGE_LOCAL_ROOT: /app/.local/cv-storage
+      IMAGE_SEARCH_STORAGE_LOCAL_ROOT: /app/.local/image-search-storage
       ADMIN_EVIDENCE_STORAGE_ROOT: /app/.local/admin-evidence
       ADMIN_CLAMD_SOCKET_PATH: /run/clamav/clamd.sock
       # The shared server environment validates every storage boundary. Do not
@@ -201,13 +205,15 @@ services:
         condition: service_healthy
       clamav:
         condition: service_healthy
+    group_add:
+      - "101"
     read_only: true
     cap_drop:
       - ALL
     security_opt:
       - no-new-privileges:true
     volumes:
-      - admin_evidence:/app/.local/admin-evidence
+      - ./web/.private-admin-evidence:/app/.local/admin-evidence
       - clamav_runtime:/run/clamav
     tmpfs:
       - /tmp:size=128m,mode=1770,uid=1000,gid=1000
@@ -216,4 +222,3 @@ volumes:
   clamav_signatures:
   clamav_runtime:
   ocr_runtime:
-  admin_evidence:
