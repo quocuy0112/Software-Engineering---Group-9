@@ -54,7 +54,7 @@ services:
       context: .
       dockerfile: web/Dockerfile.cv-worker
     image: smarthire-cv-worker:local
-    restart: "no"
+    restart: unless-stopped
     env_file:
       - .env
       - web/.env.local
@@ -137,7 +137,7 @@ services:
       context: .
       dockerfile: Dockerfile.image-search-worker
     image: smarthire-image-search-worker:local
-    restart: "no"
+    restart: unless-stopped
     env_file:
       - .env
       - web/.env.local
@@ -187,7 +187,7 @@ services:
       context: .
       dockerfile: Dockerfile.admin-worker
     image: smarthire-admin-worker:local
-    restart: "no"
+    restart: unless-stopped
     env_file:
       - .env
       - web/.env.local

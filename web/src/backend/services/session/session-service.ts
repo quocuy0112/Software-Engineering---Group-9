@@ -2,6 +2,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
 import { PrismaSessionPolicyRepository } from "@/backend/repositories/identity/prisma-session-policy-repository";
+import { enforceMessagingUserRevocation } from "@/backend/messaging/realtime/messaging-authority-enforcement";
 export class SessionService {
   constructor(
     private readonly repository = new PrismaSessionPolicyRepository(),
@@ -27,6 +28,13 @@ export class SessionService {
           .catch(() => undefined),
       ),
     );
+    if (victims.length > 0) {
+      await enforceMessagingUserRevocation({
+        userId,
+        sessionIds: victims,
+        cause: "SESSION",
+      }).catch(() => undefined);
+    }
     return victims;
   }
   recordLogout(userId: string, sessionId: string, occurredAt = new Date()) {

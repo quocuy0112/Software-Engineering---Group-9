@@ -27,6 +27,7 @@ import {
   type WorkspaceLocale,
 } from "../client/workspace-locale";
 import { WorkspaceNavigation } from "./workspace-navigation";
+import { closeMessagingConnectionOnLogout } from "@/frontend/features/messaging/client/use-chat-connection";
 
 import { RecruiterHeaderAction } from "@/frontend/features/recruiter-header/components/recruiter-header-action";
 import type { RecruiterHeaderStatus } from "@/shared/contracts/recruiter-header-status";
@@ -222,6 +223,7 @@ function WorkspaceShellContent({
         setStatus(copy.signOutError);
         return;
       }
+      closeMessagingConnectionOnLogout();
       startNavigation(() => router.replace("/login"));
     } catch {
       setStatus(copy.signOutError);
@@ -325,11 +327,19 @@ function WorkspaceShellContent({
             aria-valuemin={SIDEBAR_MINIMUM_WIDTH}
             aria-valuemax={sidebarMaximumWidth}
             aria-valuenow={sidebarWidth}
+            aria-valuetext={`${sidebarWidth}px of ${sidebarMaximumWidth}px`}
+            aria-description="Drag to resize. Double-click to reset the default width."
+            title="Drag to resize. Double-click to reset the default width."
             onPointerDown={startSidebarResize}
             onPointerMove={resizeSidebar}
             onPointerUp={finishSidebarResize}
             onPointerCancel={finishSidebarResize}
             onKeyDown={resizeSidebarWithKeyboard}
+            onDoubleClick={() =>
+              setSidebarWidth(
+                clampSidebarWidth(SIDEBAR_MINIMUM_WIDTH, sidebarMaximumWidth),
+              )
+            }
           />
           {workspaceMode === "recruiter" ? (
             <RecruiterWorkspaceNavigation

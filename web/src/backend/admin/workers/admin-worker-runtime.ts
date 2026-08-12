@@ -34,7 +34,6 @@ export class AdminWorkerRuntime {
         () => void loop.run(new Date()).catch(() => undefined),
         loop.intervalMs,
       );
-      timer.unref();
       this.timers.push(timer);
     }
   }

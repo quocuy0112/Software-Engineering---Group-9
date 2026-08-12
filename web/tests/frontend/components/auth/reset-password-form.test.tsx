@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { StrictMode } from "react";
 import {
   cleanup,
   fireEvent,
@@ -107,5 +108,31 @@ describe("reset password form", () => {
     expect(navigation.replace).not.toHaveBeenCalled();
     expect(password).toHaveValue("correct horse 2026");
     expect(confirmation).toHaveValue("different horse 2026");
+  });
+
+  it("keeps the reset token when mounted in React Strict Mode", async () => {
+    window.history.replaceState(
+      null,
+      "",
+      "/reset-password#token=opaque-test-token",
+    );
+    render(
+      <StrictMode>
+        <ResetPasswordForm />
+      </StrictMode>,
+    );
+
+    fireEvent.change(screen.getByLabelText("New password"), {
+      target: { value: "correct horse 2026" },
+    });
+    fireEvent.change(screen.getByLabelText("Confirm new password"), {
+      target: { value: "correct horse 2026" },
+    });
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: /reset password/i }),
+      ).toBeEnabled(),
+    );
   });
 });

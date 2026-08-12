@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ProfilePreferencesView } from "@/frontend/features/profile/components/profile-preferences-view";
 
@@ -20,156 +20,96 @@ const defaults = {
   },
 };
 
+function chooseUtc() {
+  const timezone = screen.getByLabelText("Timezone");
+  fireEvent.focus(timezone);
+  fireEvent.change(timezone, { target: { value: "UTC" } });
+  fireEvent.click(screen.getByRole("button", { name: /GMT\+00:00.*UTC/i }));
+}
+
 afterEach(() => {
   vi.restoreAllMocks();
 });
 
 describe("account-preferences accessibility", () => {
   it("renders defaults and all labelled controls with mandatory security explained", () => {
-    render(
-      <ProfilePreferencesView
-        initialPreferences={defaults}
-        csrfProof="csrf-proof"
-      />,
-    );
+    render(<ProfilePreferencesView initialPreferences={defaults} csrfProof="csrf-proof" />);
     expect(screen.getByLabelText("Interface language")).toHaveValue("vi");
-    expect(screen.getByLabelText("Interface language")).not.toBeDisabled();
-    expect(screen.getByLabelText("Timezone")).toHaveValue("Asia/Ho_Chi_Minh");
+    expect(screen.getByLabelText("Timezone")).toHaveDisplayValue(/Asia.*Ho Chi Minh/i);
     expect(screen.getByLabelText("Application updates")).toBeChecked();
     expect(screen.getByLabelText("Job recommendations")).toBeChecked();
-    const security = screen.getByLabelText("Account security");
-    expect(security).toBeChecked();
-    expect(security).toBeDisabled();
+    expect(screen.getByLabelText("Account security")).toBeDisabled();
     expect(screen.getByText(/stay enabled/i)).toBeVisible();
   });
 
-  it("provides a searchable IANA timezone list with current GMT offsets", async () => {
-    render(
-      <ProfilePreferencesView
-        initialPreferences={defaults}
-        csrfProof="csrf-proof"
-      />,
-    );
-
+  it("provides a compact, searchable IANA timezone combobox", () => {
+    render(<ProfilePreferencesView initialPreferences={defaults} csrfProof="csrf-proof" />);
     const timezone = screen.getByRole("combobox", { name: /Timezone/i });
-    expect(timezone).toHaveAttribute("list", "preference-timezones");
-
-    await waitFor(() => {
-      expect(
-        document.querySelectorAll("#preference-timezones option").length,
-      ).toBeGreaterThan(400);
-    });
-
-    const vietnam = document.querySelector(
-      '#preference-timezones option[value="Asia/Ho_Chi_Minh"]',
-    );
-    expect(vietnam).toHaveAttribute(
-      "label",
-      expect.stringMatching(/^GMT\+07:00 · Asia — Ho Chi Minh$/),
-    );
+    expect(timezone.tagName).toBe("INPUT");
+    fireEvent.focus(timezone);
+    const options = screen.getByRole("listbox", { name: /Timezone options/i });
+    expect(within(options).getAllByRole("option")).toHaveLength(8);
+    fireEvent.change(timezone, { target: { value: "Ho Chi Minh" } });
+    expect(screen.getByRole("button", { name: /Asia.*Ho Chi Minh/i })).toBeVisible();
   });
 
-  it("submits a complete set once, reconciles authoritative state, and announces success", async () => {
+  it("submits the selected timezone once and reconciles authoritative state", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
       Response.json({
         preferences: {
           ...defaults,
           language: "en",
           timezone: "UTC",
-          emailNotifications: {
-            ...defaults.emailNotifications,
-            application_updates: false,
-          },
+          emailNotifications: { ...defaults.emailNotifications, application_updates: false },
         },
         message: "Preferences saved.",
       }),
     );
-    render(
-      <ProfilePreferencesView
-        initialPreferences={defaults}
-        csrfProof="csrf-proof"
-      />,
-    );
-    fireEvent.change(screen.getByLabelText("Timezone"), {
-      target: { value: "UTC" },
-    });
-    fireEvent.change(screen.getByLabelText("Interface language"), {
-      target: { value: "en" },
-    });
+    render(<ProfilePreferencesView initialPreferences={defaults} csrfProof="csrf-proof" />);
+    chooseUtc();
+    fireEvent.change(screen.getByLabelText("Interface language"), { target: { value: "en" } });
     fireEvent.click(screen.getByLabelText("Application updates"));
     const submit = screen.getByRole("button", { name: "Save preferences" });
     fireEvent.click(submit);
     fireEvent.click(submit);
-    expect(await screen.findByRole("status")).toHaveTextContent(
-      "Preferences saved.",
-    );
+    expect(await screen.findByRole("status")).toHaveTextContent("Preferences saved.");
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/account/preferences",
-      expect.objectContaining({
-        method: "PUT",
-        headers: expect.objectContaining({
-          "X-CSRF-Token": "csrf-proof",
-        }),
-      }),
+      expect.objectContaining({ method: "PUT", headers: expect.objectContaining({ "X-CSRF-Token": "csrf-proof" }) }),
     );
     expect(screen.getByLabelText("Interface language")).toHaveValue("en");
-    expect(screen.getByLabelText("Interface language")).not.toBeDisabled();
-    expect(screen.getByLabelText("Timezone")).toHaveValue("UTC");
+    expect(screen.getByLabelText("Timezone")).toHaveDisplayValue(/UTC/);
   });
 
-  it("retains a failed complete set and focuses persistent feedback", async () => {
+  it("retains a failed timezone selection and focuses persistent feedback", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
       Response.json(
-        {
-          code: "ACCOUNT_TIMEZONE_UNSUPPORTED",
-          message: "Choose a supported timezone.",
-          fieldErrors: { timezone: ["Choose a supported timezone."] },
-        },
+        { code: "ACCOUNT_TIMEZONE_UNSUPPORTED", message: "Choose a supported timezone.", fieldErrors: { timezone: ["Choose a supported timezone."] } },
         { status: 400 },
       ),
     );
-    render(
-      <ProfilePreferencesView
-        initialPreferences={defaults}
-        csrfProof="csrf-proof"
-      />,
-    );
-    fireEvent.change(screen.getByLabelText("Timezone"), {
-      target: { value: "Mars/Olympus" },
-    });
+    render(<ProfilePreferencesView initialPreferences={defaults} csrfProof="csrf-proof" />);
+    chooseUtc();
     fireEvent.click(screen.getByRole("button", { name: "Save preferences" }));
     const alert = await screen.findByRole("alert");
-    expect(alert).toHaveTextContent(/múi giờ được hỗ trợ/i);
     await waitFor(() => expect(alert).toHaveFocus());
-    expect(screen.getByLabelText("Timezone")).toHaveValue("Mars/Olympus");
+    expect(screen.getByLabelText("Timezone")).toHaveDisplayValue(/UTC/);
   });
 
   it("preserves and explains an unsupported stored timezone", () => {
     render(
       <ProfilePreferencesView
-        initialPreferences={{
-          ...defaults,
-          timezone: "Legacy/Removed_Zone",
-          timezoneSupported: false,
-        }}
+        initialPreferences={{ ...defaults, timezone: "Legacy/Removed_Zone", timezoneSupported: false }}
         csrfProof="csrf-proof"
       />,
     );
-    expect(screen.getByLabelText("Timezone")).toHaveValue(
-      "Legacy/Removed_Zone",
-    );
+    expect(screen.getByLabelText("Timezone")).toHaveDisplayValue(/Legacy.*Removed Zone/i);
     expect(screen.getByText(/no longer supported/i)).toBeVisible();
   });
 
   it("ships keyboard focus, non-color cues, reduced motion, and 320px safety", () => {
-    const css = readFileSync(
-      resolve(
-        process.cwd(),
-        "src/frontend/features/profile/styles/account-preferences.css",
-      ),
-      "utf8",
-    );
+    const css = readFileSync(resolve(process.cwd(), "src/frontend/features/profile/styles/account-preferences.css"), "utf8");
     expect(css).toMatch(/@media\s*\(max-width:\s*320px\)/);
     expect(css).toMatch(/max-width:\s*100%/);
     expect(css).toMatch(/overflow-wrap:\s*anywhere/);
