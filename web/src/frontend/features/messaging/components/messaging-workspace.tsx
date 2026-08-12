@@ -11,11 +11,13 @@ import { MessageThread } from "./message-thread";
 import { StartConversation } from "./start-conversation";
 
 export function MessagingWorkspace({
+  currentUserId,
   csrfProof,
   initialConversations,
   initialEligibleParticipants,
   initialConversationId = null,
 }: {
+  currentUserId: string;
   csrfProof: string;
   initialConversations: ConversationSummary[];
   initialEligibleParticipants: EligibleParticipant[];
@@ -75,12 +77,32 @@ export function MessagingWorkspace({
         <div>
           <p className="workspace-kicker">PROFESSIONAL COMMUNICATION</p>
           <h1 id="workspace-page-title">Messages</h1>
+          <p className="messaging-heading-copy">
+            Stay connected with candidates and hiring teams in one secure workspace.
+          </p>
         </div>
-        <span role="status">{connectionState.toLocaleLowerCase()}</span>
+        <span
+          className="messaging-connection-status"
+          data-state={connectionState.toLocaleLowerCase()}
+          role="status"
+        >
+          <span aria-hidden="true" />
+          {connectionState === "CONNECTED"
+            ? "Realtime connected"
+            : connectionState === "CONNECTING"
+              ? "Connecting"
+              : connectionState === "RECONNECTING"
+                ? "Reconnecting"
+                : "Offline"}
+        </span>
       </header>
-      {conversations.error ? <p role="alert">{conversations.error}</p> : null}
+      {conversations.error ? (
+        <p className="messaging-page-alert" role="alert">
+          {conversations.error}
+        </p>
+      ) : null}
       <div className="messaging-grid">
-        <aside>
+        <aside className="messaging-sidebar" aria-label="Messaging navigation">
           <StartConversation
             csrfProof={csrfProof}
             initialItems={initialEligibleParticipants}
@@ -90,6 +112,7 @@ export function MessagingWorkspace({
             }}
           />
           <ConversationList
+            currentUserId={currentUserId}
             items={conversations.items}
             selectedId={selectedId}
             onSelect={setSelectedId}
@@ -98,6 +121,7 @@ export function MessagingWorkspace({
           />
         </aside>
         <MessageThread
+          currentUserId={currentUserId}
           csrfProof={csrfProof}
           page={history.page}
           error={history.error}

@@ -16,6 +16,7 @@ export default async function MessagesPage({
   return (
     <MessagingWorkspace
       key={query.conversation ?? "conversation-list"}
+      currentUserId={context.userId}
       csrfProof={context.csrfProof}
       initialEligibleParticipants={context.initialEligibleParticipants}
       initialConversations={context.initialConversations}
