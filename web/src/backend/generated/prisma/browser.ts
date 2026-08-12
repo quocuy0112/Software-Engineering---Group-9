@@ -263,6 +263,36 @@ export type JobReport = Prisma.JobReportModel
  */
 export type JobApplication = Prisma.JobApplicationModel
 /**
+ * Model ProfessionalConnection
+ * 
+ */
+export type ProfessionalConnection = Prisma.ProfessionalConnectionModel
+/**
+ * Model MessagingConversation
+ * 
+ */
+export type MessagingConversation = Prisma.MessagingConversationModel
+/**
+ * Model MessagingConversationParticipant
+ * 
+ */
+export type MessagingConversationParticipant = Prisma.MessagingConversationParticipantModel
+/**
+ * Model MessagingMessage
+ * 
+ */
+export type MessagingMessage = Prisma.MessagingMessageModel
+/**
+ * Model UserMessagingBlock
+ * 
+ */
+export type UserMessagingBlock = Prisma.UserMessagingBlockModel
+/**
+ * Model MessagingReport
+ * 
+ */
+export type MessagingReport = Prisma.MessagingReportModel
+/**
  * Model ApplicationStageEvent
  * 
  */

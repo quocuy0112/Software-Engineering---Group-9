@@ -141,6 +141,14 @@ const schema = z
     IMAGE_SEARCH_VISITOR_LIMIT_PER_HOUR: z.string().optional(),
     IMAGE_SEARCH_ACCOUNT_LIMIT_PER_HOUR: z.string().optional(),
     IMAGE_SEARCH_RETENTION_MINUTES: z.string().optional(),
+    MESSAGING_REALTIME_ENABLED: booleanString.default(true),
+    MESSAGING_SOCKET_PATH: z.literal("/chat").default("/chat"),
+    MESSAGING_ACK_TIMEOUT_MS: z.literal("5000").default("5000").transform(Number),
+    MESSAGING_ACK_RETRIES: z.literal("2").default("2").transform(Number),
+    MESSAGING_DISCONNECT_GRACE_MS: z
+      .literal("2000")
+      .default("2000")
+      .transform(Number),
   })
   .superRefine((env, ctx) => {
     const production = env.APP_ENV === "production";
@@ -309,6 +317,7 @@ export function parseServerEnvironment(
       /^CV_CLAMD_(?:HOST|PORT|TCP|ADDR|ADDRESS)$/iu.test(key) ||
       /^OCR_ENGINE_(?:URL|HOST|PORT|TCP|ADDR|ADDRESS)$/iu.test(key) ||
       /^(?:CV_OPENAI_(?:BASE_URL|ENDPOINT)|OPENAI_BASE_URL)$/iu.test(key) ||
+      /^NEXT_PUBLIC_MESSAGING_(?:TOKEN|JWT|SECRET)$/iu.test(key) ||
       (key === "CV_S3_VERSIONING_ENABLED" && input[key] !== "false") ||
       (key === "CV_S3_PUBLIC_ACCESS_ENABLED" && input[key] !== "false"),
   );

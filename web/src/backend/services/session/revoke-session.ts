@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { BetterAuthSessionGateway } from "@/backend/auth/better-auth/better-auth-session-gateway";
 import { PrismaSessionPolicyRepository } from "@/backend/repositories/identity/prisma-session-policy-repository";
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
+import { enforceMessagingUserRevocation } from "@/backend/messaging/realtime/messaging-authority-enforcement";
 export class RevokeSessionService {
   constructor(
     private readonly repository = new PrismaSessionPolicyRepository(),
@@ -42,6 +43,11 @@ export class RevokeSessionService {
           context: { reason: "user_requested" },
         })
         .catch(() => undefined);
+      await enforceMessagingUserRevocation({
+        userId,
+        sessionIds: [reference],
+        cause: "SESSION",
+      }).catch(() => undefined);
     } catch {
       await this.audit
         .append({

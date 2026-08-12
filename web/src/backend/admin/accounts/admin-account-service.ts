@@ -6,6 +6,7 @@ import {
 } from "@/backend/repositories/admin/prisma-admin-command-repository";
 import { PrismaAdminAccountRepository } from "@/backend/repositories/admin/prisma-admin-account-repository";
 import { recordAccountCommand } from "./admin-account-command-transaction";
+import { enforceMessagingUserRevocation } from "@/backend/messaging/realtime/messaging-authority-enforcement";
 
 type Command = {
   expectedVersion: number;
@@ -27,7 +28,7 @@ export class AdminAccountService {
     if (authority.userId === targetUserId)
       throw new Error("PROTECTED_ADMIN_ACTION");
     const now = new Date();
-    return new PrismaAdminCommandRepository().execute(
+    const outcome = await new PrismaAdminCommandRepository().execute(
       {
         actorUserId: authority.userId,
         actorSessionId: authority.sessionId,
@@ -199,6 +200,13 @@ export class AdminAccountService {
         return { version: account.version + 1, state: resultingState };
       },
     );
+    if (kind === "suspend" || kind === "revoke-all" || kind === "revoke-one") {
+      await enforceMessagingUserRevocation({
+        userId: targetUserId,
+        cause: kind === "suspend" ? "ACCOUNT" : "SESSION",
+      }).catch(() => undefined);
+    }
+    return outcome;
   }
   suspend(a: AdminAuthority, id: string, c: Command) {
     return this.run(a, id, "suspend", c);

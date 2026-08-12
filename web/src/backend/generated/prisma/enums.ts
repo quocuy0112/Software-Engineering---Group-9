@@ -324,6 +324,29 @@ export const CompanyMembershipStatus = {
 export type CompanyMembershipStatus = (typeof CompanyMembershipStatus)[keyof typeof CompanyMembershipStatus]
 
 
+export const ProfessionalConnectionStatus = {
+  ACCEPTED: 'ACCEPTED'
+} as const
+
+export type ProfessionalConnectionStatus = (typeof ProfessionalConnectionStatus)[keyof typeof ProfessionalConnectionStatus]
+
+
+export const MessagingConversationContextType = {
+  APPLICATION: 'APPLICATION',
+  PROFESSIONAL_CONNECTION: 'PROFESSIONAL_CONNECTION'
+} as const
+
+export type MessagingConversationContextType = (typeof MessagingConversationContextType)[keyof typeof MessagingConversationContextType]
+
+
+export const MessagingReportTargetType = {
+  PARTICIPANT: 'PARTICIPANT',
+  CONVERSATION: 'CONVERSATION'
+} as const
+
+export type MessagingReportTargetType = (typeof MessagingReportTargetType)[keyof typeof MessagingReportTargetType]
+
+
 export const AdministratorGrantState = {
   ACTIVE: 'ACTIVE',
   SUSPENDED: 'SUSPENDED',

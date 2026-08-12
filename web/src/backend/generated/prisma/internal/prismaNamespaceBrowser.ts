@@ -100,6 +100,12 @@ export const ModelName = {
   SavedJob: 'SavedJob',
   JobReport: 'JobReport',
   JobApplication: 'JobApplication',
+  ProfessionalConnection: 'ProfessionalConnection',
+  MessagingConversation: 'MessagingConversation',
+  MessagingConversationParticipant: 'MessagingConversationParticipant',
+  MessagingMessage: 'MessagingMessage',
+  UserMessagingBlock: 'UserMessagingBlock',
+  MessagingReport: 'MessagingReport',
   ApplicationStageEvent: 'ApplicationStageEvent',
   ApplicationAnswer: 'ApplicationAnswer',
   RecruitmentNotificationWork: 'RecruitmentNotificationWork',
@@ -1044,6 +1050,92 @@ export const JobApplicationScalarFieldEnum = {
 } as const
 
 export type JobApplicationScalarFieldEnum = (typeof JobApplicationScalarFieldEnum)[keyof typeof JobApplicationScalarFieldEnum]
+
+
+export const ProfessionalConnectionScalarFieldEnum = {
+  id: 'id',
+  participantLowId: 'participantLowId',
+  participantHighId: 'participantHighId',
+  state: 'state',
+  acceptedAt: 'acceptedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProfessionalConnectionScalarFieldEnum = (typeof ProfessionalConnectionScalarFieldEnum)[keyof typeof ProfessionalConnectionScalarFieldEnum]
+
+
+export const MessagingConversationScalarFieldEnum = {
+  id: 'id',
+  participantLowId: 'participantLowId',
+  participantHighId: 'participantHighId',
+  contextType: 'contextType',
+  contextReference: 'contextReference',
+  applicationId: 'applicationId',
+  companyId: 'companyId',
+  professionalConnectionId: 'professionalConnectionId',
+  nextMessageSequence: 'nextMessageSequence',
+  lastMessageSequence: 'lastMessageSequence',
+  lastMessageAt: 'lastMessageAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MessagingConversationScalarFieldEnum = (typeof MessagingConversationScalarFieldEnum)[keyof typeof MessagingConversationScalarFieldEnum]
+
+
+export const MessagingConversationParticipantScalarFieldEnum = {
+  conversationId: 'conversationId',
+  userId: 'userId',
+  lastReadSequence: 'lastReadSequence',
+  lastReadAt: 'lastReadAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MessagingConversationParticipantScalarFieldEnum = (typeof MessagingConversationParticipantScalarFieldEnum)[keyof typeof MessagingConversationParticipantScalarFieldEnum]
+
+
+export const MessagingMessageScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  sequence: 'sequence',
+  senderId: 'senderId',
+  clientOperationId: 'clientOperationId',
+  content: 'content',
+  createdAt: 'createdAt'
+} as const
+
+export type MessagingMessageScalarFieldEnum = (typeof MessagingMessageScalarFieldEnum)[keyof typeof MessagingMessageScalarFieldEnum]
+
+
+export const UserMessagingBlockScalarFieldEnum = {
+  blockerUserId: 'blockerUserId',
+  blockedUserId: 'blockedUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type UserMessagingBlockScalarFieldEnum = (typeof UserMessagingBlockScalarFieldEnum)[keyof typeof UserMessagingBlockScalarFieldEnum]
+
+
+export const MessagingReportScalarFieldEnum = {
+  id: 'id',
+  reporterUserId: 'reporterUserId',
+  targetUserId: 'targetUserId',
+  conversationId: 'conversationId',
+  targetType: 'targetType',
+  evidenceMessageId: 'evidenceMessageId',
+  category: 'category',
+  normalizedDetail: 'normalizedDetail',
+  state: 'state',
+  unresolvedKey: 'unresolvedKey',
+  handledAt: 'handledAt',
+  preserveUntil: 'preserveUntil',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MessagingReportScalarFieldEnum = (typeof MessagingReportScalarFieldEnum)[keyof typeof MessagingReportScalarFieldEnum]
 
 
 export const ApplicationStageEventScalarFieldEnum = {

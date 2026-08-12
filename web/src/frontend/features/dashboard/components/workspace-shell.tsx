@@ -27,6 +27,7 @@ import {
   type WorkspaceLocale,
 } from "../client/workspace-locale";
 import { WorkspaceNavigation } from "./workspace-navigation";
+import { closeMessagingConnectionOnLogout } from "@/frontend/features/messaging/client/use-chat-connection";
 
 const SIDEBAR_MINIMUM_WIDTH = 220;
 const SIDEBAR_WIDTH_STEP = 16;
@@ -199,6 +200,7 @@ function WorkspaceShellContent({
         setStatus(copy.signOutError);
         return;
       }
+      closeMessagingConnectionOnLogout();
       startNavigation(() => router.replace("/login"));
     } catch {
       setStatus(copy.signOutError);

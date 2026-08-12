@@ -54,7 +54,7 @@ services:
       context: .
       dockerfile: web/Dockerfile.cv-worker
     image: smarthire-cv-worker:local
-    restart: "no"
+    restart: unless-stopped
     env_file:
       - .env
       - web/.env.local
@@ -133,7 +133,7 @@ services:
       context: .
       dockerfile: Dockerfile.image-search-worker
     image: smarthire-image-search-worker:local
-    restart: "no"
+    restart: unless-stopped
     env_file:
       - .env
       - web/.env.local
@@ -182,7 +182,7 @@ services:
       context: .
       dockerfile: Dockerfile.admin-worker
     image: smarthire-admin-worker:local
-    restart: "no"
+    restart: unless-stopped
     env_file:
       - .env
       - web/.env.local
@@ -192,6 +192,10 @@ services:
       ADMIN_WORKER_ENABLED: ${ADMIN_WORKER_ENABLED:-true}
       ADMIN_EVIDENCE_STORAGE_ROOT: /app/.local/admin-evidence
       ADMIN_CLAMD_SOCKET_PATH: /run/clamav/clamd.sock
+      # The shared server environment validates every storage boundary. Do not
+      # leak Windows host paths from env_file into this Linux container.
+      CV_STORAGE_LOCAL_ROOT: /app/.local/cv-storage
+      IMAGE_SEARCH_STORAGE_LOCAL_ROOT: /app/.local/image-search-storage
     depends_on:
       postgres:
         condition: service_healthy
