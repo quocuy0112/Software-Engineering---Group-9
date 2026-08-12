@@ -354,6 +354,7 @@ export type JobApplicationWhereInput = {
   answers?: Prisma.ApplicationAnswerListRelationFilter
   notificationWork?: Prisma.RecruitmentNotificationWorkListRelationFilter
   stageEvents?: Prisma.ApplicationStageEventListRelationFilter
+  messagingConversations?: Prisma.MessagingConversationListRelationFilter
 }
 
 export type JobApplicationOrderByWithRelationInput = {
@@ -386,6 +387,7 @@ export type JobApplicationOrderByWithRelationInput = {
   answers?: Prisma.ApplicationAnswerOrderByRelationAggregateInput
   notificationWork?: Prisma.RecruitmentNotificationWorkOrderByRelationAggregateInput
   stageEvents?: Prisma.ApplicationStageEventOrderByRelationAggregateInput
+  messagingConversations?: Prisma.MessagingConversationOrderByRelationAggregateInput
 }
 
 export type JobApplicationWhereUniqueInput = Prisma.AtLeast<{
@@ -423,6 +425,7 @@ export type JobApplicationWhereUniqueInput = Prisma.AtLeast<{
   answers?: Prisma.ApplicationAnswerListRelationFilter
   notificationWork?: Prisma.RecruitmentNotificationWorkListRelationFilter
   stageEvents?: Prisma.ApplicationStageEventListRelationFilter
+  messagingConversations?: Prisma.MessagingConversationListRelationFilter
 }, "id" | "candidateUserId_jobPostingId" | "candidateUserId_idempotencyKey">
 
 export type JobApplicationOrderByWithAggregationInput = {
@@ -512,6 +515,7 @@ export type JobApplicationCreateInput = {
   answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateInput = {
@@ -541,6 +545,7 @@ export type JobApplicationUncheckedCreateInput = {
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUpdateInput = {
@@ -570,6 +575,7 @@ export type JobApplicationUpdateInput = {
   answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateInput = {
@@ -599,6 +605,7 @@ export type JobApplicationUncheckedUpdateInput = {
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationCreateManyInput = {
@@ -776,6 +783,11 @@ export type JobApplicationSumOrderByAggregateInput = {
   stageVersion?: Prisma.SortOrder
 }
 
+export type JobApplicationNullableScalarRelationFilter = {
+  is?: Prisma.JobApplicationWhereInput | null
+  isNot?: Prisma.JobApplicationWhereInput | null
+}
+
 export type JobApplicationScalarRelationFilter = {
   is?: Prisma.JobApplicationWhereInput
   isNot?: Prisma.JobApplicationWhereInput
@@ -915,6 +927,22 @@ export type EnumApplicationStageFieldUpdateOperationsInput = {
   set?: $Enums.ApplicationStage
 }
 
+export type JobApplicationCreateNestedOneWithoutMessagingConversationsInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutMessagingConversationsInput, Prisma.JobApplicationUncheckedCreateWithoutMessagingConversationsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutMessagingConversationsInput
+  connect?: Prisma.JobApplicationWhereUniqueInput
+}
+
+export type JobApplicationUpdateOneWithoutMessagingConversationsNestedInput = {
+  create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutMessagingConversationsInput, Prisma.JobApplicationUncheckedCreateWithoutMessagingConversationsInput>
+  connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutMessagingConversationsInput
+  upsert?: Prisma.JobApplicationUpsertWithoutMessagingConversationsInput
+  disconnect?: Prisma.JobApplicationWhereInput | boolean
+  delete?: Prisma.JobApplicationWhereInput | boolean
+  connect?: Prisma.JobApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JobApplicationUpdateToOneWithWhereWithoutMessagingConversationsInput, Prisma.JobApplicationUpdateWithoutMessagingConversationsInput>, Prisma.JobApplicationUncheckedUpdateWithoutMessagingConversationsInput>
+}
+
 export type JobApplicationCreateNestedOneWithoutStageEventsInput = {
   create?: Prisma.XOR<Prisma.JobApplicationCreateWithoutStageEventsInput, Prisma.JobApplicationUncheckedCreateWithoutStageEventsInput>
   connectOrCreate?: Prisma.JobApplicationCreateOrConnectWithoutStageEventsInput
@@ -983,6 +1011,7 @@ export type JobApplicationCreateWithoutCandidateInput = {
   answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutCandidateInput = {
@@ -1011,6 +1040,7 @@ export type JobApplicationUncheckedCreateWithoutCandidateInput = {
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutCandidateInput = {
@@ -1094,6 +1124,7 @@ export type JobApplicationCreateWithoutJobPostingInput = {
   answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutJobPostingInput = {
@@ -1122,6 +1153,7 @@ export type JobApplicationUncheckedCreateWithoutJobPostingInput = {
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutJobPostingInput = {
@@ -1176,6 +1208,7 @@ export type JobApplicationCreateWithoutSelectedCvInput = {
   answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutSelectedCvInput = {
@@ -1204,6 +1237,7 @@ export type JobApplicationUncheckedCreateWithoutSelectedCvInput = {
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutSelectedCvInput = {
@@ -1232,6 +1266,138 @@ export type JobApplicationUpdateManyWithWhereWithoutSelectedCvInput = {
   data: Prisma.XOR<Prisma.JobApplicationUpdateManyMutationInput, Prisma.JobApplicationUncheckedUpdateManyWithoutSelectedCvInput>
 }
 
+export type JobApplicationCreateWithoutMessagingConversationsInput = {
+  id?: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutJobApplicationsInput
+  jobPosting: Prisma.JobPostingCreateNestedOneWithoutApplicationsInput
+  selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
+  answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationUncheckedCreateWithoutMessagingConversationsInput = {
+  id?: string
+  candidateUserId: string
+  jobPostingId: string
+  selectedCvId: string
+  cvFileRef?: string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: boolean
+  aiMatchScore?: number | null
+  scoringStatus?: $Enums.ApplicationScoringStatus
+  stage?: $Enums.ApplicationStage
+  stageVersion?: number
+  lastStageChangedAt?: Date | string
+  coverLetter?: string | null
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion: string
+  consentedAt: Date | string
+  idempotencyKey: string
+  submissionBindingDigest: string
+  submittedAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+}
+
+export type JobApplicationCreateOrConnectWithoutMessagingConversationsInput = {
+  where: Prisma.JobApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutMessagingConversationsInput, Prisma.JobApplicationUncheckedCreateWithoutMessagingConversationsInput>
+}
+
+export type JobApplicationUpsertWithoutMessagingConversationsInput = {
+  update: Prisma.XOR<Prisma.JobApplicationUpdateWithoutMessagingConversationsInput, Prisma.JobApplicationUncheckedUpdateWithoutMessagingConversationsInput>
+  create: Prisma.XOR<Prisma.JobApplicationCreateWithoutMessagingConversationsInput, Prisma.JobApplicationUncheckedCreateWithoutMessagingConversationsInput>
+  where?: Prisma.JobApplicationWhereInput
+}
+
+export type JobApplicationUpdateToOneWithWhereWithoutMessagingConversationsInput = {
+  where?: Prisma.JobApplicationWhereInput
+  data: Prisma.XOR<Prisma.JobApplicationUpdateWithoutMessagingConversationsInput, Prisma.JobApplicationUncheckedUpdateWithoutMessagingConversationsInput>
+}
+
+export type JobApplicationUpdateWithoutMessagingConversationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutJobApplicationsNestedInput
+  jobPosting?: Prisma.JobPostingUpdateOneRequiredWithoutApplicationsNestedInput
+  selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
+  answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+}
+
+export type JobApplicationUncheckedUpdateWithoutMessagingConversationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobPostingId?: Prisma.StringFieldUpdateOperationsInput | string
+  selectedCvId?: Prisma.StringFieldUpdateOperationsInput | string
+  cvFileRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiAnalysisConsent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  aiMatchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scoringStatus?: Prisma.EnumApplicationScoringStatusFieldUpdateOperationsInput | $Enums.ApplicationScoringStatus
+  stage?: Prisma.EnumApplicationStageFieldUpdateOperationsInput | $Enums.ApplicationStage
+  stageVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  lastStageChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  coverLetter?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  cvSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  jobSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  consentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  consentedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionBindingDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
+  notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+}
+
 export type JobApplicationCreateWithoutStageEventsInput = {
   id?: string
   cvFileRef?: string | null
@@ -1258,6 +1424,7 @@ export type JobApplicationCreateWithoutStageEventsInput = {
   selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
   answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutStageEventsInput = {
@@ -1286,6 +1453,7 @@ export type JobApplicationUncheckedCreateWithoutStageEventsInput = {
   updatedAt?: Date | string
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutStageEventsInput = {
@@ -1330,6 +1498,7 @@ export type JobApplicationUpdateWithoutStageEventsInput = {
   selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
   answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutStageEventsInput = {
@@ -1358,6 +1527,7 @@ export type JobApplicationUncheckedUpdateWithoutStageEventsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationCreateWithoutAnswersInput = {
@@ -1386,6 +1556,7 @@ export type JobApplicationCreateWithoutAnswersInput = {
   selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
   notificationWork?: Prisma.RecruitmentNotificationWorkCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutAnswersInput = {
@@ -1414,6 +1585,7 @@ export type JobApplicationUncheckedCreateWithoutAnswersInput = {
   updatedAt?: Date | string
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutAnswersInput = {
@@ -1458,6 +1630,7 @@ export type JobApplicationUpdateWithoutAnswersInput = {
   selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutAnswersInput = {
@@ -1486,6 +1659,7 @@ export type JobApplicationUncheckedUpdateWithoutAnswersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationCreateWithoutNotificationWorkInput = {
@@ -1514,6 +1688,7 @@ export type JobApplicationCreateWithoutNotificationWorkInput = {
   selectedCv: Prisma.CandidateCvCreateNestedOneWithoutApplicationsInput
   answers?: Prisma.ApplicationAnswerCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationUncheckedCreateWithoutNotificationWorkInput = {
@@ -1542,6 +1717,7 @@ export type JobApplicationUncheckedCreateWithoutNotificationWorkInput = {
   updatedAt?: Date | string
   answers?: Prisma.ApplicationAnswerUncheckedCreateNestedManyWithoutApplicationInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedCreateNestedManyWithoutApplicationInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type JobApplicationCreateOrConnectWithoutNotificationWorkInput = {
@@ -1586,6 +1762,7 @@ export type JobApplicationUpdateWithoutNotificationWorkInput = {
   selectedCv?: Prisma.CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput
   answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutNotificationWorkInput = {
@@ -1614,6 +1791,7 @@ export type JobApplicationUncheckedUpdateWithoutNotificationWorkInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationCreateManyCandidateInput = {
@@ -1667,6 +1845,7 @@ export type JobApplicationUpdateWithoutCandidateInput = {
   answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutCandidateInput = {
@@ -1695,6 +1874,7 @@ export type JobApplicationUncheckedUpdateWithoutCandidateInput = {
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateManyWithoutCandidateInput = {
@@ -1773,6 +1953,7 @@ export type JobApplicationUpdateWithoutJobPostingInput = {
   answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutJobPostingInput = {
@@ -1801,6 +1982,7 @@ export type JobApplicationUncheckedUpdateWithoutJobPostingInput = {
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateManyWithoutJobPostingInput = {
@@ -1879,6 +2061,7 @@ export type JobApplicationUpdateWithoutSelectedCvInput = {
   answers?: Prisma.ApplicationAnswerUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateWithoutSelectedCvInput = {
@@ -1907,6 +2090,7 @@ export type JobApplicationUncheckedUpdateWithoutSelectedCvInput = {
   answers?: Prisma.ApplicationAnswerUncheckedUpdateManyWithoutApplicationNestedInput
   notificationWork?: Prisma.RecruitmentNotificationWorkUncheckedUpdateManyWithoutApplicationNestedInput
   stageEvents?: Prisma.ApplicationStageEventUncheckedUpdateManyWithoutApplicationNestedInput
+  messagingConversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type JobApplicationUncheckedUpdateManyWithoutSelectedCvInput = {
@@ -1943,12 +2127,14 @@ export type JobApplicationCountOutputType = {
   answers: number
   notificationWork: number
   stageEvents: number
+  messagingConversations: number
 }
 
 export type JobApplicationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   answers?: boolean | JobApplicationCountOutputTypeCountAnswersArgs
   notificationWork?: boolean | JobApplicationCountOutputTypeCountNotificationWorkArgs
   stageEvents?: boolean | JobApplicationCountOutputTypeCountStageEventsArgs
+  messagingConversations?: boolean | JobApplicationCountOutputTypeCountMessagingConversationsArgs
 }
 
 /**
@@ -1982,6 +2168,13 @@ export type JobApplicationCountOutputTypeCountStageEventsArgs<ExtArgs extends ru
   where?: Prisma.ApplicationStageEventWhereInput
 }
 
+/**
+ * JobApplicationCountOutputType without action
+ */
+export type JobApplicationCountOutputTypeCountMessagingConversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessagingConversationWhereInput
+}
+
 
 export type JobApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2013,6 +2206,7 @@ export type JobApplicationSelect<ExtArgs extends runtime.Types.Extensions.Intern
   answers?: boolean | Prisma.JobApplication$answersArgs<ExtArgs>
   notificationWork?: boolean | Prisma.JobApplication$notificationWorkArgs<ExtArgs>
   stageEvents?: boolean | Prisma.JobApplication$stageEventsArgs<ExtArgs>
+  messagingConversations?: boolean | Prisma.JobApplication$messagingConversationsArgs<ExtArgs>
   _count?: boolean | Prisma.JobApplicationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["jobApplication"]>
 
@@ -2108,6 +2302,7 @@ export type JobApplicationInclude<ExtArgs extends runtime.Types.Extensions.Inter
   answers?: boolean | Prisma.JobApplication$answersArgs<ExtArgs>
   notificationWork?: boolean | Prisma.JobApplication$notificationWorkArgs<ExtArgs>
   stageEvents?: boolean | Prisma.JobApplication$stageEventsArgs<ExtArgs>
+  messagingConversations?: boolean | Prisma.JobApplication$messagingConversationsArgs<ExtArgs>
   _count?: boolean | Prisma.JobApplicationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type JobApplicationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2130,6 +2325,7 @@ export type $JobApplicationPayload<ExtArgs extends runtime.Types.Extensions.Inte
     answers: Prisma.$ApplicationAnswerPayload<ExtArgs>[]
     notificationWork: Prisma.$RecruitmentNotificationWorkPayload<ExtArgs>[]
     stageEvents: Prisma.$ApplicationStageEventPayload<ExtArgs>[]
+    messagingConversations: Prisma.$MessagingConversationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2555,6 +2751,7 @@ export interface Prisma__JobApplicationClient<T, Null = never, ExtArgs extends r
   answers<T extends Prisma.JobApplication$answersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$answersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationAnswerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notificationWork<T extends Prisma.JobApplication$notificationWorkArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$notificationWorkArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecruitmentNotificationWorkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   stageEvents<T extends Prisma.JobApplication$stageEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$stageEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationStageEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  messagingConversations<T extends Prisma.JobApplication$messagingConversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobApplication$messagingConversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagingConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3077,6 +3274,30 @@ export type JobApplication$stageEventsArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.ApplicationStageEventScalarFieldEnum | Prisma.ApplicationStageEventScalarFieldEnum[]
+}
+
+/**
+ * JobApplication.messagingConversations
+ */
+export type JobApplication$messagingConversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MessagingConversation
+   */
+  select?: Prisma.MessagingConversationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MessagingConversation
+   */
+  omit?: Prisma.MessagingConversationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessagingConversationInclude<ExtArgs> | null
+  where?: Prisma.MessagingConversationWhereInput
+  orderBy?: Prisma.MessagingConversationOrderByWithRelationInput | Prisma.MessagingConversationOrderByWithRelationInput[]
+  cursor?: Prisma.MessagingConversationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessagingConversationScalarFieldEnum | Prisma.MessagingConversationScalarFieldEnum[]
 }
 
 /**

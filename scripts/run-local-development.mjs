@@ -124,20 +124,6 @@ async function shutdown(exitCode, reason) {
   if (shutdownPromise) return shutdownPromise;
   shutdownPromise = (async () => {
     console.log(`[dev] shutting down (${reason})`);
-    const composeStop = spawn(
-      "docker",
-      [
-        "compose",
-        "stop",
-        "cv-worker",
-        "admin-worker",
-        "image-search-worker",
-        "ocr-engine",
-        "clamav",
-      ],
-      { stdio: "inherit", windowsHide: true },
-    );
-    await waitForExit(composeStop);
     await Promise.all([...children.values()].map((child) => terminate(child)));
     const exited = Promise.all([...children.values()].map(waitForExit)).then(
       () => true,
@@ -163,53 +149,54 @@ process.once("SIGINT", () => void shutdown(0, "SIGINT"));
 process.once("SIGTERM", () => void shutdown(0, "SIGTERM"));
 
 async function main() {
-  start("web", "dev:web");
-  start("email worker", "email:worker");
-
-  const cvBuild = await runCommand(
-    "building CV and admin worker images",
-    "docker",
-    ["compose", "build", "cv-worker", "admin-worker"],
-  );
-  if (!cvBuild.ok) {
+  const composeServices = [
+    "postgres",
+    "clamav",
+    "ocr-engine",
+    "cv-worker",
+    "image-search-worker",
+    "admin-worker",
+  ];
+  const workerBuild = await runCommand("building worker images", "docker", [
+    "compose",
+    "build",
+    "cv-worker",
+    "ocr-engine",
+    "image-search-worker",
+    "admin-worker",
+  ]);
+  if (!workerBuild.ok) {
     if (!shutdownPromise) {
-      await shutdown(
-        cvBuild.exitCode,
-        "CV and admin worker image build failed",
-      );
+      await shutdown(workerBuild.exitCode, "worker image build failed");
     }
     return;
   }
   if (shutdownPromise) return;
 
-  const optionalBuild = await runCommand(
-    "building OCR and image-search worker images",
+  const composeUp = await runCommand(
+    "starting or recovering Compose services: " + composeServices.join(", "),
     "docker",
-    ["compose", "build", "ocr-engine", "image-search-worker"],
+    [
+      "compose",
+      "up",
+      "-d",
+      "--no-build",
+      ...composeServices,
+    ],
   );
-  if (!optionalBuild.ok) {
-    const exitReason = optionalBuild.signal ?? "code " + optionalBuild.exitCode;
-    console.error(
-      "[dev] OCR/image-search image build stopped (" +
-        exitReason +
-        "); continuing with reduced OCR/image-search capability",
-    );
+  if (!composeUp.ok) {
+    if (!shutdownPromise) {
+      await shutdown(composeUp.exitCode, "Compose services failed to start");
+    }
+    return;
   }
-
   if (shutdownPromise) return;
 
-  const composeServices = ["postgres", "clamav", "cv-worker", "admin-worker"];
-  if (optionalBuild.ok) {
-    composeServices.push("ocr-engine", "image-search-worker");
-  }
-
-  console.log("[dev] starting Compose services: " + composeServices.join(", "));
-  startProcess("Compose services", "docker", [
-    "compose",
-    "up",
-    "--no-build",
-    ...composeServices,
-  ]);
+  console.log(
+    "[dev] Compose infrastructure remains running after this dev session; use npm run infra:down to stop it explicitly",
+  );
+  start("web", "dev:web");
+  start("email worker", "email:worker");
 }
 
 void main().catch((error) => {

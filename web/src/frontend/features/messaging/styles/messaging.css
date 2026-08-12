@@ -1,0 +1,18 @@
+.messaging-workspace { display: grid; gap: 1rem; width: 100%; }
+.messaging-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.messaging-grid { display: grid; grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr); min-height: 36rem; border: 1px solid var(--sh-border, #d8dee8); border-radius: 1rem; overflow: hidden; }
+.messaging-grid > aside { border-right: 1px solid var(--sh-border, #d8dee8); padding: 1rem; overflow: auto; }
+.messaging-conversation-list { display: grid; gap: .5rem; margin-top: 1rem; }
+.messaging-conversation-list > button { display: grid; gap: .25rem; width: 100%; padding: .75rem; text-align: left; }
+.messaging-thread { display: grid; grid-template-rows: auto auto 1fr auto; gap: 1rem; padding: 1rem; min-width: 0; }
+.messaging-thread ol { display: grid; gap: .75rem; overflow-y: auto; padding: 0; list-style: none; }
+.messaging-thread li { max-width: 75%; padding: .75rem; border-radius: .75rem; background: var(--sh-surface-subtle, #f3f5f8); overflow-wrap: anywhere; }
+.messaging-mobile-back { display: none; }
+@media (max-width: 720px) {
+  .messaging-grid { display: block; }
+  .messaging-grid > aside { border-right: 0; }
+  .messaging-workspace[data-thread-open="true"] .messaging-grid > aside { display: none; }
+  .messaging-workspace[data-thread-open="false"] .messaging-thread { display: none; }
+  .messaging-mobile-back { display: inline-flex; }
+  .messaging-thread li { max-width: 90%; }
+}

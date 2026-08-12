@@ -48,6 +48,7 @@ export function WorkspaceNavigation({
   const destinations = [
     { href: "/dashboard", label: copy.dashboard, icon: "dashboard" },
     { href: "/jobs", label: copy.jobs, icon: "jobs" },
+    { href: "/messages", label: "Messages", icon: "messages" },
     { href: "/profile", label: copy.profile, icon: "profile" },
   ] as const;
   const jobsSubnav = [
@@ -223,6 +224,14 @@ function NavIcon({ name }: { name: string }) {
       <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
         <rect x="3" y="6" width="14" height="10" rx="2" />
         <path d="M7 6V4.8C7 3.8 7.8 3 8.8 3h2.4c1 0 1.8.8 1.8 1.8V6M3 10h14M8 10v1h4v-1" />
+      </svg>
+    );
+  }
+  if (name === "messages") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
+        <path d="M3 4.5h14v9H8l-4 3v-3H3z" />
+        <path d="M6 8h8M6 10.5h5" />
       </svg>
     );
   }
