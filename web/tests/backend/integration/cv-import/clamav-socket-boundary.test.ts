@@ -21,7 +21,7 @@ function docker(args: string[]) {
 }
 
 describe("ClamAV Unix-socket boundary", () => {
-  it("refreshes persisted signatures before clamd enforces freshness", async () => {
+  it("refreshes persisted signatures before clamd enforces the local 48-hour fallback", async () => {
     const entrypoint = await readFile(
       resolve(repositoryRoot, "infra/clamav/entrypoint.sh"),
       "utf8",
@@ -49,7 +49,7 @@ describe("ClamAV Unix-socket boundary", () => {
     expect(entrypoint).toMatch(
       /set -eu[\s\S]*?freshclam \\\n {2}--stdout[\s\S]*?freshclam \\\n {2}--daemon/u,
     );
-    expect(clamdConfiguration).toMatch(/^FailIfCvdOlderThan 1$/mu);
+    expect(clamdConfiguration).toMatch(/^FailIfCvdOlderThan 2$/mu);
   });
 
   it("keeps the Compose socket private to clamd and the CV worker", async () => {

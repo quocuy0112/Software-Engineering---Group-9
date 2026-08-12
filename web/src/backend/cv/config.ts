@@ -25,7 +25,7 @@ export type CvConfiguration = Readonly<{
   scanner: Readonly<{
     transport: "unix";
     socketPath: "/run/clamav/clamd.sock";
-    signatureMaximumAgeHours: 24;
+    signatureMaximumAgeHours: number;
   }>;
   parser: Readonly<{
     adapter: "deterministic" | "openai";
@@ -87,7 +87,7 @@ export function createCvConfiguration(env: ServerEnvironment): CvConfiguration {
     scanner: frozen({
       transport: "unix" as const,
       socketPath: env.CV_CLAMD_SOCKET_PATH,
-      signatureMaximumAgeHours: 24 as const,
+      signatureMaximumAgeHours: env.CV_CLAMD_SIGNATURE_MAX_AGE_HOURS,
     }),
     parser: frozen({
       adapter: env.CV_PARSER_ADAPTER,

@@ -87,7 +87,9 @@ const schema = z
     CV_S3_REGION: z.string().trim().max(100).optional().or(z.literal("")),
     CV_S3_KMS_KEY_ID: z.string().trim().max(2048).optional().or(z.literal("")),
     CV_CLAMD_SOCKET_PATH: z.literal("/run/clamav/clamd.sock"),
-    CV_CLAMD_SIGNATURE_MAX_AGE_HOURS: z.literal("24").transform(Number),
+    CV_CLAMD_SIGNATURE_MAX_AGE_HOURS: z
+      .enum(["24", "48"])
+      .transform(Number),
     CV_PARSER_ADAPTER: z.enum(["deterministic", "openai"]),
     CV_OPENAI_ENABLED: booleanString,
     CV_OPENAI_LOCAL_DEV_ENABLED: booleanString,
@@ -148,6 +150,15 @@ const schema = z
     const authUrl = new URL(env.BETTER_AUTH_URL);
     const fail = (path: string, message: string) =>
       ctx.addIssue({ code: "custom", path: [path], message });
+    if (
+      env.APP_ENV !== "local" &&
+      env.CV_CLAMD_SIGNATURE_MAX_AGE_HOURS !== 24
+    ) {
+      fail(
+        "CV_CLAMD_SIGNATURE_MAX_AGE_HOURS",
+        "non-local environments require the 24-hour signature freshness policy",
+      );
+    }
     if (env.EMAIL_ADAPTER === "smtp") {
       if (!env.SMTP_HOST) fail("SMTP_HOST", "is required for SMTP");
       if (!env.SMTP_PORT) fail("SMTP_PORT", "is required for SMTP");
