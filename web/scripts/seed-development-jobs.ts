@@ -128,7 +128,17 @@ const sourceJobSchema = z.object({
     "temporary",
   ]),
   workArrangement: z.enum(["onsite", "hybrid", "remote"]),
-  status: z.enum(["open", "closing_soon", "closed", "filled", "expired"]),
+  status: z.enum([
+    "open",
+    "closing_soon",
+    "closed",
+    "filled",
+    "expired",
+    "draft",
+    "pending_approval",
+    "rejected",
+    "active",
+  ]),
   isVerified: z.boolean(),
   postedAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
@@ -138,7 +148,13 @@ const sourceJobSchema = z.object({
 
 type SourceCompany = z.infer<typeof sourceCompanySchema>;
 type SourceJob = z.infer<typeof sourceJobSchema>;
-type JobPostingStatus = "ACTIVE" | "CLOSED" | "EXPIRED";
+type JobPostingStatus =
+  | "DRAFT"
+  | "PENDING_REVIEW"
+  | "ACTIVE"
+  | "CLOSED"
+  | "EXPIRED"
+  | "REJECTED";
 
 function argumentPath(flag: string, fallback: string): string {
   const argumentIndex = process.argv.indexOf(flag);
@@ -317,6 +333,9 @@ function mapSalaryPeriod(
 }
 
 function mapJobStatus(job: SourceJob, now: Date): JobPostingStatus {
+  if (job.status === "draft") return "DRAFT";
+  if (job.status === "pending_approval") return "PENDING_REVIEW";
+  if (job.status === "rejected") return "REJECTED";
   if (job.status === "closed" || job.status === "filled") return "CLOSED";
   if (job.status === "expired") return "EXPIRED";
   if (job.applyDeadline && new Date(job.applyDeadline) <= now) {
@@ -460,6 +479,10 @@ async function importJob(
     ? new Date(job.applyDeadline)
     : null;
   const description = job.description;
+  const responsibilities =
+    joinLines(description.responsibilities) || description.overview;
+  const requirements =
+    joinLines(description.requirements) || description.overview;
   const searchDocumentNormalized = normalize(
     [
       job.title,
@@ -485,8 +508,8 @@ async function importJob(
     normalizedTitle: normalize(job.title),
     summary: job.shortPitch,
     description: description.overview,
-    responsibilities: joinLines(description.responsibilities),
-    requirements: joinLines(description.requirements),
+    responsibilities,
+    requirements,
     benefits: joinLines(description.benefits.map(({ label }) => label)) || null,
     education: job.education,
     numberOfHires: job.numberOfHires,
@@ -502,10 +525,13 @@ async function importJob(
     salaryPeriod: mapSalaryPeriod(job.salary.period),
     searchDocumentNormalized,
     status,
-    approvedAt: publishedAt,
-    publishedAt,
+    approvedAt: status === "ACTIVE" ? publishedAt : null,
+    publishedAt: status === "ACTIVE" ? publishedAt : null,
     applicationDeadline,
-    closedAt: status === "ACTIVE" ? null : new Date(job.updatedAt),
+    closedAt:
+      status === "CLOSED" || status === "EXPIRED"
+        ? new Date(job.updatedAt)
+        : null,
     removedAt: null,
   };
 
