@@ -21,7 +21,7 @@ function docker(args: string[]) {
 }
 
 describe("ClamAV Unix-socket boundary", () => {
-  it("refreshes persisted signatures before clamd enforces the local 48-hour fallback", async () => {
+  it("keeps signature updates alive while clamd fails closed and retries", async () => {
     const entrypoint = await readFile(
       resolve(repositoryRoot, "infra/clamav/entrypoint.sh"),
       "utf8",
@@ -37,17 +37,31 @@ describe("ClamAV Unix-socket boundary", () => {
     const clamdStart = entrypoint.indexOf(
       'clamd --foreground --config-file="${CLAMD_CONFIG}" &',
     );
-    const daemonRefresh = entrypoint.indexOf("freshclam \\\n  --daemon \\");
+    const daemonRefresh = entrypoint.indexOf("freshclam \\\n    --daemon \\");
+    const daemonStart = entrypoint.indexOf(
+      "\nstart_freshclam\n",
+      synchronousRefresh,
+    );
 
     expect(synchronousRefresh).toBeGreaterThan(-1);
-    expect(clamdStart).toBeGreaterThan(synchronousRefresh);
-    expect(daemonRefresh).toBeGreaterThan(synchronousRefresh);
+    expect(daemonRefresh).toBeGreaterThan(-1);
+    expect(daemonStart).toBeGreaterThan(synchronousRefresh);
+    expect(clamdStart).toBeGreaterThan(daemonStart);
     expect(entrypoint).not.toMatch(
       /if ! find [\s\S]*?then\s+freshclam[\s\S]*?fi/u,
     );
-    expect(entrypoint).not.toContain("if ! freshclam");
-    expect(entrypoint).toMatch(
-      /set -eu[\s\S]*?freshclam \\\n {2}--stdout[\s\S]*?freshclam \\\n {2}--daemon/u,
+    expect(entrypoint).toContain("if ! freshclam");
+    expect(entrypoint).toContain("#!/bin/sh\nset -eu");
+    expect(entrypoint).toContain(
+      'readonly RESTART_DELAY="${CLAMD_RESTART_DELAY_SECONDS:-60}"',
+    );
+    expect(entrypoint).toContain("while true; do");
+    expect(entrypoint).toContain("ensure_freshclam");
+    expect(entrypoint).toContain(
+      "signatures remain fail-closed and startup will retry",
+    );
+    expect(entrypoint).not.toContain(
+      "clamd exited before creating its Unix socket",
     );
     expect(clamdConfiguration).toMatch(/^FailIfCvdOlderThan 2$/mu);
   });

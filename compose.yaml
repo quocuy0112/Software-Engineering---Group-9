@@ -23,6 +23,7 @@ services:
     entrypoint: ["/bin/sh", "/opt/smarthire/clamav-entrypoint.sh"]
     environment:
       CLAMD_STARTUP_TIMEOUT_SECONDS: "1800"
+      CLAMD_RESTART_DELAY_SECONDS: "60"
       FRESHCLAM_CHECKS_PER_DAY: "12"
     group_add:
       - "101"

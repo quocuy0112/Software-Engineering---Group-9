@@ -149,14 +149,8 @@ process.once("SIGINT", () => void shutdown(0, "SIGINT"));
 process.once("SIGTERM", () => void shutdown(0, "SIGTERM"));
 
 async function main() {
-  const composeServices = [
-    "postgres",
-    "clamav",
-    "ocr-engine",
-    "cv-worker",
-    "image-search-worker",
-    "admin-worker",
-  ];
+  const infrastructureServices = ["postgres", "clamav", "ocr-engine"];
+  const workerServices = ["cv-worker", "image-search-worker", "admin-worker"];
   const workerBuild = await runCommand("building worker images", "docker", [
     "compose",
     "build",
@@ -174,15 +168,10 @@ async function main() {
   if (shutdownPromise) return;
 
   const composeUp = await runCommand(
-    "starting or recovering Compose services: " + composeServices.join(", "),
+    "starting or recovering Compose infrastructure: " +
+      infrastructureServices.join(", "),
     "docker",
-    [
-      "compose",
-      "up",
-      "-d",
-      "--no-build",
-      ...composeServices,
-    ],
+    ["compose", "up", "-d", "--no-build", ...infrastructureServices],
   );
   if (!composeUp.ok) {
     if (!shutdownPromise) {
@@ -192,8 +181,23 @@ async function main() {
   }
   if (shutdownPromise) return;
 
+  void runCommand(
+    "starting restartable worker services: " + workerServices.join(", "),
+    "docker",
+    ["compose", "up", "-d", "--no-build", "--no-deps", ...workerServices],
+  ).then((result) => {
+    if (!result.ok && !shutdownPromise) {
+      console.error(
+        "[dev] worker services are recovering in Docker; web development remains available",
+      );
+    }
+  });
+
   console.log(
-    "[dev] Compose infrastructure remains running after this dev session; use npm run infra:down to stop it explicitly",
+    "[dev] Compose infrastructure and workers remain running after this dev session; use npm run infra:down to stop them explicitly",
+  );
+  console.log(
+    "[dev] web startup does not wait for ClamAV health; scanner-dependent workers recover through Docker",
   );
   start("web", "dev:web");
   start("email worker", "email:worker");
