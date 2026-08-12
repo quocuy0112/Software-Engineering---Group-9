@@ -1,4 +1,5 @@
 import "server-only";
+import { cvConfiguration } from "@/backend/cv/config";
 import { ClamAvScanner } from "@/backend/cv/scanning/clamav";
 import type { MalwareScanner } from "@/backend/cv/scanning/malware-scanner";
 import { normalizeBusinessEvidencePreview } from "./business-evidence-preview";
@@ -43,10 +44,11 @@ async function* source(bytes: Buffer) {
 export class EvidenceSafetyPipeline {
   constructor(
     private readonly scanner: MalwareScanner = new ClamAvScanner({
-      socketPath: "/run/clamav/clamd.sock",
+      socketPath: cvConfiguration.scanner.socketPath,
       maximumBytes: 5_000_000,
       timeoutMs: 20_000,
-      signatureMaximumAgeMs: 24 * 60 * 60_000,
+      signatureMaximumAgeMs:
+        cvConfiguration.scanner.signatureMaximumAgeHours * 60 * 60_000,
     }),
   ) {}
 

@@ -63,7 +63,7 @@ describe("ClamAV Unix-socket boundary", () => {
     expect(entrypoint).not.toContain(
       "clamd exited before creating its Unix socket",
     );
-    expect(clamdConfiguration).toMatch(/^FailIfCvdOlderThan 1$/mu);
+    expect(clamdConfiguration).toMatch(/^FailIfCvdOlderThan 2$/mu);
   });
 
   it("keeps the Compose socket private to clamd and the CV worker", async () => {
