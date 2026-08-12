@@ -98,6 +98,21 @@ describe("server environment", () => {
       }),
     ).toThrow(/CV_PARSER_ADAPTER/);
   });
+  it("allows a 48-hour local signature fallback but keeps non-local at 24", () => {
+    expect(
+      parseServerEnvironment({
+        ...local,
+        CV_CLAMD_SIGNATURE_MAX_AGE_HOURS: "48",
+      }).CV_CLAMD_SIGNATURE_MAX_AGE_HOURS,
+    ).toBe(48);
+    expect(() =>
+      parseServerEnvironment({
+        ...local,
+        APP_ENV: "test",
+        CV_CLAMD_SIGNATURE_MAX_AGE_HOURS: "48",
+      }),
+    ).toThrow(/CV_CLAMD_SIGNATURE_MAX_AGE_HOURS/);
+  });
   it("rejects unsafe cookies/origins and redacts secrets", () => {
     expect(() =>
       parseServerEnvironment({

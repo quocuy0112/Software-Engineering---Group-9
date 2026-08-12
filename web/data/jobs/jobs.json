@@ -10655,11 +10655,11 @@
     "id": "job-000100",
     "slug": "software-engineer-ruby-dong-nai-000100",
     "companyId": "comp-0115-compass-capital",
-    "title": "Software Engineer (Ruby)",
-    "shortPitch": "Grow your career as Software Engineer (Ruby) in software development.",
     "industry": "Information Technology (IT)",
     "industryCode": "r03",
     "subIndustry": "Software Development",
+    "title": "Software Engineer (Ruby)",
+    "shortPitch": "Grow your career as Software Engineer (Ruby) in software development.",
     "categoryIds": [
       "r03-software-development"
     ],
@@ -10692,11 +10692,11 @@
     "education": "Bachelor's degree or above",
     "age": "26-29",
     "numberOfHires": 4,
-    "status": "open",
-    "isUrgent": false,
+    "status": "closed",
+    "isUrgent": true,
     "isVerified": true,
     "postedAt": "2026-07-30T00:00:00.000Z",
-    "updatedAt": "2026-08-05T00:00:00.000Z",
+    "updatedAt": "2026-08-12T10:19:49.081Z",
     "applyDeadline": "2026-08-23T00:00:00.000Z",
     "description": {
       "overview": "Join us as Software Engineer (Ruby) and help shape the future of our Software Development function as we expand across the Information Technology (IT) sector.",
@@ -537170,6 +537170,81 @@
     "stats": {
       "viewCount": 3144,
       "applicantCount": 192
+    }
+  },
+  {
+    "id": "job-f3c458c3-e74e-4abb-8b35-1dd2e0169df4",
+    "slug": "game-development-ho-chi-minh-city-e0169df4",
+    "companyId": "comp-0115-compass-capital",
+    "industry": "Technology",
+    "industryCode": "technology",
+    "subIndustry": "Software & Technology Services",
+    "title": "Game Development",
+    "shortPitch": "Game Development",
+    "categoryIds": [
+      "r01"
+    ],
+    "categoryFamily": "technology",
+    "skillTags": [
+      "C++"
+    ],
+    "location": {
+      "city": "Ho Chi Minh City",
+      "district": "1",
+      "isNationwideRemote": true
+    },
+    "salary": {
+      "min": 29000000,
+      "max": 33000000,
+      "currency": "VND",
+      "period": "month",
+      "isNegotiable": true
+    },
+    "experience": {
+      "minYears": 3,
+      "label": "3+ years"
+    },
+    "level": "intern",
+    "employmentType": "full_time",
+    "workArrangement": "remote",
+    "workOnSaturday": false,
+    "education": "College degree or above",
+    "age": "20-30",
+    "numberOfHires": 3,
+    "status": "pending_approval",
+    "isUrgent": false,
+    "isVerified": false,
+    "postedAt": "2026-08-12T10:19:56.921Z",
+    "updatedAt": "2026-08-12T10:22:45.916Z",
+    "applyDeadline": "2026-08-20T23:59:59.000Z",
+    "description": {
+      "overview": "asdasd",
+      "topReasonsToJoin": [],
+      "responsibilities": [],
+      "requirements": [
+        "Photoshop",
+        "Animation"
+      ],
+      "benefits": [
+        {
+          "icon": "shield",
+          "label": "Social, health & unemployment insurance as per Labor Law"
+        },
+        {
+          "icon": "heart",
+          "label": "Premium healthcare package for employee and dependents"
+        }
+      ],
+      "generalInfo": {
+        "reportsTo": null,
+        "department": null,
+        "workingHours": "8:30 - 17:30",
+        "workAddress": "asda"
+      }
+    },
+    "stats": {
+      "viewCount": 0,
+      "applicantCount": 0
     }
   }
 ]

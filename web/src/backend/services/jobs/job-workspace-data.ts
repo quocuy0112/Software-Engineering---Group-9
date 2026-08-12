@@ -13,6 +13,7 @@ import type { UserJobState } from "@/shared/contracts/jobs/catalog";
 import { normalizeSalaryAmount } from "@/shared/utils/jobs/job-display";
 import { PrismaApplicationTrackingRepository } from "@/backend/repositories/jobs/prisma-application-tracking-repository";
 import { readUserJobState } from "./user-job-state-store";
+import { readMockAppliedJobIds } from "./recruiter-job-posting-data";
 
 const dataPath = (name: string) => resolve(process.cwd(), "data", "jobs", name);
 
@@ -72,7 +73,17 @@ const sourceJobSchema = z
     employmentType: z.string().min(1),
     workArrangement: z.string().min(1),
     workOnSaturday: z.boolean(),
-    status: z.enum(["open", "closing_soon", "closed", "filled", "expired"]),
+    status: z.enum([
+      "draft",
+      "pending_approval",
+      "rejected",
+      "active",
+      "closed",
+      "open",
+      "closing_soon",
+      "filled",
+      "expired",
+    ]),
     isUrgent: z.boolean(),
     isVerified: z.boolean(),
     postedAt: z.string().datetime(),
@@ -107,8 +118,17 @@ async function readCatalog(): Promise<JobCatalog> {
     const companies = z
       .array(sourceCompanySchema)
       .parse(JSON.parse(companiesText)) as SourceCompany[];
+    const normalizedJobs = jobs.map((job) => ({
+      ...job,
+      status:
+        job.status === "open" || job.status === "closing_soon"
+          ? "active"
+          : job.status === "filled" || job.status === "expired"
+            ? "closed"
+            : job.status,
+    }));
     return {
-      jobs,
+      jobs: normalizedJobs,
       companies: new Map(companies.map((company) => [company.id, company])),
     };
   });
@@ -133,7 +153,7 @@ function locationLabel(job: SourceJob) {
 
 function isOpenForApplications(job: SourceJob, now: Date) {
   return (
-    (job.status === "open" || job.status === "closing_soon") &&
+    job.status === "active" &&
     (!job.applyDeadline || new Date(job.applyDeadline) > now)
   );
 }
@@ -266,13 +286,18 @@ export async function readJobWorkspaceSnapshot(
   candidateUserId: string,
   now = new Date(),
 ): Promise<JobWorkspaceSnapshot> {
-  const [catalog, state, appliedJobIds] = await Promise.all([
-    readCatalog(),
-    readUserJobState(candidateUserId),
-    new PrismaApplicationTrackingRepository().listAppliedJobIds(
-      candidateUserId,
-    ),
-  ]);
+  const [catalog, state, prismaAppliedJobIds, mockAppliedJobIds] =
+    await Promise.all([
+      readCatalog(),
+      readUserJobState(candidateUserId),
+      new PrismaApplicationTrackingRepository().listAppliedJobIds(
+        candidateUserId,
+      ),
+      readMockAppliedJobIds(candidateUserId),
+    ]);
+  const appliedJobIds = [
+    ...new Set([...prismaAppliedJobIds, ...mockAppliedJobIds]),
+  ];
   const appliedIds = new Set(appliedJobIds);
   const cardById = new Map(
     catalog.jobs.map((job) => [
