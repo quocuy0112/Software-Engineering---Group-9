@@ -121,6 +121,10 @@
     text-align: left;
   }
 
+  .profile-account-id-value {
+    justify-content: flex-start;
+  }
+
   .sessions-panel-heading > p {
     max-width: none;
     margin-top: var(--sh-space-2);

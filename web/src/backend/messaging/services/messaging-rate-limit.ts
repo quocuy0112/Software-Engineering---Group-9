@@ -5,6 +5,7 @@ import { MessagingError } from "@/backend/messaging/messaging-errors";
 
 type PolicyName =
   | "messagingDiscovery"
+  | "messagingDiscoveryNetwork"
   | "messagingConversationCreate"
   | "messagingBlock"
   | "messagingReport";

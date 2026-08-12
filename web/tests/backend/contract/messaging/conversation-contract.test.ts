@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   conversationDetailSchema,
   eligibleParticipantListSchema,
+  messagingListQuerySchema,
   openConversationInputSchema,
 } from "@/shared/contracts/messaging";
 import { messagingJson } from "@/backend/messaging/http/messaging-route";
@@ -18,7 +19,11 @@ describe("messaging conversation REST contract", () => {
     expect(() =>
       openConversationInputSchema.parse({
         targetUserId: "user-b",
-        context: { type: "APPLICATION", applicationId: "application-1", extra: true },
+        context: {
+          type: "APPLICATION",
+          applicationId: "application-1",
+          extra: true,
+        },
       }),
     ).toThrow();
   });
@@ -46,6 +51,12 @@ describe("messaging conversation REST contract", () => {
     expect(() =>
       conversationDetailSchema.parse({ email: "private@example.test" }),
     ).toThrow();
+  });
+
+  it("requires a meaningful bounded participant search query", () => {
+    expect(messagingListQuerySchema.parse({ q: "an" }).q).toBe("an");
+    expect(() => messagingListQuerySchema.parse({ q: "a" })).toThrow();
+    expect(messagingListQuerySchema.parse({}).q).toBeUndefined();
   });
 
   it("sets no-store on every messaging JSON response", async () => {

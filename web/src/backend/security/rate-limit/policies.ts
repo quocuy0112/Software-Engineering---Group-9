@@ -23,8 +23,13 @@ export const rateLimitPolicies = {
   jobReport: { scope: "job-report", limit: 10, windowSeconds: 60 * 60 },
   messagingDiscovery: {
     scope: "messaging-discovery",
-    limit: 60,
+    limit: 40,
     windowSeconds: 60,
+  },
+  messagingDiscoveryNetwork: {
+    scope: "messaging-discovery-network",
+    limit: 300,
+    windowSeconds: 5 * 60,
   },
   messagingConversationCreate: {
     scope: "messaging-conversation-create",
