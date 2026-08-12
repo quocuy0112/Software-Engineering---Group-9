@@ -43,6 +43,17 @@ export const rateLimitPolicies = {
     limit: 10,
     windowSeconds: 24 * 60 * 60,
   },
+  supportCaseCreate: {
+    scope: "support-case-create",
+    limit: 5,
+    windowSeconds: 24 * 60 * 60,
+  },
+  supportSend: { scope: "support-send", limit: 60, windowSeconds: 60 },
+  supportSendNetwork: {
+    scope: "support-send-network",
+    limit: 300,
+    windowSeconds: 5 * 60,
+  },
 } as const;
 
 export function safeRetryMetadata(decision: RateLimitDecision) {

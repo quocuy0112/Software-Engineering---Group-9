@@ -26,9 +26,13 @@ import {
   conversationRoom,
   MessagingRealtimePublisher,
 } from "./messaging-realtime-publisher";
-import { authorizeSocketConversation, registerChatEvents } from "./register-chat-events";
+import {
+  authorizeSocketConversation,
+  registerChatEvents,
+} from "./register-chat-events";
 import { installMessagingRealtimePublisher } from "./messaging-realtime-hub";
 import { MessagingPresenceRegistry } from "./messaging-presence-registry";
+import { attachSupportNamespace } from "@/backend/support/realtime/socket-io-support-gateway";
 
 type Actor = { userId: string; sessionId: string };
 
@@ -68,6 +72,7 @@ export function attachSocketIoChatGateway(
     maxHttpBufferSize: 32 * 1024,
   });
   const chat = io.of("/chat");
+  attachSupportNamespace(io as unknown as Server);
   const conversations =
     supplied.conversations ?? new PrismaMessagingConversationRepository();
   const eligibility = supplied.eligibility ?? new MessagingEligibilityService();
@@ -91,10 +96,18 @@ export function attachSocketIoChatGateway(
     blocks,
   );
   installMessagingRealtimePublisher(publisher);
-  const emitPresence = async (event: { userId: string; presence: "ONLINE" | "OFFLINE" }) => {
-    const conversationIds = await conversations.listAuthorizedConversationIds(event.userId);
+  const emitPresence = async (event: {
+    userId: string;
+    presence: "ONLINE" | "OFFLINE";
+  }) => {
+    const conversationIds = await conversations.listAuthorizedConversationIds(
+      event.userId,
+    );
     for (const conversationId of conversationIds) {
-      const access = await conversations.findAccess(conversationId, event.userId);
+      const access = await conversations.findAccess(
+        conversationId,
+        event.userId,
+      );
       if (!access) continue;
       const partnerId =
         access.participantLowId === event.userId
@@ -130,7 +143,9 @@ export function attachSocketIoChatGateway(
   );
 
   chat.use(async (socket, next) => {
-    const actor = await authenticate(handshakeHeaders(socket.handshake.headers));
+    const actor = await authenticate(
+      handshakeHeaders(socket.handshake.headers),
+    );
     if (!actor) return next(new Error("AUTH_REQUIRED"));
     socket.data.userId = actor.userId;
     socket.data.sessionId = actor.sessionId;
@@ -141,7 +156,9 @@ export function attachSocketIoChatGateway(
     registry.register({ socketId: socket.id, ...socket.data });
     presence.register(socket.id, socket.data.userId);
     await socket.join(accountRoom(socket.data.userId));
-    const ids = await conversations.listAuthorizedConversationIds(socket.data.userId);
+    const ids = await conversations.listAuthorizedConversationIds(
+      socket.data.userId,
+    );
     for (const conversationId of ids) {
       try {
         await authorizeSocketConversation({
@@ -165,7 +182,8 @@ export function attachSocketIoChatGateway(
       eligibility,
       blocks,
       send,
-      revalidateSession: async () => Boolean(await authenticate(currentHeaders())),
+      revalidateSession: async () =>
+        Boolean(await authenticate(currentHeaders())),
     });
     socket.on("disconnect", () => {
       registry.unregister(socket.id);

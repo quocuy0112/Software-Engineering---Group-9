@@ -91,6 +91,7 @@ enum EmailKind {
   VERIFICATION_CANCELLED
   VERIFICATION_DELAYED
   VERIFICATION_EXPIRED
+  SUPPORT_CASE_UPDATED
 }
 
 enum PreferenceLanguage {
@@ -237,6 +238,35 @@ enum CompanyMembershipStatus {
 
 enum ProfessionalConnectionStatus {
   ACCEPTED
+}
+
+enum SupportConversationCategory {
+  ACCOUNT_ACCESS
+  PROFILE
+  JOBS_APPLICATIONS
+  RECRUITER
+  MESSAGING
+  PRIVACY_SAFETY
+  OTHER
+}
+
+enum SupportConversationState {
+  OPEN
+  WAITING_FOR_USER
+  WAITING_FOR_SUPPORT
+  RESOLVED
+  CLOSED
+}
+
+enum SupportMessageSenderKind {
+  REQUESTER
+  ADMINISTRATOR
+}
+
+enum SupportAssignmentEndReason {
+  REASSIGNED
+  AUTHORITY_LOST
+  CASE_CLOSED
 }
 
 enum MessagingConversationContextType {
@@ -649,6 +679,12 @@ model UserAccount {
   messagingBlocksReceived       UserMessagingBlock[]               @relation("MessagingBlocked")
   submittedMessagingReports     MessagingReport[]                  @relation("MessagingReporter")
   targetedMessagingReports      MessagingReport[]                  @relation("MessagingTarget")
+  supportConversationsRequested SupportConversation[]              @relation("SupportRequester")
+  supportConversationsAssigned  SupportConversation[]              @relation("SupportCurrentAssignee")
+  supportMessages               SupportMessage[]
+  supportAssignmentsReceived    SupportAssignment[]                @relation("SupportAssignmentAssignee")
+  supportAssignmentsMade        SupportAssignment[]                @relation("SupportAssignmentActor")
+  supportInternalNotes          SupportInternalNote[]
 
   @@index([state, id])
   @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "user_name_trgm_idx")
@@ -1062,6 +1098,7 @@ model EmailOutbox {
   userId                        String?
   securityTokenId               String?
   verificationRequestId         String?
+  supportConversationId         String?
   recipientRef                  String
   recipientCiphertext           String?
   recipientPurpose              String?
@@ -1083,11 +1120,13 @@ model EmailOutbox {
   emailChangeOldAddressFor      EmailChangeRequest?           @relation("EmailChangeOldAddressOutbox")
   passwordChangeNotificationFor PasswordChangeOperation?      @relation("PasswordChangeNotificationOutbox")
   verificationRequest           RecruiterVerificationRequest? @relation(fields: [verificationRequestId], references: [id], onDelete: SetNull)
+  supportConversation           SupportConversation?          @relation(fields: [supportConversationId], references: [id], onDelete: SetNull)
   securityNotificationWork      SecurityNotificationWork?
 
   @@index([status, nextAttemptAt])
   @@index([leaseExpiresAt])
   @@index([verificationRequestId, kind])
+  @@index([supportConversationId, kind])
 }
 
 model AuditEvent {
@@ -1667,6 +1706,98 @@ model ProfessionalConnection {
 
   @@unique([participantLowId, participantHighId])
   @@index([participantHighId, participantLowId, state])
+}
+
+model SupportConversation {
+  id                    String                       @id @default(cuid())
+  requesterUserId       String
+  category              SupportConversationCategory
+  subject               String                       @db.VarChar(120)
+  state                 SupportConversationState     @default(OPEN)
+  version               Int                          @default(1)
+  nextMessageSequence   Int                          @default(1)
+  lastMessageAt         DateTime?
+  currentAssigneeUserId String?
+  resolvedAt            DateTime?
+  closedAt              DateTime?
+  contentDeleteAfter    DateTime?
+  contentDeletedAt      DateTime?
+  createdAt             DateTime                     @default(now())
+  updatedAt             DateTime                     @updatedAt
+  requester             UserAccount                  @relation("SupportRequester", fields: [requesterUserId], references: [id], onDelete: Restrict)
+  currentAssignee       UserAccount?                 @relation("SupportCurrentAssignee", fields: [currentAssigneeUserId], references: [id], onDelete: SetNull)
+  messages              SupportMessage[]
+  assignments           SupportAssignment[]
+  internalNotes         SupportInternalNote[]
+  history               SupportConversationHistory[]
+  notificationOutbox    EmailOutbox[]
+
+  @@index([requesterUserId, updatedAt(sort: Desc), id])
+  @@index([state, updatedAt, id])
+  @@index([currentAssigneeUserId, state, updatedAt])
+  @@index([contentDeleteAfter, contentDeletedAt])
+}
+
+model SupportMessage {
+  id                String                   @id @default(cuid())
+  conversationId    String
+  sequence          Int
+  senderKind        SupportMessageSenderKind
+  senderUserId      String
+  clientOperationId String
+  content           String                   @db.Text
+  createdAt         DateTime                 @default(now())
+  conversation      SupportConversation      @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender            UserAccount              @relation(fields: [senderUserId], references: [id], onDelete: Restrict)
+
+  @@unique([conversationId, sequence])
+  @@unique([senderUserId, clientOperationId])
+  @@index([conversationId, sequence(sort: Desc)])
+}
+
+model SupportAssignment {
+  id                    String                      @id @default(cuid())
+  conversationId        String
+  assigneeAdminUserId   String
+  assignedByAdminUserId String
+  assignedAt            DateTime                    @default(now())
+  endedAt               DateTime?
+  endReason             SupportAssignmentEndReason?
+  conversation          SupportConversation         @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  assignee              UserAccount                 @relation("SupportAssignmentAssignee", fields: [assigneeAdminUserId], references: [id], onDelete: Restrict)
+  assignedBy            UserAccount                 @relation("SupportAssignmentActor", fields: [assignedByAdminUserId], references: [id], onDelete: Restrict)
+
+  @@index([conversationId, assignedAt(sort: Desc)])
+  @@index([assigneeAdminUserId, endedAt])
+}
+
+model SupportInternalNote {
+  id                String              @id @default(cuid())
+  conversationId    String
+  authorAdminUserId String
+  normalizedText    String              @db.Text
+  createdAt         DateTime            @default(now())
+  conversation      SupportConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  author            UserAccount         @relation(fields: [authorAdminUserId], references: [id], onDelete: Restrict)
+
+  @@index([conversationId, createdAt])
+}
+
+model SupportConversationHistory {
+  id                      String                    @id @default(cuid())
+  conversationId          String
+  actorUserId             String?
+  action                  String                    @db.VarChar(80)
+  priorState              SupportConversationState?
+  resultingState          SupportConversationState
+  resultingVersion        Int
+  assignmentReason        String?                   @db.VarChar(80)
+  priorAssigneeUserId     String?
+  resultingAssigneeUserId String?
+  occurredAt              DateTime                  @default(now())
+  conversation            SupportConversation       @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, occurredAt])
 }
 
 model MessagingConversation {

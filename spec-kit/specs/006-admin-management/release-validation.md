@@ -117,3 +117,32 @@ root, and the company-access prerequisite owner/version/environment record.
 open because full authenticated accessibility/moderation/auth acceptance,
 manual usability/screen-reader evidence, the pre-existing lint gate, and
 production evidence-policy/prerequisite approvals are not complete.
+
+## 2026-08-13 Support Center Extension
+
+The Feature 006 Support Center increment is implementation-complete. It keeps
+support data separate from Feature 008 private messaging, exposes only the
+`SmartHire Support` identity to requesters, and gives administrators access only
+to support cases through the existing PlatformAdministrator boundary.
+
+| Gate                        |                 Result | Evidence                                                                                                                                                         |
+| --------------------------- | ---------------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Prisma schema/generation    |                   PASS | `prisma format`, `prisma validate`, and Prisma Client generation completed.                                                                                      |
+| Migration deployment/status |                   PASS | `20260813090000_support_center` deployed; 25 migrations and local schema up to date.                                                                             |
+| OpenAPI/runtime drift       |                   PASS | 38 reviewed paths, version 0.3.0, drift false, SHA-256 `1e5a925424bccc2314c3d08b59b217a3b5969c156e06252624102125ffb165a0`.                                       |
+| TypeScript                  |                   PASS | `npm run typecheck`.                                                                                                                                             |
+| Support lint scope          |                   PASS | New Support routes, backend, UI, contracts, and tests pass ESLint.                                                                                               |
+| Support tests               |                   PASS | 7 files and 17 tests, including repository transactions, contract, privacy, architecture, components, and accessibility.                                         |
+| Feature 006 regression      |                   PASS | 55 files and 154 tests. One provider-notification case was flaky in the first aggregate run, then passed 4/4 in isolation and the complete rerun passed 154/154. |
+| Feature 008 regression      |                   PASS | 28 files and 66 tests.                                                                                                                                           |
+| Admin worker probe          |                   PASS | Worker runtime, including the Support lifecycle loop, exited successfully.                                                                                       |
+| Production build            |                   PASS | Next.js compiled and generated 75 routes/pages, including requester and administrator Support routes.                                                            |
+| Repository-wide lint        | BLOCKED (pre-existing) | Two Profile files outside this increment fail React hook rules; all Support files pass targeted lint.                                                            |
+| Repository-wide format      | BLOCKED (pre-existing) | 242 previously unformatted files outside this increment fail the global check; all changed non-generated Support files pass targeted formatting.                 |
+
+The final boundary audit confirms requester ownership predicates on every read
+and write, current-assignee enforcement for replies and lifecycle actions, a
+database-enforced single active assignment, content-free realtime/email events,
+no dependency that reads ordinary Feature 008 messages, bounded worker batches,
+and exact-time content suppression/deletion. `.claude/settings.local.json` is a
+local untracked file and is explicitly excluded from staging and commits.

@@ -280,3 +280,15 @@ Attach these artifacts to the Feature 006 release record:
 Record actual outcomes, timestamps, environment references, and external
 blockers in `release-validation.md`. A skipped, gated, or manually unexecuted
 journey is not a pass.
+
+## 9. SmartHire Support Center
+
+```powershell
+cd web
+npx prisma validate
+npm run typecheck
+npm run lint
+npm run test:support
+```
+
+Use one ACTIVE requester and two designated Platform Administrator accounts. Create a case at `/support`, claim and reassign it in `support-cases`, exchange replies, add an internal note, resolve and reopen, then advance fixtures through auto-close and 365-day content deletion. Confirm requester APIs, realtime payloads, captured email, logs, and audit rows contain no administrator identity, internal note, or ordinary Feature 008 message content.

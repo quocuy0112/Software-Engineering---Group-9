@@ -2,6 +2,7 @@ import "server-only";
 import type { z } from "zod";
 import { AdminBoundaryError } from "@/backend/security/admin-request-boundary";
 import { AdminCommandConflict } from "@/backend/repositories/admin/prisma-admin-command-repository";
+import { SupportError } from "@/backend/support/support-errors";
 
 export function adminNoStoreHeaders(extra: HeadersInit = {}) {
   const headers = new Headers({
@@ -50,6 +51,17 @@ export function adminJson(value: unknown, init: ResponseInit = {}) {
 }
 
 export function adminRouteError(error: unknown) {
+  if (error instanceof SupportError) {
+    return adminJson(
+      {
+        code: error.code,
+        ...(error.retryAfterSeconds
+          ? { retryAfterSeconds: error.retryAfterSeconds }
+          : {}),
+      },
+      { status: error.status },
+    );
+  }
   if (error instanceof AdminBoundaryError) {
     return adminJson({ code: error.code }, { status: error.status });
   }

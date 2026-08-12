@@ -20,6 +20,10 @@ import {
   type AdminSecurityEventKind,
   type VerificationEventKind,
 } from "./notification-events";
+import {
+  SupportCaseEmail,
+  supportCaseEmailText,
+} from "./support-case-template";
 
 const eventBase = z.object({
   eventKind: z.string(),
@@ -40,6 +44,11 @@ const verificationPayload = eventBase.extend({
   approvedMembershipRole: z
     .enum(["OWNER", "HR_MANAGER", "RECRUITER", "HIRING_MANAGER"])
     .optional(),
+});
+const supportCasePayload = z.object({
+  caseId: z.string().min(1).max(128),
+  state: z.enum(["WAITING_FOR_USER", "RESOLVED"]),
+  occurredAt: z.string().datetime(),
 });
 
 export type RenderedFeature006Email = {
@@ -133,6 +142,18 @@ export async function renderFeature006Email(input: {
           : "Employer verification update",
       html: await render(createElement(VerificationEmail, props)),
       text: verificationEmailText(props),
+    };
+  }
+  if (input.templateVersion === "support-case-v1") {
+    const payload = supportCasePayload.parse(input.payloadRef);
+    const props = {
+      ...payload,
+      supportUrl: new URL("/support", input.appUrl).toString(),
+    };
+    return {
+      subject: "Your SmartHire support case was updated",
+      html: await render(createElement(SupportCaseEmail, props)),
+      text: supportCaseEmailText(props),
     };
   }
   throw new Error("FEATURE_006_TEMPLATE_UNSUPPORTED");

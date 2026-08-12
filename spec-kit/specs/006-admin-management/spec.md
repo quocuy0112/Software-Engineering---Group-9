@@ -165,6 +165,31 @@ As an approved recruiter, I want my active company memberships to authorize the 
 3. **Given** a user with multiple active memberships, **When** one company context is selected, **Then** every recruiter operation remains limited to that company and role.
 4. **Given** Feature 006 is delivered before the Recruiter Manager feature, **When** an approved member follows the recruiter link, **Then** a clearly labelled unavailable/coming-next state may be shown; job-post, applicant, Kanban, analytics, and company-team management are not silently added to this feature.
 
+### User Story 8 - Resolve Support Requests Through Direct Messaging (Priority: P1)
+
+As an authenticated active account holder, I want to open a private support case with SmartHire Support and receive replies in the product so that routine account, profile, recruitment, messaging, privacy, and safety questions do not require an email exchange.
+
+As a Platform Administrator, I want a protected Support Inbox where I can claim, reassign, reply to, annotate, resolve, and close support cases so that the platform can provide accountable assistance without granting access to ordinary user-to-user conversations.
+
+**Why this priority**: Direct support reduces resolution time while preserving the existing rule that Platform Administrators are not unrestricted readers of Feature 008 conversations.
+
+**Independent Test**: Create cases as active users, exceed case and message limits, claim and race-claim cases as two administrators, reassign between administrators, add internal notes, exchange realtime messages, resolve, reopen inside seven days, auto-close after seven days, revoke an assignee's administrator authority, and execute retention cleanup; verify authorization, neutral errors, audit, notification, privacy, and concurrency outcomes.
+
+**Acceptance Scenarios**:
+
+1. **Given** an authenticated ACTIVE account with fewer than three non-terminal cases and fewer than five new cases in the preceding 24 hours, **When** the user submits an allowlisted category, a 5–120-character subject, and a 1–4,000-character initial plain-text message, **Then** one private support case is created in WAITING_FOR_SUPPORT, appears in the Support Inbox, and is represented to the user only as a conversation with `SmartHire Support`.
+2. **Given** an unauthorized, suspended, deleted, cross-origin, forged, or over-limit requester, **When** support data or a mutation is requested, **Then** no support content or target existence is disclosed and no case or message is created.
+3. **Given** an unassigned support case, **When** two authorized administrators claim the same reviewed version concurrently, **Then** exactly one becomes the current assignee and the other receives the authoritative current version before retrying.
+4. **Given** an assigned case, **When** an authorized administrator reassigns it with a required allowlisted reason, **Then** exactly one active assignment remains, the prior assignment receives an immutable end record, the user-facing state does not change, and the user continues to see only `SmartHire Support`.
+5. **Given** an assigned non-closed case, **When** its current assignee sends a valid reply, **Then** the reply is durably persisted before acknowledgement, the state becomes WAITING_FOR_USER, the user receives a realtime invalidation plus a content-free email notification, and other administrators cannot impersonate the assignee through direct operations.
+6. **Given** a requester sends a valid message to a non-closed case, **When** the write commits, **Then** the state becomes WAITING_FOR_SUPPORT, the Support Inbox receives a realtime invalidation, and no ordinary Feature 008 conversation, eligibility record, presence state, or message is created.
+7. **Given** an administrator adds a private note, **When** any requester API, realtime event, notification, browser cache, URL, analytics event, or ordinary log is inspected, **Then** the note and its existence are absent; it remains available only through the protected admin case detail.
+8. **Given** an assigned case is resolved, **When** the requester replies within seven calendar days, **Then** the same case reopens as WAITING_FOR_SUPPORT; **When** no reply occurs by the deadline, **Then** the worker transitions it once to terminal CLOSED.
+9. **Given** a case is CLOSED, **When** either party attempts to send another message or reopen it, **Then** the operation is rejected and the requester is directed to create a new case.
+10. **Given** the current assignee loses ACTIVE account or Platform Administrator authority, **When** the worker or next case operation observes the change, **Then** the assignment is ended as AUTHORITY_LOST, the case returns to the unassigned queue without exposing administrator identity, and the support state remains accurate.
+11. **Given** a case has been CLOSED for 365 calendar days, **When** retention processing runs, **Then** user-visible messages and internal notes become inaccessible and are deleted within 24 hours while content-free lifecycle and audit metadata remain.
+12. **Given** any Platform Administrator uses Support Inbox, **When** they attempt to inspect an ordinary Feature 008 conversation through support or admin APIs, **Then** no endpoint, resource, query, or UI path returns that conversation or its messages.
+
 ### Edge Cases
 
 - A Platform Administrator grant changes while the administrator has the console open; every subsequent page and action rechecks current authority.
@@ -181,6 +206,11 @@ As an approved recruiter, I want my active company memberships to authorize the 
 - A report contains markup, executable or style content, ASCII control characters, Unicode bidirectional controls, personal data, or attempts to influence administrators; required normalization and display rules apply, content above 2,000 characters is rejected, and report text is excluded from ordinary logs.
 - Removing or suspending an OWNER is blocked when it would leave an active company without an active OWNER unless a separately authorized company action resolves ownership.
 - Hostname manipulation, direct operation calls, stale browser state, or a recruiter-domain page cannot substitute for server-verified Platform Administrator or company-membership authority.
+- A support request is retried with the same requester and idempotency key; exactly one case or message is visible and an incompatible retry is rejected.
+- A resolved support case receives a requester message at the exact auto-close boundary; row-version and deadline checks permit exactly one authoritative reopen-or-close outcome.
+- An administrator is reassigned while composing a reply; the send revalidates current assignment and stale versions before persisting content.
+- Realtime delivery fails after a support write commits; HTTP remains authoritative and reconnect triggers a protected refetch without duplicate messages.
+- Support content contains markup, executable/style content, control characters, bidirectional controls, or excessive line breaks; FR-048 normalization applies and over-limit text is rejected without truncation.
 
 ## Requirements _(mandatory)_
 
@@ -269,6 +299,21 @@ As an approved recruiter, I want my active company memberships to authorize the 
 - **FR-061**: Existing Candidate authentication, profile, CV, job search, application, session-self-service, and deterministic recruitment behavior MUST continue unchanged except where a current account or membership suspension lawfully denies access.
 - **FR-062**: Each Platform Administrator grant MUST designate at most one administration-authorized Login Session at a time. Completing administration sign-in and two-factor authentication on a second session MUST atomically designate the new session and revoke the previously designated administration session within 2 seconds. Other Candidate-only sessions for the same account MAY remain active under the ordinary account session limit but MUST NOT access the administration console unless they complete administration sign-in and become the designated session.
 
+#### SmartHire Support Center
+
+- **FR-063**: Every authenticated ACTIVE account MUST be able to create and view only its own support cases through the exact Candidate origin. Categories MUST be ACCOUNT_ACCESS, PROFILE, JOBS_APPLICATIONS, RECRUITER, MESSAGING, PRIVACY_SAFETY, or OTHER; subject length MUST be 5–120 and message length 1–4,000 Unicode characters after FR-048 normalization. Empty or over-limit values MUST be rejected without truncation.
+- **FR-064**: A requester MUST have at most three cases in OPEN, WAITING_FOR_USER, WAITING_FOR_SUPPORT, or RESOLVED and MAY create at most five cases in any rolling 24-hour period across all sessions. Message sending MUST be limited to 60 accepted attempts per account per minute and 300 per network subject per five minutes. Limits MUST be server-enforced, content-free, and return only a safe retry duration.
+- **FR-065**: Support cases MUST use only OPEN, WAITING_FOR_USER, WAITING_FOR_SUPPORT, RESOLVED, and CLOSED. Creation with an initial message MUST atomically enter WAITING_FOR_SUPPORT. A requester message MUST enter WAITING_FOR_SUPPORT; an assignee reply MUST enter WAITING_FOR_USER; an assignee resolution MUST enter RESOLVED; a requester reply within seven calendar days of resolution MUST reopen the same case as WAITING_FOR_SUPPORT; otherwise a worker MUST close it exactly once. CLOSED is terminal.
+- **FR-066**: Requesters MUST see the support correspondent only as `SmartHire Support`. Administrator account reference, name, email, assignment, reassignment, internal note, session reference, and grant reference MUST NOT appear in requester responses, realtime events, email, URLs, analytics, or ordinary logs.
+- **FR-067**: The administration console MUST provide a Support Inbox filtered by state, category, age, and current assignment. It MUST default to 25 rows, permit at most 100, order WAITING_FOR_SUPPORT before OPEN, WAITING_FOR_USER, RESOLVED, and CLOSED, then oldest activity first and case reference ascending, and exclude message and note content from list rows.
+- **FR-068**: At most one active Support Assignment MAY exist per case. An authorized Platform Administrator MAY atomically claim an unassigned case or reassign a case to another currently authorized Platform Administrator using STAFF_HANDOFF, WORKLOAD_BALANCE, EXPERTISE_REQUIRED, or AUTHORITY_LOST. Assignment history MUST be append-only; loss of assignee authority MUST end the active assignment and return the case to the unassigned queue without changing requester-visible identity.
+- **FR-069**: Only the current assignee MAY send a support reply, add an internal note, resolve, or close an assigned case. Every command MUST revalidate administrator authority, current assignment, case version, case state, and idempotency before persistence. Notes MUST contain 1–2,000 normalized characters and MUST never enter requester projections or realtime payloads.
+- **FR-070**: Case creation, message acceptance, state transition, assignment, reassignment, resolution, closure, and retention MUST preserve deterministic sequence or version order under retries and concurrency. A successful message acknowledgement MUST occur only after durable persistence; realtime publication happens after commit and failure to publish MUST NOT roll back the write.
+- **FR-071**: An assignee reply and resolution MUST enqueue at most one idempotent email notification to the requester. The email MUST identify the case reference, resulting state, event time, and authenticated `/support` destination but MUST contain no message content, internal note, administrator identity, assignment data, or private operational signal. Delivery failure MUST NOT reverse the support action.
+- **FR-072**: The Support realtime channel MUST authenticate every connection, disclose only content-free case invalidations, and authorize Candidate and administration origins separately. A requester receives invalidations only for their cases; administrators receive only Support Inbox invalidations. Support realtime MUST NOT join, inspect, publish, or grant access to Feature 008 conversation rooms, presence, reports, or messages.
+- **FR-073**: Support message and internal-note content MUST become inaccessible exactly 365 calendar days after CLOSED and be deleted within the following 24 hours. Audit events MUST contain no support message, subject, internal note, user email, or administrator identity disclosed to the requester. Content-free case, assignment, state, retention, and delivery metadata MAY remain for integrity and aggregate measurement.
+- **FR-074**: Support Center APIs, repositories, admin resources, realtime adapters, and UI MUST be separate from Feature 008 ordinary conversation and message repositories. No Platform Administrator grant, support assignment, or support-case participation authorizes reading an ordinary user-to-user conversation.
+
 ### Key Entities
 
 - **Platform Administrator Grant**: Separately provisioned platform authority associated with an account; includes lifecycle state, activation and revocation times, and non-secret provenance. It is neither a Candidate role nor a company membership.
@@ -283,6 +328,11 @@ As an approved recruiter, I want my active company memberships to authorize the 
 - **Administration Audit Event**: An append-only record of a privileged attempt or outcome with actor, action, target, result, timestamp, correlation reference, and allowlisted non-sensitive context.
 - **Privileged Action Rationale**: The FR-048-normalized 10–500-character administrator explanation for a committed session, account, or membership action, linked to its audit event only by correlation reference. It is restricted to current Platform Administrators with fresh step-up proof, excluded from affected-user notifications and ordinary telemetry, inaccessible at 365 calendar days, and deleted within the following 24 hours.
 - **Notification Work**: Durable, idempotent delivery intent created with an administration outcome. It records PENDING, RETRYING, DELIVERED, or MANUAL_INTERVENTION_REQUIRED; attempt count; last and next attempt times; a 24-hour delivery deadline; and a non-sensitive failure category. Retryable security notifications receive at most five attempts on the FR-022 schedule, while permanent or exhausted failure is visible to administrators and never reverses the originating decision.
+- **Support Conversation**: A private requester-owned support case with category, subject, lifecycle state, administrator-only current assignment, deterministic version/message sequence, activity times, resolution deadline, and retention boundary.
+- **Support Message**: A sequenced, durable, idempotent plain-text message authored by the requester or current Platform Administrator assignee. Requester projections replace every administrator sender identity with `SmartHire Support`.
+- **Support Assignment**: An append-only assignment interval recording assignee, assigning administrator, start, end, and allowlisted end reason. Exactly one interval may remain active for a case.
+- **Support Internal Note**: Administrator-only normalized text associated with a support case and excluded from every requester projection and notification.
+- **Support Case History**: Content-free immutable state and command history used for concurrency review, lifecycle audit, and retention evidence.
 
 ## Success Criteria _(mandatory)_
 
@@ -306,6 +356,12 @@ As an approved recruiter, I want my active company memberships to authorize the 
 - **SC-016**: In 100% of sensitive-action tests, a successful two-factor proof permits every FR-004 action for no more than 15 minutes; at 15 minutes plus 1 second each action requires renewed proof, and failed or abandoned proof produces no business-state change.
 - **SC-017**: In 100% of report-input tests, the seven-category allowlist, 2,000-character limit, OTHER minimum, specified normalization removals, one-unresolved and one-per-24-hour dedupe rules, 10-per-24-hour account quota, cross-session aggregation, and direct application-processing authorization produce the outcomes defined by FR-046–FR-048 without disclosing a non-public target.
 - **SC-018**: In 100% of injected security-notification failures, retryable notifications follow no more than five attempts at the FR-022 intervals, permanent or exhausted failures reach MANUAL_INTERVENTION_REQUIRED no later than 24 hours, the administrator can see the required delivery fields, and the originating account or membership action remains effective.
+- **SC-019**: In 100% of support authorization tests, only an ACTIVE requester can access its own cases, only a currently authorized Platform Administrator can access Support Inbox, only the current assignee can perform assignee commands, and no support path returns any Feature 008 conversation or message.
+- **SC-020**: Across at least 10,000 support cases and 20 concurrent requester/administrator sessions, at least 95% of case-list, case-detail, message-send, claim, reassign, and state-transition interactions complete authoritatively within 2 seconds, with fewer than 1% unplanned errors and zero duplicate visible messages or active assignments.
+- **SC-021**: In 100% of lifecycle tests, creation, requester message, assignee reply, resolution, seven-day reopen, exact-boundary close, terminal rejection, authority-loss requeue, and stale-version races produce the FR-065 through FR-070 outcome exactly once.
+- **SC-022**: In 100% of privacy tests, requester responses and notifications use only `SmartHire Support`; internal notes and administrator identity are absent from requester APIs, realtime payloads, email, URLs, analytics, logs, and support audit context; ordinary Feature 008 messages remain inaccessible to every admin support operation.
+- **SC-023**: In 100% of abuse-control tests, the three-active-case, five-case-per-24-hour, account-message, and network-message limits aggregate across sessions and return only safe retry metadata without disclosing another case or account.
+- **SC-024**: In 100% of retention tests, support content is readable before the 365-day boundary, inaccessible at the boundary, deleted within 24 hours, and absent from retained audit and aggregate metadata.
 
 ## Assumptions
 
@@ -341,8 +397,13 @@ As an approved recruiter, I want my active company memberships to authorize the 
 - Full Recruiter Manager capabilities at `console.recruiter.localhost:3001`, including job-post management, applicant review, scoring, pipeline/Kanban, notifications, analytics, and export.
 - Recruitment analytics and data export beyond operational counts required to run the administration queues.
 - Job-post approval and removal workflow beyond viewing current job reports and linking a separately authorized enforcement action; full job-post moderation can be specified as its own focused increment.
+- Reading, searching, exporting, moderating, or impersonating any ordinary Feature 008 conversation through Support Center.
+- Support attachments, anonymous visitor chat, voice/video, bots, AI replies, cross-case merging, public knowledge base, service-level escalation, or a separate Support Agent role.
+- Professional Connection proposals, consent, connection discovery, or connection lifecycle; these belong to Feature 011.
 
 ## Changelog
+
+- **[FR-063–FR-074 Add]** — Added SmartHire Support Center requester cases, protected Support Inbox, assignment/reassignment, private notes, realtime invalidation, content-free email, abuse controls, auto-close, retention, and an explicit prohibition on ordinary-message access — extension 2026-08-13.
 
 - **[FR-024, FR-030, FR-033 Modify]** — Required a valid scoped invitation or active OWNER approval before an administrator may approve membership in an existing verified company; tax-identifier matching alone never grants or reveals tenant authority — clarify session 2026-08-10, question 1.
 - **[FR-025, FR-034 Modify]** — Defined the canonical Vietnamese company tax identifier as exactly 10 ASCII digits after outer-whitespace removal and rejected all embedded separators, non-ASCII digits, and incorrect lengths before document processing — clarify session 2026-08-10, question 2.

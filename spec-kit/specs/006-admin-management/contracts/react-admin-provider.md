@@ -69,6 +69,15 @@ command.
 - Generic create/edit/delete unsupported; reporter route owns submission and
   custom commands own review changes.
 
+### `support-cases`
+
+- `getList` returns the server-prioritized support inbox with state, category,
+  assignee, and age filters; it never contains Feature 008 private conversations.
+- `getOne` returns the support transcript, assignment/history timeline, and
+  administrator-only notes. Requester projections never contain notes or staff identity.
+- Generic create/edit/delete remain disabled; claim, reassign, reply, note,
+  resolve, and close use explicit versioned, idempotent commands.
+
 ### Nested-only resources
 
 `login-sessions`, `notification-work`, and correlation-specific `audit-events`
@@ -135,6 +144,10 @@ type SmartHireAdminDataProvider = DataProvider & {
     reportId: string,
     signal?: AbortSignal,
   ): Promise<ModerationReview>;
+  getSupportCase(
+    caseId: string,
+    signal?: AbortSignal,
+  ): Promise<AdminSupportCaseDetail>;
 };
 ```
 
@@ -198,6 +211,20 @@ type SmartHireAdminCommands = {
     reportId: string,
     enforcementCorrelationId: string,
   ): Promise<CommandResult>;
+  claimSupportCase(caseId: string): Promise<CommandResult>;
+  reassignSupportCase(
+    caseId: string,
+    assigneeAdminUserId: string,
+    reason: "STAFF_HANDOFF" | "WORKLOAD_BALANCE" | "EXPERTISE_REQUIRED",
+  ): Promise<CommandResult>;
+  replySupportCase(
+    caseId: string,
+    content: string,
+    clientOperationId: string,
+  ): Promise<CommandResult>;
+  noteSupportCase(caseId: string, note: string): Promise<CommandResult>;
+  resolveSupportCase(caseId: string): Promise<CommandResult>;
+  closeSupportCase(caseId: string): Promise<CommandResult>;
 };
 ```
 

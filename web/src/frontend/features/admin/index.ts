@@ -8,3 +8,5 @@ export { AccountSecurityShow } from "./accounts/account-security-show";
 export { CompanyMembershipList } from "./memberships/company-membership-list";
 export { ModerationReportList } from "./moderation/moderation-report-list";
 export { VerificationRequestList } from "./verification/verification-request-list";
+export { SupportCaseList } from "./support/support-case-list";
+export { SupportCaseShow } from "./support/support-case-show";

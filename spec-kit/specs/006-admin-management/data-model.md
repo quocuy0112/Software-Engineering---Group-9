@@ -472,3 +472,61 @@ RecruiterVerificationRequest 1---* EmailOutbox (verification lifecycle correlati
    notification status/next attempt/deadline, and rationale deleteAfter.
 7. Migration verification proves no Session token, factor secret, Candidate
    Profile/CV, job/application state, or existing audit record is altered.
+
+## SmartHire Support Center Extension
+
+### SupportConversation
+
+- `id`: opaque case reference.
+- `requesterUserId`: immutable ACTIVE account owner.
+- `category`: `ACCOUNT_ACCESS | PROFILE | JOBS_APPLICATIONS | RECRUITER | MESSAGING | PRIVACY_SAFETY | OTHER`.
+- `subject`: normalized requester-visible text, 5–120 characters.
+- `state`: `OPEN | WAITING_FOR_USER | WAITING_FOR_SUPPORT | RESOLVED | CLOSED`.
+- `version`, `nextMessageSequence`, `lastMessageAt`.
+- `currentAssigneeUserId`: nullable Platform Administrator reference, never projected to requester.
+- `resolvedAt`, `closedAt`, `contentDeleteAfter`, `contentDeletedAt`, `createdAt`, `updatedAt`.
+
+Indexes support requester activity, admin state/age/assignment ordering, and retention claims. `CLOSED` is terminal. `RESOLVED` reopens only through a requester message strictly before `resolvedAt + 7 days`; otherwise a guarded worker transition closes it.
+
+### SupportMessage
+
+- `id`, `conversationId`, monotonic `sequence`.
+- `senderKind`: `REQUESTER | ADMINISTRATOR`.
+- `senderUserId`, UUID `clientOperationId`, normalized 1–4,000-character `content`, `createdAt`.
+
+Uniqueness on `(conversationId, sequence)` and `(senderUserId, clientOperationId)` prevents duplicate visible messages. A case row lock allocates sequence and applies the matching state transition in one transaction.
+
+### SupportAssignment
+
+- `id`, `conversationId`, `assigneeAdminUserId`, `assignedByAdminUserId`.
+- `assignedAt`, nullable `endedAt` and `endReason`: `REASSIGNED | AUTHORITY_LOST | CASE_CLOSED`.
+
+A partial unique index permits one row with `endedAt IS NULL` per conversation. `currentAssigneeUserId` equals the active row and changes in the same transaction.
+
+### SupportInternalNote
+
+- `id`, `conversationId`, `authorAdminUserId`, normalized 1–2,000-character `normalizedText`, `createdAt`.
+- No requester repository method selects this entity.
+
+### SupportConversationHistory
+
+- `id`, `conversationId`, `actorUserId`, `action`, `priorState`, `resultingState`, `resultingVersion`, `occurredAt`.
+- Optional content-free assignment references and reason category are administrator-only.
+- Message, subject, note, email, and session content are forbidden.
+
+### State transitions
+
+```text
+create + initial requester message -> WAITING_FOR_SUPPORT
+requester message                 -> WAITING_FOR_SUPPORT
+assigned administrator reply      -> WAITING_FOR_USER
+assigned administrator resolve    -> RESOLVED
+requester reply before deadline   -> WAITING_FOR_SUPPORT
+worker after deadline             -> CLOSED
+assigned administrator close      -> CLOSED
+CLOSED                             -> terminal
+```
+
+### Retention and isolation
+
+Closing sets `contentDeleteAfter = closedAt + 365 days`. A bounded worker deletes SupportMessage and SupportInternalNote rows, sets `contentDeletedAt`, and appends content-free evidence. No Support entity relates to MessagingConversation or MessagingMessage. Realtime carries only case ID, version, state, and change kind.

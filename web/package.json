@@ -62,6 +62,7 @@
     "test:admin-management:e2e": "playwright test -c playwright.admin.config.ts",
     "test:messaging": "vitest run tests/backend/unit/messaging tests/backend/contract/messaging tests/backend/integration/messaging tests/frontend/components/messaging tests/frontend/accessibility/messaging tests/architecture/realtime-messaging-boundaries.test.ts tests/security/realtime-messaging tests/performance/messaging --passWithNoTests",
     "test:messaging:e2e": "node --conditions=react-server --import tsx scripts/run-messaging-e2e.mjs",
+    "test:support": "vitest run tests/shared/unit/support tests/backend/unit/support tests/backend/contract/support tests/backend/integration/support tests/frontend/components/support tests/frontend/accessibility/support tests/architecture/support-boundaries.test.ts tests/security/support --passWithNoTests",
     "pretest:e2e": "node scripts/clean-next-output.mjs",
     "test:e2e": "playwright test",
     "db:validate": "prisma validate",
