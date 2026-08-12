@@ -67,46 +67,79 @@ export function ReportMessagingDialog({
   }
 
   return (
-    <div>
-      <button ref={trigger} type="button" onClick={() => setOpen(true)}>
-        Report
+    <div className="messaging-safety-control">
+      <button
+        ref={trigger}
+        className="messaging-icon-button"
+        type="button"
+        aria-label="Report"
+        title="Report conversation"
+        onClick={() => setOpen(true)}
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M5 21V4m0 1h12l-2 4 2 4H5" />
+        </svg>
+        <span className="sr-only">Report</span>
       </button>
       {open ? (
-        <section role="dialog" aria-modal="true" aria-label="Report conversation">
-          <h3>Report harmful communication</h3>
-          <label>
-            Category
-            <select value={category} onChange={(event) => setCategory(event.target.value as typeof category)}>
-              {categories.map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Evidence message (optional)
-            <select value={evidenceMessageId} onChange={(event) => setEvidenceMessageId(event.target.value)}>
-              <option value="">No specific message</option>
-              {messages.map((message) => (
-                <option key={message.id} value={message.id}>
-                  {message.content.slice(0, 80)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Details (optional)
-            <textarea maxLength={500} value={detail} onChange={(event) => setDetail(event.target.value)} />
-          </label>
-          {status ? <p role="status">{status}</p> : null}
-          <button type="button" disabled={busy} onClick={() => void submit()}>
-            {busy ? "Submitting..." : "Submit report"}
-          </button>
-          <button type="button" disabled={busy} onClick={close}>
-            Close
-          </button>
-        </section>
+        <div className="messaging-modal-layer">
+          <section className="messaging-modal messaging-report-modal" role="dialog" aria-modal="true" aria-label="Report conversation">
+            <div className="messaging-modal-heading">
+              <div className="messaging-modal-icon" data-tone="warning" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M5 21V4m0 1h12l-2 4 2 4H5" />
+                </svg>
+              </div>
+              <div>
+                <h3>Report harmful communication</h3>
+                <p>Your report is private and reviewed through protected moderation channels.</p>
+              </div>
+            </div>
+            <div className="messaging-report-fields">
+              <label>
+                <span>Category</span>
+                <select value={category} onChange={(event) => setCategory(event.target.value as typeof category)}>
+                  {categories.map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span>Evidence message (optional)</span>
+                <select value={evidenceMessageId} onChange={(event) => setEvidenceMessageId(event.target.value)}>
+                  <option value="">No specific message</option>
+                  {messages.map((message) => (
+                    <option key={message.id} value={message.id}>
+                      {message.content.slice(0, 80)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span>Details (optional)</span>
+                <textarea
+                  aria-label="Details (optional)"
+                  maxLength={500}
+                  placeholder="Add context that can help the review..."
+                  value={detail}
+                  onChange={(event) => setDetail(event.target.value)}
+                />
+                <small>{detail.length}/500</small>
+              </label>
+            </div>
+            {status ? <p className="messaging-report-status" role="status">{status}</p> : null}
+            <div className="messaging-modal-actions messaging-modal-actions-inline">
+              <button className="messaging-danger-button" type="button" disabled={busy} onClick={() => void submit()}>
+                {busy ? "Submitting..." : "Submit report"}
+              </button>
+              <button className="messaging-secondary-button" type="button" disabled={busy} onClick={close}>
+                Close
+              </button>
+            </div>
+          </section>
+        </div>
       ) : null}
     </div>
   );

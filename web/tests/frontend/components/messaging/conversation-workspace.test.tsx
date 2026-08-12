@@ -49,6 +49,7 @@ describe("conversation workspace projections", () => {
     const onBack = vi.fn();
     render(
       <MessageThread
+        currentUserId="user-a"
         csrfProof="csrf"
         error={null}
         onBack={onBack}
@@ -76,6 +77,10 @@ describe("conversation workspace projections", () => {
       />,
     );
     expect(screen.getByText("First")).toBeVisible();
+    expect(screen.getByText("First").closest("li")).toHaveAttribute(
+      "data-direction",
+      "outgoing",
+    );
     expect(screen.getByText("Read")).toBeVisible();
     expect(screen.getByRole("button", { name: /load older/i })).toBeVisible();
     fireEvent.click(screen.getByRole("button", { name: /back to conversations/i }));
