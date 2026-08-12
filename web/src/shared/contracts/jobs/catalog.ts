@@ -9,11 +9,22 @@ import {
 const nullableString = (maximum: number) =>
   z.string().trim().max(maximum).nullable();
 
+export const jobPostingStatusSchema = z.enum([
+  "draft",
+  "pending_approval",
+  "rejected",
+  "active",
+  "closed",
+]);
+
 export const jobCatalogSchema = z
   .object({
     id: z.string().min(1).max(128),
     slug: z.string().min(1).max(220),
     companyId: z.string().min(1).max(128),
+    industry: z.string().min(1).max(160),
+    industryCode: z.string().max(80),
+    subIndustry: z.string().min(1).max(160),
     title: z.string().min(1).max(200),
     shortPitch: z.string().min(1).max(500),
     categoryIds: z.array(z.string().min(1).max(128)).max(20),
@@ -47,8 +58,9 @@ export const jobCatalogSchema = z
     workArrangement: z.string().min(1).max(80),
     workOnSaturday: z.boolean(),
     education: z.string().min(1).max(200),
+    age: z.string().max(80),
     numberOfHires: z.number().int().positive(),
-    status: z.enum(["open", "closed", "expired"]),
+    status: jobPostingStatusSchema,
     isUrgent: z.boolean(),
     isVerified: z.boolean(),
     postedAt: z.string().datetime(),
@@ -57,6 +69,7 @@ export const jobCatalogSchema = z
     description: z
       .object({
         overview: z.string().min(1).max(20_000),
+        topReasonsToJoin: z.array(z.string().min(1).max(2_000)).max(100),
         responsibilities: z.array(z.string().min(1).max(2_000)).max(100),
         requirements: z.array(z.string().min(1).max(2_000)).max(100),
         benefits: z
@@ -99,6 +112,14 @@ export const companyCatalogSchema = z
     address: z.string().min(1).max(300),
     website: z.string().url().nullable(),
     description: z.string().max(3_000).nullable(),
+    rating: z
+      .object({
+        score: z.number().nonnegative(),
+        reviewCount: z.number().int().nonnegative(),
+      })
+      .optional(),
+    jobCount: z.number().int().nonnegative().optional(),
+    ownerUserId: z.string().min(1).max(128).nullable().optional(),
   })
   .strict();
 
@@ -130,6 +151,7 @@ export const userJobStateViewSchema = z
   .strict();
 export type JobCatalogItem = z.infer<typeof jobCatalogSchema>;
 export type CompanyCatalogItem = z.infer<typeof companyCatalogSchema>;
+export type JobPostingStatus = z.infer<typeof jobPostingStatusSchema>;
 export type UserJobState = z.infer<typeof userJobStateSchema>;
 export type { JobPreferences };
 export { jobPreferencesSchema, jobPreferencesUpdateSchema };

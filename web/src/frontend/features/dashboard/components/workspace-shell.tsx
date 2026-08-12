@@ -30,6 +30,11 @@ import { WorkspaceNavigation } from "./workspace-navigation";
 
 import { RecruiterHeaderAction } from "@/frontend/features/recruiter-header/components/recruiter-header-action";
 import type { RecruiterHeaderStatus } from "@/shared/contracts/recruiter-header-status";
+import type { RecruiterJobManagementData } from "@/shared/contracts/recruiter-job-posting";
+import {
+  RecruiterJobPostingManagement,
+  RecruiterWorkspaceNavigation,
+} from "@/frontend/features/recruiter-workspace/job-posting-management";
 const SIDEBAR_MINIMUM_WIDTH = 220;
 const SIDEBAR_WIDTH_STEP = 16;
 const SIDEBAR_MAXIMUM_FALLBACK_WIDTH = 360;
@@ -45,6 +50,8 @@ export function WorkspaceShell({
   profile = { name: "SmartHire member", email: "" },
   initialLocale = "en",
   contentMode = "default",
+  initialWorkspaceMode = "candidate",
+  initialRecruiterJobData,
 }: {
   children: React.ReactNode;
   initialRecruiterStatus?: RecruiterHeaderStatus | null;
@@ -56,6 +63,8 @@ export function WorkspaceShell({
   };
   initialLocale?: WorkspaceLocale;
   contentMode?: "default" | "job-board";
+  initialWorkspaceMode?: "candidate" | "recruiter";
+  initialRecruiterJobData?: RecruiterJobManagementData | null;
 }) {
   return (
     <WorkspaceLocaleProvider initialLocale={initialLocale}>
@@ -64,6 +73,8 @@ export function WorkspaceShell({
         initialRecruiterStatus={initialRecruiterStatus}
         profile={profile}
         contentMode={contentMode}
+        initialWorkspaceMode={initialWorkspaceMode}
+        initialRecruiterJobData={initialRecruiterJobData}
       >
         {children}
       </WorkspaceShellContent>
@@ -77,6 +88,8 @@ function WorkspaceShellContent({
   csrfProof,
   profile,
   contentMode,
+  initialWorkspaceMode,
+  initialRecruiterJobData,
 }: {
   children: React.ReactNode;
   initialRecruiterStatus?: RecruiterHeaderStatus | null;
@@ -87,6 +100,8 @@ function WorkspaceShellContent({
     image?: string | null;
   };
   contentMode: "default" | "job-board";
+  initialWorkspaceMode: "candidate" | "recruiter";
+  initialRecruiterJobData?: RecruiterJobManagementData | null;
 }) {
   const router = useRouter();
   const locale = useWorkspaceLocale();
@@ -94,6 +109,7 @@ function WorkspaceShellContent({
   const [navigating, startNavigation] = useTransition();
   const [status, setStatus] = useState("");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [workspaceMode, setWorkspaceMode] = useState(initialWorkspaceMode);
   const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_MINIMUM_WIDTH);
   const [sidebarMaximumWidth, setSidebarMaximumWidth] = useState(
     SIDEBAR_MAXIMUM_FALLBACK_WIDTH,
@@ -315,17 +331,34 @@ function WorkspaceShellContent({
             onPointerCancel={finishSidebarResize}
             onKeyDown={resizeSidebarWithKeyboard}
           />
-          <WorkspaceNavigation
-            busy={busy || navigating}
-            collapsed={sidebarCollapsed}
-            onSignOut={() => void signOut()}
-          />
+          {workspaceMode === "recruiter" ? (
+            <RecruiterWorkspaceNavigation
+              busy={busy || navigating}
+              collapsed={sidebarCollapsed}
+              onExit={() => setWorkspaceMode("candidate")}
+              onSignOut={() => void signOut()}
+            />
+          ) : (
+            <WorkspaceNavigation
+              busy={busy || navigating}
+              collapsed={sidebarCollapsed}
+              onSignOut={() => void signOut()}
+            />
+          )}
         </aside>
         <div className="workspace-main" data-content-mode={contentMode}>
           <header className="workspace-header">
             <div>
-              <p className="workspace-topbar-kicker">{copy.workspace}</p>
-              <p className="workspace-topbar-title">{copy.greeting}</p>
+              <p className="workspace-topbar-kicker">
+                {workspaceMode === "recruiter"
+                  ? "Recruiter workspace"
+                  : copy.workspace}
+              </p>
+              <p className="workspace-topbar-title">
+                {workspaceMode === "recruiter"
+                  ? "Manage your hiring pipeline"
+                  : copy.greeting}
+              </p>
             </div>
             {contentMode === "job-board" ? (
               <GlobalImageSearch csrfProof={csrfProof} />
@@ -363,7 +396,28 @@ function WorkspaceShellContent({
                   <small>{workspaceProfile.email || copy.manageProfile}</small>
                 </span>
               </Link>
-              <RecruiterHeaderAction initialStatus={initialRecruiterStatus} />
+              {workspaceMode === "recruiter" ? (
+                <button
+                  className="recruiter-header-action recruiter-header-action--secondary"
+                  type="button"
+                  onClick={() => setWorkspaceMode("candidate")}
+                >
+                  <span
+                    className="recruiter-header-action__icon"
+                    aria-hidden="true"
+                  >
+                    &lt;
+                  </span>
+                  <span className="recruiter-header-action__label">
+                    Candidate workspace
+                  </span>
+                </button>
+              ) : (
+                <RecruiterHeaderAction
+                  initialStatus={initialRecruiterStatus}
+                  onOpenWorkspace={() => setWorkspaceMode("recruiter")}
+                />
+              )}
             </div>
           </header>
           <div className="workspace-status">
@@ -372,8 +426,17 @@ function WorkspaceShellContent({
           <section
             className="workspace-content"
             data-content-mode={contentMode}
+            data-workspace-mode={workspaceMode}
           >
-            <CsrfProofProvider value={csrfProof}>{children}</CsrfProofProvider>
+            <CsrfProofProvider value={csrfProof}>
+              {workspaceMode === "recruiter" ? (
+                <RecruiterJobPostingManagement
+                  initialData={initialRecruiterJobData}
+                />
+              ) : (
+                children
+              )}
+            </CsrfProofProvider>
           </section>
         </div>
       </div>
