@@ -12,6 +12,7 @@ import {
   type ApplicationSubmission,
 } from "@/shared/contracts/jobs/actions";
 import { JobServiceError, type CandidateActor } from "./job-types";
+import { recordApplication } from "./recruiter-job-posting-data";
 import type {
   DirectApplicationCvSource,
   PreparedDirectApplicationCv,
@@ -164,6 +165,9 @@ export class JobApplicationService {
         correlationId: randomUUID(),
       });
       if (!result.created) await directCv?.cleanup();
+      if (result.created) {
+        await recordApplication(actor.userId, jobId).catch(() => undefined);
+      }
       return { ...result.application, created: result.created };
     } catch (error) {
       if (directCv) await directCv.cleanup().catch(() => undefined);

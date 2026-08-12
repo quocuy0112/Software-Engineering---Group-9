@@ -21,6 +21,23 @@ export const rateLimitPolicies = {
     windowSeconds: 10 * 60,
   },
   jobReport: { scope: "job-report", limit: 10, windowSeconds: 60 * 60 },
+  messagingDiscovery: {
+    scope: "messaging-discovery",
+    limit: 60,
+    windowSeconds: 60,
+  },
+  messagingConversationCreate: {
+    scope: "messaging-conversation-create",
+    limit: 20,
+    windowSeconds: 60,
+  },
+  messagingSend: { scope: "messaging-send", limit: 60, windowSeconds: 60 },
+  messagingBlock: { scope: "messaging-block", limit: 20, windowSeconds: 60 },
+  messagingReport: {
+    scope: "messaging-report",
+    limit: 10,
+    windowSeconds: 24 * 60 * 60,
+  },
 } as const;
 
 export function safeRetryMetadata(decision: RateLimitDecision) {

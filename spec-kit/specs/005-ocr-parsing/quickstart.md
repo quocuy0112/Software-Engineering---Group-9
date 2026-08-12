@@ -577,7 +577,10 @@ Safe troubleshooting uses only stage, lease age, version, safe failure code,
 resource count, due count, and aggregate timing:
 
 - scanner failure: inspect socket health and signature freshness; never disable
-  `FailIfCvdOlderThan 1`, enable TCP, or skip the scan;
+  freshness enforcement, enable TCP, or skip the scan. Production requires
+  `FailIfCvdOlderThan 1`; local development may temporarily use
+  `FailIfCvdOlderThan 2` only while the official mirror's latest database is
+  older than 24 hours, and must restore `1` after a fresh database is published;
 - OCR failure: inspect readiness/model manifest/socket permissions/resource
   ceilings using a synthetic fixture; never dump normalized pixels or text;
 - CV conflict/low confidence: reproduce with corpus fixture and policy versions,

@@ -1,19 +1,11 @@
 <!--
 Sync Impact Report
-- Version change: 2.0.0 -> 2.1.0
+- Version change: 2.1.0 -> 2.2.0
 - Modified principles:
-  - Principle II - Security, Privacy, and Tenant Isolation: permits bounded OCR
-    inside accepted PDF/DOCX CVs and ephemeral PNG/JPEG job-search inputs while
-    preserving the PDF/DOCX-only CV upload boundary and purpose-limited deletion.
-  - Principle III - Deterministic Core and Explainable AI: permits AI to derive
-    typed job-search intent while keeping deterministic retrieval and ranking
-    authoritative, reversible, and available as a fallback.
-  - Principle VI - Measurable Quality and Accessible Experience: adds a separate
-    asynchronous P95 target for image-assisted search interpretation without
-    weakening the existing deterministic job-search target.
-  - Mandatory Product Boundaries - Explicit exclusions and restrictions: adds
-    the narrow approved exception for OCR/AI-generated job-search keywords and
-    filters; direct LLM job selection and ranking remain excluded.
+  - Principle VII - Maintainable and Provider-Independent Architecture: adds a
+    narrow exception that permits an approved long-lived realtime gateway to
+    attach to the same HTTP server as Next.js through a custom Node entrypoint.
+    Ordinary HTTP backend endpoints remain subject to Next.js routing.
 - Added sections: none
 - Removed sections: none
 - Templates:
@@ -26,10 +18,7 @@ Sync Impact Report
   - ✅ spec-kit/.specify/templates/commands/ reviewed; directory is not present.
 - Runtime guidance:
   - ✅ README.md and AGENTS.md reviewed; no principle reference requires change.
-- Follow-up TODOs:
-  - Feature 005 must specify the purpose-specific CV OCR and image-assisted job
-    search policies before implementation; completed Features 003 and 004 remain
-    the deterministic search and PDF/DOCX CV-import baselines.
+- Follow-up TODOs: none.
 -->
 
 # SmartHire Constitution
@@ -271,6 +260,20 @@ business rules, persistence, and external services.
 - The approved mechanism MAY use App Router Route Handlers under
   `app/api/**/route.ts` or Pages Router API Routes when explicitly documented.
 - The same endpoint MUST NOT be implemented using both routing mechanisms.
+- A separately approved realtime transport MAY be the sole exception to the
+  Next.js routing requirement when a long-lived WebSocket or equivalent
+  connection cannot be hosted correctly by the selected Route Handler,
+  serverless, or edge runtime. The exception MUST use a documented long-lived
+  Node custom-server entrypoint, MUST attach the realtime gateway to the same
+  HTTP server and application process as Next.js unless a later architecture
+  amendment explicitly authorizes another topology, and MUST NOT move ordinary
+  REST/backend HTTP endpoints out of Next.js routing.
+- A realtime custom server MUST remain transport composition only. It MUST
+  delegate ordinary HTTP requests to Next.js, authenticate through the one
+  approved browser-session mechanism, and call the same typed authorization,
+  service, persistence, audit, and privacy boundaries as Route Handlers. It MUST
+  NOT become a second backend service, database authority, or business-logic
+  layer.
 - Backend code MUST preserve layered separation between transport handlers,
   services, and repositories or data-access code.
 
@@ -422,4 +425,4 @@ they do not conflict with this constitution.
 - Compliance MUST be checked when generating or updating a specification, plan,
   or task list.
 
-**Version**: 2.1.0 | **Ratified**: 2026-07-11 | **Last Amended**: 2026-08-06
+**Version**: 2.2.0 | **Ratified**: 2026-07-11 | **Last Amended**: 2026-08-11

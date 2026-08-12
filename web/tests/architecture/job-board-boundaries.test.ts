@@ -71,11 +71,14 @@ describe("Feature 003 architecture boundaries", () => {
     expect(schema.match(/ops: raw\("gin_trgm_ops"\)/gu)).toHaveLength(3);
   });
 
-  it("does not silently promote temporary Feature 004 imports into application attachments", () => {
+  it("keeps application attachments behind the durable CandidateCv projection", () => {
     const cvImportSources = files(/\/(?:services|repositories)\/cv-import\//u)
       .map(read)
       .join("\n");
-    expect(cvImportSources).not.toMatch(/CandidateCv|candidateCv/u);
+    // Confirmed imports may trigger the explicit Profile read projection, but
+    // CV-import code must not write the CandidateCv table directly.
+    expect(cvImportSources).toContain("ensureCandidateCvLibrary");
+    expect(cvImportSources).not.toMatch(/(?:transaction|prisma)\.candidateCv\./u);
 
     const applicationSources = files(
       /\/(?:services|repositories)\/jobs\/(?:application-policy|prisma-job-application-repository)\.ts$/u,
@@ -85,6 +88,7 @@ describe("Feature 003 architecture boundaries", () => {
     expect(applicationSources).not.toMatch(
       /CvUpload|CvStoredArtifact|cvUpload|cvStoredArtifact/u,
     );
+    expect(applicationSources).toContain("ensureCandidateCvLibrary");
   });
 
   it("keeps application and report enforcement human-controlled", () => {
