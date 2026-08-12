@@ -28,11 +28,6 @@ export function ResetPasswordForm() {
 
   useEffect(() => {
     window.history.replaceState(null, "", window.location.pathname);
-    return () => {
-      setToken("");
-      setPassword("");
-      setConfirmation("");
-    };
   }, []);
 
   useEffect(() => {
