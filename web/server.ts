@@ -1,4 +1,6 @@
 import { createServer } from "node:http";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { loadEnvConfig } from "@next/env";
 import next from "next";
 
@@ -50,42 +52,68 @@ function routeProductShell(request: Parameters<typeof handle>[0]) {
   request.url = `${shell.route}${pathname === "/" ? "" : pathname}${requestUrl.search}`;
 }
 
-async function start() {
-  const { attachSocketIoChatGateway } = await import(
-    "./src/backend/messaging/realtime/socket-io-chat-gateway"
+export async function start() {
+  const { acquireNextOutputLock } = await import(
+    "./scripts/next-output-lock.mjs"
   );
-  await app.prepare();
-  const server = createServer((request, response) => {
-    routeProductShell(request);
-    return handle(request, response);
-  });
-  const chat = attachSocketIoChatGateway(server);
-  server.on("error", (error) => {
-    console.error("SmartHire HTTP server failed", error);
-    process.exitCode = 1;
-  });
-  server.listen(port, hostname, () => {
-    console.info(`SmartHire ready at http://${hostname}:${port}`);
-  });
+  const releaseNextOutputLock = await acquireNextOutputLock(
+    development ? "next-development-server" : "next-production-server",
+  );
 
-  let closing = false;
-  const close = () => {
-    if (closing) return;
-    closing = true;
-    // Socket.IO owns the attached HTTP server lifecycle and closes it here.
-    // Calling server.close() again can double-close native handles on Windows.
-    chat.close(() => {
-      void app.close().catch((error) => {
-        console.error("SmartHire application shutdown failed", error);
-        process.exitCode = 1;
-      });
+  try {
+    const { attachSocketIoChatGateway } = await import(
+      "./src/backend/messaging/realtime/socket-io-chat-gateway"
+    );
+    await app.prepare();
+    const server = createServer((request, response) => {
+      routeProductShell(request);
+      return handle(request, response);
     });
-  };
-  process.once("SIGINT", close);
-  process.once("SIGTERM", close);
+    const chat = attachSocketIoChatGateway(server);
+    server.on("error", (error) => {
+      console.error("SmartHire HTTP server failed", error);
+      process.exitCode = 1;
+    });
+    server.listen(port, hostname, () => {
+      console.info(`SmartHire ready at http://${hostname}:${port}`);
+    });
+
+    let closing: Promise<void> | null = null;
+    const close = () => {
+      if (closing) return closing;
+      closing = new Promise<void>((resolveClose, rejectClose) =>
+        chat.close((error) => {
+          if (error) rejectClose(error);
+          else resolveClose();
+        }),
+      )
+        .then(() => app.close())
+        .catch((error) => {
+          console.error("SmartHire application shutdown failed", error);
+          process.exitCode = 1;
+        })
+        .finally(releaseNextOutputLock);
+      return closing;
+    };
+    const requestClose = () => {
+      void close().finally(() => process.exit(process.exitCode ?? 0));
+    };
+    process.once("SIGINT", requestClose);
+    process.once("SIGTERM", requestClose);
+    return { close };
+  } catch (error) {
+    await releaseNextOutputLock();
+    throw error;
+  }
 }
 
-void start().catch((error) => {
-  console.error("SmartHire startup failed", error);
-  process.exit(1);
-});
+const entrypoint = process.argv[1]
+  ? pathToFileURL(resolve(process.argv[1])).href
+  : null;
+
+if (entrypoint === import.meta.url) {
+  void start().catch((error) => {
+    console.error("SmartHire startup failed", error);
+    process.exit(1);
+  });
+}
