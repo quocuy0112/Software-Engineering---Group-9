@@ -20,7 +20,13 @@ export class ListConversationsService {
           type: conversation.context.type,
           reference: conversation.context.reference,
         });
-        if (context) authorized.push(conversation);
+        if (
+          context ||
+          (conversation.context.type === "PROFESSIONAL_CONNECTION" &&
+            conversation.accessMode === "READ_ONLY")
+        ) {
+          authorized.push(conversation);
+        }
       }
       return { items: authorized, nextCursor: page.nextCursor };
     } catch (error) {

@@ -447,6 +447,11 @@ export const ModelName = {
   JobReport: 'JobReport',
   JobApplication: 'JobApplication',
   ProfessionalConnection: 'ProfessionalConnection',
+  ProfessionalConnectionProposal: 'ProfessionalConnectionProposal',
+  ProfessionalConnectionDecision: 'ProfessionalConnectionDecision',
+  ProfessionalConnectionProposalHistory: 'ProfessionalConnectionProposalHistory',
+  ProfessionalConnectionNotification: 'ProfessionalConnectionNotification',
+  ProfessionalConnectionCommandReceipt: 'ProfessionalConnectionCommandReceipt',
   SupportConversation: 'SupportConversation',
   SupportMessage: 'SupportMessage',
   SupportAssignment: 'SupportAssignment',
@@ -495,7 +500,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "auditEvent" | "company" | "companyMembership" | "platformAdministratorGrant" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "professionalConnection" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence"
+    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "auditEvent" | "company" | "companyMembership" | "platformAdministratorGrant" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4199,6 +4204,376 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ProfessionalConnectionProposal: {
+      payload: Prisma.$ProfessionalConnectionProposalPayload<ExtArgs>
+      fields: Prisma.ProfessionalConnectionProposalFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProfessionalConnectionProposalFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProfessionalConnectionProposalFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalPayload>
+        }
+        findFirst: {
+          args: Prisma.ProfessionalConnectionProposalFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProfessionalConnectionProposalFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalPayload>
+        }
+        findMany: {
+          args: Prisma.ProfessionalConnectionProposalFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalPayload>[]
+        }
+        create: {
+          args: Prisma.ProfessionalConnectionProposalCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalPayload>
+        }
+        createMany: {
+          args: Prisma.ProfessionalConnectionProposalCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProfessionalConnectionProposalCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalPayload>[]
+        }
+        delete: {
+          args: Prisma.ProfessionalConnectionProposalDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalPayload>
+        }
+        update: {
+          args: Prisma.ProfessionalConnectionProposalUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProfessionalConnectionProposalDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProfessionalConnectionProposalUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProfessionalConnectionProposalUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProfessionalConnectionProposalUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalPayload>
+        }
+        aggregate: {
+          args: Prisma.ProfessionalConnectionProposalAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProfessionalConnectionProposal>
+        }
+        groupBy: {
+          args: Prisma.ProfessionalConnectionProposalGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfessionalConnectionProposalGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProfessionalConnectionProposalCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfessionalConnectionProposalCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProfessionalConnectionDecision: {
+      payload: Prisma.$ProfessionalConnectionDecisionPayload<ExtArgs>
+      fields: Prisma.ProfessionalConnectionDecisionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProfessionalConnectionDecisionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionDecisionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProfessionalConnectionDecisionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionDecisionPayload>
+        }
+        findFirst: {
+          args: Prisma.ProfessionalConnectionDecisionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionDecisionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProfessionalConnectionDecisionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionDecisionPayload>
+        }
+        findMany: {
+          args: Prisma.ProfessionalConnectionDecisionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionDecisionPayload>[]
+        }
+        create: {
+          args: Prisma.ProfessionalConnectionDecisionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionDecisionPayload>
+        }
+        createMany: {
+          args: Prisma.ProfessionalConnectionDecisionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProfessionalConnectionDecisionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionDecisionPayload>[]
+        }
+        delete: {
+          args: Prisma.ProfessionalConnectionDecisionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionDecisionPayload>
+        }
+        update: {
+          args: Prisma.ProfessionalConnectionDecisionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionDecisionPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProfessionalConnectionDecisionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProfessionalConnectionDecisionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProfessionalConnectionDecisionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionDecisionPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProfessionalConnectionDecisionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionDecisionPayload>
+        }
+        aggregate: {
+          args: Prisma.ProfessionalConnectionDecisionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProfessionalConnectionDecision>
+        }
+        groupBy: {
+          args: Prisma.ProfessionalConnectionDecisionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfessionalConnectionDecisionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProfessionalConnectionDecisionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfessionalConnectionDecisionCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProfessionalConnectionProposalHistory: {
+      payload: Prisma.$ProfessionalConnectionProposalHistoryPayload<ExtArgs>
+      fields: Prisma.ProfessionalConnectionProposalHistoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProfessionalConnectionProposalHistoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalHistoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProfessionalConnectionProposalHistoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalHistoryPayload>
+        }
+        findFirst: {
+          args: Prisma.ProfessionalConnectionProposalHistoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalHistoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProfessionalConnectionProposalHistoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalHistoryPayload>
+        }
+        findMany: {
+          args: Prisma.ProfessionalConnectionProposalHistoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalHistoryPayload>[]
+        }
+        create: {
+          args: Prisma.ProfessionalConnectionProposalHistoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalHistoryPayload>
+        }
+        createMany: {
+          args: Prisma.ProfessionalConnectionProposalHistoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProfessionalConnectionProposalHistoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalHistoryPayload>[]
+        }
+        delete: {
+          args: Prisma.ProfessionalConnectionProposalHistoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalHistoryPayload>
+        }
+        update: {
+          args: Prisma.ProfessionalConnectionProposalHistoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalHistoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProfessionalConnectionProposalHistoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProfessionalConnectionProposalHistoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProfessionalConnectionProposalHistoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalHistoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProfessionalConnectionProposalHistoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionProposalHistoryPayload>
+        }
+        aggregate: {
+          args: Prisma.ProfessionalConnectionProposalHistoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProfessionalConnectionProposalHistory>
+        }
+        groupBy: {
+          args: Prisma.ProfessionalConnectionProposalHistoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfessionalConnectionProposalHistoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProfessionalConnectionProposalHistoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfessionalConnectionProposalHistoryCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProfessionalConnectionNotification: {
+      payload: Prisma.$ProfessionalConnectionNotificationPayload<ExtArgs>
+      fields: Prisma.ProfessionalConnectionNotificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProfessionalConnectionNotificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionNotificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProfessionalConnectionNotificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionNotificationPayload>
+        }
+        findFirst: {
+          args: Prisma.ProfessionalConnectionNotificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionNotificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProfessionalConnectionNotificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionNotificationPayload>
+        }
+        findMany: {
+          args: Prisma.ProfessionalConnectionNotificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionNotificationPayload>[]
+        }
+        create: {
+          args: Prisma.ProfessionalConnectionNotificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionNotificationPayload>
+        }
+        createMany: {
+          args: Prisma.ProfessionalConnectionNotificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProfessionalConnectionNotificationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionNotificationPayload>[]
+        }
+        delete: {
+          args: Prisma.ProfessionalConnectionNotificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionNotificationPayload>
+        }
+        update: {
+          args: Prisma.ProfessionalConnectionNotificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionNotificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProfessionalConnectionNotificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProfessionalConnectionNotificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProfessionalConnectionNotificationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionNotificationPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProfessionalConnectionNotificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionNotificationPayload>
+        }
+        aggregate: {
+          args: Prisma.ProfessionalConnectionNotificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProfessionalConnectionNotification>
+        }
+        groupBy: {
+          args: Prisma.ProfessionalConnectionNotificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfessionalConnectionNotificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProfessionalConnectionNotificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfessionalConnectionNotificationCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProfessionalConnectionCommandReceipt: {
+      payload: Prisma.$ProfessionalConnectionCommandReceiptPayload<ExtArgs>
+      fields: Prisma.ProfessionalConnectionCommandReceiptFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProfessionalConnectionCommandReceiptFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionCommandReceiptPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProfessionalConnectionCommandReceiptFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionCommandReceiptPayload>
+        }
+        findFirst: {
+          args: Prisma.ProfessionalConnectionCommandReceiptFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionCommandReceiptPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProfessionalConnectionCommandReceiptFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionCommandReceiptPayload>
+        }
+        findMany: {
+          args: Prisma.ProfessionalConnectionCommandReceiptFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionCommandReceiptPayload>[]
+        }
+        create: {
+          args: Prisma.ProfessionalConnectionCommandReceiptCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionCommandReceiptPayload>
+        }
+        createMany: {
+          args: Prisma.ProfessionalConnectionCommandReceiptCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProfessionalConnectionCommandReceiptCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionCommandReceiptPayload>[]
+        }
+        delete: {
+          args: Prisma.ProfessionalConnectionCommandReceiptDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionCommandReceiptPayload>
+        }
+        update: {
+          args: Prisma.ProfessionalConnectionCommandReceiptUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionCommandReceiptPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProfessionalConnectionCommandReceiptDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProfessionalConnectionCommandReceiptUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProfessionalConnectionCommandReceiptUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionCommandReceiptPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProfessionalConnectionCommandReceiptUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProfessionalConnectionCommandReceiptPayload>
+        }
+        aggregate: {
+          args: Prisma.ProfessionalConnectionCommandReceiptAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProfessionalConnectionCommandReceipt>
+        }
+        groupBy: {
+          args: Prisma.ProfessionalConnectionCommandReceiptGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfessionalConnectionCommandReceiptGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProfessionalConnectionCommandReceiptCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProfessionalConnectionCommandReceiptCountAggregateOutputType> | number
+        }
+      }
+    }
     SupportConversation: {
       payload: Prisma.$SupportConversationPayload<ExtArgs>
       fields: Prisma.SupportConversationFieldRefs
@@ -7070,6 +7445,8 @@ export const EmailOutboxScalarFieldEnum = {
   securityTokenId: 'securityTokenId',
   verificationRequestId: 'verificationRequestId',
   supportConversationId: 'supportConversationId',
+  professionalConnectionProposalId: 'professionalConnectionProposalId',
+  professionalConnectionId: 'professionalConnectionId',
   recipientRef: 'recipientRef',
   recipientCiphertext: 'recipientCiphertext',
   recipientPurpose: 'recipientPurpose',
@@ -7590,13 +7967,97 @@ export const ProfessionalConnectionScalarFieldEnum = {
   id: 'id',
   participantLowId: 'participantLowId',
   participantHighId: 'participantHighId',
+  sourceProposalId: 'sourceProposalId',
   state: 'state',
+  version: 'version',
   acceptedAt: 'acceptedAt',
+  revokedAt: 'revokedAt',
+  revokedByUserId: 'revokedByUserId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type ProfessionalConnectionScalarFieldEnum = (typeof ProfessionalConnectionScalarFieldEnum)[keyof typeof ProfessionalConnectionScalarFieldEnum]
+
+
+export const ProfessionalConnectionProposalScalarFieldEnum = {
+  id: 'id',
+  participantLowId: 'participantLowId',
+  participantHighId: 'participantHighId',
+  participantPairDigest: 'participantPairDigest',
+  createdByAdminUserId: 'createdByAdminUserId',
+  sourceSupportConversationId: 'sourceSupportConversationId',
+  reason: 'reason',
+  state: 'state',
+  expiresAt: 'expiresAt',
+  version: 'version',
+  terminalAt: 'terminalAt',
+  ordinaryDetailHiddenAt: 'ordinaryDetailHiddenAt',
+  protectedDeleteAfter: 'protectedDeleteAfter',
+  protectedDeletedAt: 'protectedDeletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProfessionalConnectionProposalScalarFieldEnum = (typeof ProfessionalConnectionProposalScalarFieldEnum)[keyof typeof ProfessionalConnectionProposalScalarFieldEnum]
+
+
+export const ProfessionalConnectionDecisionScalarFieldEnum = {
+  proposalId: 'proposalId',
+  participantUserId: 'participantUserId',
+  decision: 'decision',
+  version: 'version',
+  decidedAt: 'decidedAt'
+} as const
+
+export type ProfessionalConnectionDecisionScalarFieldEnum = (typeof ProfessionalConnectionDecisionScalarFieldEnum)[keyof typeof ProfessionalConnectionDecisionScalarFieldEnum]
+
+
+export const ProfessionalConnectionProposalHistoryScalarFieldEnum = {
+  id: 'id',
+  proposalId: 'proposalId',
+  actorUserId: 'actorUserId',
+  action: 'action',
+  priorState: 'priorState',
+  resultingState: 'resultingState',
+  resultingVersion: 'resultingVersion',
+  decisionKind: 'decisionKind',
+  correlationId: 'correlationId',
+  occurredAt: 'occurredAt'
+} as const
+
+export type ProfessionalConnectionProposalHistoryScalarFieldEnum = (typeof ProfessionalConnectionProposalHistoryScalarFieldEnum)[keyof typeof ProfessionalConnectionProposalHistoryScalarFieldEnum]
+
+
+export const ProfessionalConnectionNotificationScalarFieldEnum = {
+  id: 'id',
+  recipientUserId: 'recipientUserId',
+  proposalId: 'proposalId',
+  connectionId: 'connectionId',
+  kind: 'kind',
+  deduplicationKey: 'deduplicationKey',
+  readAt: 'readAt',
+  deleteAfter: 'deleteAfter',
+  createdAt: 'createdAt'
+} as const
+
+export type ProfessionalConnectionNotificationScalarFieldEnum = (typeof ProfessionalConnectionNotificationScalarFieldEnum)[keyof typeof ProfessionalConnectionNotificationScalarFieldEnum]
+
+
+export const ProfessionalConnectionCommandReceiptScalarFieldEnum = {
+  id: 'id',
+  actorUserId: 'actorUserId',
+  idempotencyKey: 'idempotencyKey',
+  commandKind: 'commandKind',
+  targetReference: 'targetReference',
+  payloadDigest: 'payloadDigest',
+  resultReference: 'resultReference',
+  resultState: 'resultState',
+  resultVersion: 'resultVersion',
+  createdAt: 'createdAt'
+} as const
+
+export type ProfessionalConnectionCommandReceiptScalarFieldEnum = (typeof ProfessionalConnectionCommandReceiptScalarFieldEnum)[keyof typeof ProfessionalConnectionCommandReceiptScalarFieldEnum]
 
 
 export const SupportConversationScalarFieldEnum = {
@@ -7684,6 +8145,8 @@ export const MessagingConversationScalarFieldEnum = {
   applicationId: 'applicationId',
   companyId: 'companyId',
   professionalConnectionId: 'professionalConnectionId',
+  archivedAt: 'archivedAt',
+  archiveReason: 'archiveReason',
   nextMessageSequence: 'nextMessageSequence',
   lastMessageSequence: 'lastMessageSequence',
   lastMessageAt: 'lastMessageAt',
@@ -9018,6 +9481,48 @@ export type ListEnumProfessionalConnectionStatusFieldRefInput<$PrismaModel> = Fi
 
 
 /**
+ * Reference to a field of type 'ProfessionalConnectionProposalState'
+ */
+export type EnumProfessionalConnectionProposalStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProfessionalConnectionProposalState'>
+    
+
+
+/**
+ * Reference to a field of type 'ProfessionalConnectionProposalState[]'
+ */
+export type ListEnumProfessionalConnectionProposalStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProfessionalConnectionProposalState[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ProfessionalConnectionDecisionKind'
+ */
+export type EnumProfessionalConnectionDecisionKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProfessionalConnectionDecisionKind'>
+    
+
+
+/**
+ * Reference to a field of type 'ProfessionalConnectionDecisionKind[]'
+ */
+export type ListEnumProfessionalConnectionDecisionKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProfessionalConnectionDecisionKind[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ProfessionalConnectionNotificationKind'
+ */
+export type EnumProfessionalConnectionNotificationKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProfessionalConnectionNotificationKind'>
+    
+
+
+/**
+ * Reference to a field of type 'ProfessionalConnectionNotificationKind[]'
+ */
+export type ListEnumProfessionalConnectionNotificationKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProfessionalConnectionNotificationKind[]'>
+    
+
+
+/**
  * Reference to a field of type 'SupportConversationCategory'
  */
 export type EnumSupportConversationCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportConversationCategory'>
@@ -9084,6 +9589,20 @@ export type EnumMessagingConversationContextTypeFieldRefInput<$PrismaModel> = Fi
  * Reference to a field of type 'MessagingConversationContextType[]'
  */
 export type ListEnumMessagingConversationContextTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessagingConversationContextType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'MessagingConversationArchiveReason'
+ */
+export type EnumMessagingConversationArchiveReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessagingConversationArchiveReason'>
+    
+
+
+/**
+ * Reference to a field of type 'MessagingConversationArchiveReason[]'
+ */
+export type ListEnumMessagingConversationArchiveReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessagingConversationArchiveReason[]'>
     
 
 
@@ -9777,6 +10296,11 @@ export type GlobalOmitConfig = {
   jobReport?: Prisma.JobReportOmit
   jobApplication?: Prisma.JobApplicationOmit
   professionalConnection?: Prisma.ProfessionalConnectionOmit
+  professionalConnectionProposal?: Prisma.ProfessionalConnectionProposalOmit
+  professionalConnectionDecision?: Prisma.ProfessionalConnectionDecisionOmit
+  professionalConnectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryOmit
+  professionalConnectionNotification?: Prisma.ProfessionalConnectionNotificationOmit
+  professionalConnectionCommandReceipt?: Prisma.ProfessionalConnectionCommandReceiptOmit
   supportConversation?: Prisma.SupportConversationOmit
   supportMessage?: Prisma.SupportMessageOmit
   supportAssignment?: Prisma.SupportAssignmentOmit

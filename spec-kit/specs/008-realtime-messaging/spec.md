@@ -484,11 +484,10 @@ Candidate, Recruiter, and unrestricted Administrator views.
 
 ## Assumptions
 
-- Feature 008 is planned after a minimal Feature 007 dependency slice that owns
-  the canonical `ProfessionalConnection` pair and `ACCEPTED` state. Feature 008
-  consumes it only through the stable `canMessage(userA, userB)` service boundary
-  together with the existing Application eligibility path; future Feature 007
-  expansion changes the provider implementation, not the messaging contract.
+- Feature 011 owns bilateral proposals and the canonical
+  `ProfessionalConnection` lifecycle. Feature 008 consumes current `ACCEPTED`
+  authority and participant-only `REVOKED` archived-history access through stable
+  server-only boundaries together with the existing Application eligibility path.
 - Existing SmartHire authentication remains the exclusive browser-session
   owner. Realtime transport receives the same first-party cookie and does not
   create, return, or persist a JWT or other browser credential.

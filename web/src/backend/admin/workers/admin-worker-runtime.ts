@@ -7,7 +7,8 @@ export type AdminWorkerLoop = {
     | "verification-deadline"
     | "notification"
     | "retention"
-    | "support";
+    | "support"
+    | "connections";
   intervalMs: number;
   run(now: Date): Promise<unknown>;
 };

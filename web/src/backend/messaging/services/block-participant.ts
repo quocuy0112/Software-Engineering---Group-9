@@ -4,6 +4,7 @@ import { PrismaUserMessagingBlockRepository } from "@/backend/repositories/messa
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
 import { unavailableConversation } from "@/backend/messaging/messaging-errors";
 import { revokeMessagingConversationAccess } from "@/backend/messaging/realtime/messaging-realtime-hub";
+import { ProposalAuthorityInvalidationService } from "@/backend/connections/services/proposal-authority-invalidation-service";
 
 export class BlockParticipantService {
   constructor(
@@ -11,12 +12,22 @@ export class BlockParticipantService {
     private readonly audit = new PrismaAuditRepository(),
   ) {}
 
-  async execute(actor: { userId: string; sessionId: string }, targetUserId: string) {
-    const conversationIds = await this.blocks.sharedConversationIds(actor.userId, targetUserId);
+  async execute(
+    actor: { userId: string; sessionId: string },
+    targetUserId: string,
+  ) {
+    const conversationIds = await this.blocks.sharedConversationIds(
+      actor.userId,
+      targetUserId,
+    );
     if (conversationIds.length === 0) throw unavailableConversation();
     const now = new Date();
     const correlationId = randomUUID();
-    await this.blocks.createOwned(actor.userId, targetUserId, now);
+    await new ProposalAuthorityInvalidationService().block(
+      actor.userId,
+      targetUserId,
+      correlationId,
+    );
     await this.audit.append({
       occurredAt: now,
       actorType: "user",

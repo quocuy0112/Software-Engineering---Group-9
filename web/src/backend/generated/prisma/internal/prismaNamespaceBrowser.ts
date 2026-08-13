@@ -101,6 +101,11 @@ export const ModelName = {
   JobReport: 'JobReport',
   JobApplication: 'JobApplication',
   ProfessionalConnection: 'ProfessionalConnection',
+  ProfessionalConnectionProposal: 'ProfessionalConnectionProposal',
+  ProfessionalConnectionDecision: 'ProfessionalConnectionDecision',
+  ProfessionalConnectionProposalHistory: 'ProfessionalConnectionProposalHistory',
+  ProfessionalConnectionNotification: 'ProfessionalConnectionNotification',
+  ProfessionalConnectionCommandReceipt: 'ProfessionalConnectionCommandReceipt',
   SupportConversation: 'SupportConversation',
   SupportMessage: 'SupportMessage',
   SupportAssignment: 'SupportAssignment',
@@ -542,6 +547,8 @@ export const EmailOutboxScalarFieldEnum = {
   securityTokenId: 'securityTokenId',
   verificationRequestId: 'verificationRequestId',
   supportConversationId: 'supportConversationId',
+  professionalConnectionProposalId: 'professionalConnectionProposalId',
+  professionalConnectionId: 'professionalConnectionId',
   recipientRef: 'recipientRef',
   recipientCiphertext: 'recipientCiphertext',
   recipientPurpose: 'recipientPurpose',
@@ -1062,13 +1069,97 @@ export const ProfessionalConnectionScalarFieldEnum = {
   id: 'id',
   participantLowId: 'participantLowId',
   participantHighId: 'participantHighId',
+  sourceProposalId: 'sourceProposalId',
   state: 'state',
+  version: 'version',
   acceptedAt: 'acceptedAt',
+  revokedAt: 'revokedAt',
+  revokedByUserId: 'revokedByUserId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type ProfessionalConnectionScalarFieldEnum = (typeof ProfessionalConnectionScalarFieldEnum)[keyof typeof ProfessionalConnectionScalarFieldEnum]
+
+
+export const ProfessionalConnectionProposalScalarFieldEnum = {
+  id: 'id',
+  participantLowId: 'participantLowId',
+  participantHighId: 'participantHighId',
+  participantPairDigest: 'participantPairDigest',
+  createdByAdminUserId: 'createdByAdminUserId',
+  sourceSupportConversationId: 'sourceSupportConversationId',
+  reason: 'reason',
+  state: 'state',
+  expiresAt: 'expiresAt',
+  version: 'version',
+  terminalAt: 'terminalAt',
+  ordinaryDetailHiddenAt: 'ordinaryDetailHiddenAt',
+  protectedDeleteAfter: 'protectedDeleteAfter',
+  protectedDeletedAt: 'protectedDeletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProfessionalConnectionProposalScalarFieldEnum = (typeof ProfessionalConnectionProposalScalarFieldEnum)[keyof typeof ProfessionalConnectionProposalScalarFieldEnum]
+
+
+export const ProfessionalConnectionDecisionScalarFieldEnum = {
+  proposalId: 'proposalId',
+  participantUserId: 'participantUserId',
+  decision: 'decision',
+  version: 'version',
+  decidedAt: 'decidedAt'
+} as const
+
+export type ProfessionalConnectionDecisionScalarFieldEnum = (typeof ProfessionalConnectionDecisionScalarFieldEnum)[keyof typeof ProfessionalConnectionDecisionScalarFieldEnum]
+
+
+export const ProfessionalConnectionProposalHistoryScalarFieldEnum = {
+  id: 'id',
+  proposalId: 'proposalId',
+  actorUserId: 'actorUserId',
+  action: 'action',
+  priorState: 'priorState',
+  resultingState: 'resultingState',
+  resultingVersion: 'resultingVersion',
+  decisionKind: 'decisionKind',
+  correlationId: 'correlationId',
+  occurredAt: 'occurredAt'
+} as const
+
+export type ProfessionalConnectionProposalHistoryScalarFieldEnum = (typeof ProfessionalConnectionProposalHistoryScalarFieldEnum)[keyof typeof ProfessionalConnectionProposalHistoryScalarFieldEnum]
+
+
+export const ProfessionalConnectionNotificationScalarFieldEnum = {
+  id: 'id',
+  recipientUserId: 'recipientUserId',
+  proposalId: 'proposalId',
+  connectionId: 'connectionId',
+  kind: 'kind',
+  deduplicationKey: 'deduplicationKey',
+  readAt: 'readAt',
+  deleteAfter: 'deleteAfter',
+  createdAt: 'createdAt'
+} as const
+
+export type ProfessionalConnectionNotificationScalarFieldEnum = (typeof ProfessionalConnectionNotificationScalarFieldEnum)[keyof typeof ProfessionalConnectionNotificationScalarFieldEnum]
+
+
+export const ProfessionalConnectionCommandReceiptScalarFieldEnum = {
+  id: 'id',
+  actorUserId: 'actorUserId',
+  idempotencyKey: 'idempotencyKey',
+  commandKind: 'commandKind',
+  targetReference: 'targetReference',
+  payloadDigest: 'payloadDigest',
+  resultReference: 'resultReference',
+  resultState: 'resultState',
+  resultVersion: 'resultVersion',
+  createdAt: 'createdAt'
+} as const
+
+export type ProfessionalConnectionCommandReceiptScalarFieldEnum = (typeof ProfessionalConnectionCommandReceiptScalarFieldEnum)[keyof typeof ProfessionalConnectionCommandReceiptScalarFieldEnum]
 
 
 export const SupportConversationScalarFieldEnum = {
@@ -1156,6 +1247,8 @@ export const MessagingConversationScalarFieldEnum = {
   applicationId: 'applicationId',
   companyId: 'companyId',
   professionalConnectionId: 'professionalConnectionId',
+  archivedAt: 'archivedAt',
+  archiveReason: 'archiveReason',
   nextMessageSequence: 'nextMessageSequence',
   lastMessageSequence: 'lastMessageSequence',
   lastMessageAt: 'lastMessageAt',

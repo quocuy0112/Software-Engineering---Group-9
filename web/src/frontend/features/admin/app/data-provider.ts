@@ -9,6 +9,8 @@ const endpoints: Record<string, string> = {
   "verification-requests": "/api/admin/verification-requests",
   "moderation-reports": "/api/admin/moderation-reports",
   "support-cases": "/api/admin/support-cases",
+  "professional-connection-proposals":
+    "/api/admin/professional-connection-proposals",
 };
 
 async function api(path: string, init: RequestInit = {}) {

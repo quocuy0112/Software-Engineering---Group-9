@@ -54,6 +54,21 @@ export const rateLimitPolicies = {
     limit: 300,
     windowSeconds: 5 * 60,
   },
+  connectionProposalCreate: {
+    scope: "connection-proposal-create",
+    limit: 20,
+    windowSeconds: 24 * 60 * 60,
+  },
+  connectionProposalDecision: {
+    scope: "connection-proposal-decision",
+    limit: 30,
+    windowSeconds: 60,
+  },
+  connectionDisconnect: {
+    scope: "connection-disconnect",
+    limit: 10,
+    windowSeconds: 60,
+  },
 } as const;
 
 export function safeRetryMetadata(decision: RateLimitDecision) {

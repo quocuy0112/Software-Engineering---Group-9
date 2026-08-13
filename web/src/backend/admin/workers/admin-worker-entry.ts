@@ -9,6 +9,8 @@ import { runEvidenceRetentionCycle } from "./evidence-retention-loop";
 import { runSecurityNotificationCycle } from "./security-notification-loop";
 import { runRationaleRetentionCycle } from "./rationale-retention-loop";
 import { runSupportLifecycleCycle } from "./support-lifecycle-loop";
+import { runProposalLifecycleCycle } from "@/backend/connections/workers/proposal-lifecycle-loop";
+import { runProposalRetentionCycle } from "@/backend/connections/workers/proposal-retention-loop";
 
 export async function startAdminWorker(options: { probe?: boolean } = {}) {
   const runtime = new AdminWorkerRuntime([
@@ -33,6 +35,14 @@ export async function startAdminWorker(options: { probe?: boolean } = {}) {
       }),
     },
     { name: "support", intervalMs: 60_000, run: runSupportLifecycleCycle },
+    {
+      name: "connections",
+      intervalMs: 60_000,
+      run: async (now) => ({
+        lifecycle: await runProposalLifecycleCycle(now),
+        retention: await runProposalRetentionCycle(now),
+      }),
+    },
   ]);
   const readiness = await runtime.probe();
   if (readiness.some((item) => !item.ready))

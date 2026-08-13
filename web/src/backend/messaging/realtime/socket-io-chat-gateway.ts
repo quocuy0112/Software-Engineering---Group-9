@@ -33,6 +33,7 @@ import {
 import { installMessagingRealtimePublisher } from "./messaging-realtime-hub";
 import { MessagingPresenceRegistry } from "./messaging-presence-registry";
 import { attachSupportNamespace } from "@/backend/support/realtime/socket-io-support-gateway";
+import { attachConnectionNamespace } from "@/backend/connections/realtime/socket-io-connection-gateway";
 
 type Actor = { userId: string; sessionId: string };
 
@@ -73,6 +74,7 @@ export function attachSocketIoChatGateway(
   });
   const chat = io.of("/chat");
   attachSupportNamespace(io as unknown as Server);
+  attachConnectionNamespace(io as unknown as Server);
   const conversations =
     supplied.conversations ?? new PrismaMessagingConversationRepository();
   const eligibility = supplied.eligibility ?? new MessagingEligibilityService();

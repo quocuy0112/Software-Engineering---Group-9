@@ -25,6 +25,8 @@ const summary = {
   unreadCount: 2,
   blocked: false,
   presence: "OFFLINE" as const,
+  accessMode: "READ_WRITE" as const,
+  archivedAt: null,
   createdAt: new Date(0).toISOString(),
 };
 
@@ -83,7 +85,9 @@ describe("conversation workspace projections", () => {
     );
     expect(screen.getByText("Read")).toBeVisible();
     expect(screen.getByRole("button", { name: /load older/i })).toBeVisible();
-    fireEvent.click(screen.getByRole("button", { name: /back to conversations/i }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /back to conversations/i }),
+    );
     expect(onBack).toHaveBeenCalled();
   });
 });

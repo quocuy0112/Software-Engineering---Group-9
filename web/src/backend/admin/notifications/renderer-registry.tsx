@@ -24,6 +24,10 @@ import {
   SupportCaseEmail,
   supportCaseEmailText,
 } from "./support-case-template";
+import {
+  ProfessionalConnectionEmail,
+  professionalConnectionEmailText,
+} from "./professional-connection-template";
 
 const eventBase = z.object({
   eventKind: z.string(),
@@ -49,6 +53,18 @@ const supportCasePayload = z.object({
   caseId: z.string().min(1).max(128),
   state: z.enum(["WAITING_FOR_USER", "RESOLVED"]),
   occurredAt: z.string().datetime(),
+});
+const professionalConnectionPayload = z.object({
+  eventKind: z.enum([
+    "PROPOSAL_CREATED",
+    "PROPOSAL_UPDATED",
+    "PROPOSAL_NO_LONGER_ACTIVE",
+    "CONNECTION_ACCEPTED",
+    "CONNECTION_REVOKED",
+  ]),
+  occurredAt: z.string().datetime(),
+  proposalId: z.string().max(128).optional(),
+  connectionId: z.string().max(128).optional(),
 });
 
 export type RenderedFeature006Email = {
@@ -154,6 +170,19 @@ export async function renderFeature006Email(input: {
       subject: "Your SmartHire support case was updated",
       html: await render(createElement(SupportCaseEmail, props)),
       text: supportCaseEmailText(props),
+    };
+  }
+  if (input.templateVersion === "professional-connection-v1") {
+    const payload = professionalConnectionPayload.parse(input.payloadRef);
+    const props = {
+      eventKind: payload.eventKind,
+      occurredAt: payload.occurredAt,
+      connectionsUrl: new URL("/connections", input.appUrl).toString(),
+    };
+    return {
+      subject: "Your SmartHire professional connection was updated",
+      html: await render(createElement(ProfessionalConnectionEmail, props)),
+      text: professionalConnectionEmailText(props),
     };
   }
   throw new Error("FEATURE_006_TEMPLATE_UNSUPPORTED");
