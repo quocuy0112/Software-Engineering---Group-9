@@ -26,10 +26,29 @@ function expectedHost(kind: "candidate" | "admin" | "recruiter") {
   return configured ? new URL(configured).host : local[kind];
 }
 
+function redirectToAdminOrigin(request: NextRequest) {
+  const target = new URL(
+    process.env.ADMIN_ORIGIN ?? "http://console.admin.localhost:3001",
+  );
+  const internalPath = request.nextUrl.pathname.slice(
+    INTERNAL_ADMIN_ROUTE.length,
+  );
+  target.pathname = internalPath || "/";
+  target.search = request.nextUrl.search;
+  return NextResponse.redirect(target);
+}
+
 export function proxy(request: NextRequest) {
   const host = request.headers.get("host")?.toLowerCase() ?? "";
   const pathname = request.nextUrl.pathname;
   if (pathname.startsWith("/api/")) return NextResponse.next();
+  if (
+    host === expectedHost("candidate") &&
+    (pathname === INTERNAL_ADMIN_ROUTE ||
+      pathname.startsWith(`${INTERNAL_ADMIN_ROUTE}/`))
+  ) {
+    return redirectToAdminOrigin(request);
+  }
   if (isInternalShellPath(pathname)) {
     const shell = request.headers.get(INTERNAL_SHELL_HEADER);
     const trustedAdminRoute =
@@ -50,13 +69,15 @@ export function proxy(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = `${INTERNAL_ADMIN_ROUTE}${pathname === "/" ? "" : pathname}`;
     const headers = new Headers(request.headers);
-    headers.set(INTERNAL_ADMIN_SHELL_HEADER, "1");
+    headers.set(INTERNAL_SHELL_HEADER, "admin");
     return NextResponse.rewrite(url, { request: { headers } });
   }
   if (host === expectedHost("recruiter")) {
     const url = request.nextUrl.clone();
     url.pathname = `${INTERNAL_RECRUITER_ROUTE}${pathname === "/" ? "" : pathname}`;
-    return NextResponse.rewrite(url);
+    const headers = new Headers(request.headers);
+    headers.set(INTERNAL_SHELL_HEADER, "recruiter");
+    return NextResponse.rewrite(url, { request: { headers } });
   }
   if (host === expectedHost("candidate")) return NextResponse.next();
   return new NextResponse(null, { status: 404 });

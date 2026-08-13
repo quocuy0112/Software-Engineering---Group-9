@@ -57,8 +57,8 @@ describe("product host shell routing", () => {
         request(`http://localhost:3001${INTERNAL_ADMIN_ROUTE}`, {
           "x-smarthire-internal-admin-shell": "1",
         }),
-      ).headers.get("x-middleware-next"),
-    ).toBe("1");
+      ).status,
+    ).toBe(307);
   });
 
   it("allows only server-routed internal product shells", () => {
