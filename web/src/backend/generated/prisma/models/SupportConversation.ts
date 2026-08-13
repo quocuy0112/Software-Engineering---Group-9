@@ -307,6 +307,7 @@ export type SupportConversationWhereInput = {
   internalNotes?: Prisma.SupportInternalNoteListRelationFilter
   history?: Prisma.SupportConversationHistoryListRelationFilter
   notificationOutbox?: Prisma.EmailOutboxListRelationFilter
+  connectionProposals?: Prisma.ProfessionalConnectionProposalListRelationFilter
 }
 
 export type SupportConversationOrderByWithRelationInput = {
@@ -332,6 +333,7 @@ export type SupportConversationOrderByWithRelationInput = {
   internalNotes?: Prisma.SupportInternalNoteOrderByRelationAggregateInput
   history?: Prisma.SupportConversationHistoryOrderByRelationAggregateInput
   notificationOutbox?: Prisma.EmailOutboxOrderByRelationAggregateInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalOrderByRelationAggregateInput
 }
 
 export type SupportConversationWhereUniqueInput = Prisma.AtLeast<{
@@ -360,6 +362,7 @@ export type SupportConversationWhereUniqueInput = Prisma.AtLeast<{
   internalNotes?: Prisma.SupportInternalNoteListRelationFilter
   history?: Prisma.SupportConversationHistoryListRelationFilter
   notificationOutbox?: Prisma.EmailOutboxListRelationFilter
+  connectionProposals?: Prisma.ProfessionalConnectionProposalListRelationFilter
 }, "id">
 
 export type SupportConversationOrderByWithAggregationInput = {
@@ -427,6 +430,7 @@ export type SupportConversationCreateInput = {
   internalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutConversationInput
   history?: Prisma.SupportConversationHistoryCreateNestedManyWithoutConversationInput
   notificationOutbox?: Prisma.EmailOutboxCreateNestedManyWithoutSupportConversationInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutSourceSupportConversationInput
 }
 
 export type SupportConversationUncheckedCreateInput = {
@@ -450,6 +454,7 @@ export type SupportConversationUncheckedCreateInput = {
   internalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutConversationInput
   history?: Prisma.SupportConversationHistoryUncheckedCreateNestedManyWithoutConversationInput
   notificationOutbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutSupportConversationInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutSourceSupportConversationInput
 }
 
 export type SupportConversationUpdateInput = {
@@ -473,6 +478,7 @@ export type SupportConversationUpdateInput = {
   internalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutConversationNestedInput
   history?: Prisma.SupportConversationHistoryUpdateManyWithoutConversationNestedInput
   notificationOutbox?: Prisma.EmailOutboxUpdateManyWithoutSupportConversationNestedInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutSourceSupportConversationNestedInput
 }
 
 export type SupportConversationUncheckedUpdateInput = {
@@ -496,6 +502,7 @@ export type SupportConversationUncheckedUpdateInput = {
   internalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutConversationNestedInput
   history?: Prisma.SupportConversationHistoryUncheckedUpdateManyWithoutConversationNestedInput
   notificationOutbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutSupportConversationNestedInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutSourceSupportConversationNestedInput
 }
 
 export type SupportConversationCreateManyInput = {
@@ -734,6 +741,22 @@ export type SupportConversationUpdateOneWithoutNotificationOutboxNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SupportConversationUpdateToOneWithWhereWithoutNotificationOutboxInput, Prisma.SupportConversationUpdateWithoutNotificationOutboxInput>, Prisma.SupportConversationUncheckedUpdateWithoutNotificationOutboxInput>
 }
 
+export type SupportConversationCreateNestedOneWithoutConnectionProposalsInput = {
+  create?: Prisma.XOR<Prisma.SupportConversationCreateWithoutConnectionProposalsInput, Prisma.SupportConversationUncheckedCreateWithoutConnectionProposalsInput>
+  connectOrCreate?: Prisma.SupportConversationCreateOrConnectWithoutConnectionProposalsInput
+  connect?: Prisma.SupportConversationWhereUniqueInput
+}
+
+export type SupportConversationUpdateOneWithoutConnectionProposalsNestedInput = {
+  create?: Prisma.XOR<Prisma.SupportConversationCreateWithoutConnectionProposalsInput, Prisma.SupportConversationUncheckedCreateWithoutConnectionProposalsInput>
+  connectOrCreate?: Prisma.SupportConversationCreateOrConnectWithoutConnectionProposalsInput
+  upsert?: Prisma.SupportConversationUpsertWithoutConnectionProposalsInput
+  disconnect?: Prisma.SupportConversationWhereInput | boolean
+  delete?: Prisma.SupportConversationWhereInput | boolean
+  connect?: Prisma.SupportConversationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SupportConversationUpdateToOneWithWhereWithoutConnectionProposalsInput, Prisma.SupportConversationUpdateWithoutConnectionProposalsInput>, Prisma.SupportConversationUncheckedUpdateWithoutConnectionProposalsInput>
+}
+
 export type EnumSupportConversationCategoryFieldUpdateOperationsInput = {
   set?: $Enums.SupportConversationCategory
 }
@@ -818,6 +841,7 @@ export type SupportConversationCreateWithoutRequesterInput = {
   internalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutConversationInput
   history?: Prisma.SupportConversationHistoryCreateNestedManyWithoutConversationInput
   notificationOutbox?: Prisma.EmailOutboxCreateNestedManyWithoutSupportConversationInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutSourceSupportConversationInput
 }
 
 export type SupportConversationUncheckedCreateWithoutRequesterInput = {
@@ -840,6 +864,7 @@ export type SupportConversationUncheckedCreateWithoutRequesterInput = {
   internalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutConversationInput
   history?: Prisma.SupportConversationHistoryUncheckedCreateNestedManyWithoutConversationInput
   notificationOutbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutSupportConversationInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutSourceSupportConversationInput
 }
 
 export type SupportConversationCreateOrConnectWithoutRequesterInput = {
@@ -872,6 +897,7 @@ export type SupportConversationCreateWithoutCurrentAssigneeInput = {
   internalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutConversationInput
   history?: Prisma.SupportConversationHistoryCreateNestedManyWithoutConversationInput
   notificationOutbox?: Prisma.EmailOutboxCreateNestedManyWithoutSupportConversationInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutSourceSupportConversationInput
 }
 
 export type SupportConversationUncheckedCreateWithoutCurrentAssigneeInput = {
@@ -894,6 +920,7 @@ export type SupportConversationUncheckedCreateWithoutCurrentAssigneeInput = {
   internalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutConversationInput
   history?: Prisma.SupportConversationHistoryUncheckedCreateNestedManyWithoutConversationInput
   notificationOutbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutSupportConversationInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutSourceSupportConversationInput
 }
 
 export type SupportConversationCreateOrConnectWithoutCurrentAssigneeInput = {
@@ -979,6 +1006,7 @@ export type SupportConversationCreateWithoutNotificationOutboxInput = {
   assignments?: Prisma.SupportAssignmentCreateNestedManyWithoutConversationInput
   internalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutConversationInput
   history?: Prisma.SupportConversationHistoryCreateNestedManyWithoutConversationInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutSourceSupportConversationInput
 }
 
 export type SupportConversationUncheckedCreateWithoutNotificationOutboxInput = {
@@ -1001,6 +1029,7 @@ export type SupportConversationUncheckedCreateWithoutNotificationOutboxInput = {
   assignments?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutConversationInput
   internalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutConversationInput
   history?: Prisma.SupportConversationHistoryUncheckedCreateNestedManyWithoutConversationInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutSourceSupportConversationInput
 }
 
 export type SupportConversationCreateOrConnectWithoutNotificationOutboxInput = {
@@ -1039,6 +1068,7 @@ export type SupportConversationUpdateWithoutNotificationOutboxInput = {
   assignments?: Prisma.SupportAssignmentUpdateManyWithoutConversationNestedInput
   internalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutConversationNestedInput
   history?: Prisma.SupportConversationHistoryUpdateManyWithoutConversationNestedInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutSourceSupportConversationNestedInput
 }
 
 export type SupportConversationUncheckedUpdateWithoutNotificationOutboxInput = {
@@ -1061,6 +1091,115 @@ export type SupportConversationUncheckedUpdateWithoutNotificationOutboxInput = {
   assignments?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutConversationNestedInput
   internalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutConversationNestedInput
   history?: Prisma.SupportConversationHistoryUncheckedUpdateManyWithoutConversationNestedInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutSourceSupportConversationNestedInput
+}
+
+export type SupportConversationCreateWithoutConnectionProposalsInput = {
+  id?: string
+  category: $Enums.SupportConversationCategory
+  subject: string
+  state?: $Enums.SupportConversationState
+  version?: number
+  nextMessageSequence?: number
+  lastMessageAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  closedAt?: Date | string | null
+  contentDeleteAfter?: Date | string | null
+  contentDeletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  requester: Prisma.UserAccountCreateNestedOneWithoutSupportConversationsRequestedInput
+  currentAssignee?: Prisma.UserAccountCreateNestedOneWithoutSupportConversationsAssignedInput
+  messages?: Prisma.SupportMessageCreateNestedManyWithoutConversationInput
+  assignments?: Prisma.SupportAssignmentCreateNestedManyWithoutConversationInput
+  internalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutConversationInput
+  history?: Prisma.SupportConversationHistoryCreateNestedManyWithoutConversationInput
+  notificationOutbox?: Prisma.EmailOutboxCreateNestedManyWithoutSupportConversationInput
+}
+
+export type SupportConversationUncheckedCreateWithoutConnectionProposalsInput = {
+  id?: string
+  requesterUserId: string
+  category: $Enums.SupportConversationCategory
+  subject: string
+  state?: $Enums.SupportConversationState
+  version?: number
+  nextMessageSequence?: number
+  lastMessageAt?: Date | string | null
+  currentAssigneeUserId?: string | null
+  resolvedAt?: Date | string | null
+  closedAt?: Date | string | null
+  contentDeleteAfter?: Date | string | null
+  contentDeletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  messages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutConversationInput
+  assignments?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutConversationInput
+  internalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutConversationInput
+  history?: Prisma.SupportConversationHistoryUncheckedCreateNestedManyWithoutConversationInput
+  notificationOutbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutSupportConversationInput
+}
+
+export type SupportConversationCreateOrConnectWithoutConnectionProposalsInput = {
+  where: Prisma.SupportConversationWhereUniqueInput
+  create: Prisma.XOR<Prisma.SupportConversationCreateWithoutConnectionProposalsInput, Prisma.SupportConversationUncheckedCreateWithoutConnectionProposalsInput>
+}
+
+export type SupportConversationUpsertWithoutConnectionProposalsInput = {
+  update: Prisma.XOR<Prisma.SupportConversationUpdateWithoutConnectionProposalsInput, Prisma.SupportConversationUncheckedUpdateWithoutConnectionProposalsInput>
+  create: Prisma.XOR<Prisma.SupportConversationCreateWithoutConnectionProposalsInput, Prisma.SupportConversationUncheckedCreateWithoutConnectionProposalsInput>
+  where?: Prisma.SupportConversationWhereInput
+}
+
+export type SupportConversationUpdateToOneWithWhereWithoutConnectionProposalsInput = {
+  where?: Prisma.SupportConversationWhereInput
+  data: Prisma.XOR<Prisma.SupportConversationUpdateWithoutConnectionProposalsInput, Prisma.SupportConversationUncheckedUpdateWithoutConnectionProposalsInput>
+}
+
+export type SupportConversationUpdateWithoutConnectionProposalsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumSupportConversationCategoryFieldUpdateOperationsInput | $Enums.SupportConversationCategory
+  subject?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumSupportConversationStateFieldUpdateOperationsInput | $Enums.SupportConversationState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
+  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contentDeleteAfter?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requester?: Prisma.UserAccountUpdateOneRequiredWithoutSupportConversationsRequestedNestedInput
+  currentAssignee?: Prisma.UserAccountUpdateOneWithoutSupportConversationsAssignedNestedInput
+  messages?: Prisma.SupportMessageUpdateManyWithoutConversationNestedInput
+  assignments?: Prisma.SupportAssignmentUpdateManyWithoutConversationNestedInput
+  internalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutConversationNestedInput
+  history?: Prisma.SupportConversationHistoryUpdateManyWithoutConversationNestedInput
+  notificationOutbox?: Prisma.EmailOutboxUpdateManyWithoutSupportConversationNestedInput
+}
+
+export type SupportConversationUncheckedUpdateWithoutConnectionProposalsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  requesterUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumSupportConversationCategoryFieldUpdateOperationsInput | $Enums.SupportConversationCategory
+  subject?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumSupportConversationStateFieldUpdateOperationsInput | $Enums.SupportConversationState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
+  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  currentAssigneeUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contentDeleteAfter?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contentDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messages?: Prisma.SupportMessageUncheckedUpdateManyWithoutConversationNestedInput
+  assignments?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutConversationNestedInput
+  internalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutConversationNestedInput
+  history?: Prisma.SupportConversationHistoryUncheckedUpdateManyWithoutConversationNestedInput
+  notificationOutbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutSupportConversationNestedInput
 }
 
 export type SupportConversationCreateWithoutMessagesInput = {
@@ -1083,6 +1222,7 @@ export type SupportConversationCreateWithoutMessagesInput = {
   internalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutConversationInput
   history?: Prisma.SupportConversationHistoryCreateNestedManyWithoutConversationInput
   notificationOutbox?: Prisma.EmailOutboxCreateNestedManyWithoutSupportConversationInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutSourceSupportConversationInput
 }
 
 export type SupportConversationUncheckedCreateWithoutMessagesInput = {
@@ -1105,6 +1245,7 @@ export type SupportConversationUncheckedCreateWithoutMessagesInput = {
   internalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutConversationInput
   history?: Prisma.SupportConversationHistoryUncheckedCreateNestedManyWithoutConversationInput
   notificationOutbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutSupportConversationInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutSourceSupportConversationInput
 }
 
 export type SupportConversationCreateOrConnectWithoutMessagesInput = {
@@ -1143,6 +1284,7 @@ export type SupportConversationUpdateWithoutMessagesInput = {
   internalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutConversationNestedInput
   history?: Prisma.SupportConversationHistoryUpdateManyWithoutConversationNestedInput
   notificationOutbox?: Prisma.EmailOutboxUpdateManyWithoutSupportConversationNestedInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutSourceSupportConversationNestedInput
 }
 
 export type SupportConversationUncheckedUpdateWithoutMessagesInput = {
@@ -1165,6 +1307,7 @@ export type SupportConversationUncheckedUpdateWithoutMessagesInput = {
   internalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutConversationNestedInput
   history?: Prisma.SupportConversationHistoryUncheckedUpdateManyWithoutConversationNestedInput
   notificationOutbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutSupportConversationNestedInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutSourceSupportConversationNestedInput
 }
 
 export type SupportConversationCreateWithoutAssignmentsInput = {
@@ -1187,6 +1330,7 @@ export type SupportConversationCreateWithoutAssignmentsInput = {
   internalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutConversationInput
   history?: Prisma.SupportConversationHistoryCreateNestedManyWithoutConversationInput
   notificationOutbox?: Prisma.EmailOutboxCreateNestedManyWithoutSupportConversationInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutSourceSupportConversationInput
 }
 
 export type SupportConversationUncheckedCreateWithoutAssignmentsInput = {
@@ -1209,6 +1353,7 @@ export type SupportConversationUncheckedCreateWithoutAssignmentsInput = {
   internalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutConversationInput
   history?: Prisma.SupportConversationHistoryUncheckedCreateNestedManyWithoutConversationInput
   notificationOutbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutSupportConversationInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutSourceSupportConversationInput
 }
 
 export type SupportConversationCreateOrConnectWithoutAssignmentsInput = {
@@ -1247,6 +1392,7 @@ export type SupportConversationUpdateWithoutAssignmentsInput = {
   internalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutConversationNestedInput
   history?: Prisma.SupportConversationHistoryUpdateManyWithoutConversationNestedInput
   notificationOutbox?: Prisma.EmailOutboxUpdateManyWithoutSupportConversationNestedInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutSourceSupportConversationNestedInput
 }
 
 export type SupportConversationUncheckedUpdateWithoutAssignmentsInput = {
@@ -1269,6 +1415,7 @@ export type SupportConversationUncheckedUpdateWithoutAssignmentsInput = {
   internalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutConversationNestedInput
   history?: Prisma.SupportConversationHistoryUncheckedUpdateManyWithoutConversationNestedInput
   notificationOutbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutSupportConversationNestedInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutSourceSupportConversationNestedInput
 }
 
 export type SupportConversationCreateWithoutInternalNotesInput = {
@@ -1291,6 +1438,7 @@ export type SupportConversationCreateWithoutInternalNotesInput = {
   assignments?: Prisma.SupportAssignmentCreateNestedManyWithoutConversationInput
   history?: Prisma.SupportConversationHistoryCreateNestedManyWithoutConversationInput
   notificationOutbox?: Prisma.EmailOutboxCreateNestedManyWithoutSupportConversationInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutSourceSupportConversationInput
 }
 
 export type SupportConversationUncheckedCreateWithoutInternalNotesInput = {
@@ -1313,6 +1461,7 @@ export type SupportConversationUncheckedCreateWithoutInternalNotesInput = {
   assignments?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutConversationInput
   history?: Prisma.SupportConversationHistoryUncheckedCreateNestedManyWithoutConversationInput
   notificationOutbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutSupportConversationInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutSourceSupportConversationInput
 }
 
 export type SupportConversationCreateOrConnectWithoutInternalNotesInput = {
@@ -1351,6 +1500,7 @@ export type SupportConversationUpdateWithoutInternalNotesInput = {
   assignments?: Prisma.SupportAssignmentUpdateManyWithoutConversationNestedInput
   history?: Prisma.SupportConversationHistoryUpdateManyWithoutConversationNestedInput
   notificationOutbox?: Prisma.EmailOutboxUpdateManyWithoutSupportConversationNestedInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutSourceSupportConversationNestedInput
 }
 
 export type SupportConversationUncheckedUpdateWithoutInternalNotesInput = {
@@ -1373,6 +1523,7 @@ export type SupportConversationUncheckedUpdateWithoutInternalNotesInput = {
   assignments?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutConversationNestedInput
   history?: Prisma.SupportConversationHistoryUncheckedUpdateManyWithoutConversationNestedInput
   notificationOutbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutSupportConversationNestedInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutSourceSupportConversationNestedInput
 }
 
 export type SupportConversationCreateWithoutHistoryInput = {
@@ -1395,6 +1546,7 @@ export type SupportConversationCreateWithoutHistoryInput = {
   assignments?: Prisma.SupportAssignmentCreateNestedManyWithoutConversationInput
   internalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutConversationInput
   notificationOutbox?: Prisma.EmailOutboxCreateNestedManyWithoutSupportConversationInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutSourceSupportConversationInput
 }
 
 export type SupportConversationUncheckedCreateWithoutHistoryInput = {
@@ -1417,6 +1569,7 @@ export type SupportConversationUncheckedCreateWithoutHistoryInput = {
   assignments?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutConversationInput
   internalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutConversationInput
   notificationOutbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutSupportConversationInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutSourceSupportConversationInput
 }
 
 export type SupportConversationCreateOrConnectWithoutHistoryInput = {
@@ -1455,6 +1608,7 @@ export type SupportConversationUpdateWithoutHistoryInput = {
   assignments?: Prisma.SupportAssignmentUpdateManyWithoutConversationNestedInput
   internalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutConversationNestedInput
   notificationOutbox?: Prisma.EmailOutboxUpdateManyWithoutSupportConversationNestedInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutSourceSupportConversationNestedInput
 }
 
 export type SupportConversationUncheckedUpdateWithoutHistoryInput = {
@@ -1477,6 +1631,7 @@ export type SupportConversationUncheckedUpdateWithoutHistoryInput = {
   assignments?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutConversationNestedInput
   internalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutConversationNestedInput
   notificationOutbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutSupportConversationNestedInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutSourceSupportConversationNestedInput
 }
 
 export type SupportConversationCreateManyRequesterInput = {
@@ -1533,6 +1688,7 @@ export type SupportConversationUpdateWithoutRequesterInput = {
   internalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutConversationNestedInput
   history?: Prisma.SupportConversationHistoryUpdateManyWithoutConversationNestedInput
   notificationOutbox?: Prisma.EmailOutboxUpdateManyWithoutSupportConversationNestedInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutSourceSupportConversationNestedInput
 }
 
 export type SupportConversationUncheckedUpdateWithoutRequesterInput = {
@@ -1555,6 +1711,7 @@ export type SupportConversationUncheckedUpdateWithoutRequesterInput = {
   internalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutConversationNestedInput
   history?: Prisma.SupportConversationHistoryUncheckedUpdateManyWithoutConversationNestedInput
   notificationOutbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutSupportConversationNestedInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutSourceSupportConversationNestedInput
 }
 
 export type SupportConversationUncheckedUpdateManyWithoutRequesterInput = {
@@ -1594,6 +1751,7 @@ export type SupportConversationUpdateWithoutCurrentAssigneeInput = {
   internalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutConversationNestedInput
   history?: Prisma.SupportConversationHistoryUpdateManyWithoutConversationNestedInput
   notificationOutbox?: Prisma.EmailOutboxUpdateManyWithoutSupportConversationNestedInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutSourceSupportConversationNestedInput
 }
 
 export type SupportConversationUncheckedUpdateWithoutCurrentAssigneeInput = {
@@ -1616,6 +1774,7 @@ export type SupportConversationUncheckedUpdateWithoutCurrentAssigneeInput = {
   internalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutConversationNestedInput
   history?: Prisma.SupportConversationHistoryUncheckedUpdateManyWithoutConversationNestedInput
   notificationOutbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutSupportConversationNestedInput
+  connectionProposals?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutSourceSupportConversationNestedInput
 }
 
 export type SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeInput = {
@@ -1646,6 +1805,7 @@ export type SupportConversationCountOutputType = {
   internalNotes: number
   history: number
   notificationOutbox: number
+  connectionProposals: number
 }
 
 export type SupportConversationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1654,6 +1814,7 @@ export type SupportConversationCountOutputTypeSelect<ExtArgs extends runtime.Typ
   internalNotes?: boolean | SupportConversationCountOutputTypeCountInternalNotesArgs
   history?: boolean | SupportConversationCountOutputTypeCountHistoryArgs
   notificationOutbox?: boolean | SupportConversationCountOutputTypeCountNotificationOutboxArgs
+  connectionProposals?: boolean | SupportConversationCountOutputTypeCountConnectionProposalsArgs
 }
 
 /**
@@ -1701,6 +1862,13 @@ export type SupportConversationCountOutputTypeCountNotificationOutboxArgs<ExtArg
   where?: Prisma.EmailOutboxWhereInput
 }
 
+/**
+ * SupportConversationCountOutputType without action
+ */
+export type SupportConversationCountOutputTypeCountConnectionProposalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProfessionalConnectionProposalWhereInput
+}
+
 
 export type SupportConversationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1725,6 +1893,7 @@ export type SupportConversationSelect<ExtArgs extends runtime.Types.Extensions.I
   internalNotes?: boolean | Prisma.SupportConversation$internalNotesArgs<ExtArgs>
   history?: boolean | Prisma.SupportConversation$historyArgs<ExtArgs>
   notificationOutbox?: boolean | Prisma.SupportConversation$notificationOutboxArgs<ExtArgs>
+  connectionProposals?: boolean | Prisma.SupportConversation$connectionProposalsArgs<ExtArgs>
   _count?: boolean | Prisma.SupportConversationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["supportConversation"]>
 
@@ -1795,6 +1964,7 @@ export type SupportConversationInclude<ExtArgs extends runtime.Types.Extensions.
   internalNotes?: boolean | Prisma.SupportConversation$internalNotesArgs<ExtArgs>
   history?: boolean | Prisma.SupportConversation$historyArgs<ExtArgs>
   notificationOutbox?: boolean | Prisma.SupportConversation$notificationOutboxArgs<ExtArgs>
+  connectionProposals?: boolean | Prisma.SupportConversation$connectionProposalsArgs<ExtArgs>
   _count?: boolean | Prisma.SupportConversationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SupportConversationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1816,6 +1986,7 @@ export type $SupportConversationPayload<ExtArgs extends runtime.Types.Extensions
     internalNotes: Prisma.$SupportInternalNotePayload<ExtArgs>[]
     history: Prisma.$SupportConversationHistoryPayload<ExtArgs>[]
     notificationOutbox: Prisma.$EmailOutboxPayload<ExtArgs>[]
+    connectionProposals: Prisma.$ProfessionalConnectionProposalPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2234,6 +2405,7 @@ export interface Prisma__SupportConversationClient<T, Null = never, ExtArgs exte
   internalNotes<T extends Prisma.SupportConversation$internalNotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupportConversation$internalNotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportInternalNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   history<T extends Prisma.SupportConversation$historyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupportConversation$historyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportConversationHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notificationOutbox<T extends Prisma.SupportConversation$notificationOutboxArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupportConversation$notificationOutboxArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailOutboxPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  connectionProposals<T extends Prisma.SupportConversation$connectionProposalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupportConversation$connectionProposalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfessionalConnectionProposalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2815,6 +2987,30 @@ export type SupportConversation$notificationOutboxArgs<ExtArgs extends runtime.T
   take?: number
   skip?: number
   distinct?: Prisma.EmailOutboxScalarFieldEnum | Prisma.EmailOutboxScalarFieldEnum[]
+}
+
+/**
+ * SupportConversation.connectionProposals
+ */
+export type SupportConversation$connectionProposalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProfessionalConnectionProposal
+   */
+  select?: Prisma.ProfessionalConnectionProposalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProfessionalConnectionProposal
+   */
+  omit?: Prisma.ProfessionalConnectionProposalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalConnectionProposalInclude<ExtArgs> | null
+  where?: Prisma.ProfessionalConnectionProposalWhereInput
+  orderBy?: Prisma.ProfessionalConnectionProposalOrderByWithRelationInput | Prisma.ProfessionalConnectionProposalOrderByWithRelationInput[]
+  cursor?: Prisma.ProfessionalConnectionProposalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProfessionalConnectionProposalScalarFieldEnum | Prisma.ProfessionalConnectionProposalScalarFieldEnum[]
 }
 
 /**

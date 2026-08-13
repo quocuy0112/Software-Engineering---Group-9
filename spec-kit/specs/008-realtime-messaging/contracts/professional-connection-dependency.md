@@ -1,13 +1,10 @@
-# Internal Contract: Minimal Feature 007 Professional Connection Dependency
+# Internal Contract: Feature 011 Professional Connection Dependency
 
 ## Ownership and roadmap position
 
-Feature 007 owns this dependency slice and is scheduled immediately before
-Feature 008. The repository had no Feature 007 specification or Connection
-model when Feature 008 remediation began, so this document freezes only the
-minimum contract required by messaging. Invitation flows, connection discovery,
-network feeds, recommendations, and connection-management UI remain outside
-Feature 008.
+Feature 011 owns bilateral proposals, decisions, connection lifecycle,
+disconnect, and retention. Feature 008 owns only private conversations/messages
+and consumes the minimum current-authority and archived-history projections.
 
 ## Durable record
 
@@ -24,7 +21,7 @@ signal for every messaging conversation that references the connection.
 
 ## Provider boundary
 
-The Feature 007 provider exposes a server-only lookup equivalent to:
+The Feature 011 provider exposes a server-only lookup equivalent to:
 
 ```text
 findAcceptedConnection(userA, userB)
@@ -43,7 +40,7 @@ and conversation membership checks remain separate mandatory gates.
 
 ## Compatibility and tests
 
-Feature 007 may later expand its schema and lifecycle without changing the
+Feature 011 may later expand its schema and lifecycle without changing the
 messaging-facing provider or `canMessage()` contract. Compatibility tests must
 cover:
 

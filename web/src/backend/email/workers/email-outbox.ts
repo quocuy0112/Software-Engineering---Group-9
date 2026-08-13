@@ -111,6 +111,7 @@ export async function deliverClaimedOutbox(
     row.templateVersion === "admin-security-v1" ||
     row.templateVersion === "verification-v1" ||
     row.templateVersion === "support-case-v1" ||
+    row.templateVersion === "professional-connection-v1" ||
     /^email-delivery:(account|membership|verification):/u.test(
       row.idempotencyKey,
     );
@@ -153,7 +154,8 @@ export async function deliverClaimedOutbox(
     if (
       row.templateVersion === "admin-security-v1" ||
       row.templateVersion === "verification-v1" ||
-      row.templateVersion === "support-case-v1"
+      row.templateVersion === "support-case-v1" ||
+      row.templateVersion === "professional-connection-v1"
     ) {
       const rendered = await renderFeature006Email({
         templateVersion: row.templateVersion,

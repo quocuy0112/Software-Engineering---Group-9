@@ -31,20 +31,18 @@ Existing user-to-company authority. Messaging accepts only current `ACTIVE`
 memberships with approved recruiting roles. `SUSPENDED` and `REMOVED` rows grant
 no access.
 
-### ProfessionalConnection (Feature 007 dependency)
+### ProfessionalConnection (Feature 011 dependency)
 
-The repository contains neither a Feature 007 specification nor a Connection
-model at the start of this remediation. A minimal Feature 007 dependency slice
-therefore precedes Feature 008 and owns this durable entity:
+Feature 011 owns this durable entity and its consent-based lifecycle:
 
-| Field                    | Type              | Rules                                                                                   |
-| ------------------------ | ----------------- | --------------------------------------------------------------------------------------- |
-| `id`                     | opaque string     | Stable primary key consumed by conversation context.                                    |
-| `participantLowId`       | account reference | Lexicographically lower account ID.                                                     |
-| `participantHighId`      | account reference | Lexicographically higher account ID; differs from low ID.                               |
-| `state`                  | enum              | Minimal dependency exposes `ACCEPTED`; other lifecycle states remain Feature 007 scope. |
-| `acceptedAt`             | timestamp         | Required when state is `ACCEPTED`.                                                      |
-| `createdAt`, `updatedAt` | timestamp         | Server-maintained.                                                                      |
+| Field                    | Type              | Rules                                                                                             |
+| ------------------------ | ----------------- | ------------------------------------------------------------------------------------------------- |
+| `id`                     | opaque string     | Stable primary key consumed by conversation context.                                              |
+| `participantLowId`       | account reference | Lexicographically lower account ID.                                                               |
+| `participantHighId`      | account reference | Lexicographically higher account ID; differs from low ID.                                         |
+| `state`                  | enum              | `ACCEPTED` grants current writes; `REVOKED` grants only participant-owned archived history reads. |
+| `acceptedAt`             | timestamp         | Required when state is `ACCEPTED`.                                                                |
+| `createdAt`, `updatedAt` | timestamp         | Server-maintained.                                                                                |
 
 The canonical pair is unique. Feature 008 neither creates connection invitations
 nor infers a connection from search/profile visibility; it consumes only the
@@ -58,11 +56,11 @@ currently valid provider authorizes the pair:
 
 1. the existing Application provider confirms Candidate ownership plus current
    Recruiter membership in the application's company; or
-2. the minimal Feature 007 provider confirms the canonical pair is `ACCEPTED`.
+2. the Feature 011 provider confirms the canonical pair is currently `ACCEPTED`.
 
 Block, account/session state, tenant context, and conversation membership are
 composed with this relationship result by the calling authorization service.
-Future Feature 007 work replaces only the professional-connection provider; the
+Future Feature 011 work replaces only the professional-connection provider; the
 `canMessage()` signature and all messaging callers remain unchanged. Unit tests
 must cover accepted connection only, application only, both, and neither.
 
@@ -102,7 +100,7 @@ context.
 | `contextReference`         | opaque string                   | Stable application or professional-connection reference; immutable.                                        |
 | `applicationId`            | application reference, nullable | Required only for `APPLICATION`; must equal `contextReference`.                                            |
 | `companyId`                | company reference, nullable     | Required only for `APPLICATION`; derived from the application's job at creation and revalidated on access. |
-| `professionalConnectionId` | connection reference, nullable  | Required only for `PROFESSIONAL_CONNECTION`; supplied by Feature 007.                                      |
+| `professionalConnectionId` | connection reference, nullable  | Required only for `PROFESSIONAL_CONNECTION`; supplied by Feature 011.                                      |
 | `nextMessageSequence`      | integer                         | Starts at 1; transactionally allocates a total conversation-local message order.                           |
 | `lastMessageSequence`      | integer, nullable               | Null before the first message; updated in the same transaction as accepted send.                           |
 | `lastMessageAt`            | timestamp, nullable             | Null before the first message; used with `id` for stable list ordering.                                    |

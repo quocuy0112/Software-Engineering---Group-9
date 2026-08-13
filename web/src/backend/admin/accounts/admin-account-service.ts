@@ -7,6 +7,7 @@ import {
 import { PrismaAdminAccountRepository } from "@/backend/repositories/admin/prisma-admin-account-repository";
 import { recordAccountCommand } from "./admin-account-command-transaction";
 import { enforceMessagingUserRevocation } from "@/backend/messaging/realtime/messaging-authority-enforcement";
+import { ProposalAuthorityInvalidationService } from "@/backend/connections/services/proposal-authority-invalidation-service";
 
 type Command = {
   expectedVersion: number;
@@ -205,6 +206,11 @@ export class AdminAccountService {
         userId: targetUserId,
         cause: kind === "suspend" ? "ACCOUNT" : "SESSION",
       }).catch(() => undefined);
+      if (kind === "suspend") {
+        await new ProposalAuthorityInvalidationService()
+          .account(targetUserId)
+          .catch(() => undefined);
+      }
     }
     return outcome;
   }

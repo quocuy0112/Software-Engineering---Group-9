@@ -1,7 +1,10 @@
 import "server-only";
 import { MessagingEligibilityService } from "@/backend/messaging/authorization/messaging-eligibility-service";
 import { PrismaMessagingConversationRepository } from "@/backend/repositories/messaging/prisma-messaging-conversation-repository";
-import { MessagingError, unavailableConversation } from "@/backend/messaging/messaging-errors";
+import {
+  MessagingError,
+  unavailableConversation,
+} from "@/backend/messaging/messaging-errors";
 
 export class GetMessageHistoryService {
   constructor(
@@ -15,20 +18,25 @@ export class GetMessageHistoryService {
     cursor?: string;
     limit: number;
   }) {
-    const access = await this.repository.findAccess(input.conversationId, input.userId);
+    const access = await this.repository.findAccess(
+      input.conversationId,
+      input.userId,
+    );
     if (!access) throw unavailableConversation();
     const otherUserId =
       access.participantLowId === input.userId
         ? access.participantHighId
         : access.participantLowId;
-    if (
-      !(await this.eligibility.authorizeContext({
-        userA: input.userId,
-        userB: otherUserId,
-        type: access.contextType,
-        reference: access.contextReference,
-      }))
-    ) {
+    const current = await this.eligibility.authorizeContext({
+      userA: input.userId,
+      userB: otherUserId,
+      type: access.contextType,
+      reference: access.contextReference,
+    });
+    const archivedProfessionalHistory =
+      access.contextType === "PROFESSIONAL_CONNECTION" &&
+      Boolean(access.archivedAt);
+    if (!current && !archivedProfessionalHistory) {
       throw unavailableConversation();
     }
     try {

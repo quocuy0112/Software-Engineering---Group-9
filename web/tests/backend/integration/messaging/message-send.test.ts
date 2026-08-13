@@ -28,9 +28,13 @@ describe("message acceptance orchestration", () => {
           companyId: null,
           professionalConnectionId: "connection-1",
           lastMessageSequence: null,
+          archivedAt: null,
         }),
         listAuthorizedConversationIds: async () => [],
-        open: async () => ({ conversationId: "conversation-1", created: false }),
+        open: async () => ({
+          conversationId: "conversation-1",
+          created: false,
+        }),
       },
       {
         accept: async (input) => {

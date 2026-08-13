@@ -15,7 +15,10 @@ import type {
 } from "@/shared/contracts/messaging/socket-events";
 import { conversationRoomInputSchema } from "@/shared/contracts/messaging/socket-events";
 import { sendMessageInputSchema } from "@/shared/contracts/messaging/messages";
-import { MessagingError, unavailableConversation } from "@/backend/messaging/messaging-errors";
+import {
+  MessagingError,
+  unavailableConversation,
+} from "@/backend/messaging/messaging-errors";
 import { SendMessageService } from "@/backend/messaging/services/send-message";
 import { conversationRoom } from "./messaging-realtime-publisher";
 
@@ -60,8 +63,12 @@ export async function authorizeSocketConversation(input: {
   eligibility: MessagingEligibilityPort;
   blocks: MessagingBlockRepositoryPort;
 }) {
-  const access = await input.conversations.findAccess(input.conversationId, input.userId);
+  const access = await input.conversations.findAccess(
+    input.conversationId,
+    input.userId,
+  );
   if (!access) throw unavailableConversation();
+  if (access.archivedAt) throw unavailableConversation();
   const otherUserId =
     access.participantLowId === input.userId
       ? access.participantHighId
