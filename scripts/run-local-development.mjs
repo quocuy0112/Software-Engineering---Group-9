@@ -1,8 +1,11 @@
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import { existsSync, lstatSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import process from "node:process";
 
 const npmCli = process.env.npm_execpath;
 const shutdownTimeoutMs = 5_000;
+const commandLineArgs = new Set(process.argv.slice(2));
 
 if (!npmCli) throw new Error("npm_execpath is required");
 
@@ -38,6 +41,109 @@ function runCommand(name, executable, args) {
       finish({ ok: exitCode === 0, exitCode, signal });
     });
   });
+}
+
+function hasFlag(...flags) {
+  return flags.some((flag) => commandLineArgs.has(flag));
+}
+
+function isTruthy(value) {
+  return ["1", "true", "yes", "on"].includes(
+    String(value ?? "")
+      .trim()
+      .toLowerCase(),
+  );
+}
+
+function getDockerImageCreatedAt(image) {
+  const result = spawnSync(
+    "docker",
+    ["image", "inspect", "--format", "{{.Created}}", image],
+    {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+      windowsHide: true,
+      timeout: 5_000,
+    },
+  );
+  if (result.status !== 0) return null;
+
+  const createdAt = Date.parse(result.stdout.trim());
+  return Number.isFinite(createdAt) ? createdAt : null;
+}
+
+const ignoredBuildInputNames = new Set([
+  ".git",
+  ".next",
+  ".local",
+  "coverage",
+  "dist",
+  "build",
+  "node_modules",
+]);
+
+function latestModifiedAt(pathname) {
+  if (!existsSync(pathname)) return 0;
+
+  const stat = lstatSync(pathname);
+  if (!stat.isDirectory()) return stat.mtimeMs;
+
+  let latest = stat.mtimeMs;
+  for (const entry of readdirSync(pathname, { withFileTypes: true })) {
+    if (
+      ignoredBuildInputNames.has(entry.name) ||
+      entry.name.startsWith(".env") ||
+      entry.isSymbolicLink()
+    ) {
+      continue;
+    }
+    latest = Math.max(latest, latestModifiedAt(join(pathname, entry.name)));
+  }
+  return latest;
+}
+
+const workerBuildInputs = {
+  "ocr-engine": ["Dockerfile.ocr-engine", "ocr-engine"],
+  "cv-worker": [
+    "web/Dockerfile.cv-worker",
+    "package.json",
+    "package-lock.json",
+    "web/package.json",
+    "web/tsconfig.json",
+    "web/prisma.config.ts",
+    "web/prisma",
+    "web/scripts",
+    "web/src",
+  ],
+  "image-search-worker": [
+    "Dockerfile.image-search-worker",
+    "package.json",
+    "package-lock.json",
+    "web/package.json",
+    "web/tsconfig.json",
+    "web/prisma.config.ts",
+    "web/prisma",
+    "web/scripts",
+    "web/src",
+  ],
+  "admin-worker": [
+    "Dockerfile.admin-worker",
+    "package.json",
+    "package-lock.json",
+    "web",
+  ],
+};
+
+function workerImageNeedsBuild(service) {
+  const createdAt = getDockerImageCreatedAt(`smarthire-${service}:local`);
+  if (createdAt === null) return true;
+
+  const latestInputChange = Math.max(
+    ...workerBuildInputs[service].map((pathname) =>
+      latestModifiedAt(join(process.cwd(), pathname)),
+    ),
+  );
+  return latestInputChange > createdAt + 1_000;
 }
 
 function startProcess(name, executable, args, fatal = true) {
@@ -149,22 +255,47 @@ process.once("SIGINT", () => void shutdown(0, "SIGINT"));
 process.once("SIGTERM", () => void shutdown(0, "SIGTERM"));
 
 async function main() {
-  const infrastructureServices = ["postgres", "clamav", "ocr-engine"];
-  const workerServices = ["cv-worker", "image-search-worker", "admin-worker"];
-  const workerBuild = await runCommand("building worker images", "docker", [
-    "compose",
-    "build",
-    "cv-worker",
+  const infrastructureServices = ["postgres", "clamav"];
+  const builtServices = [
     "ocr-engine",
+    "cv-worker",
     "image-search-worker",
     "admin-worker",
-  ]);
-  if (!workerBuild.ok) {
-    if (!shutdownPromise) {
-      await shutdown(workerBuild.exitCode, "worker image build failed");
+  ];
+  const forceWorkerBuild =
+    hasFlag("--build", "--build-workers") ||
+    isTruthy(process.env.BUILD_WORKERS);
+  const skipWorkerBuild =
+    hasFlag("--skip-worker-build") || isTruthy(process.env.SKIP_WORKER_BUILD);
+
+  let workerBuild = Promise.resolve({ ok: true, exitCode: 0 });
+  if (skipWorkerBuild) {
+    console.log(
+      "[dev] skipping worker image build (--skip-worker-build / SKIP_WORKER_BUILD)",
+    );
+  } else {
+    const changedServices = builtServices.filter(workerImageNeedsBuild);
+    const servicesToBuild = forceWorkerBuild ? builtServices : changedServices;
+
+    if (servicesToBuild.length === 0) {
+      console.log(
+        "[dev] worker images are up to date; skipping build (use --build-workers to force a rebuild)",
+      );
+    } else {
+      const reason = forceWorkerBuild
+        ? "requested worker image rebuild"
+        : `missing or changed worker images: ${servicesToBuild.join(", ")}`;
+      workerBuild = runCommand(`building worker images (${reason})`, "docker", [
+        "compose",
+        "build",
+        ...servicesToBuild,
+      ]);
     }
-    return;
   }
+
+  // Worker/OCR image builds can run npm ci and download large model layers.
+  // Do not hold web startup behind that work. Built services start after the
+  // optional background build completes.
   if (shutdownPromise) return;
 
   const composeUp = await runCommand(
@@ -181,18 +312,6 @@ async function main() {
   }
   if (shutdownPromise) return;
 
-  void runCommand(
-    "starting restartable worker services: " + workerServices.join(", "),
-    "docker",
-    ["compose", "up", "-d", "--no-build", "--no-deps", ...workerServices],
-  ).then((result) => {
-    if (!result.ok && !shutdownPromise) {
-      console.error(
-        "[dev] worker services are recovering in Docker; web development remains available",
-      );
-    }
-  });
-
   console.log(
     "[dev] Compose infrastructure and workers remain running after this dev session; use npm run infra:down to stop them explicitly",
   );
@@ -201,6 +320,29 @@ async function main() {
   );
   start("web", "dev:web");
   start("email worker", "email:worker");
+
+  void workerBuild.then(async (result) => {
+    if (!result.ok) {
+      if (!shutdownPromise) {
+        console.error(
+          `[dev] worker image build failed (code ${result.exitCode}); web development remains available`,
+        );
+      }
+      return;
+    }
+    if (shutdownPromise) return;
+
+    const workerStart = await runCommand(
+      "starting restartable worker services: " + builtServices.join(", "),
+      "docker",
+      ["compose", "up", "-d", "--no-build", "--no-deps", ...builtServices],
+    );
+    if (!workerStart.ok && !shutdownPromise) {
+      console.error(
+        "[dev] worker services are recovering in Docker; web development remains available",
+      );
+    }
+  });
 }
 
 void main().catch((error) => {
