@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { z } from "zod";
+import { prisma } from "@/backend/database/prisma";
 import {
   companyCatalogSchema,
   recruiterCompanySettingsInputSchema,
@@ -25,7 +26,8 @@ const jobsPath = dataPath("jobs.json");
 const companiesPath = dataPath("companies.json");
 const applicationsPath = dataPath("applications.json");
 const MAX_COMPANY_LOGO_BYTES = 800 * 1024;
-type CompanyProfileField = RecruiterCompanySettings["missingProfileFields"][number];
+type CompanyProfileField =
+  RecruiterCompanySettings["missingProfileFields"][number];
 
 const noCompanyProfileFields: CompanyProfileField[] = [
   "name",
@@ -36,7 +38,10 @@ const noCompanyProfileFields: CompanyProfileField[] = [
 ];
 
 function missingCompanyProfileFields(
-  company: Pick<CompanyCatalogItem, "name" | "industry" | "size" | "address" | "logo">,
+  company: Pick<
+    CompanyCatalogItem,
+    "name" | "industry" | "size" | "address" | "logo"
+  >,
 ): CompanyProfileField[] {
   const required = [
     ["name", company.name],
@@ -46,35 +51,49 @@ function missingCompanyProfileFields(
     ["logo", company.logo],
   ] as const;
   return required
-    .filter(([, value]) => typeof value !== "string" || value.trim().length === 0)
+    .filter(
+      ([, value]) => typeof value !== "string" || value.trim().length === 0,
+    )
     .map(([field]) => field);
 }
 
 function isPng(bytes: Buffer) {
-  return bytes.subarray(0, 8).equals(
-    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-  );
+  return bytes
+    .subarray(0, 8)
+    .equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
 }
 
 function isJpeg(bytes: Buffer) {
-  return bytes[0] === 0xff && bytes[1] === 0xd8 &&
-    bytes.at(-2) === 0xff && bytes.at(-1) === 0xd9;
+  return (
+    bytes[0] === 0xff &&
+    bytes[1] === 0xd8 &&
+    bytes.at(-2) === 0xff &&
+    bytes.at(-1) === 0xd9
+  );
 }
 
 function isWebp(bytes: Buffer) {
-  return bytes.subarray(0, 4).toString("ascii") === "RIFF" &&
-    bytes.subarray(8, 12).toString("ascii") === "WEBP";
+  return (
+    bytes.subarray(0, 4).toString("ascii") === "RIFF" &&
+    bytes.subarray(8, 12).toString("ascii") === "WEBP"
+  );
 }
 
 function validateCompanyLogo(logo: string | null) {
   if (!logo?.startsWith("data:")) return;
-  const match = /^data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+/]+={0,2})$/u.exec(logo);
+  const match =
+    /^data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+/]+={0,2})$/u.exec(logo);
   if (!match) throw new Error("Invalid company logo.");
   const bytes = Buffer.from(match[2], "base64");
   if (bytes.length === 0 || bytes.length > MAX_COMPANY_LOGO_BYTES) {
     throw new Error("Invalid company logo.");
   }
-  const valid = match[1] === "png" ? isPng(bytes) : match[1] === "jpeg" ? isJpeg(bytes) : isWebp(bytes);
+  const valid =
+    match[1] === "png"
+      ? isPng(bytes)
+      : match[1] === "jpeg"
+        ? isJpeg(bytes)
+        : isWebp(bytes);
   if (!valid) throw new Error("Invalid company logo.");
 }
 
@@ -102,6 +121,9 @@ type JobApplicationRecord = z.infer<typeof applicationSchema>;
 type RecruiterCompany = CompanyCatalogItem & {
   ownerUserId: string | null;
   memberUserIds: string[];
+  /** The persistent company id when the catalog id is a legacy JSON id. */
+  databaseId?: string;
+  databaseBacked?: boolean;
 };
 
 const legacyStatusMap: Record<
@@ -166,6 +188,122 @@ function normalizeCompany(value: unknown): RecruiterCompany {
   };
 }
 
+type DatabaseCompanyRow = {
+  id: string;
+  slug: string;
+  legalName: string;
+  displayName: string;
+  logoUrl: string | null;
+  websiteUrl: string | null;
+  publicDescription: string | null;
+  publicLocation: string | null;
+  size: string | null;
+  industry: string | null;
+  address: string | null;
+  normalizedTaxIdentifier: string | null;
+  memberships: Array<{ userId: string; role: string }>;
+};
+
+function databaseCompanyToRecruiterCompany(
+  company: DatabaseCompanyRow,
+  catalogCompany?: RecruiterCompany,
+): RecruiterCompany {
+  const owner = company.memberships.find(
+    (membership) => membership.role === "OWNER",
+  );
+  const databaseCompany: RecruiterCompany = {
+    // Keep the legacy catalog id when the company is already represented in
+    // jobs.json. Jobs are still stored in that catalog, while auth and
+    // verification remain authoritative in PostgreSQL.
+    id: catalogCompany?.id ?? company.id,
+    slug: catalogCompany?.slug ?? company.slug,
+    name: company.displayName || company.legalName,
+    logo: company.logoUrl ?? catalogCompany?.logo ?? null,
+    size: company.size ?? "",
+    industry: company.industry ?? "",
+    address: company.address ?? company.publicLocation ?? "",
+    website: company.websiteUrl ?? null,
+    description: company.publicDescription ?? null,
+    ownerUserId: owner?.userId ?? null,
+    memberUserIds: company.memberships.map((membership) => membership.userId),
+    taxCode:
+      company.normalizedTaxIdentifier ??
+      catalogCompany?.taxCode ??
+      "Not provided",
+    verificationStatus: "approved",
+    databaseId: company.id,
+    databaseBacked: true,
+  };
+
+  return databaseCompany;
+}
+
+async function readDatabaseAuthorizedCompanies(userId: string) {
+  try {
+    return await prisma.company.findMany({
+      where: {
+        verificationState: "ACTIVE",
+        verifiedAt: { not: null },
+        memberships: {
+          some: { userId, status: "ACTIVE" },
+        },
+      },
+      select: {
+        id: true,
+        slug: true,
+        legalName: true,
+        displayName: true,
+        logoUrl: true,
+        websiteUrl: true,
+        publicDescription: true,
+        publicLocation: true,
+        size: true,
+        industry: true,
+        address: true,
+        normalizedTaxIdentifier: true,
+        memberships: {
+          where: { status: "ACTIVE" },
+          select: { userId: true, role: true },
+        },
+      },
+      orderBy: [{ displayName: "asc" }, { id: "asc" }],
+    });
+  } catch {
+    // The JSON catalog remains a compatibility source for legacy local data.
+    // A database-backed company is only added when its authorization can be
+    // read successfully, so a transient database failure cannot grant new
+    // access through this bridge.
+    return [];
+  }
+}
+
+async function authorizedCompanies(
+  companies: RecruiterCompany[],
+  userId: string,
+) {
+  const databaseCompanies = await readDatabaseAuthorizedCompanies(userId);
+  const byTaxCode = new Map(
+    companies
+      .filter((company) => company.taxCode)
+      .map((company) => [company.taxCode, company]),
+  );
+  const databaseViews = databaseCompanies.map((company) =>
+    databaseCompanyToRecruiterCompany(
+      company,
+      byTaxCode.get(company.normalizedTaxIdentifier ?? ""),
+    ),
+  );
+  const databaseIds = new Set(databaseViews.map((company) => company.id));
+  const legacyAuthorized = companies.filter(
+    (company) =>
+      !databaseIds.has(company.id) &&
+      company.verificationStatus === "approved" &&
+      (company.ownerUserId === userId ||
+        company.memberUserIds.includes(userId)),
+  );
+  return [...databaseViews, ...legacyAuthorized];
+}
+
 async function readCatalog() {
   const [jobsValue, companiesValue] = await Promise.all([
     readJson(jobsPath),
@@ -212,43 +350,14 @@ export async function readMockAppliedJobIds(userId: string) {
     .map((application) => application.jobId);
 }
 
-function authorizedCompany(companies: RecruiterCompany[], userId: string) {
-  return (
-    companies.find(
-      (company) =>
-        company.verificationStatus === "approved" &&
-        (company.ownerUserId === userId ||
-          company.memberUserIds.includes(userId)),
-    ) ?? null
-  );
-}
-
-function authorizedCompanyForSettings(
-  companies: RecruiterCompany[],
-  userId: string,
-) {
-  return (
-    companies.find(
-      (company) =>
-        company.ownerUserId === userId ||
-        company.memberUserIds.includes(userId),
-    ) ?? null
-  );
-}
-
 export async function readRecruiterJobManagementData(
   userId: string,
 ): Promise<RecruiterJobManagementData> {
   const { jobs, companies } = await readCatalog();
-  const ownedCompanies = companies.filter(
-    (company) =>
-      company.verificationStatus === "approved" &&
-      (company.ownerUserId === userId ||
-        company.memberUserIds.includes(userId)),
-  );
+  const ownedCompanies = await authorizedCompanies(companies, userId);
   const ownedCompanyIds = new Set(ownedCompanies.map((company) => company.id));
   const companyById = new Map(
-    companies.map((company) => [company.id, company]),
+    [...companies, ...ownedCompanies].map((company) => [company.id, company]),
   );
   const recruiterJobs: RecruiterJob[] = jobs
     .filter((job) => ownedCompanyIds.has(job.companyId))
@@ -264,7 +373,9 @@ export async function readRecruiterJobManagementData(
     jobs: recruiterJobs,
     companies: ownedCompanies,
     companyId: primaryCompany?.id ?? null,
-    companyProfileComplete: Boolean(primaryCompany && missingProfileFields.length === 0),
+    companyProfileComplete: Boolean(
+      primaryCompany && missingProfileFields.length === 0,
+    ),
     missingCompanyProfileFields: missingProfileFields,
   };
 }
@@ -317,7 +428,7 @@ export async function createRecruiterJob(
 ) {
   return withWriteLock(async () => {
     const { companies, rawJobs } = await readCatalog();
-    const company = authorizedCompany(companies, userId);
+    const company = (await authorizedCompanies(companies, userId))[0] ?? null;
     if (!company) throw new Error("A recruiter-owned company is required.");
     const now = new Date().toISOString();
     const missingProfileFields = missingCompanyProfileFields(company);
@@ -344,7 +455,7 @@ function recruiterCanUpdateStatus(
 export async function updateRecruiterJob(userId: string, raw: unknown) {
   return withWriteLock(async () => {
     const { jobs, companies, rawJobs } = await readCatalog();
-    const company = authorizedCompany(companies, userId);
+    const company = (await authorizedCompanies(companies, userId))[0] ?? null;
     if (!company) throw new Error("A recruiter-owned company is required.");
     const input = normalizeJob(raw);
     const current = jobs.find(
@@ -378,7 +489,7 @@ export async function updateRecruiterJob(userId: string, raw: unknown) {
 export async function closeRecruiterJob(userId: string, jobId: string) {
   return withWriteLock(async () => {
     const { jobs, companies, rawJobs } = await readCatalog();
-    const company = authorizedCompany(companies, userId);
+    const company = (await authorizedCompanies(companies, userId))[0] ?? null;
     if (!company) throw new Error("A recruiter-owned company is required.");
     const current = jobs.find(
       (job) => job.id === jobId && job.companyId === company.id,
@@ -405,7 +516,7 @@ export async function ensureRecruiterCompany(
 ) {
   return withWriteLock(async () => {
     const { companies, rawCompanies } = await readCatalog();
-    const existing = authorizedCompanyForSettings(companies, userId);
+    const existing = (await authorizedCompanies(companies, userId))[0] ?? null;
     if (existing) return existing;
     const id = `comp-${randomUUID()}`;
     const company = companyCatalogSchema.parse({
@@ -429,7 +540,9 @@ export async function ensureRecruiterCompany(
   });
 }
 
-function settingsFromCompany(company: RecruiterCompany): RecruiterCompanySettings {
+function settingsFromCompany(
+  company: RecruiterCompany,
+): RecruiterCompanySettings {
   return {
     id: company.id,
     slug: company.slug,
@@ -451,7 +564,7 @@ function settingsFromCompany(company: RecruiterCompany): RecruiterCompanySetting
 
 export async function readRecruiterCompanySettings(userId: string) {
   const { companies } = await readCatalog();
-  const company = authorizedCompanyForSettings(companies, userId);
+  const company = (await authorizedCompanies(companies, userId))[0] ?? null;
   return company ? settingsFromCompany(company) : null;
 }
 
@@ -461,7 +574,7 @@ export async function updateRecruiterCompanySettings(
 ) {
   return withWriteLock(async () => {
     const { companies, rawCompanies } = await readCatalog();
-    const company = authorizedCompanyForSettings(companies, userId);
+    const company = (await authorizedCompanies(companies, userId))[0] ?? null;
     if (!company) throw new Error("Recruiter company not found.");
     const editable = recruiterCompanySettingsInputSchema.parse(input);
     validateCompanyLogo(editable.logo);
@@ -475,18 +588,40 @@ export async function updateRecruiterCompanySettings(
       website: editable.website,
       description: editable.description,
     });
-    await writeJson(companiesPath, rawCompanies.map((value) => {
-      if (
-        value &&
-        typeof value === "object" &&
-        !Array.isArray(value) &&
-        (value as Record<string, unknown>).id === updated.id
-      ) {
-        return updated;
-      }
-      return value;
-    }));
-    return settingsFromCompany({ ...updated, ownerUserId: updated.ownerUserId ?? null, memberUserIds: updated.memberUserIds });
+    await writeJson(
+      companiesPath,
+      rawCompanies.map((value) => {
+        if (
+          value &&
+          typeof value === "object" &&
+          !Array.isArray(value) &&
+          (value as Record<string, unknown>).id === updated.id
+        ) {
+          return updated;
+        }
+        return value;
+      }),
+    );
+    if (company.databaseBacked && company.databaseId) {
+      await prisma.company.update({
+        where: { id: company.databaseId },
+        data: {
+          displayName: updated.name,
+          logoUrl: updated.logo,
+          size: updated.size,
+          industry: updated.industry,
+          address: updated.address,
+          websiteUrl: updated.website,
+          publicDescription: updated.description,
+          publicLocation: updated.address,
+        },
+      });
+    }
+    return settingsFromCompany({
+      ...updated,
+      ownerUserId: updated.ownerUserId ?? null,
+      memberUserIds: updated.memberUserIds,
+    });
   });
 }
 

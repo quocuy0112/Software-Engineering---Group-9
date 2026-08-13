@@ -1,10 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createRecruiterJob } from "@/backend/services/jobs/recruiter-job-posting-data";
+import {
+  createRecruiterJob,
+  readRecruiterCompanySettings,
+  readRecruiterJobManagementData,
+} from "@/backend/services/jobs/recruiter-job-posting-data";
 import { createEmptyJobPosting } from "@/shared/contracts/recruiter-job-posting";
 
 const fsMocks = vi.hoisted(() => ({
   readFile: vi.fn(),
   writeFile: vi.fn(),
+}));
+
+const prismaMocks = vi.hoisted(() => ({
+  company: {
+    findMany: vi.fn(),
+    update: vi.fn(),
+  },
 }));
 
 vi.mock("node:fs/promises", () => ({
@@ -16,17 +27,24 @@ vi.mock("node:fs/promises", () => ({
   writeFile: fsMocks.writeFile,
 }));
 
+vi.mock("@/backend/database/prisma", () => ({
+  prisma: prismaMocks,
+}));
+
 const company = {
   id: "company-1",
   slug: "northstar-labs",
   name: "Northstar Labs",
-  logo: null,
+  logo: "https://example.com/logo.png",
   size: "51-200 employees",
   industry: "Technology",
   address: "Ho Chi Minh City",
   website: null,
   description: "A product company.",
   ownerUserId: "recruiter-1",
+  memberUserIds: [],
+  taxCode: "1234567890",
+  verificationStatus: "approved",
 };
 
 function completeJob(id: string) {
@@ -49,6 +67,76 @@ describe("recruiter JSON job persistence", () => {
     fsMocks.readFile.mockReset();
     fsMocks.writeFile.mockReset();
     fsMocks.writeFile.mockResolvedValue(undefined);
+    prismaMocks.company.findMany.mockReset();
+    prismaMocks.company.findMany.mockResolvedValue([]);
+    prismaMocks.company.update.mockReset();
+    prismaMocks.company.update.mockResolvedValue({});
+  });
+
+  it("exposes an admin-approved database company to recruiter settings", async () => {
+    prismaMocks.company.findMany.mockResolvedValue([
+      {
+        id: "db-company-1",
+        slug: "northstar-labs",
+        legalName: "Northstar Labs",
+        displayName: "Northstar Labs",
+        logoUrl: null,
+        websiteUrl: null,
+        publicDescription: null,
+        publicLocation: null,
+        size: null,
+        industry: null,
+        address: null,
+        normalizedTaxIdentifier: "1234567890",
+        memberships: [{ userId: "recruiter-1", role: "OWNER" }],
+      },
+    ]);
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return "[]";
+      if (path.endsWith("companies.json")) return "[]";
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const settings = await readRecruiterCompanySettings("recruiter-1");
+
+    expect(settings).toMatchObject({
+      id: "db-company-1",
+      name: "Northstar Labs",
+      verificationStatus: "approved",
+      profileComplete: false,
+      missingProfileFields: ["industry", "size", "address", "logo"],
+    });
+  });
+
+  it("allows an approved database member to open job posting management", async () => {
+    prismaMocks.company.findMany.mockResolvedValue([
+      {
+        id: "db-company-1",
+        slug: "northstar-labs",
+        legalName: "Northstar Labs",
+        displayName: "Northstar Labs",
+        logoUrl: "https://example.com/logo.png",
+        websiteUrl: "https://northstar.example.com",
+        publicDescription: "A product company.",
+        publicLocation: "Ho Chi Minh City",
+        size: "51-200 employees",
+        industry: "Technology",
+        address: "Ho Chi Minh City",
+        normalizedTaxIdentifier: "1234567890",
+        memberships: [{ userId: "recruiter-1", role: "OWNER" }],
+      },
+    ]);
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return "[]";
+      if (path.endsWith("companies.json")) return "[]";
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const data = await readRecruiterJobManagementData("recruiter-1");
+
+    expect(data.companyId).toBe("db-company-1");
+    expect(data.companies).toHaveLength(1);
+    expect(data.companyProfileComplete).toBe(true);
   });
 
   it("persists every expanded jobs.json field for a recruiter posting", async () => {
