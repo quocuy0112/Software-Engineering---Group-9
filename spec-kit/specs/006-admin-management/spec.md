@@ -10,6 +10,14 @@
 
 ## Clarifications
 
+> **Feature 014 synchronization (2026-08-14):** Feature 014 owns enriched
+> Candidate business facts, public registry lookup snapshots, company-email
+> verification, normalized phone/website fields, applicant relationship context,
+> consent, and field/toast validation before a Feature 006 request enters
+> `PENDING_CHECKS`. Feature 006 continues to own the authoritative request
+> lifecycle, evidence safety, administrator decisions, relationship prerequisite,
+> audit, notifications, and company-membership transaction.
+
 ### Session 2026-08-10
 
 - Q: What prerequisite must an applicant satisfy before an administrator can approve membership in an already verified company? → A: Invitation or OWNER approval.

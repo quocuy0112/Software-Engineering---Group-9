@@ -715,9 +715,16 @@ internal safety signals, and company-private facts not needed by the applicant.
 
 ## Assumptions
 
-- The Candidate-side flow collects legal company name, exact normalized
-  Vietnamese tax code, requested role, and one PDF, PNG, or JPEG business-
-  license file containing 1 through 5,000,000 bytes.
+- The Candidate-side flow is enriched by Feature 014. It supplies the submitted
+  and registry business facts, registry source/outcome/check time, exact
+  normalized Vietnamese tax code, verified company email and non-decisive
+  domain signals, normalized unverified phone, optional normalized website,
+  applicant relationship/title/explanation, mismatch explanation, consent
+  metadata, requested role, and one PDF, PNG, or JPEG business-license file
+  containing 1 through 5,000,000 bytes.
+- Feature 014 registry and contact signals support human review only and never
+  replace Group 2 evidence, applicant-eligibility, relationship-prerequisite,
+  concurrency, or explicit administrator-decision gates.
 - Candidate-side status is authoritative for receipt, pending, rejection,
   delay, expiry, cancellation, and Reapply as Recruiter.
 - Every normal account retains Candidate identity; recruiter authority is one
