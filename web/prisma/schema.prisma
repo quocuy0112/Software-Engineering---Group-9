@@ -235,6 +235,20 @@ enum CompanyMembershipStatus {
   REMOVED
 }
 
+enum ProfessionalConnectionStatus {
+  ACCEPTED
+}
+
+enum MessagingConversationContextType {
+  APPLICATION
+  PROFESSIONAL_CONNECTION
+}
+
+enum MessagingReportTargetType {
+  PARTICIPANT
+  CONVERSATION
+}
+
 enum AdministratorGrantState {
   ACTIVE
   SUSPENDED
@@ -579,19 +593,19 @@ enum ImageSearchAdmissionSubject {
 }
 
 model UserAccount {
-  id                            String                         @id
+  id                            String                             @id
   name                          String
-  email                         String                         @unique
-  normalizedEmail               String                         @unique
-  emailVerified                 Boolean                        @default(false)
+  email                         String                             @unique
+  normalizedEmail               String                             @unique
+  emailVerified                 Boolean                            @default(false)
   image                         String?
-  state                         AccountState                   @default(PENDING_VERIFICATION)
-  version                       Int                            @default(1)
-  twoFactorEnabled              Boolean                        @default(false)
-  stateChangedAt                DateTime                       @default(now())
+  state                         AccountState                       @default(PENDING_VERIFICATION)
+  version                       Int                                @default(1)
+  twoFactorEnabled              Boolean                            @default(false)
+  stateChangedAt                DateTime                           @default(now())
   deletedAt                     DateTime?
-  createdAt                     DateTime                       @default(now())
-  updatedAt                     DateTime                       @updatedAt
+  createdAt                     DateTime                           @default(now())
+  updatedAt                     DateTime                           @updatedAt
   accounts                      AuthProviderAccount[]
   sessions                      Session[]
   verifications                 Verification[]
@@ -624,9 +638,20 @@ model UserAccount {
   companyMemberships            CompanyMembership[]
   platformAdministratorGrants   PlatformAdministratorGrant[]
   recruiterVerificationRequests RecruiterVerificationRequest[]
-  submittedModerationReports    ModerationReport[]             @relation("ModerationReporter")
+  submittedModerationReports    ModerationReport[]                 @relation("ModerationReporter")
+  professionalConnectionsLow    ProfessionalConnection[]           @relation("ProfessionalConnectionLow")
+  professionalConnectionsHigh   ProfessionalConnection[]           @relation("ProfessionalConnectionHigh")
+  messagingConversationsLow     MessagingConversation[]            @relation("MessagingConversationLow")
+  messagingConversationsHigh    MessagingConversation[]            @relation("MessagingConversationHigh")
+  messagingParticipants         MessagingConversationParticipant[]
+  messagingMessages             MessagingMessage[]
+  messagingBlocksInitiated      UserMessagingBlock[]               @relation("MessagingBlocker")
+  messagingBlocksReceived       UserMessagingBlock[]               @relation("MessagingBlocked")
+  submittedMessagingReports     MessagingReport[]                  @relation("MessagingReporter")
+  targetedMessagingReports      MessagingReport[]                  @relation("MessagingTarget")
 
   @@index([state, id])
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "user_name_trgm_idx")
   @@map("user")
 }
 
@@ -1109,6 +1134,7 @@ model Company {
   memberships                   CompanyMembership[]
   recruiterVerificationRequests RecruiterVerificationRequest[]
   accessPrerequisites           CompanyAccessPrerequisite[]
+  messagingConversations        MessagingConversation[]
 
   @@index([verifiedAt, id])
 }
@@ -1618,12 +1644,127 @@ model JobApplication {
   answers                 ApplicationAnswer[]
   notificationWork        RecruitmentNotificationWork[]
   stageEvents             ApplicationStageEvent[]
+  messagingConversations  MessagingConversation[]
 
   @@unique([candidateUserId, jobPostingId])
   @@unique([candidateUserId, idempotencyKey])
   @@index([jobPostingId, stage, submittedAt])
   @@index([candidateUserId, submittedAt(sort: Desc)])
   @@index([candidateUserId, aiAnalysisConsent])
+}
+
+model ProfessionalConnection {
+  id                String                       @id @default(cuid())
+  participantLowId  String
+  participantHighId String
+  state             ProfessionalConnectionStatus @default(ACCEPTED)
+  acceptedAt        DateTime                     @default(now())
+  createdAt         DateTime                     @default(now())
+  updatedAt         DateTime                     @updatedAt
+  participantLow    UserAccount                  @relation("ProfessionalConnectionLow", fields: [participantLowId], references: [id], onDelete: Restrict)
+  participantHigh   UserAccount                  @relation("ProfessionalConnectionHigh", fields: [participantHighId], references: [id], onDelete: Restrict)
+  conversations     MessagingConversation[]
+
+  @@unique([participantLowId, participantHighId])
+  @@index([participantHighId, participantLowId, state])
+}
+
+model MessagingConversation {
+  id                       String                             @id @default(cuid())
+  participantLowId         String
+  participantHighId        String
+  contextType              MessagingConversationContextType
+  contextReference         String
+  applicationId            String?
+  companyId                String?
+  professionalConnectionId String?
+  nextMessageSequence      Int                                @default(1)
+  lastMessageSequence      Int?
+  lastMessageAt            DateTime?
+  createdAt                DateTime                           @default(now())
+  updatedAt                DateTime                           @updatedAt
+  participantLow           UserAccount                        @relation("MessagingConversationLow", fields: [participantLowId], references: [id], onDelete: Restrict)
+  participantHigh          UserAccount                        @relation("MessagingConversationHigh", fields: [participantHighId], references: [id], onDelete: Restrict)
+  application              JobApplication?                    @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  company                  Company?                           @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  professionalConnection   ProfessionalConnection?            @relation(fields: [professionalConnectionId], references: [id], onDelete: Restrict)
+  participants             MessagingConversationParticipant[]
+  messages                 MessagingMessage[]
+  reports                  MessagingReport[]
+
+  @@unique([participantLowId, participantHighId, contextType, contextReference])
+  @@index([participantLowId, lastMessageAt(sort: Desc), id])
+  @@index([participantHighId, lastMessageAt(sort: Desc), id])
+  @@index([applicationId])
+  @@index([companyId])
+  @@index([professionalConnectionId])
+}
+
+model MessagingConversationParticipant {
+  conversationId   String
+  userId           String
+  lastReadSequence Int                   @default(0)
+  lastReadAt       DateTime?
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  conversation     MessagingConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user             UserAccount           @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@id([conversationId, userId])
+  @@index([userId, updatedAt(sort: Desc)])
+}
+
+model MessagingMessage {
+  id                 String                @id @default(cuid())
+  conversationId     String
+  sequence           Int
+  senderId           String
+  clientOperationId  String
+  content            String                @db.Text
+  createdAt          DateTime              @default(now())
+  conversation       MessagingConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender             UserAccount           @relation(fields: [senderId], references: [id], onDelete: Restrict)
+  evidenceForReports MessagingReport[]     @relation("MessagingReportEvidence")
+
+  @@unique([conversationId, sequence])
+  @@unique([senderId, clientOperationId])
+  @@index([conversationId, sequence(sort: Desc)])
+}
+
+model UserMessagingBlock {
+  blockerUserId String
+  blockedUserId String
+  createdAt     DateTime    @default(now())
+  blocker       UserAccount @relation("MessagingBlocker", fields: [blockerUserId], references: [id], onDelete: Restrict)
+  blocked       UserAccount @relation("MessagingBlocked", fields: [blockedUserId], references: [id], onDelete: Restrict)
+
+  @@id([blockerUserId, blockedUserId])
+  @@index([blockedUserId, blockerUserId])
+}
+
+model MessagingReport {
+  id                String                    @id @default(cuid())
+  reporterUserId    String
+  targetUserId      String
+  conversationId    String
+  targetType        MessagingReportTargetType
+  evidenceMessageId String?
+  category          ModerationReportCategory
+  normalizedDetail  String?
+  state             ModerationReportState     @default(PENDING_REVIEW)
+  unresolvedKey     String?                   @unique
+  handledAt         DateTime?
+  preserveUntil     DateTime?
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+  reporter          UserAccount               @relation("MessagingReporter", fields: [reporterUserId], references: [id], onDelete: Restrict)
+  target            UserAccount               @relation("MessagingTarget", fields: [targetUserId], references: [id], onDelete: Restrict)
+  conversation      MessagingConversation     @relation(fields: [conversationId], references: [id], onDelete: Restrict)
+  evidenceMessage   MessagingMessage?         @relation("MessagingReportEvidence", fields: [evidenceMessageId], references: [id], onDelete: SetNull)
+
+  @@index([reporterUserId, createdAt(sort: Desc)])
+  @@index([conversationId, state, createdAt])
+  @@index([preserveUntil])
 }
 
 model ApplicationStageEvent {

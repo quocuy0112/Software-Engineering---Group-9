@@ -281,6 +281,59 @@
   text-align: right;
 }
 
+.profile-account-id-value {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sh-space-2);
+}
+
+.profile-account-id-value code {
+  min-width: 0;
+  overflow: hidden;
+  color: inherit;
+  font: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-account-id-value button {
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  place-items: center;
+  border: 1px solid var(--sh-color-border-default);
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-color-surface-card);
+  color: var(--sh-color-brand-primary);
+  cursor: pointer;
+}
+
+.profile-account-id-value button:hover {
+  border-color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+}
+
+.profile-account-id-value button:focus-visible {
+  outline: 3px solid var(--sh-color-border-focus);
+  outline-offset: 2px;
+}
+
+.profile-account-id-value button[data-state="copied"] {
+  color: var(--sh-color-success);
+}
+
+.profile-account-id-value svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
 .profile-account-actions {
   display: flex;
   flex-wrap: wrap;

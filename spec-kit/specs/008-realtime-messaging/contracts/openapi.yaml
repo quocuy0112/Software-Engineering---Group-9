@@ -1,0 +1,529 @@
+openapi: 3.1.0
+info:
+  title: SmartHire Messaging REST Contract
+  version: 0.1.0
+  description: >-
+    HTTP bootstrap, durable history, read, block, and report contracts for
+    Feature 008. Realtime transport is defined separately in socket-events.md.
+servers:
+  - url: /
+security:
+  - betterAuthCookie: []
+tags:
+  - name: Messaging
+
+paths:
+  /api/messaging/eligible-participants:
+    get:
+      tags: [Messaging]
+      summary: Find currently eligible direct-message participants
+      parameters:
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit20"
+      responses:
+        "200":
+          description: Safe eligible participant projections only
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [items, nextCursor]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: "#/components/schemas/EligibleParticipant" }
+                  nextCursor:
+                    type: [string, "null"]
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "401": { $ref: "#/components/responses/AuthRequired" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+
+  /api/messaging/conversations:
+    get:
+      tags: [Messaging]
+      summary: List authorized conversations ordered by latest message
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit20"
+      responses:
+        "200":
+          description: Authorized conversation summaries
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [items, nextCursor]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: "#/components/schemas/ConversationSummary" }
+                  nextCursor:
+                    type: [string, "null"]
+        "401": { $ref: "#/components/responses/AuthRequired" }
+    post:
+      tags: [Messaging]
+      summary: Open or return one eligible context-scoped direct conversation
+      parameters:
+        - $ref: "#/components/parameters/CsrfProof"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [targetUserId, context]
+              properties:
+                targetUserId: { $ref: "#/components/schemas/OpaqueId" }
+                context:
+                  { $ref: "#/components/schemas/ConversationContextInput" }
+      responses:
+        "200":
+          description: Existing equivalent conversation
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConversationDetail" }
+        "201":
+          description: Newly created conversation
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConversationDetail" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "401": { $ref: "#/components/responses/AuthRequired" }
+        "403": { $ref: "#/components/responses/CsrfOrAuthorityDenied" }
+        "404": { $ref: "#/components/responses/Unavailable" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+
+  /api/messaging/conversations/{conversationId}/messages:
+    get:
+      tags: [Messaging]
+      summary: Load one bounded page of authorized message history
+      parameters:
+        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit20"
+      responses:
+        "200":
+          description: Stable chronological message page
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [conversation, items, nextCursor]
+                properties:
+                  conversation:
+                    { $ref: "#/components/schemas/ConversationDetail" }
+                  items:
+                    type: array
+                    maxItems: 20
+                    items: { $ref: "#/components/schemas/Message" }
+                  nextCursor:
+                    type: [string, "null"]
+        "401": { $ref: "#/components/responses/AuthRequired" }
+        "404": { $ref: "#/components/responses/Unavailable" }
+
+  /api/messaging/conversations/{conversationId}/read:
+    post:
+      tags: [Messaging]
+      summary: Advance the current participant's monotonic read boundary
+      parameters:
+        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/CsrfProof"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [lastReadSequence]
+              properties:
+                lastReadSequence:
+                  type: integer
+                  minimum: 0
+      responses:
+        "200":
+          description: Authoritative read boundary
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReadBoundary" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "401": { $ref: "#/components/responses/AuthRequired" }
+        "403": { $ref: "#/components/responses/CsrfOrAuthorityDenied" }
+        "404": { $ref: "#/components/responses/Unavailable" }
+        "409": { $ref: "#/components/responses/Conflict" }
+
+  /api/messaging/blocks/{targetUserId}:
+    post:
+      tags: [Messaging]
+      summary: Idempotently block the target in both communication directions
+      parameters:
+        - $ref: "#/components/parameters/TargetUserId"
+        - $ref: "#/components/parameters/CsrfProof"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Authoritative shared blocked projection
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BlockProjection" }
+        "401": { $ref: "#/components/responses/AuthRequired" }
+        "403": { $ref: "#/components/responses/CsrfOrAuthorityDenied" }
+        "404": { $ref: "#/components/responses/Unavailable" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+    delete:
+      tags: [Messaging]
+      summary: Remove only the current user's directional block
+      parameters:
+        - $ref: "#/components/parameters/TargetUserId"
+        - $ref: "#/components/parameters/CsrfProof"
+      responses:
+        "200":
+          description: Current shared blocked projection after fresh eligibility checks
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BlockProjection" }
+        "401": { $ref: "#/components/responses/AuthRequired" }
+        "403": { $ref: "#/components/responses/CsrfOrAuthorityDenied" }
+        "404": { $ref: "#/components/responses/Unavailable" }
+
+  /api/messaging/reports:
+    post:
+      tags: [Messaging]
+      summary: Submit a privacy-minimized messaging report
+      parameters:
+        - $ref: "#/components/parameters/CsrfProof"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReportInput" }
+      responses:
+        "202":
+          description: Neutral receipt for new or deduplicated pending report
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [receipt]
+                properties:
+                  receipt:
+                    type: string
+                    enum: [REPORT_RECEIVED]
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "401": { $ref: "#/components/responses/AuthRequired" }
+        "403": { $ref: "#/components/responses/CsrfOrAuthorityDenied" }
+        "404": { $ref: "#/components/responses/Unavailable" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+
+components:
+  securitySchemes:
+    betterAuthCookie:
+      type: apiKey
+      in: cookie
+      name: smarthire.session
+      description: >-
+        Existing exclusive HttpOnly SmartHire browser session. The exact secure
+        production cookie name may use the configured __Host- prefix.
+
+  parameters:
+    SearchQuery:
+      name: q
+      in: query
+      required: false
+      schema: { type: string, minLength: 1, maxLength: 100 }
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      schema: { type: string, minLength: 1, maxLength: 512 }
+    Limit20:
+      name: limit
+      in: query
+      required: false
+      schema: { type: integer, minimum: 1, maximum: 20, default: 20 }
+    ConversationId:
+      name: conversationId
+      in: path
+      required: true
+      schema: { $ref: "#/components/schemas/OpaqueId" }
+    TargetUserId:
+      name: targetUserId
+      in: path
+      required: true
+      schema: { $ref: "#/components/schemas/OpaqueId" }
+    CsrfProof:
+      name: X-CSRF-Proof
+      in: header
+      required: true
+      schema: { type: string, minLength: 16, maxLength: 512 }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, format: uuid }
+
+  schemas:
+    OpaqueId:
+      type: string
+      minLength: 1
+      maxLength: 128
+
+    ConversationContextInput:
+      oneOf:
+        - type: object
+          additionalProperties: false
+          required: [type, applicationId]
+          properties:
+            type: { type: string, const: APPLICATION }
+            applicationId: { $ref: "#/components/schemas/OpaqueId" }
+        - type: object
+          additionalProperties: false
+          required: [type, professionalConnectionId]
+          properties:
+            type: { type: string, const: PROFESSIONAL_CONNECTION }
+            professionalConnectionId: { $ref: "#/components/schemas/OpaqueId" }
+
+    SafeParticipant:
+      type: object
+      additionalProperties: false
+      required: [id, name, image]
+      properties:
+        id: { $ref: "#/components/schemas/OpaqueId" }
+        name: { type: string, minLength: 1, maxLength: 120 }
+        image: { type: [string, "null"] }
+
+    EligibleContext:
+      type: object
+      additionalProperties: false
+      required: [type, reference, label]
+      properties:
+        type:
+          type: string
+          enum: [APPLICATION, PROFESSIONAL_CONNECTION]
+        reference: { $ref: "#/components/schemas/OpaqueId" }
+        label: { type: string, minLength: 1, maxLength: 200 }
+        companyName: { type: [string, "null"], maxLength: 200 }
+        jobTitle: { type: [string, "null"], maxLength: 200 }
+
+    EligibleParticipant:
+      type: object
+      additionalProperties: false
+      required: [participant, contexts]
+      properties:
+        participant: { $ref: "#/components/schemas/SafeParticipant" }
+        contexts:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/EligibleContext" }
+
+    ConversationSummary:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - otherParticipant
+        - context
+        - lastMessage
+        - unreadCount
+        - blocked
+        - presence
+        - createdAt
+      properties:
+        id: { $ref: "#/components/schemas/OpaqueId" }
+        otherParticipant: { $ref: "#/components/schemas/SafeParticipant" }
+        context: { $ref: "#/components/schemas/EligibleContext" }
+        lastMessage:
+          oneOf:
+            - { $ref: "#/components/schemas/MessagePreview" }
+            - { type: "null" }
+        unreadCount: { type: integer, minimum: 0 }
+        blocked: { type: boolean }
+        presence: { type: string, enum: [ONLINE, OFFLINE] }
+        createdAt: { type: string, format: date-time }
+
+    ConversationDetail:
+      allOf:
+        - { $ref: "#/components/schemas/ConversationSummary" }
+        - type: object
+          required: [currentLastSequence, currentUserLastReadSequence]
+          properties:
+            currentLastSequence: { type: integer, minimum: 0 }
+            currentUserLastReadSequence: { type: integer, minimum: 0 }
+
+    MessagePreview:
+      type: object
+      additionalProperties: false
+      required: [senderId, content, createdAt]
+      properties:
+        senderId: { $ref: "#/components/schemas/OpaqueId" }
+        content: { type: string, minLength: 1, maxLength: 2000 }
+        createdAt: { type: string, format: date-time }
+
+    Message:
+      type: object
+      additionalProperties: false
+      required:
+        [id, conversationId, sequence, senderId, content, createdAt, delivery]
+      properties:
+        id: { $ref: "#/components/schemas/OpaqueId" }
+        conversationId: { $ref: "#/components/schemas/OpaqueId" }
+        sequence: { type: integer, minimum: 1 }
+        senderId: { $ref: "#/components/schemas/OpaqueId" }
+        content: { type: string, minLength: 1, maxLength: 2000 }
+        createdAt: { type: string, format: date-time }
+        delivery: { type: string, enum: [SENT, READ] }
+
+    ReadBoundary:
+      type: object
+      additionalProperties: false
+      required: [conversationId, readerId, lastReadSequence, readAt]
+      properties:
+        conversationId: { $ref: "#/components/schemas/OpaqueId" }
+        readerId: { $ref: "#/components/schemas/OpaqueId" }
+        lastReadSequence: { type: integer, minimum: 0 }
+        readAt: { type: string, format: date-time }
+
+    BlockProjection:
+      type: object
+      additionalProperties: false
+      required: [targetUserId, blocked]
+      properties:
+        targetUserId: { $ref: "#/components/schemas/OpaqueId" }
+        blocked: { type: boolean }
+
+    ReportInput:
+      type: object
+      additionalProperties: false
+      required: [conversationId, targetUserId, targetType, category]
+      properties:
+        conversationId: { $ref: "#/components/schemas/OpaqueId" }
+        targetUserId: { $ref: "#/components/schemas/OpaqueId" }
+        targetType:
+          type: string
+          enum: [PARTICIPANT, CONVERSATION]
+        evidenceMessageId:
+          oneOf:
+            - { $ref: "#/components/schemas/OpaqueId" }
+            - { type: "null" }
+        category:
+          type: string
+          enum:
+            - FRAUD_OR_IMPERSONATION
+            - MISLEADING_CONTENT
+            - DISCRIMINATION_OR_HARASSMENT
+            - ABUSE_OR_THREATS
+            - SPAM_OR_DUPLICATE
+            - PRIVACY_OR_DATA_MISUSE
+            - OTHER
+        detail: { type: string, maxLength: 500, default: "" }
+
+    ErrorEnvelope:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum:
+                - VALIDATION_ERROR
+                - AUTH_REQUIRED
+                - CSRF_INVALID
+                - AUTHORITY_DENIED
+                - UNAVAILABLE
+                - CONFLICT
+                - RATE_LIMITED
+            message: { type: string, minLength: 1, maxLength: 200 }
+            retryAfterSeconds: { type: [integer, "null"], minimum: 0 }
+
+  responses:
+    ValidationError:
+      description: Strict input validation failed
+      headers:
+        Cache-Control:
+          schema: { type: string, const: no-store }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+    AuthRequired:
+      description: Existing SmartHire session is missing or invalid
+      headers:
+        Cache-Control:
+          schema: { type: string, const: no-store }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+    CsrfOrAuthorityDenied:
+      description: CSRF proof or current domain authority denied the operation
+      headers:
+        Cache-Control:
+          schema: { type: string, const: no-store }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+    Unavailable:
+      description: Neutral unknown, ineligible, or unauthorized target
+      headers:
+        Cache-Control:
+          schema: { type: string, const: no-store }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+    Conflict:
+      description: Authoritative state changed; caller must refetch
+      headers:
+        Cache-Control:
+          schema: { type: string, const: no-store }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+    RateLimited:
+      description: Safe admission limit exceeded
+      headers:
+        Cache-Control:
+          schema: { type: string, const: no-store }
+        Retry-After:
+          schema: { type: integer, minimum: 1 }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }

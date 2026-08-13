@@ -6,8 +6,10 @@ import type { RecruiterHeaderStatus } from "@/shared/contracts/recruiter-header-
 
 export function RecruiterHeaderAction({
   initialStatus,
+  onOpenWorkspace,
 }: {
   initialStatus?: RecruiterHeaderStatus | null;
+  onOpenWorkspace?: () => void;
 }) {
   const { status, checking, unavailable } =
     useRecruiterHeaderStatus(initialStatus);
@@ -35,7 +37,9 @@ export function RecruiterHeaderAction({
     : status.state === "REJECTED"
       ? "Reapply as Recruiter"
       : approved
-        ? "Recruiter Workspace"
+        ? onOpenWorkspace
+          ? "Post a Job"
+          : "Recruiter Workspace"
         : "Apply as Recruiter";
   const busy = checking || navigation.busy;
   const state = unavailable
@@ -59,6 +63,10 @@ export function RecruiterHeaderAction({
       tabIndex={pending ? 0 : undefined}
       onClick={() => {
         if (pending || busy) return;
+        if (approved && onOpenWorkspace) {
+          onOpenWorkspace();
+          return;
+        }
         navigation.open(status.href);
       }}
       onKeyDown={(event) => {

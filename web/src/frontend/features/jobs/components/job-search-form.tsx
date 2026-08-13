@@ -497,14 +497,19 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
           <input type="hidden" name="salaryPeriod" value="MONTH" />
           <div className="job-filter-actions">
             <button className="job-primary-button" type="submit">
+              <svg className="job-filter-action-icon" aria-hidden="true" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="6" />
+                <path d="m16 16 4 4" />
+              </svg>
               {copy.search}
             </button>
-            <Link className="job-secondary-link" href="/jobs">
+            <Link className="job-secondary-link job-filter-clear" href="/jobs">
+              <svg className="job-filter-action-icon" aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M20 11a8 8 0 1 0 1.6 4.8" />
+                <path d="M20 4v7h-7" />
+              </svg>
               {copy.clear}
             </Link>
-            <a className="job-secondary-link" href="#global-image-search">
-              {copy.image}
-            </a>
           </div>
         </form>
       </section>

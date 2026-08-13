@@ -109,6 +109,16 @@ const automaticParseFailures = new Set([
   "PARSER_TIMEOUT",
   "PARSER_UNAVAILABLE",
 ]);
+const retryableReadinessFailures = new Set([
+  "CV_SCANNER_UNAVAILABLE",
+  "CV_SCANNER_DEFINITIONS_STALE",
+]);
+const READINESS_RETRY_MS = 60_000;
+
+function errorCode(error: unknown): string {
+  if (error instanceof Error && "code" in error) return String(error.code);
+  return error instanceof Error ? error.message : "";
+}
 
 function automaticRetryDelay(
   stage: CvWorkStage,
@@ -149,6 +159,7 @@ export class CvWorkerRuntime {
   private readonly controller = new AbortController();
   private running = false;
   private stopping = false;
+  private shutdownPromise: Promise<void> | null = null;
   private active = new Set<Promise<void>>();
 
   constructor(options: CvWorkerRuntimeOptions) {
@@ -184,11 +195,26 @@ export class CvWorkerRuntime {
   }
 
   async assertReady(): Promise<void> {
-    await PrivateRasterWorkspace.cleanupStale();
-    await this.readiness();
     if (!this.pipeline.has("DELETE")) {
       throw new Error("CV_CLEANUP_PROCESSOR_REQUIRED");
     }
+    await PrivateRasterWorkspace.cleanupStale();
+    await this.readiness();
+  }
+
+  private async waitUntilReady(): Promise<boolean> {
+    while (!this.stopping && !this.controller.signal.aborted) {
+      try {
+        await this.assertReady();
+        return true;
+      } catch (error) {
+        const code = errorCode(error);
+        if (!retryableReadinessFailures.has(code)) throw error;
+        console.warn(`[cv-worker] readiness deferred: ${code}`);
+        await this.sleep(READINESS_RETRY_MS, this.controller.signal);
+      }
+    }
+    return false;
   }
 
   private async process(stage: CvWorkStage, claim: CvWorkClaim): Promise<void> {
@@ -371,7 +397,7 @@ export class CvWorkerRuntime {
     if (this.running) throw new Error("CV_WORKER_ALREADY_RUNNING");
     this.running = true;
     try {
-      await this.assertReady();
+      if (!(await this.waitUntilReady())) return;
       while (!this.stopping && !this.controller.signal.aborted) {
         const claimed = await this.pollOnce();
         if (this.active.size > 0) {
@@ -387,11 +413,15 @@ export class CvWorkerRuntime {
   }
 
   async shutdown(): Promise<void> {
-    if (!this.stopping) {
-      this.stopping = true;
-      this.controller.abort();
-    }
-    await Promise.allSettled([...this.active]);
-    await this.repository.releaseWorkerLeases(this.owner, this.clock.now());
+    if (this.shutdownPromise) return this.shutdownPromise;
+    this.shutdownPromise = (async () => {
+      if (!this.stopping) {
+        this.stopping = true;
+        this.controller.abort();
+      }
+      await Promise.allSettled([...this.active]);
+      await this.repository.releaseWorkerLeases(this.owner, this.clock.now());
+    })();
+    return this.shutdownPromise;
   }
 }

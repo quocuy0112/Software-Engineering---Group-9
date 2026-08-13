@@ -6,6 +6,7 @@ import { formatSalary } from "@/shared/utils/jobs/job-display";
 
 import companyCatalog from "../../../../../data/jobs/companies.json";
 import { CompanyAvatar } from "./company-avatar";
+import { JobMetaIcon, type JobMetaIconName } from "./job-meta-icon";
 import { ReportJobDialog } from "./report-job-dialog";
 
 const valueLabel: Record<string, string> = {
@@ -212,7 +213,7 @@ export function CompanyCard({ job }: { job: JobDetail }) {
           <div>
             <dt>
               <span className="job-sidebar-fact-icon" aria-hidden="true">
-                S
+                <JobMetaIcon name="company-size" />
               </span>
               Scale
             </dt>
@@ -221,7 +222,7 @@ export function CompanyCard({ job }: { job: JobDetail }) {
           <div>
             <dt>
               <span className="job-sidebar-fact-icon" aria-hidden="true">
-                I
+                <JobMetaIcon name="industry" />
               </span>
               Industry
             </dt>
@@ -230,7 +231,7 @@ export function CompanyCard({ job }: { job: JobDetail }) {
           <div>
             <dt>
               <span className="job-sidebar-fact-icon" aria-hidden="true">
-                A
+                <JobMetaIcon name="location" />
               </span>
               Address
             </dt>
@@ -257,7 +258,7 @@ function InfoRow({
   label,
   value,
 }: {
-  icon: string;
+  icon: JobMetaIconName;
   label: string;
   value: string;
 }) {
@@ -269,7 +270,7 @@ function InfoRow({
       }
     >
       <span className="job-general-info-icon" aria-hidden="true">
-        {icon}
+        <JobMetaIcon name={icon} />
       </span>
       <dt>{label}</dt>
       <dd>{displayValue(value)}</dd>
@@ -291,12 +292,12 @@ export function GeneralInfoCard({ job }: { job: JobDetail }) {
       />
       <dl className="job-general-info-list">
         <InfoRow
-          icon="↗"
+          icon="level"
           label="Level"
           value={valueLabel[job.experienceLevel] ?? "Not listed"}
         />
         <InfoRow
-          icon="◷"
+          icon="experience"
           label="Experience"
           value={
             job.experienceMinYears !== undefined
@@ -305,12 +306,12 @@ export function GeneralInfoCard({ job }: { job: JobDetail }) {
           }
         />
         <InfoRow
-          icon="◇"
+          icon="education"
           label="Education"
           value={job.education?.trim() || "Not listed"}
         />
         <InfoRow
-          icon="◉"
+          icon="hires"
           label="Number of hires"
           value={
             job.numberOfHires === undefined || job.numberOfHires === null
@@ -319,12 +320,12 @@ export function GeneralInfoCard({ job }: { job: JobDetail }) {
           }
         />
         <InfoRow
-          icon="▣"
+          icon="arrangement"
           label="Work arrangement"
           value={valueLabel[job.workArrangement] ?? "Not listed"}
         />
         <InfoRow
-          icon="TY"
+          icon="employment"
           label="Employment type"
           value={valueLabel[job.employmentType] ?? "Not listed"}
         />

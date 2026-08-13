@@ -14,6 +14,7 @@ export default async function ProfilePage() {
   return (
     <ProfileOverview
       account={{
+        id: context.userId,
         name: context.account.name,
         email: context.account.email,
         image: context.account.image,

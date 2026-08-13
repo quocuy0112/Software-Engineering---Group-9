@@ -23,6 +23,7 @@ services:
     entrypoint: ["/bin/sh", "/opt/smarthire/clamav-entrypoint.sh"]
     environment:
       CLAMD_STARTUP_TIMEOUT_SECONDS: "1800"
+      CLAMD_RESTART_DELAY_SECONDS: "60"
       FRESHCLAM_CHECKS_PER_DAY: "12"
     group_add:
       - "101"
@@ -54,7 +55,7 @@ services:
       context: .
       dockerfile: web/Dockerfile.cv-worker
     image: smarthire-cv-worker:local
-    restart: "no"
+    restart: unless-stopped
     env_file:
       - .env
       - web/.env.local
@@ -65,6 +66,10 @@ services:
       CV_STORAGE_LOCAL_ROOT: /app/.local/cv-storage
       CV_STORAGE_DOCKER_BIND_MOUNT: "true"
       CV_CLAMD_SOCKET_PATH: /run/clamav/clamd.sock
+      # Local-only fallback while the official mirror's newest signatures are
+      # older than the normal 24-hour policy. Non-local env validation still
+      # requires 24 hours.
+      CV_CLAMD_SIGNATURE_MAX_AGE_HOURS: "48"
       OCR_ENGINE_ENABLED: ${OCR_ENGINE_ENABLED:-true}
       OCR_ENGINE_SOCKET_PATH: /run/smarthire-ocr/ocr.sock
       OCR_ENGINE_NAME: ${OCR_ENGINE_NAME:-paddleocr-onnx}
@@ -133,7 +138,7 @@ services:
       context: .
       dockerfile: Dockerfile.image-search-worker
     image: smarthire-image-search-worker:local
-    restart: "no"
+    restart: unless-stopped
     env_file:
       - .env
       - web/.env.local
@@ -151,6 +156,7 @@ services:
       # purpose-isolated image-search worker.
       CV_STORAGE_LOCAL_ROOT: /app/.local/cv-storage
       CV_CLAMD_SOCKET_PATH: /run/clamav/clamd.sock
+      CV_CLAMD_SIGNATURE_MAX_AGE_HOURS: "48"
       OCR_ENGINE_SOCKET_PATH: /run/smarthire-ocr/ocr.sock
     depends_on:
       postgres:
@@ -182,7 +188,7 @@ services:
       context: .
       dockerfile: Dockerfile.admin-worker
     image: smarthire-admin-worker:local
-    restart: "no"
+    restart: unless-stopped
     env_file:
       - .env
       - web/.env.local
@@ -196,6 +202,7 @@ services:
       IMAGE_SEARCH_STORAGE_LOCAL_ROOT: /app/.local/image-search-storage
       ADMIN_EVIDENCE_STORAGE_ROOT: /app/.local/admin-evidence
       ADMIN_CLAMD_SOCKET_PATH: /run/clamav/clamd.sock
+      CV_CLAMD_SIGNATURE_MAX_AGE_HOURS: "48"
     depends_on:
       postgres:
         condition: service_healthy

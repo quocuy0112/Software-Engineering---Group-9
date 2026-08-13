@@ -2,6 +2,7 @@ import "server-only";
 
 import { randomUUID } from "node:crypto";
 
+import { cvConfiguration } from "@/backend/cv/config";
 import { ClamAvScanner } from "@/backend/cv/scanning/clamav";
 import { createSearchStorageResource } from "@/backend/image-search/storage/factory";
 import { OpenAiSearchIntentInterpreter } from "@/backend/image-search/interpretation/openai";
@@ -24,8 +25,10 @@ export function createImageSearchWorkerResources() {
   const work = new PrismaImageSearchWorkRepository();
   const queries = new PrismaImageSearchQueryRepository();
   const scanner = new ClamAvScanner({
-    socketPath: process.env.CV_CLAMD_SOCKET_PATH ?? "/run/clamav/clamd.sock",
+    socketPath: cvConfiguration.scanner.socketPath,
     maximumBytes: 5_000_000,
+    signatureMaximumAgeMs:
+      cvConfiguration.scanner.signatureMaximumAgeHours * 60 * 60_000,
   });
   const normalizer = new SharpImageNormalizer({
     assertCleanAssessment: async (assessmentId, purpose) => {

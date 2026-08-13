@@ -4,5 +4,6 @@ COPY package.json package-lock.json ./
 COPY web/package.json web/package.json
 RUN npm ci --workspace @smarthire/web
 COPY web web
+RUN install -d -o node -g node -m 0700 /app/.local/admin-evidence
 USER node
 CMD ["npm", "run", "admin:worker", "--workspace", "@smarthire/web"]

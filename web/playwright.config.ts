@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 const reuseExistingServer = process.env.PLAYWRIGHT_REUSE_SERVER === "1";
 const appOnlyServer = process.env.PLAYWRIGHT_APP_ONLY === "1";
+const productionServer = process.env.PLAYWRIGHT_PRODUCTION === "1";
 
 export default defineConfig({
   testDir: "./tests/system/e2e",
@@ -10,7 +11,9 @@ export default defineConfig({
   workers: 1,
   webServer: {
     command: appOnlyServer
-      ? "npm run dev"
+      ? productionServer
+        ? "npm run start"
+        : "npm run dev"
       : "node ../scripts/run-local-development.mjs",
     url: "http://localhost:3001",
     reuseExistingServer,

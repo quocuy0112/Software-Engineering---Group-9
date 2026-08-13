@@ -18,14 +18,12 @@ import {
 } from "@/shared/contracts/jobs/discovery";
 import {
   computeDiscoveryJobs,
-  computeMatchScore,
   computeRelatedJobs,
-  type CandidateJobProfile,
   type JobSimilarityInput,
 } from "@/shared/utils/jobs/similarity";
 import { GetProfileAggregateService } from "@/backend/services/profile/get-profile-aggregate";
-import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
 import { normalizeSalaryAmount } from "@/shared/utils/jobs/job-display";
+import { rankJobsForCandidate } from "./candidate-job-match";
 
 const experienceYears: Record<string, number> = {
   ENTRY: 0,
@@ -36,64 +34,7 @@ const experienceYears: Record<string, number> = {
   MANAGER: 7,
 };
 
-const yearMilliseconds = 365.25 * 24 * 60 * 60 * 1000;
-
 type CandidateSignal = JobSimilarityInput & { row: PublicJobRow };
-
-function candidateExperienceYears(
-  profile: CandidateProfileContract,
-  now: Date,
-) {
-  const starts = profile.experience
-    .map((item) => Date.parse(item.startDate))
-    .filter(Number.isFinite);
-  if (!starts.length) return null;
-
-  const ends = profile.experience.map((item) =>
-    item.current || !item.endDate ? now.getTime() : Date.parse(item.endDate),
-  );
-  const earliestStart = Math.min(...starts);
-  const latestEnd = Math.max(...ends.filter((value) => Number.isFinite(value)));
-  return Math.max(0, (latestEnd - earliestStart) / yearMilliseconds);
-}
-
-function candidateProfileSignals(
-  profile: CandidateProfileContract,
-  now: Date,
-): CandidateJobProfile {
-  return {
-    skillTags: profile.skills.map((skill) => skill.label),
-    city: profile.basics.location ?? undefined,
-    experienceMinYears: candidateExperienceYears(profile, now),
-  };
-}
-
-function rankForCandidateProfile(
-  profile: CandidateProfileContract,
-  candidates: readonly CandidateSignal[],
-  now: Date,
-  limit = 3,
-) {
-  const profileSignals = candidateProfileSignals(profile, now);
-  return candidates
-    .filter(
-      (candidate) =>
-        !candidate.status || candidate.status.toLowerCase() === "open",
-    )
-    .map((candidate, index) => ({
-      candidate,
-      matchScore: computeMatchScore(profileSignals, candidate),
-      index,
-    }))
-    .sort((left, right) => {
-      if (right.matchScore !== left.matchScore)
-        return right.matchScore - left.matchScore;
-      const rightDate = right.candidate.postedAt ?? "";
-      const leftDate = left.candidate.postedAt ?? "";
-      return rightDate.localeCompare(leftDate) || left.index - right.index;
-    })
-    .slice(0, Math.max(0, limit));
-}
 
 function validationError(error: z.ZodError) {
   const fieldErrors: Record<string, string[]> = {};
@@ -421,7 +362,7 @@ export class JobDiscoveryService {
     if (actor.kind === "user") {
       try {
         const profile = await this.profileService.execute(actor.userId);
-        const personalized = rankForCandidateProfile(
+        const personalized = rankJobsForCandidate(
           profile,
           discoveryCandidateSignals.filter(
             (candidate) => !relatedJobIds.has(candidate.id),

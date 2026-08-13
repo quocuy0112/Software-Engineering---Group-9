@@ -6,6 +6,7 @@ import {
 } from "@/backend/repositories/admin/prisma-admin-command-repository";
 import { recordMembershipCommand } from "./admin-membership-command-transaction";
 import { PrismaAdminMembershipRepository } from "@/backend/repositories/admin/prisma-admin-membership-repository";
+import { enforceMessagingMembershipRevocation } from "@/backend/messaging/realtime/messaging-authority-enforcement";
 type Command = {
   expectedVersion: number;
   idempotencyKey: string;
@@ -30,14 +31,14 @@ export class AdminMembershipService {
   detail(membershipId: string) {
     return new PrismaAdminMembershipRepository().one(membershipId);
   }
-  private run(
+  private async run(
     authority: AdminAuthority,
     membershipId: string,
     action: "suspend" | "restore" | "remove",
     command: Command,
   ) {
     const now = new Date();
-    return new PrismaAdminCommandRepository().execute(
+    const outcome = await new PrismaAdminCommandRepository().execute(
       {
         actorUserId: authority.userId,
         actorSessionId: authority.sessionId,
@@ -130,9 +131,26 @@ export class AdminMembershipService {
           version,
           occurredAt: now,
         });
-        return { version, state: resultingState, role: resultingRole };
+        return {
+          version,
+          state: resultingState,
+          role: resultingRole,
+          messagingUserId: row.userId,
+          messagingCompanyId: row.companyId,
+        };
       },
     );
+    if (action === "suspend" || action === "remove") {
+      await enforceMessagingMembershipRevocation({
+        userId: outcome.messagingUserId,
+        companyId: outcome.messagingCompanyId,
+      }).catch(() => undefined);
+    }
+    return {
+      version: outcome.version,
+      state: outcome.state,
+      role: outcome.role,
+    };
   }
   suspend(a: AdminAuthority, id: string, c: Command) {
     return this.run(a, id, "suspend", c);

@@ -11,10 +11,12 @@ import { ProfileExperienceForm } from "./profile-experience-form";
 import { ProfileEducationForm } from "./profile-education-form";
 import { ProfileSocialLinksForm } from "./profile-social-links-form";
 import { ProfileAvatarEditor } from "./profile-avatar-editor";
+import { AccountIdRow } from "./account-id-row";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 
 type ProfileOverviewProps = {
   account: {
+    id: string;
     name: string;
     email: string;
     image?: string | null;
@@ -44,6 +46,10 @@ export function ProfileOverview({
           enabled2fa: "Đã bật 2FA",
           recommended2fa: "Nên bật 2FA",
           account: "CHI TIẾT TÀI KHOẢN",
+          accountId: "ID tài khoản",
+          copyAccountId: "Sao chép ID tài khoản",
+          copiedAccountId: "Đã sao chép ID tài khoản",
+          copyAccountIdFailed: "Không thể sao chép ID tài khoản",
           email: "Địa chỉ email",
           status: "Trạng thái tài khoản",
           active: "Đang hoạt động",
@@ -75,6 +81,10 @@ export function ProfileOverview({
           enabled2fa: "2FA enabled",
           recommended2fa: "2FA recommended",
           account: "ACCOUNT DETAILS",
+          accountId: "Account ID",
+          copyAccountId: "Copy account ID",
+          copiedAccountId: "Account ID copied",
+          copyAccountIdFailed: "Account ID could not be copied",
           email: "Email address",
           status: "Account status",
           active: "Active",
@@ -154,6 +164,13 @@ export function ProfileOverview({
           <h2>{account.name}</h2>
 
           <dl className="profile-account-details">
+            <AccountIdRow
+              accountId={account.id}
+              label={copy.accountId}
+              copyLabel={copy.copyAccountId}
+              copiedLabel={copy.copiedAccountId}
+              failedLabel={copy.copyAccountIdFailed}
+            />
             <div>
               <dt>{copy.email}</dt>
               <dd>{account.email}</dd>

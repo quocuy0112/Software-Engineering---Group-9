@@ -201,6 +201,40 @@ describe.sequential("controlled CV retry policy", () => {
     ).not.toThrow();
   });
 
+  it("stays alive but claims no work while scanner definitions are stale", async () => {
+    const readiness = vi
+      .fn<() => Promise<void>>()
+      .mockRejectedValueOnce(
+        Object.assign(new Error("CV_SCANNER_DEFINITIONS_STALE"), {
+          code: "CV_SCANNER_DEFINITIONS_STALE",
+        }),
+      )
+      .mockResolvedValue(undefined);
+    const repository = {
+      claimStage: vi.fn(async () => []),
+      finalizeStage: vi.fn(async () => true),
+      releaseWorkerLeases: vi.fn(async () => 0),
+    };
+    const sleep = vi.fn(async (milliseconds: number) => {
+      if (milliseconds === 1_000) await runtime.shutdown();
+    });
+    const runtime = new CvWorkerRuntime({
+      repository: repository as never,
+      pipeline: new CvWorkerPipeline({
+        DELETE: async () => ({ status: "DELETED" }),
+      }),
+      readiness,
+      pollMs: 1_000,
+      sleep,
+    });
+
+    await expect(runtime.run()).resolves.toBeUndefined();
+    expect(readiness).toHaveBeenCalledTimes(2);
+    expect(sleep).toHaveBeenNthCalledWith(1, 60_000, expect.any(AbortSignal));
+    expect(repository.claimStage).toHaveBeenCalledOnce();
+    expect(repository.releaseWorkerLeases).toHaveBeenCalledOnce();
+  });
+
   it("uses fixed 2/5-second backoff and permits exactly three automatic parse attempts", async () => {
     const client = await pool.connect();
     const seeded = await seedCvRecoveryImport(client, "parse-auto-cycle", {

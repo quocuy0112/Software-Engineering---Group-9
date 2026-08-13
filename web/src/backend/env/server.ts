@@ -87,7 +87,9 @@ const schema = z
     CV_S3_REGION: z.string().trim().max(100).optional().or(z.literal("")),
     CV_S3_KMS_KEY_ID: z.string().trim().max(2048).optional().or(z.literal("")),
     CV_CLAMD_SOCKET_PATH: z.literal("/run/clamav/clamd.sock"),
-    CV_CLAMD_SIGNATURE_MAX_AGE_HOURS: z.literal("24").transform(Number),
+    CV_CLAMD_SIGNATURE_MAX_AGE_HOURS: z
+      .enum(["24", "48"])
+      .transform(Number),
     CV_PARSER_ADAPTER: z.enum(["deterministic", "openai"]),
     CV_OPENAI_ENABLED: booleanString,
     CV_OPENAI_LOCAL_DEV_ENABLED: booleanString,
@@ -141,6 +143,14 @@ const schema = z
     IMAGE_SEARCH_VISITOR_LIMIT_PER_HOUR: z.string().optional(),
     IMAGE_SEARCH_ACCOUNT_LIMIT_PER_HOUR: z.string().optional(),
     IMAGE_SEARCH_RETENTION_MINUTES: z.string().optional(),
+    MESSAGING_REALTIME_ENABLED: booleanString.default(true),
+    MESSAGING_SOCKET_PATH: z.literal("/chat").default("/chat"),
+    MESSAGING_ACK_TIMEOUT_MS: z.literal("5000").default("5000").transform(Number),
+    MESSAGING_ACK_RETRIES: z.literal("2").default("2").transform(Number),
+    MESSAGING_DISCONNECT_GRACE_MS: z
+      .literal("2000")
+      .default("2000")
+      .transform(Number),
   })
   .superRefine((env, ctx) => {
     const production = env.APP_ENV === "production";
@@ -148,6 +158,15 @@ const schema = z
     const authUrl = new URL(env.BETTER_AUTH_URL);
     const fail = (path: string, message: string) =>
       ctx.addIssue({ code: "custom", path: [path], message });
+    if (
+      env.APP_ENV !== "local" &&
+      env.CV_CLAMD_SIGNATURE_MAX_AGE_HOURS !== 24
+    ) {
+      fail(
+        "CV_CLAMD_SIGNATURE_MAX_AGE_HOURS",
+        "non-local environments require the 24-hour signature freshness policy",
+      );
+    }
     if (env.EMAIL_ADAPTER === "smtp") {
       if (!env.SMTP_HOST) fail("SMTP_HOST", "is required for SMTP");
       if (!env.SMTP_PORT) fail("SMTP_PORT", "is required for SMTP");
@@ -309,6 +328,7 @@ export function parseServerEnvironment(
       /^CV_CLAMD_(?:HOST|PORT|TCP|ADDR|ADDRESS)$/iu.test(key) ||
       /^OCR_ENGINE_(?:URL|HOST|PORT|TCP|ADDR|ADDRESS)$/iu.test(key) ||
       /^(?:CV_OPENAI_(?:BASE_URL|ENDPOINT)|OPENAI_BASE_URL)$/iu.test(key) ||
+      /^NEXT_PUBLIC_MESSAGING_(?:TOKEN|JWT|SECRET)$/iu.test(key) ||
       (key === "CV_S3_VERSIONING_ENABLED" && input[key] !== "false") ||
       (key === "CV_S3_PUBLIC_ACCESS_ENABLED" && input[key] !== "false"),
   );
