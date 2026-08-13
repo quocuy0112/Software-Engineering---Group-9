@@ -58,7 +58,7 @@ export function ReportMessagingDialog({
     setStatus(null);
     try {
       await submitMessagingReport(parsed.data, csrfProof);
-      setStatus("Report received.");
+      setStatus("Report received and queued for protected review.");
     } catch {
       setStatus("The report could not be submitted. Please try again.");
     } finally {

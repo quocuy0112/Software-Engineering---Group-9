@@ -116,6 +116,8 @@ export const ModelName = {
   MessagingMessage: 'MessagingMessage',
   UserMessagingBlock: 'UserMessagingBlock',
   MessagingReport: 'MessagingReport',
+  MessagingReportReviewEvent: 'MessagingReportReviewEvent',
+  MessagingReportPrivateNote: 'MessagingReportPrivateNote',
   ApplicationStageEvent: 'ApplicationStageEvent',
   ApplicationAnswer: 'ApplicationAnswer',
   RecruitmentNotificationWork: 'RecruitmentNotificationWork',
@@ -829,6 +831,7 @@ export const AdminCommandReceiptScalarFieldEnum = {
   normalizedBodyDigest: 'normalizedBodyDigest',
   resultCode: 'resultCode',
   resultingVersion: 'resultingVersion',
+  resultPayload: 'resultPayload',
   correlationId: 'correlationId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1303,6 +1306,10 @@ export const MessagingReportScalarFieldEnum = {
   category: 'category',
   normalizedDetail: 'normalizedDetail',
   state: 'state',
+  assignedAdminUserId: 'assignedAdminUserId',
+  handledByAdminUserId: 'handledByAdminUserId',
+  enforcementCorrelationId: 'enforcementCorrelationId',
+  version: 'version',
   unresolvedKey: 'unresolvedKey',
   handledAt: 'handledAt',
   preserveUntil: 'preserveUntil',
@@ -1311,6 +1318,32 @@ export const MessagingReportScalarFieldEnum = {
 } as const
 
 export type MessagingReportScalarFieldEnum = (typeof MessagingReportScalarFieldEnum)[keyof typeof MessagingReportScalarFieldEnum]
+
+
+export const MessagingReportReviewEventScalarFieldEnum = {
+  id: 'id',
+  reportId: 'reportId',
+  actorAdminUserId: 'actorAdminUserId',
+  action: 'action',
+  priorState: 'priorState',
+  resultingState: 'resultingState',
+  resultingVersion: 'resultingVersion',
+  enforcementCorrelationId: 'enforcementCorrelationId',
+  occurredAt: 'occurredAt'
+} as const
+
+export type MessagingReportReviewEventScalarFieldEnum = (typeof MessagingReportReviewEventScalarFieldEnum)[keyof typeof MessagingReportReviewEventScalarFieldEnum]
+
+
+export const MessagingReportPrivateNoteScalarFieldEnum = {
+  id: 'id',
+  reportId: 'reportId',
+  authorAdminUserId: 'authorAdminUserId',
+  normalizedText: 'normalizedText',
+  createdAt: 'createdAt'
+} as const
+
+export type MessagingReportPrivateNoteScalarFieldEnum = (typeof MessagingReportPrivateNoteScalarFieldEnum)[keyof typeof MessagingReportPrivateNoteScalarFieldEnum]
 
 
 export const ApplicationStageEventScalarFieldEnum = {

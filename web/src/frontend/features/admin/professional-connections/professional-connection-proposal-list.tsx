@@ -18,7 +18,7 @@ import {
   TextInput,
   useRefresh,
 } from "react-admin";
-import { adminDataProvider } from "../app/data-provider";
+import { adminApiErrorDetails, adminDataProvider } from "../app/data-provider";
 import { useConnectionInvalidation } from "@/frontend/features/connections/client/use-connection-invalidation";
 
 type AccountOption = {
@@ -132,6 +132,10 @@ function ProposalCreatePanel() {
     setBusy(true);
     setMessage(null);
     try {
+      const supportCaseId = supportCase.trim();
+      if (supportCaseId) {
+        await adminDataProvider.getOne("support-cases", { id: supportCaseId });
+      }
       await adminDataProvider.command(
         "/api/admin/professional-connection-proposals",
         {
@@ -139,8 +143,8 @@ function ProposalCreatePanel() {
           participantBId: second.id,
           reason,
           expiryDays,
-          ...(supportCase.trim()
-            ? { sourceSupportConversationId: supportCase.trim() }
+          ...(supportCaseId
+            ? { sourceSupportConversationId: supportCaseId }
             : {}),
         },
         1,
@@ -155,8 +159,20 @@ function ProposalCreatePanel() {
       );
       refresh();
     } catch (error) {
+      const details = adminApiErrorDetails(
+        error && typeof error === "object" && "body" in error
+          ? error.body
+          : null,
+      );
       setMessage(
-        error instanceof Error ? error.message : "Unable to create proposal.",
+        details.code === "TARGET_UNAVAILABLE" ||
+          details.code === "CASE_UNAVAILABLE"
+          ? "The optional Support case ID does not exist or is unavailable. Clear it or choose an existing case."
+          : details.code === "RESOURCE_UNAVAILABLE"
+            ? "Unable to create this proposal. Verify both accounts are ACTIVE and not blocked, and clear any invalid optional Support case ID."
+            : error instanceof Error
+              ? error.message
+              : "Unable to create proposal.",
       );
     } finally {
       setBusy(false);
@@ -238,6 +254,7 @@ function ProposalCreatePanel() {
           label="Optional Support case ID"
           value={supportCase}
           onChange={(event) => setSupportCase(event.target.value)}
+          helperText="Leave blank unless linking an existing case from the Support Inbox."
         />
       </Box>
       <Button

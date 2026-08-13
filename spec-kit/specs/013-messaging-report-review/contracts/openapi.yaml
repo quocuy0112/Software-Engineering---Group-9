@@ -1,0 +1,194 @@
+openapi: 3.1.0
+info:
+  title: SmartHire Protected Messaging Report Review API
+  version: 1.0.0
+paths:
+  /api/admin/messaging-reports:
+    get:
+      summary: List messaging reports using a metadata-only projection
+      parameters:
+        - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - { name: perPage, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 25 } }
+        - { name: filter, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: Bounded metadata-only list
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MessagingReportList' }
+        '401': { $ref: '#/components/responses/SafeError' }
+        '403': { $ref: '#/components/responses/SafeError' }
+  /api/admin/messaging-reports/{reportId}:
+    get:
+      summary: Read protected detail and exactly one submitted evidence message
+      parameters:
+        - $ref: '#/components/parameters/ReportId'
+      responses:
+        '200':
+          description: Protected evidence-only detail
+          headers:
+            Cache-Control: { schema: { type: string }, description: private, no-store }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/MessagingReportDetail' }
+        '403': { $ref: '#/components/responses/SafeError' }
+        '404': { $ref: '#/components/responses/SafeError' }
+  /api/admin/messaging-reports/{reportId}/{action}:
+    post:
+      summary: Apply an idempotent, version-checked review command
+      parameters:
+        - $ref: '#/components/parameters/ReportId'
+        - name: action
+          in: path
+          required: true
+          schema: { type: string, enum: [assign, note, resolve, dismiss, link-enforcement] }
+        - name: If-Match-Version
+          in: header
+          required: true
+          schema: { type: integer, minimum: 1 }
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string, minLength: 8, maxLength: 128 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/ConfirmedCommand'
+                - $ref: '#/components/schemas/NoteCommand'
+                - $ref: '#/components/schemas/EnforcementCommand'
+      responses:
+        '200':
+          description: Accepted or exactly replayed command
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CommandResult' }
+        '400': { $ref: '#/components/responses/SafeError' }
+        '403': { $ref: '#/components/responses/SafeError' }
+        '404': { $ref: '#/components/responses/SafeError' }
+        '409': { $ref: '#/components/responses/SafeError' }
+components:
+  parameters:
+    ReportId:
+      name: reportId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+  responses:
+    SafeError:
+      description: Content-free administrator error
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/SafeError' }
+  schemas:
+    MessagingReportListItem:
+      type: object
+      additionalProperties: false
+      required: [id, reporterAccountId, reporterDisplayName, targetAccountId, targetDisplayName, targetType, category, state, assignedAdministratorId, evidenceAvailable, createdAt, version]
+      properties:
+        id: { type: string }
+        reporterAccountId: { type: string }
+        reporterDisplayName: { type: string }
+        targetAccountId: { type: string }
+        targetDisplayName: { type: string }
+        targetType: { type: string, enum: [CONVERSATION, PARTICIPANT] }
+        category: { type: string }
+        state: { type: string, enum: [PENDING_REVIEW, RESOLVED, DISMISSED] }
+        assignedAdministratorId: { type: [string, 'null'] }
+        evidenceAvailable: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        version: { type: integer, minimum: 1 }
+    MessagingReportList:
+      type: object
+      required: [data, total, calculatedAt, stateDefinitionVersion]
+      properties:
+        data: { type: array, items: { $ref: '#/components/schemas/MessagingReportListItem' } }
+        total: { type: integer, minimum: 0 }
+        calculatedAt: { type: string, format: date-time }
+        stateDefinitionVersion: { type: string }
+    EvidenceMessage:
+      type: object
+      additionalProperties: false
+      required: [id, senderAccountId, senderDisplayName, content, sentAt]
+      properties:
+        id: { type: string }
+        senderAccountId: { type: string }
+        senderDisplayName: { type: string }
+        content: { type: string }
+        sentAt: { type: string, format: date-time }
+    ReviewEvent:
+      type: object
+      required: [id, actorAdministratorId, action, priorState, resultingState, resultingVersion, enforcementCorrelationId, occurredAt]
+      properties:
+        id: { type: string }
+        actorAdministratorId: { type: string }
+        action: { type: string }
+        priorState: { type: string }
+        resultingState: { type: string }
+        resultingVersion: { type: integer }
+        enforcementCorrelationId: { type: [string, 'null'] }
+        occurredAt: { type: string, format: date-time }
+    PrivateNote:
+      type: object
+      required: [id, authorAdministratorId, text, createdAt]
+      properties:
+        id: { type: string }
+        authorAdministratorId: { type: string }
+        text: { type: string, maxLength: 2000 }
+        createdAt: { type: string, format: date-time }
+    MessagingReportDetail:
+      allOf:
+        - $ref: '#/components/schemas/MessagingReportListItem'
+        - type: object
+          required: [detail, evidence, history, notes, updatedAt, handledAt, handledByAdministratorId, enforcementCorrelationId]
+          properties:
+            detail: { type: [string, 'null'] }
+            evidence: { anyOf: [{ $ref: '#/components/schemas/EvidenceMessage' }, { type: 'null' }] }
+            history: { type: array, items: { $ref: '#/components/schemas/ReviewEvent' } }
+            notes: { type: array, items: { $ref: '#/components/schemas/PrivateNote' } }
+            updatedAt: { type: string, format: date-time }
+            handledAt: { type: [string, 'null'], format: date-time }
+            handledByAdministratorId: { type: [string, 'null'] }
+            enforcementCorrelationId: { type: [string, 'null'] }
+    ConfirmedCommand:
+      type: object
+      additionalProperties: false
+      required: [confirmation]
+      properties: { confirmation: { type: boolean, const: true } }
+    NoteCommand:
+      type: object
+      additionalProperties: false
+      required: [confirmation, note]
+      properties:
+        confirmation: { type: boolean, const: true }
+        note: { type: string, minLength: 1, maxLength: 2000 }
+    EnforcementCommand:
+      type: object
+      additionalProperties: false
+      required: [confirmation, enforcementCorrelationId]
+      properties:
+        confirmation: { type: boolean, const: true }
+        enforcementCorrelationId: { type: string, minLength: 8, maxLength: 128 }
+    CommandResult:
+      type: object
+      required: [version, state, assignedAdministratorId, handledAt, handledByAdministratorId, enforcementCorrelationId]
+      properties:
+        version: { type: integer, minimum: 2 }
+        state: { type: string, enum: [PENDING_REVIEW, RESOLVED, DISMISSED] }
+        assignedAdministratorId: { type: [string, 'null'] }
+        handledAt: { type: [string, 'null'], format: date-time }
+        handledByAdministratorId: { type: [string, 'null'] }
+        enforcementCorrelationId: { type: [string, 'null'] }
+    SafeError:
+      type: object
+      required: [code]
+      properties:
+        code: { type: string, enum: [UNAVAILABLE, UNAUTHORIZED, STEP_UP_REQUIRED, VALIDATION_FAILED, STALE_CONFLICT, RATE_LIMITED, INTERNAL_FAILURE] }
+        correlationId: { type: string }
+        currentVersion: { type: integer }

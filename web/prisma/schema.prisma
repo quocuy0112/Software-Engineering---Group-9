@@ -715,6 +715,10 @@ model UserAccount {
   messagingBlocksReceived        UserMessagingBlock[]                    @relation("MessagingBlocked")
   submittedMessagingReports      MessagingReport[]                       @relation("MessagingReporter")
   targetedMessagingReports       MessagingReport[]                       @relation("MessagingTarget")
+  assignedMessagingReports       MessagingReport[]                       @relation("MessagingReportAssignee")
+  handledMessagingReports        MessagingReport[]                       @relation("MessagingReportHandler")
+  messagingReportReviewEvents    MessagingReportReviewEvent[]            @relation("MessagingReportReviewActor")
+  messagingReportPrivateNotes    MessagingReportPrivateNote[]            @relation("MessagingReportNoteAuthor")
   supportConversationsRequested  SupportConversation[]                   @relation("SupportRequester")
   supportConversationsAssigned   SupportConversation[]                   @relation("SupportCurrentAssignee")
   supportMessages                SupportMessage[]
@@ -1459,6 +1463,7 @@ model AdminCommandReceipt {
   normalizedBodyDigest String
   resultCode           String
   resultingVersion     Int?
+  resultPayload        Json?
   correlationId        String
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
@@ -2028,28 +2033,68 @@ model UserMessagingBlock {
 }
 
 model MessagingReport {
-  id                String                    @id @default(cuid())
-  reporterUserId    String
-  targetUserId      String
-  conversationId    String
-  targetType        MessagingReportTargetType
-  evidenceMessageId String?
-  category          ModerationReportCategory
-  normalizedDetail  String?
-  state             ModerationReportState     @default(PENDING_REVIEW)
-  unresolvedKey     String?                   @unique
-  handledAt         DateTime?
-  preserveUntil     DateTime?
-  createdAt         DateTime                  @default(now())
-  updatedAt         DateTime                  @updatedAt
-  reporter          UserAccount               @relation("MessagingReporter", fields: [reporterUserId], references: [id], onDelete: Restrict)
-  target            UserAccount               @relation("MessagingTarget", fields: [targetUserId], references: [id], onDelete: Restrict)
-  conversation      MessagingConversation     @relation(fields: [conversationId], references: [id], onDelete: Restrict)
-  evidenceMessage   MessagingMessage?         @relation("MessagingReportEvidence", fields: [evidenceMessageId], references: [id], onDelete: SetNull)
+  id                       String                       @id @default(cuid())
+  reporterUserId           String
+  targetUserId             String
+  conversationId           String
+  targetType               MessagingReportTargetType
+  evidenceMessageId        String?
+  category                 ModerationReportCategory
+  normalizedDetail         String?
+  state                    ModerationReportState        @default(PENDING_REVIEW)
+  assignedAdminUserId      String?
+  handledByAdminUserId     String?
+  enforcementCorrelationId String?                      @db.VarChar(128)
+  version                  Int                          @default(1)
+  unresolvedKey            String?                      @unique
+  handledAt                DateTime?
+  preserveUntil            DateTime?
+  createdAt                DateTime                     @default(now())
+  updatedAt                DateTime                     @updatedAt
+  reporter                 UserAccount                  @relation("MessagingReporter", fields: [reporterUserId], references: [id], onDelete: Restrict)
+  target                   UserAccount                  @relation("MessagingTarget", fields: [targetUserId], references: [id], onDelete: Restrict)
+  assignedAdmin            UserAccount?                 @relation("MessagingReportAssignee", fields: [assignedAdminUserId], references: [id], onDelete: SetNull)
+  handledByAdmin           UserAccount?                 @relation("MessagingReportHandler", fields: [handledByAdminUserId], references: [id], onDelete: SetNull)
+  conversation             MessagingConversation        @relation(fields: [conversationId], references: [id], onDelete: Restrict)
+  evidenceMessage          MessagingMessage?            @relation("MessagingReportEvidence", fields: [evidenceMessageId], references: [id], onDelete: SetNull)
+  reviewEvents             MessagingReportReviewEvent[]
+  privateNotes             MessagingReportPrivateNote[]
 
   @@index([reporterUserId, createdAt(sort: Desc)])
   @@index([conversationId, state, createdAt])
+  @@index([state, createdAt, id])
+  @@index([assignedAdminUserId, state, createdAt, id])
   @@index([preserveUntil])
+}
+
+model MessagingReportReviewEvent {
+  id                       String                @id @default(cuid())
+  reportId                 String
+  actorAdminUserId         String
+  action                   String                @db.VarChar(80)
+  priorState               ModerationReportState
+  resultingState           ModerationReportState
+  resultingVersion         Int
+  enforcementCorrelationId String?               @db.VarChar(128)
+  occurredAt               DateTime              @default(now())
+  report                   MessagingReport       @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  actorAdmin               UserAccount           @relation("MessagingReportReviewActor", fields: [actorAdminUserId], references: [id], onDelete: Restrict)
+
+  @@unique([reportId, resultingVersion])
+  @@index([reportId, occurredAt, id])
+  @@index([actorAdminUserId, occurredAt])
+}
+
+model MessagingReportPrivateNote {
+  id                String          @id @default(cuid())
+  reportId          String
+  authorAdminUserId String
+  normalizedText    String          @db.VarChar(2000)
+  createdAt         DateTime        @default(now())
+  report            MessagingReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  authorAdmin       UserAccount      @relation("MessagingReportNoteAuthor", fields: [authorAdminUserId], references: [id], onDelete: Restrict)
+
+  @@index([reportId, createdAt, id])
 }
 
 model ApplicationStageEvent {

@@ -8,10 +8,29 @@ const endpoints: Record<string, string> = {
   "company-memberships": "/api/admin/company-memberships",
   "verification-requests": "/api/admin/verification-requests",
   "moderation-reports": "/api/admin/moderation-reports",
+  "messaging-reports": "/api/admin/messaging-reports",
   "support-cases": "/api/admin/support-cases",
   "professional-connection-proposals":
     "/api/admin/professional-connection-proposals",
 };
+
+export function adminApiErrorDetails(body: unknown) {
+  if (!body || typeof body !== "object")
+    return { code: "INTERNAL_FAILURE", message: "INTERNAL_FAILURE" };
+  const envelope = body as {
+    code?: unknown;
+    error?: { code?: unknown; message?: unknown };
+  };
+  const code =
+    typeof envelope.code === "string"
+      ? envelope.code
+      : typeof envelope.error?.code === "string"
+        ? envelope.error.code
+        : "INTERNAL_FAILURE";
+  const message =
+    typeof envelope.error?.message === "string" ? envelope.error.message : code;
+  return { code, message };
+}
 
 async function api(path: string, init: RequestInit = {}) {
   const headers = new Headers(init.headers);
@@ -26,11 +45,14 @@ async function api(path: string, init: RequestInit = {}) {
     credentials: "same-origin",
   });
   const body = await response.json().catch(() => ({}));
-  if (!response.ok)
-    throw Object.assign(new Error(body.code ?? "INTERNAL_FAILURE"), {
+  if (!response.ok) {
+    const error = adminApiErrorDetails(body);
+    throw Object.assign(new Error(error.message), {
       status: response.status,
       body,
+      code: error.code,
     });
+  }
   return body;
 }
 
