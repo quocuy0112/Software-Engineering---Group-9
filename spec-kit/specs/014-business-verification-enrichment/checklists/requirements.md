@@ -32,4 +32,5 @@
 ## Notes
 
 - Clarifications use recommended defaults requested by the user: human-only decisions, manual provider fallback, pre-submission email verification, syntax-only phone validation, and ten-digit enterprise tax identifiers.
+- Clarification audit fixed exact retention/deletion, 24-hour post-verification submission, deterministic mismatch comparison, and Vietnamese phone canonicalization boundaries.
 - Public/no-cost provider eligibility is a product constraint; provider selection remains an implementation planning decision.

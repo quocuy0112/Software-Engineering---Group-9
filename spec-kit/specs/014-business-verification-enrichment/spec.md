@@ -18,6 +18,13 @@
 - Q: Does a syntactically valid company phone become verified? → A: No. It is normalized to Vietnamese international format and explicitly remains unverified because Feature 014 adds no OTP flow.
 - Q: Which tax identifiers are supported? → A: Exactly ten ASCII digits for Vietnamese enterprises. Thirteen-digit branch and dependent-unit identifiers remain out of scope until the company model represents parent/dependent entities.
 
+### Clarification Audit 2026-08-14
+
+- Q: How long may lookup and email-verification preparation records remain when no request is submitted? → A: An unused lookup snapshot becomes inaccessible 24 hours after expiry and is deleted within the following 24 hours; expired, superseded, or consumed email challenges retain content-free delivery/security metadata for 30 days, while token digests and normalized email become inaccessible immediately and are deleted within 24 hours. A snapshot accepted into a request follows the request's authorized review/history lifetime.
+- Q: How long after mailbox verification may final submission occur? → A: Within 24 hours of successful verification and before the bound lookup snapshot expires; afterward the applicant must run lookup and email verification again.
+- Q: What exactly triggers a mismatch explanation? → A: Any applicant legal name or registered address that is not equal to the available registry value after the same field-specific normalization triggers the explanation; there is no fuzzy-match threshold that can silently suppress a difference.
+- Q: Which phone syntax is accepted without OTP? → A: A Vietnamese local number beginning with `0` followed by 9 or 10 digits, or its equivalent `+84` form; separators are removed before validation, extensions are rejected, and the canonical stored value is `+84` plus the national number without its leading zero.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Confirm Registered Business Facts (Priority: P1)
@@ -121,8 +128,10 @@ As a Platform Administrator, I want registry, applicant, contact, relationship, 
 - **FR-012**: Company email MUST be normalized, syntax validated, length bounded, and verified by a short-lived single-use challenge before final request submission.
 - **FR-013**: An email challenge MUST be bound to applicant account, normalized tax identifier, normalized email, and lookup snapshot; changing any binding value MUST supersede the challenge.
 - **FR-014**: Verification tokens MUST be random, stored only as secure digests, excluded from logs and analytics, single-use, and expire after 24 hours; resend MUST invalidate earlier unconsumed challenges and apply bounded rate limits.
+- **FR-014A**: Final submission MUST occur within 24 hours after successful mailbox verification and before the bound lookup snapshot expires; an expired binding requires a fresh lookup and challenge.
 - **FR-015**: Email verification proves control of one mailbox only. Free-provider and website-domain-match signals MAY be displayed but MUST NOT independently permit or deny submission or administrator decision.
 - **FR-016**: Company phone MUST be required, normalize supported Vietnamese local forms to canonical `+84` E.164 form, reject unsupported or ambiguous forms, and always be labelled unverified because this feature performs no OTP verification.
+- **FR-016A**: Phone normalization MUST remove ordinary visual separators, accept only local `0` plus 9 or 10 digits or the equivalent `+84` form, reject extensions and every other country code, and store `+84` plus the national number without its leading zero.
 - **FR-017**: Optional company website MUST normalize to an HTTPS origin using an internationalized-domain-safe ASCII host and MUST reject credentials, query, fragment, IP literals, localhost/private hosts, unsupported ports, and non-web schemes.
 - **FR-018**: Applicant relationship MUST be one of `LEGAL_OWNER`, `AUTHORIZED_EMPLOYEE`, `INVITED_MEMBER`, `EXISTING_OWNER_APPROVAL`, or `OTHER`; current job title is mandatory for every relationship.
 - **FR-019**: `AUTHORIZED_EMPLOYEE` and `OTHER` MUST require a 20–500-character normalized authority explanation; no relationship declaration replaces Feature 006 invitation or OWNER approval for existing-company authority.
@@ -142,6 +151,7 @@ As a Platform Administrator, I want registry, applicant, contact, relationship, 
 - **FR-033**: Existing applicant receipt, change, approval, rejection, cancellation, delay, and expiry notifications MUST remain idempotent and MUST NOT disclose registry representative, internal lookup failures, evidence locators, admin identity, or private notes.
 - **FR-034**: Feature 014 MUST provide deterministic manual fallback whenever the external public lookup is disabled or unavailable; lookup availability MUST NOT be an authorization dependency.
 - **FR-035**: The implementation MUST document and test how the public provider can be disabled or replaced if it becomes paid, non-public, incompatible, or unavailable.
+- **FR-035A**: Unused lookup snapshots MUST become inaccessible 24 hours after expiry and be deleted within the following 24 hours. Expired, superseded, and consumed email challenges MAY retain content-free security/delivery metadata for 30 days, but token digests and normalized email MUST become inaccessible immediately and be deleted within 24 hours. A snapshot accepted into a request follows the request's authorized review/history lifetime.
 - **FR-036**: Feature 006 documentation MUST identify Feature 014 as the owner of enriched Candidate business facts and contact verification, and Feature 009 Group 2 MUST replace its old Candidate-side field assumption with the Feature 014 contract while preserving its planned admin decision scope.
 - **FR-037**: The existing Feature 007 header status projection MUST remain read-only and MUST not transfer enriched application facts or own lookup/contact progress.
 
