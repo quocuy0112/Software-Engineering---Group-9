@@ -119,7 +119,8 @@ export const EmailKind = {
   VERIFICATION_REJECTED: 'VERIFICATION_REJECTED',
   VERIFICATION_CANCELLED: 'VERIFICATION_CANCELLED',
   VERIFICATION_DELAYED: 'VERIFICATION_DELAYED',
-  VERIFICATION_EXPIRED: 'VERIFICATION_EXPIRED'
+  VERIFICATION_EXPIRED: 'VERIFICATION_EXPIRED',
+  SUPPORT_CASE_UPDATED: 'SUPPORT_CASE_UPDATED'
 } as const
 
 export type EmailKind = (typeof EmailKind)[keyof typeof EmailKind]
@@ -329,6 +330,47 @@ export const ProfessionalConnectionStatus = {
 } as const
 
 export type ProfessionalConnectionStatus = (typeof ProfessionalConnectionStatus)[keyof typeof ProfessionalConnectionStatus]
+
+
+export const SupportConversationCategory = {
+  ACCOUNT_ACCESS: 'ACCOUNT_ACCESS',
+  PROFILE: 'PROFILE',
+  JOBS_APPLICATIONS: 'JOBS_APPLICATIONS',
+  RECRUITER: 'RECRUITER',
+  MESSAGING: 'MESSAGING',
+  PRIVACY_SAFETY: 'PRIVACY_SAFETY',
+  OTHER: 'OTHER'
+} as const
+
+export type SupportConversationCategory = (typeof SupportConversationCategory)[keyof typeof SupportConversationCategory]
+
+
+export const SupportConversationState = {
+  OPEN: 'OPEN',
+  WAITING_FOR_USER: 'WAITING_FOR_USER',
+  WAITING_FOR_SUPPORT: 'WAITING_FOR_SUPPORT',
+  RESOLVED: 'RESOLVED',
+  CLOSED: 'CLOSED'
+} as const
+
+export type SupportConversationState = (typeof SupportConversationState)[keyof typeof SupportConversationState]
+
+
+export const SupportMessageSenderKind = {
+  REQUESTER: 'REQUESTER',
+  ADMINISTRATOR: 'ADMINISTRATOR'
+} as const
+
+export type SupportMessageSenderKind = (typeof SupportMessageSenderKind)[keyof typeof SupportMessageSenderKind]
+
+
+export const SupportAssignmentEndReason = {
+  REASSIGNED: 'REASSIGNED',
+  AUTHORITY_LOST: 'AUTHORITY_LOST',
+  CASE_CLOSED: 'CASE_CLOSED'
+} as const
+
+export type SupportAssignmentEndReason = (typeof SupportAssignmentEndReason)[keyof typeof SupportAssignmentEndReason]
 
 
 export const MessagingConversationContextType = {

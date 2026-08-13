@@ -292,6 +292,31 @@ export type JobApplication = Prisma.JobApplicationModel
  */
 export type ProfessionalConnection = Prisma.ProfessionalConnectionModel
 /**
+ * Model SupportConversation
+ * 
+ */
+export type SupportConversation = Prisma.SupportConversationModel
+/**
+ * Model SupportMessage
+ * 
+ */
+export type SupportMessage = Prisma.SupportMessageModel
+/**
+ * Model SupportAssignment
+ * 
+ */
+export type SupportAssignment = Prisma.SupportAssignmentModel
+/**
+ * Model SupportInternalNote
+ * 
+ */
+export type SupportInternalNote = Prisma.SupportInternalNoteModel
+/**
+ * Model SupportConversationHistory
+ * 
+ */
+export type SupportConversationHistory = Prisma.SupportConversationHistoryModel
+/**
  * Model MessagingConversation
  * 
  */

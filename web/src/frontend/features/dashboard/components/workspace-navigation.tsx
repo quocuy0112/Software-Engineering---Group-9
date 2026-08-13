@@ -49,6 +49,7 @@ export function WorkspaceNavigation({
     { href: "/dashboard", label: copy.dashboard, icon: "dashboard" },
     { href: "/jobs", label: copy.jobs, icon: "jobs" },
     { href: "/messages", label: "Messages", icon: "messages" },
+    { href: "/support", label: "Support", icon: "support" },
     { href: "/profile", label: copy.profile, icon: "profile" },
   ] as const;
   const jobsSubnav = [
@@ -232,6 +233,14 @@ function NavIcon({ name }: { name: string }) {
       <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
         <path d="M3 4.5h14v9H8l-4 3v-3H3z" />
         <path d="M6 8h8M6 10.5h5" />
+      </svg>
+    );
+  }
+  if (name === "support") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
+        <path d="M4 9a6 6 0 0 1 12 0v4a2 2 0 0 1-2 2h-2" />
+        <path d="M4 9v3H2V9h2M16 9h2v3h-2M8 16h4" />
       </svg>
     );
   }

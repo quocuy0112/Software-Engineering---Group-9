@@ -852,3 +852,19 @@ No constitutional violation requires justification. The client-only React Admin
 shell and one admin worker are bounded extensions of the approved Next.js
 application and existing worker pattern, not additional authorities, browser
 sessions, databases, or product surfaces.
+
+## SmartHire Support Center Extension (2026-08-13)
+
+Feature 006 adds a separate `support` domain beside `admin` and `messaging`. Candidate-origin Route Handlers use Better Auth plus CSRF proof; admin-origin handlers use `AdminRequestBoundary`. Both call support services and a Prisma support repository. Architecture tests prohibit imports from Feature 008 repositories.
+
+`SupportConversation`, `SupportMessage`, `SupportAssignment`, `SupportInternalNote`, and `SupportConversationHistory` own durable state. Message acceptance, sequence allocation, lifecycle transitions, assignment changes, audit, and email intent are transactional. Realtime publication is content-free and after-commit.
+
+The Socket.IO server receives a dedicated `/support` namespace. Candidate-origin sockets authenticate as requesters; admin-origin sockets additionally validate the designated Platform Administrator session and current grant. Account rooms and one admin invalidation room carry only `{ caseId, version, state, change }`; content is refetched through HTTP authorization.
+
+React Admin receives a closed `support-cases` resource with list/detail projections and explicit claim, reassign, reply, note, resolve, and close commands. The Candidate workspace receives `/support`. Feature 008 `/messages`, `/chat`, presence, eligibility, reports, and repositories remain isolated.
+
+Case creation consumes admission, validates the three-active and rolling five-case quotas, and inserts case, initial message, history, and audit in one transaction. Message send locks the case, checks ownership or assignment, validates state/version/idempotency, allocates one sequence, transitions state, and conditionally inserts one content-free EmailOutbox row. Claim/reassign uses optimistic versioning plus a partial unique active-assignment index. Auto-close, authority-loss requeue, and retention workers use bounded guarded claims.
+
+Requester DTOs map every administrator-authored message to `SmartHire Support` and omit assignment/note fields. At `closedAt + 365 days`, content becomes unavailable and is removed within 24 hours. Retained metadata contains no subject, message, note, email, or session details.
+
+Verification adds contract tests for origins/session/CSRF/grant/projections, integration tests for lifecycle/concurrency/workers/outbox, frontend/accessibility tests for both workspaces, privacy tests for redaction, and architecture tests proving no ordinary-message reader exists.

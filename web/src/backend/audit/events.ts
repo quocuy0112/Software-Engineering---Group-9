@@ -106,6 +106,18 @@ export const authenticationAuditAction = z.enum([
   "admin.report_resolved",
   "admin.report_dismissed",
   "admin.report_enforcement_linked",
+  "support.case_created",
+  "support.message_sent",
+  "admin.support_claimed",
+  "admin.support_reassigned",
+  "admin.support_replied",
+  "admin.support_noted",
+  "admin.support_resolved",
+  "admin.support_closed",
+  "support.case_reopened",
+  "support.case_auto_closed",
+  "support.assignment_requeued",
+  "support.content_deleted",
 ]);
 
 const auditContextSchema = z
@@ -199,6 +211,7 @@ export const authenticationAuditEventSchema = z
       "moderation_report",
       "privileged_action",
       "security_notification",
+      "support_case",
     ]),
     targetId: z.string().min(1).nullable().optional(),
     result: z.enum(["SUCCESS", "FAILURE", "DENIED"]),

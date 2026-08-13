@@ -162,3 +162,12 @@ verification milestones, notifications, and retention cleanup. A failing loop
 does not stop other loops or the web/Candidate/OCR/email features. Readiness
 reports each loop separately. Shutdown stops claims and lets leases expire; it
 does not mark in-flight work successful.
+
+## SmartHire Support Center
+
+- Candidate HTTP accepts only exact Candidate origin, current ACTIVE Better Auth session, and valid CSRF proof for writes.
+- Admin HTTP reuses the designated Platform Administrator boundary; assignee commands additionally require current assignment and reviewed version.
+- Requester projections expose case/message references, category, subject, state, timestamps, requester messages, and administrator messages labelled only `SmartHire Support`.
+- Admin projections expose requester reference, assignment history, internal notes, messages, lifecycle history, and version but no Feature 008 conversation data.
+- Realtime emits only `{ caseId, version, state, change }`; content is fetched through protected HTTP.
+- Repository operations are transactional and idempotent for create, message, claim, reassign, reply, note, resolve, close, authority-loss requeue, auto-close, and retention.

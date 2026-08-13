@@ -323,6 +323,12 @@ export type UserAccountWhereInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockListRelationFilter
   submittedMessagingReports?: Prisma.MessagingReportListRelationFilter
   targetedMessagingReports?: Prisma.MessagingReportListRelationFilter
+  supportConversationsRequested?: Prisma.SupportConversationListRelationFilter
+  supportConversationsAssigned?: Prisma.SupportConversationListRelationFilter
+  supportMessages?: Prisma.SupportMessageListRelationFilter
+  supportAssignmentsReceived?: Prisma.SupportAssignmentListRelationFilter
+  supportAssignmentsMade?: Prisma.SupportAssignmentListRelationFilter
+  supportInternalNotes?: Prisma.SupportInternalNoteListRelationFilter
 }
 
 export type UserAccountOrderByWithRelationInput = {
@@ -382,6 +388,12 @@ export type UserAccountOrderByWithRelationInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockOrderByRelationAggregateInput
   submittedMessagingReports?: Prisma.MessagingReportOrderByRelationAggregateInput
   targetedMessagingReports?: Prisma.MessagingReportOrderByRelationAggregateInput
+  supportConversationsRequested?: Prisma.SupportConversationOrderByRelationAggregateInput
+  supportConversationsAssigned?: Prisma.SupportConversationOrderByRelationAggregateInput
+  supportMessages?: Prisma.SupportMessageOrderByRelationAggregateInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentOrderByRelationAggregateInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentOrderByRelationAggregateInput
+  supportInternalNotes?: Prisma.SupportInternalNoteOrderByRelationAggregateInput
 }
 
 export type UserAccountWhereUniqueInput = Prisma.AtLeast<{
@@ -444,6 +456,12 @@ export type UserAccountWhereUniqueInput = Prisma.AtLeast<{
   messagingBlocksReceived?: Prisma.UserMessagingBlockListRelationFilter
   submittedMessagingReports?: Prisma.MessagingReportListRelationFilter
   targetedMessagingReports?: Prisma.MessagingReportListRelationFilter
+  supportConversationsRequested?: Prisma.SupportConversationListRelationFilter
+  supportConversationsAssigned?: Prisma.SupportConversationListRelationFilter
+  supportMessages?: Prisma.SupportMessageListRelationFilter
+  supportAssignmentsReceived?: Prisma.SupportAssignmentListRelationFilter
+  supportAssignmentsMade?: Prisma.SupportAssignmentListRelationFilter
+  supportInternalNotes?: Prisma.SupportInternalNoteListRelationFilter
 }, "id" | "email" | "normalizedEmail">
 
 export type UserAccountOrderByWithAggregationInput = {
@@ -543,6 +561,12 @@ export type UserAccountCreateInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateInput = {
@@ -602,6 +626,12 @@ export type UserAccountUncheckedCreateInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUpdateInput = {
@@ -661,6 +691,12 @@ export type UserAccountUpdateInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateInput = {
@@ -720,6 +756,12 @@ export type UserAccountUncheckedUpdateInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateManyInput = {
@@ -1194,6 +1236,92 @@ export type UserAccountUpdateOneRequiredWithoutProfessionalConnectionsHighNested
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutProfessionalConnectionsHighInput, Prisma.UserAccountUpdateWithoutProfessionalConnectionsHighInput>, Prisma.UserAccountUncheckedUpdateWithoutProfessionalConnectionsHighInput>
 }
 
+export type UserAccountCreateNestedOneWithoutSupportConversationsRequestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportConversationsRequestedInput, Prisma.UserAccountUncheckedCreateWithoutSupportConversationsRequestedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportConversationsRequestedInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountCreateNestedOneWithoutSupportConversationsAssignedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportConversationsAssignedInput, Prisma.UserAccountUncheckedCreateWithoutSupportConversationsAssignedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportConversationsAssignedInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutSupportConversationsRequestedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportConversationsRequestedInput, Prisma.UserAccountUncheckedCreateWithoutSupportConversationsRequestedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportConversationsRequestedInput
+  upsert?: Prisma.UserAccountUpsertWithoutSupportConversationsRequestedInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutSupportConversationsRequestedInput, Prisma.UserAccountUpdateWithoutSupportConversationsRequestedInput>, Prisma.UserAccountUncheckedUpdateWithoutSupportConversationsRequestedInput>
+}
+
+export type UserAccountUpdateOneWithoutSupportConversationsAssignedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportConversationsAssignedInput, Prisma.UserAccountUncheckedCreateWithoutSupportConversationsAssignedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportConversationsAssignedInput
+  upsert?: Prisma.UserAccountUpsertWithoutSupportConversationsAssignedInput
+  disconnect?: Prisma.UserAccountWhereInput | boolean
+  delete?: Prisma.UserAccountWhereInput | boolean
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutSupportConversationsAssignedInput, Prisma.UserAccountUpdateWithoutSupportConversationsAssignedInput>, Prisma.UserAccountUncheckedUpdateWithoutSupportConversationsAssignedInput>
+}
+
+export type UserAccountCreateNestedOneWithoutSupportMessagesInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportMessagesInput, Prisma.UserAccountUncheckedCreateWithoutSupportMessagesInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportMessagesInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutSupportMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportMessagesInput, Prisma.UserAccountUncheckedCreateWithoutSupportMessagesInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportMessagesInput
+  upsert?: Prisma.UserAccountUpsertWithoutSupportMessagesInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutSupportMessagesInput, Prisma.UserAccountUpdateWithoutSupportMessagesInput>, Prisma.UserAccountUncheckedUpdateWithoutSupportMessagesInput>
+}
+
+export type UserAccountCreateNestedOneWithoutSupportAssignmentsReceivedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportAssignmentsReceivedInput, Prisma.UserAccountUncheckedCreateWithoutSupportAssignmentsReceivedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportAssignmentsReceivedInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountCreateNestedOneWithoutSupportAssignmentsMadeInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportAssignmentsMadeInput, Prisma.UserAccountUncheckedCreateWithoutSupportAssignmentsMadeInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportAssignmentsMadeInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutSupportAssignmentsReceivedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportAssignmentsReceivedInput, Prisma.UserAccountUncheckedCreateWithoutSupportAssignmentsReceivedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportAssignmentsReceivedInput
+  upsert?: Prisma.UserAccountUpsertWithoutSupportAssignmentsReceivedInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutSupportAssignmentsReceivedInput, Prisma.UserAccountUpdateWithoutSupportAssignmentsReceivedInput>, Prisma.UserAccountUncheckedUpdateWithoutSupportAssignmentsReceivedInput>
+}
+
+export type UserAccountUpdateOneRequiredWithoutSupportAssignmentsMadeNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportAssignmentsMadeInput, Prisma.UserAccountUncheckedCreateWithoutSupportAssignmentsMadeInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportAssignmentsMadeInput
+  upsert?: Prisma.UserAccountUpsertWithoutSupportAssignmentsMadeInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutSupportAssignmentsMadeInput, Prisma.UserAccountUpdateWithoutSupportAssignmentsMadeInput>, Prisma.UserAccountUncheckedUpdateWithoutSupportAssignmentsMadeInput>
+}
+
+export type UserAccountCreateNestedOneWithoutSupportInternalNotesInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportInternalNotesInput, Prisma.UserAccountUncheckedCreateWithoutSupportInternalNotesInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportInternalNotesInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutSupportInternalNotesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportInternalNotesInput, Prisma.UserAccountUncheckedCreateWithoutSupportInternalNotesInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportInternalNotesInput
+  upsert?: Prisma.UserAccountUpsertWithoutSupportInternalNotesInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutSupportInternalNotesInput, Prisma.UserAccountUpdateWithoutSupportInternalNotesInput>, Prisma.UserAccountUncheckedUpdateWithoutSupportInternalNotesInput>
+}
+
 export type UserAccountCreateNestedOneWithoutMessagingConversationsLowInput = {
   create?: Prisma.XOR<Prisma.UserAccountCreateWithoutMessagingConversationsLowInput, Prisma.UserAccountUncheckedCreateWithoutMessagingConversationsLowInput>
   connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutMessagingConversationsLowInput
@@ -1534,6 +1662,12 @@ export type UserAccountCreateWithoutAccountsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutAccountsInput = {
@@ -1592,6 +1726,12 @@ export type UserAccountUncheckedCreateWithoutAccountsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutAccountsInput = {
@@ -1666,6 +1806,12 @@ export type UserAccountUpdateWithoutAccountsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutAccountsInput = {
@@ -1724,6 +1870,12 @@ export type UserAccountUncheckedUpdateWithoutAccountsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutSessionsInput = {
@@ -1782,6 +1934,12 @@ export type UserAccountCreateWithoutSessionsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutSessionsInput = {
@@ -1840,6 +1998,12 @@ export type UserAccountUncheckedCreateWithoutSessionsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutSessionsInput = {
@@ -1914,6 +2078,12 @@ export type UserAccountUpdateWithoutSessionsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSessionsInput = {
@@ -1972,6 +2142,12 @@ export type UserAccountUncheckedUpdateWithoutSessionsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutVerificationsInput = {
@@ -2030,6 +2206,12 @@ export type UserAccountCreateWithoutVerificationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutVerificationsInput = {
@@ -2088,6 +2270,12 @@ export type UserAccountUncheckedCreateWithoutVerificationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutVerificationsInput = {
@@ -2162,6 +2350,12 @@ export type UserAccountUpdateWithoutVerificationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutVerificationsInput = {
@@ -2220,6 +2414,12 @@ export type UserAccountUncheckedUpdateWithoutVerificationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutTwoFactorInput = {
@@ -2278,6 +2478,12 @@ export type UserAccountCreateWithoutTwoFactorInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutTwoFactorInput = {
@@ -2336,6 +2542,12 @@ export type UserAccountUncheckedCreateWithoutTwoFactorInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutTwoFactorInput = {
@@ -2410,6 +2622,12 @@ export type UserAccountUpdateWithoutTwoFactorInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutTwoFactorInput = {
@@ -2468,6 +2686,12 @@ export type UserAccountUncheckedUpdateWithoutTwoFactorInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCandidateIdentityInput = {
@@ -2526,6 +2750,12 @@ export type UserAccountCreateWithoutCandidateIdentityInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCandidateIdentityInput = {
@@ -2584,6 +2814,12 @@ export type UserAccountUncheckedCreateWithoutCandidateIdentityInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCandidateIdentityInput = {
@@ -2658,6 +2894,12 @@ export type UserAccountUpdateWithoutCandidateIdentityInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCandidateIdentityInput = {
@@ -2716,6 +2958,12 @@ export type UserAccountUncheckedUpdateWithoutCandidateIdentityInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutPreferencesInput = {
@@ -2774,6 +3022,12 @@ export type UserAccountCreateWithoutPreferencesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutPreferencesInput = {
@@ -2832,6 +3086,12 @@ export type UserAccountUncheckedCreateWithoutPreferencesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutPreferencesInput = {
@@ -2906,6 +3166,12 @@ export type UserAccountUpdateWithoutPreferencesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPreferencesInput = {
@@ -2964,6 +3230,12 @@ export type UserAccountUncheckedUpdateWithoutPreferencesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutJobWorkspaceStateInput = {
@@ -3022,6 +3294,12 @@ export type UserAccountCreateWithoutJobWorkspaceStateInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutJobWorkspaceStateInput = {
@@ -3080,6 +3358,12 @@ export type UserAccountUncheckedCreateWithoutJobWorkspaceStateInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutJobWorkspaceStateInput = {
@@ -3154,6 +3438,12 @@ export type UserAccountUpdateWithoutJobWorkspaceStateInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutJobWorkspaceStateInput = {
@@ -3212,6 +3502,12 @@ export type UserAccountUncheckedUpdateWithoutJobWorkspaceStateInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutEmailChangeRequestsInput = {
@@ -3270,6 +3566,12 @@ export type UserAccountCreateWithoutEmailChangeRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutEmailChangeRequestsInput = {
@@ -3328,6 +3630,12 @@ export type UserAccountUncheckedCreateWithoutEmailChangeRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutEmailChangeRequestsInput = {
@@ -3402,6 +3710,12 @@ export type UserAccountUpdateWithoutEmailChangeRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutEmailChangeRequestsInput = {
@@ -3460,6 +3774,12 @@ export type UserAccountUncheckedUpdateWithoutEmailChangeRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordChangeAttemptWindowInput = {
@@ -3518,6 +3838,12 @@ export type UserAccountCreateWithoutPasswordChangeAttemptWindowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordChangeAttemptWindowInput = {
@@ -3576,6 +3902,12 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeAttemptWindowInput = 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordChangeAttemptWindowInput = {
@@ -3650,6 +3982,12 @@ export type UserAccountUpdateWithoutPasswordChangeAttemptWindowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordChangeAttemptWindowInput = {
@@ -3708,6 +4046,12 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeAttemptWindowInput = 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordChangeOperationsInput = {
@@ -3766,6 +4110,12 @@ export type UserAccountCreateWithoutPasswordChangeOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordChangeOperationsInput = {
@@ -3824,6 +4174,12 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordChangeOperationsInput = {
@@ -3898,6 +4254,12 @@ export type UserAccountUpdateWithoutPasswordChangeOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordChangeOperationsInput = {
@@ -3956,6 +4318,12 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutSecurityTokensInput = {
@@ -4014,6 +4382,12 @@ export type UserAccountCreateWithoutSecurityTokensInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutSecurityTokensInput = {
@@ -4072,6 +4446,12 @@ export type UserAccountUncheckedCreateWithoutSecurityTokensInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutSecurityTokensInput = {
@@ -4146,6 +4526,12 @@ export type UserAccountUpdateWithoutSecurityTokensInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSecurityTokensInput = {
@@ -4204,6 +4590,12 @@ export type UserAccountUncheckedUpdateWithoutSecurityTokensInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordResetOperationsInput = {
@@ -4262,6 +4654,12 @@ export type UserAccountCreateWithoutPasswordResetOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordResetOperationsInput = {
@@ -4320,6 +4718,12 @@ export type UserAccountUncheckedCreateWithoutPasswordResetOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordResetOperationsInput = {
@@ -4394,6 +4798,12 @@ export type UserAccountUpdateWithoutPasswordResetOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordResetOperationsInput = {
@@ -4452,6 +4862,12 @@ export type UserAccountUncheckedUpdateWithoutPasswordResetOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutFullAccountRecoveryOperationsInput = {
@@ -4510,6 +4926,12 @@ export type UserAccountCreateWithoutFullAccountRecoveryOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutFullAccountRecoveryOperationsInput = {
@@ -4568,6 +4990,12 @@ export type UserAccountUncheckedCreateWithoutFullAccountRecoveryOperationsInput 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutFullAccountRecoveryOperationsInput = {
@@ -4642,6 +5070,12 @@ export type UserAccountUpdateWithoutFullAccountRecoveryOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutFullAccountRecoveryOperationsInput = {
@@ -4700,6 +5134,12 @@ export type UserAccountUncheckedUpdateWithoutFullAccountRecoveryOperationsInput 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutChallengesInput = {
@@ -4758,6 +5198,12 @@ export type UserAccountCreateWithoutChallengesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutChallengesInput = {
@@ -4816,6 +5262,12 @@ export type UserAccountUncheckedCreateWithoutChallengesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutChallengesInput = {
@@ -4890,6 +5342,12 @@ export type UserAccountUpdateWithoutChallengesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutChallengesInput = {
@@ -4948,6 +5406,12 @@ export type UserAccountUncheckedUpdateWithoutChallengesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutOutboxInput = {
@@ -5006,6 +5470,12 @@ export type UserAccountCreateWithoutOutboxInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutOutboxInput = {
@@ -5064,6 +5534,12 @@ export type UserAccountUncheckedCreateWithoutOutboxInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutOutboxInput = {
@@ -5138,6 +5614,12 @@ export type UserAccountUpdateWithoutOutboxInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutOutboxInput = {
@@ -5196,6 +5678,12 @@ export type UserAccountUncheckedUpdateWithoutOutboxInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCompanyMembershipsInput = {
@@ -5254,6 +5742,12 @@ export type UserAccountCreateWithoutCompanyMembershipsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCompanyMembershipsInput = {
@@ -5312,6 +5806,12 @@ export type UserAccountUncheckedCreateWithoutCompanyMembershipsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCompanyMembershipsInput = {
@@ -5386,6 +5886,12 @@ export type UserAccountUpdateWithoutCompanyMembershipsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCompanyMembershipsInput = {
@@ -5444,6 +5950,12 @@ export type UserAccountUncheckedUpdateWithoutCompanyMembershipsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutPlatformAdministratorGrantsInput = {
@@ -5502,6 +6014,12 @@ export type UserAccountCreateWithoutPlatformAdministratorGrantsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutPlatformAdministratorGrantsInput = {
@@ -5560,6 +6078,12 @@ export type UserAccountUncheckedCreateWithoutPlatformAdministratorGrantsInput = 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutPlatformAdministratorGrantsInput = {
@@ -5634,6 +6158,12 @@ export type UserAccountUpdateWithoutPlatformAdministratorGrantsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPlatformAdministratorGrantsInput = {
@@ -5692,6 +6222,12 @@ export type UserAccountUncheckedUpdateWithoutPlatformAdministratorGrantsInput = 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutRecruiterVerificationRequestsInput = {
@@ -5750,6 +6286,12 @@ export type UserAccountCreateWithoutRecruiterVerificationRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutRecruiterVerificationRequestsInput = {
@@ -5808,6 +6350,12 @@ export type UserAccountUncheckedCreateWithoutRecruiterVerificationRequestsInput 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutRecruiterVerificationRequestsInput = {
@@ -5882,6 +6430,12 @@ export type UserAccountUpdateWithoutRecruiterVerificationRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutRecruiterVerificationRequestsInput = {
@@ -5940,6 +6494,12 @@ export type UserAccountUncheckedUpdateWithoutRecruiterVerificationRequestsInput 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutSubmittedModerationReportsInput = {
@@ -5998,6 +6558,12 @@ export type UserAccountCreateWithoutSubmittedModerationReportsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutSubmittedModerationReportsInput = {
@@ -6056,6 +6622,12 @@ export type UserAccountUncheckedCreateWithoutSubmittedModerationReportsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutSubmittedModerationReportsInput = {
@@ -6130,6 +6702,12 @@ export type UserAccountUpdateWithoutSubmittedModerationReportsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSubmittedModerationReportsInput = {
@@ -6188,6 +6766,12 @@ export type UserAccountUncheckedUpdateWithoutSubmittedModerationReportsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutSavedJobsInput = {
@@ -6246,6 +6830,12 @@ export type UserAccountCreateWithoutSavedJobsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutSavedJobsInput = {
@@ -6304,6 +6894,12 @@ export type UserAccountUncheckedCreateWithoutSavedJobsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutSavedJobsInput = {
@@ -6378,6 +6974,12 @@ export type UserAccountUpdateWithoutSavedJobsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSavedJobsInput = {
@@ -6436,6 +7038,12 @@ export type UserAccountUncheckedUpdateWithoutSavedJobsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutJobReportsInput = {
@@ -6494,6 +7102,12 @@ export type UserAccountCreateWithoutJobReportsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutJobReportsInput = {
@@ -6552,6 +7166,12 @@ export type UserAccountUncheckedCreateWithoutJobReportsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutJobReportsInput = {
@@ -6626,6 +7246,12 @@ export type UserAccountUpdateWithoutJobReportsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutJobReportsInput = {
@@ -6684,6 +7310,12 @@ export type UserAccountUncheckedUpdateWithoutJobReportsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutProfessionalConnectionsLowInput = {
@@ -6742,6 +7374,12 @@ export type UserAccountCreateWithoutProfessionalConnectionsLowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutProfessionalConnectionsLowInput = {
@@ -6800,6 +7438,12 @@ export type UserAccountUncheckedCreateWithoutProfessionalConnectionsLowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutProfessionalConnectionsLowInput = {
@@ -6863,6 +7507,12 @@ export type UserAccountCreateWithoutProfessionalConnectionsHighInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutProfessionalConnectionsHighInput = {
@@ -6921,6 +7571,12 @@ export type UserAccountUncheckedCreateWithoutProfessionalConnectionsHighInput = 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutProfessionalConnectionsHighInput = {
@@ -6995,6 +7651,12 @@ export type UserAccountUpdateWithoutProfessionalConnectionsLowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutProfessionalConnectionsLowInput = {
@@ -7053,6 +7715,12 @@ export type UserAccountUncheckedUpdateWithoutProfessionalConnectionsLowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUpsertWithoutProfessionalConnectionsHighInput = {
@@ -7122,6 +7790,12 @@ export type UserAccountUpdateWithoutProfessionalConnectionsHighInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutProfessionalConnectionsHighInput = {
@@ -7180,6 +7854,1644 @@ export type UserAccountUncheckedUpdateWithoutProfessionalConnectionsHighInput = 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountCreateWithoutSupportConversationsRequestedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutSupportConversationsRequestedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutSupportConversationsRequestedInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportConversationsRequestedInput, Prisma.UserAccountUncheckedCreateWithoutSupportConversationsRequestedInput>
+}
+
+export type UserAccountCreateWithoutSupportConversationsAssignedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutSupportConversationsAssignedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutSupportConversationsAssignedInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportConversationsAssignedInput, Prisma.UserAccountUncheckedCreateWithoutSupportConversationsAssignedInput>
+}
+
+export type UserAccountUpsertWithoutSupportConversationsRequestedInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportConversationsRequestedInput, Prisma.UserAccountUncheckedUpdateWithoutSupportConversationsRequestedInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportConversationsRequestedInput, Prisma.UserAccountUncheckedCreateWithoutSupportConversationsRequestedInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutSupportConversationsRequestedInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportConversationsRequestedInput, Prisma.UserAccountUncheckedUpdateWithoutSupportConversationsRequestedInput>
+}
+
+export type UserAccountUpdateWithoutSupportConversationsRequestedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutSupportConversationsRequestedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUpsertWithoutSupportConversationsAssignedInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportConversationsAssignedInput, Prisma.UserAccountUncheckedUpdateWithoutSupportConversationsAssignedInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportConversationsAssignedInput, Prisma.UserAccountUncheckedCreateWithoutSupportConversationsAssignedInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutSupportConversationsAssignedInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportConversationsAssignedInput, Prisma.UserAccountUncheckedUpdateWithoutSupportConversationsAssignedInput>
+}
+
+export type UserAccountUpdateWithoutSupportConversationsAssignedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutSupportConversationsAssignedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountCreateWithoutSupportMessagesInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutSupportMessagesInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutSupportMessagesInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportMessagesInput, Prisma.UserAccountUncheckedCreateWithoutSupportMessagesInput>
+}
+
+export type UserAccountUpsertWithoutSupportMessagesInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportMessagesInput, Prisma.UserAccountUncheckedUpdateWithoutSupportMessagesInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportMessagesInput, Prisma.UserAccountUncheckedCreateWithoutSupportMessagesInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutSupportMessagesInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportMessagesInput, Prisma.UserAccountUncheckedUpdateWithoutSupportMessagesInput>
+}
+
+export type UserAccountUpdateWithoutSupportMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutSupportMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountCreateWithoutSupportAssignmentsReceivedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutSupportAssignmentsReceivedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutSupportAssignmentsReceivedInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportAssignmentsReceivedInput, Prisma.UserAccountUncheckedCreateWithoutSupportAssignmentsReceivedInput>
+}
+
+export type UserAccountCreateWithoutSupportAssignmentsMadeInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutSupportAssignmentsMadeInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutSupportAssignmentsMadeInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportAssignmentsMadeInput, Prisma.UserAccountUncheckedCreateWithoutSupportAssignmentsMadeInput>
+}
+
+export type UserAccountUpsertWithoutSupportAssignmentsReceivedInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportAssignmentsReceivedInput, Prisma.UserAccountUncheckedUpdateWithoutSupportAssignmentsReceivedInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportAssignmentsReceivedInput, Prisma.UserAccountUncheckedCreateWithoutSupportAssignmentsReceivedInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutSupportAssignmentsReceivedInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportAssignmentsReceivedInput, Prisma.UserAccountUncheckedUpdateWithoutSupportAssignmentsReceivedInput>
+}
+
+export type UserAccountUpdateWithoutSupportAssignmentsReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutSupportAssignmentsReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUpsertWithoutSupportAssignmentsMadeInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportAssignmentsMadeInput, Prisma.UserAccountUncheckedUpdateWithoutSupportAssignmentsMadeInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportAssignmentsMadeInput, Prisma.UserAccountUncheckedCreateWithoutSupportAssignmentsMadeInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutSupportAssignmentsMadeInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportAssignmentsMadeInput, Prisma.UserAccountUncheckedUpdateWithoutSupportAssignmentsMadeInput>
+}
+
+export type UserAccountUpdateWithoutSupportAssignmentsMadeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutSupportAssignmentsMadeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountCreateWithoutSupportInternalNotesInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+}
+
+export type UserAccountUncheckedCreateWithoutSupportInternalNotesInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+}
+
+export type UserAccountCreateOrConnectWithoutSupportInternalNotesInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportInternalNotesInput, Prisma.UserAccountUncheckedCreateWithoutSupportInternalNotesInput>
+}
+
+export type UserAccountUpsertWithoutSupportInternalNotesInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportInternalNotesInput, Prisma.UserAccountUncheckedUpdateWithoutSupportInternalNotesInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportInternalNotesInput, Prisma.UserAccountUncheckedCreateWithoutSupportInternalNotesInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutSupportInternalNotesInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportInternalNotesInput, Prisma.UserAccountUncheckedUpdateWithoutSupportInternalNotesInput>
+}
+
+export type UserAccountUpdateWithoutSupportInternalNotesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutSupportInternalNotesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserAccountCreateWithoutMessagingConversationsLowInput = {
@@ -7238,6 +9550,12 @@ export type UserAccountCreateWithoutMessagingConversationsLowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingConversationsLowInput = {
@@ -7296,6 +9614,12 @@ export type UserAccountUncheckedCreateWithoutMessagingConversationsLowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingConversationsLowInput = {
@@ -7359,6 +9683,12 @@ export type UserAccountCreateWithoutMessagingConversationsHighInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingConversationsHighInput = {
@@ -7417,6 +9747,12 @@ export type UserAccountUncheckedCreateWithoutMessagingConversationsHighInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingConversationsHighInput = {
@@ -7491,6 +9827,12 @@ export type UserAccountUpdateWithoutMessagingConversationsLowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingConversationsLowInput = {
@@ -7549,6 +9891,12 @@ export type UserAccountUncheckedUpdateWithoutMessagingConversationsLowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUpsertWithoutMessagingConversationsHighInput = {
@@ -7618,6 +9966,12 @@ export type UserAccountUpdateWithoutMessagingConversationsHighInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingConversationsHighInput = {
@@ -7676,6 +10030,12 @@ export type UserAccountUncheckedUpdateWithoutMessagingConversationsHighInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutMessagingParticipantsInput = {
@@ -7734,6 +10094,12 @@ export type UserAccountCreateWithoutMessagingParticipantsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingParticipantsInput = {
@@ -7792,6 +10158,12 @@ export type UserAccountUncheckedCreateWithoutMessagingParticipantsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingParticipantsInput = {
@@ -7866,6 +10238,12 @@ export type UserAccountUpdateWithoutMessagingParticipantsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingParticipantsInput = {
@@ -7924,6 +10302,12 @@ export type UserAccountUncheckedUpdateWithoutMessagingParticipantsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutMessagingMessagesInput = {
@@ -7982,6 +10366,12 @@ export type UserAccountCreateWithoutMessagingMessagesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingMessagesInput = {
@@ -8040,6 +10430,12 @@ export type UserAccountUncheckedCreateWithoutMessagingMessagesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingMessagesInput = {
@@ -8114,6 +10510,12 @@ export type UserAccountUpdateWithoutMessagingMessagesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingMessagesInput = {
@@ -8172,6 +10574,12 @@ export type UserAccountUncheckedUpdateWithoutMessagingMessagesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutMessagingBlocksInitiatedInput = {
@@ -8230,6 +10638,12 @@ export type UserAccountCreateWithoutMessagingBlocksInitiatedInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingBlocksInitiatedInput = {
@@ -8288,6 +10702,12 @@ export type UserAccountUncheckedCreateWithoutMessagingBlocksInitiatedInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingBlocksInitiatedInput = {
@@ -8351,6 +10771,12 @@ export type UserAccountCreateWithoutMessagingBlocksReceivedInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingBlocksReceivedInput = {
@@ -8409,6 +10835,12 @@ export type UserAccountUncheckedCreateWithoutMessagingBlocksReceivedInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingBlocksReceivedInput = {
@@ -8483,6 +10915,12 @@ export type UserAccountUpdateWithoutMessagingBlocksInitiatedInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingBlocksInitiatedInput = {
@@ -8541,6 +10979,12 @@ export type UserAccountUncheckedUpdateWithoutMessagingBlocksInitiatedInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUpsertWithoutMessagingBlocksReceivedInput = {
@@ -8610,6 +11054,12 @@ export type UserAccountUpdateWithoutMessagingBlocksReceivedInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingBlocksReceivedInput = {
@@ -8668,6 +11118,12 @@ export type UserAccountUncheckedUpdateWithoutMessagingBlocksReceivedInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutSubmittedMessagingReportsInput = {
@@ -8726,6 +11182,12 @@ export type UserAccountCreateWithoutSubmittedMessagingReportsInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutSubmittedMessagingReportsInput = {
@@ -8784,6 +11246,12 @@ export type UserAccountUncheckedCreateWithoutSubmittedMessagingReportsInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutSubmittedMessagingReportsInput = {
@@ -8847,6 +11315,12 @@ export type UserAccountCreateWithoutTargetedMessagingReportsInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutTargetedMessagingReportsInput = {
@@ -8905,6 +11379,12 @@ export type UserAccountUncheckedCreateWithoutTargetedMessagingReportsInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutTargetedMessagingReportsInput = {
@@ -8979,6 +11459,12 @@ export type UserAccountUpdateWithoutSubmittedMessagingReportsInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSubmittedMessagingReportsInput = {
@@ -9037,6 +11523,12 @@ export type UserAccountUncheckedUpdateWithoutSubmittedMessagingReportsInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUpsertWithoutTargetedMessagingReportsInput = {
@@ -9106,6 +11598,12 @@ export type UserAccountUpdateWithoutTargetedMessagingReportsInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutTargetedMessagingReportsInput = {
@@ -9164,6 +11662,12 @@ export type UserAccountUncheckedUpdateWithoutTargetedMessagingReportsInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvQuotaInput = {
@@ -9222,6 +11726,12 @@ export type UserAccountCreateWithoutCvQuotaInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvQuotaInput = {
@@ -9280,6 +11790,12 @@ export type UserAccountUncheckedCreateWithoutCvQuotaInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvQuotaInput = {
@@ -9354,6 +11870,12 @@ export type UserAccountUpdateWithoutCvQuotaInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvQuotaInput = {
@@ -9412,6 +11934,12 @@ export type UserAccountUncheckedUpdateWithoutCvQuotaInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvUploadsInput = {
@@ -9470,6 +11998,12 @@ export type UserAccountCreateWithoutCvUploadsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvUploadsInput = {
@@ -9528,6 +12062,12 @@ export type UserAccountUncheckedCreateWithoutCvUploadsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvUploadsInput = {
@@ -9602,6 +12142,12 @@ export type UserAccountUpdateWithoutCvUploadsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvUploadsInput = {
@@ -9660,6 +12206,12 @@ export type UserAccountUncheckedUpdateWithoutCvUploadsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvStoredArtifactsInput = {
@@ -9718,6 +12270,12 @@ export type UserAccountCreateWithoutCvStoredArtifactsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvStoredArtifactsInput = {
@@ -9776,6 +12334,12 @@ export type UserAccountUncheckedCreateWithoutCvStoredArtifactsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvStoredArtifactsInput = {
@@ -9850,6 +12414,12 @@ export type UserAccountUpdateWithoutCvStoredArtifactsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvStoredArtifactsInput = {
@@ -9908,6 +12478,12 @@ export type UserAccountUncheckedUpdateWithoutCvStoredArtifactsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvScanAssessmentsInput = {
@@ -9966,6 +12542,12 @@ export type UserAccountCreateWithoutCvScanAssessmentsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvScanAssessmentsInput = {
@@ -10024,6 +12606,12 @@ export type UserAccountUncheckedCreateWithoutCvScanAssessmentsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvScanAssessmentsInput = {
@@ -10098,6 +12686,12 @@ export type UserAccountUpdateWithoutCvScanAssessmentsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvScanAssessmentsInput = {
@@ -10156,6 +12750,12 @@ export type UserAccountUncheckedUpdateWithoutCvScanAssessmentsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvExtractionsInput = {
@@ -10214,6 +12814,12 @@ export type UserAccountCreateWithoutCvExtractionsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvExtractionsInput = {
@@ -10272,6 +12878,12 @@ export type UserAccountUncheckedCreateWithoutCvExtractionsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvExtractionsInput = {
@@ -10346,6 +12958,12 @@ export type UserAccountUpdateWithoutCvExtractionsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvExtractionsInput = {
@@ -10404,6 +13022,12 @@ export type UserAccountUncheckedUpdateWithoutCvExtractionsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvParseJobsInput = {
@@ -10462,6 +13086,12 @@ export type UserAccountCreateWithoutCvParseJobsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvParseJobsInput = {
@@ -10520,6 +13150,12 @@ export type UserAccountUncheckedCreateWithoutCvParseJobsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvParseJobsInput = {
@@ -10594,6 +13230,12 @@ export type UserAccountUpdateWithoutCvParseJobsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvParseJobsInput = {
@@ -10652,6 +13294,12 @@ export type UserAccountUncheckedUpdateWithoutCvParseJobsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvRetryRequestsInput = {
@@ -10710,6 +13358,12 @@ export type UserAccountCreateWithoutCvRetryRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvRetryRequestsInput = {
@@ -10768,6 +13422,12 @@ export type UserAccountUncheckedCreateWithoutCvRetryRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvRetryRequestsInput = {
@@ -10842,6 +13502,12 @@ export type UserAccountUpdateWithoutCvRetryRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvRetryRequestsInput = {
@@ -10900,6 +13566,12 @@ export type UserAccountUncheckedUpdateWithoutCvRetryRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvDraftsInput = {
@@ -10958,6 +13630,12 @@ export type UserAccountCreateWithoutCvDraftsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvDraftsInput = {
@@ -11016,6 +13694,12 @@ export type UserAccountUncheckedCreateWithoutCvDraftsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvDraftsInput = {
@@ -11090,6 +13774,12 @@ export type UserAccountUpdateWithoutCvDraftsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvDraftsInput = {
@@ -11148,6 +13838,12 @@ export type UserAccountUncheckedUpdateWithoutCvDraftsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvConsentEventsInput = {
@@ -11206,6 +13902,12 @@ export type UserAccountCreateWithoutCvConsentEventsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvConsentEventsInput = {
@@ -11264,6 +13966,12 @@ export type UserAccountUncheckedCreateWithoutCvConsentEventsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvConsentEventsInput = {
@@ -11338,6 +14046,12 @@ export type UserAccountUpdateWithoutCvConsentEventsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvConsentEventsInput = {
@@ -11396,6 +14110,12 @@ export type UserAccountUncheckedUpdateWithoutCvConsentEventsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvConfirmationsInput = {
@@ -11454,6 +14174,12 @@ export type UserAccountCreateWithoutCvConfirmationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvConfirmationsInput = {
@@ -11512,6 +14238,12 @@ export type UserAccountUncheckedCreateWithoutCvConfirmationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvConfirmationsInput = {
@@ -11586,6 +14318,12 @@ export type UserAccountUpdateWithoutCvConfirmationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvConfirmationsInput = {
@@ -11644,6 +14382,12 @@ export type UserAccountUncheckedUpdateWithoutCvConfirmationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutImageSearchQueriesInput = {
@@ -11702,6 +14446,12 @@ export type UserAccountCreateWithoutImageSearchQueriesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutImageSearchQueriesInput = {
@@ -11760,6 +14510,12 @@ export type UserAccountUncheckedCreateWithoutImageSearchQueriesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutImageSearchQueriesInput = {
@@ -11834,6 +14590,12 @@ export type UserAccountUpdateWithoutImageSearchQueriesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutImageSearchQueriesInput = {
@@ -11892,6 +14654,12 @@ export type UserAccountUncheckedUpdateWithoutImageSearchQueriesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutImageSearchConsentsInput = {
@@ -11950,6 +14718,12 @@ export type UserAccountCreateWithoutImageSearchConsentsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutImageSearchConsentsInput = {
@@ -12008,6 +14782,12 @@ export type UserAccountUncheckedCreateWithoutImageSearchConsentsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutImageSearchConsentsInput = {
@@ -12082,6 +14862,12 @@ export type UserAccountUpdateWithoutImageSearchConsentsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutImageSearchConsentsInput = {
@@ -12140,6 +14926,12 @@ export type UserAccountUncheckedUpdateWithoutImageSearchConsentsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 
@@ -12185,6 +14977,12 @@ export type UserAccountCountOutputType = {
   messagingBlocksReceived: number
   submittedMessagingReports: number
   targetedMessagingReports: number
+  supportConversationsRequested: number
+  supportConversationsAssigned: number
+  supportMessages: number
+  supportAssignmentsReceived: number
+  supportAssignmentsMade: number
+  supportInternalNotes: number
 }
 
 export type UserAccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -12225,6 +15023,12 @@ export type UserAccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   messagingBlocksReceived?: boolean | UserAccountCountOutputTypeCountMessagingBlocksReceivedArgs
   submittedMessagingReports?: boolean | UserAccountCountOutputTypeCountSubmittedMessagingReportsArgs
   targetedMessagingReports?: boolean | UserAccountCountOutputTypeCountTargetedMessagingReportsArgs
+  supportConversationsRequested?: boolean | UserAccountCountOutputTypeCountSupportConversationsRequestedArgs
+  supportConversationsAssigned?: boolean | UserAccountCountOutputTypeCountSupportConversationsAssignedArgs
+  supportMessages?: boolean | UserAccountCountOutputTypeCountSupportMessagesArgs
+  supportAssignmentsReceived?: boolean | UserAccountCountOutputTypeCountSupportAssignmentsReceivedArgs
+  supportAssignmentsMade?: boolean | UserAccountCountOutputTypeCountSupportAssignmentsMadeArgs
+  supportInternalNotes?: boolean | UserAccountCountOutputTypeCountSupportInternalNotesArgs
 }
 
 /**
@@ -12496,6 +15300,48 @@ export type UserAccountCountOutputTypeCountTargetedMessagingReportsArgs<ExtArgs 
   where?: Prisma.MessagingReportWhereInput
 }
 
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountSupportConversationsRequestedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportConversationWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountSupportConversationsAssignedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportConversationWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountSupportMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportMessageWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountSupportAssignmentsReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportAssignmentWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountSupportAssignmentsMadeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportAssignmentWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountSupportInternalNotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportInternalNoteWhereInput
+}
+
 
 export type UserAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -12554,6 +15400,12 @@ export type UserAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   messagingBlocksReceived?: boolean | Prisma.UserAccount$messagingBlocksReceivedArgs<ExtArgs>
   submittedMessagingReports?: boolean | Prisma.UserAccount$submittedMessagingReportsArgs<ExtArgs>
   targetedMessagingReports?: boolean | Prisma.UserAccount$targetedMessagingReportsArgs<ExtArgs>
+  supportConversationsRequested?: boolean | Prisma.UserAccount$supportConversationsRequestedArgs<ExtArgs>
+  supportConversationsAssigned?: boolean | Prisma.UserAccount$supportConversationsAssignedArgs<ExtArgs>
+  supportMessages?: boolean | Prisma.UserAccount$supportMessagesArgs<ExtArgs>
+  supportAssignmentsReceived?: boolean | Prisma.UserAccount$supportAssignmentsReceivedArgs<ExtArgs>
+  supportAssignmentsMade?: boolean | Prisma.UserAccount$supportAssignmentsMadeArgs<ExtArgs>
+  supportInternalNotes?: boolean | Prisma.UserAccount$supportInternalNotesArgs<ExtArgs>
   _count?: boolean | Prisma.UserAccountCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userAccount"]>
 
@@ -12650,6 +15502,12 @@ export type UserAccountInclude<ExtArgs extends runtime.Types.Extensions.Internal
   messagingBlocksReceived?: boolean | Prisma.UserAccount$messagingBlocksReceivedArgs<ExtArgs>
   submittedMessagingReports?: boolean | Prisma.UserAccount$submittedMessagingReportsArgs<ExtArgs>
   targetedMessagingReports?: boolean | Prisma.UserAccount$targetedMessagingReportsArgs<ExtArgs>
+  supportConversationsRequested?: boolean | Prisma.UserAccount$supportConversationsRequestedArgs<ExtArgs>
+  supportConversationsAssigned?: boolean | Prisma.UserAccount$supportConversationsAssignedArgs<ExtArgs>
+  supportMessages?: boolean | Prisma.UserAccount$supportMessagesArgs<ExtArgs>
+  supportAssignmentsReceived?: boolean | Prisma.UserAccount$supportAssignmentsReceivedArgs<ExtArgs>
+  supportAssignmentsMade?: boolean | Prisma.UserAccount$supportAssignmentsMadeArgs<ExtArgs>
+  supportInternalNotes?: boolean | Prisma.UserAccount$supportInternalNotesArgs<ExtArgs>
   _count?: boolean | Prisma.UserAccountCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserAccountIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -12701,6 +15559,12 @@ export type $UserAccountPayload<ExtArgs extends runtime.Types.Extensions.Interna
     messagingBlocksReceived: Prisma.$UserMessagingBlockPayload<ExtArgs>[]
     submittedMessagingReports: Prisma.$MessagingReportPayload<ExtArgs>[]
     targetedMessagingReports: Prisma.$MessagingReportPayload<ExtArgs>[]
+    supportConversationsRequested: Prisma.$SupportConversationPayload<ExtArgs>[]
+    supportConversationsAssigned: Prisma.$SupportConversationPayload<ExtArgs>[]
+    supportMessages: Prisma.$SupportMessagePayload<ExtArgs>[]
+    supportAssignmentsReceived: Prisma.$SupportAssignmentPayload<ExtArgs>[]
+    supportAssignmentsMade: Prisma.$SupportAssignmentPayload<ExtArgs>[]
+    supportInternalNotes: Prisma.$SupportInternalNotePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -13153,6 +16017,12 @@ export interface Prisma__UserAccountClient<T, Null = never, ExtArgs extends runt
   messagingBlocksReceived<T extends Prisma.UserAccount$messagingBlocksReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$messagingBlocksReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserMessagingBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   submittedMessagingReports<T extends Prisma.UserAccount$submittedMessagingReportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$submittedMessagingReportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagingReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   targetedMessagingReports<T extends Prisma.UserAccount$targetedMessagingReportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$targetedMessagingReportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagingReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportConversationsRequested<T extends Prisma.UserAccount$supportConversationsRequestedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$supportConversationsRequestedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportConversationsAssigned<T extends Prisma.UserAccount$supportConversationsAssignedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$supportConversationsAssignedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportMessages<T extends Prisma.UserAccount$supportMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$supportMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportAssignmentsReceived<T extends Prisma.UserAccount$supportAssignmentsReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$supportAssignmentsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportAssignmentsMade<T extends Prisma.UserAccount$supportAssignmentsMadeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$supportAssignmentsMadeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportInternalNotes<T extends Prisma.UserAccount$supportInternalNotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$supportInternalNotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportInternalNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -14587,6 +17457,150 @@ export type UserAccount$targetedMessagingReportsArgs<ExtArgs extends runtime.Typ
   take?: number
   skip?: number
   distinct?: Prisma.MessagingReportScalarFieldEnum | Prisma.MessagingReportScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.supportConversationsRequested
+ */
+export type UserAccount$supportConversationsRequestedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportConversation
+   */
+  select?: Prisma.SupportConversationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportConversation
+   */
+  omit?: Prisma.SupportConversationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportConversationInclude<ExtArgs> | null
+  where?: Prisma.SupportConversationWhereInput
+  orderBy?: Prisma.SupportConversationOrderByWithRelationInput | Prisma.SupportConversationOrderByWithRelationInput[]
+  cursor?: Prisma.SupportConversationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportConversationScalarFieldEnum | Prisma.SupportConversationScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.supportConversationsAssigned
+ */
+export type UserAccount$supportConversationsAssignedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportConversation
+   */
+  select?: Prisma.SupportConversationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportConversation
+   */
+  omit?: Prisma.SupportConversationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportConversationInclude<ExtArgs> | null
+  where?: Prisma.SupportConversationWhereInput
+  orderBy?: Prisma.SupportConversationOrderByWithRelationInput | Prisma.SupportConversationOrderByWithRelationInput[]
+  cursor?: Prisma.SupportConversationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportConversationScalarFieldEnum | Prisma.SupportConversationScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.supportMessages
+ */
+export type UserAccount$supportMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportMessage
+   */
+  select?: Prisma.SupportMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportMessage
+   */
+  omit?: Prisma.SupportMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportMessageInclude<ExtArgs> | null
+  where?: Prisma.SupportMessageWhereInput
+  orderBy?: Prisma.SupportMessageOrderByWithRelationInput | Prisma.SupportMessageOrderByWithRelationInput[]
+  cursor?: Prisma.SupportMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportMessageScalarFieldEnum | Prisma.SupportMessageScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.supportAssignmentsReceived
+ */
+export type UserAccount$supportAssignmentsReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportAssignment
+   */
+  select?: Prisma.SupportAssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportAssignment
+   */
+  omit?: Prisma.SupportAssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportAssignmentInclude<ExtArgs> | null
+  where?: Prisma.SupportAssignmentWhereInput
+  orderBy?: Prisma.SupportAssignmentOrderByWithRelationInput | Prisma.SupportAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.SupportAssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportAssignmentScalarFieldEnum | Prisma.SupportAssignmentScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.supportAssignmentsMade
+ */
+export type UserAccount$supportAssignmentsMadeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportAssignment
+   */
+  select?: Prisma.SupportAssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportAssignment
+   */
+  omit?: Prisma.SupportAssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportAssignmentInclude<ExtArgs> | null
+  where?: Prisma.SupportAssignmentWhereInput
+  orderBy?: Prisma.SupportAssignmentOrderByWithRelationInput | Prisma.SupportAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.SupportAssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportAssignmentScalarFieldEnum | Prisma.SupportAssignmentScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.supportInternalNotes
+ */
+export type UserAccount$supportInternalNotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportInternalNote
+   */
+  select?: Prisma.SupportInternalNoteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportInternalNote
+   */
+  omit?: Prisma.SupportInternalNoteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportInternalNoteInclude<ExtArgs> | null
+  where?: Prisma.SupportInternalNoteWhereInput
+  orderBy?: Prisma.SupportInternalNoteOrderByWithRelationInput | Prisma.SupportInternalNoteOrderByWithRelationInput[]
+  cursor?: Prisma.SupportInternalNoteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportInternalNoteScalarFieldEnum | Prisma.SupportInternalNoteScalarFieldEnum[]
 }
 
 /**

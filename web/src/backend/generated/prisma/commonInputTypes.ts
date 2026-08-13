@@ -1072,6 +1072,91 @@ export type EnumProfessionalConnectionStatusWithAggregatesFilter<$PrismaModel = 
   _max?: Prisma.NestedEnumProfessionalConnectionStatusFilter<$PrismaModel>
 }
 
+export type EnumSupportConversationCategoryFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportConversationCategory | Prisma.EnumSupportConversationCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.SupportConversationCategory[] | Prisma.ListEnumSupportConversationCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SupportConversationCategory[] | Prisma.ListEnumSupportConversationCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSupportConversationCategoryFilter<$PrismaModel> | $Enums.SupportConversationCategory
+}
+
+export type EnumSupportConversationStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportConversationState | Prisma.EnumSupportConversationStateFieldRefInput<$PrismaModel>
+  in?: $Enums.SupportConversationState[] | Prisma.ListEnumSupportConversationStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SupportConversationState[] | Prisma.ListEnumSupportConversationStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSupportConversationStateFilter<$PrismaModel> | $Enums.SupportConversationState
+}
+
+export type EnumSupportConversationCategoryWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportConversationCategory | Prisma.EnumSupportConversationCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.SupportConversationCategory[] | Prisma.ListEnumSupportConversationCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SupportConversationCategory[] | Prisma.ListEnumSupportConversationCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSupportConversationCategoryWithAggregatesFilter<$PrismaModel> | $Enums.SupportConversationCategory
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSupportConversationCategoryFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSupportConversationCategoryFilter<$PrismaModel>
+}
+
+export type EnumSupportConversationStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportConversationState | Prisma.EnumSupportConversationStateFieldRefInput<$PrismaModel>
+  in?: $Enums.SupportConversationState[] | Prisma.ListEnumSupportConversationStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SupportConversationState[] | Prisma.ListEnumSupportConversationStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSupportConversationStateWithAggregatesFilter<$PrismaModel> | $Enums.SupportConversationState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSupportConversationStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSupportConversationStateFilter<$PrismaModel>
+}
+
+export type EnumSupportMessageSenderKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportMessageSenderKind | Prisma.EnumSupportMessageSenderKindFieldRefInput<$PrismaModel>
+  in?: $Enums.SupportMessageSenderKind[] | Prisma.ListEnumSupportMessageSenderKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SupportMessageSenderKind[] | Prisma.ListEnumSupportMessageSenderKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSupportMessageSenderKindFilter<$PrismaModel> | $Enums.SupportMessageSenderKind
+}
+
+export type EnumSupportMessageSenderKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportMessageSenderKind | Prisma.EnumSupportMessageSenderKindFieldRefInput<$PrismaModel>
+  in?: $Enums.SupportMessageSenderKind[] | Prisma.ListEnumSupportMessageSenderKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SupportMessageSenderKind[] | Prisma.ListEnumSupportMessageSenderKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSupportMessageSenderKindWithAggregatesFilter<$PrismaModel> | $Enums.SupportMessageSenderKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSupportMessageSenderKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSupportMessageSenderKindFilter<$PrismaModel>
+}
+
+export type EnumSupportAssignmentEndReasonNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportAssignmentEndReason | Prisma.EnumSupportAssignmentEndReasonFieldRefInput<$PrismaModel> | null
+  in?: $Enums.SupportAssignmentEndReason[] | Prisma.ListEnumSupportAssignmentEndReasonFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.SupportAssignmentEndReason[] | Prisma.ListEnumSupportAssignmentEndReasonFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumSupportAssignmentEndReasonNullableFilter<$PrismaModel> | $Enums.SupportAssignmentEndReason | null
+}
+
+export type EnumSupportAssignmentEndReasonNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportAssignmentEndReason | Prisma.EnumSupportAssignmentEndReasonFieldRefInput<$PrismaModel> | null
+  in?: $Enums.SupportAssignmentEndReason[] | Prisma.ListEnumSupportAssignmentEndReasonFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.SupportAssignmentEndReason[] | Prisma.ListEnumSupportAssignmentEndReasonFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumSupportAssignmentEndReasonNullableWithAggregatesFilter<$PrismaModel> | $Enums.SupportAssignmentEndReason | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSupportAssignmentEndReasonNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSupportAssignmentEndReasonNullableFilter<$PrismaModel>
+}
+
+export type EnumSupportConversationStateNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportConversationState | Prisma.EnumSupportConversationStateFieldRefInput<$PrismaModel> | null
+  in?: $Enums.SupportConversationState[] | Prisma.ListEnumSupportConversationStateFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.SupportConversationState[] | Prisma.ListEnumSupportConversationStateFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumSupportConversationStateNullableFilter<$PrismaModel> | $Enums.SupportConversationState | null
+}
+
+export type EnumSupportConversationStateNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportConversationState | Prisma.EnumSupportConversationStateFieldRefInput<$PrismaModel> | null
+  in?: $Enums.SupportConversationState[] | Prisma.ListEnumSupportConversationStateFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.SupportConversationState[] | Prisma.ListEnumSupportConversationStateFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumSupportConversationStateNullableWithAggregatesFilter<$PrismaModel> | $Enums.SupportConversationState | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSupportConversationStateNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSupportConversationStateNullableFilter<$PrismaModel>
+}
+
 export type EnumMessagingConversationContextTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.MessagingConversationContextType | Prisma.EnumMessagingConversationContextTypeFieldRefInput<$PrismaModel>
   in?: $Enums.MessagingConversationContextType[] | Prisma.ListEnumMessagingConversationContextTypeFieldRefInput<$PrismaModel>
@@ -2729,6 +2814,91 @@ export type NestedEnumProfessionalConnectionStatusWithAggregatesFilter<$PrismaMo
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumProfessionalConnectionStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumProfessionalConnectionStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumSupportConversationCategoryFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportConversationCategory | Prisma.EnumSupportConversationCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.SupportConversationCategory[] | Prisma.ListEnumSupportConversationCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SupportConversationCategory[] | Prisma.ListEnumSupportConversationCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSupportConversationCategoryFilter<$PrismaModel> | $Enums.SupportConversationCategory
+}
+
+export type NestedEnumSupportConversationStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportConversationState | Prisma.EnumSupportConversationStateFieldRefInput<$PrismaModel>
+  in?: $Enums.SupportConversationState[] | Prisma.ListEnumSupportConversationStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SupportConversationState[] | Prisma.ListEnumSupportConversationStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSupportConversationStateFilter<$PrismaModel> | $Enums.SupportConversationState
+}
+
+export type NestedEnumSupportConversationCategoryWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportConversationCategory | Prisma.EnumSupportConversationCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.SupportConversationCategory[] | Prisma.ListEnumSupportConversationCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SupportConversationCategory[] | Prisma.ListEnumSupportConversationCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSupportConversationCategoryWithAggregatesFilter<$PrismaModel> | $Enums.SupportConversationCategory
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSupportConversationCategoryFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSupportConversationCategoryFilter<$PrismaModel>
+}
+
+export type NestedEnumSupportConversationStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportConversationState | Prisma.EnumSupportConversationStateFieldRefInput<$PrismaModel>
+  in?: $Enums.SupportConversationState[] | Prisma.ListEnumSupportConversationStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SupportConversationState[] | Prisma.ListEnumSupportConversationStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSupportConversationStateWithAggregatesFilter<$PrismaModel> | $Enums.SupportConversationState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSupportConversationStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSupportConversationStateFilter<$PrismaModel>
+}
+
+export type NestedEnumSupportMessageSenderKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportMessageSenderKind | Prisma.EnumSupportMessageSenderKindFieldRefInput<$PrismaModel>
+  in?: $Enums.SupportMessageSenderKind[] | Prisma.ListEnumSupportMessageSenderKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SupportMessageSenderKind[] | Prisma.ListEnumSupportMessageSenderKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSupportMessageSenderKindFilter<$PrismaModel> | $Enums.SupportMessageSenderKind
+}
+
+export type NestedEnumSupportMessageSenderKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportMessageSenderKind | Prisma.EnumSupportMessageSenderKindFieldRefInput<$PrismaModel>
+  in?: $Enums.SupportMessageSenderKind[] | Prisma.ListEnumSupportMessageSenderKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SupportMessageSenderKind[] | Prisma.ListEnumSupportMessageSenderKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSupportMessageSenderKindWithAggregatesFilter<$PrismaModel> | $Enums.SupportMessageSenderKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSupportMessageSenderKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSupportMessageSenderKindFilter<$PrismaModel>
+}
+
+export type NestedEnumSupportAssignmentEndReasonNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportAssignmentEndReason | Prisma.EnumSupportAssignmentEndReasonFieldRefInput<$PrismaModel> | null
+  in?: $Enums.SupportAssignmentEndReason[] | Prisma.ListEnumSupportAssignmentEndReasonFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.SupportAssignmentEndReason[] | Prisma.ListEnumSupportAssignmentEndReasonFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumSupportAssignmentEndReasonNullableFilter<$PrismaModel> | $Enums.SupportAssignmentEndReason | null
+}
+
+export type NestedEnumSupportAssignmentEndReasonNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportAssignmentEndReason | Prisma.EnumSupportAssignmentEndReasonFieldRefInput<$PrismaModel> | null
+  in?: $Enums.SupportAssignmentEndReason[] | Prisma.ListEnumSupportAssignmentEndReasonFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.SupportAssignmentEndReason[] | Prisma.ListEnumSupportAssignmentEndReasonFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumSupportAssignmentEndReasonNullableWithAggregatesFilter<$PrismaModel> | $Enums.SupportAssignmentEndReason | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSupportAssignmentEndReasonNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSupportAssignmentEndReasonNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumSupportConversationStateNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportConversationState | Prisma.EnumSupportConversationStateFieldRefInput<$PrismaModel> | null
+  in?: $Enums.SupportConversationState[] | Prisma.ListEnumSupportConversationStateFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.SupportConversationState[] | Prisma.ListEnumSupportConversationStateFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumSupportConversationStateNullableFilter<$PrismaModel> | $Enums.SupportConversationState | null
+}
+
+export type NestedEnumSupportConversationStateNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SupportConversationState | Prisma.EnumSupportConversationStateFieldRefInput<$PrismaModel> | null
+  in?: $Enums.SupportConversationState[] | Prisma.ListEnumSupportConversationStateFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.SupportConversationState[] | Prisma.ListEnumSupportConversationStateFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumSupportConversationStateNullableWithAggregatesFilter<$PrismaModel> | $Enums.SupportConversationState | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSupportConversationStateNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSupportConversationStateNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumMessagingConversationContextTypeFilter<$PrismaModel = never> = {

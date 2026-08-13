@@ -447,6 +447,11 @@ export const ModelName = {
   JobReport: 'JobReport',
   JobApplication: 'JobApplication',
   ProfessionalConnection: 'ProfessionalConnection',
+  SupportConversation: 'SupportConversation',
+  SupportMessage: 'SupportMessage',
+  SupportAssignment: 'SupportAssignment',
+  SupportInternalNote: 'SupportInternalNote',
+  SupportConversationHistory: 'SupportConversationHistory',
   MessagingConversation: 'MessagingConversation',
   MessagingConversationParticipant: 'MessagingConversationParticipant',
   MessagingMessage: 'MessagingMessage',
@@ -490,7 +495,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "auditEvent" | "company" | "companyMembership" | "platformAdministratorGrant" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "professionalConnection" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence"
+    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "auditEvent" | "company" | "companyMembership" | "platformAdministratorGrant" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "professionalConnection" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4194,6 +4199,376 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SupportConversation: {
+      payload: Prisma.$SupportConversationPayload<ExtArgs>
+      fields: Prisma.SupportConversationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SupportConversationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SupportConversationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationPayload>
+        }
+        findFirst: {
+          args: Prisma.SupportConversationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SupportConversationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationPayload>
+        }
+        findMany: {
+          args: Prisma.SupportConversationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationPayload>[]
+        }
+        create: {
+          args: Prisma.SupportConversationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationPayload>
+        }
+        createMany: {
+          args: Prisma.SupportConversationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SupportConversationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationPayload>[]
+        }
+        delete: {
+          args: Prisma.SupportConversationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationPayload>
+        }
+        update: {
+          args: Prisma.SupportConversationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationPayload>
+        }
+        deleteMany: {
+          args: Prisma.SupportConversationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SupportConversationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SupportConversationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationPayload>[]
+        }
+        upsert: {
+          args: Prisma.SupportConversationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationPayload>
+        }
+        aggregate: {
+          args: Prisma.SupportConversationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSupportConversation>
+        }
+        groupBy: {
+          args: Prisma.SupportConversationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportConversationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SupportConversationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportConversationCountAggregateOutputType> | number
+        }
+      }
+    }
+    SupportMessage: {
+      payload: Prisma.$SupportMessagePayload<ExtArgs>
+      fields: Prisma.SupportMessageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SupportMessageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportMessagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SupportMessageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportMessagePayload>
+        }
+        findFirst: {
+          args: Prisma.SupportMessageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportMessagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SupportMessageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportMessagePayload>
+        }
+        findMany: {
+          args: Prisma.SupportMessageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportMessagePayload>[]
+        }
+        create: {
+          args: Prisma.SupportMessageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportMessagePayload>
+        }
+        createMany: {
+          args: Prisma.SupportMessageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SupportMessageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportMessagePayload>[]
+        }
+        delete: {
+          args: Prisma.SupportMessageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportMessagePayload>
+        }
+        update: {
+          args: Prisma.SupportMessageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportMessagePayload>
+        }
+        deleteMany: {
+          args: Prisma.SupportMessageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SupportMessageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SupportMessageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportMessagePayload>[]
+        }
+        upsert: {
+          args: Prisma.SupportMessageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportMessagePayload>
+        }
+        aggregate: {
+          args: Prisma.SupportMessageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSupportMessage>
+        }
+        groupBy: {
+          args: Prisma.SupportMessageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportMessageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SupportMessageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportMessageCountAggregateOutputType> | number
+        }
+      }
+    }
+    SupportAssignment: {
+      payload: Prisma.$SupportAssignmentPayload<ExtArgs>
+      fields: Prisma.SupportAssignmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SupportAssignmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportAssignmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SupportAssignmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportAssignmentPayload>
+        }
+        findFirst: {
+          args: Prisma.SupportAssignmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportAssignmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SupportAssignmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportAssignmentPayload>
+        }
+        findMany: {
+          args: Prisma.SupportAssignmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportAssignmentPayload>[]
+        }
+        create: {
+          args: Prisma.SupportAssignmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportAssignmentPayload>
+        }
+        createMany: {
+          args: Prisma.SupportAssignmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SupportAssignmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportAssignmentPayload>[]
+        }
+        delete: {
+          args: Prisma.SupportAssignmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportAssignmentPayload>
+        }
+        update: {
+          args: Prisma.SupportAssignmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportAssignmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.SupportAssignmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SupportAssignmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SupportAssignmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportAssignmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.SupportAssignmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportAssignmentPayload>
+        }
+        aggregate: {
+          args: Prisma.SupportAssignmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSupportAssignment>
+        }
+        groupBy: {
+          args: Prisma.SupportAssignmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportAssignmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SupportAssignmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportAssignmentCountAggregateOutputType> | number
+        }
+      }
+    }
+    SupportInternalNote: {
+      payload: Prisma.$SupportInternalNotePayload<ExtArgs>
+      fields: Prisma.SupportInternalNoteFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SupportInternalNoteFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInternalNotePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SupportInternalNoteFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInternalNotePayload>
+        }
+        findFirst: {
+          args: Prisma.SupportInternalNoteFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInternalNotePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SupportInternalNoteFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInternalNotePayload>
+        }
+        findMany: {
+          args: Prisma.SupportInternalNoteFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInternalNotePayload>[]
+        }
+        create: {
+          args: Prisma.SupportInternalNoteCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInternalNotePayload>
+        }
+        createMany: {
+          args: Prisma.SupportInternalNoteCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SupportInternalNoteCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInternalNotePayload>[]
+        }
+        delete: {
+          args: Prisma.SupportInternalNoteDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInternalNotePayload>
+        }
+        update: {
+          args: Prisma.SupportInternalNoteUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInternalNotePayload>
+        }
+        deleteMany: {
+          args: Prisma.SupportInternalNoteDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SupportInternalNoteUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SupportInternalNoteUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInternalNotePayload>[]
+        }
+        upsert: {
+          args: Prisma.SupportInternalNoteUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportInternalNotePayload>
+        }
+        aggregate: {
+          args: Prisma.SupportInternalNoteAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSupportInternalNote>
+        }
+        groupBy: {
+          args: Prisma.SupportInternalNoteGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportInternalNoteGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SupportInternalNoteCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportInternalNoteCountAggregateOutputType> | number
+        }
+      }
+    }
+    SupportConversationHistory: {
+      payload: Prisma.$SupportConversationHistoryPayload<ExtArgs>
+      fields: Prisma.SupportConversationHistoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SupportConversationHistoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationHistoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SupportConversationHistoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationHistoryPayload>
+        }
+        findFirst: {
+          args: Prisma.SupportConversationHistoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationHistoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SupportConversationHistoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationHistoryPayload>
+        }
+        findMany: {
+          args: Prisma.SupportConversationHistoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationHistoryPayload>[]
+        }
+        create: {
+          args: Prisma.SupportConversationHistoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationHistoryPayload>
+        }
+        createMany: {
+          args: Prisma.SupportConversationHistoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SupportConversationHistoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationHistoryPayload>[]
+        }
+        delete: {
+          args: Prisma.SupportConversationHistoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationHistoryPayload>
+        }
+        update: {
+          args: Prisma.SupportConversationHistoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationHistoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.SupportConversationHistoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SupportConversationHistoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SupportConversationHistoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationHistoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.SupportConversationHistoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportConversationHistoryPayload>
+        }
+        aggregate: {
+          args: Prisma.SupportConversationHistoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSupportConversationHistory>
+        }
+        groupBy: {
+          args: Prisma.SupportConversationHistoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportConversationHistoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SupportConversationHistoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportConversationHistoryCountAggregateOutputType> | number
+        }
+      }
+    }
     MessagingConversation: {
       payload: Prisma.$MessagingConversationPayload<ExtArgs>
       fields: Prisma.MessagingConversationFieldRefs
@@ -6694,6 +7069,7 @@ export const EmailOutboxScalarFieldEnum = {
   userId: 'userId',
   securityTokenId: 'securityTokenId',
   verificationRequestId: 'verificationRequestId',
+  supportConversationId: 'supportConversationId',
   recipientRef: 'recipientRef',
   recipientCiphertext: 'recipientCiphertext',
   recipientPurpose: 'recipientPurpose',
@@ -7221,6 +7597,82 @@ export const ProfessionalConnectionScalarFieldEnum = {
 } as const
 
 export type ProfessionalConnectionScalarFieldEnum = (typeof ProfessionalConnectionScalarFieldEnum)[keyof typeof ProfessionalConnectionScalarFieldEnum]
+
+
+export const SupportConversationScalarFieldEnum = {
+  id: 'id',
+  requesterUserId: 'requesterUserId',
+  category: 'category',
+  subject: 'subject',
+  state: 'state',
+  version: 'version',
+  nextMessageSequence: 'nextMessageSequence',
+  lastMessageAt: 'lastMessageAt',
+  currentAssigneeUserId: 'currentAssigneeUserId',
+  resolvedAt: 'resolvedAt',
+  closedAt: 'closedAt',
+  contentDeleteAfter: 'contentDeleteAfter',
+  contentDeletedAt: 'contentDeletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupportConversationScalarFieldEnum = (typeof SupportConversationScalarFieldEnum)[keyof typeof SupportConversationScalarFieldEnum]
+
+
+export const SupportMessageScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  sequence: 'sequence',
+  senderKind: 'senderKind',
+  senderUserId: 'senderUserId',
+  clientOperationId: 'clientOperationId',
+  content: 'content',
+  createdAt: 'createdAt'
+} as const
+
+export type SupportMessageScalarFieldEnum = (typeof SupportMessageScalarFieldEnum)[keyof typeof SupportMessageScalarFieldEnum]
+
+
+export const SupportAssignmentScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  assigneeAdminUserId: 'assigneeAdminUserId',
+  assignedByAdminUserId: 'assignedByAdminUserId',
+  assignedAt: 'assignedAt',
+  endedAt: 'endedAt',
+  endReason: 'endReason'
+} as const
+
+export type SupportAssignmentScalarFieldEnum = (typeof SupportAssignmentScalarFieldEnum)[keyof typeof SupportAssignmentScalarFieldEnum]
+
+
+export const SupportInternalNoteScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  authorAdminUserId: 'authorAdminUserId',
+  normalizedText: 'normalizedText',
+  createdAt: 'createdAt'
+} as const
+
+export type SupportInternalNoteScalarFieldEnum = (typeof SupportInternalNoteScalarFieldEnum)[keyof typeof SupportInternalNoteScalarFieldEnum]
+
+
+export const SupportConversationHistoryScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  actorUserId: 'actorUserId',
+  action: 'action',
+  priorState: 'priorState',
+  resultingState: 'resultingState',
+  resultingVersion: 'resultingVersion',
+  assignmentReason: 'assignmentReason',
+  priorAssigneeUserId: 'priorAssigneeUserId',
+  resultingAssigneeUserId: 'resultingAssigneeUserId',
+  occurredAt: 'occurredAt'
+} as const
+
+export type SupportConversationHistoryScalarFieldEnum = (typeof SupportConversationHistoryScalarFieldEnum)[keyof typeof SupportConversationHistoryScalarFieldEnum]
 
 
 export const MessagingConversationScalarFieldEnum = {
@@ -8566,6 +9018,62 @@ export type ListEnumProfessionalConnectionStatusFieldRefInput<$PrismaModel> = Fi
 
 
 /**
+ * Reference to a field of type 'SupportConversationCategory'
+ */
+export type EnumSupportConversationCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportConversationCategory'>
+    
+
+
+/**
+ * Reference to a field of type 'SupportConversationCategory[]'
+ */
+export type ListEnumSupportConversationCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportConversationCategory[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SupportConversationState'
+ */
+export type EnumSupportConversationStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportConversationState'>
+    
+
+
+/**
+ * Reference to a field of type 'SupportConversationState[]'
+ */
+export type ListEnumSupportConversationStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportConversationState[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SupportMessageSenderKind'
+ */
+export type EnumSupportMessageSenderKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportMessageSenderKind'>
+    
+
+
+/**
+ * Reference to a field of type 'SupportMessageSenderKind[]'
+ */
+export type ListEnumSupportMessageSenderKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportMessageSenderKind[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SupportAssignmentEndReason'
+ */
+export type EnumSupportAssignmentEndReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportAssignmentEndReason'>
+    
+
+
+/**
+ * Reference to a field of type 'SupportAssignmentEndReason[]'
+ */
+export type ListEnumSupportAssignmentEndReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportAssignmentEndReason[]'>
+    
+
+
+/**
  * Reference to a field of type 'MessagingConversationContextType'
  */
 export type EnumMessagingConversationContextTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessagingConversationContextType'>
@@ -9269,6 +9777,11 @@ export type GlobalOmitConfig = {
   jobReport?: Prisma.JobReportOmit
   jobApplication?: Prisma.JobApplicationOmit
   professionalConnection?: Prisma.ProfessionalConnectionOmit
+  supportConversation?: Prisma.SupportConversationOmit
+  supportMessage?: Prisma.SupportMessageOmit
+  supportAssignment?: Prisma.SupportAssignmentOmit
+  supportInternalNote?: Prisma.SupportInternalNoteOmit
+  supportConversationHistory?: Prisma.SupportConversationHistoryOmit
   messagingConversation?: Prisma.MessagingConversationOmit
   messagingConversationParticipant?: Prisma.MessagingConversationParticipantOmit
   messagingMessage?: Prisma.MessagingMessageOmit
