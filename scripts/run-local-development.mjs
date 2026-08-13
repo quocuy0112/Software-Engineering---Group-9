@@ -76,9 +76,12 @@ const ignoredBuildInputNames = new Set([
   ".git",
   ".next",
   ".local",
+  ".pytest_cache",
+  ".ruff_cache",
   "coverage",
   "dist",
   "build",
+  "__pycache__",
   "node_modules",
 ]);
 

@@ -266,6 +266,7 @@ export function ProfessionalConnectionProposalList() {
     <List
       title="Professional Connection Proposals"
       perPage={25}
+      empty={false}
       pagination={<Pagination rowsPerPageOptions={[25, 50, 100]} />}
       filters={[
         <SelectInput
@@ -293,7 +294,16 @@ export function ProfessionalConnectionProposalList() {
       ]}
     >
       <ProposalCreatePanel />
-      <Datagrid bulkActionButtons={false} rowClick="show">
+      <Datagrid
+        bulkActionButtons={false}
+        rowClick="show"
+        empty={
+          <Alert severity="info">
+            No connection proposals yet. Use the form above to introduce two
+            accounts.
+          </Alert>
+        }
+      >
         <TextField source="id" label="Proposal" />
         <TextField
           source="participantLow.displayName"
