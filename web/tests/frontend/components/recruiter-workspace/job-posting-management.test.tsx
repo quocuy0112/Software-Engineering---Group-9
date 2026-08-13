@@ -492,7 +492,7 @@ describe("recruiter job posting management", () => {
     expect(benefitCard).toHaveClass("is-selected");
     expect(benefitCard?.querySelector(".recruiter-benefit-icon")).toBeTruthy();
     expect(
-      within(benefitCard!).getByLabelText(
+      within(benefitCard as HTMLElement).getByLabelText(
         "Benefit label for Holiday and Tet bonus",
       ),
     ).toBeEnabled();

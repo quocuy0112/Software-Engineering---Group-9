@@ -46,6 +46,9 @@ function mutationErrorResponse(error: unknown, fallback: string) {
   }
 
   const message = error instanceof Error ? error.message : fallback;
+  if (message === "Company profile is incomplete.") {
+    return errorResponse(message, 409);
+  }
   if (message === "A recruiter-owned company is required.") {
     return errorResponse(message, 409);
   }

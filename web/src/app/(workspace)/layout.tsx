@@ -25,7 +25,7 @@ export default async function WorkspaceLayout({
       profile={context.account}
       initialLocale={context.initialLocale}
       initialRecruiterStatus={context.initialRecruiterStatus}
-      initialWorkspaceMode={context.initialWorkspaceMode}
+      initialWorkspaceMode="candidate"
     >
       {children}
     </WorkspaceShell>

@@ -57,6 +57,7 @@ export function WorkspaceShell({
   contentMode = "default",
   initialWorkspaceMode = "candidate",
   initialRecruiterJobData,
+  recruiterContent,
 }: {
   children: React.ReactNode;
   initialRecruiterStatus?: RecruiterHeaderStatus | null;
@@ -70,6 +71,7 @@ export function WorkspaceShell({
   contentMode?: "default" | "job-board";
   initialWorkspaceMode?: "candidate" | "recruiter";
   initialRecruiterJobData?: RecruiterJobManagementData | null;
+  recruiterContent?: React.ReactNode;
 }) {
   return (
     <WorkspaceLocaleProvider initialLocale={initialLocale}>
@@ -80,6 +82,7 @@ export function WorkspaceShell({
         contentMode={contentMode}
         initialWorkspaceMode={initialWorkspaceMode}
         initialRecruiterJobData={initialRecruiterJobData}
+        recruiterContent={recruiterContent}
       >
         {children}
       </WorkspaceShellContent>
@@ -95,6 +98,7 @@ function WorkspaceShellContent({
   contentMode,
   initialWorkspaceMode,
   initialRecruiterJobData,
+  recruiterContent,
 }: {
   children: React.ReactNode;
   initialRecruiterStatus?: RecruiterHeaderStatus | null;
@@ -107,6 +111,7 @@ function WorkspaceShellContent({
   contentMode: "default" | "job-board";
   initialWorkspaceMode: "candidate" | "recruiter";
   initialRecruiterJobData?: RecruiterJobManagementData | null;
+  recruiterContent?: React.ReactNode;
 }) {
   const router = useRouter();
   const locale = useWorkspaceLocale();
@@ -114,7 +119,7 @@ function WorkspaceShellContent({
   const [navigating, startNavigation] = useTransition();
   const [status, setStatus] = useState("");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [workspaceMode, setWorkspaceMode] = useState(initialWorkspaceMode);
+  const workspaceMode = initialWorkspaceMode;
   const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_MINIMUM_WIDTH);
   const [sidebarMaximumWidth, setSidebarMaximumWidth] = useState(
     SIDEBAR_MAXIMUM_FALLBACK_WIDTH,
@@ -215,12 +220,22 @@ function WorkspaceShellContent({
         };
 
   function persistWorkspaceMode(mode: WorkspaceMode) {
-    setWorkspaceMode(mode);
-    document.cookie = `${WORKSPACE_MODE_COOKIE}=${mode}; Path=/; Max-Age=31536000; SameSite=Lax`;
+    if (mode === 'recruiter') openRecruiterWorkspace();
+    else openCandidateWorkspace();
   }
 
   function clearPersistedWorkspaceMode() {
     document.cookie = `${WORKSPACE_MODE_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax`;
+  }
+
+  function openRecruiterWorkspace() {
+    document.cookie = `${WORKSPACE_MODE_COOKIE}=recruiter; Path=/; Max-Age=31536000; SameSite=Lax`;
+    startNavigation(() => router.push('/recruiter'));
+  }
+
+  function openCandidateWorkspace() {
+    clearPersistedWorkspaceMode();
+    startNavigation(() => router.push('/dashboard'));
   }
 
   async function signOut() {
@@ -460,9 +475,11 @@ function WorkspaceShellContent({
           >
             <CsrfProofProvider value={csrfProof}>
               {workspaceMode === "recruiter" ? (
-                <RecruiterJobPostingManagement
-                  initialData={initialRecruiterJobData}
-                />
+                recruiterContent ?? (
+                  <RecruiterJobPostingManagement
+                    initialData={initialRecruiterJobData}
+                  />
+                )
               ) : (
                 children
               )}

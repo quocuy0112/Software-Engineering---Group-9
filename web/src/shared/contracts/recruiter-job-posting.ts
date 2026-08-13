@@ -47,14 +47,23 @@ export const recruiterJobStatusMeta: Record<
   },
 };
 
+export type RecruiterCompanyView = Omit<
+  CompanyCatalogItem,
+  "memberUserIds" | "taxCode" | "verificationStatus"
+> &
+  Partial<
+    Pick<CompanyCatalogItem, "memberUserIds" | "taxCode" | "verificationStatus">
+  >;
 export type RecruiterJob = JobCatalogItem & {
-  company: CompanyCatalogItem;
+  company: RecruiterCompanyView;
 };
 
 export type RecruiterJobManagementData = {
   jobs: RecruiterJob[];
-  companies: CompanyCatalogItem[];
+  companies: RecruiterCompanyView[];
   companyId: string | null;
+  companyProfileComplete?: boolean;
+  missingCompanyProfileFields?: Array<"name" | "industry" | "size" | "address" | "logo">;
 };
 
 export type RecruiterJobFieldErrors = Record<string, string>;
@@ -70,10 +79,10 @@ export function parseVndInput(value: string): number {
   const normalized = value.trim().toLowerCase();
   if (!normalized) return 0;
 
-  const hasMillionSuffix = /(?:tr|trieu|triệu|m)\s*$/iu.test(normalized);
+  const hasMillionSuffix = /(?:tr|trieu|triÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡u|m)\s*$/iu.test(normalized);
   if (hasMillionSuffix) {
     const numericPart = normalized
-      .replace(/(?:tr|trieu|triệu|m)\s*$/iu, "")
+      .replace(/(?:tr|trieu|triÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡u|m)\s*$/iu, "")
       .replace(/\s+/gu, "")
       .replace(",", ".");
     const millions = Number.parseFloat(numericPart);
@@ -293,6 +302,7 @@ export function createEmptyJobPosting(
     age: "",
     numberOfHires: 1,
     status: "draft",
+    approvalComment: null,
     isUrgent: false,
     isVerified: false,
     postedAt: timestamp,

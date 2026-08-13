@@ -130,7 +130,7 @@ describe("job board navigation", () => {
     expect(styles).toContain("overflow-x: auto;");
   });
 
-  it("keeps the Filters sidebar independently scrollable", async () => {
+  it("keeps the Filters sidebar in the page scroll context", async () => {
     const styles = await readFile(
       resolve(process.cwd(), "src/frontend/features/jobs/styles/job-board.css"),
       "utf8",
@@ -143,12 +143,9 @@ describe("job board navigation", () => {
       "utf8",
     );
 
-    expect(styles).toContain(
-      "max-height: calc(100dvh - var(--sh-topbar-height) - var(--sh-space-8));",
-    );
-    expect(styles).toContain("overflow-y: auto;");
-    expect(styles).toContain("scrollbar-width: thin;");
-    expect(styles).toContain(".job-filter-column::-webkit-scrollbar {");
+    expect(styles).toContain("height: auto;");
+    expect(styles).toContain("max-height: none;");
+    expect(styles).not.toContain(".job-filter-column::-webkit-scrollbar {");
     expect(formSource).toContain('filterColumn.addEventListener("wheel"');
     expect(styles).toContain(".job-filter-mobile-trigger");
     expect(styles).toContain(".job-filter-drawer");
