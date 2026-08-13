@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
+import { format } from "prettier";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const contract = resolve(
@@ -14,7 +15,10 @@ const paths = [...source.matchAll(/^ {2}(\/api\/[^:]+):$/gmu)].map(
   (match) => match[1],
 );
 const digest = createHash("sha256").update(source).digest("hex");
-const generated = `// Generated from Feature 006 OpenAPI. Do not edit by hand.\nexport const adminContractVersion = "0.2.0" as const;\nexport const adminContractSha256 = "${digest}" as const;\nexport const adminContractPaths = ${JSON.stringify(paths, null, 2)} as const;\n`;
+const generated = await format(
+  `// Generated from Feature 006 OpenAPI. Do not edit by hand.\nexport const adminContractVersion = "0.3.0" as const;\nexport const adminContractSha256 = "${digest}" as const;\nexport const adminContractPaths = ${JSON.stringify(paths, null, 2)} as const;\n`,
+  { parser: "typescript" },
+);
 if (process.argv.includes("--check")) {
   const current = await readFile(output, "utf8").catch(() => "");
   if (current !== generated) {
@@ -24,7 +28,7 @@ if (process.argv.includes("--check")) {
     console.log(
       JSON.stringify({
         contract: "Feature 006 admin API",
-        version: "0.2.0",
+        version: "0.3.0",
         pathCount: paths.length,
         sha256: digest,
         drift: false,

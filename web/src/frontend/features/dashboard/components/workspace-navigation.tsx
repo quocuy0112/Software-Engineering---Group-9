@@ -49,6 +49,8 @@ export function WorkspaceNavigation({
     { href: "/dashboard", label: copy.dashboard, icon: "dashboard" },
     { href: "/jobs", label: copy.jobs, icon: "jobs" },
     { href: "/messages", label: "Messages", icon: "messages" },
+    { href: "/connections", label: "Connections", icon: "connections" },
+    { href: "/support", label: "Support", icon: "support" },
     { href: "/profile", label: copy.profile, icon: "profile" },
   ] as const;
   const jobsSubnav = [
@@ -232,6 +234,23 @@ function NavIcon({ name }: { name: string }) {
       <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
         <path d="M3 4.5h14v9H8l-4 3v-3H3z" />
         <path d="M6 8h8M6 10.5h5" />
+      </svg>
+    );
+  }
+  if (name === "support") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
+        <path d="M4 9a6 6 0 0 1 12 0v4a2 2 0 0 1-2 2h-2" />
+        <path d="M4 9v3H2V9h2M16 9h2v3h-2M8 16h4" />
+      </svg>
+    );
+  }
+  if (name === "connections") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
+        <circle cx="6" cy="7" r="2.5" />
+        <circle cx="14" cy="7" r="2.5" />
+        <path d="M2.5 16c.4-3 1.6-4.5 3.5-4.5S9.1 13 9.5 16M10.5 16c.4-3 1.6-4.5 3.5-4.5s3.1 1.5 3.5 4.5M8.5 8.5h3" />
       </svg>
     );
   }

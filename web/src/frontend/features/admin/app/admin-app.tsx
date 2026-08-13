@@ -22,6 +22,10 @@ import { VerificationRequestList } from "../verification/verification-request-li
 import { VerificationReviewShow } from "../verification/verification-review-show";
 import { ModerationReportList } from "../moderation/moderation-report-list";
 import { ModerationReviewShow } from "../moderation/moderation-review-show";
+import { SupportCaseList } from "../support/support-case-list";
+import { SupportCaseShow } from "../support/support-case-show";
+import { ProfessionalConnectionProposalList } from "../professional-connections/professional-connection-proposal-list";
+import { ProfessionalConnectionProposalShow } from "../professional-connections/professional-connection-proposal-show";
 
 const theme = createTheme({
   palette: { mode: "light", primary: { main: "#155eef" } },
@@ -100,6 +104,17 @@ export function AdminApp() {
             name="moderation-reports"
             list={ModerationReportList}
             show={ModerationReviewShow}
+          />
+          <Resource
+            name="support-cases"
+            list={SupportCaseList}
+            show={SupportCaseShow}
+          />
+          <Resource
+            name="professional-connection-proposals"
+            options={{ label: "Connection Proposals" }}
+            list={ProfessionalConnectionProposalList}
+            show={ProfessionalConnectionProposalShow}
           />
         </Admin>
       </main>

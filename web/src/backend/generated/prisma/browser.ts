@@ -268,6 +268,56 @@ export type JobApplication = Prisma.JobApplicationModel
  */
 export type ProfessionalConnection = Prisma.ProfessionalConnectionModel
 /**
+ * Model ProfessionalConnectionProposal
+ * 
+ */
+export type ProfessionalConnectionProposal = Prisma.ProfessionalConnectionProposalModel
+/**
+ * Model ProfessionalConnectionDecision
+ * 
+ */
+export type ProfessionalConnectionDecision = Prisma.ProfessionalConnectionDecisionModel
+/**
+ * Model ProfessionalConnectionProposalHistory
+ * 
+ */
+export type ProfessionalConnectionProposalHistory = Prisma.ProfessionalConnectionProposalHistoryModel
+/**
+ * Model ProfessionalConnectionNotification
+ * 
+ */
+export type ProfessionalConnectionNotification = Prisma.ProfessionalConnectionNotificationModel
+/**
+ * Model ProfessionalConnectionCommandReceipt
+ * 
+ */
+export type ProfessionalConnectionCommandReceipt = Prisma.ProfessionalConnectionCommandReceiptModel
+/**
+ * Model SupportConversation
+ * 
+ */
+export type SupportConversation = Prisma.SupportConversationModel
+/**
+ * Model SupportMessage
+ * 
+ */
+export type SupportMessage = Prisma.SupportMessageModel
+/**
+ * Model SupportAssignment
+ * 
+ */
+export type SupportAssignment = Prisma.SupportAssignmentModel
+/**
+ * Model SupportInternalNote
+ * 
+ */
+export type SupportInternalNote = Prisma.SupportInternalNoteModel
+/**
+ * Model SupportConversationHistory
+ * 
+ */
+export type SupportConversationHistory = Prisma.SupportConversationHistoryModel
+/**
  * Model MessagingConversation
  * 
  */

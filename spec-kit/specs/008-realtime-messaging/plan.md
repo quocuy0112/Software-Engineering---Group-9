@@ -167,7 +167,7 @@ life of a socket.
 An in-process `MessagingSocketRegistry` indexes `userId -> Set<socketId>`,
 `sessionId -> Set<socketId>`, and `socketId -> { userId, sessionId,
 conversationIds }`. Existing session/account/membership services, the Feature
-007 connection provider, block services, and moderation suspension flow publish
+011 connection provider, block services, and moderation suspension flow publish
 a privacy-minimized invalidation only after their transaction commits. The
 gateway looks up every affected socket, force-leaves the revoked conversation
 rooms immediately, and emits `conversation:access_revoked` to that client. A
@@ -183,22 +183,22 @@ Conversation eligibility has two explicit adapters:
    company; the other participant has a current `ACTIVE` membership in that
    company with one of the approved recruiting roles. The conversation stores
    the application and company references and rechecks them on access.
-2. `PROFESSIONAL_CONNECTION`: a minimal Feature 007 dependency slice owns a
-   canonical participant pair and `ACCEPTED` state. Feature 008 stores the
-   stable connection reference and never infers a connection from search,
-   profile visibility, or a socket room.
+2. `PROFESSIONAL_CONNECTION`: Feature 011 owns a canonical participant pair,
+   bilateral consent, and `ACCEPTED`/`REVOKED` lifecycle. Feature 008 stores the
+   stable connection reference, requires `ACCEPTED` for active communication,
+   and permits `REVOKED` only for participant-owned archived history reads.
 
 `MessagingEligibilityService.canMessage(userA, userB)` is the stable business
 boundary used by create, join, send, and outbound delivery. Its providers check
-the existing Application relationship and the Feature 007 accepted connection
+the existing Application relationship and the Feature 011 accepted connection
 contract. Unit tests cover connection only, application only, both, and neither.
-Future Feature 007 expansion changes only the connection provider behind this
+Future Feature 011 expansion changes only the connection provider behind this
 boundary.
 
 Conversation uniqueness is `(lowerParticipantId, higherParticipantId,
 contextType, contextReference)`, not one global pair. This allows the same people
 to communicate in separate company/application contexts without tenant leakage.
-The roadmap schedules the minimal Feature 007 persistence/lookup dependency
+The roadmap schedules the Feature 011 persistence/lifecycle dependency
 immediately before Feature 008 schema work. It includes no networking feed,
 invitation UI, recommendation, or connection-management surface.
 
@@ -277,7 +277,7 @@ no general message-reading endpoint.
 
 REST contracts are documented in `contracts/openapi.yaml` under
 `/api/messaging/**`. Realtime events and acknowledgements are documented in
-`contracts/socket-events.md`. The minimal Feature 007 ownership/lookup boundary
+`contracts/socket-events.md`. The Feature 011 ownership/lookup boundary
 is frozen in `contracts/professional-connection-dependency.md`. Shared Zod
 schemas and TypeScript event maps live under
 `web/src/shared/contracts/messaging/`; both Route Handlers and Socket.IO parse
@@ -403,7 +403,7 @@ service, store, broker, or credential.
 
 The deadline extension removes the former one-day constraint. Delivery follows
 the realistic week/day allocation in `tasks.md`, beginning with the minimal
-Feature 007 accepted-connection dependency and then Feature 008 in priority
+Feature 011 accepted-connection dependency and then Feature 008 in priority
 order: US1, US2, US3, US5, US6, US4, followed by performance and accessibility
 qualification. No task or acceptance gate is removed for schedule reasons.
 Out-of-scope ideas go only to the `Post-MVP` backlog.

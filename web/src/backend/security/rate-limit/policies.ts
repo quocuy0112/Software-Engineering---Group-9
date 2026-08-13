@@ -43,6 +43,32 @@ export const rateLimitPolicies = {
     limit: 10,
     windowSeconds: 24 * 60 * 60,
   },
+  supportCaseCreate: {
+    scope: "support-case-create",
+    limit: 5,
+    windowSeconds: 24 * 60 * 60,
+  },
+  supportSend: { scope: "support-send", limit: 60, windowSeconds: 60 },
+  supportSendNetwork: {
+    scope: "support-send-network",
+    limit: 300,
+    windowSeconds: 5 * 60,
+  },
+  connectionProposalCreate: {
+    scope: "connection-proposal-create",
+    limit: 20,
+    windowSeconds: 24 * 60 * 60,
+  },
+  connectionProposalDecision: {
+    scope: "connection-proposal-decision",
+    limit: 30,
+    windowSeconds: 60,
+  },
+  connectionDisconnect: {
+    scope: "connection-disconnect",
+    limit: 10,
+    windowSeconds: 60,
+  },
 } as const;
 
 export function safeRetryMetadata(decision: RateLimitDecision) {

@@ -9,8 +9,12 @@ import type {
   ConversationDetail,
   ConversationSummary,
 } from "@/shared/contracts/messaging/conversations";
-import type { MessagingMessage, ReadBoundary } from "@/shared/contracts/messaging/messages";
+import type {
+  MessagingMessage,
+  ReadBoundary,
+} from "@/shared/contracts/messaging/messages";
 import { messagingParticipantProjection } from "@/backend/messaging/services/apply-messaging-data-lifecycle";
+import { MessagingError } from "@/backend/messaging/messaging-errors";
 
 type ListCursor = { lastMessageAt: string | null; id: string };
 
@@ -21,7 +25,9 @@ export function encodeConversationCursor(cursor: ListCursor) {
 export function decodeConversationCursor(cursor?: string): ListCursor | null {
   if (!cursor) return null;
   try {
-    const value = JSON.parse(Buffer.from(cursor, "base64url").toString("utf8")) as ListCursor;
+    const value = JSON.parse(
+      Buffer.from(cursor, "base64url").toString("utf8"),
+    ) as ListCursor;
     return typeof value.id === "string" &&
       (value.lastMessageAt === null || typeof value.lastMessageAt === "string")
       ? value
@@ -31,9 +37,7 @@ export function decodeConversationCursor(cursor?: string): ListCursor | null {
   }
 }
 
-export class PrismaMessagingConversationRepository
-  implements MessagingConversationRepositoryPort
-{
+export class PrismaMessagingConversationRepository implements MessagingConversationRepositoryPort {
   constructor(private readonly db: typeof prisma = prisma) {}
 
   async findAccess(conversationId: string, userId: string) {
@@ -52,6 +56,7 @@ export class PrismaMessagingConversationRepository
         companyId: true,
         professionalConnectionId: true,
         lastMessageSequence: true,
+        archivedAt: true,
       },
     });
   }
@@ -64,30 +69,53 @@ export class PrismaMessagingConversationRepository
     return rows.map((row) => row.conversationId);
   }
 
-  async open(input: Parameters<MessagingConversationRepositoryPort["open"]>[0]) {
-    const pair = canonicalParticipantPair(input.actorUserId, input.targetUserId);
+  async open(
+    input: Parameters<MessagingConversationRepositoryPort["open"]>[0],
+  ) {
+    const pair = canonicalParticipantPair(
+      input.actorUserId,
+      input.targetUserId,
+    );
     const unique = {
       ...pair,
       contextType: input.context.type,
       contextReference: input.context.reference,
     };
     const existing = await this.db.messagingConversation.findUnique({
-      where: { participantLowId_participantHighId_contextType_contextReference: unique },
+      where: {
+        participantLowId_participantHighId_contextType_contextReference: unique,
+      },
       select: { id: true },
     });
     if (existing) return { conversationId: existing.id, created: false };
 
     try {
       const created = await this.db.$transaction(
-        async (tx) =>
-          tx.messagingConversation.create({
+        async (tx) => {
+          if (input.context.type === "PROFESSIONAL_CONNECTION") {
+            await tx.$queryRaw(
+              Prisma.sql`SELECT "id" FROM "ProfessionalConnection" WHERE "id" = ${input.context.professionalConnectionId} FOR UPDATE`,
+            );
+            const connection = await tx.professionalConnection.findUnique({
+              where: { id: input.context.professionalConnectionId },
+              select: { state: true },
+            });
+            if (connection?.state !== "ACCEPTED") {
+              throw new MessagingError("CONFLICT", 409);
+            }
+          }
+          return tx.messagingConversation.create({
             data: {
               ...unique,
               createdAt: input.now,
               applicationId:
-                input.context.type === "APPLICATION" ? input.context.applicationId : null,
+                input.context.type === "APPLICATION"
+                  ? input.context.applicationId
+                  : null,
               companyId:
-                input.context.type === "APPLICATION" ? input.context.companyId : null,
+                input.context.type === "APPLICATION"
+                  ? input.context.companyId
+                  : null,
               professionalConnectionId:
                 input.context.type === "PROFESSIONAL_CONNECTION"
                   ? input.context.professionalConnectionId
@@ -100,16 +128,23 @@ export class PrismaMessagingConversationRepository
               },
             },
             select: { id: true },
-          }),
+          });
+        },
         { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
       );
       return { conversationId: created.id, created: true };
     } catch (error) {
-      if (!(error instanceof Prisma.PrismaClientKnownRequestError) || error.code !== "P2002") {
+      if (
+        !(error instanceof Prisma.PrismaClientKnownRequestError) ||
+        error.code !== "P2002"
+      ) {
         throw error;
       }
       const winner = await this.db.messagingConversation.findUnique({
-        where: { participantLowId_participantHighId_contextType_contextReference: unique },
+        where: {
+          participantLowId_participantHighId_contextType_contextReference:
+            unique,
+        },
         select: { id: true },
       });
       if (!winner) throw error;
@@ -117,7 +152,10 @@ export class PrismaMessagingConversationRepository
     }
   }
 
-  async getDetail(conversationId: string, userId: string): Promise<ConversationDetail | null> {
+  async getDetail(
+    conversationId: string,
+    userId: string,
+  ): Promise<ConversationDetail | null> {
     const row = await this.db.messagingConversation.findFirst({
       where: {
         id: conversationId,
@@ -132,11 +170,17 @@ export class PrismaMessagingConversationRepository
         contextReference: true,
         application: {
           select: {
-            jobPosting: { select: { title: true, company: { select: { displayName: true } } } },
+            jobPosting: {
+              select: {
+                title: true,
+                company: { select: { displayName: true } },
+              },
+            },
           },
         },
         lastMessageSequence: true,
         createdAt: true,
+        archivedAt: true,
         participants: { where: { userId }, select: { lastReadSequence: true } },
         messages: {
           orderBy: { sequence: "desc" },
@@ -146,24 +190,30 @@ export class PrismaMessagingConversationRepository
       },
     });
     if (!row) return null;
-    const other = row.participantLowId === userId ? row.participantHigh : row.participantLow;
+    const other =
+      row.participantLowId === userId
+        ? row.participantHigh
+        : row.participantLow;
     const lastSequence = row.lastMessageSequence ?? 0;
     const lastReadSequence = row.participants[0]?.lastReadSequence ?? 0;
-    const [blocked, unreadCount] = await Promise.all([this.db.userMessagingBlock.findFirst({
-      where: {
-        OR: [
-          { blockerUserId: userId, blockedUserId: other.id },
-          { blockerUserId: other.id, blockedUserId: userId },
-        ],
-      },
-      select: { blockerUserId: true },
-    }), this.db.messagingMessage.count({
-      where: {
-        conversationId: row.id,
-        sequence: { gt: lastReadSequence },
-        senderId: { not: userId },
-      },
-    })]);
+    const [blocked, unreadCount] = await Promise.all([
+      this.db.userMessagingBlock.findFirst({
+        where: {
+          OR: [
+            { blockerUserId: userId, blockedUserId: other.id },
+            { blockerUserId: other.id, blockedUserId: userId },
+          ],
+        },
+        select: { blockerUserId: true },
+      }),
+      this.db.messagingMessage.count({
+        where: {
+          conversationId: row.id,
+          sequence: { gt: lastReadSequence },
+          senderId: { not: userId },
+        },
+      }),
+    ]);
     const job = row.application?.jobPosting;
     const lastMessage = row.messages[0];
     return {
@@ -186,6 +236,8 @@ export class PrismaMessagingConversationRepository
       unreadCount,
       blocked: Boolean(blocked),
       presence: "OFFLINE",
+      accessMode: row.archivedAt ? "READ_ONLY" : "READ_WRITE",
+      archivedAt: row.archivedAt?.toISOString() ?? null,
       createdAt: row.createdAt.toISOString(),
       currentLastSequence: lastSequence,
       currentUserLastReadSequence: lastReadSequence,
@@ -205,7 +257,10 @@ export class PrismaMessagingConversationRepository
         : {
             OR: [
               { lastMessageAt: { lt: new Date(cursor.lastMessageAt) } },
-              { lastMessageAt: new Date(cursor.lastMessageAt), id: { lt: cursor.id } },
+              {
+                lastMessageAt: new Date(cursor.lastMessageAt),
+                id: { lt: cursor.id },
+              },
               { lastMessageAt: null },
             ],
           }
@@ -223,18 +278,31 @@ export class PrismaMessagingConversationRepository
       select: {
         id: true,
         participantLowId: true,
-        participantLow: { select: { id: true, name: true, image: true, state: true } },
-        participantHigh: { select: { id: true, name: true, image: true, state: true } },
+        participantLow: {
+          select: { id: true, name: true, image: true, state: true },
+        },
+        participantHigh: {
+          select: { id: true, name: true, image: true, state: true },
+        },
         contextType: true,
         contextReference: true,
         application: {
           select: {
-            jobPosting: { select: { title: true, company: { select: { displayName: true } } } },
+            jobPosting: {
+              select: {
+                title: true,
+                company: { select: { displayName: true } },
+              },
+            },
           },
         },
         lastMessageAt: true,
         createdAt: true,
-        participants: { where: { userId: input.userId }, select: { lastReadSequence: true } },
+        archivedAt: true,
+        participants: {
+          where: { userId: input.userId },
+          select: { lastReadSequence: true },
+        },
         messages: {
           orderBy: { sequence: "desc" },
           take: 1,
@@ -246,7 +314,9 @@ export class PrismaMessagingConversationRepository
     const items = await Promise.all(
       pageRows.map(async (row) => {
         const otherRaw =
-          row.participantLowId === input.userId ? row.participantHigh : row.participantLow;
+          row.participantLowId === input.userId
+            ? row.participantHigh
+            : row.participantLow;
         const other = messagingParticipantProjection(otherRaw);
         const boundary = row.participants[0]?.lastReadSequence ?? 0;
         const [blocked, unreadCount] = await Promise.all([
@@ -289,6 +359,10 @@ export class PrismaMessagingConversationRepository
           unreadCount,
           blocked: Boolean(blocked),
           presence: "OFFLINE" as const,
+          accessMode: row.archivedAt
+            ? ("READ_ONLY" as const)
+            : ("READ_WRITE" as const),
+          archivedAt: row.archivedAt?.toISOString() ?? null,
           createdAt: row.createdAt.toISOString(),
         };
       }),
@@ -311,8 +385,15 @@ export class PrismaMessagingConversationRepository
     userId: string;
     cursor?: string;
     limit: number;
-  }): Promise<{ conversation: ConversationDetail; items: MessagingMessage[]; nextCursor: string | null } | null> {
-    const conversation = await this.getDetail(input.conversationId, input.userId);
+  }): Promise<{
+    conversation: ConversationDetail;
+    items: MessagingMessage[];
+    nextCursor: string | null;
+  } | null> {
+    const conversation = await this.getDetail(
+      input.conversationId,
+      input.userId,
+    );
     if (!conversation) return null;
     const before = input.cursor ? Number.parseInt(input.cursor, 10) : undefined;
     if (input.cursor && (!Number.isSafeInteger(before) || before! < 1)) {
@@ -335,13 +416,14 @@ export class PrismaMessagingConversationRepository
       },
     });
     const page = rows.slice(0, input.limit);
-    const otherBoundary = await this.db.messagingConversationParticipant.findFirst({
-      where: {
-        conversationId: input.conversationId,
-        userId: { not: input.userId },
-      },
-      select: { lastReadSequence: true },
-    });
+    const otherBoundary =
+      await this.db.messagingConversationParticipant.findFirst({
+        where: {
+          conversationId: input.conversationId,
+          userId: { not: input.userId },
+        },
+        select: { lastReadSequence: true },
+      });
     return {
       conversation,
       items: page
@@ -366,33 +448,69 @@ export class PrismaMessagingConversationRepository
     lastReadSequence: number;
     now: Date;
   }): Promise<ReadBoundary | null> {
-    const access = await this.findAccess(input.conversationId, input.userId);
-    if (!access) return null;
-    const maximum = access.lastMessageSequence ?? 0;
-    if (input.lastReadSequence > maximum) throw new Error("READ_SEQUENCE_CONFLICT");
-    await this.db.messagingConversationParticipant.updateMany({
-      where: {
-        conversationId: input.conversationId,
-        userId: input.userId,
-        lastReadSequence: { lt: input.lastReadSequence },
-      },
-      data: { lastReadSequence: input.lastReadSequence, lastReadAt: input.now },
-    });
-    const participant = await this.db.messagingConversationParticipant.findUnique({
-      where: {
-        conversationId_userId: {
+    return this.db.$transaction(async (tx) => {
+      const initial = await tx.messagingConversation.findFirst({
+        where: {
+          id: input.conversationId,
+          participants: { some: { userId: input.userId } },
+        },
+        select: { professionalConnectionId: true },
+      });
+      if (!initial) return null;
+      if (initial.professionalConnectionId) {
+        await tx.$queryRaw(
+          Prisma.sql`SELECT "id" FROM "ProfessionalConnection" WHERE "id" = ${initial.professionalConnectionId} FOR UPDATE`,
+        );
+      }
+      await tx.$queryRaw(
+        Prisma.sql`SELECT "id" FROM "MessagingConversation" WHERE "id" = ${input.conversationId} FOR UPDATE`,
+      );
+      const authority = await tx.messagingConversation.findUnique({
+        where: { id: input.conversationId },
+        select: {
+          archivedAt: true,
+          lastMessageSequence: true,
+          professionalConnection: { select: { state: true } },
+        },
+      });
+      if (
+        !authority ||
+        authority.archivedAt ||
+        (authority.professionalConnection &&
+          authority.professionalConnection.state !== "ACCEPTED")
+      ) {
+        return null;
+      }
+      const maximum = authority.lastMessageSequence ?? 0;
+      if (input.lastReadSequence > maximum)
+        throw new Error("READ_SEQUENCE_CONFLICT");
+      await tx.messagingConversationParticipant.updateMany({
+        where: {
           conversationId: input.conversationId,
           userId: input.userId,
+          lastReadSequence: { lt: input.lastReadSequence },
         },
-      },
-      select: { lastReadSequence: true, lastReadAt: true },
+        data: {
+          lastReadSequence: input.lastReadSequence,
+          lastReadAt: input.now,
+        },
+      });
+      const participant = await tx.messagingConversationParticipant.findUnique({
+        where: {
+          conversationId_userId: {
+            conversationId: input.conversationId,
+            userId: input.userId,
+          },
+        },
+        select: { lastReadSequence: true, lastReadAt: true },
+      });
+      if (!participant) return null;
+      return {
+        conversationId: input.conversationId,
+        readerId: input.userId,
+        lastReadSequence: participant.lastReadSequence,
+        readAt: (participant.lastReadAt ?? input.now).toISOString(),
+      };
     });
-    if (!participant) return null;
-    return {
-      conversationId: input.conversationId,
-      readerId: input.userId,
-      lastReadSequence: participant.lastReadSequence,
-      readAt: (participant.lastReadAt ?? input.now).toISOString(),
-    };
   }
 }

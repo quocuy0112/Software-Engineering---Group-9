@@ -315,6 +315,14 @@ export type UserAccountWhereInput = {
   submittedModerationReports?: Prisma.ModerationReportListRelationFilter
   professionalConnectionsLow?: Prisma.ProfessionalConnectionListRelationFilter
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionListRelationFilter
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionListRelationFilter
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalListRelationFilter
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalListRelationFilter
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalListRelationFilter
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionListRelationFilter
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryListRelationFilter
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationListRelationFilter
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptListRelationFilter
   messagingConversationsLow?: Prisma.MessagingConversationListRelationFilter
   messagingConversationsHigh?: Prisma.MessagingConversationListRelationFilter
   messagingParticipants?: Prisma.MessagingConversationParticipantListRelationFilter
@@ -323,6 +331,12 @@ export type UserAccountWhereInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockListRelationFilter
   submittedMessagingReports?: Prisma.MessagingReportListRelationFilter
   targetedMessagingReports?: Prisma.MessagingReportListRelationFilter
+  supportConversationsRequested?: Prisma.SupportConversationListRelationFilter
+  supportConversationsAssigned?: Prisma.SupportConversationListRelationFilter
+  supportMessages?: Prisma.SupportMessageListRelationFilter
+  supportAssignmentsReceived?: Prisma.SupportAssignmentListRelationFilter
+  supportAssignmentsMade?: Prisma.SupportAssignmentListRelationFilter
+  supportInternalNotes?: Prisma.SupportInternalNoteListRelationFilter
 }
 
 export type UserAccountOrderByWithRelationInput = {
@@ -374,6 +388,14 @@ export type UserAccountOrderByWithRelationInput = {
   submittedModerationReports?: Prisma.ModerationReportOrderByRelationAggregateInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionOrderByRelationAggregateInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionOrderByRelationAggregateInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionOrderByRelationAggregateInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalOrderByRelationAggregateInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalOrderByRelationAggregateInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalOrderByRelationAggregateInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionOrderByRelationAggregateInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryOrderByRelationAggregateInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationOrderByRelationAggregateInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptOrderByRelationAggregateInput
   messagingConversationsLow?: Prisma.MessagingConversationOrderByRelationAggregateInput
   messagingConversationsHigh?: Prisma.MessagingConversationOrderByRelationAggregateInput
   messagingParticipants?: Prisma.MessagingConversationParticipantOrderByRelationAggregateInput
@@ -382,6 +404,12 @@ export type UserAccountOrderByWithRelationInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockOrderByRelationAggregateInput
   submittedMessagingReports?: Prisma.MessagingReportOrderByRelationAggregateInput
   targetedMessagingReports?: Prisma.MessagingReportOrderByRelationAggregateInput
+  supportConversationsRequested?: Prisma.SupportConversationOrderByRelationAggregateInput
+  supportConversationsAssigned?: Prisma.SupportConversationOrderByRelationAggregateInput
+  supportMessages?: Prisma.SupportMessageOrderByRelationAggregateInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentOrderByRelationAggregateInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentOrderByRelationAggregateInput
+  supportInternalNotes?: Prisma.SupportInternalNoteOrderByRelationAggregateInput
 }
 
 export type UserAccountWhereUniqueInput = Prisma.AtLeast<{
@@ -436,6 +464,14 @@ export type UserAccountWhereUniqueInput = Prisma.AtLeast<{
   submittedModerationReports?: Prisma.ModerationReportListRelationFilter
   professionalConnectionsLow?: Prisma.ProfessionalConnectionListRelationFilter
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionListRelationFilter
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionListRelationFilter
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalListRelationFilter
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalListRelationFilter
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalListRelationFilter
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionListRelationFilter
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryListRelationFilter
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationListRelationFilter
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptListRelationFilter
   messagingConversationsLow?: Prisma.MessagingConversationListRelationFilter
   messagingConversationsHigh?: Prisma.MessagingConversationListRelationFilter
   messagingParticipants?: Prisma.MessagingConversationParticipantListRelationFilter
@@ -444,6 +480,12 @@ export type UserAccountWhereUniqueInput = Prisma.AtLeast<{
   messagingBlocksReceived?: Prisma.UserMessagingBlockListRelationFilter
   submittedMessagingReports?: Prisma.MessagingReportListRelationFilter
   targetedMessagingReports?: Prisma.MessagingReportListRelationFilter
+  supportConversationsRequested?: Prisma.SupportConversationListRelationFilter
+  supportConversationsAssigned?: Prisma.SupportConversationListRelationFilter
+  supportMessages?: Prisma.SupportMessageListRelationFilter
+  supportAssignmentsReceived?: Prisma.SupportAssignmentListRelationFilter
+  supportAssignmentsMade?: Prisma.SupportAssignmentListRelationFilter
+  supportInternalNotes?: Prisma.SupportInternalNoteListRelationFilter
 }, "id" | "email" | "normalizedEmail">
 
 export type UserAccountOrderByWithAggregationInput = {
@@ -535,6 +577,14 @@ export type UserAccountCreateInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -543,6 +593,12 @@ export type UserAccountCreateInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateInput = {
@@ -594,6 +650,14 @@ export type UserAccountUncheckedCreateInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -602,6 +666,12 @@ export type UserAccountUncheckedCreateInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUpdateInput = {
@@ -653,6 +723,14 @@ export type UserAccountUpdateInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -661,6 +739,12 @@ export type UserAccountUpdateInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateInput = {
@@ -712,6 +796,14 @@ export type UserAccountUncheckedUpdateInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -720,6 +812,12 @@ export type UserAccountUncheckedUpdateInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateManyInput = {
@@ -1178,6 +1276,12 @@ export type UserAccountCreateNestedOneWithoutProfessionalConnectionsHighInput = 
   connect?: Prisma.UserAccountWhereUniqueInput
 }
 
+export type UserAccountCreateNestedOneWithoutProfessionalConnectionsRevokedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutProfessionalConnectionsRevokedInput, Prisma.UserAccountUncheckedCreateWithoutProfessionalConnectionsRevokedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutProfessionalConnectionsRevokedInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
 export type UserAccountUpdateOneRequiredWithoutProfessionalConnectionsLowNestedInput = {
   create?: Prisma.XOR<Prisma.UserAccountCreateWithoutProfessionalConnectionsLowInput, Prisma.UserAccountUncheckedCreateWithoutProfessionalConnectionsLowInput>
   connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutProfessionalConnectionsLowInput
@@ -1192,6 +1296,208 @@ export type UserAccountUpdateOneRequiredWithoutProfessionalConnectionsHighNested
   upsert?: Prisma.UserAccountUpsertWithoutProfessionalConnectionsHighInput
   connect?: Prisma.UserAccountWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutProfessionalConnectionsHighInput, Prisma.UserAccountUpdateWithoutProfessionalConnectionsHighInput>, Prisma.UserAccountUncheckedUpdateWithoutProfessionalConnectionsHighInput>
+}
+
+export type UserAccountUpdateOneWithoutProfessionalConnectionsRevokedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutProfessionalConnectionsRevokedInput, Prisma.UserAccountUncheckedCreateWithoutProfessionalConnectionsRevokedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutProfessionalConnectionsRevokedInput
+  upsert?: Prisma.UserAccountUpsertWithoutProfessionalConnectionsRevokedInput
+  disconnect?: Prisma.UserAccountWhereInput | boolean
+  delete?: Prisma.UserAccountWhereInput | boolean
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutProfessionalConnectionsRevokedInput, Prisma.UserAccountUpdateWithoutProfessionalConnectionsRevokedInput>, Prisma.UserAccountUncheckedUpdateWithoutProfessionalConnectionsRevokedInput>
+}
+
+export type UserAccountCreateNestedOneWithoutConnectionProposalsLowInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalsLowInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalsLowInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutConnectionProposalsLowInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountCreateNestedOneWithoutConnectionProposalsHighInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalsHighInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalsHighInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutConnectionProposalsHighInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountCreateNestedOneWithoutConnectionProposalsCreatedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalsCreatedInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalsCreatedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutConnectionProposalsCreatedInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneWithoutConnectionProposalsLowNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalsLowInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalsLowInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutConnectionProposalsLowInput
+  upsert?: Prisma.UserAccountUpsertWithoutConnectionProposalsLowInput
+  disconnect?: Prisma.UserAccountWhereInput | boolean
+  delete?: Prisma.UserAccountWhereInput | boolean
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutConnectionProposalsLowInput, Prisma.UserAccountUpdateWithoutConnectionProposalsLowInput>, Prisma.UserAccountUncheckedUpdateWithoutConnectionProposalsLowInput>
+}
+
+export type UserAccountUpdateOneWithoutConnectionProposalsHighNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalsHighInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalsHighInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutConnectionProposalsHighInput
+  upsert?: Prisma.UserAccountUpsertWithoutConnectionProposalsHighInput
+  disconnect?: Prisma.UserAccountWhereInput | boolean
+  delete?: Prisma.UserAccountWhereInput | boolean
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutConnectionProposalsHighInput, Prisma.UserAccountUpdateWithoutConnectionProposalsHighInput>, Prisma.UserAccountUncheckedUpdateWithoutConnectionProposalsHighInput>
+}
+
+export type UserAccountUpdateOneWithoutConnectionProposalsCreatedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalsCreatedInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalsCreatedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutConnectionProposalsCreatedInput
+  upsert?: Prisma.UserAccountUpsertWithoutConnectionProposalsCreatedInput
+  disconnect?: Prisma.UserAccountWhereInput | boolean
+  delete?: Prisma.UserAccountWhereInput | boolean
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutConnectionProposalsCreatedInput, Prisma.UserAccountUpdateWithoutConnectionProposalsCreatedInput>, Prisma.UserAccountUncheckedUpdateWithoutConnectionProposalsCreatedInput>
+}
+
+export type UserAccountCreateNestedOneWithoutConnectionProposalDecisionsInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalDecisionsInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalDecisionsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutConnectionProposalDecisionsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutConnectionProposalDecisionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalDecisionsInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalDecisionsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutConnectionProposalDecisionsInput
+  upsert?: Prisma.UserAccountUpsertWithoutConnectionProposalDecisionsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutConnectionProposalDecisionsInput, Prisma.UserAccountUpdateWithoutConnectionProposalDecisionsInput>, Prisma.UserAccountUncheckedUpdateWithoutConnectionProposalDecisionsInput>
+}
+
+export type UserAccountCreateNestedOneWithoutConnectionProposalHistoryInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalHistoryInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalHistoryInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutConnectionProposalHistoryInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneWithoutConnectionProposalHistoryNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalHistoryInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalHistoryInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutConnectionProposalHistoryInput
+  upsert?: Prisma.UserAccountUpsertWithoutConnectionProposalHistoryInput
+  disconnect?: Prisma.UserAccountWhereInput | boolean
+  delete?: Prisma.UserAccountWhereInput | boolean
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutConnectionProposalHistoryInput, Prisma.UserAccountUpdateWithoutConnectionProposalHistoryInput>, Prisma.UserAccountUncheckedUpdateWithoutConnectionProposalHistoryInput>
+}
+
+export type UserAccountCreateNestedOneWithoutConnectionNotificationsInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionNotificationsInput, Prisma.UserAccountUncheckedCreateWithoutConnectionNotificationsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutConnectionNotificationsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutConnectionNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionNotificationsInput, Prisma.UserAccountUncheckedCreateWithoutConnectionNotificationsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutConnectionNotificationsInput
+  upsert?: Prisma.UserAccountUpsertWithoutConnectionNotificationsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutConnectionNotificationsInput, Prisma.UserAccountUpdateWithoutConnectionNotificationsInput>, Prisma.UserAccountUncheckedUpdateWithoutConnectionNotificationsInput>
+}
+
+export type UserAccountCreateNestedOneWithoutConnectionCommandReceiptsInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionCommandReceiptsInput, Prisma.UserAccountUncheckedCreateWithoutConnectionCommandReceiptsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutConnectionCommandReceiptsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutConnectionCommandReceiptsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionCommandReceiptsInput, Prisma.UserAccountUncheckedCreateWithoutConnectionCommandReceiptsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutConnectionCommandReceiptsInput
+  upsert?: Prisma.UserAccountUpsertWithoutConnectionCommandReceiptsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutConnectionCommandReceiptsInput, Prisma.UserAccountUpdateWithoutConnectionCommandReceiptsInput>, Prisma.UserAccountUncheckedUpdateWithoutConnectionCommandReceiptsInput>
+}
+
+export type UserAccountCreateNestedOneWithoutSupportConversationsRequestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportConversationsRequestedInput, Prisma.UserAccountUncheckedCreateWithoutSupportConversationsRequestedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportConversationsRequestedInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountCreateNestedOneWithoutSupportConversationsAssignedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportConversationsAssignedInput, Prisma.UserAccountUncheckedCreateWithoutSupportConversationsAssignedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportConversationsAssignedInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutSupportConversationsRequestedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportConversationsRequestedInput, Prisma.UserAccountUncheckedCreateWithoutSupportConversationsRequestedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportConversationsRequestedInput
+  upsert?: Prisma.UserAccountUpsertWithoutSupportConversationsRequestedInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutSupportConversationsRequestedInput, Prisma.UserAccountUpdateWithoutSupportConversationsRequestedInput>, Prisma.UserAccountUncheckedUpdateWithoutSupportConversationsRequestedInput>
+}
+
+export type UserAccountUpdateOneWithoutSupportConversationsAssignedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportConversationsAssignedInput, Prisma.UserAccountUncheckedCreateWithoutSupportConversationsAssignedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportConversationsAssignedInput
+  upsert?: Prisma.UserAccountUpsertWithoutSupportConversationsAssignedInput
+  disconnect?: Prisma.UserAccountWhereInput | boolean
+  delete?: Prisma.UserAccountWhereInput | boolean
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutSupportConversationsAssignedInput, Prisma.UserAccountUpdateWithoutSupportConversationsAssignedInput>, Prisma.UserAccountUncheckedUpdateWithoutSupportConversationsAssignedInput>
+}
+
+export type UserAccountCreateNestedOneWithoutSupportMessagesInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportMessagesInput, Prisma.UserAccountUncheckedCreateWithoutSupportMessagesInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportMessagesInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutSupportMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportMessagesInput, Prisma.UserAccountUncheckedCreateWithoutSupportMessagesInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportMessagesInput
+  upsert?: Prisma.UserAccountUpsertWithoutSupportMessagesInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutSupportMessagesInput, Prisma.UserAccountUpdateWithoutSupportMessagesInput>, Prisma.UserAccountUncheckedUpdateWithoutSupportMessagesInput>
+}
+
+export type UserAccountCreateNestedOneWithoutSupportAssignmentsReceivedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportAssignmentsReceivedInput, Prisma.UserAccountUncheckedCreateWithoutSupportAssignmentsReceivedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportAssignmentsReceivedInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountCreateNestedOneWithoutSupportAssignmentsMadeInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportAssignmentsMadeInput, Prisma.UserAccountUncheckedCreateWithoutSupportAssignmentsMadeInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportAssignmentsMadeInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutSupportAssignmentsReceivedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportAssignmentsReceivedInput, Prisma.UserAccountUncheckedCreateWithoutSupportAssignmentsReceivedInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportAssignmentsReceivedInput
+  upsert?: Prisma.UserAccountUpsertWithoutSupportAssignmentsReceivedInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutSupportAssignmentsReceivedInput, Prisma.UserAccountUpdateWithoutSupportAssignmentsReceivedInput>, Prisma.UserAccountUncheckedUpdateWithoutSupportAssignmentsReceivedInput>
+}
+
+export type UserAccountUpdateOneRequiredWithoutSupportAssignmentsMadeNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportAssignmentsMadeInput, Prisma.UserAccountUncheckedCreateWithoutSupportAssignmentsMadeInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportAssignmentsMadeInput
+  upsert?: Prisma.UserAccountUpsertWithoutSupportAssignmentsMadeInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutSupportAssignmentsMadeInput, Prisma.UserAccountUpdateWithoutSupportAssignmentsMadeInput>, Prisma.UserAccountUncheckedUpdateWithoutSupportAssignmentsMadeInput>
+}
+
+export type UserAccountCreateNestedOneWithoutSupportInternalNotesInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportInternalNotesInput, Prisma.UserAccountUncheckedCreateWithoutSupportInternalNotesInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportInternalNotesInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutSupportInternalNotesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportInternalNotesInput, Prisma.UserAccountUncheckedCreateWithoutSupportInternalNotesInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutSupportInternalNotesInput
+  upsert?: Prisma.UserAccountUpsertWithoutSupportInternalNotesInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutSupportInternalNotesInput, Prisma.UserAccountUpdateWithoutSupportInternalNotesInput>, Prisma.UserAccountUncheckedUpdateWithoutSupportInternalNotesInput>
 }
 
 export type UserAccountCreateNestedOneWithoutMessagingConversationsLowInput = {
@@ -1526,6 +1832,14 @@ export type UserAccountCreateWithoutAccountsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -1534,6 +1848,12 @@ export type UserAccountCreateWithoutAccountsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutAccountsInput = {
@@ -1584,6 +1904,14 @@ export type UserAccountUncheckedCreateWithoutAccountsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -1592,6 +1920,12 @@ export type UserAccountUncheckedCreateWithoutAccountsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutAccountsInput = {
@@ -1658,6 +1992,14 @@ export type UserAccountUpdateWithoutAccountsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -1666,6 +2008,12 @@ export type UserAccountUpdateWithoutAccountsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutAccountsInput = {
@@ -1716,6 +2064,14 @@ export type UserAccountUncheckedUpdateWithoutAccountsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -1724,6 +2080,12 @@ export type UserAccountUncheckedUpdateWithoutAccountsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutSessionsInput = {
@@ -1774,6 +2136,14 @@ export type UserAccountCreateWithoutSessionsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -1782,6 +2152,12 @@ export type UserAccountCreateWithoutSessionsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutSessionsInput = {
@@ -1832,6 +2208,14 @@ export type UserAccountUncheckedCreateWithoutSessionsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -1840,6 +2224,12 @@ export type UserAccountUncheckedCreateWithoutSessionsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutSessionsInput = {
@@ -1906,6 +2296,14 @@ export type UserAccountUpdateWithoutSessionsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -1914,6 +2312,12 @@ export type UserAccountUpdateWithoutSessionsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSessionsInput = {
@@ -1964,6 +2368,14 @@ export type UserAccountUncheckedUpdateWithoutSessionsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -1972,6 +2384,12 @@ export type UserAccountUncheckedUpdateWithoutSessionsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutVerificationsInput = {
@@ -2022,6 +2440,14 @@ export type UserAccountCreateWithoutVerificationsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -2030,6 +2456,12 @@ export type UserAccountCreateWithoutVerificationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutVerificationsInput = {
@@ -2080,6 +2512,14 @@ export type UserAccountUncheckedCreateWithoutVerificationsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -2088,6 +2528,12 @@ export type UserAccountUncheckedCreateWithoutVerificationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutVerificationsInput = {
@@ -2154,6 +2600,14 @@ export type UserAccountUpdateWithoutVerificationsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -2162,6 +2616,12 @@ export type UserAccountUpdateWithoutVerificationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutVerificationsInput = {
@@ -2212,6 +2672,14 @@ export type UserAccountUncheckedUpdateWithoutVerificationsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -2220,6 +2688,12 @@ export type UserAccountUncheckedUpdateWithoutVerificationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutTwoFactorInput = {
@@ -2270,6 +2744,14 @@ export type UserAccountCreateWithoutTwoFactorInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -2278,6 +2760,12 @@ export type UserAccountCreateWithoutTwoFactorInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutTwoFactorInput = {
@@ -2328,6 +2816,14 @@ export type UserAccountUncheckedCreateWithoutTwoFactorInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -2336,6 +2832,12 @@ export type UserAccountUncheckedCreateWithoutTwoFactorInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutTwoFactorInput = {
@@ -2402,6 +2904,14 @@ export type UserAccountUpdateWithoutTwoFactorInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -2410,6 +2920,12 @@ export type UserAccountUpdateWithoutTwoFactorInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutTwoFactorInput = {
@@ -2460,6 +2976,14 @@ export type UserAccountUncheckedUpdateWithoutTwoFactorInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -2468,6 +2992,12 @@ export type UserAccountUncheckedUpdateWithoutTwoFactorInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCandidateIdentityInput = {
@@ -2518,6 +3048,14 @@ export type UserAccountCreateWithoutCandidateIdentityInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -2526,6 +3064,12 @@ export type UserAccountCreateWithoutCandidateIdentityInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCandidateIdentityInput = {
@@ -2576,6 +3120,14 @@ export type UserAccountUncheckedCreateWithoutCandidateIdentityInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -2584,6 +3136,12 @@ export type UserAccountUncheckedCreateWithoutCandidateIdentityInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCandidateIdentityInput = {
@@ -2650,6 +3208,14 @@ export type UserAccountUpdateWithoutCandidateIdentityInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -2658,6 +3224,12 @@ export type UserAccountUpdateWithoutCandidateIdentityInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCandidateIdentityInput = {
@@ -2708,6 +3280,14 @@ export type UserAccountUncheckedUpdateWithoutCandidateIdentityInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -2716,6 +3296,12 @@ export type UserAccountUncheckedUpdateWithoutCandidateIdentityInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutPreferencesInput = {
@@ -2766,6 +3352,14 @@ export type UserAccountCreateWithoutPreferencesInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -2774,6 +3368,12 @@ export type UserAccountCreateWithoutPreferencesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutPreferencesInput = {
@@ -2824,6 +3424,14 @@ export type UserAccountUncheckedCreateWithoutPreferencesInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -2832,6 +3440,12 @@ export type UserAccountUncheckedCreateWithoutPreferencesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutPreferencesInput = {
@@ -2898,6 +3512,14 @@ export type UserAccountUpdateWithoutPreferencesInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -2906,6 +3528,12 @@ export type UserAccountUpdateWithoutPreferencesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPreferencesInput = {
@@ -2956,6 +3584,14 @@ export type UserAccountUncheckedUpdateWithoutPreferencesInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -2964,6 +3600,12 @@ export type UserAccountUncheckedUpdateWithoutPreferencesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutJobWorkspaceStateInput = {
@@ -3014,6 +3656,14 @@ export type UserAccountCreateWithoutJobWorkspaceStateInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -3022,6 +3672,12 @@ export type UserAccountCreateWithoutJobWorkspaceStateInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutJobWorkspaceStateInput = {
@@ -3072,6 +3728,14 @@ export type UserAccountUncheckedCreateWithoutJobWorkspaceStateInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -3080,6 +3744,12 @@ export type UserAccountUncheckedCreateWithoutJobWorkspaceStateInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutJobWorkspaceStateInput = {
@@ -3146,6 +3816,14 @@ export type UserAccountUpdateWithoutJobWorkspaceStateInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -3154,6 +3832,12 @@ export type UserAccountUpdateWithoutJobWorkspaceStateInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutJobWorkspaceStateInput = {
@@ -3204,6 +3888,14 @@ export type UserAccountUncheckedUpdateWithoutJobWorkspaceStateInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -3212,6 +3904,12 @@ export type UserAccountUncheckedUpdateWithoutJobWorkspaceStateInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutEmailChangeRequestsInput = {
@@ -3262,6 +3960,14 @@ export type UserAccountCreateWithoutEmailChangeRequestsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -3270,6 +3976,12 @@ export type UserAccountCreateWithoutEmailChangeRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutEmailChangeRequestsInput = {
@@ -3320,6 +4032,14 @@ export type UserAccountUncheckedCreateWithoutEmailChangeRequestsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -3328,6 +4048,12 @@ export type UserAccountUncheckedCreateWithoutEmailChangeRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutEmailChangeRequestsInput = {
@@ -3394,6 +4120,14 @@ export type UserAccountUpdateWithoutEmailChangeRequestsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -3402,6 +4136,12 @@ export type UserAccountUpdateWithoutEmailChangeRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutEmailChangeRequestsInput = {
@@ -3452,6 +4192,14 @@ export type UserAccountUncheckedUpdateWithoutEmailChangeRequestsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -3460,6 +4208,12 @@ export type UserAccountUncheckedUpdateWithoutEmailChangeRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordChangeAttemptWindowInput = {
@@ -3510,6 +4264,14 @@ export type UserAccountCreateWithoutPasswordChangeAttemptWindowInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -3518,6 +4280,12 @@ export type UserAccountCreateWithoutPasswordChangeAttemptWindowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordChangeAttemptWindowInput = {
@@ -3568,6 +4336,14 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeAttemptWindowInput = 
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -3576,6 +4352,12 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeAttemptWindowInput = 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordChangeAttemptWindowInput = {
@@ -3642,6 +4424,14 @@ export type UserAccountUpdateWithoutPasswordChangeAttemptWindowInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -3650,6 +4440,12 @@ export type UserAccountUpdateWithoutPasswordChangeAttemptWindowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordChangeAttemptWindowInput = {
@@ -3700,6 +4496,14 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeAttemptWindowInput = 
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -3708,6 +4512,12 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeAttemptWindowInput = 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordChangeOperationsInput = {
@@ -3758,6 +4568,14 @@ export type UserAccountCreateWithoutPasswordChangeOperationsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -3766,6 +4584,12 @@ export type UserAccountCreateWithoutPasswordChangeOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordChangeOperationsInput = {
@@ -3816,6 +4640,14 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeOperationsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -3824,6 +4656,12 @@ export type UserAccountUncheckedCreateWithoutPasswordChangeOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordChangeOperationsInput = {
@@ -3890,6 +4728,14 @@ export type UserAccountUpdateWithoutPasswordChangeOperationsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -3898,6 +4744,12 @@ export type UserAccountUpdateWithoutPasswordChangeOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordChangeOperationsInput = {
@@ -3948,6 +4800,14 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeOperationsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -3956,6 +4816,12 @@ export type UserAccountUncheckedUpdateWithoutPasswordChangeOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutSecurityTokensInput = {
@@ -4006,6 +4872,14 @@ export type UserAccountCreateWithoutSecurityTokensInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -4014,6 +4888,12 @@ export type UserAccountCreateWithoutSecurityTokensInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutSecurityTokensInput = {
@@ -4064,6 +4944,14 @@ export type UserAccountUncheckedCreateWithoutSecurityTokensInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -4072,6 +4960,12 @@ export type UserAccountUncheckedCreateWithoutSecurityTokensInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutSecurityTokensInput = {
@@ -4138,6 +5032,14 @@ export type UserAccountUpdateWithoutSecurityTokensInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -4146,6 +5048,12 @@ export type UserAccountUpdateWithoutSecurityTokensInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSecurityTokensInput = {
@@ -4196,6 +5104,14 @@ export type UserAccountUncheckedUpdateWithoutSecurityTokensInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -4204,6 +5120,12 @@ export type UserAccountUncheckedUpdateWithoutSecurityTokensInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutPasswordResetOperationsInput = {
@@ -4254,6 +5176,14 @@ export type UserAccountCreateWithoutPasswordResetOperationsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -4262,6 +5192,12 @@ export type UserAccountCreateWithoutPasswordResetOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutPasswordResetOperationsInput = {
@@ -4312,6 +5248,14 @@ export type UserAccountUncheckedCreateWithoutPasswordResetOperationsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -4320,6 +5264,12 @@ export type UserAccountUncheckedCreateWithoutPasswordResetOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutPasswordResetOperationsInput = {
@@ -4386,6 +5336,14 @@ export type UserAccountUpdateWithoutPasswordResetOperationsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -4394,6 +5352,12 @@ export type UserAccountUpdateWithoutPasswordResetOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPasswordResetOperationsInput = {
@@ -4444,6 +5408,14 @@ export type UserAccountUncheckedUpdateWithoutPasswordResetOperationsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -4452,6 +5424,12 @@ export type UserAccountUncheckedUpdateWithoutPasswordResetOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutFullAccountRecoveryOperationsInput = {
@@ -4502,6 +5480,14 @@ export type UserAccountCreateWithoutFullAccountRecoveryOperationsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -4510,6 +5496,12 @@ export type UserAccountCreateWithoutFullAccountRecoveryOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutFullAccountRecoveryOperationsInput = {
@@ -4560,6 +5552,14 @@ export type UserAccountUncheckedCreateWithoutFullAccountRecoveryOperationsInput 
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -4568,6 +5568,12 @@ export type UserAccountUncheckedCreateWithoutFullAccountRecoveryOperationsInput 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutFullAccountRecoveryOperationsInput = {
@@ -4634,6 +5640,14 @@ export type UserAccountUpdateWithoutFullAccountRecoveryOperationsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -4642,6 +5656,12 @@ export type UserAccountUpdateWithoutFullAccountRecoveryOperationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutFullAccountRecoveryOperationsInput = {
@@ -4692,6 +5712,14 @@ export type UserAccountUncheckedUpdateWithoutFullAccountRecoveryOperationsInput 
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -4700,6 +5728,12 @@ export type UserAccountUncheckedUpdateWithoutFullAccountRecoveryOperationsInput 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutChallengesInput = {
@@ -4750,6 +5784,14 @@ export type UserAccountCreateWithoutChallengesInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -4758,6 +5800,12 @@ export type UserAccountCreateWithoutChallengesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutChallengesInput = {
@@ -4808,6 +5856,14 @@ export type UserAccountUncheckedCreateWithoutChallengesInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -4816,6 +5872,12 @@ export type UserAccountUncheckedCreateWithoutChallengesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutChallengesInput = {
@@ -4882,6 +5944,14 @@ export type UserAccountUpdateWithoutChallengesInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -4890,6 +5960,12 @@ export type UserAccountUpdateWithoutChallengesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutChallengesInput = {
@@ -4940,6 +6016,14 @@ export type UserAccountUncheckedUpdateWithoutChallengesInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -4948,6 +6032,12 @@ export type UserAccountUncheckedUpdateWithoutChallengesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutOutboxInput = {
@@ -4998,6 +6088,14 @@ export type UserAccountCreateWithoutOutboxInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -5006,6 +6104,12 @@ export type UserAccountCreateWithoutOutboxInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutOutboxInput = {
@@ -5056,6 +6160,14 @@ export type UserAccountUncheckedCreateWithoutOutboxInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -5064,6 +6176,12 @@ export type UserAccountUncheckedCreateWithoutOutboxInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutOutboxInput = {
@@ -5130,6 +6248,14 @@ export type UserAccountUpdateWithoutOutboxInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -5138,6 +6264,12 @@ export type UserAccountUpdateWithoutOutboxInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutOutboxInput = {
@@ -5188,6 +6320,14 @@ export type UserAccountUncheckedUpdateWithoutOutboxInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -5196,6 +6336,12 @@ export type UserAccountUncheckedUpdateWithoutOutboxInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCompanyMembershipsInput = {
@@ -5246,6 +6392,14 @@ export type UserAccountCreateWithoutCompanyMembershipsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -5254,6 +6408,12 @@ export type UserAccountCreateWithoutCompanyMembershipsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCompanyMembershipsInput = {
@@ -5304,6 +6464,14 @@ export type UserAccountUncheckedCreateWithoutCompanyMembershipsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -5312,6 +6480,12 @@ export type UserAccountUncheckedCreateWithoutCompanyMembershipsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCompanyMembershipsInput = {
@@ -5378,6 +6552,14 @@ export type UserAccountUpdateWithoutCompanyMembershipsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -5386,6 +6568,12 @@ export type UserAccountUpdateWithoutCompanyMembershipsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCompanyMembershipsInput = {
@@ -5436,6 +6624,14 @@ export type UserAccountUncheckedUpdateWithoutCompanyMembershipsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -5444,6 +6640,12 @@ export type UserAccountUncheckedUpdateWithoutCompanyMembershipsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutPlatformAdministratorGrantsInput = {
@@ -5494,6 +6696,14 @@ export type UserAccountCreateWithoutPlatformAdministratorGrantsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -5502,6 +6712,12 @@ export type UserAccountCreateWithoutPlatformAdministratorGrantsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutPlatformAdministratorGrantsInput = {
@@ -5552,6 +6768,14 @@ export type UserAccountUncheckedCreateWithoutPlatformAdministratorGrantsInput = 
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -5560,6 +6784,12 @@ export type UserAccountUncheckedCreateWithoutPlatformAdministratorGrantsInput = 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutPlatformAdministratorGrantsInput = {
@@ -5626,6 +6856,14 @@ export type UserAccountUpdateWithoutPlatformAdministratorGrantsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -5634,6 +6872,12 @@ export type UserAccountUpdateWithoutPlatformAdministratorGrantsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPlatformAdministratorGrantsInput = {
@@ -5684,6 +6928,14 @@ export type UserAccountUncheckedUpdateWithoutPlatformAdministratorGrantsInput = 
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -5692,6 +6944,12 @@ export type UserAccountUncheckedUpdateWithoutPlatformAdministratorGrantsInput = 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutRecruiterVerificationRequestsInput = {
@@ -5742,6 +7000,14 @@ export type UserAccountCreateWithoutRecruiterVerificationRequestsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -5750,6 +7016,12 @@ export type UserAccountCreateWithoutRecruiterVerificationRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutRecruiterVerificationRequestsInput = {
@@ -5800,6 +7072,14 @@ export type UserAccountUncheckedCreateWithoutRecruiterVerificationRequestsInput 
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -5808,6 +7088,12 @@ export type UserAccountUncheckedCreateWithoutRecruiterVerificationRequestsInput 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutRecruiterVerificationRequestsInput = {
@@ -5874,6 +7160,14 @@ export type UserAccountUpdateWithoutRecruiterVerificationRequestsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -5882,6 +7176,12 @@ export type UserAccountUpdateWithoutRecruiterVerificationRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutRecruiterVerificationRequestsInput = {
@@ -5932,6 +7232,14 @@ export type UserAccountUncheckedUpdateWithoutRecruiterVerificationRequestsInput 
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -5940,6 +7248,12 @@ export type UserAccountUncheckedUpdateWithoutRecruiterVerificationRequestsInput 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutSubmittedModerationReportsInput = {
@@ -5990,6 +7304,14 @@ export type UserAccountCreateWithoutSubmittedModerationReportsInput = {
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -5998,6 +7320,12 @@ export type UserAccountCreateWithoutSubmittedModerationReportsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutSubmittedModerationReportsInput = {
@@ -6048,6 +7376,14 @@ export type UserAccountUncheckedCreateWithoutSubmittedModerationReportsInput = {
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -6056,6 +7392,12 @@ export type UserAccountUncheckedCreateWithoutSubmittedModerationReportsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutSubmittedModerationReportsInput = {
@@ -6122,6 +7464,14 @@ export type UserAccountUpdateWithoutSubmittedModerationReportsInput = {
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -6130,6 +7480,12 @@ export type UserAccountUpdateWithoutSubmittedModerationReportsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSubmittedModerationReportsInput = {
@@ -6180,6 +7536,14 @@ export type UserAccountUncheckedUpdateWithoutSubmittedModerationReportsInput = {
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -6188,6 +7552,12 @@ export type UserAccountUncheckedUpdateWithoutSubmittedModerationReportsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutSavedJobsInput = {
@@ -6238,6 +7608,14 @@ export type UserAccountCreateWithoutSavedJobsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -6246,6 +7624,12 @@ export type UserAccountCreateWithoutSavedJobsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutSavedJobsInput = {
@@ -6296,6 +7680,14 @@ export type UserAccountUncheckedCreateWithoutSavedJobsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -6304,6 +7696,12 @@ export type UserAccountUncheckedCreateWithoutSavedJobsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutSavedJobsInput = {
@@ -6370,6 +7768,14 @@ export type UserAccountUpdateWithoutSavedJobsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -6378,6 +7784,12 @@ export type UserAccountUpdateWithoutSavedJobsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSavedJobsInput = {
@@ -6428,6 +7840,14 @@ export type UserAccountUncheckedUpdateWithoutSavedJobsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -6436,6 +7856,12 @@ export type UserAccountUncheckedUpdateWithoutSavedJobsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutJobReportsInput = {
@@ -6486,6 +7912,14 @@ export type UserAccountCreateWithoutJobReportsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -6494,6 +7928,12 @@ export type UserAccountCreateWithoutJobReportsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutJobReportsInput = {
@@ -6544,6 +7984,14 @@ export type UserAccountUncheckedCreateWithoutJobReportsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -6552,6 +8000,12 @@ export type UserAccountUncheckedCreateWithoutJobReportsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutJobReportsInput = {
@@ -6618,6 +8072,14 @@ export type UserAccountUpdateWithoutJobReportsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -6626,6 +8088,12 @@ export type UserAccountUpdateWithoutJobReportsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutJobReportsInput = {
@@ -6676,6 +8144,14 @@ export type UserAccountUncheckedUpdateWithoutJobReportsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -6684,6 +8160,12 @@ export type UserAccountUncheckedUpdateWithoutJobReportsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutProfessionalConnectionsLowInput = {
@@ -6734,6 +8216,14 @@ export type UserAccountCreateWithoutProfessionalConnectionsLowInput = {
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -6742,6 +8232,12 @@ export type UserAccountCreateWithoutProfessionalConnectionsLowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutProfessionalConnectionsLowInput = {
@@ -6792,6 +8288,14 @@ export type UserAccountUncheckedCreateWithoutProfessionalConnectionsLowInput = {
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -6800,6 +8304,12 @@ export type UserAccountUncheckedCreateWithoutProfessionalConnectionsLowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutProfessionalConnectionsLowInput = {
@@ -6855,6 +8365,14 @@ export type UserAccountCreateWithoutProfessionalConnectionsHighInput = {
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -6863,6 +8381,12 @@ export type UserAccountCreateWithoutProfessionalConnectionsHighInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutProfessionalConnectionsHighInput = {
@@ -6913,6 +8437,14 @@ export type UserAccountUncheckedCreateWithoutProfessionalConnectionsHighInput = 
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -6921,11 +8453,166 @@ export type UserAccountUncheckedCreateWithoutProfessionalConnectionsHighInput = 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutProfessionalConnectionsHighInput = {
   where: Prisma.UserAccountWhereUniqueInput
   create: Prisma.XOR<Prisma.UserAccountCreateWithoutProfessionalConnectionsHighInput, Prisma.UserAccountUncheckedCreateWithoutProfessionalConnectionsHighInput>
+}
+
+export type UserAccountCreateWithoutProfessionalConnectionsRevokedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutProfessionalConnectionsRevokedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutProfessionalConnectionsRevokedInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutProfessionalConnectionsRevokedInput, Prisma.UserAccountUncheckedCreateWithoutProfessionalConnectionsRevokedInput>
 }
 
 export type UserAccountUpsertWithoutProfessionalConnectionsLowInput = {
@@ -6987,6 +8674,14 @@ export type UserAccountUpdateWithoutProfessionalConnectionsLowInput = {
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -6995,6 +8690,12 @@ export type UserAccountUpdateWithoutProfessionalConnectionsLowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutProfessionalConnectionsLowInput = {
@@ -7045,6 +8746,14 @@ export type UserAccountUncheckedUpdateWithoutProfessionalConnectionsLowInput = {
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -7053,6 +8762,12 @@ export type UserAccountUncheckedUpdateWithoutProfessionalConnectionsLowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUpsertWithoutProfessionalConnectionsHighInput = {
@@ -7114,6 +8829,14 @@ export type UserAccountUpdateWithoutProfessionalConnectionsHighInput = {
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -7122,6 +8845,12 @@ export type UserAccountUpdateWithoutProfessionalConnectionsHighInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutProfessionalConnectionsHighInput = {
@@ -7172,6 +8901,14 @@ export type UserAccountUncheckedUpdateWithoutProfessionalConnectionsHighInput = 
   recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -7180,6 +8917,4119 @@ export type UserAccountUncheckedUpdateWithoutProfessionalConnectionsHighInput = 
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUpsertWithoutProfessionalConnectionsRevokedInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutProfessionalConnectionsRevokedInput, Prisma.UserAccountUncheckedUpdateWithoutProfessionalConnectionsRevokedInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutProfessionalConnectionsRevokedInput, Prisma.UserAccountUncheckedCreateWithoutProfessionalConnectionsRevokedInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutProfessionalConnectionsRevokedInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutProfessionalConnectionsRevokedInput, Prisma.UserAccountUncheckedUpdateWithoutProfessionalConnectionsRevokedInput>
+}
+
+export type UserAccountUpdateWithoutProfessionalConnectionsRevokedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutProfessionalConnectionsRevokedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountCreateWithoutConnectionProposalsLowInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutConnectionProposalsLowInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutConnectionProposalsLowInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalsLowInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalsLowInput>
+}
+
+export type UserAccountCreateWithoutConnectionProposalsHighInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutConnectionProposalsHighInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutConnectionProposalsHighInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalsHighInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalsHighInput>
+}
+
+export type UserAccountCreateWithoutConnectionProposalsCreatedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutConnectionProposalsCreatedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutConnectionProposalsCreatedInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalsCreatedInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalsCreatedInput>
+}
+
+export type UserAccountUpsertWithoutConnectionProposalsLowInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutConnectionProposalsLowInput, Prisma.UserAccountUncheckedUpdateWithoutConnectionProposalsLowInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalsLowInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalsLowInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutConnectionProposalsLowInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutConnectionProposalsLowInput, Prisma.UserAccountUncheckedUpdateWithoutConnectionProposalsLowInput>
+}
+
+export type UserAccountUpdateWithoutConnectionProposalsLowInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutConnectionProposalsLowInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUpsertWithoutConnectionProposalsHighInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutConnectionProposalsHighInput, Prisma.UserAccountUncheckedUpdateWithoutConnectionProposalsHighInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalsHighInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalsHighInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutConnectionProposalsHighInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutConnectionProposalsHighInput, Prisma.UserAccountUncheckedUpdateWithoutConnectionProposalsHighInput>
+}
+
+export type UserAccountUpdateWithoutConnectionProposalsHighInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutConnectionProposalsHighInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUpsertWithoutConnectionProposalsCreatedInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutConnectionProposalsCreatedInput, Prisma.UserAccountUncheckedUpdateWithoutConnectionProposalsCreatedInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalsCreatedInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalsCreatedInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutConnectionProposalsCreatedInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutConnectionProposalsCreatedInput, Prisma.UserAccountUncheckedUpdateWithoutConnectionProposalsCreatedInput>
+}
+
+export type UserAccountUpdateWithoutConnectionProposalsCreatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutConnectionProposalsCreatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountCreateWithoutConnectionProposalDecisionsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutConnectionProposalDecisionsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutConnectionProposalDecisionsInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalDecisionsInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalDecisionsInput>
+}
+
+export type UserAccountUpsertWithoutConnectionProposalDecisionsInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutConnectionProposalDecisionsInput, Prisma.UserAccountUncheckedUpdateWithoutConnectionProposalDecisionsInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalDecisionsInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalDecisionsInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutConnectionProposalDecisionsInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutConnectionProposalDecisionsInput, Prisma.UserAccountUncheckedUpdateWithoutConnectionProposalDecisionsInput>
+}
+
+export type UserAccountUpdateWithoutConnectionProposalDecisionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutConnectionProposalDecisionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountCreateWithoutConnectionProposalHistoryInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutConnectionProposalHistoryInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutConnectionProposalHistoryInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalHistoryInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalHistoryInput>
+}
+
+export type UserAccountUpsertWithoutConnectionProposalHistoryInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutConnectionProposalHistoryInput, Prisma.UserAccountUncheckedUpdateWithoutConnectionProposalHistoryInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionProposalHistoryInput, Prisma.UserAccountUncheckedCreateWithoutConnectionProposalHistoryInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutConnectionProposalHistoryInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutConnectionProposalHistoryInput, Prisma.UserAccountUncheckedUpdateWithoutConnectionProposalHistoryInput>
+}
+
+export type UserAccountUpdateWithoutConnectionProposalHistoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutConnectionProposalHistoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountCreateWithoutConnectionNotificationsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutConnectionNotificationsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutConnectionNotificationsInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionNotificationsInput, Prisma.UserAccountUncheckedCreateWithoutConnectionNotificationsInput>
+}
+
+export type UserAccountUpsertWithoutConnectionNotificationsInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutConnectionNotificationsInput, Prisma.UserAccountUncheckedUpdateWithoutConnectionNotificationsInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionNotificationsInput, Prisma.UserAccountUncheckedCreateWithoutConnectionNotificationsInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutConnectionNotificationsInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutConnectionNotificationsInput, Prisma.UserAccountUncheckedUpdateWithoutConnectionNotificationsInput>
+}
+
+export type UserAccountUpdateWithoutConnectionNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutConnectionNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountCreateWithoutConnectionCommandReceiptsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutConnectionCommandReceiptsInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutConnectionCommandReceiptsInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionCommandReceiptsInput, Prisma.UserAccountUncheckedCreateWithoutConnectionCommandReceiptsInput>
+}
+
+export type UserAccountUpsertWithoutConnectionCommandReceiptsInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutConnectionCommandReceiptsInput, Prisma.UserAccountUncheckedUpdateWithoutConnectionCommandReceiptsInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutConnectionCommandReceiptsInput, Prisma.UserAccountUncheckedCreateWithoutConnectionCommandReceiptsInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutConnectionCommandReceiptsInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutConnectionCommandReceiptsInput, Prisma.UserAccountUncheckedUpdateWithoutConnectionCommandReceiptsInput>
+}
+
+export type UserAccountUpdateWithoutConnectionCommandReceiptsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutConnectionCommandReceiptsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountCreateWithoutSupportConversationsRequestedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutSupportConversationsRequestedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutSupportConversationsRequestedInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportConversationsRequestedInput, Prisma.UserAccountUncheckedCreateWithoutSupportConversationsRequestedInput>
+}
+
+export type UserAccountCreateWithoutSupportConversationsAssignedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutSupportConversationsAssignedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutSupportConversationsAssignedInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportConversationsAssignedInput, Prisma.UserAccountUncheckedCreateWithoutSupportConversationsAssignedInput>
+}
+
+export type UserAccountUpsertWithoutSupportConversationsRequestedInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportConversationsRequestedInput, Prisma.UserAccountUncheckedUpdateWithoutSupportConversationsRequestedInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportConversationsRequestedInput, Prisma.UserAccountUncheckedCreateWithoutSupportConversationsRequestedInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutSupportConversationsRequestedInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportConversationsRequestedInput, Prisma.UserAccountUncheckedUpdateWithoutSupportConversationsRequestedInput>
+}
+
+export type UserAccountUpdateWithoutSupportConversationsRequestedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutSupportConversationsRequestedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUpsertWithoutSupportConversationsAssignedInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportConversationsAssignedInput, Prisma.UserAccountUncheckedUpdateWithoutSupportConversationsAssignedInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportConversationsAssignedInput, Prisma.UserAccountUncheckedCreateWithoutSupportConversationsAssignedInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutSupportConversationsAssignedInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportConversationsAssignedInput, Prisma.UserAccountUncheckedUpdateWithoutSupportConversationsAssignedInput>
+}
+
+export type UserAccountUpdateWithoutSupportConversationsAssignedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutSupportConversationsAssignedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountCreateWithoutSupportMessagesInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutSupportMessagesInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutSupportMessagesInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportMessagesInput, Prisma.UserAccountUncheckedCreateWithoutSupportMessagesInput>
+}
+
+export type UserAccountUpsertWithoutSupportMessagesInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportMessagesInput, Prisma.UserAccountUncheckedUpdateWithoutSupportMessagesInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportMessagesInput, Prisma.UserAccountUncheckedCreateWithoutSupportMessagesInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutSupportMessagesInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportMessagesInput, Prisma.UserAccountUncheckedUpdateWithoutSupportMessagesInput>
+}
+
+export type UserAccountUpdateWithoutSupportMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutSupportMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountCreateWithoutSupportAssignmentsReceivedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutSupportAssignmentsReceivedInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutSupportAssignmentsReceivedInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportAssignmentsReceivedInput, Prisma.UserAccountUncheckedCreateWithoutSupportAssignmentsReceivedInput>
+}
+
+export type UserAccountCreateWithoutSupportAssignmentsMadeInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountUncheckedCreateWithoutSupportAssignmentsMadeInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserAccountCreateOrConnectWithoutSupportAssignmentsMadeInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportAssignmentsMadeInput, Prisma.UserAccountUncheckedCreateWithoutSupportAssignmentsMadeInput>
+}
+
+export type UserAccountUpsertWithoutSupportAssignmentsReceivedInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportAssignmentsReceivedInput, Prisma.UserAccountUncheckedUpdateWithoutSupportAssignmentsReceivedInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportAssignmentsReceivedInput, Prisma.UserAccountUncheckedCreateWithoutSupportAssignmentsReceivedInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutSupportAssignmentsReceivedInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportAssignmentsReceivedInput, Prisma.UserAccountUncheckedUpdateWithoutSupportAssignmentsReceivedInput>
+}
+
+export type UserAccountUpdateWithoutSupportAssignmentsReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutSupportAssignmentsReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUpsertWithoutSupportAssignmentsMadeInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportAssignmentsMadeInput, Prisma.UserAccountUncheckedUpdateWithoutSupportAssignmentsMadeInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportAssignmentsMadeInput, Prisma.UserAccountUncheckedCreateWithoutSupportAssignmentsMadeInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutSupportAssignmentsMadeInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportAssignmentsMadeInput, Prisma.UserAccountUncheckedUpdateWithoutSupportAssignmentsMadeInput>
+}
+
+export type UserAccountUpdateWithoutSupportAssignmentsMadeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutSupportAssignmentsMadeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserAccountCreateWithoutSupportInternalNotesInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+}
+
+export type UserAccountUncheckedCreateWithoutSupportInternalNotesInput = {
+  id: string
+  name: string
+  email: string
+  normalizedEmail: string
+  emailVerified?: boolean
+  image?: string | null
+  state?: $Enums.AccountState
+  version?: number
+  twoFactorEnabled?: boolean
+  stateChangedAt?: Date | string
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  twoFactor?: Prisma.TwoFactorUncheckedCreateNestedOneWithoutUserInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedCreateNestedOneWithoutUserInput
+  securityTokens?: Prisma.SecurityTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedCreateNestedManyWithoutUserInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedCreateNestedManyWithoutUserInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedCreateNestedManyWithoutUserInput
+  outbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.AccountPreferencesUncheckedCreateNestedOneWithoutUserInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedCreateNestedOneWithoutUserInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedCreateNestedManyWithoutUserInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedCreateNestedOneWithoutUserInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedCreateNestedManyWithoutUserInput
+  savedJobs?: Prisma.SavedJobUncheckedCreateNestedManyWithoutUserInput
+  jobReports?: Prisma.JobReportUncheckedCreateNestedManyWithoutReporterInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedCreateNestedOneWithoutAccountInput
+  cvUploads?: Prisma.CvUploadUncheckedCreateNestedManyWithoutAccountInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedCreateNestedManyWithoutAccountInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedCreateNestedManyWithoutAccountInput
+  cvExtractions?: Prisma.CvExtractionUncheckedCreateNestedManyWithoutAccountInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedCreateNestedManyWithoutAccountInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedCreateNestedManyWithoutAccountInput
+  cvDrafts?: Prisma.CvDraftUncheckedCreateNestedManyWithoutAccountInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedCreateNestedManyWithoutAccountInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedCreateNestedManyWithoutAccountInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedCreateNestedManyWithoutUserInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedCreateNestedManyWithoutUserInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedCreateNestedManyWithoutApplicantInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+}
+
+export type UserAccountCreateOrConnectWithoutSupportInternalNotesInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportInternalNotesInput, Prisma.UserAccountUncheckedCreateWithoutSupportInternalNotesInput>
+}
+
+export type UserAccountUpsertWithoutSupportInternalNotesInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportInternalNotesInput, Prisma.UserAccountUncheckedUpdateWithoutSupportInternalNotesInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutSupportInternalNotesInput, Prisma.UserAccountUncheckedCreateWithoutSupportInternalNotesInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutSupportInternalNotesInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutSupportInternalNotesInput, Prisma.UserAccountUncheckedUpdateWithoutSupportInternalNotesInput>
+}
+
+export type UserAccountUpdateWithoutSupportInternalNotesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutSupportInternalNotesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AuthProviderAccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  twoFactor?: Prisma.TwoFactorUncheckedUpdateOneWithoutUserNestedInput
+  candidateIdentity?: Prisma.CandidateIdentityUncheckedUpdateOneWithoutUserNestedInput
+  securityTokens?: Prisma.SecurityTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetOperations?: Prisma.PasswordResetOperationUncheckedUpdateManyWithoutUserNestedInput
+  fullAccountRecoveryOperations?: Prisma.FullAccountRecoveryOperationUncheckedUpdateManyWithoutUserNestedInput
+  challenges?: Prisma.AuthenticationChallengeUncheckedUpdateManyWithoutUserNestedInput
+  outbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.AccountPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  jobWorkspaceState?: Prisma.UserJobWorkspaceStateUncheckedUpdateOneWithoutUserNestedInput
+  emailChangeRequests?: Prisma.EmailChangeRequestUncheckedUpdateManyWithoutUserNestedInput
+  passwordChangeAttemptWindow?: Prisma.PasswordChangeAttemptWindowUncheckedUpdateOneWithoutUserNestedInput
+  passwordChangeOperations?: Prisma.PasswordChangeOperationUncheckedUpdateManyWithoutUserNestedInput
+  savedJobs?: Prisma.SavedJobUncheckedUpdateManyWithoutUserNestedInput
+  jobReports?: Prisma.JobReportUncheckedUpdateManyWithoutReporterNestedInput
+  cvQuota?: Prisma.CvAccountQuotaUncheckedUpdateOneWithoutAccountNestedInput
+  cvUploads?: Prisma.CvUploadUncheckedUpdateManyWithoutAccountNestedInput
+  cvStoredArtifacts?: Prisma.CvStoredArtifactUncheckedUpdateManyWithoutAccountNestedInput
+  cvScanAssessments?: Prisma.CvScanAssessmentUncheckedUpdateManyWithoutAccountNestedInput
+  cvExtractions?: Prisma.CvExtractionUncheckedUpdateManyWithoutAccountNestedInput
+  cvParseJobs?: Prisma.CvParseJobUncheckedUpdateManyWithoutAccountNestedInput
+  cvRetryRequests?: Prisma.CvRetryRequestUncheckedUpdateManyWithoutAccountNestedInput
+  cvDrafts?: Prisma.CvDraftUncheckedUpdateManyWithoutAccountNestedInput
+  cvConsentEvents?: Prisma.CvProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  cvConfirmations?: Prisma.CvImportConfirmationUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchQueries?: Prisma.SearchImageQueryUncheckedUpdateManyWithoutAccountNestedInput
+  imageSearchConsents?: Prisma.SearchProcessingConsentUncheckedUpdateManyWithoutAccountNestedInput
+  companyMemberships?: Prisma.CompanyMembershipUncheckedUpdateManyWithoutUserNestedInput
+  platformAdministratorGrants?: Prisma.PlatformAdministratorGrantUncheckedUpdateManyWithoutUserNestedInput
+  recruiterVerificationRequests?: Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantNestedInput
+  submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
+  professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
+  professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
+  messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
+  messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
+  messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
+  messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
+  submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserAccountCreateWithoutMessagingConversationsLowInput = {
@@ -7231,6 +13081,14 @@ export type UserAccountCreateWithoutMessagingConversationsLowInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
   messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
@@ -7238,6 +13096,12 @@ export type UserAccountCreateWithoutMessagingConversationsLowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingConversationsLowInput = {
@@ -7289,6 +13153,14 @@ export type UserAccountUncheckedCreateWithoutMessagingConversationsLowInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
@@ -7296,6 +13168,12 @@ export type UserAccountUncheckedCreateWithoutMessagingConversationsLowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingConversationsLowInput = {
@@ -7352,6 +13230,14 @@ export type UserAccountCreateWithoutMessagingConversationsHighInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
   messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
@@ -7359,6 +13245,12 @@ export type UserAccountCreateWithoutMessagingConversationsHighInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingConversationsHighInput = {
@@ -7410,6 +13302,14 @@ export type UserAccountUncheckedCreateWithoutMessagingConversationsHighInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
@@ -7417,6 +13317,12 @@ export type UserAccountUncheckedCreateWithoutMessagingConversationsHighInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingConversationsHighInput = {
@@ -7484,6 +13390,14 @@ export type UserAccountUpdateWithoutMessagingConversationsLowInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
   messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
@@ -7491,6 +13405,12 @@ export type UserAccountUpdateWithoutMessagingConversationsLowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingConversationsLowInput = {
@@ -7542,6 +13462,14 @@ export type UserAccountUncheckedUpdateWithoutMessagingConversationsLowInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -7549,6 +13477,12 @@ export type UserAccountUncheckedUpdateWithoutMessagingConversationsLowInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUpsertWithoutMessagingConversationsHighInput = {
@@ -7611,6 +13545,14 @@ export type UserAccountUpdateWithoutMessagingConversationsHighInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
   messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
@@ -7618,6 +13560,12 @@ export type UserAccountUpdateWithoutMessagingConversationsHighInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingConversationsHighInput = {
@@ -7669,6 +13617,14 @@ export type UserAccountUncheckedUpdateWithoutMessagingConversationsHighInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -7676,6 +13632,12 @@ export type UserAccountUncheckedUpdateWithoutMessagingConversationsHighInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutMessagingParticipantsInput = {
@@ -7727,6 +13689,14 @@ export type UserAccountCreateWithoutMessagingParticipantsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingMessages?: Prisma.MessagingMessageCreateNestedManyWithoutSenderInput
@@ -7734,6 +13704,12 @@ export type UserAccountCreateWithoutMessagingParticipantsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingParticipantsInput = {
@@ -7785,6 +13761,14 @@ export type UserAccountUncheckedCreateWithoutMessagingParticipantsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingMessages?: Prisma.MessagingMessageUncheckedCreateNestedManyWithoutSenderInput
@@ -7792,6 +13776,12 @@ export type UserAccountUncheckedCreateWithoutMessagingParticipantsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingParticipantsInput = {
@@ -7859,6 +13849,14 @@ export type UserAccountUpdateWithoutMessagingParticipantsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingMessages?: Prisma.MessagingMessageUpdateManyWithoutSenderNestedInput
@@ -7866,6 +13864,12 @@ export type UserAccountUpdateWithoutMessagingParticipantsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingParticipantsInput = {
@@ -7917,6 +13921,14 @@ export type UserAccountUncheckedUpdateWithoutMessagingParticipantsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingMessages?: Prisma.MessagingMessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -7924,6 +13936,12 @@ export type UserAccountUncheckedUpdateWithoutMessagingParticipantsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutMessagingMessagesInput = {
@@ -7975,6 +13993,14 @@ export type UserAccountCreateWithoutMessagingMessagesInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -7982,6 +14008,12 @@ export type UserAccountCreateWithoutMessagingMessagesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingMessagesInput = {
@@ -8033,6 +14065,14 @@ export type UserAccountUncheckedCreateWithoutMessagingMessagesInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -8040,6 +14080,12 @@ export type UserAccountUncheckedCreateWithoutMessagingMessagesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingMessagesInput = {
@@ -8107,6 +14153,14 @@ export type UserAccountUpdateWithoutMessagingMessagesInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -8114,6 +14168,12 @@ export type UserAccountUpdateWithoutMessagingMessagesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingMessagesInput = {
@@ -8165,6 +14225,14 @@ export type UserAccountUncheckedUpdateWithoutMessagingMessagesInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -8172,6 +14240,12 @@ export type UserAccountUncheckedUpdateWithoutMessagingMessagesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutMessagingBlocksInitiatedInput = {
@@ -8223,6 +14297,14 @@ export type UserAccountCreateWithoutMessagingBlocksInitiatedInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -8230,6 +14312,12 @@ export type UserAccountCreateWithoutMessagingBlocksInitiatedInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingBlocksInitiatedInput = {
@@ -8281,6 +14369,14 @@ export type UserAccountUncheckedCreateWithoutMessagingBlocksInitiatedInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -8288,6 +14384,12 @@ export type UserAccountUncheckedCreateWithoutMessagingBlocksInitiatedInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingBlocksInitiatedInput = {
@@ -8344,6 +14446,14 @@ export type UserAccountCreateWithoutMessagingBlocksReceivedInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -8351,6 +14461,12 @@ export type UserAccountCreateWithoutMessagingBlocksReceivedInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutMessagingBlocksReceivedInput = {
@@ -8402,6 +14518,14 @@ export type UserAccountUncheckedCreateWithoutMessagingBlocksReceivedInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -8409,6 +14533,12 @@ export type UserAccountUncheckedCreateWithoutMessagingBlocksReceivedInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutMessagingBlocksReceivedInput = {
@@ -8476,6 +14606,14 @@ export type UserAccountUpdateWithoutMessagingBlocksInitiatedInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -8483,6 +14621,12 @@ export type UserAccountUpdateWithoutMessagingBlocksInitiatedInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingBlocksInitiatedInput = {
@@ -8534,6 +14678,14 @@ export type UserAccountUncheckedUpdateWithoutMessagingBlocksInitiatedInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -8541,6 +14693,12 @@ export type UserAccountUncheckedUpdateWithoutMessagingBlocksInitiatedInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUpsertWithoutMessagingBlocksReceivedInput = {
@@ -8603,6 +14761,14 @@ export type UserAccountUpdateWithoutMessagingBlocksReceivedInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -8610,6 +14776,12 @@ export type UserAccountUpdateWithoutMessagingBlocksReceivedInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMessagingBlocksReceivedInput = {
@@ -8661,6 +14833,14 @@ export type UserAccountUncheckedUpdateWithoutMessagingBlocksReceivedInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -8668,6 +14848,12 @@ export type UserAccountUncheckedUpdateWithoutMessagingBlocksReceivedInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutSubmittedMessagingReportsInput = {
@@ -8719,6 +14905,14 @@ export type UserAccountCreateWithoutSubmittedMessagingReportsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -8726,6 +14920,12 @@ export type UserAccountCreateWithoutSubmittedMessagingReportsInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutSubmittedMessagingReportsInput = {
@@ -8777,6 +14977,14 @@ export type UserAccountUncheckedCreateWithoutSubmittedMessagingReportsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -8784,6 +14992,12 @@ export type UserAccountUncheckedCreateWithoutSubmittedMessagingReportsInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutSubmittedMessagingReportsInput = {
@@ -8840,6 +15054,14 @@ export type UserAccountCreateWithoutTargetedMessagingReportsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -8847,6 +15069,12 @@ export type UserAccountCreateWithoutTargetedMessagingReportsInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockerInput
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutTargetedMessagingReportsInput = {
@@ -8898,6 +15126,14 @@ export type UserAccountUncheckedCreateWithoutTargetedMessagingReportsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -8905,6 +15141,12 @@ export type UserAccountUncheckedCreateWithoutTargetedMessagingReportsInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockerInput
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutTargetedMessagingReportsInput = {
@@ -8972,6 +15214,14 @@ export type UserAccountUpdateWithoutSubmittedMessagingReportsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -8979,6 +15229,12 @@ export type UserAccountUpdateWithoutSubmittedMessagingReportsInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSubmittedMessagingReportsInput = {
@@ -9030,6 +15286,14 @@ export type UserAccountUncheckedUpdateWithoutSubmittedMessagingReportsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -9037,6 +15301,12 @@ export type UserAccountUncheckedUpdateWithoutSubmittedMessagingReportsInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUpsertWithoutTargetedMessagingReportsInput = {
@@ -9099,6 +15369,14 @@ export type UserAccountUpdateWithoutTargetedMessagingReportsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -9106,6 +15384,12 @@ export type UserAccountUpdateWithoutTargetedMessagingReportsInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUpdateManyWithoutBlockerNestedInput
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutTargetedMessagingReportsInput = {
@@ -9157,6 +15441,14 @@ export type UserAccountUncheckedUpdateWithoutTargetedMessagingReportsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -9164,6 +15456,12 @@ export type UserAccountUncheckedUpdateWithoutTargetedMessagingReportsInput = {
   messagingBlocksInitiated?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockerNestedInput
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvQuotaInput = {
@@ -9214,6 +15512,14 @@ export type UserAccountCreateWithoutCvQuotaInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -9222,6 +15528,12 @@ export type UserAccountCreateWithoutCvQuotaInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvQuotaInput = {
@@ -9272,6 +15584,14 @@ export type UserAccountUncheckedCreateWithoutCvQuotaInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -9280,6 +15600,12 @@ export type UserAccountUncheckedCreateWithoutCvQuotaInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvQuotaInput = {
@@ -9346,6 +15672,14 @@ export type UserAccountUpdateWithoutCvQuotaInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -9354,6 +15688,12 @@ export type UserAccountUpdateWithoutCvQuotaInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvQuotaInput = {
@@ -9404,6 +15744,14 @@ export type UserAccountUncheckedUpdateWithoutCvQuotaInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -9412,6 +15760,12 @@ export type UserAccountUncheckedUpdateWithoutCvQuotaInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvUploadsInput = {
@@ -9462,6 +15816,14 @@ export type UserAccountCreateWithoutCvUploadsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -9470,6 +15832,12 @@ export type UserAccountCreateWithoutCvUploadsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvUploadsInput = {
@@ -9520,6 +15888,14 @@ export type UserAccountUncheckedCreateWithoutCvUploadsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -9528,6 +15904,12 @@ export type UserAccountUncheckedCreateWithoutCvUploadsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvUploadsInput = {
@@ -9594,6 +15976,14 @@ export type UserAccountUpdateWithoutCvUploadsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -9602,6 +15992,12 @@ export type UserAccountUpdateWithoutCvUploadsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvUploadsInput = {
@@ -9652,6 +16048,14 @@ export type UserAccountUncheckedUpdateWithoutCvUploadsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -9660,6 +16064,12 @@ export type UserAccountUncheckedUpdateWithoutCvUploadsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvStoredArtifactsInput = {
@@ -9710,6 +16120,14 @@ export type UserAccountCreateWithoutCvStoredArtifactsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -9718,6 +16136,12 @@ export type UserAccountCreateWithoutCvStoredArtifactsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvStoredArtifactsInput = {
@@ -9768,6 +16192,14 @@ export type UserAccountUncheckedCreateWithoutCvStoredArtifactsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -9776,6 +16208,12 @@ export type UserAccountUncheckedCreateWithoutCvStoredArtifactsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvStoredArtifactsInput = {
@@ -9842,6 +16280,14 @@ export type UserAccountUpdateWithoutCvStoredArtifactsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -9850,6 +16296,12 @@ export type UserAccountUpdateWithoutCvStoredArtifactsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvStoredArtifactsInput = {
@@ -9900,6 +16352,14 @@ export type UserAccountUncheckedUpdateWithoutCvStoredArtifactsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -9908,6 +16368,12 @@ export type UserAccountUncheckedUpdateWithoutCvStoredArtifactsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvScanAssessmentsInput = {
@@ -9958,6 +16424,14 @@ export type UserAccountCreateWithoutCvScanAssessmentsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -9966,6 +16440,12 @@ export type UserAccountCreateWithoutCvScanAssessmentsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvScanAssessmentsInput = {
@@ -10016,6 +16496,14 @@ export type UserAccountUncheckedCreateWithoutCvScanAssessmentsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -10024,6 +16512,12 @@ export type UserAccountUncheckedCreateWithoutCvScanAssessmentsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvScanAssessmentsInput = {
@@ -10090,6 +16584,14 @@ export type UserAccountUpdateWithoutCvScanAssessmentsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -10098,6 +16600,12 @@ export type UserAccountUpdateWithoutCvScanAssessmentsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvScanAssessmentsInput = {
@@ -10148,6 +16656,14 @@ export type UserAccountUncheckedUpdateWithoutCvScanAssessmentsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -10156,6 +16672,12 @@ export type UserAccountUncheckedUpdateWithoutCvScanAssessmentsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvExtractionsInput = {
@@ -10206,6 +16728,14 @@ export type UserAccountCreateWithoutCvExtractionsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -10214,6 +16744,12 @@ export type UserAccountCreateWithoutCvExtractionsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvExtractionsInput = {
@@ -10264,6 +16800,14 @@ export type UserAccountUncheckedCreateWithoutCvExtractionsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -10272,6 +16816,12 @@ export type UserAccountUncheckedCreateWithoutCvExtractionsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvExtractionsInput = {
@@ -10338,6 +16888,14 @@ export type UserAccountUpdateWithoutCvExtractionsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -10346,6 +16904,12 @@ export type UserAccountUpdateWithoutCvExtractionsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvExtractionsInput = {
@@ -10396,6 +16960,14 @@ export type UserAccountUncheckedUpdateWithoutCvExtractionsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -10404,6 +16976,12 @@ export type UserAccountUncheckedUpdateWithoutCvExtractionsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvParseJobsInput = {
@@ -10454,6 +17032,14 @@ export type UserAccountCreateWithoutCvParseJobsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -10462,6 +17048,12 @@ export type UserAccountCreateWithoutCvParseJobsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvParseJobsInput = {
@@ -10512,6 +17104,14 @@ export type UserAccountUncheckedCreateWithoutCvParseJobsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -10520,6 +17120,12 @@ export type UserAccountUncheckedCreateWithoutCvParseJobsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvParseJobsInput = {
@@ -10586,6 +17192,14 @@ export type UserAccountUpdateWithoutCvParseJobsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -10594,6 +17208,12 @@ export type UserAccountUpdateWithoutCvParseJobsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvParseJobsInput = {
@@ -10644,6 +17264,14 @@ export type UserAccountUncheckedUpdateWithoutCvParseJobsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -10652,6 +17280,12 @@ export type UserAccountUncheckedUpdateWithoutCvParseJobsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvRetryRequestsInput = {
@@ -10702,6 +17336,14 @@ export type UserAccountCreateWithoutCvRetryRequestsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -10710,6 +17352,12 @@ export type UserAccountCreateWithoutCvRetryRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvRetryRequestsInput = {
@@ -10760,6 +17408,14 @@ export type UserAccountUncheckedCreateWithoutCvRetryRequestsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -10768,6 +17424,12 @@ export type UserAccountUncheckedCreateWithoutCvRetryRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvRetryRequestsInput = {
@@ -10834,6 +17496,14 @@ export type UserAccountUpdateWithoutCvRetryRequestsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -10842,6 +17512,12 @@ export type UserAccountUpdateWithoutCvRetryRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvRetryRequestsInput = {
@@ -10892,6 +17568,14 @@ export type UserAccountUncheckedUpdateWithoutCvRetryRequestsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -10900,6 +17584,12 @@ export type UserAccountUncheckedUpdateWithoutCvRetryRequestsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvDraftsInput = {
@@ -10950,6 +17640,14 @@ export type UserAccountCreateWithoutCvDraftsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -10958,6 +17656,12 @@ export type UserAccountCreateWithoutCvDraftsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvDraftsInput = {
@@ -11008,6 +17712,14 @@ export type UserAccountUncheckedCreateWithoutCvDraftsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -11016,6 +17728,12 @@ export type UserAccountUncheckedCreateWithoutCvDraftsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvDraftsInput = {
@@ -11082,6 +17800,14 @@ export type UserAccountUpdateWithoutCvDraftsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -11090,6 +17816,12 @@ export type UserAccountUpdateWithoutCvDraftsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvDraftsInput = {
@@ -11140,6 +17872,14 @@ export type UserAccountUncheckedUpdateWithoutCvDraftsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -11148,6 +17888,12 @@ export type UserAccountUncheckedUpdateWithoutCvDraftsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvConsentEventsInput = {
@@ -11198,6 +17944,14 @@ export type UserAccountCreateWithoutCvConsentEventsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -11206,6 +17960,12 @@ export type UserAccountCreateWithoutCvConsentEventsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvConsentEventsInput = {
@@ -11256,6 +18016,14 @@ export type UserAccountUncheckedCreateWithoutCvConsentEventsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -11264,6 +18032,12 @@ export type UserAccountUncheckedCreateWithoutCvConsentEventsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvConsentEventsInput = {
@@ -11330,6 +18104,14 @@ export type UserAccountUpdateWithoutCvConsentEventsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -11338,6 +18120,12 @@ export type UserAccountUpdateWithoutCvConsentEventsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvConsentEventsInput = {
@@ -11388,6 +18176,14 @@ export type UserAccountUncheckedUpdateWithoutCvConsentEventsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -11396,6 +18192,12 @@ export type UserAccountUncheckedUpdateWithoutCvConsentEventsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutCvConfirmationsInput = {
@@ -11446,6 +18248,14 @@ export type UserAccountCreateWithoutCvConfirmationsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -11454,6 +18264,12 @@ export type UserAccountCreateWithoutCvConfirmationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutCvConfirmationsInput = {
@@ -11504,6 +18320,14 @@ export type UserAccountUncheckedCreateWithoutCvConfirmationsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -11512,6 +18336,12 @@ export type UserAccountUncheckedCreateWithoutCvConfirmationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutCvConfirmationsInput = {
@@ -11578,6 +18408,14 @@ export type UserAccountUpdateWithoutCvConfirmationsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -11586,6 +18424,12 @@ export type UserAccountUpdateWithoutCvConfirmationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCvConfirmationsInput = {
@@ -11636,6 +18480,14 @@ export type UserAccountUncheckedUpdateWithoutCvConfirmationsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -11644,6 +18496,12 @@ export type UserAccountUncheckedUpdateWithoutCvConfirmationsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutImageSearchQueriesInput = {
@@ -11694,6 +18552,14 @@ export type UserAccountCreateWithoutImageSearchQueriesInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -11702,6 +18568,12 @@ export type UserAccountCreateWithoutImageSearchQueriesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutImageSearchQueriesInput = {
@@ -11752,6 +18624,14 @@ export type UserAccountUncheckedCreateWithoutImageSearchQueriesInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -11760,6 +18640,12 @@ export type UserAccountUncheckedCreateWithoutImageSearchQueriesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutImageSearchQueriesInput = {
@@ -11826,6 +18712,14 @@ export type UserAccountUpdateWithoutImageSearchQueriesInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -11834,6 +18728,12 @@ export type UserAccountUpdateWithoutImageSearchQueriesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutImageSearchQueriesInput = {
@@ -11884,6 +18784,14 @@ export type UserAccountUncheckedUpdateWithoutImageSearchQueriesInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -11892,6 +18800,12 @@ export type UserAccountUncheckedUpdateWithoutImageSearchQueriesInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountCreateWithoutImageSearchConsentsInput = {
@@ -11942,6 +18856,14 @@ export type UserAccountCreateWithoutImageSearchConsentsInput = {
   submittedModerationReports?: Prisma.ModerationReportCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantCreateNestedManyWithoutUserInput
@@ -11950,6 +18872,12 @@ export type UserAccountCreateWithoutImageSearchConsentsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountUncheckedCreateWithoutImageSearchConsentsInput = {
@@ -12000,6 +18928,14 @@ export type UserAccountUncheckedCreateWithoutImageSearchConsentsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedCreateNestedManyWithoutReporterInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHighInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantLowInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutParticipantHighInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedCreateNestedManyWithoutCreatedByAdminInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedCreateNestedManyWithoutParticipantInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedCreateNestedManyWithoutActorInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedCreateNestedManyWithoutActorInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantLowInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutParticipantHighInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -12008,6 +18944,12 @@ export type UserAccountUncheckedCreateWithoutImageSearchConsentsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedCreateNestedManyWithoutBlockedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutReporterInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedCreateNestedManyWithoutTargetInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutRequesterInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedCreateNestedManyWithoutCurrentAssigneeInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssigneeInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserAccountCreateOrConnectWithoutImageSearchConsentsInput = {
@@ -12074,6 +19016,14 @@ export type UserAccountUpdateWithoutImageSearchConsentsInput = {
   submittedModerationReports?: Prisma.ModerationReportUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUpdateManyWithoutUserNestedInput
@@ -12082,6 +19032,12 @@ export type UserAccountUpdateWithoutImageSearchConsentsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutImageSearchConsentsInput = {
@@ -12132,6 +19088,14 @@ export type UserAccountUncheckedUpdateWithoutImageSearchConsentsInput = {
   submittedModerationReports?: Prisma.ModerationReportUncheckedUpdateManyWithoutReporterNestedInput
   professionalConnectionsLow?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput
   professionalConnectionsHigh?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNestedInput
+  professionalConnectionsRevoked?: Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput
+  connectionProposalsLow?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantLowNestedInput
+  connectionProposalsHigh?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutParticipantHighNestedInput
+  connectionProposalsCreated?: Prisma.ProfessionalConnectionProposalUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+  connectionProposalDecisions?: Prisma.ProfessionalConnectionDecisionUncheckedUpdateManyWithoutParticipantNestedInput
+  connectionProposalHistory?: Prisma.ProfessionalConnectionProposalHistoryUncheckedUpdateManyWithoutActorNestedInput
+  connectionNotifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  connectionCommandReceipts?: Prisma.ProfessionalConnectionCommandReceiptUncheckedUpdateManyWithoutActorNestedInput
   messagingConversationsLow?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantLowNestedInput
   messagingConversationsHigh?: Prisma.MessagingConversationUncheckedUpdateManyWithoutParticipantHighNestedInput
   messagingParticipants?: Prisma.MessagingConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -12140,6 +19104,12 @@ export type UserAccountUncheckedUpdateWithoutImageSearchConsentsInput = {
   messagingBlocksReceived?: Prisma.UserMessagingBlockUncheckedUpdateManyWithoutBlockedNestedInput
   submittedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutReporterNestedInput
   targetedMessagingReports?: Prisma.MessagingReportUncheckedUpdateManyWithoutTargetNestedInput
+  supportConversationsRequested?: Prisma.SupportConversationUncheckedUpdateManyWithoutRequesterNestedInput
+  supportConversationsAssigned?: Prisma.SupportConversationUncheckedUpdateManyWithoutCurrentAssigneeNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAssignmentsReceived?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssigneeNestedInput
+  supportAssignmentsMade?: Prisma.SupportAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+  supportInternalNotes?: Prisma.SupportInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 
@@ -12177,6 +19147,14 @@ export type UserAccountCountOutputType = {
   submittedModerationReports: number
   professionalConnectionsLow: number
   professionalConnectionsHigh: number
+  professionalConnectionsRevoked: number
+  connectionProposalsLow: number
+  connectionProposalsHigh: number
+  connectionProposalsCreated: number
+  connectionProposalDecisions: number
+  connectionProposalHistory: number
+  connectionNotifications: number
+  connectionCommandReceipts: number
   messagingConversationsLow: number
   messagingConversationsHigh: number
   messagingParticipants: number
@@ -12185,6 +19163,12 @@ export type UserAccountCountOutputType = {
   messagingBlocksReceived: number
   submittedMessagingReports: number
   targetedMessagingReports: number
+  supportConversationsRequested: number
+  supportConversationsAssigned: number
+  supportMessages: number
+  supportAssignmentsReceived: number
+  supportAssignmentsMade: number
+  supportInternalNotes: number
 }
 
 export type UserAccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -12217,6 +19201,14 @@ export type UserAccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   submittedModerationReports?: boolean | UserAccountCountOutputTypeCountSubmittedModerationReportsArgs
   professionalConnectionsLow?: boolean | UserAccountCountOutputTypeCountProfessionalConnectionsLowArgs
   professionalConnectionsHigh?: boolean | UserAccountCountOutputTypeCountProfessionalConnectionsHighArgs
+  professionalConnectionsRevoked?: boolean | UserAccountCountOutputTypeCountProfessionalConnectionsRevokedArgs
+  connectionProposalsLow?: boolean | UserAccountCountOutputTypeCountConnectionProposalsLowArgs
+  connectionProposalsHigh?: boolean | UserAccountCountOutputTypeCountConnectionProposalsHighArgs
+  connectionProposalsCreated?: boolean | UserAccountCountOutputTypeCountConnectionProposalsCreatedArgs
+  connectionProposalDecisions?: boolean | UserAccountCountOutputTypeCountConnectionProposalDecisionsArgs
+  connectionProposalHistory?: boolean | UserAccountCountOutputTypeCountConnectionProposalHistoryArgs
+  connectionNotifications?: boolean | UserAccountCountOutputTypeCountConnectionNotificationsArgs
+  connectionCommandReceipts?: boolean | UserAccountCountOutputTypeCountConnectionCommandReceiptsArgs
   messagingConversationsLow?: boolean | UserAccountCountOutputTypeCountMessagingConversationsLowArgs
   messagingConversationsHigh?: boolean | UserAccountCountOutputTypeCountMessagingConversationsHighArgs
   messagingParticipants?: boolean | UserAccountCountOutputTypeCountMessagingParticipantsArgs
@@ -12225,6 +19217,12 @@ export type UserAccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   messagingBlocksReceived?: boolean | UserAccountCountOutputTypeCountMessagingBlocksReceivedArgs
   submittedMessagingReports?: boolean | UserAccountCountOutputTypeCountSubmittedMessagingReportsArgs
   targetedMessagingReports?: boolean | UserAccountCountOutputTypeCountTargetedMessagingReportsArgs
+  supportConversationsRequested?: boolean | UserAccountCountOutputTypeCountSupportConversationsRequestedArgs
+  supportConversationsAssigned?: boolean | UserAccountCountOutputTypeCountSupportConversationsAssignedArgs
+  supportMessages?: boolean | UserAccountCountOutputTypeCountSupportMessagesArgs
+  supportAssignmentsReceived?: boolean | UserAccountCountOutputTypeCountSupportAssignmentsReceivedArgs
+  supportAssignmentsMade?: boolean | UserAccountCountOutputTypeCountSupportAssignmentsMadeArgs
+  supportInternalNotes?: boolean | UserAccountCountOutputTypeCountSupportInternalNotesArgs
 }
 
 /**
@@ -12443,6 +19441,62 @@ export type UserAccountCountOutputTypeCountProfessionalConnectionsHighArgs<ExtAr
 /**
  * UserAccountCountOutputType without action
  */
+export type UserAccountCountOutputTypeCountProfessionalConnectionsRevokedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProfessionalConnectionWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountConnectionProposalsLowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProfessionalConnectionProposalWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountConnectionProposalsHighArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProfessionalConnectionProposalWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountConnectionProposalsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProfessionalConnectionProposalWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountConnectionProposalDecisionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProfessionalConnectionDecisionWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountConnectionProposalHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProfessionalConnectionProposalHistoryWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountConnectionNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProfessionalConnectionNotificationWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountConnectionCommandReceiptsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProfessionalConnectionCommandReceiptWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
 export type UserAccountCountOutputTypeCountMessagingConversationsLowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.MessagingConversationWhereInput
 }
@@ -12496,6 +19550,48 @@ export type UserAccountCountOutputTypeCountTargetedMessagingReportsArgs<ExtArgs 
   where?: Prisma.MessagingReportWhereInput
 }
 
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountSupportConversationsRequestedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportConversationWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountSupportConversationsAssignedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportConversationWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountSupportMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportMessageWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountSupportAssignmentsReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportAssignmentWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountSupportAssignmentsMadeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportAssignmentWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountSupportInternalNotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportInternalNoteWhereInput
+}
+
 
 export type UserAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -12546,6 +19642,14 @@ export type UserAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   submittedModerationReports?: boolean | Prisma.UserAccount$submittedModerationReportsArgs<ExtArgs>
   professionalConnectionsLow?: boolean | Prisma.UserAccount$professionalConnectionsLowArgs<ExtArgs>
   professionalConnectionsHigh?: boolean | Prisma.UserAccount$professionalConnectionsHighArgs<ExtArgs>
+  professionalConnectionsRevoked?: boolean | Prisma.UserAccount$professionalConnectionsRevokedArgs<ExtArgs>
+  connectionProposalsLow?: boolean | Prisma.UserAccount$connectionProposalsLowArgs<ExtArgs>
+  connectionProposalsHigh?: boolean | Prisma.UserAccount$connectionProposalsHighArgs<ExtArgs>
+  connectionProposalsCreated?: boolean | Prisma.UserAccount$connectionProposalsCreatedArgs<ExtArgs>
+  connectionProposalDecisions?: boolean | Prisma.UserAccount$connectionProposalDecisionsArgs<ExtArgs>
+  connectionProposalHistory?: boolean | Prisma.UserAccount$connectionProposalHistoryArgs<ExtArgs>
+  connectionNotifications?: boolean | Prisma.UserAccount$connectionNotificationsArgs<ExtArgs>
+  connectionCommandReceipts?: boolean | Prisma.UserAccount$connectionCommandReceiptsArgs<ExtArgs>
   messagingConversationsLow?: boolean | Prisma.UserAccount$messagingConversationsLowArgs<ExtArgs>
   messagingConversationsHigh?: boolean | Prisma.UserAccount$messagingConversationsHighArgs<ExtArgs>
   messagingParticipants?: boolean | Prisma.UserAccount$messagingParticipantsArgs<ExtArgs>
@@ -12554,6 +19658,12 @@ export type UserAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   messagingBlocksReceived?: boolean | Prisma.UserAccount$messagingBlocksReceivedArgs<ExtArgs>
   submittedMessagingReports?: boolean | Prisma.UserAccount$submittedMessagingReportsArgs<ExtArgs>
   targetedMessagingReports?: boolean | Prisma.UserAccount$targetedMessagingReportsArgs<ExtArgs>
+  supportConversationsRequested?: boolean | Prisma.UserAccount$supportConversationsRequestedArgs<ExtArgs>
+  supportConversationsAssigned?: boolean | Prisma.UserAccount$supportConversationsAssignedArgs<ExtArgs>
+  supportMessages?: boolean | Prisma.UserAccount$supportMessagesArgs<ExtArgs>
+  supportAssignmentsReceived?: boolean | Prisma.UserAccount$supportAssignmentsReceivedArgs<ExtArgs>
+  supportAssignmentsMade?: boolean | Prisma.UserAccount$supportAssignmentsMadeArgs<ExtArgs>
+  supportInternalNotes?: boolean | Prisma.UserAccount$supportInternalNotesArgs<ExtArgs>
   _count?: boolean | Prisma.UserAccountCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userAccount"]>
 
@@ -12642,6 +19752,14 @@ export type UserAccountInclude<ExtArgs extends runtime.Types.Extensions.Internal
   submittedModerationReports?: boolean | Prisma.UserAccount$submittedModerationReportsArgs<ExtArgs>
   professionalConnectionsLow?: boolean | Prisma.UserAccount$professionalConnectionsLowArgs<ExtArgs>
   professionalConnectionsHigh?: boolean | Prisma.UserAccount$professionalConnectionsHighArgs<ExtArgs>
+  professionalConnectionsRevoked?: boolean | Prisma.UserAccount$professionalConnectionsRevokedArgs<ExtArgs>
+  connectionProposalsLow?: boolean | Prisma.UserAccount$connectionProposalsLowArgs<ExtArgs>
+  connectionProposalsHigh?: boolean | Prisma.UserAccount$connectionProposalsHighArgs<ExtArgs>
+  connectionProposalsCreated?: boolean | Prisma.UserAccount$connectionProposalsCreatedArgs<ExtArgs>
+  connectionProposalDecisions?: boolean | Prisma.UserAccount$connectionProposalDecisionsArgs<ExtArgs>
+  connectionProposalHistory?: boolean | Prisma.UserAccount$connectionProposalHistoryArgs<ExtArgs>
+  connectionNotifications?: boolean | Prisma.UserAccount$connectionNotificationsArgs<ExtArgs>
+  connectionCommandReceipts?: boolean | Prisma.UserAccount$connectionCommandReceiptsArgs<ExtArgs>
   messagingConversationsLow?: boolean | Prisma.UserAccount$messagingConversationsLowArgs<ExtArgs>
   messagingConversationsHigh?: boolean | Prisma.UserAccount$messagingConversationsHighArgs<ExtArgs>
   messagingParticipants?: boolean | Prisma.UserAccount$messagingParticipantsArgs<ExtArgs>
@@ -12650,6 +19768,12 @@ export type UserAccountInclude<ExtArgs extends runtime.Types.Extensions.Internal
   messagingBlocksReceived?: boolean | Prisma.UserAccount$messagingBlocksReceivedArgs<ExtArgs>
   submittedMessagingReports?: boolean | Prisma.UserAccount$submittedMessagingReportsArgs<ExtArgs>
   targetedMessagingReports?: boolean | Prisma.UserAccount$targetedMessagingReportsArgs<ExtArgs>
+  supportConversationsRequested?: boolean | Prisma.UserAccount$supportConversationsRequestedArgs<ExtArgs>
+  supportConversationsAssigned?: boolean | Prisma.UserAccount$supportConversationsAssignedArgs<ExtArgs>
+  supportMessages?: boolean | Prisma.UserAccount$supportMessagesArgs<ExtArgs>
+  supportAssignmentsReceived?: boolean | Prisma.UserAccount$supportAssignmentsReceivedArgs<ExtArgs>
+  supportAssignmentsMade?: boolean | Prisma.UserAccount$supportAssignmentsMadeArgs<ExtArgs>
+  supportInternalNotes?: boolean | Prisma.UserAccount$supportInternalNotesArgs<ExtArgs>
   _count?: boolean | Prisma.UserAccountCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserAccountIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -12693,6 +19817,14 @@ export type $UserAccountPayload<ExtArgs extends runtime.Types.Extensions.Interna
     submittedModerationReports: Prisma.$ModerationReportPayload<ExtArgs>[]
     professionalConnectionsLow: Prisma.$ProfessionalConnectionPayload<ExtArgs>[]
     professionalConnectionsHigh: Prisma.$ProfessionalConnectionPayload<ExtArgs>[]
+    professionalConnectionsRevoked: Prisma.$ProfessionalConnectionPayload<ExtArgs>[]
+    connectionProposalsLow: Prisma.$ProfessionalConnectionProposalPayload<ExtArgs>[]
+    connectionProposalsHigh: Prisma.$ProfessionalConnectionProposalPayload<ExtArgs>[]
+    connectionProposalsCreated: Prisma.$ProfessionalConnectionProposalPayload<ExtArgs>[]
+    connectionProposalDecisions: Prisma.$ProfessionalConnectionDecisionPayload<ExtArgs>[]
+    connectionProposalHistory: Prisma.$ProfessionalConnectionProposalHistoryPayload<ExtArgs>[]
+    connectionNotifications: Prisma.$ProfessionalConnectionNotificationPayload<ExtArgs>[]
+    connectionCommandReceipts: Prisma.$ProfessionalConnectionCommandReceiptPayload<ExtArgs>[]
     messagingConversationsLow: Prisma.$MessagingConversationPayload<ExtArgs>[]
     messagingConversationsHigh: Prisma.$MessagingConversationPayload<ExtArgs>[]
     messagingParticipants: Prisma.$MessagingConversationParticipantPayload<ExtArgs>[]
@@ -12701,6 +19833,12 @@ export type $UserAccountPayload<ExtArgs extends runtime.Types.Extensions.Interna
     messagingBlocksReceived: Prisma.$UserMessagingBlockPayload<ExtArgs>[]
     submittedMessagingReports: Prisma.$MessagingReportPayload<ExtArgs>[]
     targetedMessagingReports: Prisma.$MessagingReportPayload<ExtArgs>[]
+    supportConversationsRequested: Prisma.$SupportConversationPayload<ExtArgs>[]
+    supportConversationsAssigned: Prisma.$SupportConversationPayload<ExtArgs>[]
+    supportMessages: Prisma.$SupportMessagePayload<ExtArgs>[]
+    supportAssignmentsReceived: Prisma.$SupportAssignmentPayload<ExtArgs>[]
+    supportAssignmentsMade: Prisma.$SupportAssignmentPayload<ExtArgs>[]
+    supportInternalNotes: Prisma.$SupportInternalNotePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -13145,6 +20283,14 @@ export interface Prisma__UserAccountClient<T, Null = never, ExtArgs extends runt
   submittedModerationReports<T extends Prisma.UserAccount$submittedModerationReportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$submittedModerationReportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModerationReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   professionalConnectionsLow<T extends Prisma.UserAccount$professionalConnectionsLowArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$professionalConnectionsLowArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfessionalConnectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   professionalConnectionsHigh<T extends Prisma.UserAccount$professionalConnectionsHighArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$professionalConnectionsHighArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfessionalConnectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  professionalConnectionsRevoked<T extends Prisma.UserAccount$professionalConnectionsRevokedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$professionalConnectionsRevokedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfessionalConnectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  connectionProposalsLow<T extends Prisma.UserAccount$connectionProposalsLowArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$connectionProposalsLowArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfessionalConnectionProposalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  connectionProposalsHigh<T extends Prisma.UserAccount$connectionProposalsHighArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$connectionProposalsHighArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfessionalConnectionProposalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  connectionProposalsCreated<T extends Prisma.UserAccount$connectionProposalsCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$connectionProposalsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfessionalConnectionProposalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  connectionProposalDecisions<T extends Prisma.UserAccount$connectionProposalDecisionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$connectionProposalDecisionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfessionalConnectionDecisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  connectionProposalHistory<T extends Prisma.UserAccount$connectionProposalHistoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$connectionProposalHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfessionalConnectionProposalHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  connectionNotifications<T extends Prisma.UserAccount$connectionNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$connectionNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfessionalConnectionNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  connectionCommandReceipts<T extends Prisma.UserAccount$connectionCommandReceiptsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$connectionCommandReceiptsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfessionalConnectionCommandReceiptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   messagingConversationsLow<T extends Prisma.UserAccount$messagingConversationsLowArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$messagingConversationsLowArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagingConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   messagingConversationsHigh<T extends Prisma.UserAccount$messagingConversationsHighArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$messagingConversationsHighArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagingConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   messagingParticipants<T extends Prisma.UserAccount$messagingParticipantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$messagingParticipantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagingConversationParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -13153,6 +20299,12 @@ export interface Prisma__UserAccountClient<T, Null = never, ExtArgs extends runt
   messagingBlocksReceived<T extends Prisma.UserAccount$messagingBlocksReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$messagingBlocksReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserMessagingBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   submittedMessagingReports<T extends Prisma.UserAccount$submittedMessagingReportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$submittedMessagingReportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagingReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   targetedMessagingReports<T extends Prisma.UserAccount$targetedMessagingReportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$targetedMessagingReportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagingReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportConversationsRequested<T extends Prisma.UserAccount$supportConversationsRequestedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$supportConversationsRequestedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportConversationsAssigned<T extends Prisma.UserAccount$supportConversationsAssignedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$supportConversationsAssignedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportMessages<T extends Prisma.UserAccount$supportMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$supportMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportAssignmentsReceived<T extends Prisma.UserAccount$supportAssignmentsReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$supportAssignmentsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportAssignmentsMade<T extends Prisma.UserAccount$supportAssignmentsMadeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$supportAssignmentsMadeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportInternalNotes<T extends Prisma.UserAccount$supportInternalNotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$supportInternalNotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportInternalNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -14398,6 +21550,198 @@ export type UserAccount$professionalConnectionsHighArgs<ExtArgs extends runtime.
 }
 
 /**
+ * UserAccount.professionalConnectionsRevoked
+ */
+export type UserAccount$professionalConnectionsRevokedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProfessionalConnection
+   */
+  select?: Prisma.ProfessionalConnectionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProfessionalConnection
+   */
+  omit?: Prisma.ProfessionalConnectionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalConnectionInclude<ExtArgs> | null
+  where?: Prisma.ProfessionalConnectionWhereInput
+  orderBy?: Prisma.ProfessionalConnectionOrderByWithRelationInput | Prisma.ProfessionalConnectionOrderByWithRelationInput[]
+  cursor?: Prisma.ProfessionalConnectionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProfessionalConnectionScalarFieldEnum | Prisma.ProfessionalConnectionScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.connectionProposalsLow
+ */
+export type UserAccount$connectionProposalsLowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProfessionalConnectionProposal
+   */
+  select?: Prisma.ProfessionalConnectionProposalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProfessionalConnectionProposal
+   */
+  omit?: Prisma.ProfessionalConnectionProposalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalConnectionProposalInclude<ExtArgs> | null
+  where?: Prisma.ProfessionalConnectionProposalWhereInput
+  orderBy?: Prisma.ProfessionalConnectionProposalOrderByWithRelationInput | Prisma.ProfessionalConnectionProposalOrderByWithRelationInput[]
+  cursor?: Prisma.ProfessionalConnectionProposalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProfessionalConnectionProposalScalarFieldEnum | Prisma.ProfessionalConnectionProposalScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.connectionProposalsHigh
+ */
+export type UserAccount$connectionProposalsHighArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProfessionalConnectionProposal
+   */
+  select?: Prisma.ProfessionalConnectionProposalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProfessionalConnectionProposal
+   */
+  omit?: Prisma.ProfessionalConnectionProposalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalConnectionProposalInclude<ExtArgs> | null
+  where?: Prisma.ProfessionalConnectionProposalWhereInput
+  orderBy?: Prisma.ProfessionalConnectionProposalOrderByWithRelationInput | Prisma.ProfessionalConnectionProposalOrderByWithRelationInput[]
+  cursor?: Prisma.ProfessionalConnectionProposalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProfessionalConnectionProposalScalarFieldEnum | Prisma.ProfessionalConnectionProposalScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.connectionProposalsCreated
+ */
+export type UserAccount$connectionProposalsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProfessionalConnectionProposal
+   */
+  select?: Prisma.ProfessionalConnectionProposalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProfessionalConnectionProposal
+   */
+  omit?: Prisma.ProfessionalConnectionProposalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalConnectionProposalInclude<ExtArgs> | null
+  where?: Prisma.ProfessionalConnectionProposalWhereInput
+  orderBy?: Prisma.ProfessionalConnectionProposalOrderByWithRelationInput | Prisma.ProfessionalConnectionProposalOrderByWithRelationInput[]
+  cursor?: Prisma.ProfessionalConnectionProposalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProfessionalConnectionProposalScalarFieldEnum | Prisma.ProfessionalConnectionProposalScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.connectionProposalDecisions
+ */
+export type UserAccount$connectionProposalDecisionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProfessionalConnectionDecision
+   */
+  select?: Prisma.ProfessionalConnectionDecisionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProfessionalConnectionDecision
+   */
+  omit?: Prisma.ProfessionalConnectionDecisionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalConnectionDecisionInclude<ExtArgs> | null
+  where?: Prisma.ProfessionalConnectionDecisionWhereInput
+  orderBy?: Prisma.ProfessionalConnectionDecisionOrderByWithRelationInput | Prisma.ProfessionalConnectionDecisionOrderByWithRelationInput[]
+  cursor?: Prisma.ProfessionalConnectionDecisionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProfessionalConnectionDecisionScalarFieldEnum | Prisma.ProfessionalConnectionDecisionScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.connectionProposalHistory
+ */
+export type UserAccount$connectionProposalHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProfessionalConnectionProposalHistory
+   */
+  select?: Prisma.ProfessionalConnectionProposalHistorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProfessionalConnectionProposalHistory
+   */
+  omit?: Prisma.ProfessionalConnectionProposalHistoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalConnectionProposalHistoryInclude<ExtArgs> | null
+  where?: Prisma.ProfessionalConnectionProposalHistoryWhereInput
+  orderBy?: Prisma.ProfessionalConnectionProposalHistoryOrderByWithRelationInput | Prisma.ProfessionalConnectionProposalHistoryOrderByWithRelationInput[]
+  cursor?: Prisma.ProfessionalConnectionProposalHistoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProfessionalConnectionProposalHistoryScalarFieldEnum | Prisma.ProfessionalConnectionProposalHistoryScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.connectionNotifications
+ */
+export type UserAccount$connectionNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProfessionalConnectionNotification
+   */
+  select?: Prisma.ProfessionalConnectionNotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProfessionalConnectionNotification
+   */
+  omit?: Prisma.ProfessionalConnectionNotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalConnectionNotificationInclude<ExtArgs> | null
+  where?: Prisma.ProfessionalConnectionNotificationWhereInput
+  orderBy?: Prisma.ProfessionalConnectionNotificationOrderByWithRelationInput | Prisma.ProfessionalConnectionNotificationOrderByWithRelationInput[]
+  cursor?: Prisma.ProfessionalConnectionNotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProfessionalConnectionNotificationScalarFieldEnum | Prisma.ProfessionalConnectionNotificationScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.connectionCommandReceipts
+ */
+export type UserAccount$connectionCommandReceiptsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProfessionalConnectionCommandReceipt
+   */
+  select?: Prisma.ProfessionalConnectionCommandReceiptSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProfessionalConnectionCommandReceipt
+   */
+  omit?: Prisma.ProfessionalConnectionCommandReceiptOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalConnectionCommandReceiptInclude<ExtArgs> | null
+  where?: Prisma.ProfessionalConnectionCommandReceiptWhereInput
+  orderBy?: Prisma.ProfessionalConnectionCommandReceiptOrderByWithRelationInput | Prisma.ProfessionalConnectionCommandReceiptOrderByWithRelationInput[]
+  cursor?: Prisma.ProfessionalConnectionCommandReceiptWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProfessionalConnectionCommandReceiptScalarFieldEnum | Prisma.ProfessionalConnectionCommandReceiptScalarFieldEnum[]
+}
+
+/**
  * UserAccount.messagingConversationsLow
  */
 export type UserAccount$messagingConversationsLowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -14587,6 +21931,150 @@ export type UserAccount$targetedMessagingReportsArgs<ExtArgs extends runtime.Typ
   take?: number
   skip?: number
   distinct?: Prisma.MessagingReportScalarFieldEnum | Prisma.MessagingReportScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.supportConversationsRequested
+ */
+export type UserAccount$supportConversationsRequestedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportConversation
+   */
+  select?: Prisma.SupportConversationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportConversation
+   */
+  omit?: Prisma.SupportConversationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportConversationInclude<ExtArgs> | null
+  where?: Prisma.SupportConversationWhereInput
+  orderBy?: Prisma.SupportConversationOrderByWithRelationInput | Prisma.SupportConversationOrderByWithRelationInput[]
+  cursor?: Prisma.SupportConversationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportConversationScalarFieldEnum | Prisma.SupportConversationScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.supportConversationsAssigned
+ */
+export type UserAccount$supportConversationsAssignedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportConversation
+   */
+  select?: Prisma.SupportConversationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportConversation
+   */
+  omit?: Prisma.SupportConversationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportConversationInclude<ExtArgs> | null
+  where?: Prisma.SupportConversationWhereInput
+  orderBy?: Prisma.SupportConversationOrderByWithRelationInput | Prisma.SupportConversationOrderByWithRelationInput[]
+  cursor?: Prisma.SupportConversationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportConversationScalarFieldEnum | Prisma.SupportConversationScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.supportMessages
+ */
+export type UserAccount$supportMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportMessage
+   */
+  select?: Prisma.SupportMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportMessage
+   */
+  omit?: Prisma.SupportMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportMessageInclude<ExtArgs> | null
+  where?: Prisma.SupportMessageWhereInput
+  orderBy?: Prisma.SupportMessageOrderByWithRelationInput | Prisma.SupportMessageOrderByWithRelationInput[]
+  cursor?: Prisma.SupportMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportMessageScalarFieldEnum | Prisma.SupportMessageScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.supportAssignmentsReceived
+ */
+export type UserAccount$supportAssignmentsReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportAssignment
+   */
+  select?: Prisma.SupportAssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportAssignment
+   */
+  omit?: Prisma.SupportAssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportAssignmentInclude<ExtArgs> | null
+  where?: Prisma.SupportAssignmentWhereInput
+  orderBy?: Prisma.SupportAssignmentOrderByWithRelationInput | Prisma.SupportAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.SupportAssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportAssignmentScalarFieldEnum | Prisma.SupportAssignmentScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.supportAssignmentsMade
+ */
+export type UserAccount$supportAssignmentsMadeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportAssignment
+   */
+  select?: Prisma.SupportAssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportAssignment
+   */
+  omit?: Prisma.SupportAssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportAssignmentInclude<ExtArgs> | null
+  where?: Prisma.SupportAssignmentWhereInput
+  orderBy?: Prisma.SupportAssignmentOrderByWithRelationInput | Prisma.SupportAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.SupportAssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportAssignmentScalarFieldEnum | Prisma.SupportAssignmentScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.supportInternalNotes
+ */
+export type UserAccount$supportInternalNotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportInternalNote
+   */
+  select?: Prisma.SupportInternalNoteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportInternalNote
+   */
+  omit?: Prisma.SupportInternalNoteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportInternalNoteInclude<ExtArgs> | null
+  where?: Prisma.SupportInternalNoteWhereInput
+  orderBy?: Prisma.SupportInternalNoteOrderByWithRelationInput | Prisma.SupportInternalNoteOrderByWithRelationInput[]
+  cursor?: Prisma.SupportInternalNoteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportInternalNoteScalarFieldEnum | Prisma.SupportInternalNoteScalarFieldEnum[]
 }
 
 /**

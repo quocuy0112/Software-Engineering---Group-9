@@ -1,6 +1,4 @@
-import type {
-  AuthorizedMessagingContext,
-} from "./eligibility-provider";
+import type { AuthorizedMessagingContext } from "./eligibility-provider";
 import type { ConversationDetail } from "@/shared/contracts/messaging/conversations";
 
 export type CanonicalParticipantPair = {
@@ -28,10 +26,14 @@ export type ConversationAccess = {
   companyId: string | null;
   professionalConnectionId: string | null;
   lastMessageSequence: number | null;
+  archivedAt: Date | null;
 };
 
 export interface MessagingConversationRepositoryPort {
-  findAccess(conversationId: string, userId: string): Promise<ConversationAccess | null>;
+  findAccess(
+    conversationId: string,
+    userId: string,
+  ): Promise<ConversationAccess | null>;
   listAuthorizedConversationIds(userId: string): Promise<string[]>;
   open(input: {
     actorUserId: string;
@@ -39,7 +41,10 @@ export interface MessagingConversationRepositoryPort {
     context: AuthorizedMessagingContext;
     now: Date;
   }): Promise<{ conversationId: string; created: boolean }>;
-  getDetail?(conversationId: string, userId: string): Promise<ConversationDetail | null>;
+  getDetail?(
+    conversationId: string,
+    userId: string,
+  ): Promise<ConversationDetail | null>;
 }
 
 export interface MessagingBlockRepositoryPort {

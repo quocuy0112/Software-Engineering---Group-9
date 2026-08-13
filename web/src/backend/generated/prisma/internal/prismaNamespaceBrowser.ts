@@ -101,6 +101,16 @@ export const ModelName = {
   JobReport: 'JobReport',
   JobApplication: 'JobApplication',
   ProfessionalConnection: 'ProfessionalConnection',
+  ProfessionalConnectionProposal: 'ProfessionalConnectionProposal',
+  ProfessionalConnectionDecision: 'ProfessionalConnectionDecision',
+  ProfessionalConnectionProposalHistory: 'ProfessionalConnectionProposalHistory',
+  ProfessionalConnectionNotification: 'ProfessionalConnectionNotification',
+  ProfessionalConnectionCommandReceipt: 'ProfessionalConnectionCommandReceipt',
+  SupportConversation: 'SupportConversation',
+  SupportMessage: 'SupportMessage',
+  SupportAssignment: 'SupportAssignment',
+  SupportInternalNote: 'SupportInternalNote',
+  SupportConversationHistory: 'SupportConversationHistory',
   MessagingConversation: 'MessagingConversation',
   MessagingConversationParticipant: 'MessagingConversationParticipant',
   MessagingMessage: 'MessagingMessage',
@@ -536,6 +546,9 @@ export const EmailOutboxScalarFieldEnum = {
   userId: 'userId',
   securityTokenId: 'securityTokenId',
   verificationRequestId: 'verificationRequestId',
+  supportConversationId: 'supportConversationId',
+  professionalConnectionProposalId: 'professionalConnectionProposalId',
+  professionalConnectionId: 'professionalConnectionId',
   recipientRef: 'recipientRef',
   recipientCiphertext: 'recipientCiphertext',
   recipientPurpose: 'recipientPurpose',
@@ -1056,13 +1069,173 @@ export const ProfessionalConnectionScalarFieldEnum = {
   id: 'id',
   participantLowId: 'participantLowId',
   participantHighId: 'participantHighId',
+  sourceProposalId: 'sourceProposalId',
   state: 'state',
+  version: 'version',
   acceptedAt: 'acceptedAt',
+  revokedAt: 'revokedAt',
+  revokedByUserId: 'revokedByUserId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type ProfessionalConnectionScalarFieldEnum = (typeof ProfessionalConnectionScalarFieldEnum)[keyof typeof ProfessionalConnectionScalarFieldEnum]
+
+
+export const ProfessionalConnectionProposalScalarFieldEnum = {
+  id: 'id',
+  participantLowId: 'participantLowId',
+  participantHighId: 'participantHighId',
+  participantPairDigest: 'participantPairDigest',
+  createdByAdminUserId: 'createdByAdminUserId',
+  sourceSupportConversationId: 'sourceSupportConversationId',
+  reason: 'reason',
+  state: 'state',
+  expiresAt: 'expiresAt',
+  version: 'version',
+  terminalAt: 'terminalAt',
+  ordinaryDetailHiddenAt: 'ordinaryDetailHiddenAt',
+  protectedDeleteAfter: 'protectedDeleteAfter',
+  protectedDeletedAt: 'protectedDeletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProfessionalConnectionProposalScalarFieldEnum = (typeof ProfessionalConnectionProposalScalarFieldEnum)[keyof typeof ProfessionalConnectionProposalScalarFieldEnum]
+
+
+export const ProfessionalConnectionDecisionScalarFieldEnum = {
+  proposalId: 'proposalId',
+  participantUserId: 'participantUserId',
+  decision: 'decision',
+  version: 'version',
+  decidedAt: 'decidedAt'
+} as const
+
+export type ProfessionalConnectionDecisionScalarFieldEnum = (typeof ProfessionalConnectionDecisionScalarFieldEnum)[keyof typeof ProfessionalConnectionDecisionScalarFieldEnum]
+
+
+export const ProfessionalConnectionProposalHistoryScalarFieldEnum = {
+  id: 'id',
+  proposalId: 'proposalId',
+  actorUserId: 'actorUserId',
+  action: 'action',
+  priorState: 'priorState',
+  resultingState: 'resultingState',
+  resultingVersion: 'resultingVersion',
+  decisionKind: 'decisionKind',
+  correlationId: 'correlationId',
+  occurredAt: 'occurredAt'
+} as const
+
+export type ProfessionalConnectionProposalHistoryScalarFieldEnum = (typeof ProfessionalConnectionProposalHistoryScalarFieldEnum)[keyof typeof ProfessionalConnectionProposalHistoryScalarFieldEnum]
+
+
+export const ProfessionalConnectionNotificationScalarFieldEnum = {
+  id: 'id',
+  recipientUserId: 'recipientUserId',
+  proposalId: 'proposalId',
+  connectionId: 'connectionId',
+  kind: 'kind',
+  deduplicationKey: 'deduplicationKey',
+  readAt: 'readAt',
+  deleteAfter: 'deleteAfter',
+  createdAt: 'createdAt'
+} as const
+
+export type ProfessionalConnectionNotificationScalarFieldEnum = (typeof ProfessionalConnectionNotificationScalarFieldEnum)[keyof typeof ProfessionalConnectionNotificationScalarFieldEnum]
+
+
+export const ProfessionalConnectionCommandReceiptScalarFieldEnum = {
+  id: 'id',
+  actorUserId: 'actorUserId',
+  idempotencyKey: 'idempotencyKey',
+  commandKind: 'commandKind',
+  targetReference: 'targetReference',
+  payloadDigest: 'payloadDigest',
+  resultReference: 'resultReference',
+  resultState: 'resultState',
+  resultVersion: 'resultVersion',
+  createdAt: 'createdAt'
+} as const
+
+export type ProfessionalConnectionCommandReceiptScalarFieldEnum = (typeof ProfessionalConnectionCommandReceiptScalarFieldEnum)[keyof typeof ProfessionalConnectionCommandReceiptScalarFieldEnum]
+
+
+export const SupportConversationScalarFieldEnum = {
+  id: 'id',
+  requesterUserId: 'requesterUserId',
+  category: 'category',
+  subject: 'subject',
+  state: 'state',
+  version: 'version',
+  nextMessageSequence: 'nextMessageSequence',
+  lastMessageAt: 'lastMessageAt',
+  currentAssigneeUserId: 'currentAssigneeUserId',
+  resolvedAt: 'resolvedAt',
+  closedAt: 'closedAt',
+  contentDeleteAfter: 'contentDeleteAfter',
+  contentDeletedAt: 'contentDeletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupportConversationScalarFieldEnum = (typeof SupportConversationScalarFieldEnum)[keyof typeof SupportConversationScalarFieldEnum]
+
+
+export const SupportMessageScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  sequence: 'sequence',
+  senderKind: 'senderKind',
+  senderUserId: 'senderUserId',
+  clientOperationId: 'clientOperationId',
+  content: 'content',
+  createdAt: 'createdAt'
+} as const
+
+export type SupportMessageScalarFieldEnum = (typeof SupportMessageScalarFieldEnum)[keyof typeof SupportMessageScalarFieldEnum]
+
+
+export const SupportAssignmentScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  assigneeAdminUserId: 'assigneeAdminUserId',
+  assignedByAdminUserId: 'assignedByAdminUserId',
+  assignedAt: 'assignedAt',
+  endedAt: 'endedAt',
+  endReason: 'endReason'
+} as const
+
+export type SupportAssignmentScalarFieldEnum = (typeof SupportAssignmentScalarFieldEnum)[keyof typeof SupportAssignmentScalarFieldEnum]
+
+
+export const SupportInternalNoteScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  authorAdminUserId: 'authorAdminUserId',
+  normalizedText: 'normalizedText',
+  createdAt: 'createdAt'
+} as const
+
+export type SupportInternalNoteScalarFieldEnum = (typeof SupportInternalNoteScalarFieldEnum)[keyof typeof SupportInternalNoteScalarFieldEnum]
+
+
+export const SupportConversationHistoryScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  actorUserId: 'actorUserId',
+  action: 'action',
+  priorState: 'priorState',
+  resultingState: 'resultingState',
+  resultingVersion: 'resultingVersion',
+  assignmentReason: 'assignmentReason',
+  priorAssigneeUserId: 'priorAssigneeUserId',
+  resultingAssigneeUserId: 'resultingAssigneeUserId',
+  occurredAt: 'occurredAt'
+} as const
+
+export type SupportConversationHistoryScalarFieldEnum = (typeof SupportConversationHistoryScalarFieldEnum)[keyof typeof SupportConversationHistoryScalarFieldEnum]
 
 
 export const MessagingConversationScalarFieldEnum = {
@@ -1074,6 +1247,8 @@ export const MessagingConversationScalarFieldEnum = {
   applicationId: 'applicationId',
   companyId: 'companyId',
   professionalConnectionId: 'professionalConnectionId',
+  archivedAt: 'archivedAt',
+  archiveReason: 'archiveReason',
   nextMessageSequence: 'nextMessageSequence',
   lastMessageSequence: 'lastMessageSequence',
   lastMessageAt: 'lastMessageAt',
