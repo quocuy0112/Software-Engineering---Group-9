@@ -1,0 +1,26 @@
+-- RenameIndex
+ALTER INDEX "ProfessionalConnectionCommandReceipt_actorUserId_idempotencyKey" RENAME TO "ProfessionalConnectionCommandReceipt_actorUserId_idempotenc_key";
+
+-- RenameIndex
+ALTER INDEX "ProfessionalConnectionCommandReceipt_targetReference_createdAt_" RENAME TO "ProfessionalConnectionCommandReceipt_targetReference_create_idx";
+
+-- RenameIndex
+ALTER INDEX "ProfessionalConnectionNotification_recipientUserId_createdAt_id" RENAME TO "ProfessionalConnectionNotification_recipientUserId_createdA_idx";
+
+-- RenameIndex
+ALTER INDEX "ProfessionalConnectionProposal_createdByAdminUserId_createdAt_i" RENAME TO "ProfessionalConnectionProposal_createdByAdminUserId_created_idx";
+
+-- RenameIndex
+ALTER INDEX "ProfessionalConnectionProposal_participantHighId_state_expiresA" RENAME TO "ProfessionalConnectionProposal_participantHighId_state_expi_idx";
+
+-- RenameIndex
+ALTER INDEX "ProfessionalConnectionProposal_participantLowId_participantHigh" RENAME TO "ProfessionalConnectionProposal_participantLowId_participant_idx";
+
+-- RenameIndex
+ALTER INDEX "ProfessionalConnectionProposal_participantLowId_state_expiresAt" RENAME TO "ProfessionalConnectionProposal_participantLowId_state_expir_idx";
+
+-- RenameIndex
+ALTER INDEX "ProfessionalConnectionProposal_protectedDeleteAfter_protectedDe" RENAME TO "ProfessionalConnectionProposal_protectedDeleteAfter_protect_idx";
+
+-- RenameIndex
+ALTER INDEX "ProfessionalConnectionProposalHistory_proposalId_occurredAt_id_" RENAME TO "ProfessionalConnectionProposalHistory_proposalId_occurredAt_idx";

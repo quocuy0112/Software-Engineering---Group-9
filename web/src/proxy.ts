@@ -8,19 +8,7 @@ const local = {
 
 export const INTERNAL_ADMIN_ROUTE = "/admin-console";
 export const INTERNAL_RECRUITER_ROUTE = "/recruiter-entitlement";
-const INTERNAL_ADMIN_SHELL_HEADER = "x-smarthire-internal-admin-shell";
-
-function redirectToAdminOrigin(request: NextRequest) {
-  const target = new URL(
-    process.env.ADMIN_ORIGIN ?? "http://console.admin.localhost:3001",
-  );
-  const internalPath = request.nextUrl.pathname.slice(
-    INTERNAL_ADMIN_ROUTE.length,
-  );
-  target.pathname = internalPath || "/";
-  target.search = request.nextUrl.search;
-  return NextResponse.redirect(target);
-}
+export const INTERNAL_SHELL_HEADER = "x-smarthire-internal-shell";
 
 function isInternalShellPath(pathname: string) {
   return [INTERNAL_ADMIN_ROUTE, INTERNAL_RECRUITER_ROUTE].some(
@@ -42,9 +30,23 @@ export function proxy(request: NextRequest) {
   const host = request.headers.get("host")?.toLowerCase() ?? "";
   const pathname = request.nextUrl.pathname;
   if (pathname.startsWith("/api/")) return NextResponse.next();
+  if (isInternalShellPath(pathname)) {
+    const shell = request.headers.get(INTERNAL_SHELL_HEADER);
+    const trustedAdminRoute =
+      shell === "admin" &&
+      host === expectedHost("admin") &&
+      (pathname === INTERNAL_ADMIN_ROUTE ||
+        pathname.startsWith(`${INTERNAL_ADMIN_ROUTE}/`));
+    const trustedRecruiterRoute =
+      shell === "recruiter" &&
+      host === expectedHost("recruiter") &&
+      (pathname === INTERNAL_RECRUITER_ROUTE ||
+        pathname.startsWith(`${INTERNAL_RECRUITER_ROUTE}/`));
+    return trustedAdminRoute || trustedRecruiterRoute
+      ? NextResponse.next()
+      : new NextResponse(null, { status: 404 });
+  }
   if (host === expectedHost("admin")) {
-    if (isInternalShellPath(pathname))
-      return new NextResponse(null, { status: 404 });
     const url = request.nextUrl.clone();
     url.pathname = `${INTERNAL_ADMIN_ROUTE}${pathname === "/" ? "" : pathname}`;
     const headers = new Headers(request.headers);
@@ -52,21 +54,11 @@ export function proxy(request: NextRequest) {
     return NextResponse.rewrite(url, { request: { headers } });
   }
   if (host === expectedHost("recruiter")) {
-    if (isInternalShellPath(pathname))
-      return new NextResponse(null, { status: 404 });
     const url = request.nextUrl.clone();
     url.pathname = `${INTERNAL_RECRUITER_ROUTE}${pathname === "/" ? "" : pathname}`;
     return NextResponse.rewrite(url);
   }
-  if (host === expectedHost("candidate"))
-    return request.headers.get(INTERNAL_ADMIN_SHELL_HEADER) === "1"
-      ? NextResponse.next()
-      : pathname === INTERNAL_ADMIN_ROUTE ||
-          pathname.startsWith(`${INTERNAL_ADMIN_ROUTE}/`)
-        ? redirectToAdminOrigin(request)
-        : isInternalShellPath(pathname)
-          ? new NextResponse(null, { status: 404 })
-          : NextResponse.next();
+  if (host === expectedHost("candidate")) return NextResponse.next();
   return new NextResponse(null, { status: 404 });
 }
 

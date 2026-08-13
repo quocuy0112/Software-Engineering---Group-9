@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
   Box,
   Button,
+  Chip,
   Divider,
   MenuItem,
   TextField,
@@ -13,9 +14,10 @@ import {
 import { Show, useRecordContext, useRefresh } from "react-admin";
 import type { AdminSupportCaseDetail } from "@/shared/contracts/support";
 import { useSupportInvalidation } from "@/frontend/features/support/client/use-support-invalidation";
+import { handleSupportMessageKeyDown } from "@/frontend/features/support/components/support-message-keyboard";
 import { adminDataProvider } from "../app/data-provider";
 
-function SupportCaseReview() {
+export function SupportCaseReview() {
   const record = useRecordContext<AdminSupportCaseDetail>();
   const refresh = useRefresh();
   const [reply, setReply] = useState("");
@@ -24,6 +26,7 @@ function SupportCaseReview() {
   const [reason, setReason] = useState("STAFF_HANDOFF");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const messagesRef = useRef<HTMLDivElement>(null);
   const recordId = record?.id;
   useSupportInvalidation(
     useCallback(
@@ -33,6 +36,11 @@ function SupportCaseReview() {
       [recordId, refresh],
     ),
   );
+  useEffect(() => {
+    const messages = messagesRef.current;
+    if (messages) messages.scrollTop = messages.scrollHeight;
+  }, [record?.id, record?.messages.length]);
+
   if (!record) return null;
   const currentRecord = record;
 
@@ -64,6 +72,13 @@ function SupportCaseReview() {
     }
   }
 
+  function sendReply() {
+    return command("reply", {
+      content: reply,
+      clientOperationId: crypto.randomUUID(),
+    });
+  }
+
   return (
     <Box sx={{ p: 3, display: "grid", gap: 2, maxWidth: 1100 }}>
       <Box
@@ -85,17 +100,20 @@ function SupportCaseReview() {
             Case {record.id} · {record.category.replaceAll("_", " ")}
           </Typography>
         </Box>
-        <Typography
-          sx={{
-            px: 1.5,
-            py: 0.75,
-            borderRadius: 99,
-            bgcolor: "grey.100",
-            fontWeight: 700,
-          }}
-        >
-          {record.state.replaceAll("_", " ")}
-        </Typography>
+        <Box sx={{ display: "grid", justifyItems: "end", gap: 1 }}>
+          <Chip label="Online" color="success" size="small" />
+          <Typography
+            sx={{
+              px: 1.5,
+              py: 0.75,
+              borderRadius: 99,
+              bgcolor: "grey.100",
+              fontWeight: 700,
+            }}
+          >
+            {record.state.replaceAll("_", " ")}
+          </Typography>
+        </Box>
       </Box>
 
       {error ? (
@@ -190,7 +208,20 @@ function SupportCaseReview() {
           Content was deleted under the retention policy.
         </Alert>
       ) : (
-        <Box sx={{ display: "grid", gap: 1.5 }}>
+        <Box
+          ref={messagesRef}
+          aria-label="Support conversation messages"
+          sx={{
+            display: "grid",
+            gap: 1.5,
+            minHeight: 240,
+            maxHeight: "52vh",
+            overflowY: "auto",
+            overscrollBehavior: "contain",
+            scrollbarGutter: "stable",
+            pr: 1,
+          }}
+        >
           {record.messages.map((message) => (
             <Box
               key={message.id}
@@ -238,17 +269,18 @@ function SupportCaseReview() {
             minRows={3}
             value={reply}
             onChange={(event) => setReply(event.target.value)}
+            onKeyDown={(event) =>
+              handleSupportMessageKeyDown(event, () => {
+                if (!busy && reply.trim()) void sendReply();
+              })
+            }
             inputProps={{ maxLength: 4000 }}
+            helperText="Enter to send; Shift+Enter for a new line"
           />
           <Button
             variant="contained"
             disabled={busy || !reply.trim()}
-            onClick={() =>
-              command("reply", {
-                content: reply,
-                clientOperationId: crypto.randomUUID(),
-              })
-            }
+            onClick={() => void sendReply()}
           >
             Send reply
           </Button>

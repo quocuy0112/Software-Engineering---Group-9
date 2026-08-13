@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { SupportWorkspace } from "@/frontend/features/support/components/support-workspace";
 
@@ -54,6 +54,41 @@ describe("SupportWorkspace", () => {
     expect(
       screen.queryByText(/administrator account/i),
     ).not.toBeInTheDocument();
+    expect(screen.getByText("Online")).toBeVisible();
+    expect(
+      screen.getByLabelText("Support conversation messages"),
+    ).toBeVisible();
+  });
+
+  it("sends a reply with Enter", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(async (path: string, init?: RequestInit) => {
+        const data =
+          path === "/api/support/cases" && !init?.method
+            ? [supportCase]
+            : {
+                ...supportCase,
+                version: init?.method === "POST" ? 3 : 2,
+                messages: [],
+              };
+        return { ok: true, json: async () => ({ data }) };
+      });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<SupportWorkspace csrfProof="proof" initialCases={[supportCase]} />);
+    const reply = await screen.findByRole("textbox", {
+      name: "Reply to SmartHire Support",
+    });
+
+    fireEvent.change(reply, { target: { value: "Please check this case." } });
+    fireEvent.keyDown(reply, { key: "Enter", shiftKey: false });
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/support/cases/case-1/messages",
+        expect.objectContaining({ method: "POST" }),
+      ),
+    );
   });
 
   it("shows terminal guidance instead of a reply composer", async () => {
