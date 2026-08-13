@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import type { AccountPreferences } from "@/shared/contracts/account/preferences";
 import {
   getTimezoneOptions,
@@ -133,9 +133,8 @@ export function AccountPreferencesForm({
   onChange: (preferences: AccountPreferences) => void;
   onSave: () => Promise<boolean>;
 }) {
-  const initialTimezone = useRef(preferences.timezone);
   const [timezoneOptions] = useState<TimezoneOption[]>(() =>
-    getTimezoneOptions([initialTimezone.current]),
+    getTimezoneOptions([preferences.timezone]),
   );
   const locale = useWorkspaceLocale();
 

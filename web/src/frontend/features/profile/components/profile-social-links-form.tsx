@@ -226,7 +226,7 @@ export function ProfileSocialLinksForm({
     setQuickLinkError("");
   }
 
-  function usePlatformTemplate(prefix: string) {
+  function applyPlatformTemplate(prefix: string) {
     setQuickLink(prefix);
     setQuickLinkError("");
     quickLinkInputRef.current?.focus();
@@ -323,7 +323,7 @@ export function ProfileSocialLinksForm({
                       : `Use ${platform.name} template`
                 }
                 disabled={fields.length >= 10 || added}
-                onClick={() => usePlatformTemplate(platform.prefix)}
+                onClick={() => applyPlatformTemplate(platform.prefix)}
               >
                 <span className="social-platform-mark" aria-hidden="true">
                   <SocialPlatformIcon name={platform.id} />
