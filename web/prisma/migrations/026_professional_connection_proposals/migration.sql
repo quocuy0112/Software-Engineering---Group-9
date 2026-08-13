@@ -1,5 +1,16 @@
 ALTER TYPE "EmailKind" ADD VALUE IF NOT EXISTS 'PROFESSIONAL_CONNECTION_UPDATED';
-ALTER TYPE "ProfessionalConnectionStatus" ADD VALUE IF NOT EXISTS 'REVOKED';
+
+ALTER TABLE "ProfessionalConnection"
+  ALTER COLUMN "state" DROP DEFAULT;
+CREATE TYPE "ProfessionalConnectionStatus_next" AS ENUM ('ACCEPTED', 'REVOKED');
+ALTER TABLE "ProfessionalConnection"
+  ALTER COLUMN "state" TYPE "ProfessionalConnectionStatus_next"
+  USING ("state"::text::"ProfessionalConnectionStatus_next");
+DROP TYPE "ProfessionalConnectionStatus";
+ALTER TYPE "ProfessionalConnectionStatus_next"
+  RENAME TO "ProfessionalConnectionStatus";
+ALTER TABLE "ProfessionalConnection"
+  ALTER COLUMN "state" SET DEFAULT 'ACCEPTED';
 
 DO $$ BEGIN
   CREATE TYPE "ProfessionalConnectionProposalState" AS ENUM (
