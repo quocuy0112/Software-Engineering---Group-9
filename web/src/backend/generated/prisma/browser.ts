@@ -343,6 +343,16 @@ export type UserMessagingBlock = Prisma.UserMessagingBlockModel
  */
 export type MessagingReport = Prisma.MessagingReportModel
 /**
+ * Model MessagingReportReviewEvent
+ * 
+ */
+export type MessagingReportReviewEvent = Prisma.MessagingReportReviewEventModel
+/**
+ * Model MessagingReportPrivateNote
+ * 
+ */
+export type MessagingReportPrivateNote = Prisma.MessagingReportPrivateNoteModel
+/**
  * Model ApplicationStageEvent
  * 
  */

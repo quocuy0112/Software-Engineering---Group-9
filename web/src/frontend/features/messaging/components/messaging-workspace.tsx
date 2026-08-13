@@ -25,10 +25,15 @@ export function MessagingWorkspace({
 }) {
   const conversations = useConversations(initialConversations);
   const [selectedId, setSelectedId] = useState(initialConversationId);
-  const history = useMessageHistory(selectedId, csrfProof);
+  const history = useMessageHistory(
+    selectedId,
+    csrfProof,
+    conversations.clearUnread,
+  );
   const {
     addMessage,
     loadOlder,
+    markReadThrough,
     refresh: refreshHistory,
     setPage,
     setPresence,
@@ -48,9 +53,23 @@ export function MessagingWorkspace({
   const onMessage = useCallback(
     (message: Parameters<typeof addMessage>[0]) => {
       addMessage(message);
-      void refreshConversations();
+      if (
+        message.conversationId === selectedId &&
+        message.senderId !== currentUserId &&
+        document.visibilityState === "visible"
+      ) {
+        void markReadThrough(message.sequence).finally(refreshConversations);
+      } else {
+        void refreshConversations();
+      }
     },
-    [addMessage, refreshConversations],
+    [
+      addMessage,
+      currentUserId,
+      markReadThrough,
+      refreshConversations,
+      selectedId,
+    ],
   );
   const onRead = useCallback(() => void refreshHistory(), [refreshHistory]);
   const onAccessRevoked = useCallback(

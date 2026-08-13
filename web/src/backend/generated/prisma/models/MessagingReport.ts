@@ -20,8 +20,18 @@ export type MessagingReportModel = runtime.Types.Result.DefaultSelection<Prisma.
 
 export type AggregateMessagingReport = {
   _count: MessagingReportCountAggregateOutputType | null
+  _avg: MessagingReportAvgAggregateOutputType | null
+  _sum: MessagingReportSumAggregateOutputType | null
   _min: MessagingReportMinAggregateOutputType | null
   _max: MessagingReportMaxAggregateOutputType | null
+}
+
+export type MessagingReportAvgAggregateOutputType = {
+  version: number | null
+}
+
+export type MessagingReportSumAggregateOutputType = {
+  version: number | null
 }
 
 export type MessagingReportMinAggregateOutputType = {
@@ -34,6 +44,10 @@ export type MessagingReportMinAggregateOutputType = {
   category: $Enums.ModerationReportCategory | null
   normalizedDetail: string | null
   state: $Enums.ModerationReportState | null
+  assignedAdminUserId: string | null
+  handledByAdminUserId: string | null
+  enforcementCorrelationId: string | null
+  version: number | null
   unresolvedKey: string | null
   handledAt: Date | null
   preserveUntil: Date | null
@@ -51,6 +65,10 @@ export type MessagingReportMaxAggregateOutputType = {
   category: $Enums.ModerationReportCategory | null
   normalizedDetail: string | null
   state: $Enums.ModerationReportState | null
+  assignedAdminUserId: string | null
+  handledByAdminUserId: string | null
+  enforcementCorrelationId: string | null
+  version: number | null
   unresolvedKey: string | null
   handledAt: Date | null
   preserveUntil: Date | null
@@ -68,6 +86,10 @@ export type MessagingReportCountAggregateOutputType = {
   category: number
   normalizedDetail: number
   state: number
+  assignedAdminUserId: number
+  handledByAdminUserId: number
+  enforcementCorrelationId: number
+  version: number
   unresolvedKey: number
   handledAt: number
   preserveUntil: number
@@ -76,6 +98,14 @@ export type MessagingReportCountAggregateOutputType = {
   _all: number
 }
 
+
+export type MessagingReportAvgAggregateInputType = {
+  version?: true
+}
+
+export type MessagingReportSumAggregateInputType = {
+  version?: true
+}
 
 export type MessagingReportMinAggregateInputType = {
   id?: true
@@ -87,6 +117,10 @@ export type MessagingReportMinAggregateInputType = {
   category?: true
   normalizedDetail?: true
   state?: true
+  assignedAdminUserId?: true
+  handledByAdminUserId?: true
+  enforcementCorrelationId?: true
+  version?: true
   unresolvedKey?: true
   handledAt?: true
   preserveUntil?: true
@@ -104,6 +138,10 @@ export type MessagingReportMaxAggregateInputType = {
   category?: true
   normalizedDetail?: true
   state?: true
+  assignedAdminUserId?: true
+  handledByAdminUserId?: true
+  enforcementCorrelationId?: true
+  version?: true
   unresolvedKey?: true
   handledAt?: true
   preserveUntil?: true
@@ -121,6 +159,10 @@ export type MessagingReportCountAggregateInputType = {
   category?: true
   normalizedDetail?: true
   state?: true
+  assignedAdminUserId?: true
+  handledByAdminUserId?: true
+  enforcementCorrelationId?: true
+  version?: true
   unresolvedKey?: true
   handledAt?: true
   preserveUntil?: true
@@ -167,6 +209,18 @@ export type MessagingReportAggregateArgs<ExtArgs extends runtime.Types.Extension
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: MessagingReportAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: MessagingReportSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: MessagingReportMinAggregateInputType
@@ -197,6 +251,8 @@ export type MessagingReportGroupByArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   _count?: MessagingReportCountAggregateInputType | true
+  _avg?: MessagingReportAvgAggregateInputType
+  _sum?: MessagingReportSumAggregateInputType
   _min?: MessagingReportMinAggregateInputType
   _max?: MessagingReportMaxAggregateInputType
 }
@@ -211,12 +267,18 @@ export type MessagingReportGroupByOutputType = {
   category: $Enums.ModerationReportCategory
   normalizedDetail: string | null
   state: $Enums.ModerationReportState
+  assignedAdminUserId: string | null
+  handledByAdminUserId: string | null
+  enforcementCorrelationId: string | null
+  version: number
   unresolvedKey: string | null
   handledAt: Date | null
   preserveUntil: Date | null
   createdAt: Date
   updatedAt: Date
   _count: MessagingReportCountAggregateOutputType | null
+  _avg: MessagingReportAvgAggregateOutputType | null
+  _sum: MessagingReportSumAggregateOutputType | null
   _min: MessagingReportMinAggregateOutputType | null
   _max: MessagingReportMaxAggregateOutputType | null
 }
@@ -249,6 +311,10 @@ export type MessagingReportWhereInput = {
   category?: Prisma.EnumModerationReportCategoryFilter<"MessagingReport"> | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
   state?: Prisma.EnumModerationReportStateFilter<"MessagingReport"> | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
+  handledByAdminUserId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
+  enforcementCorrelationId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
+  version?: Prisma.IntFilter<"MessagingReport"> | number
   unresolvedKey?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
   handledAt?: Prisma.DateTimeNullableFilter<"MessagingReport"> | Date | string | null
   preserveUntil?: Prisma.DateTimeNullableFilter<"MessagingReport"> | Date | string | null
@@ -256,8 +322,12 @@ export type MessagingReportWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"MessagingReport"> | Date | string
   reporter?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   target?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
+  assignedAdmin?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
+  handledByAdmin?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
   conversation?: Prisma.XOR<Prisma.MessagingConversationScalarRelationFilter, Prisma.MessagingConversationWhereInput>
   evidenceMessage?: Prisma.XOR<Prisma.MessagingMessageNullableScalarRelationFilter, Prisma.MessagingMessageWhereInput> | null
+  reviewEvents?: Prisma.MessagingReportReviewEventListRelationFilter
+  privateNotes?: Prisma.MessagingReportPrivateNoteListRelationFilter
 }
 
 export type MessagingReportOrderByWithRelationInput = {
@@ -270,6 +340,10 @@ export type MessagingReportOrderByWithRelationInput = {
   category?: Prisma.SortOrder
   normalizedDetail?: Prisma.SortOrderInput | Prisma.SortOrder
   state?: Prisma.SortOrder
+  assignedAdminUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  handledByAdminUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  enforcementCorrelationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  version?: Prisma.SortOrder
   unresolvedKey?: Prisma.SortOrderInput | Prisma.SortOrder
   handledAt?: Prisma.SortOrderInput | Prisma.SortOrder
   preserveUntil?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -277,8 +351,12 @@ export type MessagingReportOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   reporter?: Prisma.UserAccountOrderByWithRelationInput
   target?: Prisma.UserAccountOrderByWithRelationInput
+  assignedAdmin?: Prisma.UserAccountOrderByWithRelationInput
+  handledByAdmin?: Prisma.UserAccountOrderByWithRelationInput
   conversation?: Prisma.MessagingConversationOrderByWithRelationInput
   evidenceMessage?: Prisma.MessagingMessageOrderByWithRelationInput
+  reviewEvents?: Prisma.MessagingReportReviewEventOrderByRelationAggregateInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteOrderByRelationAggregateInput
 }
 
 export type MessagingReportWhereUniqueInput = Prisma.AtLeast<{
@@ -295,14 +373,22 @@ export type MessagingReportWhereUniqueInput = Prisma.AtLeast<{
   category?: Prisma.EnumModerationReportCategoryFilter<"MessagingReport"> | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
   state?: Prisma.EnumModerationReportStateFilter<"MessagingReport"> | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
+  handledByAdminUserId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
+  enforcementCorrelationId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
+  version?: Prisma.IntFilter<"MessagingReport"> | number
   handledAt?: Prisma.DateTimeNullableFilter<"MessagingReport"> | Date | string | null
   preserveUntil?: Prisma.DateTimeNullableFilter<"MessagingReport"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"MessagingReport"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MessagingReport"> | Date | string
   reporter?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   target?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
+  assignedAdmin?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
+  handledByAdmin?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
   conversation?: Prisma.XOR<Prisma.MessagingConversationScalarRelationFilter, Prisma.MessagingConversationWhereInput>
   evidenceMessage?: Prisma.XOR<Prisma.MessagingMessageNullableScalarRelationFilter, Prisma.MessagingMessageWhereInput> | null
+  reviewEvents?: Prisma.MessagingReportReviewEventListRelationFilter
+  privateNotes?: Prisma.MessagingReportPrivateNoteListRelationFilter
 }, "id" | "unresolvedKey">
 
 export type MessagingReportOrderByWithAggregationInput = {
@@ -315,14 +401,20 @@ export type MessagingReportOrderByWithAggregationInput = {
   category?: Prisma.SortOrder
   normalizedDetail?: Prisma.SortOrderInput | Prisma.SortOrder
   state?: Prisma.SortOrder
+  assignedAdminUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  handledByAdminUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  enforcementCorrelationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  version?: Prisma.SortOrder
   unresolvedKey?: Prisma.SortOrderInput | Prisma.SortOrder
   handledAt?: Prisma.SortOrderInput | Prisma.SortOrder
   preserveUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.MessagingReportCountOrderByAggregateInput
+  _avg?: Prisma.MessagingReportAvgOrderByAggregateInput
   _max?: Prisma.MessagingReportMaxOrderByAggregateInput
   _min?: Prisma.MessagingReportMinOrderByAggregateInput
+  _sum?: Prisma.MessagingReportSumOrderByAggregateInput
 }
 
 export type MessagingReportScalarWhereWithAggregatesInput = {
@@ -338,6 +430,10 @@ export type MessagingReportScalarWhereWithAggregatesInput = {
   category?: Prisma.EnumModerationReportCategoryWithAggregatesFilter<"MessagingReport"> | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.StringNullableWithAggregatesFilter<"MessagingReport"> | string | null
   state?: Prisma.EnumModerationReportStateWithAggregatesFilter<"MessagingReport"> | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.StringNullableWithAggregatesFilter<"MessagingReport"> | string | null
+  handledByAdminUserId?: Prisma.StringNullableWithAggregatesFilter<"MessagingReport"> | string | null
+  enforcementCorrelationId?: Prisma.StringNullableWithAggregatesFilter<"MessagingReport"> | string | null
+  version?: Prisma.IntWithAggregatesFilter<"MessagingReport"> | number
   unresolvedKey?: Prisma.StringNullableWithAggregatesFilter<"MessagingReport"> | string | null
   handledAt?: Prisma.DateTimeNullableWithAggregatesFilter<"MessagingReport"> | Date | string | null
   preserveUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"MessagingReport"> | Date | string | null
@@ -351,6 +447,8 @@ export type MessagingReportCreateInput = {
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
+  enforcementCorrelationId?: string | null
+  version?: number
   unresolvedKey?: string | null
   handledAt?: Date | string | null
   preserveUntil?: Date | string | null
@@ -358,8 +456,12 @@ export type MessagingReportCreateInput = {
   updatedAt?: Date | string
   reporter: Prisma.UserAccountCreateNestedOneWithoutSubmittedMessagingReportsInput
   target: Prisma.UserAccountCreateNestedOneWithoutTargetedMessagingReportsInput
+  assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
+  handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
   conversation: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
   evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
 }
 
 export type MessagingReportUncheckedCreateInput = {
@@ -372,11 +474,17 @@ export type MessagingReportUncheckedCreateInput = {
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
   unresolvedKey?: string | null
   handledAt?: Date | string | null
   preserveUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedCreateNestedManyWithoutReportInput
 }
 
 export type MessagingReportUpdateInput = {
@@ -385,6 +493,8 @@ export type MessagingReportUpdateInput = {
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -392,8 +502,12 @@ export type MessagingReportUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reporter?: Prisma.UserAccountUpdateOneRequiredWithoutSubmittedMessagingReportsNestedInput
   target?: Prisma.UserAccountUpdateOneRequiredWithoutTargetedMessagingReportsNestedInput
+  assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
+  handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
   conversation?: Prisma.MessagingConversationUpdateOneRequiredWithoutReportsNestedInput
   evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
 }
 
 export type MessagingReportUncheckedUpdateInput = {
@@ -406,11 +520,17 @@ export type MessagingReportUncheckedUpdateInput = {
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedUpdateManyWithoutReportNestedInput
 }
 
 export type MessagingReportCreateManyInput = {
@@ -423,6 +543,10 @@ export type MessagingReportCreateManyInput = {
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
   unresolvedKey?: string | null
   handledAt?: Date | string | null
   preserveUntil?: Date | string | null
@@ -436,6 +560,8 @@ export type MessagingReportUpdateManyMutationInput = {
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -453,6 +579,10 @@ export type MessagingReportUncheckedUpdateManyInput = {
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -480,11 +610,19 @@ export type MessagingReportCountOrderByAggregateInput = {
   category?: Prisma.SortOrder
   normalizedDetail?: Prisma.SortOrder
   state?: Prisma.SortOrder
+  assignedAdminUserId?: Prisma.SortOrder
+  handledByAdminUserId?: Prisma.SortOrder
+  enforcementCorrelationId?: Prisma.SortOrder
+  version?: Prisma.SortOrder
   unresolvedKey?: Prisma.SortOrder
   handledAt?: Prisma.SortOrder
   preserveUntil?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type MessagingReportAvgOrderByAggregateInput = {
+  version?: Prisma.SortOrder
 }
 
 export type MessagingReportMaxOrderByAggregateInput = {
@@ -497,6 +635,10 @@ export type MessagingReportMaxOrderByAggregateInput = {
   category?: Prisma.SortOrder
   normalizedDetail?: Prisma.SortOrder
   state?: Prisma.SortOrder
+  assignedAdminUserId?: Prisma.SortOrder
+  handledByAdminUserId?: Prisma.SortOrder
+  enforcementCorrelationId?: Prisma.SortOrder
+  version?: Prisma.SortOrder
   unresolvedKey?: Prisma.SortOrder
   handledAt?: Prisma.SortOrder
   preserveUntil?: Prisma.SortOrder
@@ -514,11 +656,24 @@ export type MessagingReportMinOrderByAggregateInput = {
   category?: Prisma.SortOrder
   normalizedDetail?: Prisma.SortOrder
   state?: Prisma.SortOrder
+  assignedAdminUserId?: Prisma.SortOrder
+  handledByAdminUserId?: Prisma.SortOrder
+  enforcementCorrelationId?: Prisma.SortOrder
+  version?: Prisma.SortOrder
   unresolvedKey?: Prisma.SortOrder
   handledAt?: Prisma.SortOrder
   preserveUntil?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type MessagingReportSumOrderByAggregateInput = {
+  version?: Prisma.SortOrder
+}
+
+export type MessagingReportScalarRelationFilter = {
+  is?: Prisma.MessagingReportWhereInput
+  isNot?: Prisma.MessagingReportWhereInput
 }
 
 export type MessagingReportCreateNestedManyWithoutReporterInput = {
@@ -535,6 +690,20 @@ export type MessagingReportCreateNestedManyWithoutTargetInput = {
   connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
 }
 
+export type MessagingReportCreateNestedManyWithoutAssignedAdminInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutAssignedAdminInput, Prisma.MessagingReportUncheckedCreateWithoutAssignedAdminInput> | Prisma.MessagingReportCreateWithoutAssignedAdminInput[] | Prisma.MessagingReportUncheckedCreateWithoutAssignedAdminInput[]
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutAssignedAdminInput | Prisma.MessagingReportCreateOrConnectWithoutAssignedAdminInput[]
+  createMany?: Prisma.MessagingReportCreateManyAssignedAdminInputEnvelope
+  connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+}
+
+export type MessagingReportCreateNestedManyWithoutHandledByAdminInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutHandledByAdminInput, Prisma.MessagingReportUncheckedCreateWithoutHandledByAdminInput> | Prisma.MessagingReportCreateWithoutHandledByAdminInput[] | Prisma.MessagingReportUncheckedCreateWithoutHandledByAdminInput[]
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutHandledByAdminInput | Prisma.MessagingReportCreateOrConnectWithoutHandledByAdminInput[]
+  createMany?: Prisma.MessagingReportCreateManyHandledByAdminInputEnvelope
+  connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+}
+
 export type MessagingReportUncheckedCreateNestedManyWithoutReporterInput = {
   create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutReporterInput, Prisma.MessagingReportUncheckedCreateWithoutReporterInput> | Prisma.MessagingReportCreateWithoutReporterInput[] | Prisma.MessagingReportUncheckedCreateWithoutReporterInput[]
   connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutReporterInput | Prisma.MessagingReportCreateOrConnectWithoutReporterInput[]
@@ -546,6 +715,20 @@ export type MessagingReportUncheckedCreateNestedManyWithoutTargetInput = {
   create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutTargetInput, Prisma.MessagingReportUncheckedCreateWithoutTargetInput> | Prisma.MessagingReportCreateWithoutTargetInput[] | Prisma.MessagingReportUncheckedCreateWithoutTargetInput[]
   connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutTargetInput | Prisma.MessagingReportCreateOrConnectWithoutTargetInput[]
   createMany?: Prisma.MessagingReportCreateManyTargetInputEnvelope
+  connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+}
+
+export type MessagingReportUncheckedCreateNestedManyWithoutAssignedAdminInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutAssignedAdminInput, Prisma.MessagingReportUncheckedCreateWithoutAssignedAdminInput> | Prisma.MessagingReportCreateWithoutAssignedAdminInput[] | Prisma.MessagingReportUncheckedCreateWithoutAssignedAdminInput[]
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutAssignedAdminInput | Prisma.MessagingReportCreateOrConnectWithoutAssignedAdminInput[]
+  createMany?: Prisma.MessagingReportCreateManyAssignedAdminInputEnvelope
+  connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+}
+
+export type MessagingReportUncheckedCreateNestedManyWithoutHandledByAdminInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutHandledByAdminInput, Prisma.MessagingReportUncheckedCreateWithoutHandledByAdminInput> | Prisma.MessagingReportCreateWithoutHandledByAdminInput[] | Prisma.MessagingReportUncheckedCreateWithoutHandledByAdminInput[]
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutHandledByAdminInput | Prisma.MessagingReportCreateOrConnectWithoutHandledByAdminInput[]
+  createMany?: Prisma.MessagingReportCreateManyHandledByAdminInputEnvelope
   connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
 }
 
@@ -577,6 +760,34 @@ export type MessagingReportUpdateManyWithoutTargetNestedInput = {
   deleteMany?: Prisma.MessagingReportScalarWhereInput | Prisma.MessagingReportScalarWhereInput[]
 }
 
+export type MessagingReportUpdateManyWithoutAssignedAdminNestedInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutAssignedAdminInput, Prisma.MessagingReportUncheckedCreateWithoutAssignedAdminInput> | Prisma.MessagingReportCreateWithoutAssignedAdminInput[] | Prisma.MessagingReportUncheckedCreateWithoutAssignedAdminInput[]
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutAssignedAdminInput | Prisma.MessagingReportCreateOrConnectWithoutAssignedAdminInput[]
+  upsert?: Prisma.MessagingReportUpsertWithWhereUniqueWithoutAssignedAdminInput | Prisma.MessagingReportUpsertWithWhereUniqueWithoutAssignedAdminInput[]
+  createMany?: Prisma.MessagingReportCreateManyAssignedAdminInputEnvelope
+  set?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  disconnect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  delete?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  update?: Prisma.MessagingReportUpdateWithWhereUniqueWithoutAssignedAdminInput | Prisma.MessagingReportUpdateWithWhereUniqueWithoutAssignedAdminInput[]
+  updateMany?: Prisma.MessagingReportUpdateManyWithWhereWithoutAssignedAdminInput | Prisma.MessagingReportUpdateManyWithWhereWithoutAssignedAdminInput[]
+  deleteMany?: Prisma.MessagingReportScalarWhereInput | Prisma.MessagingReportScalarWhereInput[]
+}
+
+export type MessagingReportUpdateManyWithoutHandledByAdminNestedInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutHandledByAdminInput, Prisma.MessagingReportUncheckedCreateWithoutHandledByAdminInput> | Prisma.MessagingReportCreateWithoutHandledByAdminInput[] | Prisma.MessagingReportUncheckedCreateWithoutHandledByAdminInput[]
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutHandledByAdminInput | Prisma.MessagingReportCreateOrConnectWithoutHandledByAdminInput[]
+  upsert?: Prisma.MessagingReportUpsertWithWhereUniqueWithoutHandledByAdminInput | Prisma.MessagingReportUpsertWithWhereUniqueWithoutHandledByAdminInput[]
+  createMany?: Prisma.MessagingReportCreateManyHandledByAdminInputEnvelope
+  set?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  disconnect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  delete?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  update?: Prisma.MessagingReportUpdateWithWhereUniqueWithoutHandledByAdminInput | Prisma.MessagingReportUpdateWithWhereUniqueWithoutHandledByAdminInput[]
+  updateMany?: Prisma.MessagingReportUpdateManyWithWhereWithoutHandledByAdminInput | Prisma.MessagingReportUpdateManyWithWhereWithoutHandledByAdminInput[]
+  deleteMany?: Prisma.MessagingReportScalarWhereInput | Prisma.MessagingReportScalarWhereInput[]
+}
+
 export type MessagingReportUncheckedUpdateManyWithoutReporterNestedInput = {
   create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutReporterInput, Prisma.MessagingReportUncheckedCreateWithoutReporterInput> | Prisma.MessagingReportCreateWithoutReporterInput[] | Prisma.MessagingReportUncheckedCreateWithoutReporterInput[]
   connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutReporterInput | Prisma.MessagingReportCreateOrConnectWithoutReporterInput[]
@@ -602,6 +813,34 @@ export type MessagingReportUncheckedUpdateManyWithoutTargetNestedInput = {
   connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
   update?: Prisma.MessagingReportUpdateWithWhereUniqueWithoutTargetInput | Prisma.MessagingReportUpdateWithWhereUniqueWithoutTargetInput[]
   updateMany?: Prisma.MessagingReportUpdateManyWithWhereWithoutTargetInput | Prisma.MessagingReportUpdateManyWithWhereWithoutTargetInput[]
+  deleteMany?: Prisma.MessagingReportScalarWhereInput | Prisma.MessagingReportScalarWhereInput[]
+}
+
+export type MessagingReportUncheckedUpdateManyWithoutAssignedAdminNestedInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutAssignedAdminInput, Prisma.MessagingReportUncheckedCreateWithoutAssignedAdminInput> | Prisma.MessagingReportCreateWithoutAssignedAdminInput[] | Prisma.MessagingReportUncheckedCreateWithoutAssignedAdminInput[]
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutAssignedAdminInput | Prisma.MessagingReportCreateOrConnectWithoutAssignedAdminInput[]
+  upsert?: Prisma.MessagingReportUpsertWithWhereUniqueWithoutAssignedAdminInput | Prisma.MessagingReportUpsertWithWhereUniqueWithoutAssignedAdminInput[]
+  createMany?: Prisma.MessagingReportCreateManyAssignedAdminInputEnvelope
+  set?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  disconnect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  delete?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  update?: Prisma.MessagingReportUpdateWithWhereUniqueWithoutAssignedAdminInput | Prisma.MessagingReportUpdateWithWhereUniqueWithoutAssignedAdminInput[]
+  updateMany?: Prisma.MessagingReportUpdateManyWithWhereWithoutAssignedAdminInput | Prisma.MessagingReportUpdateManyWithWhereWithoutAssignedAdminInput[]
+  deleteMany?: Prisma.MessagingReportScalarWhereInput | Prisma.MessagingReportScalarWhereInput[]
+}
+
+export type MessagingReportUncheckedUpdateManyWithoutHandledByAdminNestedInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutHandledByAdminInput, Prisma.MessagingReportUncheckedCreateWithoutHandledByAdminInput> | Prisma.MessagingReportCreateWithoutHandledByAdminInput[] | Prisma.MessagingReportUncheckedCreateWithoutHandledByAdminInput[]
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutHandledByAdminInput | Prisma.MessagingReportCreateOrConnectWithoutHandledByAdminInput[]
+  upsert?: Prisma.MessagingReportUpsertWithWhereUniqueWithoutHandledByAdminInput | Prisma.MessagingReportUpsertWithWhereUniqueWithoutHandledByAdminInput[]
+  createMany?: Prisma.MessagingReportCreateManyHandledByAdminInputEnvelope
+  set?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  disconnect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  delete?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  connect?: Prisma.MessagingReportWhereUniqueInput | Prisma.MessagingReportWhereUniqueInput[]
+  update?: Prisma.MessagingReportUpdateWithWhereUniqueWithoutHandledByAdminInput | Prisma.MessagingReportUpdateWithWhereUniqueWithoutHandledByAdminInput[]
+  updateMany?: Prisma.MessagingReportUpdateManyWithWhereWithoutHandledByAdminInput | Prisma.MessagingReportUpdateManyWithWhereWithoutHandledByAdminInput[]
   deleteMany?: Prisma.MessagingReportScalarWhereInput | Prisma.MessagingReportScalarWhereInput[]
 }
 
@@ -693,20 +932,54 @@ export type EnumMessagingReportTargetTypeFieldUpdateOperationsInput = {
   set?: $Enums.MessagingReportTargetType
 }
 
+export type MessagingReportCreateNestedOneWithoutReviewEventsInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutReviewEventsInput, Prisma.MessagingReportUncheckedCreateWithoutReviewEventsInput>
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutReviewEventsInput
+  connect?: Prisma.MessagingReportWhereUniqueInput
+}
+
+export type MessagingReportUpdateOneRequiredWithoutReviewEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutReviewEventsInput, Prisma.MessagingReportUncheckedCreateWithoutReviewEventsInput>
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutReviewEventsInput
+  upsert?: Prisma.MessagingReportUpsertWithoutReviewEventsInput
+  connect?: Prisma.MessagingReportWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MessagingReportUpdateToOneWithWhereWithoutReviewEventsInput, Prisma.MessagingReportUpdateWithoutReviewEventsInput>, Prisma.MessagingReportUncheckedUpdateWithoutReviewEventsInput>
+}
+
+export type MessagingReportCreateNestedOneWithoutPrivateNotesInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutPrivateNotesInput, Prisma.MessagingReportUncheckedCreateWithoutPrivateNotesInput>
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutPrivateNotesInput
+  connect?: Prisma.MessagingReportWhereUniqueInput
+}
+
+export type MessagingReportUpdateOneRequiredWithoutPrivateNotesNestedInput = {
+  create?: Prisma.XOR<Prisma.MessagingReportCreateWithoutPrivateNotesInput, Prisma.MessagingReportUncheckedCreateWithoutPrivateNotesInput>
+  connectOrCreate?: Prisma.MessagingReportCreateOrConnectWithoutPrivateNotesInput
+  upsert?: Prisma.MessagingReportUpsertWithoutPrivateNotesInput
+  connect?: Prisma.MessagingReportWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MessagingReportUpdateToOneWithWhereWithoutPrivateNotesInput, Prisma.MessagingReportUpdateWithoutPrivateNotesInput>, Prisma.MessagingReportUncheckedUpdateWithoutPrivateNotesInput>
+}
+
 export type MessagingReportCreateWithoutReporterInput = {
   id?: string
   targetType: $Enums.MessagingReportTargetType
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
+  enforcementCorrelationId?: string | null
+  version?: number
   unresolvedKey?: string | null
   handledAt?: Date | string | null
   preserveUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   target: Prisma.UserAccountCreateNestedOneWithoutTargetedMessagingReportsInput
+  assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
+  handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
   conversation: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
   evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
 }
 
 export type MessagingReportUncheckedCreateWithoutReporterInput = {
@@ -718,11 +991,17 @@ export type MessagingReportUncheckedCreateWithoutReporterInput = {
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
   unresolvedKey?: string | null
   handledAt?: Date | string | null
   preserveUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedCreateNestedManyWithoutReportInput
 }
 
 export type MessagingReportCreateOrConnectWithoutReporterInput = {
@@ -741,14 +1020,20 @@ export type MessagingReportCreateWithoutTargetInput = {
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
+  enforcementCorrelationId?: string | null
+  version?: number
   unresolvedKey?: string | null
   handledAt?: Date | string | null
   preserveUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   reporter: Prisma.UserAccountCreateNestedOneWithoutSubmittedMessagingReportsInput
+  assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
+  handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
   conversation: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
   evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
 }
 
 export type MessagingReportUncheckedCreateWithoutTargetInput = {
@@ -760,11 +1045,17 @@ export type MessagingReportUncheckedCreateWithoutTargetInput = {
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
   unresolvedKey?: string | null
   handledAt?: Date | string | null
   preserveUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedCreateNestedManyWithoutReportInput
 }
 
 export type MessagingReportCreateOrConnectWithoutTargetInput = {
@@ -774,6 +1065,114 @@ export type MessagingReportCreateOrConnectWithoutTargetInput = {
 
 export type MessagingReportCreateManyTargetInputEnvelope = {
   data: Prisma.MessagingReportCreateManyTargetInput | Prisma.MessagingReportCreateManyTargetInput[]
+  skipDuplicates?: boolean
+}
+
+export type MessagingReportCreateWithoutAssignedAdminInput = {
+  id?: string
+  targetType: $Enums.MessagingReportTargetType
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  state?: $Enums.ModerationReportState
+  enforcementCorrelationId?: string | null
+  version?: number
+  unresolvedKey?: string | null
+  handledAt?: Date | string | null
+  preserveUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reporter: Prisma.UserAccountCreateNestedOneWithoutSubmittedMessagingReportsInput
+  target: Prisma.UserAccountCreateNestedOneWithoutTargetedMessagingReportsInput
+  handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
+  conversation: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
+  evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
+}
+
+export type MessagingReportUncheckedCreateWithoutAssignedAdminInput = {
+  id?: string
+  reporterUserId: string
+  targetUserId: string
+  conversationId: string
+  targetType: $Enums.MessagingReportTargetType
+  evidenceMessageId?: string | null
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  state?: $Enums.ModerationReportState
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
+  unresolvedKey?: string | null
+  handledAt?: Date | string | null
+  preserveUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedCreateNestedManyWithoutReportInput
+}
+
+export type MessagingReportCreateOrConnectWithoutAssignedAdminInput = {
+  where: Prisma.MessagingReportWhereUniqueInput
+  create: Prisma.XOR<Prisma.MessagingReportCreateWithoutAssignedAdminInput, Prisma.MessagingReportUncheckedCreateWithoutAssignedAdminInput>
+}
+
+export type MessagingReportCreateManyAssignedAdminInputEnvelope = {
+  data: Prisma.MessagingReportCreateManyAssignedAdminInput | Prisma.MessagingReportCreateManyAssignedAdminInput[]
+  skipDuplicates?: boolean
+}
+
+export type MessagingReportCreateWithoutHandledByAdminInput = {
+  id?: string
+  targetType: $Enums.MessagingReportTargetType
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  state?: $Enums.ModerationReportState
+  enforcementCorrelationId?: string | null
+  version?: number
+  unresolvedKey?: string | null
+  handledAt?: Date | string | null
+  preserveUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reporter: Prisma.UserAccountCreateNestedOneWithoutSubmittedMessagingReportsInput
+  target: Prisma.UserAccountCreateNestedOneWithoutTargetedMessagingReportsInput
+  assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
+  conversation: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
+  evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
+}
+
+export type MessagingReportUncheckedCreateWithoutHandledByAdminInput = {
+  id?: string
+  reporterUserId: string
+  targetUserId: string
+  conversationId: string
+  targetType: $Enums.MessagingReportTargetType
+  evidenceMessageId?: string | null
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
+  unresolvedKey?: string | null
+  handledAt?: Date | string | null
+  preserveUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedCreateNestedManyWithoutReportInput
+}
+
+export type MessagingReportCreateOrConnectWithoutHandledByAdminInput = {
+  where: Prisma.MessagingReportWhereUniqueInput
+  create: Prisma.XOR<Prisma.MessagingReportCreateWithoutHandledByAdminInput, Prisma.MessagingReportUncheckedCreateWithoutHandledByAdminInput>
+}
+
+export type MessagingReportCreateManyHandledByAdminInputEnvelope = {
+  data: Prisma.MessagingReportCreateManyHandledByAdminInput | Prisma.MessagingReportCreateManyHandledByAdminInput[]
   skipDuplicates?: boolean
 }
 
@@ -806,6 +1205,10 @@ export type MessagingReportScalarWhereInput = {
   category?: Prisma.EnumModerationReportCategoryFilter<"MessagingReport"> | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
   state?: Prisma.EnumModerationReportStateFilter<"MessagingReport"> | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
+  handledByAdminUserId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
+  enforcementCorrelationId?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
+  version?: Prisma.IntFilter<"MessagingReport"> | number
   unresolvedKey?: Prisma.StringNullableFilter<"MessagingReport"> | string | null
   handledAt?: Prisma.DateTimeNullableFilter<"MessagingReport"> | Date | string | null
   preserveUntil?: Prisma.DateTimeNullableFilter<"MessagingReport"> | Date | string | null
@@ -829,12 +1232,46 @@ export type MessagingReportUpdateManyWithWhereWithoutTargetInput = {
   data: Prisma.XOR<Prisma.MessagingReportUpdateManyMutationInput, Prisma.MessagingReportUncheckedUpdateManyWithoutTargetInput>
 }
 
+export type MessagingReportUpsertWithWhereUniqueWithoutAssignedAdminInput = {
+  where: Prisma.MessagingReportWhereUniqueInput
+  update: Prisma.XOR<Prisma.MessagingReportUpdateWithoutAssignedAdminInput, Prisma.MessagingReportUncheckedUpdateWithoutAssignedAdminInput>
+  create: Prisma.XOR<Prisma.MessagingReportCreateWithoutAssignedAdminInput, Prisma.MessagingReportUncheckedCreateWithoutAssignedAdminInput>
+}
+
+export type MessagingReportUpdateWithWhereUniqueWithoutAssignedAdminInput = {
+  where: Prisma.MessagingReportWhereUniqueInput
+  data: Prisma.XOR<Prisma.MessagingReportUpdateWithoutAssignedAdminInput, Prisma.MessagingReportUncheckedUpdateWithoutAssignedAdminInput>
+}
+
+export type MessagingReportUpdateManyWithWhereWithoutAssignedAdminInput = {
+  where: Prisma.MessagingReportScalarWhereInput
+  data: Prisma.XOR<Prisma.MessagingReportUpdateManyMutationInput, Prisma.MessagingReportUncheckedUpdateManyWithoutAssignedAdminInput>
+}
+
+export type MessagingReportUpsertWithWhereUniqueWithoutHandledByAdminInput = {
+  where: Prisma.MessagingReportWhereUniqueInput
+  update: Prisma.XOR<Prisma.MessagingReportUpdateWithoutHandledByAdminInput, Prisma.MessagingReportUncheckedUpdateWithoutHandledByAdminInput>
+  create: Prisma.XOR<Prisma.MessagingReportCreateWithoutHandledByAdminInput, Prisma.MessagingReportUncheckedCreateWithoutHandledByAdminInput>
+}
+
+export type MessagingReportUpdateWithWhereUniqueWithoutHandledByAdminInput = {
+  where: Prisma.MessagingReportWhereUniqueInput
+  data: Prisma.XOR<Prisma.MessagingReportUpdateWithoutHandledByAdminInput, Prisma.MessagingReportUncheckedUpdateWithoutHandledByAdminInput>
+}
+
+export type MessagingReportUpdateManyWithWhereWithoutHandledByAdminInput = {
+  where: Prisma.MessagingReportScalarWhereInput
+  data: Prisma.XOR<Prisma.MessagingReportUpdateManyMutationInput, Prisma.MessagingReportUncheckedUpdateManyWithoutHandledByAdminInput>
+}
+
 export type MessagingReportCreateWithoutConversationInput = {
   id?: string
   targetType: $Enums.MessagingReportTargetType
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
+  enforcementCorrelationId?: string | null
+  version?: number
   unresolvedKey?: string | null
   handledAt?: Date | string | null
   preserveUntil?: Date | string | null
@@ -842,7 +1279,11 @@ export type MessagingReportCreateWithoutConversationInput = {
   updatedAt?: Date | string
   reporter: Prisma.UserAccountCreateNestedOneWithoutSubmittedMessagingReportsInput
   target: Prisma.UserAccountCreateNestedOneWithoutTargetedMessagingReportsInput
+  assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
+  handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
   evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
 }
 
 export type MessagingReportUncheckedCreateWithoutConversationInput = {
@@ -854,11 +1295,17 @@ export type MessagingReportUncheckedCreateWithoutConversationInput = {
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
   unresolvedKey?: string | null
   handledAt?: Date | string | null
   preserveUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedCreateNestedManyWithoutReportInput
 }
 
 export type MessagingReportCreateOrConnectWithoutConversationInput = {
@@ -893,6 +1340,8 @@ export type MessagingReportCreateWithoutEvidenceMessageInput = {
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
+  enforcementCorrelationId?: string | null
+  version?: number
   unresolvedKey?: string | null
   handledAt?: Date | string | null
   preserveUntil?: Date | string | null
@@ -900,7 +1349,11 @@ export type MessagingReportCreateWithoutEvidenceMessageInput = {
   updatedAt?: Date | string
   reporter: Prisma.UserAccountCreateNestedOneWithoutSubmittedMessagingReportsInput
   target: Prisma.UserAccountCreateNestedOneWithoutTargetedMessagingReportsInput
+  assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
+  handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
   conversation: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
+  reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
 }
 
 export type MessagingReportUncheckedCreateWithoutEvidenceMessageInput = {
@@ -912,11 +1365,17 @@ export type MessagingReportUncheckedCreateWithoutEvidenceMessageInput = {
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
   unresolvedKey?: string | null
   handledAt?: Date | string | null
   preserveUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedCreateNestedManyWithoutReportInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedCreateNestedManyWithoutReportInput
 }
 
 export type MessagingReportCreateOrConnectWithoutEvidenceMessageInput = {
@@ -945,6 +1404,214 @@ export type MessagingReportUpdateManyWithWhereWithoutEvidenceMessageInput = {
   data: Prisma.XOR<Prisma.MessagingReportUpdateManyMutationInput, Prisma.MessagingReportUncheckedUpdateManyWithoutEvidenceMessageInput>
 }
 
+export type MessagingReportCreateWithoutReviewEventsInput = {
+  id?: string
+  targetType: $Enums.MessagingReportTargetType
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  state?: $Enums.ModerationReportState
+  enforcementCorrelationId?: string | null
+  version?: number
+  unresolvedKey?: string | null
+  handledAt?: Date | string | null
+  preserveUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reporter: Prisma.UserAccountCreateNestedOneWithoutSubmittedMessagingReportsInput
+  target: Prisma.UserAccountCreateNestedOneWithoutTargetedMessagingReportsInput
+  assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
+  handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
+  conversation: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
+  evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteCreateNestedManyWithoutReportInput
+}
+
+export type MessagingReportUncheckedCreateWithoutReviewEventsInput = {
+  id?: string
+  reporterUserId: string
+  targetUserId: string
+  conversationId: string
+  targetType: $Enums.MessagingReportTargetType
+  evidenceMessageId?: string | null
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
+  unresolvedKey?: string | null
+  handledAt?: Date | string | null
+  preserveUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedCreateNestedManyWithoutReportInput
+}
+
+export type MessagingReportCreateOrConnectWithoutReviewEventsInput = {
+  where: Prisma.MessagingReportWhereUniqueInput
+  create: Prisma.XOR<Prisma.MessagingReportCreateWithoutReviewEventsInput, Prisma.MessagingReportUncheckedCreateWithoutReviewEventsInput>
+}
+
+export type MessagingReportUpsertWithoutReviewEventsInput = {
+  update: Prisma.XOR<Prisma.MessagingReportUpdateWithoutReviewEventsInput, Prisma.MessagingReportUncheckedUpdateWithoutReviewEventsInput>
+  create: Prisma.XOR<Prisma.MessagingReportCreateWithoutReviewEventsInput, Prisma.MessagingReportUncheckedCreateWithoutReviewEventsInput>
+  where?: Prisma.MessagingReportWhereInput
+}
+
+export type MessagingReportUpdateToOneWithWhereWithoutReviewEventsInput = {
+  where?: Prisma.MessagingReportWhereInput
+  data: Prisma.XOR<Prisma.MessagingReportUpdateWithoutReviewEventsInput, Prisma.MessagingReportUncheckedUpdateWithoutReviewEventsInput>
+}
+
+export type MessagingReportUpdateWithoutReviewEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reporter?: Prisma.UserAccountUpdateOneRequiredWithoutSubmittedMessagingReportsNestedInput
+  target?: Prisma.UserAccountUpdateOneRequiredWithoutTargetedMessagingReportsNestedInput
+  assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
+  handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
+  conversation?: Prisma.MessagingConversationUpdateOneRequiredWithoutReportsNestedInput
+  evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
+}
+
+export type MessagingReportUncheckedUpdateWithoutReviewEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedUpdateManyWithoutReportNestedInput
+}
+
+export type MessagingReportCreateWithoutPrivateNotesInput = {
+  id?: string
+  targetType: $Enums.MessagingReportTargetType
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  state?: $Enums.ModerationReportState
+  enforcementCorrelationId?: string | null
+  version?: number
+  unresolvedKey?: string | null
+  handledAt?: Date | string | null
+  preserveUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reporter: Prisma.UserAccountCreateNestedOneWithoutSubmittedMessagingReportsInput
+  target: Prisma.UserAccountCreateNestedOneWithoutTargetedMessagingReportsInput
+  assignedAdmin?: Prisma.UserAccountCreateNestedOneWithoutAssignedMessagingReportsInput
+  handledByAdmin?: Prisma.UserAccountCreateNestedOneWithoutHandledMessagingReportsInput
+  conversation: Prisma.MessagingConversationCreateNestedOneWithoutReportsInput
+  evidenceMessage?: Prisma.MessagingMessageCreateNestedOneWithoutEvidenceForReportsInput
+  reviewEvents?: Prisma.MessagingReportReviewEventCreateNestedManyWithoutReportInput
+}
+
+export type MessagingReportUncheckedCreateWithoutPrivateNotesInput = {
+  id?: string
+  reporterUserId: string
+  targetUserId: string
+  conversationId: string
+  targetType: $Enums.MessagingReportTargetType
+  evidenceMessageId?: string | null
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
+  unresolvedKey?: string | null
+  handledAt?: Date | string | null
+  preserveUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedCreateNestedManyWithoutReportInput
+}
+
+export type MessagingReportCreateOrConnectWithoutPrivateNotesInput = {
+  where: Prisma.MessagingReportWhereUniqueInput
+  create: Prisma.XOR<Prisma.MessagingReportCreateWithoutPrivateNotesInput, Prisma.MessagingReportUncheckedCreateWithoutPrivateNotesInput>
+}
+
+export type MessagingReportUpsertWithoutPrivateNotesInput = {
+  update: Prisma.XOR<Prisma.MessagingReportUpdateWithoutPrivateNotesInput, Prisma.MessagingReportUncheckedUpdateWithoutPrivateNotesInput>
+  create: Prisma.XOR<Prisma.MessagingReportCreateWithoutPrivateNotesInput, Prisma.MessagingReportUncheckedCreateWithoutPrivateNotesInput>
+  where?: Prisma.MessagingReportWhereInput
+}
+
+export type MessagingReportUpdateToOneWithWhereWithoutPrivateNotesInput = {
+  where?: Prisma.MessagingReportWhereInput
+  data: Prisma.XOR<Prisma.MessagingReportUpdateWithoutPrivateNotesInput, Prisma.MessagingReportUncheckedUpdateWithoutPrivateNotesInput>
+}
+
+export type MessagingReportUpdateWithoutPrivateNotesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reporter?: Prisma.UserAccountUpdateOneRequiredWithoutSubmittedMessagingReportsNestedInput
+  target?: Prisma.UserAccountUpdateOneRequiredWithoutTargetedMessagingReportsNestedInput
+  assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
+  handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
+  conversation?: Prisma.MessagingConversationUpdateOneRequiredWithoutReportsNestedInput
+  evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
+}
+
+export type MessagingReportUncheckedUpdateWithoutPrivateNotesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedUpdateManyWithoutReportNestedInput
+}
+
 export type MessagingReportCreateManyReporterInput = {
   id?: string
   targetUserId: string
@@ -954,6 +1621,10 @@ export type MessagingReportCreateManyReporterInput = {
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
   unresolvedKey?: string | null
   handledAt?: Date | string | null
   preserveUntil?: Date | string | null
@@ -970,6 +1641,50 @@ export type MessagingReportCreateManyTargetInput = {
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
+  unresolvedKey?: string | null
+  handledAt?: Date | string | null
+  preserveUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type MessagingReportCreateManyAssignedAdminInput = {
+  id?: string
+  reporterUserId: string
+  targetUserId: string
+  conversationId: string
+  targetType: $Enums.MessagingReportTargetType
+  evidenceMessageId?: string | null
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  state?: $Enums.ModerationReportState
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
+  unresolvedKey?: string | null
+  handledAt?: Date | string | null
+  preserveUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type MessagingReportCreateManyHandledByAdminInput = {
+  id?: string
+  reporterUserId: string
+  targetUserId: string
+  conversationId: string
+  targetType: $Enums.MessagingReportTargetType
+  evidenceMessageId?: string | null
+  category: $Enums.ModerationReportCategory
+  normalizedDetail?: string | null
+  state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
   unresolvedKey?: string | null
   handledAt?: Date | string | null
   preserveUntil?: Date | string | null
@@ -983,14 +1698,20 @@ export type MessagingReportUpdateWithoutReporterInput = {
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   target?: Prisma.UserAccountUpdateOneRequiredWithoutTargetedMessagingReportsNestedInput
+  assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
+  handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
   conversation?: Prisma.MessagingConversationUpdateOneRequiredWithoutReportsNestedInput
   evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
 }
 
 export type MessagingReportUncheckedUpdateWithoutReporterInput = {
@@ -1002,11 +1723,17 @@ export type MessagingReportUncheckedUpdateWithoutReporterInput = {
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedUpdateManyWithoutReportNestedInput
 }
 
 export type MessagingReportUncheckedUpdateManyWithoutReporterInput = {
@@ -1018,6 +1745,10 @@ export type MessagingReportUncheckedUpdateManyWithoutReporterInput = {
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1031,14 +1762,20 @@ export type MessagingReportUpdateWithoutTargetInput = {
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reporter?: Prisma.UserAccountUpdateOneRequiredWithoutSubmittedMessagingReportsNestedInput
+  assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
+  handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
   conversation?: Prisma.MessagingConversationUpdateOneRequiredWithoutReportsNestedInput
   evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
 }
 
 export type MessagingReportUncheckedUpdateWithoutTargetInput = {
@@ -1050,11 +1787,17 @@ export type MessagingReportUncheckedUpdateWithoutTargetInput = {
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedUpdateManyWithoutReportNestedInput
 }
 
 export type MessagingReportUncheckedUpdateManyWithoutTargetInput = {
@@ -1066,6 +1809,138 @@ export type MessagingReportUncheckedUpdateManyWithoutTargetInput = {
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type MessagingReportUpdateWithoutAssignedAdminInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reporter?: Prisma.UserAccountUpdateOneRequiredWithoutSubmittedMessagingReportsNestedInput
+  target?: Prisma.UserAccountUpdateOneRequiredWithoutTargetedMessagingReportsNestedInput
+  handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
+  conversation?: Prisma.MessagingConversationUpdateOneRequiredWithoutReportsNestedInput
+  evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
+}
+
+export type MessagingReportUncheckedUpdateWithoutAssignedAdminInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedUpdateManyWithoutReportNestedInput
+}
+
+export type MessagingReportUncheckedUpdateManyWithoutAssignedAdminInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type MessagingReportUpdateWithoutHandledByAdminInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reporter?: Prisma.UserAccountUpdateOneRequiredWithoutSubmittedMessagingReportsNestedInput
+  target?: Prisma.UserAccountUpdateOneRequiredWithoutTargetedMessagingReportsNestedInput
+  assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
+  conversation?: Prisma.MessagingConversationUpdateOneRequiredWithoutReportsNestedInput
+  evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
+}
+
+export type MessagingReportUncheckedUpdateWithoutHandledByAdminInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedUpdateManyWithoutReportNestedInput
+}
+
+export type MessagingReportUncheckedUpdateManyWithoutHandledByAdminInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  reporterUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumMessagingReportTargetTypeFieldUpdateOperationsInput | $Enums.MessagingReportTargetType
+  evidenceMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
+  normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1082,6 +1957,10 @@ export type MessagingReportCreateManyConversationInput = {
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
   unresolvedKey?: string | null
   handledAt?: Date | string | null
   preserveUntil?: Date | string | null
@@ -1095,6 +1974,8 @@ export type MessagingReportUpdateWithoutConversationInput = {
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1102,7 +1983,11 @@ export type MessagingReportUpdateWithoutConversationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reporter?: Prisma.UserAccountUpdateOneRequiredWithoutSubmittedMessagingReportsNestedInput
   target?: Prisma.UserAccountUpdateOneRequiredWithoutTargetedMessagingReportsNestedInput
+  assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
+  handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
   evidenceMessage?: Prisma.MessagingMessageUpdateOneWithoutEvidenceForReportsNestedInput
+  reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
 }
 
 export type MessagingReportUncheckedUpdateWithoutConversationInput = {
@@ -1114,11 +1999,17 @@ export type MessagingReportUncheckedUpdateWithoutConversationInput = {
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedUpdateManyWithoutReportNestedInput
 }
 
 export type MessagingReportUncheckedUpdateManyWithoutConversationInput = {
@@ -1130,6 +2021,10 @@ export type MessagingReportUncheckedUpdateManyWithoutConversationInput = {
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1146,6 +2041,10 @@ export type MessagingReportCreateManyEvidenceMessageInput = {
   category: $Enums.ModerationReportCategory
   normalizedDetail?: string | null
   state?: $Enums.ModerationReportState
+  assignedAdminUserId?: string | null
+  handledByAdminUserId?: string | null
+  enforcementCorrelationId?: string | null
+  version?: number
   unresolvedKey?: string | null
   handledAt?: Date | string | null
   preserveUntil?: Date | string | null
@@ -1159,6 +2058,8 @@ export type MessagingReportUpdateWithoutEvidenceMessageInput = {
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1166,7 +2067,11 @@ export type MessagingReportUpdateWithoutEvidenceMessageInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reporter?: Prisma.UserAccountUpdateOneRequiredWithoutSubmittedMessagingReportsNestedInput
   target?: Prisma.UserAccountUpdateOneRequiredWithoutTargetedMessagingReportsNestedInput
+  assignedAdmin?: Prisma.UserAccountUpdateOneWithoutAssignedMessagingReportsNestedInput
+  handledByAdmin?: Prisma.UserAccountUpdateOneWithoutHandledMessagingReportsNestedInput
   conversation?: Prisma.MessagingConversationUpdateOneRequiredWithoutReportsNestedInput
+  reviewEvents?: Prisma.MessagingReportReviewEventUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUpdateManyWithoutReportNestedInput
 }
 
 export type MessagingReportUncheckedUpdateWithoutEvidenceMessageInput = {
@@ -1178,11 +2083,17 @@ export type MessagingReportUncheckedUpdateWithoutEvidenceMessageInput = {
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewEvents?: Prisma.MessagingReportReviewEventUncheckedUpdateManyWithoutReportNestedInput
+  privateNotes?: Prisma.MessagingReportPrivateNoteUncheckedUpdateManyWithoutReportNestedInput
 }
 
 export type MessagingReportUncheckedUpdateManyWithoutEvidenceMessageInput = {
@@ -1194,6 +2105,10 @@ export type MessagingReportUncheckedUpdateManyWithoutEvidenceMessageInput = {
   category?: Prisma.EnumModerationReportCategoryFieldUpdateOperationsInput | $Enums.ModerationReportCategory
   normalizedDetail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumModerationReportStateFieldUpdateOperationsInput | $Enums.ModerationReportState
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  handledByAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enforcementCorrelationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   unresolvedKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   handledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preserveUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1201,6 +2116,44 @@ export type MessagingReportUncheckedUpdateManyWithoutEvidenceMessageInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type MessagingReportCountOutputType
+ */
+
+export type MessagingReportCountOutputType = {
+  reviewEvents: number
+  privateNotes: number
+}
+
+export type MessagingReportCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  reviewEvents?: boolean | MessagingReportCountOutputTypeCountReviewEventsArgs
+  privateNotes?: boolean | MessagingReportCountOutputTypeCountPrivateNotesArgs
+}
+
+/**
+ * MessagingReportCountOutputType without action
+ */
+export type MessagingReportCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MessagingReportCountOutputType
+   */
+  select?: Prisma.MessagingReportCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * MessagingReportCountOutputType without action
+ */
+export type MessagingReportCountOutputTypeCountReviewEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessagingReportReviewEventWhereInput
+}
+
+/**
+ * MessagingReportCountOutputType without action
+ */
+export type MessagingReportCountOutputTypeCountPrivateNotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessagingReportPrivateNoteWhereInput
+}
 
 
 export type MessagingReportSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1213,6 +2166,10 @@ export type MessagingReportSelect<ExtArgs extends runtime.Types.Extensions.Inter
   category?: boolean
   normalizedDetail?: boolean
   state?: boolean
+  assignedAdminUserId?: boolean
+  handledByAdminUserId?: boolean
+  enforcementCorrelationId?: boolean
+  version?: boolean
   unresolvedKey?: boolean
   handledAt?: boolean
   preserveUntil?: boolean
@@ -1220,8 +2177,13 @@ export type MessagingReportSelect<ExtArgs extends runtime.Types.Extensions.Inter
   updatedAt?: boolean
   reporter?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   target?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
+  assignedAdmin?: boolean | Prisma.MessagingReport$assignedAdminArgs<ExtArgs>
+  handledByAdmin?: boolean | Prisma.MessagingReport$handledByAdminArgs<ExtArgs>
   conversation?: boolean | Prisma.MessagingConversationDefaultArgs<ExtArgs>
   evidenceMessage?: boolean | Prisma.MessagingReport$evidenceMessageArgs<ExtArgs>
+  reviewEvents?: boolean | Prisma.MessagingReport$reviewEventsArgs<ExtArgs>
+  privateNotes?: boolean | Prisma.MessagingReport$privateNotesArgs<ExtArgs>
+  _count?: boolean | Prisma.MessagingReportCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["messagingReport"]>
 
 export type MessagingReportSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1234,6 +2196,10 @@ export type MessagingReportSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   category?: boolean
   normalizedDetail?: boolean
   state?: boolean
+  assignedAdminUserId?: boolean
+  handledByAdminUserId?: boolean
+  enforcementCorrelationId?: boolean
+  version?: boolean
   unresolvedKey?: boolean
   handledAt?: boolean
   preserveUntil?: boolean
@@ -1241,6 +2207,8 @@ export type MessagingReportSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   updatedAt?: boolean
   reporter?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   target?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
+  assignedAdmin?: boolean | Prisma.MessagingReport$assignedAdminArgs<ExtArgs>
+  handledByAdmin?: boolean | Prisma.MessagingReport$handledByAdminArgs<ExtArgs>
   conversation?: boolean | Prisma.MessagingConversationDefaultArgs<ExtArgs>
   evidenceMessage?: boolean | Prisma.MessagingReport$evidenceMessageArgs<ExtArgs>
 }, ExtArgs["result"]["messagingReport"]>
@@ -1255,6 +2223,10 @@ export type MessagingReportSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   category?: boolean
   normalizedDetail?: boolean
   state?: boolean
+  assignedAdminUserId?: boolean
+  handledByAdminUserId?: boolean
+  enforcementCorrelationId?: boolean
+  version?: boolean
   unresolvedKey?: boolean
   handledAt?: boolean
   preserveUntil?: boolean
@@ -1262,6 +2234,8 @@ export type MessagingReportSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   updatedAt?: boolean
   reporter?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   target?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
+  assignedAdmin?: boolean | Prisma.MessagingReport$assignedAdminArgs<ExtArgs>
+  handledByAdmin?: boolean | Prisma.MessagingReport$handledByAdminArgs<ExtArgs>
   conversation?: boolean | Prisma.MessagingConversationDefaultArgs<ExtArgs>
   evidenceMessage?: boolean | Prisma.MessagingReport$evidenceMessageArgs<ExtArgs>
 }, ExtArgs["result"]["messagingReport"]>
@@ -1276,6 +2250,10 @@ export type MessagingReportSelectScalar = {
   category?: boolean
   normalizedDetail?: boolean
   state?: boolean
+  assignedAdminUserId?: boolean
+  handledByAdminUserId?: boolean
+  enforcementCorrelationId?: boolean
+  version?: boolean
   unresolvedKey?: boolean
   handledAt?: boolean
   preserveUntil?: boolean
@@ -1283,22 +2261,31 @@ export type MessagingReportSelectScalar = {
   updatedAt?: boolean
 }
 
-export type MessagingReportOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reporterUserId" | "targetUserId" | "conversationId" | "targetType" | "evidenceMessageId" | "category" | "normalizedDetail" | "state" | "unresolvedKey" | "handledAt" | "preserveUntil" | "createdAt" | "updatedAt", ExtArgs["result"]["messagingReport"]>
+export type MessagingReportOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reporterUserId" | "targetUserId" | "conversationId" | "targetType" | "evidenceMessageId" | "category" | "normalizedDetail" | "state" | "assignedAdminUserId" | "handledByAdminUserId" | "enforcementCorrelationId" | "version" | "unresolvedKey" | "handledAt" | "preserveUntil" | "createdAt" | "updatedAt", ExtArgs["result"]["messagingReport"]>
 export type MessagingReportInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   reporter?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   target?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
+  assignedAdmin?: boolean | Prisma.MessagingReport$assignedAdminArgs<ExtArgs>
+  handledByAdmin?: boolean | Prisma.MessagingReport$handledByAdminArgs<ExtArgs>
   conversation?: boolean | Prisma.MessagingConversationDefaultArgs<ExtArgs>
   evidenceMessage?: boolean | Prisma.MessagingReport$evidenceMessageArgs<ExtArgs>
+  reviewEvents?: boolean | Prisma.MessagingReport$reviewEventsArgs<ExtArgs>
+  privateNotes?: boolean | Prisma.MessagingReport$privateNotesArgs<ExtArgs>
+  _count?: boolean | Prisma.MessagingReportCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type MessagingReportIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   reporter?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   target?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
+  assignedAdmin?: boolean | Prisma.MessagingReport$assignedAdminArgs<ExtArgs>
+  handledByAdmin?: boolean | Prisma.MessagingReport$handledByAdminArgs<ExtArgs>
   conversation?: boolean | Prisma.MessagingConversationDefaultArgs<ExtArgs>
   evidenceMessage?: boolean | Prisma.MessagingReport$evidenceMessageArgs<ExtArgs>
 }
 export type MessagingReportIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   reporter?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   target?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
+  assignedAdmin?: boolean | Prisma.MessagingReport$assignedAdminArgs<ExtArgs>
+  handledByAdmin?: boolean | Prisma.MessagingReport$handledByAdminArgs<ExtArgs>
   conversation?: boolean | Prisma.MessagingConversationDefaultArgs<ExtArgs>
   evidenceMessage?: boolean | Prisma.MessagingReport$evidenceMessageArgs<ExtArgs>
 }
@@ -1308,8 +2295,12 @@ export type $MessagingReportPayload<ExtArgs extends runtime.Types.Extensions.Int
   objects: {
     reporter: Prisma.$UserAccountPayload<ExtArgs>
     target: Prisma.$UserAccountPayload<ExtArgs>
+    assignedAdmin: Prisma.$UserAccountPayload<ExtArgs> | null
+    handledByAdmin: Prisma.$UserAccountPayload<ExtArgs> | null
     conversation: Prisma.$MessagingConversationPayload<ExtArgs>
     evidenceMessage: Prisma.$MessagingMessagePayload<ExtArgs> | null
+    reviewEvents: Prisma.$MessagingReportReviewEventPayload<ExtArgs>[]
+    privateNotes: Prisma.$MessagingReportPrivateNotePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1321,6 +2312,10 @@ export type $MessagingReportPayload<ExtArgs extends runtime.Types.Extensions.Int
     category: $Enums.ModerationReportCategory
     normalizedDetail: string | null
     state: $Enums.ModerationReportState
+    assignedAdminUserId: string | null
+    handledByAdminUserId: string | null
+    enforcementCorrelationId: string | null
+    version: number
     unresolvedKey: string | null
     handledAt: Date | null
     preserveUntil: Date | null
@@ -1722,8 +2717,12 @@ export interface Prisma__MessagingReportClient<T, Null = never, ExtArgs extends 
   readonly [Symbol.toStringTag]: "PrismaPromise"
   reporter<T extends Prisma.UserAccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccountDefaultArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   target<T extends Prisma.UserAccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccountDefaultArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  assignedAdmin<T extends Prisma.MessagingReport$assignedAdminArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessagingReport$assignedAdminArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  handledByAdmin<T extends Prisma.MessagingReport$handledByAdminArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessagingReport$handledByAdminArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   conversation<T extends Prisma.MessagingConversationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessagingConversationDefaultArgs<ExtArgs>>): Prisma.Prisma__MessagingConversationClient<runtime.Types.Result.GetResult<Prisma.$MessagingConversationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   evidenceMessage<T extends Prisma.MessagingReport$evidenceMessageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessagingReport$evidenceMessageArgs<ExtArgs>>): Prisma.Prisma__MessagingMessageClient<runtime.Types.Result.GetResult<Prisma.$MessagingMessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  reviewEvents<T extends Prisma.MessagingReport$reviewEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessagingReport$reviewEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagingReportReviewEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  privateNotes<T extends Prisma.MessagingReport$privateNotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessagingReport$privateNotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagingReportPrivateNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1762,6 +2761,10 @@ export interface MessagingReportFieldRefs {
   readonly category: Prisma.FieldRef<"MessagingReport", 'ModerationReportCategory'>
   readonly normalizedDetail: Prisma.FieldRef<"MessagingReport", 'String'>
   readonly state: Prisma.FieldRef<"MessagingReport", 'ModerationReportState'>
+  readonly assignedAdminUserId: Prisma.FieldRef<"MessagingReport", 'String'>
+  readonly handledByAdminUserId: Prisma.FieldRef<"MessagingReport", 'String'>
+  readonly enforcementCorrelationId: Prisma.FieldRef<"MessagingReport", 'String'>
+  readonly version: Prisma.FieldRef<"MessagingReport", 'Int'>
   readonly unresolvedKey: Prisma.FieldRef<"MessagingReport", 'String'>
   readonly handledAt: Prisma.FieldRef<"MessagingReport", 'DateTime'>
   readonly preserveUntil: Prisma.FieldRef<"MessagingReport", 'DateTime'>
@@ -2168,6 +3171,44 @@ export type MessagingReportDeleteManyArgs<ExtArgs extends runtime.Types.Extensio
 }
 
 /**
+ * MessagingReport.assignedAdmin
+ */
+export type MessagingReport$assignedAdminArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserAccount
+   */
+  select?: Prisma.UserAccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserAccount
+   */
+  omit?: Prisma.UserAccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAccountInclude<ExtArgs> | null
+  where?: Prisma.UserAccountWhereInput
+}
+
+/**
+ * MessagingReport.handledByAdmin
+ */
+export type MessagingReport$handledByAdminArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserAccount
+   */
+  select?: Prisma.UserAccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserAccount
+   */
+  omit?: Prisma.UserAccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAccountInclude<ExtArgs> | null
+  where?: Prisma.UserAccountWhereInput
+}
+
+/**
  * MessagingReport.evidenceMessage
  */
 export type MessagingReport$evidenceMessageArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2184,6 +3225,54 @@ export type MessagingReport$evidenceMessageArgs<ExtArgs extends runtime.Types.Ex
    */
   include?: Prisma.MessagingMessageInclude<ExtArgs> | null
   where?: Prisma.MessagingMessageWhereInput
+}
+
+/**
+ * MessagingReport.reviewEvents
+ */
+export type MessagingReport$reviewEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MessagingReportReviewEvent
+   */
+  select?: Prisma.MessagingReportReviewEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MessagingReportReviewEvent
+   */
+  omit?: Prisma.MessagingReportReviewEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessagingReportReviewEventInclude<ExtArgs> | null
+  where?: Prisma.MessagingReportReviewEventWhereInput
+  orderBy?: Prisma.MessagingReportReviewEventOrderByWithRelationInput | Prisma.MessagingReportReviewEventOrderByWithRelationInput[]
+  cursor?: Prisma.MessagingReportReviewEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessagingReportReviewEventScalarFieldEnum | Prisma.MessagingReportReviewEventScalarFieldEnum[]
+}
+
+/**
+ * MessagingReport.privateNotes
+ */
+export type MessagingReport$privateNotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MessagingReportPrivateNote
+   */
+  select?: Prisma.MessagingReportPrivateNoteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MessagingReportPrivateNote
+   */
+  omit?: Prisma.MessagingReportPrivateNoteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessagingReportPrivateNoteInclude<ExtArgs> | null
+  where?: Prisma.MessagingReportPrivateNoteWhereInput
+  orderBy?: Prisma.MessagingReportPrivateNoteOrderByWithRelationInput | Prisma.MessagingReportPrivateNoteOrderByWithRelationInput[]
+  cursor?: Prisma.MessagingReportPrivateNoteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessagingReportPrivateNoteScalarFieldEnum | Prisma.MessagingReportPrivateNoteScalarFieldEnum[]
 }
 
 /**

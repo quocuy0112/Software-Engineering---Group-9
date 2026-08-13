@@ -22,6 +22,8 @@ import { VerificationRequestList } from "../verification/verification-request-li
 import { VerificationReviewShow } from "../verification/verification-review-show";
 import { ModerationReportList } from "../moderation/moderation-report-list";
 import { ModerationReviewShow } from "../moderation/moderation-review-show";
+import { MessagingReportList } from "../messaging-reports/messaging-report-list";
+import { MessagingReportReviewShow } from "../messaging-reports/messaging-report-review-show";
 import { SupportCaseList } from "../support/support-case-list";
 import { SupportCaseShow } from "../support/support-case-show";
 import { ProfessionalConnectionProposalList } from "../professional-connections/professional-connection-proposal-list";
@@ -104,6 +106,12 @@ export function AdminApp() {
             name="moderation-reports"
             list={ModerationReportList}
             show={ModerationReviewShow}
+          />
+          <Resource
+            name="messaging-reports"
+            options={{ label: "Messaging Reports" }}
+            list={MessagingReportList}
+            show={MessagingReportReviewShow}
           />
           <Resource
             name="support-cases"

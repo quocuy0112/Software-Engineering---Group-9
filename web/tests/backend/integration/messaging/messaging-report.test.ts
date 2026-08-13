@@ -30,8 +30,15 @@ describe("messaging report privacy boundary", () => {
     expect(audited).not.toHaveProperty("context.detail");
   });
 
-  it("does not add a messaging report or message browser to the current admin API", () => {
-    const adminRoutes = readFileSync("src/backend/admin/dashboard/dashboard-definition.ts", "utf8");
-    expect(adminRoutes).not.toMatch(/messagingReport|messagingMessage/u);
+  it("keeps the administrator review browser evidence-only", () => {
+    const repository = readFileSync(
+      "src/backend/repositories/admin/prisma-admin-messaging-report-repository.ts",
+      "utf8",
+    );
+    expect(repository).toContain("evidenceMessage:");
+    expect(repository).not.toMatch(/messages\s*:\s*\{/u);
+    expect(repository).not.toMatch(
+      /conversation\s*:\s*\{[\s\S]*?messages/u,
+    );
   });
 });

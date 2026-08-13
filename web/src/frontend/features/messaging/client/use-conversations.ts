@@ -45,5 +45,23 @@ export function useConversations(initialItems: ConversationSummary[]) {
     setNextCursor(page.nextCursor);
   }, [nextCursor]);
 
-  return { items, setItems, nextCursor, error, refresh, loadMore };
+  const clearUnread = useCallback((conversationId: string) => {
+    setItems((current) =>
+      current.map((conversation) =>
+        conversation.id === conversationId && conversation.unreadCount > 0
+          ? { ...conversation, unreadCount: 0 }
+          : conversation,
+      ),
+    );
+  }, []);
+
+  return {
+    items,
+    setItems,
+    nextCursor,
+    error,
+    refresh,
+    loadMore,
+    clearUnread,
+  };
 }

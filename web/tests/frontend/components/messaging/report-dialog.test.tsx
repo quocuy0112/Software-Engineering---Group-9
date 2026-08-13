@@ -42,7 +42,11 @@ describe("ReportMessagingDialog", () => {
       target: { value: "message-1" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Submit report" }));
-    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Report received."));
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Report received and queued for protected review.",
+      ),
+    );
     fireEvent.click(screen.getByRole("button", { name: "Close" }));
     await waitFor(() => expect(trigger).toHaveFocus());
   });

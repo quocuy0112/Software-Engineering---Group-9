@@ -462,6 +462,8 @@ export const ModelName = {
   MessagingMessage: 'MessagingMessage',
   UserMessagingBlock: 'UserMessagingBlock',
   MessagingReport: 'MessagingReport',
+  MessagingReportReviewEvent: 'MessagingReportReviewEvent',
+  MessagingReportPrivateNote: 'MessagingReportPrivateNote',
   ApplicationStageEvent: 'ApplicationStageEvent',
   ApplicationAnswer: 'ApplicationAnswer',
   RecruitmentNotificationWork: 'RecruitmentNotificationWork',
@@ -500,7 +502,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "auditEvent" | "company" | "companyMembership" | "platformAdministratorGrant" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence"
+    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "auditEvent" | "company" | "companyMembership" | "platformAdministratorGrant" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -5314,6 +5316,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    MessagingReportReviewEvent: {
+      payload: Prisma.$MessagingReportReviewEventPayload<ExtArgs>
+      fields: Prisma.MessagingReportReviewEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MessagingReportReviewEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportReviewEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MessagingReportReviewEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportReviewEventPayload>
+        }
+        findFirst: {
+          args: Prisma.MessagingReportReviewEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportReviewEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MessagingReportReviewEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportReviewEventPayload>
+        }
+        findMany: {
+          args: Prisma.MessagingReportReviewEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportReviewEventPayload>[]
+        }
+        create: {
+          args: Prisma.MessagingReportReviewEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportReviewEventPayload>
+        }
+        createMany: {
+          args: Prisma.MessagingReportReviewEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MessagingReportReviewEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportReviewEventPayload>[]
+        }
+        delete: {
+          args: Prisma.MessagingReportReviewEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportReviewEventPayload>
+        }
+        update: {
+          args: Prisma.MessagingReportReviewEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportReviewEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.MessagingReportReviewEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MessagingReportReviewEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MessagingReportReviewEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportReviewEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.MessagingReportReviewEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportReviewEventPayload>
+        }
+        aggregate: {
+          args: Prisma.MessagingReportReviewEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMessagingReportReviewEvent>
+        }
+        groupBy: {
+          args: Prisma.MessagingReportReviewEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MessagingReportReviewEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MessagingReportReviewEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MessagingReportReviewEventCountAggregateOutputType> | number
+        }
+      }
+    }
+    MessagingReportPrivateNote: {
+      payload: Prisma.$MessagingReportPrivateNotePayload<ExtArgs>
+      fields: Prisma.MessagingReportPrivateNoteFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MessagingReportPrivateNoteFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportPrivateNotePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MessagingReportPrivateNoteFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportPrivateNotePayload>
+        }
+        findFirst: {
+          args: Prisma.MessagingReportPrivateNoteFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportPrivateNotePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MessagingReportPrivateNoteFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportPrivateNotePayload>
+        }
+        findMany: {
+          args: Prisma.MessagingReportPrivateNoteFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportPrivateNotePayload>[]
+        }
+        create: {
+          args: Prisma.MessagingReportPrivateNoteCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportPrivateNotePayload>
+        }
+        createMany: {
+          args: Prisma.MessagingReportPrivateNoteCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MessagingReportPrivateNoteCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportPrivateNotePayload>[]
+        }
+        delete: {
+          args: Prisma.MessagingReportPrivateNoteDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportPrivateNotePayload>
+        }
+        update: {
+          args: Prisma.MessagingReportPrivateNoteUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportPrivateNotePayload>
+        }
+        deleteMany: {
+          args: Prisma.MessagingReportPrivateNoteDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MessagingReportPrivateNoteUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MessagingReportPrivateNoteUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportPrivateNotePayload>[]
+        }
+        upsert: {
+          args: Prisma.MessagingReportPrivateNoteUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessagingReportPrivateNotePayload>
+        }
+        aggregate: {
+          args: Prisma.MessagingReportPrivateNoteAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMessagingReportPrivateNote>
+        }
+        groupBy: {
+          args: Prisma.MessagingReportPrivateNoteGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MessagingReportPrivateNoteGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MessagingReportPrivateNoteCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MessagingReportPrivateNoteCountAggregateOutputType> | number
+        }
+      }
+    }
     ApplicationStageEvent: {
       payload: Prisma.$ApplicationStageEventPayload<ExtArgs>
       fields: Prisma.ApplicationStageEventFieldRefs
@@ -7727,6 +7877,7 @@ export const AdminCommandReceiptScalarFieldEnum = {
   normalizedBodyDigest: 'normalizedBodyDigest',
   resultCode: 'resultCode',
   resultingVersion: 'resultingVersion',
+  resultPayload: 'resultPayload',
   correlationId: 'correlationId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -8201,6 +8352,10 @@ export const MessagingReportScalarFieldEnum = {
   category: 'category',
   normalizedDetail: 'normalizedDetail',
   state: 'state',
+  assignedAdminUserId: 'assignedAdminUserId',
+  handledByAdminUserId: 'handledByAdminUserId',
+  enforcementCorrelationId: 'enforcementCorrelationId',
+  version: 'version',
   unresolvedKey: 'unresolvedKey',
   handledAt: 'handledAt',
   preserveUntil: 'preserveUntil',
@@ -8209,6 +8364,32 @@ export const MessagingReportScalarFieldEnum = {
 } as const
 
 export type MessagingReportScalarFieldEnum = (typeof MessagingReportScalarFieldEnum)[keyof typeof MessagingReportScalarFieldEnum]
+
+
+export const MessagingReportReviewEventScalarFieldEnum = {
+  id: 'id',
+  reportId: 'reportId',
+  actorAdminUserId: 'actorAdminUserId',
+  action: 'action',
+  priorState: 'priorState',
+  resultingState: 'resultingState',
+  resultingVersion: 'resultingVersion',
+  enforcementCorrelationId: 'enforcementCorrelationId',
+  occurredAt: 'occurredAt'
+} as const
+
+export type MessagingReportReviewEventScalarFieldEnum = (typeof MessagingReportReviewEventScalarFieldEnum)[keyof typeof MessagingReportReviewEventScalarFieldEnum]
+
+
+export const MessagingReportPrivateNoteScalarFieldEnum = {
+  id: 'id',
+  reportId: 'reportId',
+  authorAdminUserId: 'authorAdminUserId',
+  normalizedText: 'normalizedText',
+  createdAt: 'createdAt'
+} as const
+
+export type MessagingReportPrivateNoteScalarFieldEnum = (typeof MessagingReportPrivateNoteScalarFieldEnum)[keyof typeof MessagingReportPrivateNoteScalarFieldEnum]
 
 
 export const ApplicationStageEventScalarFieldEnum = {
@@ -10311,6 +10492,8 @@ export type GlobalOmitConfig = {
   messagingMessage?: Prisma.MessagingMessageOmit
   userMessagingBlock?: Prisma.UserMessagingBlockOmit
   messagingReport?: Prisma.MessagingReportOmit
+  messagingReportReviewEvent?: Prisma.MessagingReportReviewEventOmit
+  messagingReportPrivateNote?: Prisma.MessagingReportPrivateNoteOmit
   applicationStageEvent?: Prisma.ApplicationStageEventOmit
   applicationAnswer?: Prisma.ApplicationAnswerOmit
   recruitmentNotificationWork?: Prisma.RecruitmentNotificationWorkOmit

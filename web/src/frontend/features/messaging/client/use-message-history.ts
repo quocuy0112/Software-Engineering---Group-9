@@ -11,9 +11,50 @@ export type MessageHistoryPage = {
   nextCursor: string | null;
 };
 
-export function useMessageHistory(conversationId: string | null, csrfProof: string) {
+export function useMessageHistory(
+  conversationId: string | null,
+  csrfProof: string,
+  onReadCommitted?: (conversationId: string) => void,
+) {
   const [page, setPage] = useState<MessageHistoryPage | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const markReadThrough = useCallback(
+    async (lastReadSequence: number) => {
+      if (!conversationId) return false;
+      const response = await fetch(
+        `/api/messaging/conversations/${encodeURIComponent(conversationId)}/read`,
+        {
+          method: "POST",
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: {
+            "content-type": "application/json",
+            "x-csrf-proof": csrfProof,
+          },
+          body: JSON.stringify({ lastReadSequence }),
+        },
+      );
+      if (!response.ok) return false;
+      setPage((current) =>
+        current?.conversation.id === conversationId
+          ? {
+              ...current,
+              conversation: {
+                ...current.conversation,
+                unreadCount: 0,
+                currentUserLastReadSequence: Math.max(
+                  current.conversation.currentUserLastReadSequence,
+                  lastReadSequence,
+                ),
+              },
+            }
+          : current,
+      );
+      onReadCommitted?.(conversationId);
+      return true;
+    },
+    [conversationId, csrfProof, onReadCommitted],
+  );
   const refresh = useCallback(async () => {
     if (!conversationId) return;
     try {
@@ -34,27 +75,13 @@ export function useMessageHistory(conversationId: string | null, csrfProof: stri
         nextPage.conversation.currentLastSequence >
         nextPage.conversation.currentUserLastReadSequence
       ) {
-        await fetch(
-          `/api/messaging/conversations/${encodeURIComponent(conversationId)}/read`,
-          {
-            method: "POST",
-            credentials: "same-origin",
-            cache: "no-store",
-            headers: {
-              "content-type": "application/json",
-              "x-csrf-proof": csrfProof,
-            },
-            body: JSON.stringify({
-              lastReadSequence: nextPage.conversation.currentLastSequence,
-            }),
-          },
-        );
+        await markReadThrough(nextPage.conversation.currentLastSequence);
       }
       setError(null);
     } catch {
       setError("Messages could not be loaded.");
     }
-  }, [conversationId, csrfProof]);
+  }, [conversationId, markReadThrough]);
   useEffect(() => {
     let active = true;
     queueMicrotask(() => {
@@ -110,5 +137,14 @@ export function useMessageHistory(conversationId: string | null, csrfProof: stri
     );
   }, []);
   const visiblePage = page?.conversation.id === conversationId ? page : null;
-  return { page: visiblePage, error, refresh, loadOlder, addMessage, setPresence, setPage };
+  return {
+    page: visiblePage,
+    error,
+    refresh,
+    loadOlder,
+    addMessage,
+    markReadThrough,
+    setPresence,
+    setPage,
+  };
 }
