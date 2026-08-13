@@ -1,3 +1,4 @@
+/* Feature-specific Home breakpoints live beside its tokens in home.css. */
 @media (max-width: 1279px) {
   .dashboard-feature-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -121,6 +122,10 @@
     text-align: left;
   }
 
+  .profile-account-id-value {
+    justify-content: flex-start;
+  }
+
   .sessions-panel-heading > p {
     max-width: none;
     margin-top: var(--sh-space-2);
@@ -134,19 +139,6 @@
   .session-revoke-button {
     grid-column: 2;
     justify-self: start;
-  }
-
-  .home-header {
-    align-items: flex-start;
-  }
-
-  .home-account {
-    flex-direction: column;
-    align-items: flex-end;
-  }
-
-  .home-profile-link small {
-    display: none;
   }
 }
 

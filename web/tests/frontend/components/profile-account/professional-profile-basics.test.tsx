@@ -22,6 +22,7 @@ const emptyProfile = {
 };
 
 const account = {
+  id: "8fc8b912-baad-4be8-8c49-f8f9323f6255",
   name: "Candidate Example",
   email: "candidate@example.com",
   memberSince: "July 31, 2026",
@@ -37,6 +38,29 @@ afterEach(() => {
 });
 
 describe("professional profile basics", () => {
+  it("copies the account ID from Account Details", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText },
+    });
+    render(
+      <ProfileOverview
+        account={account}
+        initialProfile={emptyProfile}
+        csrfProof="csrf-proof"
+      />,
+    );
+
+    expect(screen.getByText(account.id)).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Copy account ID" }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith(account.id));
+    expect(
+      screen.getByRole("button", { name: "Account ID copied" }),
+    ).toBeVisible();
+    expect(screen.getByRole("status")).toHaveTextContent("Account ID copied");
+  });
+
   it("renders loading, load-error, and valid empty states", async () => {
     let resolve!: (response: Response) => void;
     const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(

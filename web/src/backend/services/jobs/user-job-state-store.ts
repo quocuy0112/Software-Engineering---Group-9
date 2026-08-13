@@ -64,6 +64,7 @@ export async function readUserJobState(userId: string): Promise<UserJobState> {
     userId,
     savedJobIds: savedJobs.map((job) => job.jobPostingId),
     hiddenJobIds: hiddenJobIds.success ? hiddenJobIds.data : [],
+    appliedJobIds: [],
     jobPreferences: preferences.success
       ? preferences.data
       : defaultJobPreferences,
@@ -77,6 +78,7 @@ export function projectUserJobState(state: UserJobState) {
   return {
     savedJobIds: state.savedJobIds,
     hiddenJobIds: state.hiddenJobIds,
+    appliedJobIds: state.appliedJobIds,
   };
 }
 

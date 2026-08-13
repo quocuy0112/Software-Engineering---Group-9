@@ -124,7 +124,7 @@ Exact dependency versions are defined in the root `package-lock.json` and `web/p
 
 ### Local service topology
 
-`npm run dev` supervises local Node processes and recovers the Docker infrastructure before starting the web application.
+`npm run dev` supervises local Node processes, recovers the core Docker infrastructure, starts restartable workers without waiting for ClamAV health, and then starts the web application.
 
 | Process/service       | Runtime      | Purpose                                             | Lifecycle                   |
 | --------------------- | ------------ | --------------------------------------------------- | --------------------------- |
@@ -161,7 +161,7 @@ PostgreSQL, `psql`, Python OCR dependencies, and ClamAV do not need to be instal
 | `npm ci`            | Install the exact root lockfile dependency graph                             |
 | `npm run env:init`  | Generate/preserve local environment files, secrets, and private directories  |
 | `npm run env:check` | Validate runtime, Docker, environment, storage, database, and provider gates |
-| `npm run dev`       | Build/recover all Compose services, then supervise web and email worker      |
+| `npm run dev`       | Recover Compose services without blocking on ClamAV, then run web and email  |
 | `npm run dev:web`   | Start only the custom Next.js/Socket.IO server                               |
 | `npm start`         | Start an already-built production-mode custom server                         |
 | `npm run build`     | Build the Next.js application                                                |
@@ -320,7 +320,7 @@ npm start
 
 **A worker is stopped and does not restart after `docker stop`** — `restart: unless-stopped` respects an explicit operator stop; recover with `npm run dev` or `npm run infra:up`.
 
-**CV worker reports stale ClamAV definitions** — inspect logs with `docker compose logs --tail 100 clamav` / `cv-worker`. If the freshness gate is exceeded, the worker stays alive and retries every 60 seconds; do not bypass this gate — restore connectivity and wait for the mirror to update.
+**CV worker reports stale ClamAV definitions** — inspect logs with `docker compose logs --tail 100 clamav` / `cv-worker`. ClamAV remains running but unhealthy, keeps FreshClam active, and retries `clamd` every 60 seconds. Scanner-dependent workers may restart until the socket returns, while web development remains available. Do not bypass the 24-hour freshness gate; restore connectivity and wait for the mirror to update.
 
 **Admin worker repeatedly exits** — check `docker compose logs --tail 100 admin-worker` and `npm run admin:worker:probe`; verify environment initialization completed and container-local storage paths are correct.
 

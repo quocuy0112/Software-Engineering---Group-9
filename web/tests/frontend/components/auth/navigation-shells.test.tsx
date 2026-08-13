@@ -3,7 +3,6 @@ import {
   render,
   screen,
   waitFor,
-  within,
 } from "@testing-library/react";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -14,7 +13,11 @@ import { DashboardView } from "@/frontend/features/dashboard/components/dashboar
 import { ProfileNavigation } from "@/frontend/features/profile/components/profile-navigation";
 import { ProfileAccountView } from "@/frontend/features/profile/components/profile-account-view";
 
-const navigation = vi.hoisted(() => ({ replace: vi.fn(), refresh: vi.fn() }));
+const navigation = vi.hoisted(() => ({
+  replace: vi.fn(),
+  refresh: vi.fn(),
+  push: vi.fn(),
+}));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/profile/security",
   useRouter: () => navigation,
@@ -329,26 +332,8 @@ describe("identity navigation shells", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Post a Job" }));
 
-    expect(screen.getByText("Recruiter workspace")).toBeVisible();
-    expect(document.querySelector(".workspace-main")).toHaveAttribute(
-      "data-content-mode",
-      "default",
-    );
-    expect(
-      screen.getByRole("button", { name: "Candidate workspace" }),
-    ).toBeVisible();
-    expect(
-      within(
-        screen.getByRole("button", { name: "Sign out" }).parentElement!,
-      ).queryByText("Candidate workspace"),
-    ).toBeNull();
+    expect(navigation.push).toHaveBeenCalledWith("/recruiter");
     expect(document.cookie).toContain("smarthire-workspace-mode=recruiter");
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Candidate workspace" }),
-    );
-    expect(screen.getByRole("button", { name: "Post a Job" })).toBeVisible();
-    expect(document.cookie).toContain("smarthire-workspace-mode=candidate");
   });
 
   it("keeps the sidebar frame width synchronized with the collapsed grid track", async () => {

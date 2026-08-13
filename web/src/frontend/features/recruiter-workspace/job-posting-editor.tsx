@@ -55,12 +55,20 @@ function ToggleField({
   label: string;
   onChange: (checked: boolean) => void;
 }) {
+  const inputId = `recruiter-toggle-${label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/gu, "-")
+    .replace(/^-|-$/gu, "")}`;
+
   return (
-    <label
+    <div
       className="recruiter-toggle-field"
+      onPointerDown={(event) => event.stopPropagation()}
       onClick={(event) => event.stopPropagation()}
+      onKeyDown={(event) => event.stopPropagation()}
     >
       <input
+        id={inputId}
         type="checkbox"
         checked={checked}
         disabled={disabled}
@@ -70,12 +78,14 @@ function ToggleField({
           onChange(event.currentTarget.checked);
         }}
       />
-      <span className="recruiter-toggle-field__control" aria-hidden="true" />
-      <span>
-        <strong>{label}</strong>
-        {help ? <small>{help}</small> : null}
-      </span>
-    </label>
+      <label className="recruiter-toggle-field__label" htmlFor={inputId}>
+        <span className="recruiter-toggle-field__control" aria-hidden="true" />
+        <span>
+          <strong>{label}</strong>
+          {help ? <small>{help}</small> : null}
+        </span>
+      </label>
+    </div>
   );
 }
 

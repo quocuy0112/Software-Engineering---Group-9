@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/frontend/components/ui/badge";
 import { CompanyAvatar } from "@/frontend/features/jobs/components/company-avatar";
@@ -197,9 +199,9 @@ function JobPostingCard({
           {job.description.generalInfo.department ||
             job.categoryFamily ||
             "No department"}
-          <span aria-hidden="true">·</span>
+          <span aria-hidden="true">|</span>
           {locationLabel(job)}
-          <span aria-hidden="true">·</span>
+          <span aria-hidden="true">|</span>
           {arrangementLabel(job)}
         </p>
         <div className="recruiter-job-card__chips" aria-label="Skills">
@@ -342,9 +344,41 @@ function CompanyRequiredState() {
     </section>
   );
 }
+
+function CompanyProfileRequiredState({
+  missingFields,
+}: {
+  missingFields: Array<"name" | "industry" | "size" | "address" | "logo">;
+}) {
+  const labels: Record<typeof missingFields[number], string> = {
+    name: "Company name",
+    industry: "Industry",
+    size: "Company size",
+    address: "Address",
+    logo: "Company logo",
+  };
+  return (
+    <section className="recruiter-empty-state recruiter-company-required">
+      <span className="recruiter-empty-state__icon">
+        <Icon name="briefcase" />
+      </span>
+      <div>
+        <h2>Complete company profile before posting</h2>
+        <p>Create job posting is locked until the following fields are complete.</p>
+        <ul className="recruiter-company-required__list">
+          {missingFields.map((field) => <li key={field}>{labels[field]}</li>)}
+        </ul>
+      </div>
+      <Link className="recruiter-primary-button" href="/recruiter/company-settings?required=profile">
+        Open company settings
+      </Link>
+    </section>
+  );
+}
 export function RecruiterJobPostingManagement({
   initialData,
-}: { initialData?: RecruiterJobManagementData | null } = {}) {
+  onNavigate,
+}: { initialData?: RecruiterJobManagementData | null; onNavigate?: (href: string) => void } = {}) {
   const [data, setData] = useState<RecruiterJobManagementData | null>(
     initialData ?? null,
   );
@@ -440,14 +474,30 @@ export function RecruiterJobPostingManagement({
   }, [activeTab, current.jobs, department, search]);
 
   const openCreate = () => {
+    if (current.companyProfileComplete === false) {
+      if (onNavigate) {
+        onNavigate("/recruiter/company-settings?required=profile");
+      } else {
+        setMessage("Complete your company profile before creating a posting.");
+      }
+      return;
+    }
     if (!current.companyId) {
       setMessage("Link a recruiter-owned company before creating a posting.");
+      return;
+    }
+    if (onNavigate) {
+      onNavigate('/recruiter/jobs/create');
       return;
     }
     setEditorJob(createEmptyJobPosting(current.companyId));
     setView("editor");
   };
   const openEdit = (job: RecruiterJob) => {
+    if (onNavigate) {
+      onNavigate(`/recruiter/jobs/${encodeURIComponent(job.id)}/edit`);
+      return;
+    }
     setEditorJob(job);
     setView("editor");
   };
@@ -529,7 +579,7 @@ export function RecruiterJobPostingManagement({
           className="recruiter-back-button"
           onClick={() => setView("dashboard")}
         >
-          ← Back to job postings
+          Back to job postings
         </button>
         <p className="recruiter-eyebrow">Candidate list</p>
         <h1>{applicantJob.title}</h1>
@@ -543,6 +593,24 @@ export function RecruiterJobPostingManagement({
       </section>
     );
 
+  if (!loading && current.companyProfileComplete === false) {
+    return (
+      <div className="recruiter-management">
+        <header className="recruiter-management__heading">
+          <div>
+            <p className="recruiter-eyebrow">Recruiter workspace</p>
+            <h1>Job postings</h1>
+            <p>Complete the company identity before opening a new role.</p>
+          </div>
+          <button type="button" className="recruiter-primary-button" onClick={openCreate}>
+            <Icon name="plus" />
+            Create job posting
+          </button>
+        </header>
+        <CompanyProfileRequiredState missingFields={current.missingCompanyProfileFields ?? ["name", "industry", "size", "address", "logo"]} />
+      </div>
+    );
+  }
   if (!loading && !companyReady) {
     return (
       <div className="recruiter-management">
@@ -711,11 +779,56 @@ export function RecruiterJobPostingManagement({
             aria-label="Dismiss message"
             onClick={() => setMessage("")}
           >
-            ×
+          <Icon name="close" />
           </button>
         </div>
       ) : null}
     </div>
+  );
+}
+
+type RecruiterNavIconName = "overview" | "jobs" | "candidates" | "settings" | "signout";
+
+function RecruiterNavIcon({ name }: { name: RecruiterNavIconName }) {
+  const paths = {
+    overview: (
+      <>
+        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+      </>
+    ),
+    jobs: (
+      <>
+        <rect x="3" y="7" width="18" height="13" rx="2" />
+        <path d="M8 7V5.5A2.5 2.5 0 0 1 10.5 3h3A2.5 2.5 0 0 1 16 5.5V7M3 12h18M9 12v2h6v-2" />
+      </>
+    ),
+    candidates: (
+      <>
+        <circle cx="9" cy="8" r="3" />
+        <circle cx="17" cy="9" r="2" />
+        <path d="M3.5 20c.6-4 2.5-6 5.5-6s4.9 2 5.5 6M14.5 15c2.8-.4 4.8 1.2 5.5 4" />
+      </>
+    ),
+    settings: (
+      <>
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V20h-2.5v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H7v-2.5h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5V4h2.5v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.2v2.5h-.2a1.7 1.7 0 0 0-1.5 1.4Z" />
+      </>
+    ),
+    signout: (
+      <>
+        <path d="M8 4H4.5A1.5 1.5 0 0 0 3 5.5v9A1.5 1.5 0 0 0 4.5 16H8" />
+        <path d="M11 6.5 14.5 10 11 13.5M7 10h7.5" />
+      </>
+    ),
+  } as const;
+  return (
+    <svg className="nav-icon recruiter-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+      {paths[name]}
+    </svg>
   );
 }
 
@@ -728,11 +841,27 @@ export function RecruiterWorkspaceNavigation({
   busy: boolean;
   onSignOut: () => void;
 }) {
-  const destinations = [
-    { label: "Overview", icon: "✦", active: false },
-    { label: "Job postings", icon: "▣", active: true },
-    { label: "Candidates", icon: "◉", active: false },
-    { label: "Company settings", icon: "⚙", active: false },
+  const pathname = usePathname();
+  const destinations: Array<{
+    label: string;
+    icon: Exclude<RecruiterNavIconName, "signout">;
+    href?: string;
+    active: boolean;
+  }> = [
+    { label: "Overview", icon: "overview", active: false },
+    {
+      label: "Job postings",
+      icon: "jobs",
+      href: "/recruiter",
+      active: pathname === "/recruiter" || pathname.startsWith("/recruiter/jobs"),
+    },
+    { label: "Candidates", icon: "candidates", active: false },
+    {
+      label: "Company settings",
+      icon: "settings",
+      href: "/recruiter/company-settings",
+      active: pathname === "/recruiter/company-settings",
+    },
   ];
   return (
     <nav
@@ -747,23 +876,34 @@ export function RecruiterWorkspaceNavigation({
       </span>
       <p className="workspace-nav-label">Recruiter workspace</p>
       <div className="workspace-navigation-scroll">
-        {destinations.map((item) => (
-          <button
-            key={item.label}
-            type="button"
-            aria-current={item.active ? "page" : undefined}
-            title={collapsed ? item.label : undefined}
-            disabled={!item.active}
-          >
-            <span className="nav-icon recruiter-nav-icon" aria-hidden="true">
-              {item.icon}
-            </span>
-            <span className="workspace-navigation-label">{item.label}</span>
-            {!item.active ? (
-              <span className="recruiter-nav-soon">Soon</span>
-            ) : null}
-          </button>
-        ))}
+        {destinations.map((item) => {
+          const content = (
+            <>
+              <RecruiterNavIcon name={item.icon} />
+              <span className="workspace-navigation-label">{item.label}</span>
+              {!item.href ? <span className="recruiter-nav-soon">Soon</span> : null}
+            </>
+          );
+          return item.href ? (
+            <Link
+              key={item.label}
+              href={item.href}
+              aria-current={item.active ? "page" : undefined}
+              title={collapsed ? item.label : undefined}
+            >
+              {content}
+            </Link>
+          ) : (
+            <button
+              key={item.label}
+              type="button"
+              title={collapsed ? item.label : undefined}
+              disabled
+            >
+              {content}
+            </button>
+          );
+        })}
       </div>
       <div className="workspace-navigation-footer">
         <button
@@ -772,11 +912,9 @@ export function RecruiterWorkspaceNavigation({
           disabled={busy}
           aria-busy={busy}
         >
-          <span className="nav-icon" aria-hidden="true">
-            ↪
-          </span>
+          <RecruiterNavIcon name="signout" />
           <span className="workspace-navigation-label">
-            {busy ? "Signing out…" : "Sign out"}
+            {busy ? "Signing out..." : "Sign out"}
           </span>
         </button>
       </div>

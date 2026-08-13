@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 describe("OCR/image-worker failure isolation", () => {
-  it("builds every worker and recovers one detached dependency-aware Compose group", async () => {
+  it("starts web without waiting for scanner-dependent workers", async () => {
     const script = await readFile(
       resolve(process.cwd(), "../scripts/run-local-development.mjs"),
       "utf8",
@@ -20,14 +20,24 @@ describe("OCR/image-worker failure isolation", () => {
     expect(script).toContain('"postgres"');
     expect(script).toContain('"clamav"');
     expect(script).toContain(
-      '"up",\n      "-d",\n      "--no-build",\n      ...composeServices',
+      '["compose", "up", "-d", "--no-build", ...infrastructureServices]',
     );
-    expect(script).not.toContain('"--no-deps"');
+    expect(script).toContain(
+      '["compose", "up", "-d", "--no-build", "--no-deps", ...workerServices]',
+    );
     expect(script).not.toContain('"compose",\n        "stop"');
     expect(script).toContain('stdio: "inherit"');
     expect(script).toContain('child.once("error", (error) =>');
     expect(script).toContain('child.once("exit", (code, signal) =>');
-    expect(script).toContain("Compose infrastructure remains running");
+    expect(script).toContain(
+      "Compose infrastructure and workers remain running",
+    );
+    expect(
+      script.indexOf(
+        'void runCommand(\n    "starting restartable worker services',
+      ),
+    ).toBeLessThan(script.indexOf('start("web", "dev:web")'));
+    expect(script).toContain("web startup does not wait for ClamAV health");
   });
 
   it("does not make the native CV worker depend on OCR startup", async () => {

@@ -8,6 +8,30 @@ import {
 
 const nullableString = (maximum: number) =>
   z.string().trim().max(maximum).nullable();
+export const companyLogoSchema = z
+  .union([
+    z.string().url().max(2_000),
+    z
+      .string()
+      .min(32)
+      .max(1_100_000)
+      .regex(
+        /^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/u,
+      ),
+  ])
+  .nullable();
+
+export const recruiterCompanySettingsInputSchema = z
+  .object({
+    name: z.string().trim().min(1).max(160),
+    logo: companyLogoSchema,
+    size: z.string().trim().min(1).max(80),
+    industry: z.string().trim().min(1).max(160),
+    address: z.string().trim().min(1).max(300),
+    website: z.string().url().max(2_000).nullable(),
+    description: z.string().trim().max(3_000).nullable(),
+  })
+  .strict();
 
 export const jobPostingStatusSchema = z.enum([
   "draft",
@@ -61,6 +85,7 @@ export const jobCatalogSchema = z
     age: z.string().max(80),
     numberOfHires: z.number().int().positive(),
     status: jobPostingStatusSchema,
+    approvalComment: nullableString(2_000).optional(),
     isUrgent: z.boolean(),
     isVerified: z.boolean(),
     postedAt: z.string().datetime(),
@@ -106,7 +131,7 @@ export const companyCatalogSchema = z
     id: z.string().min(1).max(128),
     slug: z.string().min(1).max(200),
     name: z.string().min(1).max(160),
-    logo: z.string().url().nullable(),
+    logo: companyLogoSchema,
     size: z.string().min(1).max(80),
     industry: z.string().min(1).max(160),
     address: z.string().min(1).max(300),
@@ -120,6 +145,9 @@ export const companyCatalogSchema = z
       .optional(),
     jobCount: z.number().int().nonnegative().optional(),
     ownerUserId: z.string().min(1).max(128).nullable().optional(),
+    memberUserIds: z.array(z.string().min(1).max(128)).max(10_000).default([]),
+    taxCode: z.string().regex(/^\d{10}$/u),
+    verificationStatus: z.enum(["pending", "approved", "rejected"]),
   })
   .strict();
 
@@ -128,6 +156,7 @@ export const userJobStateSchema = z
     userId: z.string().min(1).max(128),
     savedJobIds: z.array(z.string().min(1).max(128)).max(10_000),
     hiddenJobIds: z.array(z.string().min(1).max(128)).max(10_000),
+    appliedJobIds: z.array(z.string().min(1).max(128)).max(10_000),
     jobPreferences: jobPreferencesSchema.default(defaultJobPreferences),
     savedFilterPresets: z
       .array(
@@ -147,11 +176,33 @@ export const userJobStateViewSchema = z
   .object({
     savedJobIds: z.array(z.string().min(1).max(128)).max(10_000),
     hiddenJobIds: z.array(z.string().min(1).max(128)).max(10_000),
+    appliedJobIds: z.array(z.string().min(1).max(128)).max(10_000),
   })
   .strict();
 export type JobCatalogItem = z.infer<typeof jobCatalogSchema>;
 export type CompanyCatalogItem = z.infer<typeof companyCatalogSchema>;
 export type JobPostingStatus = z.infer<typeof jobPostingStatusSchema>;
 export type UserJobState = z.infer<typeof userJobStateSchema>;
+export type RecruiterCompanySettings = {
+  id: string;
+  slug: string;
+  name: string;
+  logo: string | null;
+  size: string;
+  industry: string;
+  address: string;
+  website: string | null;
+  description: string | null;
+  ownerUserId: string | null;
+  memberUserIds: string[];
+  taxCode: string;
+  verificationStatus: "pending" | "approved" | "rejected";
+  profileComplete: boolean;
+  missingProfileFields: Array<"name" | "industry" | "size" | "address" | "logo">;
+};
+
+export type RecruiterCompanySettingsInput = z.infer<
+  typeof recruiterCompanySettingsInputSchema
+>;
 export type { JobPreferences };
 export { jobPreferencesSchema, jobPreferencesUpdateSchema };

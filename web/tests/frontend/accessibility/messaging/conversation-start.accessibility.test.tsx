@@ -4,8 +4,18 @@ import { StartConversation } from "@/frontend/features/messaging/components/star
 
 describe("conversation start accessibility", () => {
   it("labels search, context, status, and the primary action", () => {
-    render(<StartConversation csrfProof="csrf" initialItems={[]} onOpened={() => undefined} />);
-    expect(screen.getByRole("searchbox", { name: /search eligible people/i })).toBeVisible();
-    expect(screen.getByRole("status")).toHaveTextContent(/no eligible people/i);
+    render(
+      <StartConversation
+        csrfProof="csrf"
+        initialItems={[]}
+        onOpened={() => undefined}
+      />,
+    );
+    expect(
+      screen.getByRole("searchbox", { name: /search eligible people/i }),
+    ).toHaveAttribute("placeholder", "Enter name, email, or account ID");
+    expect(screen.getByRole("status")).toHaveTextContent(
+      /no eligible contacts yet/i,
+    );
   });
 });

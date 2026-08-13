@@ -23,7 +23,7 @@ export const openConversationInputSchema = z
 
 export const messagingListQuerySchema = z
   .object({
-    q: z.string().trim().min(1).max(100).optional(),
+    q: z.string().trim().min(2).max(100).optional(),
     cursor: cursorSchema.optional(),
     limit: messagingPageLimitSchema,
   })

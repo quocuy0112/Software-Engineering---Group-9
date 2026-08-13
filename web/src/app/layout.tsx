@@ -45,6 +45,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <meta charSet="utf-8" />
         <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
       </head>
       <body suppressHydrationWarning>

@@ -6,16 +6,30 @@ import { MessagingSocketRegistry } from "@/backend/messaging/realtime/messaging-
 describe("realtime messaging authorization and privacy matrix", () => {
   it("denies unrestricted and self messaging at the formal service boundary", async () => {
     const eligibility = new MessagingEligibilityService(
-      { hasEligibleRelationship: async () => false, authorizeContext: async () => null },
-      { hasEligibleRelationship: async () => false, authorizeContext: async () => null },
+      {
+        hasEligibleRelationship: async () => false,
+        authorizeContext: async () => null,
+      },
+      {
+        hasEligibleRelationship: async () => false,
+        authorizeContext: async () => null,
+      },
     );
-    await expect(eligibility.canMessage("user-a", "outsider")).resolves.toBe(false);
-    await expect(eligibility.canMessage("user-a", "user-a")).resolves.toBe(false);
+    await expect(eligibility.canMessage("user-a", "outsider")).resolves.toBe(
+      false,
+    );
+    await expect(eligibility.canMessage("user-a", "user-a")).resolves.toBe(
+      false,
+    );
   });
 
   it("removes session, room, and account indexes together on socket revocation", () => {
     const registry = new MessagingSocketRegistry();
-    registry.register({ socketId: "socket-a", userId: "user-a", sessionId: "session-a" });
+    registry.register({
+      socketId: "socket-a",
+      userId: "user-a",
+      sessionId: "session-a",
+    });
     registry.joinConversation("socket-a", "conversation-a");
     registry.unregister("socket-a");
     expect(registry.socketIdsForUser("user-a").size).toBe(0);
@@ -28,9 +42,16 @@ describe("realtime messaging authorization and privacy matrix", () => {
       .filter((path) => path.includes("messaging"))
       .map((path) => readFileSync(path, "utf8"))
       .join("\n");
-    expect(sources).not.toMatch(/localStorage|sessionStorage|auth:\s*\{\s*token/iu);
-    expect(sources).not.toMatch(/searchParams\.set\(["'](?:content|detail|token)/iu);
-    const reportService = readFileSync("src/backend/messaging/services/report-messaging.ts", "utf8");
+    expect(sources).not.toMatch(
+      /localStorage|sessionStorage|auth:\s*\{\s*token/iu,
+    );
+    expect(sources).not.toMatch(
+      /searchParams\.set\(["'](?:content|detail|token)/iu,
+    );
+    const reportService = readFileSync(
+      "src/backend/messaging/services/report-messaging.ts",
+      "utf8",
+    );
     expect(reportService).not.toMatch(/context:\s*\{[\s\S]*?detail/u);
   });
 
@@ -39,5 +60,20 @@ describe("realtime messaging authorization and privacy matrix", () => {
       const source = readFileSync(route, "utf8");
       expect(source, route).toMatch(/messagingJson|messagingRouteError/u);
     }
+  });
+
+  it("keeps participant discovery eligibility-scoped and PII-free", () => {
+    const repository = readFileSync(
+      "src/backend/repositories/messaging/prisma-messaging-eligibility-repository.ts",
+      "utf8",
+    );
+    const route = readFileSync(
+      "src/app/api/messaging/eligible-participants/route.ts",
+      "utf8",
+    );
+    expect(repository).toContain("participantFilter");
+    expect(repository).toContain("buildParticipantSearchFilter(query)");
+    expect(repository).not.toMatch(/select:\s*\{[^}]*email/iu);
+    expect(route).toContain('"messagingDiscoveryNetwork"');
   });
 });

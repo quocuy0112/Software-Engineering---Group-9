@@ -24,15 +24,22 @@ export async function openConversation(
   return response.json() as Promise<ConversationDetail>;
 }
 
-export async function findEligibleParticipants(q = "") {
+export async function findEligibleParticipants(q = "", signal?: AbortSignal) {
   const search = new URLSearchParams();
   if (q.trim()) search.set("q", q.trim());
-  const response = await fetch(`/api/messaging/eligible-participants?${search}`, {
-    credentials: "same-origin",
-    cache: "no-store",
-  });
+  const response = await fetch(
+    `/api/messaging/eligible-participants?${search}`,
+    {
+      credentials: "same-origin",
+      cache: "no-store",
+      signal,
+    },
+  );
   if (!response.ok) throw new Error("ELIGIBLE_PARTICIPANTS_FAILED");
-  return response.json() as Promise<{ items: EligibleParticipant[]; nextCursor: string | null }>;
+  return response.json() as Promise<{
+    items: EligibleParticipant[];
+    nextCursor: string | null;
+  }>;
 }
 
 export async function submitMessagingReport(
