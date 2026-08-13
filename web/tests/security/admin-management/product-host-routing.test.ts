@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   INTERNAL_ADMIN_ROUTE,
   INTERNAL_RECRUITER_ROUTE,
+  INTERNAL_SHELL_HEADER,
   proxy,
 } from "@/proxy";
 
@@ -37,6 +38,30 @@ describe("product host shell routing", () => {
     ]) {
       expect(proxy(request(url)).status, url).toBe(404);
     }
+  });
+
+  it("allows only server-routed internal product shells", () => {
+    const admin = new NextRequest(
+      `http://console.admin.localhost:3001${INTERNAL_ADMIN_ROUTE}`,
+      {
+        headers: {
+          host: "console.admin.localhost:3001",
+          [INTERNAL_SHELL_HEADER]: "admin",
+        },
+      },
+    );
+    const recruiter = new NextRequest(
+      `http://console.recruiter.localhost:3001${INTERNAL_RECRUITER_ROUTE}`,
+      {
+        headers: {
+          host: "console.recruiter.localhost:3001",
+          [INTERNAL_SHELL_HEADER]: "recruiter",
+        },
+      },
+    );
+
+    expect(proxy(admin).headers.get("x-middleware-next")).toBe("1");
+    expect(proxy(recruiter).headers.get("x-middleware-next")).toBe("1");
   });
 
   it("leaves candidate pages and APIs to their authoritative handlers", () => {

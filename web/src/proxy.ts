@@ -8,6 +8,7 @@ const local = {
 
 export const INTERNAL_ADMIN_ROUTE = "/admin-console";
 export const INTERNAL_RECRUITER_ROUTE = "/recruiter-entitlement";
+export const INTERNAL_SHELL_HEADER = "x-smarthire-internal-shell";
 
 function isInternalShellPath(pathname: string) {
   return [INTERNAL_ADMIN_ROUTE, INTERNAL_RECRUITER_ROUTE].some(
@@ -29,24 +30,33 @@ export function proxy(request: NextRequest) {
   const host = request.headers.get("host")?.toLowerCase() ?? "";
   const pathname = request.nextUrl.pathname;
   if (pathname.startsWith("/api/")) return NextResponse.next();
+  if (isInternalShellPath(pathname)) {
+    const shell = request.headers.get(INTERNAL_SHELL_HEADER);
+    const trustedAdminRoute =
+      shell === "admin" &&
+      host === expectedHost("admin") &&
+      (pathname === INTERNAL_ADMIN_ROUTE ||
+        pathname.startsWith(`${INTERNAL_ADMIN_ROUTE}/`));
+    const trustedRecruiterRoute =
+      shell === "recruiter" &&
+      host === expectedHost("recruiter") &&
+      (pathname === INTERNAL_RECRUITER_ROUTE ||
+        pathname.startsWith(`${INTERNAL_RECRUITER_ROUTE}/`));
+    return trustedAdminRoute || trustedRecruiterRoute
+      ? NextResponse.next()
+      : new NextResponse(null, { status: 404 });
+  }
   if (host === expectedHost("admin")) {
-    if (isInternalShellPath(pathname))
-      return new NextResponse(null, { status: 404 });
     const url = request.nextUrl.clone();
     url.pathname = `${INTERNAL_ADMIN_ROUTE}${pathname === "/" ? "" : pathname}`;
     return NextResponse.rewrite(url);
   }
   if (host === expectedHost("recruiter")) {
-    if (isInternalShellPath(pathname))
-      return new NextResponse(null, { status: 404 });
     const url = request.nextUrl.clone();
     url.pathname = `${INTERNAL_RECRUITER_ROUTE}${pathname === "/" ? "" : pathname}`;
     return NextResponse.rewrite(url);
   }
-  if (host === expectedHost("candidate"))
-    return isInternalShellPath(pathname)
-      ? new NextResponse(null, { status: 404 })
-      : NextResponse.next();
+  if (host === expectedHost("candidate")) return NextResponse.next();
   return new NextResponse(null, { status: 404 });
 }
 
