@@ -177,7 +177,6 @@ paths:
                 - preparationId
                 - preparationVersion
                 - lookupSnapshotId
-                - companyName
                 - taxIdentifier
                 - applicantLegalName
                 - applicantRegisteredAddress
@@ -193,7 +192,6 @@ paths:
                 preparationId: { type: string, minLength: 1 }
                 preparationVersion: { type: integer, minimum: 1 }
                 lookupSnapshotId: { type: string, minLength: 1 }
-                companyName: { type: string, minLength: 1, maxLength: 240 }
                 taxIdentifier: { type: string, pattern: '^[0-9]{10}$' }
                 applicantLegalName: { type: string, minLength: 1, maxLength: 240 }
                 applicantRegisteredAddress: { type: string, minLength: 5, maxLength: 500 }
@@ -278,19 +276,42 @@ components:
       type: object
       additionalProperties: false
       properties:
-        applicantLegalName: { type: [string, 'null'] }
-        applicantRegisteredAddress: { type: [string, 'null'] }
+        applicantLegalName:
+          type: [string, 'null']
+          minLength: 1
+          maxLength: 240
+        applicantRegisteredAddress:
+          type: [string, 'null']
+          minLength: 5
+          maxLength: 500
         operatingAddressDiffers: { type: boolean }
-        operatingAddress: { type: [string, 'null'] }
-        companyPhone: { type: [string, 'null'] }
-        website: { type: [string, 'null'] }
+        operatingAddress:
+          type: [string, 'null']
+          minLength: 5
+          maxLength: 500
+        companyPhone:
+          type: [string, 'null']
+          minLength: 9
+          maxLength: 32
+        website:
+          type: [string, 'null']
+          maxLength: 2048
         relationship:
           anyOf:
             - $ref: '#/components/schemas/ApplicantRelationship'
             - type: 'null'
-        currentJobTitle: { type: [string, 'null'] }
-        authorityExplanation: { type: [string, 'null'] }
-        mismatchExplanation: { type: [string, 'null'] }
+        currentJobTitle:
+          type: [string, 'null']
+          minLength: 2
+          maxLength: 120
+        authorityExplanation:
+          type: [string, 'null']
+          minLength: 20
+          maxLength: 500
+        mismatchExplanation:
+          type: [string, 'null']
+          minLength: 20
+          maxLength: 500
     PreparationResponse:
       type: object
       additionalProperties: false

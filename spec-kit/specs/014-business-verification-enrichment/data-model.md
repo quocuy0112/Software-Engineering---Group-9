@@ -65,7 +65,7 @@ Immutable result of one admitted lookup.
 | `registryRepresentativeName` | String? | Admin-only; never required from applicant |
 | `responseDigest` | String | SHA-256 of canonical accepted fields/outcome |
 | `checkedAt` | DateTime | Provider/fallback decision time |
-| `expiresAt` | DateTime | `checkedAt + 30 minutes` |
+| `expiresAt` | DateTime | `checkedAt + 24 hours` |
 | `acceptedRequestId` | String? | Unique owning request after final submission |
 | `acceptedAt` | DateTime? | Set atomically with request creation |
 | `inaccessibleAt` | DateTime? | For unused expiry/cleanup |
@@ -197,7 +197,7 @@ A verification script fails deployment when legacy data violates the invariant. 
 
 ## Retention and Deletion
 
-- Unused snapshot: expires after 30 minutes, inaccessible no later than 24 hours after expiry, deleted no later than 24 hours after becoming inaccessible.
+- Unused snapshot: expires after 24 hours, inaccessible no later than 24 hours after expiry, deleted no later than 24 hours after becoming inaccessible.
 - Preparation: expires after 48 hours without activity or immediately after final submission; inaccessible content is deleted within 24 hours.
 - Challenge: normalized email and token digest inaccessible immediately on consumed/superseded/expired and physically nulled/deleted within 24 hours; content-free delivery/security metadata deleted within 30 days.
 - Accepted snapshot/facts: follow the owning Feature 006 request's authorized review/history retention. They are never exposed through public or unrelated tenant paths.

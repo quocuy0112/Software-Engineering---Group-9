@@ -65,7 +65,7 @@
 - [ ] T020 [P] [US1] Define provider-independent lookup gateway and outcomes in `web/src/backend/business-registry/business-registry-lookup-gateway.ts`
 - [ ] T021 [P] [US1] Implement bounded VietQR v2 adapter in `web/src/backend/business-registry/vietqr-business-registry-adapter.ts`
 - [ ] T022 [US1] Compose enabled/disabled registry providers in `web/src/backend/business-registry/business-registry-provider.ts`
-- [ ] T023 [US1] Implement lookup admission, safe snapshot mapping, exact comparison, and tax-change invalidation in `web/src/backend/admin/verification/employer-verification-preparation-service.ts`
+- [ ] T023 [US1] Implement lookup admission, safe snapshot mapping, exact comparison, tax-change invalidation, and privacy-safe operational events in `web/src/backend/admin/verification/employer-verification-preparation-service.ts`
 - [ ] T024 [US1] Implement server-side normalized draft restore/update and optimistic versioning in `web/src/backend/admin/verification/employer-verification-preparation-service.ts`
 - [ ] T025 [US1] Add no-store GET/PATCH preparation Route Handler in `web/src/app/api/employer-verifications/preparation/route.ts`
 - [ ] T026 [US1] Add no-store POST registry lookup Route Handler in `web/src/app/api/employer-verifications/registry-lookups/route.ts`
@@ -169,8 +169,8 @@
 
 - [ ] T068 Add preparation/snapshot/challenge expiry, scrub, and deletion work to `web/src/backend/admin/workers/verification-lifecycle-loop.ts`
 - [ ] T069 [P] Add retention deadline and retry integration tests in `web/tests/backend/integration/employer-verification/business-verification-retention.test.ts`
-- [ ] T070 [P] Add privacy tests for logs, URLs, storage, responses, notifications, and audit metadata in `web/tests/security/employer-verification/business-verification-privacy.test.ts`
-- [ ] T071 [P] Add provider/repository/session architecture boundary tests in `web/tests/architecture/business-verification-boundaries.test.ts`
+- [ ] T070 [P] Add privacy and existing-notification regression tests for logs, URLs, storage, responses, notifications, and audit metadata in `web/tests/security/employer-verification/business-verification-privacy.test.ts`
+- [ ] T071 [P] Add provider/repository/session boundaries and Feature 007 read-only header regression tests in `web/tests/architecture/business-verification-boundaries.test.ts`
 - [ ] T072 [P] Add lookup/challenge P95 measurement harness in `web/scripts/measure-business-verification-performance.mjs`
 - [ ] T073 [P] Add representative performance assertions and metadata checks in `web/tests/performance/employer-verification/business-verification-performance.test.ts`
 - [ ] T074 Synchronize implemented API/status details in `spec-kit/specs/006-admin-management/spec.md`, `spec-kit/specs/009-user-management-and-recruiter-verification/spec-group-2-business-verification-approval.md`, and `spec-kit/specs/014-business-verification-enrichment/quickstart.md`
