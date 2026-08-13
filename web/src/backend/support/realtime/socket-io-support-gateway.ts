@@ -29,7 +29,38 @@ function requesterRoom(userId: string) {
 
 const adminRoom = "support:administrators";
 
-export function attachSupportNamespace(io: Server) {
+type SupportNamespaceDependencies = {
+  authenticate?: (headers: Headers) => Promise<SupportSocketData>;
+};
+
+async function authenticateSupportSocket(
+  headers: Headers,
+): Promise<SupportSocketData> {
+  const origin = headers.get("origin");
+  const origins = configuredOrigins();
+  if (origin === origins.candidate) {
+    const actor = await new SupportRequestBoundary().requireSocket(headers);
+    return { ...actor, role: "REQUESTER" };
+  }
+  if (origin === origins.admin) {
+    const request = new Request(`${origins.admin}/api/admin/support-cases`, {
+      method: "GET",
+      headers,
+    });
+    const actor = await new AdminRequestBoundary().require(request);
+    return {
+      userId: actor.userId,
+      sessionId: actor.sessionId,
+      role: "ADMINISTRATOR",
+    };
+  }
+  throw new Error("AUTH_REQUIRED");
+}
+
+export function attachSupportNamespace(
+  io: Server,
+  supplied: SupportNamespaceDependencies = {},
+) {
   const support = io.of("/support") as unknown as Namespace<
     SupportClientToServerEvents,
     SupportServerToClientEvents,
@@ -45,6 +76,7 @@ export function attachSupportNamespace(io: Server) {
     },
   };
   installSupportRealtimePublisher(publisher);
+  const authenticate = supplied.authenticate ?? authenticateSupportSocket;
 
   support.use(
     async (
@@ -58,30 +90,7 @@ export function attachSupportNamespace(io: Server) {
     ) => {
       try {
         const headers = handshakeHeaders(socket.handshake.headers);
-        const origin = headers.get("origin");
-        const origins = configuredOrigins();
-        if (origin === origins.candidate) {
-          const actor = await new SupportRequestBoundary().requireSocket(
-            headers,
-          );
-          socket.data = { ...actor, role: "REQUESTER" };
-        } else if (origin === origins.admin) {
-          const request = new Request(
-            `${origins.admin}/api/admin/support-cases`,
-            {
-              method: "GET",
-              headers,
-            },
-          );
-          const actor = await new AdminRequestBoundary().require(request);
-          socket.data = {
-            userId: actor.userId,
-            sessionId: actor.sessionId,
-            role: "ADMINISTRATOR",
-          };
-        } else {
-          throw new Error("AUTH_REQUIRED");
-        }
+        socket.data = await authenticate(headers);
         next();
       } catch {
         next(new Error("AUTH_REQUIRED"));

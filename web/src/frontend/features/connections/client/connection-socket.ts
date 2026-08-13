@@ -5,6 +5,7 @@ import type {
   ConnectionClientToServerEvents,
   ConnectionServerToClientEvents,
 } from "@/shared/contracts/connections";
+import { REALTIME_SOCKET_PATH } from "@/shared/contracts/realtime/socket-transport";
 
 let socket: Socket<
   ConnectionServerToClientEvents,
@@ -13,7 +14,7 @@ let socket: Socket<
 
 export function getConnectionSocket() {
   socket ??= io("/connections", {
-    path: "/socket.io",
+    path: REALTIME_SOCKET_PATH,
     transports: ["websocket"],
     upgrade: false,
     autoConnect: false,

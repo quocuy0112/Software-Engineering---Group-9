@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import { REALTIME_SOCKET_PATH } from "@/shared/contracts/realtime/socket-transport";
 import { isAbsolute } from "node:path";
 import { loadImageSearchConfiguration } from "@/backend/image-search/config";
 const booleanString = z
@@ -87,9 +88,7 @@ const schema = z
     CV_S3_REGION: z.string().trim().max(100).optional().or(z.literal("")),
     CV_S3_KMS_KEY_ID: z.string().trim().max(2048).optional().or(z.literal("")),
     CV_CLAMD_SOCKET_PATH: z.literal("/run/clamav/clamd.sock"),
-    CV_CLAMD_SIGNATURE_MAX_AGE_HOURS: z
-      .enum(["24", "48"])
-      .transform(Number),
+    CV_CLAMD_SIGNATURE_MAX_AGE_HOURS: z.enum(["24", "48"]).transform(Number),
     CV_PARSER_ADAPTER: z.enum(["deterministic", "openai"]),
     CV_OPENAI_ENABLED: booleanString,
     CV_OPENAI_LOCAL_DEV_ENABLED: booleanString,
@@ -144,8 +143,13 @@ const schema = z
     IMAGE_SEARCH_ACCOUNT_LIMIT_PER_HOUR: z.string().optional(),
     IMAGE_SEARCH_RETENTION_MINUTES: z.string().optional(),
     MESSAGING_REALTIME_ENABLED: booleanString.default(true),
-    MESSAGING_SOCKET_PATH: z.literal("/chat").default("/chat"),
-    MESSAGING_ACK_TIMEOUT_MS: z.literal("5000").default("5000").transform(Number),
+    MESSAGING_SOCKET_PATH: z
+      .literal(REALTIME_SOCKET_PATH)
+      .default(REALTIME_SOCKET_PATH),
+    MESSAGING_ACK_TIMEOUT_MS: z
+      .literal("5000")
+      .default("5000")
+      .transform(Number),
     MESSAGING_ACK_RETRIES: z.literal("2").default("2").transform(Number),
     MESSAGING_DISCONNECT_GRACE_MS: z
       .literal("2000")
