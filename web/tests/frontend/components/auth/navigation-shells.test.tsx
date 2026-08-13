@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { describe, expect, it, vi } from "vitest";
@@ -300,6 +306,49 @@ describe("identity navigation shells", () => {
     expect(sidebar.parentElement).toHaveStyle(
       "--sh-sidebar-expanded-width: 236px",
     );
+  });
+
+  it("persists explicit workspace switches and keeps the recruiter switcher in the header", () => {
+    document.cookie = "";
+    render(
+      <WorkspaceShell
+        csrfProof="proof"
+        initialRecruiterStatus={{
+          state: "APPROVED",
+          destinationKind: "RECRUITER_WORKSPACE",
+          href: "https://recruiter.example.test",
+          observedAt: "2026-08-11T00:00:00.000Z",
+        }}
+        initialRecruiterJobData={{ jobs: [], companies: [], companyId: null }}
+        contentMode="job-board"
+        profile={{ name: "Recruiter User", email: "recruiter@example.test" }}
+      >
+        <h1>Dashboard</h1>
+      </WorkspaceShell>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Post a Job" }));
+
+    expect(screen.getByText("Recruiter workspace")).toBeVisible();
+    expect(document.querySelector(".workspace-main")).toHaveAttribute(
+      "data-content-mode",
+      "default",
+    );
+    expect(
+      screen.getByRole("button", { name: "Candidate workspace" }),
+    ).toBeVisible();
+    expect(
+      within(
+        screen.getByRole("button", { name: "Sign out" }).parentElement!,
+      ).queryByText("Candidate workspace"),
+    ).toBeNull();
+    expect(document.cookie).toContain("smarthire-workspace-mode=recruiter");
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Candidate workspace" }),
+    );
+    expect(screen.getByRole("button", { name: "Post a Job" })).toBeVisible();
+    expect(document.cookie).toContain("smarthire-workspace-mode=candidate");
   });
 
   it("keeps the sidebar frame width synchronized with the collapsed grid track", async () => {

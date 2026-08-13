@@ -566,6 +566,7 @@
 }
 
 .recruiter-editor {
+  min-width: 0;
   padding: var(--sh-space-8) 0 var(--sh-space-16);
 }
 .recruiter-back-button {
@@ -578,12 +579,14 @@
   margin-bottom: var(--sh-space-6);
 }
 .recruiter-editor__grid {
+  min-width: 0;
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
   gap: var(--sh-space-5);
   align-items: start;
 }
 .recruiter-editor__form {
+  min-width: 0;
   display: grid;
   gap: var(--sh-space-4);
   padding: var(--sh-space-6);
@@ -619,6 +622,7 @@
   font-size: var(--sh-font-size-body-sm);
 }
 .recruiter-preview {
+  min-width: 0;
   position: sticky;
   top: var(--sh-space-5);
   padding: var(--sh-space-6);
@@ -1063,11 +1067,15 @@
 .recruiter-benefit-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
   gap: var(--sh-space-3);
 }
 
 .recruiter-benefit-option {
+  position: relative;
   display: grid;
+  min-width: 0;
+  min-height: 116px;
   gap: var(--sh-space-2);
   padding: var(--sh-space-3);
   border: 1px solid var(--sh-color-border-subtle);
@@ -1085,17 +1093,29 @@
 }
 
 .recruiter-editor__form .recruiter-benefit-option > label {
+  position: relative;
   display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr);
+  min-width: 0;
+  min-height: 72px;
+  grid-template-columns: 34px minmax(0, 1fr);
   gap: var(--sh-space-2);
   align-items: center;
+  padding-right: var(--sh-space-6);
   cursor: pointer;
 }
 
 .recruiter-benefit-option > label > input {
-  width: 18px;
-  min-height: 18px;
-  accent-color: var(--sh-color-brand-primary);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.recruiter-benefit-option:focus-within {
+  outline: 3px solid var(--sh-color-focus-ring-bg);
+  outline-offset: 2px;
 }
 
 .recruiter-benefit-icon {
@@ -1109,6 +1129,60 @@
   background: var(--sh-color-brand-soft);
   font-size: 15px;
   font-weight: var(--sh-font-weight-bold);
+}
+
+.recruiter-benefit-card__label {
+  min-width: 0;
+  color: var(--sh-color-text-primary);
+  font-size: var(--sh-font-size-body-sm);
+  font-weight: var(--sh-font-weight-semibold);
+  line-height: 1.35;
+}
+
+.recruiter-benefit-card__check {
+  position: absolute;
+  top: var(--sh-space-2);
+  right: var(--sh-space-2);
+  display: inline-grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-full);
+  color: var(--sh-color-text-inverse);
+  background: var(--sh-color-brand-primary);
+  font-size: 14px;
+  font-weight: var(--sh-font-weight-bold);
+  line-height: 1;
+  opacity: 0;
+  transform: scale(0.8);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.recruiter-benefit-option.is-selected .recruiter-benefit-card__check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.recruiter-benefit-customize {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 180ms ease,
+    opacity 180ms ease;
+}
+
+.recruiter-benefit-customize > div {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.recruiter-benefit-customize[data-visible="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
 }
 
 .recruiter-editor__actions.recruiter-surface-card {

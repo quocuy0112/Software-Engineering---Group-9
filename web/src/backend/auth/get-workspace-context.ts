@@ -1,9 +1,13 @@
 import "server-only";
 
 import { cache } from "react";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { prisma } from "@/backend/database/prisma";
 import { csrfProof } from "@/backend/security/csrf/csrf-proof";
+import {
+  parseWorkspaceMode,
+  WORKSPACE_MODE_COOKIE,
+} from "@/shared/utils/workspace-mode";
 import { requireSession } from "./session/require-session";
 
 /**
@@ -18,6 +22,9 @@ import { getRecruiterHeaderStatusService } from "@/backend/recruiter-header/recr
 
 export const getWorkspaceContext = cache(async () => {
   const requestHeaders = await headers();
+  const persistedWorkspaceMode = parseWorkspaceMode(
+    (await cookies()).get(WORKSPACE_MODE_COOKIE)?.value,
+  );
   const current = await requireSession(requestHeaders);
   if (!current) return null;
 
@@ -67,6 +74,8 @@ export const getWorkspaceContext = cache(async () => {
       account.preferences?.language === "VI"
         ? ("vi" as const)
         : ("en" as const),
+    initialWorkspaceMode: persistedWorkspaceMode ?? ("candidate" as const),
+    hasPersistedWorkspaceMode: persistedWorkspaceMode !== null,
     recoveryCompleted: account.fullAccountRecoveryOperations.length > 0,
     initialRecruiterStatus,
   };

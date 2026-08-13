@@ -19,6 +19,7 @@ export default async function JobsLayout({
         profile={context.account}
         initialLocale={context.initialLocale}
         contentMode="job-board"
+        initialWorkspaceMode={context.initialWorkspaceMode}
       >
         <JobInteractionProvider>{children}</JobInteractionProvider>
       </WorkspaceShell>

@@ -21,7 +21,11 @@ export default async function RecruiterEntitlementPage() {
       csrfProof={context.csrfProof}
       profile={context.account}
       initialLocale={context.initialLocale}
-      initialWorkspaceMode="recruiter"
+      initialWorkspaceMode={
+        context.hasPersistedWorkspaceMode
+          ? context.initialWorkspaceMode
+          : "recruiter"
+      }
       initialRecruiterJobData={initialRecruiterJobData}
     >
       <div />

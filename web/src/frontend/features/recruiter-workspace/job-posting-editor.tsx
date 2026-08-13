@@ -56,12 +56,19 @@ function ToggleField({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="recruiter-toggle-field">
+    <label
+      className="recruiter-toggle-field"
+      onClick={(event) => event.stopPropagation()}
+    >
       <input
         type="checkbox"
         checked={checked}
         disabled={disabled}
-        onChange={(event) => onChange(event.target.checked)}
+        onClick={(event) => event.stopPropagation()}
+        onChange={(event) => {
+          event.stopPropagation();
+          onChange(event.currentTarget.checked);
+        }}
       />
       <span className="recruiter-toggle-field__control" aria-hidden="true" />
       <span>
@@ -977,10 +984,15 @@ export function JobPostingEditor({
                   );
                   return (
                     <div
-                      className={`recruiter-benefit-option${selected ? "is-selected" : ""}`}
+                      className={[
+                        "recruiter-benefit-option",
+                        selected ? "is-selected" : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
                       key={option.icon}
                     >
-                      <label>
+                      <label className="recruiter-benefit-card">
                         <input
                           type="checkbox"
                           aria-label={option.label}
@@ -1000,19 +1012,37 @@ export function JobPostingEditor({
                         >
                           {option.glyph}
                         </span>
-                        <span>{option.label}</span>
+                        <span className="recruiter-benefit-card__label">
+                          {option.label}
+                        </span>
+                        <span
+                          className="recruiter-benefit-card__check"
+                          aria-hidden="true"
+                        >
+                          &#10003;
+                        </span>
                       </label>
-                      {selected ? (
-                        <input
-                          aria-label={`Benefit label for ${option.label}`}
-                          disabled={readOnly}
-                          maxLength={300}
-                          value={selected.label}
-                          onChange={(event) =>
-                            updateBenefitLabel(option.icon, event.target.value)
-                          }
-                        />
-                      ) : null}
+                      <div
+                        className="recruiter-benefit-customize"
+                        data-visible={Boolean(selected)}
+                        aria-hidden={!selected}
+                      >
+                        <div>
+                          <input
+                            aria-label={`Benefit label for ${option.label}`}
+                            disabled={readOnly || !selected}
+                            tabIndex={selected ? undefined : -1}
+                            maxLength={300}
+                            value={selected?.label ?? option.label}
+                            onChange={(event) =>
+                              updateBenefitLabel(
+                                option.icon,
+                                event.target.value,
+                              )
+                            }
+                          />
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
