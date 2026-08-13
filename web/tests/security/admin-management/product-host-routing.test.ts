@@ -1,14 +1,12 @@
 import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
-import {
-  INTERNAL_ADMIN_ROUTE,
-  INTERNAL_RECRUITER_ROUTE,
-  proxy,
-} from "@/proxy";
+import { INTERNAL_ADMIN_ROUTE, INTERNAL_RECRUITER_ROUTE, proxy } from "@/proxy";
 
-function request(url: string) {
+function request(url: string, headers?: HeadersInit) {
   const target = new URL(url);
-  return new NextRequest(target, { headers: { host: target.host } });
+  return new NextRequest(target, {
+    headers: { host: target.host, ...headers },
+  });
 }
 
 describe("product host shell routing", () => {
@@ -28,15 +26,34 @@ describe("product host shell routing", () => {
     );
   });
 
-  it("does not expose either internal shell route directly", () => {
-    for (const url of [
-      `http://localhost:3001${INTERNAL_ADMIN_ROUTE}`,
-      `http://localhost:3001${INTERNAL_RECRUITER_ROUTE}`,
-      `http://console.admin.localhost:3001${INTERNAL_ADMIN_ROUTE}`,
-      `http://console.recruiter.localhost:3001${INTERNAL_RECRUITER_ROUTE}`,
-    ]) {
-      expect(proxy(request(url)).status, url).toBe(404);
-    }
+  it("redirects the user-facing admin alias without exposing the internal shell", () => {
+    const candidateAlias = proxy(
+      request(`http://localhost:3001${INTERNAL_ADMIN_ROUTE}/accounts`),
+    );
+
+    expect(candidateAlias.status).toBe(307);
+    expect(candidateAlias.headers.get("location")).toBe(
+      "http://console.admin.localhost:3001/accounts",
+    );
+    expect(
+      proxy(
+        request(`http://console.admin.localhost:3001${INTERNAL_ADMIN_ROUTE}`),
+      ).status,
+    ).toBe(404);
+    expect(
+      proxy(
+        request(
+          `http://console.recruiter.localhost:3001${INTERNAL_RECRUITER_ROUTE}`,
+        ),
+      ).status,
+    ).toBe(404);
+    expect(
+      proxy(
+        request(`http://localhost:3001${INTERNAL_ADMIN_ROUTE}`, {
+          "x-smarthire-internal-admin-shell": "1",
+        }),
+      ).headers.get("x-middleware-next"),
+    ).toBe("1");
   });
 
   it("leaves candidate pages and APIs to their authoritative handlers", () => {

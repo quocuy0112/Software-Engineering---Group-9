@@ -5,9 +5,10 @@ import Link from "next/link";
 import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { Badge } from "@/frontend/components/ui/badge";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
-import type {
-  RecruiterCompanySettings,
-  RecruiterCompanySettingsInput,
+import {
+  companyLogoSchema,
+  type RecruiterCompanySettings,
+  type RecruiterCompanySettingsInput,
 } from "@/shared/contracts/jobs/catalog";
 
 type Props = { initialCompany: RecruiterCompanySettings | null };
@@ -51,20 +52,48 @@ function statusLabel(status: RecruiterCompanySettings["verificationStatus"]) {
       : "Pending";
 }
 
-function profileMissingFields(form: FormState): FieldName[] {
-  return profileFields
-    .filter(({ key }) => {
-      const value = form[key];
-      return typeof value !== "string" || value.trim().length === 0;
-    })
-    .map(({ key }) => key);
+type ProfileValidation = {
+  missingFields: FieldName[];
+  fieldErrors: Partial<Record<FieldName, string>>;
+};
+
+export function getCompanyProfileValidation(form: FormState): ProfileValidation {
+  const missingFields: FieldName[] = [];
+  const fieldErrors: Partial<Record<FieldName, string>> = {};
+
+  for (const { key, label } of profileFields) {
+    const value = form[key];
+    if (typeof value !== "string" || value.trim().length === 0) {
+      missingFields.push(key);
+      fieldErrors[key] = `${label} is required.`;
+      continue;
+    }
+
+    if (key === "logo" && !companyLogoSchema.safeParse(value).success) {
+      missingFields.push(key);
+      fieldErrors[key] =
+        "Choose a saved PNG, JPEG, or WebP logo before posting a job.";
+    }
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    console.debug("[recruiter] posting gate validation", {
+      fields: profileFields.map(({ key }) => ({
+        field: key,
+        value: key === "logo" ? (form[key] ? "[uploaded logo]" : null) : form[key],
+        valid: !fieldErrors[key],
+        reason: fieldErrors[key] ?? null,
+      })),
+      profileComplete: missingFields.length === 0,
+    });
+  }
+
+  return { missingFields, fieldErrors };
 }
 
 function validateForm(form: FormState): FieldErrors {
   const errors: FieldErrors = {};
-  for (const key of profileMissingFields(form)) {
-    errors[key] = `${profileFields.find((field) => field.key === key)?.label ?? "This field"} is required.`;
-  }
+  Object.assign(errors, getCompanyProfileValidation(form).fieldErrors);
   if (form.website) {
     try {
       new URL(form.website);
@@ -227,11 +256,9 @@ export function CompanySettingsScreen({ initialCompany }: Props) {
     );
   }
 
-  const missingFields = company.profileComplete
-    ? []
-    : company.missingProfileFields.length
-      ? company.missingProfileFields
-      : profileMissingFields(form);
+  const profileValidation = getCompanyProfileValidation(form);
+  const missingFields = profileValidation.missingFields;
+  const profileComplete = missingFields.length === 0;
 
   return (
     <section className="recruiter-management recruiter-company-settings">
@@ -246,7 +273,7 @@ export function CompanySettingsScreen({ initialCompany }: Props) {
         </Badge>
       </div>
 
-      {!company.profileComplete ? (
+      {!profileComplete ? (
         <section className="recruiter-company-settings__profile-alert" role="alert" aria-labelledby="profile-complete-title">
           <div>
             <p className="recruiter-eyebrow">POSTING GATE</p>
@@ -255,7 +282,9 @@ export function CompanySettingsScreen({ initialCompany }: Props) {
           </div>
           <ul>
             {missingFields.map((field) => (
-              <li key={field}>{profileFields.find((item) => item.key === field)?.label}</li>
+              <li key={field}>
+                {profileFields.find((item) => item.key === field)?.label}: {profileValidation.fieldErrors[field]}
+              </li>
             ))}
           </ul>
         </section>
@@ -268,19 +297,19 @@ export function CompanySettingsScreen({ initialCompany }: Props) {
             <label htmlFor="company-name">
               Company name *
               <input id="company-name" value={form.name} onChange={(event) => updateField("name", event.target.value)} aria-invalid={Boolean(fieldErrors.name)} aria-describedby={fieldErrors.name ? "company-name-error" : undefined} maxLength={160} />
-              <FieldError id="company-name-error" message={fieldErrors.name} />
+              <FieldError id="company-name-error" message={fieldErrors.name ?? profileValidation.fieldErrors.name} />
             </label>
             <label htmlFor="company-industry">
               Industry *
               <input id="company-industry" value={form.industry} onChange={(event) => updateField("industry", event.target.value)} aria-invalid={Boolean(fieldErrors.industry)} aria-describedby={fieldErrors.industry ? "company-industry-error" : undefined} maxLength={160} />
-              <FieldError id="company-industry-error" message={fieldErrors.industry} />
+              <FieldError id="company-industry-error" message={fieldErrors.industry ?? profileValidation.fieldErrors.industry} />
             </label>
           </div>
           <div className="recruiter-form-grid">
             <label htmlFor="company-size">
               Company size *
               <input id="company-size" value={form.size} onChange={(event) => updateField("size", event.target.value)} aria-invalid={Boolean(fieldErrors.size)} aria-describedby={fieldErrors.size ? "company-size-error" : undefined} maxLength={80} />
-              <FieldError id="company-size-error" message={fieldErrors.size} />
+              <FieldError id="company-size-error" message={fieldErrors.size ?? profileValidation.fieldErrors.size} />
             </label>
             <label htmlFor="company-website">
               Website
@@ -309,14 +338,14 @@ export function CompanySettingsScreen({ initialCompany }: Props) {
                 <button className="recruiter-outline-button" type="button" disabled={!form.logo || logoBusy || busy} onClick={() => updateField("logo", null)}>
                   Remove logo
                 </button>
-                <FieldError id="company-logo-error" message={fieldErrors.logo} />
+                <FieldError id="company-logo-error" message={fieldErrors.logo ?? profileValidation.fieldErrors.logo} />
               </div>
             </div>
           </div>
           <label htmlFor="company-address">
             Address *
             <input id="company-address" value={form.address} onChange={(event) => updateField("address", event.target.value)} aria-invalid={Boolean(fieldErrors.address)} aria-describedby={fieldErrors.address ? "company-address-error" : undefined} maxLength={300} />
-            <FieldError id="company-address-error" message={fieldErrors.address} />
+            <FieldError id="company-address-error" message={fieldErrors.address ?? profileValidation.fieldErrors.address} />
           </label>
           <label htmlFor="company-description">
             Description
