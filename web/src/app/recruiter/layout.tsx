@@ -1,0 +1,28 @@
+import '@/frontend/styles/workspace.css';
+import '@/frontend/styles/responsive.css';
+import '@/frontend/styles/recruiter-workspace-full.css';
+import { redirect } from 'next/navigation';
+import { getWorkspaceContext } from '@/backend/auth/get-workspace-context';
+import { WorkspaceShell } from '@/frontend/features/dashboard/components/workspace-shell';
+
+export const dynamic = 'force-dynamic';
+
+export default async function RecruiterLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  const context = await getWorkspaceContext();
+  if (!context) redirect('/login?returnTo=%2Frecruiter');
+
+  return (
+    <WorkspaceShell
+      csrfProof={context.csrfProof}
+      profile={context.account}
+      initialLocale={context.initialLocale}
+      initialRecruiterStatus={context.initialRecruiterStatus}
+      initialWorkspaceMode='recruiter'
+      recruiterContent={children}
+    >
+      <div />
+    </WorkspaceShell>
+  );
+}

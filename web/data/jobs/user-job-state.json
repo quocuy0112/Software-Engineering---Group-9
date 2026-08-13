@@ -38,5 +38,9 @@
         "city": "Ho Chi Minh City"
       }
     }
+  ],
+  "appliedJobIds": [
+    "job-000001",
+    "job-000002"
   ]
 }

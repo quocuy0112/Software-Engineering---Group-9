@@ -635,7 +635,7 @@
 }
 
 .job-card-header-meta .job-salary.job-salary--negotiable {
-  color: var(--sh-color-success);
+  color: var(--sh-color-brand-primary);
 }
 
 .job-card-header-meta .job-card-timing {
@@ -1738,33 +1738,11 @@
 .job-filter-column {
   position: sticky;
   top: calc(var(--sh-topbar-height) + var(--sh-space-4));
-  height: calc(100dvh - var(--sh-topbar-height) - var(--sh-space-8));
-  max-height: calc(100dvh - var(--sh-topbar-height) - var(--sh-space-8));
+  height: auto;
+  max-height: none;
   min-height: 0;
   box-sizing: border-box;
   overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
-  scrollbar-color: var(--sh-color-border-default) transparent;
-  scrollbar-gutter: stable;
-  scrollbar-width: thin;
-}
-
-.job-filter-column::-webkit-scrollbar {
-  width: 6px;
-}
-
-.job-filter-column::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.job-filter-column::-webkit-scrollbar-thumb {
-  border-radius: var(--sh-radius-full);
-  background: var(--sh-color-border-default);
-}
-
-.job-filter-column::-webkit-scrollbar-thumb:hover {
-  background: var(--sh-color-text-muted);
 }
 
 .job-filter-shell {
@@ -7838,7 +7816,7 @@
 }
 
 .job-salary--negotiable {
-  color: var(--sh-color-success) !important;
+  color: var(--sh-color-brand-primary) !important;
 }
 
 .job-redesign-card {
@@ -7886,7 +7864,7 @@
 }
 
 .job-card-header-meta .job-salary.job-salary--negotiable {
-  color: var(--sh-color-success);
+  color: var(--sh-color-brand-primary);
 }
 
 .job-card-header-meta .job-card-timing {

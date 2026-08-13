@@ -33,6 +33,10 @@ import { RecruiterHeaderAction } from "@/frontend/features/recruiter-header/comp
 import type { RecruiterHeaderStatus } from "@/shared/contracts/recruiter-header-status";
 import type { RecruiterJobManagementData } from "@/shared/contracts/recruiter-job-posting";
 import {
+  WORKSPACE_MODE_COOKIE,
+  type WorkspaceMode,
+} from "@/shared/utils/workspace-mode";
+import {
   RecruiterJobPostingManagement,
   RecruiterWorkspaceNavigation,
 } from "@/frontend/features/recruiter-workspace/job-posting-management";
@@ -53,6 +57,7 @@ export function WorkspaceShell({
   contentMode = "default",
   initialWorkspaceMode = "candidate",
   initialRecruiterJobData,
+  recruiterContent,
 }: {
   children: React.ReactNode;
   initialRecruiterStatus?: RecruiterHeaderStatus | null;
@@ -66,6 +71,7 @@ export function WorkspaceShell({
   contentMode?: "default" | "job-board";
   initialWorkspaceMode?: "candidate" | "recruiter";
   initialRecruiterJobData?: RecruiterJobManagementData | null;
+  recruiterContent?: React.ReactNode;
 }) {
   return (
     <WorkspaceLocaleProvider initialLocale={initialLocale}>
@@ -76,6 +82,7 @@ export function WorkspaceShell({
         contentMode={contentMode}
         initialWorkspaceMode={initialWorkspaceMode}
         initialRecruiterJobData={initialRecruiterJobData}
+        recruiterContent={recruiterContent}
       >
         {children}
       </WorkspaceShellContent>
@@ -91,6 +98,7 @@ function WorkspaceShellContent({
   contentMode,
   initialWorkspaceMode,
   initialRecruiterJobData,
+  recruiterContent,
 }: {
   children: React.ReactNode;
   initialRecruiterStatus?: RecruiterHeaderStatus | null;
@@ -103,6 +111,7 @@ function WorkspaceShellContent({
   contentMode: "default" | "job-board";
   initialWorkspaceMode: "candidate" | "recruiter";
   initialRecruiterJobData?: RecruiterJobManagementData | null;
+  recruiterContent?: React.ReactNode;
 }) {
   const router = useRouter();
   const locale = useWorkspaceLocale();
@@ -110,7 +119,7 @@ function WorkspaceShellContent({
   const [navigating, startNavigation] = useTransition();
   const [status, setStatus] = useState("");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [workspaceMode, setWorkspaceMode] = useState(initialWorkspaceMode);
+  const workspaceMode = initialWorkspaceMode;
   const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_MINIMUM_WIDTH);
   const [sidebarMaximumWidth, setSidebarMaximumWidth] = useState(
     SIDEBAR_MAXIMUM_FALLBACK_WIDTH,
@@ -210,6 +219,25 @@ function WorkspaceShellContent({
           signOutError: "Unable to sign out. Please try again.",
         };
 
+  function persistWorkspaceMode(mode: WorkspaceMode) {
+    if (mode === 'recruiter') openRecruiterWorkspace();
+    else openCandidateWorkspace();
+  }
+
+  function clearPersistedWorkspaceMode() {
+    document.cookie = `${WORKSPACE_MODE_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax`;
+  }
+
+  function openRecruiterWorkspace() {
+    document.cookie = `${WORKSPACE_MODE_COOKIE}=recruiter; Path=/; Max-Age=31536000; SameSite=Lax`;
+    startNavigation(() => router.push('/recruiter'));
+  }
+
+  function openCandidateWorkspace() {
+    clearPersistedWorkspaceMode();
+    startNavigation(() => router.push('/dashboard'));
+  }
+
   async function signOut() {
     if (busy || navigating) return;
     setBusy(true);
@@ -224,6 +252,7 @@ function WorkspaceShellContent({
         return;
       }
       closeMessagingConnectionOnLogout();
+      clearPersistedWorkspaceMode();
       startNavigation(() => router.replace("/login"));
     } catch {
       setStatus(copy.signOutError);
@@ -345,7 +374,6 @@ function WorkspaceShellContent({
             <RecruiterWorkspaceNavigation
               busy={busy || navigating}
               collapsed={sidebarCollapsed}
-              onExit={() => setWorkspaceMode("candidate")}
               onSignOut={() => void signOut()}
             />
           ) : (
@@ -356,7 +384,12 @@ function WorkspaceShellContent({
             />
           )}
         </aside>
-        <div className="workspace-main" data-content-mode={contentMode}>
+        <div
+          className="workspace-main"
+          data-content-mode={
+            workspaceMode === "recruiter" ? "default" : contentMode
+          }
+        >
           <header className="workspace-header">
             <div>
               <p className="workspace-topbar-kicker">
@@ -370,7 +403,7 @@ function WorkspaceShellContent({
                   : copy.greeting}
               </p>
             </div>
-            {contentMode === "job-board" ? (
+            {workspaceMode === "candidate" && contentMode === "job-board" ? (
               <GlobalImageSearch csrfProof={csrfProof} />
             ) : null}
             <div className="workspace-header-actions">
@@ -410,7 +443,7 @@ function WorkspaceShellContent({
                 <button
                   className="recruiter-header-action recruiter-header-action--secondary"
                   type="button"
-                  onClick={() => setWorkspaceMode("candidate")}
+                  onClick={() => persistWorkspaceMode("candidate")}
                 >
                   <span
                     className="recruiter-header-action__icon"
@@ -425,7 +458,7 @@ function WorkspaceShellContent({
               ) : (
                 <RecruiterHeaderAction
                   initialStatus={initialRecruiterStatus}
-                  onOpenWorkspace={() => setWorkspaceMode("recruiter")}
+                  onOpenWorkspace={() => persistWorkspaceMode("recruiter")}
                 />
               )}
             </div>
@@ -435,14 +468,18 @@ function WorkspaceShellContent({
           </div>
           <section
             className="workspace-content"
-            data-content-mode={contentMode}
+            data-content-mode={
+              workspaceMode === "recruiter" ? "default" : contentMode
+            }
             data-workspace-mode={workspaceMode}
           >
             <CsrfProofProvider value={csrfProof}>
               {workspaceMode === "recruiter" ? (
-                <RecruiterJobPostingManagement
-                  initialData={initialRecruiterJobData}
-                />
+                recruiterContent ?? (
+                  <RecruiterJobPostingManagement
+                    initialData={initialRecruiterJobData}
+                  />
+                )
               ) : (
                 children
               )}

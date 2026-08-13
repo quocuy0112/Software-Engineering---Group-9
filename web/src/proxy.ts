@@ -49,7 +49,9 @@ export function proxy(request: NextRequest) {
   if (host === expectedHost("admin")) {
     const url = request.nextUrl.clone();
     url.pathname = `${INTERNAL_ADMIN_ROUTE}${pathname === "/" ? "" : pathname}`;
-    return NextResponse.rewrite(url);
+    const headers = new Headers(request.headers);
+    headers.set(INTERNAL_ADMIN_SHELL_HEADER, "1");
+    return NextResponse.rewrite(url, { request: { headers } });
   }
   if (host === expectedHost("recruiter")) {
     const url = request.nextUrl.clone();

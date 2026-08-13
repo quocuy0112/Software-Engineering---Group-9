@@ -1,4 +1,9 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { describe, expect, it, vi } from "vitest";
@@ -8,7 +13,11 @@ import { DashboardView } from "@/frontend/features/dashboard/components/dashboar
 import { ProfileNavigation } from "@/frontend/features/profile/components/profile-navigation";
 import { ProfileAccountView } from "@/frontend/features/profile/components/profile-account-view";
 
-const navigation = vi.hoisted(() => ({ replace: vi.fn(), refresh: vi.fn() }));
+const navigation = vi.hoisted(() => ({
+  replace: vi.fn(),
+  refresh: vi.fn(),
+  push: vi.fn(),
+}));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/profile/security",
   useRouter: () => navigation,
@@ -300,6 +309,31 @@ describe("identity navigation shells", () => {
     expect(sidebar.parentElement).toHaveStyle(
       "--sh-sidebar-expanded-width: 236px",
     );
+  });
+
+  it("persists explicit workspace switches and keeps the recruiter switcher in the header", () => {
+    document.cookie = "";
+    render(
+      <WorkspaceShell
+        csrfProof="proof"
+        initialRecruiterStatus={{
+          state: "APPROVED",
+          destinationKind: "RECRUITER_WORKSPACE",
+          href: "https://recruiter.example.test",
+          observedAt: "2026-08-11T00:00:00.000Z",
+        }}
+        initialRecruiterJobData={{ jobs: [], companies: [], companyId: null }}
+        contentMode="job-board"
+        profile={{ name: "Recruiter User", email: "recruiter@example.test" }}
+      >
+        <h1>Dashboard</h1>
+      </WorkspaceShell>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Post a Job" }));
+
+    expect(navigation.push).toHaveBeenCalledWith("/recruiter");
+    expect(document.cookie).toContain("smarthire-workspace-mode=recruiter");
   });
 
   it("keeps the sidebar frame width synchronized with the collapsed grid track", async () => {

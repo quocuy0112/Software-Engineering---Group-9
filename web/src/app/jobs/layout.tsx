@@ -12,6 +12,7 @@ export default async function JobsLayout({
   const context = await getWorkspaceContext();
 
   if (context) {
+
     return (
       <WorkspaceShell
         initialRecruiterStatus={context.initialRecruiterStatus}
@@ -19,6 +20,7 @@ export default async function JobsLayout({
         profile={context.account}
         initialLocale={context.initialLocale}
         contentMode="job-board"
+        initialWorkspaceMode="candidate"
       >
         <JobInteractionProvider>{children}</JobInteractionProvider>
       </WorkspaceShell>

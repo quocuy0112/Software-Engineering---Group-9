@@ -55,20 +55,37 @@ function ToggleField({
   label: string;
   onChange: (checked: boolean) => void;
 }) {
+  const inputId = `recruiter-toggle-${label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/gu, "-")
+    .replace(/^-|-$/gu, "")}`;
+
   return (
-    <label className="recruiter-toggle-field">
+    <div
+      className="recruiter-toggle-field"
+      onPointerDown={(event) => event.stopPropagation()}
+      onClick={(event) => event.stopPropagation()}
+      onKeyDown={(event) => event.stopPropagation()}
+    >
       <input
+        id={inputId}
         type="checkbox"
         checked={checked}
         disabled={disabled}
-        onChange={(event) => onChange(event.target.checked)}
+        onClick={(event) => event.stopPropagation()}
+        onChange={(event) => {
+          event.stopPropagation();
+          onChange(event.currentTarget.checked);
+        }}
       />
-      <span className="recruiter-toggle-field__control" aria-hidden="true" />
-      <span>
-        <strong>{label}</strong>
-        {help ? <small>{help}</small> : null}
-      </span>
-    </label>
+      <label className="recruiter-toggle-field__label" htmlFor={inputId}>
+        <span className="recruiter-toggle-field__control" aria-hidden="true" />
+        <span>
+          <strong>{label}</strong>
+          {help ? <small>{help}</small> : null}
+        </span>
+      </label>
+    </div>
   );
 }
 
@@ -977,10 +994,15 @@ export function JobPostingEditor({
                   );
                   return (
                     <div
-                      className={`recruiter-benefit-option${selected ? "is-selected" : ""}`}
+                      className={[
+                        "recruiter-benefit-option",
+                        selected ? "is-selected" : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
                       key={option.icon}
                     >
-                      <label>
+                      <label className="recruiter-benefit-card">
                         <input
                           type="checkbox"
                           aria-label={option.label}
@@ -1000,19 +1022,37 @@ export function JobPostingEditor({
                         >
                           {option.glyph}
                         </span>
-                        <span>{option.label}</span>
+                        <span className="recruiter-benefit-card__label">
+                          {option.label}
+                        </span>
+                        <span
+                          className="recruiter-benefit-card__check"
+                          aria-hidden="true"
+                        >
+                          &#10003;
+                        </span>
                       </label>
-                      {selected ? (
-                        <input
-                          aria-label={`Benefit label for ${option.label}`}
-                          disabled={readOnly}
-                          maxLength={300}
-                          value={selected.label}
-                          onChange={(event) =>
-                            updateBenefitLabel(option.icon, event.target.value)
-                          }
-                        />
-                      ) : null}
+                      <div
+                        className="recruiter-benefit-customize"
+                        data-visible={Boolean(selected)}
+                        aria-hidden={!selected}
+                      >
+                        <div>
+                          <input
+                            aria-label={`Benefit label for ${option.label}`}
+                            disabled={readOnly || !selected}
+                            tabIndex={selected ? undefined : -1}
+                            maxLength={300}
+                            value={selected?.label ?? option.label}
+                            onChange={(event) =>
+                              updateBenefitLabel(
+                                option.icon,
+                                event.target.value,
+                              )
+                            }
+                          />
+                        </div>
+                      </div>
                     </div>
                   );
                 })}

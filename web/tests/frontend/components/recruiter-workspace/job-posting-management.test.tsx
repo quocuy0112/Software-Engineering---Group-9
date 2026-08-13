@@ -443,4 +443,61 @@ describe("recruiter job posting management", () => {
     expect(within(preview!).getByText("Urgent hiring")).toBeVisible();
     expect(within(preview!).getByText("Holiday and Tet bonus")).toBeVisible();
   });
+
+  it("keeps benefit selection cards and boolean toggles local to the form", () => {
+    render(<RecruiterJobPostingManagement initialData={initialData} />);
+    fireEvent.click(screen.getByRole("button", { name: "Create job posting" }));
+
+    const preview = screen.getByText("Live candidate preview").closest("aside");
+    const urgent = screen.getByLabelText(/Urgent hiring/);
+    const saturday = screen.getByLabelText(/Work on Saturday/);
+    const nationwide = screen.getByLabelText(/Nationwide remote/);
+    const locationSection = screen
+      .getByText("Location & work arrangement")
+      .closest("details");
+    const hiringSection = screen
+      .getByText("Hiring settings")
+      .closest("details");
+
+    fireEvent.click(nationwide);
+    fireEvent.click(saturday);
+    fireEvent.click(urgent);
+
+    expect(nationwide).toBeChecked();
+    expect(saturday).toBeChecked();
+    expect(urgent).toBeChecked();
+    expect(locationSection).toHaveAttribute("open");
+    expect(hiringSection).toHaveAttribute("open");
+    expect(within(preview!).getByText("Nationwide")).toBeVisible();
+    expect(within(preview!).getByText("Urgent hiring")).toBeVisible();
+
+    fireEvent.click(nationwide);
+    fireEvent.click(saturday);
+    fireEvent.click(urgent);
+
+    expect(nationwide).not.toBeChecked();
+    expect(saturday).not.toBeChecked();
+    expect(urgent).not.toBeChecked();
+    expect(within(preview!).queryByText("Nationwide")).toBeNull();
+    expect(within(preview!).queryByText("Urgent hiring")).toBeNull();
+
+    const benefit = screen.getByRole("checkbox", {
+      name: "Holiday and Tet bonus",
+    });
+    fireEvent.click(benefit);
+    const benefitCard = document.querySelector(
+      ".recruiter-benefit-option.is-selected",
+    );
+    expect(benefitCard).not.toBeNull();
+    expect(benefitCard).toHaveClass("is-selected");
+    expect(benefitCard?.querySelector(".recruiter-benefit-icon")).toBeTruthy();
+    expect(
+      within(benefitCard as HTMLElement).getByLabelText(
+        "Benefit label for Holiday and Tet bonus",
+      ),
+    ).toBeEnabled();
+    expect(
+      benefitCard?.querySelector(".recruiter-benefit-card__check"),
+    ).toBeTruthy();
+  });
 });
