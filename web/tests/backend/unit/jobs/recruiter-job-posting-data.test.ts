@@ -3,6 +3,7 @@ import {
   createRecruiterJob,
   readRecruiterCompanySettings,
   readRecruiterJobManagementData,
+  updateRecruiterCompanySettings,
 } from "@/backend/services/jobs/recruiter-job-posting-data";
 import { createEmptyJobPosting } from "@/shared/contracts/recruiter-job-posting";
 
@@ -137,6 +138,47 @@ describe("recruiter JSON job persistence", () => {
     expect(data.companyId).toBe("db-company-1");
     expect(data.companies).toHaveLength(1);
     expect(data.companyProfileComplete).toBe(true);
+  });
+
+  it("saves a complete profile for a database-backed company", async () => {
+    prismaMocks.company.findMany.mockResolvedValue([
+      {
+        id: "db-company-1",
+        slug: "dava",
+        legalName: "Dava",
+        displayName: "Dava",
+        logoUrl: "https://example.com/old-logo.png",
+        websiteUrl: "https://example.com/old",
+        publicDescription: "Old description",
+        publicLocation: "Ho Chi Minh City",
+        size: "1-50 employees",
+        industry: "Game Development",
+        address: "Ho Chi Minh, District 8",
+        normalizedTaxIdentifier: "2000000000",
+        memberships: [{ userId: "recruiter-1", role: "OWNER" }],
+      },
+    ]);
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return "[]";
+      if (path.endsWith("companies.json")) return "[]";
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    const saved = await updateRecruiterCompanySettings("recruiter-1", {
+      name: "Dava",
+      industry: "Game Development",
+      size: "1-50 employees",
+      address: "Ho Chi Minh, District 8",
+      logo: "https://example.com/dava-logo.png",
+      website: "https://example.com/Dava",
+      description: "A verified SmartHire employer.",
+    });
+
+    expect(saved.profileComplete).toBe(true);
+    expect(saved.missingProfileFields).toEqual([]);
+    expect(prismaMocks.company.update).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: "db-company-1" } }),
+    );
   });
 
   it("persists every expanded jobs.json field for a recruiter posting", async () => {

@@ -578,8 +578,15 @@ export async function updateRecruiterCompanySettings(
     if (!company) throw new Error("Recruiter company not found.");
     const editable = recruiterCompanySettingsInputSchema.parse(input);
     validateCompanyLogo(editable.logo);
+    // These fields identify the PostgreSQL bridge and are not part of the
+    // strict public catalog contract. Strip them before parsing the updated
+    // catalog record, otherwise every DB-backed company save fails with an
+    // object-level Zod error.
+    const catalogCompany = { ...company };
+    delete catalogCompany.databaseId;
+    delete catalogCompany.databaseBacked;
     const updated = companyCatalogSchema.parse({
-      ...company,
+      ...catalogCompany,
       name: editable.name,
       logo: editable.logo,
       size: editable.size,

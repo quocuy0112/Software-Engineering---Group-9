@@ -36,7 +36,10 @@ function validationFields(error: ZodError): ValidationFields {
   for (const issue of error.issues) {
     const field = issue.path[0];
     if (typeof field === "string" && !fields[field]) {
-      fields[field] = field === "logo" ? "Choose a valid image file." : "This field is required.";
+      fields[field] =
+        field === "logo"
+          ? "Choose a valid image file."
+          : "This field is required.";
     }
   }
   return fields;
@@ -51,7 +54,9 @@ function normalizeOptionalEmptyValues(value: unknown) {
   return body;
 }
 
-function normalizedInput(value: RecruiterCompanySettingsInput): RecruiterCompanySettingsInput {
+function normalizedInput(
+  value: RecruiterCompanySettingsInput,
+): RecruiterCompanySettingsInput {
   return {
     ...value,
     name: value.name.trim(),
@@ -85,7 +90,8 @@ export async function PATCH(request: Request) {
     );
     return NextResponse.json(company, { headers: noStore });
   } catch (error) {
-    if (error instanceof AccountRequestError) return accountErrorResponse(error);
+    if (error instanceof AccountRequestError)
+      return accountErrorResponse(error);
     if (error instanceof ZodError) {
       return response(
         "Review the highlighted company profile fields.",
@@ -96,11 +102,16 @@ export async function PATCH(request: Request) {
     if (error instanceof SyntaxError) {
       return response("Request body must be valid JSON.", 400);
     }
-    if (error instanceof Error && error.message === "Recruiter company not found.") {
+    if (
+      error instanceof Error &&
+      error.message === "Recruiter company not found."
+    ) {
       return response(error.message, 404);
     }
     if (error instanceof Error && error.message === "Invalid company logo.") {
-      return response(error.message, 422, { logo: "Choose a valid image file." });
+      return response(error.message, 422, {
+        logo: "Choose a valid image file.",
+      });
     }
     return response("Unable to save company settings.", 400);
   }

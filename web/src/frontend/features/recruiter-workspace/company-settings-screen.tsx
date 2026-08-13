@@ -57,7 +57,9 @@ type ProfileValidation = {
   fieldErrors: Partial<Record<FieldName, string>>;
 };
 
-export function getCompanyProfileValidation(form: FormState): ProfileValidation {
+export function getCompanyProfileValidation(
+  form: FormState,
+): ProfileValidation {
   const missingFields: FieldName[] = [];
   const fieldErrors: Partial<Record<FieldName, string>> = {};
 
@@ -80,7 +82,8 @@ export function getCompanyProfileValidation(form: FormState): ProfileValidation 
     console.debug("[recruiter] posting gate validation", {
       fields: profileFields.map(({ key }) => ({
         field: key,
-        value: key === "logo" ? (form[key] ? "[uploaded logo]" : null) : form[key],
+        value:
+          key === "logo" ? (form[key] ? "[uploaded logo]" : null) : form[key],
         valid: !fieldErrors[key],
         reason: fieldErrors[key] ?? null,
       })),
@@ -111,7 +114,8 @@ function readFileAsDataUrl(file: File) {
       if (typeof reader.result === "string") resolve(reader.result);
       else reject(new Error("The selected logo could not be read."));
     };
-    reader.onerror = () => reject(new Error("The selected logo could not be read."));
+    reader.onerror = () =>
+      reject(new Error("The selected logo could not be read."));
     reader.readAsDataURL(file);
   });
 }
@@ -124,23 +128,30 @@ async function optimizeLogo(file: File) {
   const image = await new Promise<HTMLImageElement>((resolve, reject) => {
     const loaded = new window.Image();
     loaded.onload = () => resolve(loaded);
-    loaded.onerror = () => reject(new Error("The selected logo could not be decoded."));
+    loaded.onerror = () =>
+      reject(new Error("The selected logo could not be decoded."));
     loaded.src = source;
   });
   const maxDimension = 512;
-  const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+  const scale = Math.min(
+    1,
+    maxDimension / Math.max(image.naturalWidth, image.naturalHeight),
+  );
   const canvas = document.createElement("canvas");
   canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
   canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
   const context = canvas.getContext("2d");
-  if (!context) throw new Error("The logo preview is unavailable in this browser.");
+  if (!context)
+    throw new Error("The logo preview is unavailable in this browser.");
   context.drawImage(image, 0, 0, canvas.width, canvas.height);
   const webp = canvas.toDataURL("image/webp", 0.86);
   const result = webp.startsWith("data:image/webp")
     ? webp
     : canvas.toDataURL("image/jpeg", 0.86);
   if (result.length > 1_100_000) {
-    throw new Error("Choose a simpler logo image under 800 KB after compression.");
+    throw new Error(
+      "Choose a simpler logo image under 800 KB after compression.",
+    );
   }
   return result;
 }
@@ -176,7 +187,10 @@ export function CompanySettingsScreen({ initialCompany }: Props) {
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
-  function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
+  function updateField<K extends keyof FormState>(
+    field: K,
+    value: FormState[K],
+  ) {
     setForm((current) => ({ ...current, [field]: value }));
     setFieldErrors((current) => ({ ...current, [field]: undefined }));
   }
@@ -192,8 +206,15 @@ export function CompanySettingsScreen({ initialCompany }: Props) {
       updateField("logo", logo);
       setMessage("Logo preview ready. Save the profile to upload it.");
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "The logo could not be uploaded.");
-      setFieldErrors((current) => ({ ...current, logo: "Choose a valid image file." }));
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "The logo could not be uploaded.",
+      );
+      setFieldErrors((current) => ({
+        ...current,
+        logo: "Choose a valid image file.",
+      }));
     } finally {
       setLogoBusy(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -222,10 +243,11 @@ export function CompanySettingsScreen({ initialCompany }: Props) {
         },
         body: JSON.stringify(form),
       });
-      const payload = (await response.json()) as Partial<RecruiterCompanySettings> & {
-        message?: string;
-        fieldErrors?: FieldErrors;
-      };
+      const payload =
+        (await response.json()) as Partial<RecruiterCompanySettings> & {
+          message?: string;
+          fieldErrors?: FieldErrors;
+        };
       if (!response.ok || !payload.id) {
         setFieldErrors(payload.fieldErrors ?? {});
         throw new Error(payload.message ?? "Unable to save company settings.");
@@ -235,7 +257,11 @@ export function CompanySettingsScreen({ initialCompany }: Props) {
       setForm(formFromCompany(savedCompany));
       setMessage("Company profile saved.");
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Unable to save company settings.");
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "Unable to save company settings.",
+      );
     } finally {
       setBusy(false);
     }
@@ -247,9 +273,13 @@ export function CompanySettingsScreen({ initialCompany }: Props) {
         <p className="recruiter-eyebrow">COMPANY SETTINGS</p>
         <h1>No company is linked yet</h1>
         <p>
-          Complete recruiter verification first. After approval, this screen will be linked to the company you are authorized to manage.
+          Complete recruiter verification first. After approval, this screen
+          will be linked to the company you are authorized to manage.
         </p>
-        <Link className="recruiter-primary-button" href="/dashboard/employer-verification">
+        <Link
+          className="recruiter-primary-button"
+          href="/dashboard/employer-verification"
+        >
           Start recruiter verification
         </Link>
       </section>
@@ -266,7 +296,10 @@ export function CompanySettingsScreen({ initialCompany }: Props) {
         <div>
           <p className="recruiter-eyebrow">COMPANY SETTINGS</p>
           <h1>{company.name}</h1>
-          <p>Keep the company identity used by your job postings and candidate-facing cards up to date.</p>
+          <p>
+            Keep the company identity used by your job postings and
+            candidate-facing cards up to date.
+          </p>
         </div>
         <Badge tone={statusTone(company.verificationStatus)}>
           Verification: {statusLabel(company.verificationStatus)}
@@ -274,16 +307,26 @@ export function CompanySettingsScreen({ initialCompany }: Props) {
       </div>
 
       {!profileComplete ? (
-        <section className="recruiter-company-settings__profile-alert" role="alert" aria-labelledby="profile-complete-title">
+        <section
+          className="recruiter-company-settings__profile-alert"
+          role="alert"
+          aria-labelledby="profile-complete-title"
+        >
           <div>
             <p className="recruiter-eyebrow">POSTING GATE</p>
-            <h2 id="profile-complete-title">Complete your company profile before posting a job</h2>
-            <p>The Create job posting action stays locked until these fields are complete.</p>
+            <h2 id="profile-complete-title">
+              Complete your company profile before posting a job
+            </h2>
+            <p>
+              The Create job posting action stays locked until these fields are
+              complete.
+            </p>
           </div>
           <ul>
             {missingFields.map((field) => (
               <li key={field}>
-                {profileFields.find((item) => item.key === field)?.label}: {profileValidation.fieldErrors[field]}
+                {profileFields.find((item) => item.key === field)?.label}:{" "}
+                {profileValidation.fieldErrors[field]}
               </li>
             ))}
           </ul>
@@ -291,69 +334,213 @@ export function CompanySettingsScreen({ initialCompany }: Props) {
       ) : null}
 
       <div className="recruiter-company-settings__grid">
-        <form className="recruiter-editor__form recruiter-surface-card" onSubmit={save} noValidate>
-          <p className="recruiter-required-note">Fields marked * are required. A company logo is required before a job can be posted.</p>
+        <form
+          className="recruiter-editor__form recruiter-surface-card"
+          onSubmit={save}
+          noValidate
+        >
+          <p className="recruiter-required-note">
+            Fields marked * are required. A company logo is required before a
+            job can be posted.
+          </p>
           <div className="recruiter-form-grid">
             <label htmlFor="company-name">
               Company name *
-              <input id="company-name" value={form.name} onChange={(event) => updateField("name", event.target.value)} aria-invalid={Boolean(fieldErrors.name)} aria-describedby={fieldErrors.name ? "company-name-error" : undefined} maxLength={160} />
-              <FieldError id="company-name-error" message={fieldErrors.name ?? profileValidation.fieldErrors.name} />
+              <input
+                id="company-name"
+                value={form.name}
+                onChange={(event) => updateField("name", event.target.value)}
+                aria-invalid={Boolean(
+                  fieldErrors.name ?? profileValidation.fieldErrors.name,
+                )}
+                aria-describedby={
+                  (fieldErrors.name ?? profileValidation.fieldErrors.name)
+                    ? "company-name-error"
+                    : undefined
+                }
+                maxLength={160}
+              />
+              <FieldError
+                id="company-name-error"
+                message={fieldErrors.name ?? profileValidation.fieldErrors.name}
+              />
             </label>
             <label htmlFor="company-industry">
               Industry *
-              <input id="company-industry" value={form.industry} onChange={(event) => updateField("industry", event.target.value)} aria-invalid={Boolean(fieldErrors.industry)} aria-describedby={fieldErrors.industry ? "company-industry-error" : undefined} maxLength={160} />
-              <FieldError id="company-industry-error" message={fieldErrors.industry ?? profileValidation.fieldErrors.industry} />
+              <input
+                id="company-industry"
+                value={form.industry}
+                onChange={(event) =>
+                  updateField("industry", event.target.value)
+                }
+                aria-invalid={Boolean(
+                  fieldErrors.industry ??
+                  profileValidation.fieldErrors.industry,
+                )}
+                aria-describedby={
+                  (fieldErrors.industry ??
+                  profileValidation.fieldErrors.industry)
+                    ? "company-industry-error"
+                    : undefined
+                }
+                maxLength={160}
+              />
+              <FieldError
+                id="company-industry-error"
+                message={
+                  fieldErrors.industry ?? profileValidation.fieldErrors.industry
+                }
+              />
             </label>
           </div>
           <div className="recruiter-form-grid">
             <label htmlFor="company-size">
               Company size *
-              <input id="company-size" value={form.size} onChange={(event) => updateField("size", event.target.value)} aria-invalid={Boolean(fieldErrors.size)} aria-describedby={fieldErrors.size ? "company-size-error" : undefined} maxLength={80} />
-              <FieldError id="company-size-error" message={fieldErrors.size ?? profileValidation.fieldErrors.size} />
+              <input
+                id="company-size"
+                value={form.size}
+                onChange={(event) => updateField("size", event.target.value)}
+                aria-invalid={Boolean(
+                  fieldErrors.size ?? profileValidation.fieldErrors.size,
+                )}
+                aria-describedby={
+                  (fieldErrors.size ?? profileValidation.fieldErrors.size)
+                    ? "company-size-error"
+                    : undefined
+                }
+                maxLength={80}
+              />
+              <FieldError
+                id="company-size-error"
+                message={fieldErrors.size ?? profileValidation.fieldErrors.size}
+              />
             </label>
             <label htmlFor="company-website">
               Website
-              <input id="company-website" type="url" value={form.website ?? ""} onChange={(event) => updateField("website", event.target.value || null)} aria-invalid={Boolean(fieldErrors.website)} aria-describedby={fieldErrors.website ? "company-website-error" : undefined} placeholder="https://example.com" />
-              <FieldError id="company-website-error" message={fieldErrors.website} />
+              <input
+                id="company-website"
+                type="url"
+                value={form.website ?? ""}
+                onChange={(event) =>
+                  updateField("website", event.target.value || null)
+                }
+                aria-invalid={Boolean(fieldErrors.website)}
+                aria-describedby={
+                  fieldErrors.website ? "company-website-error" : undefined
+                }
+                placeholder="https://example.com"
+              />
+              <FieldError
+                id="company-website-error"
+                message={fieldErrors.website}
+              />
             </label>
           </div>
           <div className="recruiter-company-logo-field">
             <div>
               <span className="recruiter-form-label">Company logo *</span>
-              <p className="recruiter-required-note">PNG, JPEG, or WebP. The image is resized before upload.</p>
+              <p className="recruiter-required-note">
+                PNG, JPEG, or WebP. The image is resized before upload.
+              </p>
             </div>
             <div className="recruiter-company-logo-editor">
               <div className="recruiter-company-logo-preview">
                 {form.logo ? (
-                  <Image src={form.logo} alt="Company logo preview" width={128} height={128} unoptimized />
+                  <Image
+                    src={form.logo}
+                    alt="Company logo preview"
+                    width={128}
+                    height={128}
+                    unoptimized
+                  />
                 ) : (
                   <span aria-hidden="true">LOGO</span>
                 )}
               </div>
               <div className="recruiter-company-logo-actions">
-                <input ref={fileInputRef} id="company-logo-file" className="recruiter-company-logo-file" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => void selectLogo(event)} />
-                <label className="recruiter-outline-button" htmlFor="company-logo-file">
-                  {logoBusy ? "Preparing logo..." : form.logo ? "Choose another logo" : "Choose logo"}
+                <input
+                  ref={fileInputRef}
+                  id="company-logo-file"
+                  className="recruiter-company-logo-file"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={(event) => void selectLogo(event)}
+                />
+                <label
+                  className="recruiter-outline-button"
+                  htmlFor="company-logo-file"
+                >
+                  {logoBusy
+                    ? "Preparing logo..."
+                    : form.logo
+                      ? "Choose another logo"
+                      : "Choose logo"}
                 </label>
-                <button className="recruiter-outline-button" type="button" disabled={!form.logo || logoBusy || busy} onClick={() => updateField("logo", null)}>
+                <button
+                  className="recruiter-outline-button"
+                  type="button"
+                  disabled={!form.logo || logoBusy || busy}
+                  onClick={() => updateField("logo", null)}
+                >
                   Remove logo
                 </button>
-                <FieldError id="company-logo-error" message={fieldErrors.logo ?? profileValidation.fieldErrors.logo} />
+                <FieldError
+                  id="company-logo-error"
+                  message={
+                    fieldErrors.logo ?? profileValidation.fieldErrors.logo
+                  }
+                />
               </div>
             </div>
           </div>
           <label htmlFor="company-address">
             Address *
-            <input id="company-address" value={form.address} onChange={(event) => updateField("address", event.target.value)} aria-invalid={Boolean(fieldErrors.address)} aria-describedby={fieldErrors.address ? "company-address-error" : undefined} maxLength={300} />
-            <FieldError id="company-address-error" message={fieldErrors.address ?? profileValidation.fieldErrors.address} />
+            <input
+              id="company-address"
+              value={form.address}
+              onChange={(event) => updateField("address", event.target.value)}
+              aria-invalid={Boolean(
+                fieldErrors.address ?? profileValidation.fieldErrors.address,
+              )}
+              aria-describedby={
+                (fieldErrors.address ?? profileValidation.fieldErrors.address)
+                  ? "company-address-error"
+                  : undefined
+              }
+              maxLength={300}
+            />
+            <FieldError
+              id="company-address-error"
+              message={
+                fieldErrors.address ?? profileValidation.fieldErrors.address
+              }
+            />
           </label>
           <label htmlFor="company-description">
             Description
-            <textarea id="company-description" value={form.description ?? ""} onChange={(event) => updateField("description", event.target.value || null)} maxLength={3000} rows={6} />
+            <textarea
+              id="company-description"
+              value={form.description ?? ""}
+              onChange={(event) =>
+                updateField("description", event.target.value || null)
+              }
+              maxLength={3000}
+              rows={6}
+            />
           </label>
           <div className="recruiter-editor__actions">
-            <p className={`recruiter-required-note ${error ? "is-error" : ""}`} role={error ? "alert" : "status"} aria-live="polite">{error || message}</p>
-            <button className="recruiter-primary-button" type="submit" disabled={busy || logoBusy}>
+            <p
+              className={`recruiter-required-note ${error ? "is-error" : ""}`}
+              role={error ? "alert" : "status"}
+              aria-live="polite"
+            >
+              {error || message}
+            </p>
+            <button
+              className="recruiter-primary-button"
+              type="submit"
+              disabled={busy || logoBusy}
+            >
               {busy ? "Saving..." : "Save company profile"}
             </button>
           </div>
@@ -363,15 +550,37 @@ export function CompanySettingsScreen({ initialCompany }: Props) {
           <div>
             <p className="recruiter-eyebrow">OWNERSHIP</p>
             <h2>Authorized recruiters</h2>
-            <p className="recruiter-required-note">Only the owner and listed members can manage this company job postings.</p>
+            <p className="recruiter-required-note">
+              Only the owner and listed members can manage this company job
+              postings.
+            </p>
           </div>
           <dl>
-            <div><dt>Verification</dt><dd><Badge tone={statusTone(company.verificationStatus)}>{statusLabel(company.verificationStatus)}</Badge></dd></div>
-            <div><dt>Tax code</dt><dd>{company.taxCode}</dd></div>
-            <div><dt>Owner</dt><dd>{company.ownerUserId ?? "Unclaimed"}</dd></div>
-            <div><dt>Members</dt><dd>{company.memberUserIds.length}</dd></div>
+            <div>
+              <dt>Verification</dt>
+              <dd>
+                <Badge tone={statusTone(company.verificationStatus)}>
+                  {statusLabel(company.verificationStatus)}
+                </Badge>
+              </dd>
+            </div>
+            <div>
+              <dt>Tax code</dt>
+              <dd>{company.taxCode}</dd>
+            </div>
+            <div>
+              <dt>Owner</dt>
+              <dd>{company.ownerUserId ?? "Unclaimed"}</dd>
+            </div>
+            <div>
+              <dt>Members</dt>
+              <dd>{company.memberUserIds.length}</dd>
+            </div>
           </dl>
-          <p className="recruiter-required-note">Team invitations and member removal will be added after the approval workflow UI is exposed to admins.</p>
+          <p className="recruiter-required-note">
+            Team invitations and member removal will be added after the approval
+            workflow UI is exposed to admins.
+          </p>
         </aside>
       </div>
     </section>
