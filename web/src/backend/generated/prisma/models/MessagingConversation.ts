@@ -45,6 +45,8 @@ export type MessagingConversationMinAggregateOutputType = {
   applicationId: string | null
   companyId: string | null
   professionalConnectionId: string | null
+  archivedAt: Date | null
+  archiveReason: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence: number | null
   lastMessageSequence: number | null
   lastMessageAt: Date | null
@@ -61,6 +63,8 @@ export type MessagingConversationMaxAggregateOutputType = {
   applicationId: string | null
   companyId: string | null
   professionalConnectionId: string | null
+  archivedAt: Date | null
+  archiveReason: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence: number | null
   lastMessageSequence: number | null
   lastMessageAt: Date | null
@@ -77,6 +81,8 @@ export type MessagingConversationCountAggregateOutputType = {
   applicationId: number
   companyId: number
   professionalConnectionId: number
+  archivedAt: number
+  archiveReason: number
   nextMessageSequence: number
   lastMessageSequence: number
   lastMessageAt: number
@@ -105,6 +111,8 @@ export type MessagingConversationMinAggregateInputType = {
   applicationId?: true
   companyId?: true
   professionalConnectionId?: true
+  archivedAt?: true
+  archiveReason?: true
   nextMessageSequence?: true
   lastMessageSequence?: true
   lastMessageAt?: true
@@ -121,6 +129,8 @@ export type MessagingConversationMaxAggregateInputType = {
   applicationId?: true
   companyId?: true
   professionalConnectionId?: true
+  archivedAt?: true
+  archiveReason?: true
   nextMessageSequence?: true
   lastMessageSequence?: true
   lastMessageAt?: true
@@ -137,6 +147,8 @@ export type MessagingConversationCountAggregateInputType = {
   applicationId?: true
   companyId?: true
   professionalConnectionId?: true
+  archivedAt?: true
+  archiveReason?: true
   nextMessageSequence?: true
   lastMessageSequence?: true
   lastMessageAt?: true
@@ -240,6 +252,8 @@ export type MessagingConversationGroupByOutputType = {
   applicationId: string | null
   companyId: string | null
   professionalConnectionId: string | null
+  archivedAt: Date | null
+  archiveReason: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence: number
   lastMessageSequence: number | null
   lastMessageAt: Date | null
@@ -279,6 +293,8 @@ export type MessagingConversationWhereInput = {
   applicationId?: Prisma.StringNullableFilter<"MessagingConversation"> | string | null
   companyId?: Prisma.StringNullableFilter<"MessagingConversation"> | string | null
   professionalConnectionId?: Prisma.StringNullableFilter<"MessagingConversation"> | string | null
+  archivedAt?: Prisma.DateTimeNullableFilter<"MessagingConversation"> | Date | string | null
+  archiveReason?: Prisma.EnumMessagingConversationArchiveReasonNullableFilter<"MessagingConversation"> | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFilter<"MessagingConversation"> | number
   lastMessageSequence?: Prisma.IntNullableFilter<"MessagingConversation"> | number | null
   lastMessageAt?: Prisma.DateTimeNullableFilter<"MessagingConversation"> | Date | string | null
@@ -303,6 +319,8 @@ export type MessagingConversationOrderByWithRelationInput = {
   applicationId?: Prisma.SortOrderInput | Prisma.SortOrder
   companyId?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalConnectionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  archiveReason?: Prisma.SortOrderInput | Prisma.SortOrder
   nextMessageSequence?: Prisma.SortOrder
   lastMessageSequence?: Prisma.SortOrderInput | Prisma.SortOrder
   lastMessageAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -331,6 +349,8 @@ export type MessagingConversationWhereUniqueInput = Prisma.AtLeast<{
   applicationId?: Prisma.StringNullableFilter<"MessagingConversation"> | string | null
   companyId?: Prisma.StringNullableFilter<"MessagingConversation"> | string | null
   professionalConnectionId?: Prisma.StringNullableFilter<"MessagingConversation"> | string | null
+  archivedAt?: Prisma.DateTimeNullableFilter<"MessagingConversation"> | Date | string | null
+  archiveReason?: Prisma.EnumMessagingConversationArchiveReasonNullableFilter<"MessagingConversation"> | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFilter<"MessagingConversation"> | number
   lastMessageSequence?: Prisma.IntNullableFilter<"MessagingConversation"> | number | null
   lastMessageAt?: Prisma.DateTimeNullableFilter<"MessagingConversation"> | Date | string | null
@@ -355,6 +375,8 @@ export type MessagingConversationOrderByWithAggregationInput = {
   applicationId?: Prisma.SortOrderInput | Prisma.SortOrder
   companyId?: Prisma.SortOrderInput | Prisma.SortOrder
   professionalConnectionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  archiveReason?: Prisma.SortOrderInput | Prisma.SortOrder
   nextMessageSequence?: Prisma.SortOrder
   lastMessageSequence?: Prisma.SortOrderInput | Prisma.SortOrder
   lastMessageAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -379,6 +401,8 @@ export type MessagingConversationScalarWhereWithAggregatesInput = {
   applicationId?: Prisma.StringNullableWithAggregatesFilter<"MessagingConversation"> | string | null
   companyId?: Prisma.StringNullableWithAggregatesFilter<"MessagingConversation"> | string | null
   professionalConnectionId?: Prisma.StringNullableWithAggregatesFilter<"MessagingConversation"> | string | null
+  archivedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"MessagingConversation"> | Date | string | null
+  archiveReason?: Prisma.EnumMessagingConversationArchiveReasonNullableWithAggregatesFilter<"MessagingConversation"> | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntWithAggregatesFilter<"MessagingConversation"> | number
   lastMessageSequence?: Prisma.IntNullableWithAggregatesFilter<"MessagingConversation"> | number | null
   lastMessageAt?: Prisma.DateTimeNullableWithAggregatesFilter<"MessagingConversation"> | Date | string | null
@@ -390,6 +414,8 @@ export type MessagingConversationCreateInput = {
   id?: string
   contextType: $Enums.MessagingConversationContextType
   contextReference: string
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -414,6 +440,8 @@ export type MessagingConversationUncheckedCreateInput = {
   applicationId?: string | null
   companyId?: string | null
   professionalConnectionId?: string | null
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -428,6 +456,8 @@ export type MessagingConversationUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   contextType?: Prisma.EnumMessagingConversationContextTypeFieldUpdateOperationsInput | $Enums.MessagingConversationContextType
   contextReference?: Prisma.StringFieldUpdateOperationsInput | string
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -452,6 +482,8 @@ export type MessagingConversationUncheckedUpdateInput = {
   applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalConnectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -471,6 +503,8 @@ export type MessagingConversationCreateManyInput = {
   applicationId?: string | null
   companyId?: string | null
   professionalConnectionId?: string | null
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -482,6 +516,8 @@ export type MessagingConversationUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   contextType?: Prisma.EnumMessagingConversationContextTypeFieldUpdateOperationsInput | $Enums.MessagingConversationContextType
   contextReference?: Prisma.StringFieldUpdateOperationsInput | string
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -498,6 +534,8 @@ export type MessagingConversationUncheckedUpdateManyInput = {
   applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalConnectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -531,6 +569,8 @@ export type MessagingConversationCountOrderByAggregateInput = {
   applicationId?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   professionalConnectionId?: Prisma.SortOrder
+  archivedAt?: Prisma.SortOrder
+  archiveReason?: Prisma.SortOrder
   nextMessageSequence?: Prisma.SortOrder
   lastMessageSequence?: Prisma.SortOrder
   lastMessageAt?: Prisma.SortOrder
@@ -552,6 +592,8 @@ export type MessagingConversationMaxOrderByAggregateInput = {
   applicationId?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   professionalConnectionId?: Prisma.SortOrder
+  archivedAt?: Prisma.SortOrder
+  archiveReason?: Prisma.SortOrder
   nextMessageSequence?: Prisma.SortOrder
   lastMessageSequence?: Prisma.SortOrder
   lastMessageAt?: Prisma.SortOrder
@@ -568,6 +610,8 @@ export type MessagingConversationMinOrderByAggregateInput = {
   applicationId?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   professionalConnectionId?: Prisma.SortOrder
+  archivedAt?: Prisma.SortOrder
+  archiveReason?: Prisma.SortOrder
   nextMessageSequence?: Prisma.SortOrder
   lastMessageSequence?: Prisma.SortOrder
   lastMessageAt?: Prisma.SortOrder
@@ -799,6 +843,10 @@ export type EnumMessagingConversationContextTypeFieldUpdateOperationsInput = {
   set?: $Enums.MessagingConversationContextType
 }
 
+export type NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput = {
+  set?: $Enums.MessagingConversationArchiveReason | null
+}
+
 export type MessagingConversationCreateNestedOneWithoutParticipantsInput = {
   create?: Prisma.XOR<Prisma.MessagingConversationCreateWithoutParticipantsInput, Prisma.MessagingConversationUncheckedCreateWithoutParticipantsInput>
   connectOrCreate?: Prisma.MessagingConversationCreateOrConnectWithoutParticipantsInput
@@ -845,6 +893,8 @@ export type MessagingConversationCreateWithoutParticipantLowInput = {
   id?: string
   contextType: $Enums.MessagingConversationContextType
   contextReference: string
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -867,6 +917,8 @@ export type MessagingConversationUncheckedCreateWithoutParticipantLowInput = {
   applicationId?: string | null
   companyId?: string | null
   professionalConnectionId?: string | null
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -891,6 +943,8 @@ export type MessagingConversationCreateWithoutParticipantHighInput = {
   id?: string
   contextType: $Enums.MessagingConversationContextType
   contextReference: string
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -913,6 +967,8 @@ export type MessagingConversationUncheckedCreateWithoutParticipantHighInput = {
   applicationId?: string | null
   companyId?: string | null
   professionalConnectionId?: string | null
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -961,6 +1017,8 @@ export type MessagingConversationScalarWhereInput = {
   applicationId?: Prisma.StringNullableFilter<"MessagingConversation"> | string | null
   companyId?: Prisma.StringNullableFilter<"MessagingConversation"> | string | null
   professionalConnectionId?: Prisma.StringNullableFilter<"MessagingConversation"> | string | null
+  archivedAt?: Prisma.DateTimeNullableFilter<"MessagingConversation"> | Date | string | null
+  archiveReason?: Prisma.EnumMessagingConversationArchiveReasonNullableFilter<"MessagingConversation"> | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFilter<"MessagingConversation"> | number
   lastMessageSequence?: Prisma.IntNullableFilter<"MessagingConversation"> | number | null
   lastMessageAt?: Prisma.DateTimeNullableFilter<"MessagingConversation"> | Date | string | null
@@ -988,6 +1046,8 @@ export type MessagingConversationCreateWithoutCompanyInput = {
   id?: string
   contextType: $Enums.MessagingConversationContextType
   contextReference: string
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -1010,6 +1070,8 @@ export type MessagingConversationUncheckedCreateWithoutCompanyInput = {
   contextReference: string
   applicationId?: string | null
   professionalConnectionId?: string | null
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -1050,6 +1112,8 @@ export type MessagingConversationCreateWithoutApplicationInput = {
   id?: string
   contextType: $Enums.MessagingConversationContextType
   contextReference: string
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -1072,6 +1136,8 @@ export type MessagingConversationUncheckedCreateWithoutApplicationInput = {
   contextReference: string
   companyId?: string | null
   professionalConnectionId?: string | null
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -1112,6 +1178,8 @@ export type MessagingConversationCreateWithoutProfessionalConnectionInput = {
   id?: string
   contextType: $Enums.MessagingConversationContextType
   contextReference: string
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -1134,6 +1202,8 @@ export type MessagingConversationUncheckedCreateWithoutProfessionalConnectionInp
   contextReference: string
   applicationId?: string | null
   companyId?: string | null
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -1174,6 +1244,8 @@ export type MessagingConversationCreateWithoutParticipantsInput = {
   id?: string
   contextType: $Enums.MessagingConversationContextType
   contextReference: string
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -1197,6 +1269,8 @@ export type MessagingConversationUncheckedCreateWithoutParticipantsInput = {
   applicationId?: string | null
   companyId?: string | null
   professionalConnectionId?: string | null
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -1226,6 +1300,8 @@ export type MessagingConversationUpdateWithoutParticipantsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   contextType?: Prisma.EnumMessagingConversationContextTypeFieldUpdateOperationsInput | $Enums.MessagingConversationContextType
   contextReference?: Prisma.StringFieldUpdateOperationsInput | string
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1249,6 +1325,8 @@ export type MessagingConversationUncheckedUpdateWithoutParticipantsInput = {
   applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalConnectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1262,6 +1340,8 @@ export type MessagingConversationCreateWithoutMessagesInput = {
   id?: string
   contextType: $Enums.MessagingConversationContextType
   contextReference: string
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -1285,6 +1365,8 @@ export type MessagingConversationUncheckedCreateWithoutMessagesInput = {
   applicationId?: string | null
   companyId?: string | null
   professionalConnectionId?: string | null
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -1314,6 +1396,8 @@ export type MessagingConversationUpdateWithoutMessagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   contextType?: Prisma.EnumMessagingConversationContextTypeFieldUpdateOperationsInput | $Enums.MessagingConversationContextType
   contextReference?: Prisma.StringFieldUpdateOperationsInput | string
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1337,6 +1421,8 @@ export type MessagingConversationUncheckedUpdateWithoutMessagesInput = {
   applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalConnectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1350,6 +1436,8 @@ export type MessagingConversationCreateWithoutReportsInput = {
   id?: string
   contextType: $Enums.MessagingConversationContextType
   contextReference: string
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -1373,6 +1461,8 @@ export type MessagingConversationUncheckedCreateWithoutReportsInput = {
   applicationId?: string | null
   companyId?: string | null
   professionalConnectionId?: string | null
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -1402,6 +1492,8 @@ export type MessagingConversationUpdateWithoutReportsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   contextType?: Prisma.EnumMessagingConversationContextTypeFieldUpdateOperationsInput | $Enums.MessagingConversationContextType
   contextReference?: Prisma.StringFieldUpdateOperationsInput | string
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1425,6 +1517,8 @@ export type MessagingConversationUncheckedUpdateWithoutReportsInput = {
   applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalConnectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1442,6 +1536,8 @@ export type MessagingConversationCreateManyParticipantLowInput = {
   applicationId?: string | null
   companyId?: string | null
   professionalConnectionId?: string | null
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -1457,6 +1553,8 @@ export type MessagingConversationCreateManyParticipantHighInput = {
   applicationId?: string | null
   companyId?: string | null
   professionalConnectionId?: string | null
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -1468,6 +1566,8 @@ export type MessagingConversationUpdateWithoutParticipantLowInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   contextType?: Prisma.EnumMessagingConversationContextTypeFieldUpdateOperationsInput | $Enums.MessagingConversationContextType
   contextReference?: Prisma.StringFieldUpdateOperationsInput | string
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1490,6 +1590,8 @@ export type MessagingConversationUncheckedUpdateWithoutParticipantLowInput = {
   applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalConnectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1508,6 +1610,8 @@ export type MessagingConversationUncheckedUpdateManyWithoutParticipantLowInput =
   applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalConnectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1519,6 +1623,8 @@ export type MessagingConversationUpdateWithoutParticipantHighInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   contextType?: Prisma.EnumMessagingConversationContextTypeFieldUpdateOperationsInput | $Enums.MessagingConversationContextType
   contextReference?: Prisma.StringFieldUpdateOperationsInput | string
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1541,6 +1647,8 @@ export type MessagingConversationUncheckedUpdateWithoutParticipantHighInput = {
   applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalConnectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1559,6 +1667,8 @@ export type MessagingConversationUncheckedUpdateManyWithoutParticipantHighInput 
   applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalConnectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1574,6 +1684,8 @@ export type MessagingConversationCreateManyCompanyInput = {
   contextReference: string
   applicationId?: string | null
   professionalConnectionId?: string | null
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -1585,6 +1697,8 @@ export type MessagingConversationUpdateWithoutCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   contextType?: Prisma.EnumMessagingConversationContextTypeFieldUpdateOperationsInput | $Enums.MessagingConversationContextType
   contextReference?: Prisma.StringFieldUpdateOperationsInput | string
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1607,6 +1721,8 @@ export type MessagingConversationUncheckedUpdateWithoutCompanyInput = {
   contextReference?: Prisma.StringFieldUpdateOperationsInput | string
   applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalConnectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1625,6 +1741,8 @@ export type MessagingConversationUncheckedUpdateManyWithoutCompanyInput = {
   contextReference?: Prisma.StringFieldUpdateOperationsInput | string
   applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalConnectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1640,6 +1758,8 @@ export type MessagingConversationCreateManyApplicationInput = {
   contextReference: string
   companyId?: string | null
   professionalConnectionId?: string | null
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -1651,6 +1771,8 @@ export type MessagingConversationUpdateWithoutApplicationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   contextType?: Prisma.EnumMessagingConversationContextTypeFieldUpdateOperationsInput | $Enums.MessagingConversationContextType
   contextReference?: Prisma.StringFieldUpdateOperationsInput | string
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1673,6 +1795,8 @@ export type MessagingConversationUncheckedUpdateWithoutApplicationInput = {
   contextReference?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalConnectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1691,6 +1815,8 @@ export type MessagingConversationUncheckedUpdateManyWithoutApplicationInput = {
   contextReference?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   professionalConnectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1706,6 +1832,8 @@ export type MessagingConversationCreateManyProfessionalConnectionInput = {
   contextReference: string
   applicationId?: string | null
   companyId?: string | null
+  archivedAt?: Date | string | null
+  archiveReason?: $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: number
   lastMessageSequence?: number | null
   lastMessageAt?: Date | string | null
@@ -1717,6 +1845,8 @@ export type MessagingConversationUpdateWithoutProfessionalConnectionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   contextType?: Prisma.EnumMessagingConversationContextTypeFieldUpdateOperationsInput | $Enums.MessagingConversationContextType
   contextReference?: Prisma.StringFieldUpdateOperationsInput | string
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1739,6 +1869,8 @@ export type MessagingConversationUncheckedUpdateWithoutProfessionalConnectionInp
   contextReference?: Prisma.StringFieldUpdateOperationsInput | string
   applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1757,6 +1889,8 @@ export type MessagingConversationUncheckedUpdateManyWithoutProfessionalConnectio
   contextReference?: Prisma.StringFieldUpdateOperationsInput | string
   applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archiveReason?: Prisma.NullableEnumMessagingConversationArchiveReasonFieldUpdateOperationsInput | $Enums.MessagingConversationArchiveReason | null
   nextMessageSequence?: Prisma.IntFieldUpdateOperationsInput | number
   lastMessageSequence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1822,6 +1956,8 @@ export type MessagingConversationSelect<ExtArgs extends runtime.Types.Extensions
   applicationId?: boolean
   companyId?: boolean
   professionalConnectionId?: boolean
+  archivedAt?: boolean
+  archiveReason?: boolean
   nextMessageSequence?: boolean
   lastMessageSequence?: boolean
   lastMessageAt?: boolean
@@ -1847,6 +1983,8 @@ export type MessagingConversationSelectCreateManyAndReturn<ExtArgs extends runti
   applicationId?: boolean
   companyId?: boolean
   professionalConnectionId?: boolean
+  archivedAt?: boolean
+  archiveReason?: boolean
   nextMessageSequence?: boolean
   lastMessageSequence?: boolean
   lastMessageAt?: boolean
@@ -1868,6 +2006,8 @@ export type MessagingConversationSelectUpdateManyAndReturn<ExtArgs extends runti
   applicationId?: boolean
   companyId?: boolean
   professionalConnectionId?: boolean
+  archivedAt?: boolean
+  archiveReason?: boolean
   nextMessageSequence?: boolean
   lastMessageSequence?: boolean
   lastMessageAt?: boolean
@@ -1889,6 +2029,8 @@ export type MessagingConversationSelectScalar = {
   applicationId?: boolean
   companyId?: boolean
   professionalConnectionId?: boolean
+  archivedAt?: boolean
+  archiveReason?: boolean
   nextMessageSequence?: boolean
   lastMessageSequence?: boolean
   lastMessageAt?: boolean
@@ -1896,7 +2038,7 @@ export type MessagingConversationSelectScalar = {
   updatedAt?: boolean
 }
 
-export type MessagingConversationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "participantLowId" | "participantHighId" | "contextType" | "contextReference" | "applicationId" | "companyId" | "professionalConnectionId" | "nextMessageSequence" | "lastMessageSequence" | "lastMessageAt" | "createdAt" | "updatedAt", ExtArgs["result"]["messagingConversation"]>
+export type MessagingConversationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "participantLowId" | "participantHighId" | "contextType" | "contextReference" | "applicationId" | "companyId" | "professionalConnectionId" | "archivedAt" | "archiveReason" | "nextMessageSequence" | "lastMessageSequence" | "lastMessageAt" | "createdAt" | "updatedAt", ExtArgs["result"]["messagingConversation"]>
 export type MessagingConversationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   participantLow?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   participantHigh?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
@@ -1944,6 +2086,8 @@ export type $MessagingConversationPayload<ExtArgs extends runtime.Types.Extensio
     applicationId: string | null
     companyId: string | null
     professionalConnectionId: string | null
+    archivedAt: Date | null
+    archiveReason: $Enums.MessagingConversationArchiveReason | null
     nextMessageSequence: number
     lastMessageSequence: number | null
     lastMessageAt: Date | null
@@ -2388,6 +2532,8 @@ export interface MessagingConversationFieldRefs {
   readonly applicationId: Prisma.FieldRef<"MessagingConversation", 'String'>
   readonly companyId: Prisma.FieldRef<"MessagingConversation", 'String'>
   readonly professionalConnectionId: Prisma.FieldRef<"MessagingConversation", 'String'>
+  readonly archivedAt: Prisma.FieldRef<"MessagingConversation", 'DateTime'>
+  readonly archiveReason: Prisma.FieldRef<"MessagingConversation", 'MessagingConversationArchiveReason'>
   readonly nextMessageSequence: Prisma.FieldRef<"MessagingConversation", 'Int'>
   readonly lastMessageSequence: Prisma.FieldRef<"MessagingConversation", 'Int'>
   readonly lastMessageAt: Prisma.FieldRef<"MessagingConversation", 'DateTime'>

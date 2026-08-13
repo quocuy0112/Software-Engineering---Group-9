@@ -1,6 +1,7 @@
 // Generated from Feature 006 OpenAPI. Do not edit by hand.
-export const adminContractVersion = "0.2.0" as const;
-export const adminContractSha256 = "eee0a1d48d1e5a0b6a308d4545235a4f40620f527f4217c6c1045b08685d00a7" as const;
+export const adminContractVersion = "0.3.0" as const;
+export const adminContractSha256 =
+  "1e5a925424bccc2314c3d08b59b217a3b5969c156e06252624102125ffb165a0" as const;
 export const adminContractPaths = [
   "/api/admin/auth/context",
   "/api/admin/auth/login",
@@ -29,9 +30,15 @@ export const adminContractPaths = [
   "/api/admin/moderation-reports",
   "/api/admin/moderation-reports/{reportId}",
   "/api/admin/moderation-reports/{reportId}/{action}",
+  "/api/admin/support-cases",
+  "/api/admin/support-cases/{caseId}",
+  "/api/admin/support-cases/{caseId}/{action}",
   "/api/admin/audit-events/{correlationId}",
   "/api/recruiter/entitlement",
   "/api/employer-verifications",
   "/api/employer-verifications/{requestId}/{action}",
-  "/api/moderation-reports"
+  "/api/moderation-reports",
+  "/api/support/cases",
+  "/api/support/cases/{caseId}",
+  "/api/support/cases/{caseId}/messages",
 ] as const;

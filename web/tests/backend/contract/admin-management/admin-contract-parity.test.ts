@@ -5,7 +5,7 @@ import { accountListItemSchema } from "@/shared/contracts/admin/resources";
 import { adminDataProvider } from "@/frontend/features/admin/app/data-provider";
 
 describe("Feature 006 contract parity", () => {
-  it("contains exactly the 32 reviewed OpenAPI paths", () => {
+  it("contains exactly the 38 reviewed OpenAPI paths", () => {
     const source = readFileSync(
       "../spec-kit/specs/006-admin-management/contracts/admin-api.openapi.yaml",
       "utf8",
@@ -14,7 +14,7 @@ describe("Feature 006 contract parity", () => {
       (match) => match[1],
     );
     expect(paths).toEqual([...adminContractPaths]);
-    expect(paths).toHaveLength(32);
+    expect(paths).toHaveLength(38);
   });
 
   it("rejects projection fields that were not allowlisted", () => {

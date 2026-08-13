@@ -23,7 +23,10 @@ export function MessageThread({
 }) {
   if (error)
     return (
-      <section className="messaging-thread-state messaging-thread-error" role="alert">
+      <section
+        className="messaging-thread-state messaging-thread-error"
+        role="alert"
+      >
         <span aria-hidden="true">!</span>
         <h2>We could not load this conversation</h2>
         <p>{error}</p>
@@ -40,11 +43,17 @@ export function MessageThread({
         </span>
         <h2>Your professional inbox</h2>
         <p>Select a conversation to read messages.</p>
-        <small>Messages are private, durable, and protected by your SmartHire session.</small>
+        <small>
+          Messages are private, durable, and protected by your SmartHire
+          session.
+        </small>
       </section>
     );
   return (
-    <section className="messaging-thread" aria-label={`Conversation with ${page.conversation.otherParticipant.name}`}>
+    <section
+      className="messaging-thread"
+      aria-label={`Conversation with ${page.conversation.otherParticipant.name}`}
+    >
       <header className="messaging-thread-header">
         <button
           type="button"
@@ -79,7 +88,11 @@ export function MessageThread({
           />
         </div>
       </header>
-      {page.conversation.blocked ? (
+      {page.conversation.accessMode === "READ_ONLY" ? (
+        <p className="messaging-blocked-banner" role="status">
+          This connection has ended. Retained conversation history is read-only.
+        </p>
+      ) : page.conversation.blocked ? (
         <p className="messaging-blocked-banner" role="status">
           <svg aria-hidden="true" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="9" />
@@ -90,7 +103,11 @@ export function MessageThread({
       ) : null}
       <div className="messaging-history">
         {page.nextCursor ? (
-          <button className="messaging-load-older" type="button" onClick={onLoadOlder}>
+          <button
+            className="messaging-load-older"
+            type="button"
+            onClick={onLoadOlder}
+          >
             <svg aria-hidden="true" viewBox="0 0 24 24">
               <path d="m8 12 4-4 4 4M12 8v9" />
             </svg>
@@ -103,7 +120,10 @@ export function MessageThread({
           {page.items.map((message) => {
             const outgoing = message.senderId === currentUserId;
             return (
-              <li key={message.id} data-direction={outgoing ? "outgoing" : "incoming"}>
+              <li
+                key={message.id}
+                data-direction={outgoing ? "outgoing" : "incoming"}
+              >
                 <div className="messaging-message-bubble">
                   <p>{message.content}</p>
                   <span className="messaging-message-meta">
@@ -134,7 +154,13 @@ export function MessageThread({
           })}
         </ol>
       </div>
-      <MessageComposer conversationId={page.conversation.id} disabled={page.conversation.blocked} />
+      <MessageComposer
+        conversationId={page.conversation.id}
+        disabled={
+          page.conversation.blocked ||
+          page.conversation.accessMode === "READ_ONLY"
+        }
+      />
     </section>
   );
 }

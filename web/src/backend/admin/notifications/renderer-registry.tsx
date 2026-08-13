@@ -20,6 +20,14 @@ import {
   type AdminSecurityEventKind,
   type VerificationEventKind,
 } from "./notification-events";
+import {
+  SupportCaseEmail,
+  supportCaseEmailText,
+} from "./support-case-template";
+import {
+  ProfessionalConnectionEmail,
+  professionalConnectionEmailText,
+} from "./professional-connection-template";
 
 const eventBase = z.object({
   eventKind: z.string(),
@@ -40,6 +48,23 @@ const verificationPayload = eventBase.extend({
   approvedMembershipRole: z
     .enum(["OWNER", "HR_MANAGER", "RECRUITER", "HIRING_MANAGER"])
     .optional(),
+});
+const supportCasePayload = z.object({
+  caseId: z.string().min(1).max(128),
+  state: z.enum(["WAITING_FOR_USER", "RESOLVED"]),
+  occurredAt: z.string().datetime(),
+});
+const professionalConnectionPayload = z.object({
+  eventKind: z.enum([
+    "PROPOSAL_CREATED",
+    "PROPOSAL_UPDATED",
+    "PROPOSAL_NO_LONGER_ACTIVE",
+    "CONNECTION_ACCEPTED",
+    "CONNECTION_REVOKED",
+  ]),
+  occurredAt: z.string().datetime(),
+  proposalId: z.string().max(128).optional(),
+  connectionId: z.string().max(128).optional(),
 });
 
 export type RenderedFeature006Email = {
@@ -133,6 +158,31 @@ export async function renderFeature006Email(input: {
           : "Employer verification update",
       html: await render(createElement(VerificationEmail, props)),
       text: verificationEmailText(props),
+    };
+  }
+  if (input.templateVersion === "support-case-v1") {
+    const payload = supportCasePayload.parse(input.payloadRef);
+    const props = {
+      ...payload,
+      supportUrl: new URL("/support", input.appUrl).toString(),
+    };
+    return {
+      subject: "Your SmartHire support case was updated",
+      html: await render(createElement(SupportCaseEmail, props)),
+      text: supportCaseEmailText(props),
+    };
+  }
+  if (input.templateVersion === "professional-connection-v1") {
+    const payload = professionalConnectionPayload.parse(input.payloadRef);
+    const props = {
+      eventKind: payload.eventKind,
+      occurredAt: payload.occurredAt,
+      connectionsUrl: new URL("/connections", input.appUrl).toString(),
+    };
+    return {
+      subject: "Your SmartHire professional connection was updated",
+      html: await render(createElement(ProfessionalConnectionEmail, props)),
+      text: professionalConnectionEmailText(props),
     };
   }
   throw new Error("FEATURE_006_TEMPLATE_UNSUPPORTED");

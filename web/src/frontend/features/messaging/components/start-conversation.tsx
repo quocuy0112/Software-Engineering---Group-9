@@ -1,9 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { EligibleParticipant } from "@/shared/contracts/messaging/conversations";
-import { openConversation } from "../client/messaging-api";
+import {
+  findEligibleParticipants,
+  openConversation,
+} from "../client/messaging-api";
 import { MessagingAvatar } from "./messaging-avatar";
+
+const minimumSearchLength = 2;
+const searchDebounceMs = 400;
 
 export function StartConversation({
   csrfProof,
@@ -15,24 +21,68 @@ export function StartConversation({
   onOpened: (conversationId: string) => void;
 }) {
   const [query, setQuery] = useState("");
-  const [selectedContexts, setSelectedContexts] = useState<Record<string, string>>({});
+  const [searchItems, setSearchItems] = useState<EligibleParticipant[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [selectedContexts, setSelectedContexts] = useState<
+    Record<string, string>
+  >({});
   const [busyUserId, setBusyUserId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const items = useMemo(() => {
-    const normalized = query.trim().toLocaleLowerCase();
-    return normalized
-      ? initialItems.filter((item) =>
-          item.participant.name.toLocaleLowerCase().includes(normalized),
-        )
-      : initialItems;
-  }, [initialItems, query]);
+  const [openError, setOpenError] = useState<string | null>(null);
+  const normalizedQuery = query.trim();
+  const items = normalizedQuery
+    ? normalizedQuery.length >= minimumSearchLength
+      ? searchItems
+      : []
+    : initialItems;
+
+  useEffect(() => {
+    if (normalizedQuery.length < minimumSearchLength) return;
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(async () => {
+      try {
+        const result = await findEligibleParticipants(
+          normalizedQuery,
+          controller.signal,
+        );
+        if (!controller.signal.aborted) setSearchItems(result.items);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        setSearchItems([]);
+        setSearchError(
+          error instanceof Error &&
+            error.message === "ELIGIBLE_PARTICIPANTS_FAILED"
+            ? "Eligible people could not be searched. Please try again."
+            : "Search is temporarily unavailable.",
+        );
+      } finally {
+        if (!controller.signal.aborted) setSearching(false);
+      }
+    }, searchDebounceMs);
+
+    return () => {
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [normalizedQuery]);
+
+  function updateQuery(value: string) {
+    const nextQuery = value.trim();
+    setQuery(value);
+    setSearching(nextQuery.length >= minimumSearchLength);
+    setSearchError(null);
+  }
 
   async function open(item: EligibleParticipant) {
-    const reference = selectedContexts[item.participant.id] ?? item.contexts[0]?.reference;
-    const context = item.contexts.find((candidate) => candidate.reference === reference);
+    const reference =
+      selectedContexts[item.participant.id] ?? item.contexts[0]?.reference;
+    const context = item.contexts.find(
+      (candidate) => candidate.reference === reference,
+    );
     if (!context) return;
     setBusyUserId(item.participant.id);
-    setError(null);
+    setOpenError(null);
     try {
       const conversation = await openConversation(
         {
@@ -49,14 +99,18 @@ export function StartConversation({
       );
       onOpened(conversation.id);
     } catch {
-      setError("The conversation could not be opened. Please try again.");
+      setOpenError("The conversation could not be opened. Please try again.");
     } finally {
       setBusyUserId(null);
     }
   }
 
   return (
-    <section className="messaging-start" role="dialog" aria-label="Start a conversation">
+    <section
+      className="messaging-start"
+      role="dialog"
+      aria-label="Start a conversation"
+    >
       <div className="messaging-section-heading">
         <div>
           <p className="messaging-section-eyebrow">NEW MESSAGE</p>
@@ -77,17 +131,35 @@ export function StartConversation({
         <input
           type="search"
           aria-label="Search eligible people"
-          placeholder="Search eligible people"
+          placeholder="Enter name, email, or account ID"
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => updateQuery(event.target.value)}
         />
       </label>
-      {error ? (
-        <p className="messaging-inline-alert" role="alert">
-          {error}
+      {normalizedQuery.length === 1 ? (
+        <p className="messaging-search-status" role="status">
+          Enter at least 2 characters to search.
         </p>
       ) : null}
-      {items.length === 0 ? (
+      {searching ? (
+        <p className="messaging-search-status" role="status">
+          Searching eligible people…
+        </p>
+      ) : null}
+      {searchError ? (
+        <p className="messaging-inline-alert" role="alert">
+          {searchError}
+        </p>
+      ) : null}
+      {openError ? (
+        <p className="messaging-inline-alert" role="alert">
+          {openError}
+        </p>
+      ) : null}
+      {!searching &&
+      !searchError &&
+      normalizedQuery.length !== 1 &&
+      items.length === 0 ? (
         <div className="messaging-eligible-empty" role="status">
           <span aria-hidden="true">
             <svg viewBox="0 0 24 24">
@@ -97,11 +169,19 @@ export function StartConversation({
             </svg>
           </span>
           <div>
-            <strong>No connections yet</strong>
-            <p>No eligible people are available to message.</p>
+            <strong>
+              {normalizedQuery
+                ? "No eligible messaging relationship"
+                : "No eligible contacts yet"}
+            </strong>
+            <p>
+              {normalizedQuery
+                ? "Only accepted professional connections or application-related contacts can be messaged. Check the details or establish a connection first."
+                : "Establish a professional connection or use an application context before starting a conversation."}
+            </p>
           </div>
         </div>
-      ) : (
+      ) : !searching && items.length > 0 ? (
         <ul className="messaging-eligible-list" aria-label="Eligible people">
           {items.map((item) => (
             <li key={item.participant.id}>
@@ -117,7 +197,10 @@ export function StartConversation({
                     <span className="sr-only">Conversation context</span>
                     <select
                       aria-label={`Conversation context for ${item.participant.name}`}
-                      value={selectedContexts[item.participant.id] ?? item.contexts[0]?.reference}
+                      value={
+                        selectedContexts[item.participant.id] ??
+                        item.contexts[0]?.reference
+                      }
                       onChange={(event) =>
                         setSelectedContexts((current) => ({
                           ...current,
@@ -126,7 +209,10 @@ export function StartConversation({
                       }
                     >
                       {item.contexts.map((context) => (
-                        <option key={context.reference} value={context.reference}>
+                        <option
+                          key={context.reference}
+                          value={context.reference}
+                        >
                           {context.label}
                         </option>
                       ))}
@@ -152,13 +238,15 @@ export function StartConversation({
                   </svg>
                 )}
                 <span className="sr-only">
-                  {busyUserId === item.participant.id ? "Opening..." : "Message"}
+                  {busyUserId === item.participant.id
+                    ? "Opening..."
+                    : "Message"}
                 </span>
               </button>
             </li>
           ))}
         </ul>
-      )}
+      ) : null}
     </section>
   );
 }

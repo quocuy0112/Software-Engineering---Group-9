@@ -10,7 +10,10 @@ afterEach(async () => {
 
 function once(socket: Socket, event: string) {
   return new Promise<unknown>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error(`Timed out waiting for ${event}`)), 3_000);
+    const timer = setTimeout(
+      () => reject(new Error(`Timed out waiting for ${event}`)),
+      3_000,
+    );
     socket.once(event, (value) => {
       clearTimeout(timer);
       resolve(value);
@@ -32,6 +35,7 @@ describe("same-process chat gateway", () => {
       companyId: null,
       professionalConnectionId: "connection-1",
       lastMessageSequence: null,
+      archivedAt: null,
     };
     const gateway = attachSocketIoChatGateway(server, {
       authenticate: async (headers) => {
@@ -72,9 +76,12 @@ describe("same-process chat gateway", () => {
         }),
       },
     });
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    await new Promise<void>((resolve) =>
+      server.listen(0, "127.0.0.1", resolve),
+    );
     const address = server.address();
-    if (!address || typeof address === "string") throw new Error("Missing test address");
+    if (!address || typeof address === "string")
+      throw new Error("Missing test address");
     const url = `http://127.0.0.1:${address.port}/chat`;
     const client = (userId: string) =>
       createClient(url, {
@@ -84,14 +91,12 @@ describe("same-process chat gateway", () => {
       });
     const sender = client("user-a");
     const receiver = client("user-b");
-    closeCallbacks.push(
-      async () => {
-        sender.disconnect();
-        receiver.disconnect();
-        await new Promise<void>((resolve) => gateway.close(() => resolve()));
-        await new Promise<void>((resolve) => server.close(() => resolve()));
-      },
-    );
+    closeCallbacks.push(async () => {
+      sender.disconnect();
+      receiver.disconnect();
+      await new Promise<void>((resolve) => gateway.close(() => resolve()));
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+    });
     await Promise.all([once(sender, "connect"), once(receiver, "connect")]);
     await new Promise((resolve) => setTimeout(resolve, 25));
     const delivered = once(receiver, "message:new");

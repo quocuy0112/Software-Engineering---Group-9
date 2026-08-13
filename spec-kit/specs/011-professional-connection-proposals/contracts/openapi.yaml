@@ -1,0 +1,585 @@
+openapi: 3.1.0
+info:
+  title: SmartHire Professional Connection Proposals API
+  version: 1.0.0
+  description: Bilateral-consent proposal, connection, notification, and disconnect contracts. All responses are private and no-store.
+servers:
+  - url: http://localhost:3001
+    description: Candidate workspace
+  - url: http://console.admin.localhost:3001
+    description: Platform Administrator console
+tags:
+  - name: AdminProposals
+  - name: ParticipantProposals
+  - name: Connections
+  - name: ConnectionNotifications
+paths:
+  /api/admin/professional-connection-proposals:
+    get:
+      tags: [AdminProposals]
+      operationId: listAdminProfessionalConnectionProposals
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Page" }
+        - { $ref: "#/components/parameters/PerPage" }
+        - {
+            name: state,
+            in: query,
+            schema: { $ref: "#/components/schemas/ProposalState" },
+          }
+        - {
+            name: participantId,
+            in: query,
+            schema: { type: string, maxLength: 128 },
+          }
+        - {
+            name: creatorAdminUserId,
+            in: query,
+            schema: { type: string, maxLength: 128 },
+          }
+        - {
+            name: sourceSupportConversationId,
+            in: query,
+            schema: { type: string, maxLength: 128 },
+          }
+      responses:
+        "200":
+          description: Deterministically ordered authorized proposal list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminProposalList" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+        "403": { $ref: "#/components/responses/AuthorityDenied" }
+    post:
+      tags: [AdminProposals]
+      operationId: createProfessionalConnectionProposal
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/AdminCsrfToken" }
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateProposalInput" }
+      responses:
+        "201":
+          description: Proposal committed; no connection created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminProposalEnvelope" }
+        "200":
+          description: Exact idempotent replay
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminProposalEnvelope" }
+        "400": { $ref: "#/components/responses/ValidationFailed" }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+        "409": { $ref: "#/components/responses/StateConflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+  /api/admin/professional-connection-proposals/{proposalId}:
+    get:
+      tags: [AdminProposals]
+      operationId: getAdminProfessionalConnectionProposal
+      security: [{ cookieAuth: [] }]
+      parameters: [{ $ref: "#/components/parameters/ProposalId" }]
+      responses:
+        "200":
+          description: Time-bounded authorized proposal detail
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminProposalEnvelope" }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+  /api/admin/professional-connection-proposals/{proposalId}/cancel:
+    post:
+      tags: [AdminProposals]
+      operationId: cancelProfessionalConnectionProposal
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/ProposalId" }
+        - { $ref: "#/components/parameters/AdminCsrfToken" }
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+        - { $ref: "#/components/parameters/ExpectedVersion" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [confirmation]
+              properties:
+                confirmation: { const: true }
+      responses:
+        "200":
+          description: Cancelled or exact idempotent replay
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminProposalEnvelope" }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+        "409": { $ref: "#/components/responses/StateConflict" }
+  /api/admin/professional-connection-proposals/{proposalId}/protected-audit:
+    get:
+      tags: [AdminProposals]
+      operationId: getProtectedProfessionalConnectionProposalAudit
+      description: Requires current Platform Administrator authority and fresh step-up proof; unavailable at the exact protected deletion boundary.
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/ProposalId" }
+      responses:
+        "200":
+          description: Allowlisted protected proposal audit projection
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProtectedProposalAudit" }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+        "403": { $ref: "#/components/responses/StepUpRequired" }
+  /api/connections/proposals:
+    get:
+      tags: [ParticipantProposals]
+      operationId: listMyProfessionalConnectionProposals
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { name: cursor, in: query, schema: { type: string, maxLength: 512 } }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
+        - {
+            name: state,
+            in: query,
+            schema: { $ref: "#/components/schemas/ProposalState" },
+          }
+      responses:
+        "200":
+          description: Current participant-owned proposals only
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParticipantProposalList" }
+        "401": { $ref: "#/components/responses/AuthenticationRequired" }
+  /api/connections/proposals/{proposalId}:
+    get:
+      tags: [ParticipantProposals]
+      operationId: getMyProfessionalConnectionProposal
+      security: [{ cookieAuth: [] }]
+      parameters: [{ $ref: "#/components/parameters/ProposalId" }]
+      responses:
+        "200":
+          description: Participant-safe detail with no other-party decision attribution
+          content:
+            application/json:
+              schema:
+                { $ref: "#/components/schemas/ParticipantProposalEnvelope" }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+  /api/connections/proposals/{proposalId}/decision:
+    post:
+      tags: [ParticipantProposals]
+      operationId: decideProfessionalConnectionProposal
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/ProposalId" }
+        - { $ref: "#/components/parameters/UserCsrfProof" }
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+        - { $ref: "#/components/parameters/ExpectedVersion" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [decision]
+              properties:
+                decision: { enum: [ACCEPTED, DECLINED] }
+      responses:
+        "200":
+          description: Authoritative participant-safe proposal state
+          content:
+            application/json:
+              schema:
+                { $ref: "#/components/schemas/ParticipantProposalEnvelope" }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+        "409": { $ref: "#/components/responses/StateConflict" }
+  /api/connections:
+    get:
+      tags: [Connections]
+      operationId: listMyProfessionalConnections
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { name: cursor, in: query, schema: { type: string, maxLength: 512 } }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
+        - { name: state, in: query, schema: { enum: [ACCEPTED, REVOKED] } }
+      responses:
+        "200":
+          description: Current participant's accepted and revoked connection projections
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConnectionList" }
+  /api/connections/{connectionId}/disconnect:
+    post:
+      tags: [Connections]
+      operationId: disconnectProfessionalConnection
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/ConnectionId" }
+        - { $ref: "#/components/parameters/UserCsrfProof" }
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+        - { $ref: "#/components/parameters/ExpectedVersion" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [confirmation]
+              properties:
+                confirmation: { const: true }
+      responses:
+        "200":
+          description: Connection revoked and linked conversation archived
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConnectionEnvelope" }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+        "409": { $ref: "#/components/responses/StateConflict" }
+  /api/connections/notifications:
+    get:
+      tags: [ConnectionNotifications]
+      operationId: listMyConnectionNotifications
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { name: cursor, in: query, schema: { type: string, maxLength: 512 } }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
+      responses:
+        "200":
+          description: Recipient-owned safe notifications
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/NotificationList" }
+  /api/connections/notifications/{notificationId}/read:
+    post:
+      tags: [ConnectionNotifications]
+      operationId: markConnectionNotificationRead
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/NotificationId" }
+        - { $ref: "#/components/parameters/UserCsrfProof" }
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+      responses:
+        "204": { description: Read state stored or idempotently replayed }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: smarthire.session
+      description: Existing exclusive Better Auth opaque HttpOnly session cookie.
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 1, default: 1 }
+    PerPage:
+      name: perPage
+      in: query
+      schema: { type: integer, enum: [25, 50, 100], default: 25 }
+    ProposalId:
+      name: proposalId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    ConnectionId:
+      name: connectionId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    NotificationId:
+      name: notificationId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    AdminCsrfToken:
+      name: X-CSRF-Token
+      in: header
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 512 }
+    UserCsrfProof:
+      name: X-CSRF-Proof
+      in: header
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 512 }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, format: uuid }
+    ExpectedVersion:
+      name: If-Match-Version
+      in: header
+      required: true
+      schema: { type: integer, minimum: 1 }
+  schemas:
+    ProposalState:
+      enum:
+        [
+          PENDING_BOTH,
+          PARTIALLY_ACCEPTED,
+          ACCEPTED,
+          DECLINED,
+          EXPIRED,
+          CANCELLED,
+        ]
+    CreateProposalInput:
+      type: object
+      additionalProperties: false
+      required: [participantAId, participantBId, reason]
+      properties:
+        participantAId: { type: string, minLength: 1, maxLength: 128 }
+        participantBId: { type: string, minLength: 1, maxLength: 128 }
+        reason: { type: string, minLength: 10, maxLength: 500 }
+        expiryDays: { type: integer, minimum: 1, maximum: 30, default: 7 }
+        sourceSupportConversationId:
+          { type: string, minLength: 1, maxLength: 128 }
+    SafeAccountReference:
+      type: object
+      additionalProperties: false
+      required: [id, displayName, image]
+      properties:
+        id: { type: string, maxLength: 128 }
+        displayName: { type: string, maxLength: 200 }
+        image: { type: [string, "null"], maxLength: 2048 }
+    ParticipantProposal:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          id,
+          otherParticipant,
+          reason,
+          state,
+          version,
+          myDecision,
+          expiresAt,
+          createdAt,
+          detailAvailable,
+        ]
+      properties:
+        id: { type: string, maxLength: 128 }
+        otherParticipant: { $ref: "#/components/schemas/SafeAccountReference" }
+        reason: { type: [string, "null"], maxLength: 500 }
+        state: { $ref: "#/components/schemas/ProposalState" }
+        version: { type: integer, minimum: 1 }
+        myDecision: { type: [string, "null"], enum: [ACCEPTED, DECLINED, null] }
+        expiresAt: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+        terminalAt: { type: [string, "null"], format: date-time }
+        detailAvailable: { type: boolean }
+    AdminProposal:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          id,
+          participantLow,
+          participantHigh,
+          state,
+          version,
+          expiresAt,
+          createdAt,
+          ordinaryDetailAvailable,
+        ]
+      properties:
+        id: { type: string, maxLength: 128 }
+        participantLow: { $ref: "#/components/schemas/SafeAccountReference" }
+        participantHigh: { $ref: "#/components/schemas/SafeAccountReference" }
+        creatorAdminUserId: { type: [string, "null"], maxLength: 128 }
+        sourceSupportConversationId: { type: [string, "null"], maxLength: 128 }
+        reason: { type: [string, "null"], maxLength: 500 }
+        state: { $ref: "#/components/schemas/ProposalState" }
+        version: { type: integer, minimum: 1 }
+        expiresAt: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+        terminalAt: { type: [string, "null"], format: date-time }
+        ordinaryDetailAvailable: { type: boolean }
+    ProtectedProposalAudit:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          proposalId,
+          state,
+          participants,
+          decisions,
+          history,
+          protectedDeleteAfter,
+        ]
+      properties:
+        proposalId: { type: string, maxLength: 128 }
+        state: { $ref: "#/components/schemas/ProposalState" }
+        participants:
+          type: array
+          minItems: 2
+          maxItems: 2
+          items: { $ref: "#/components/schemas/SafeAccountReference" }
+        reason: { type: [string, "null"], maxLength: 500 }
+        decisions: { type: array, maxItems: 2, items: { type: object } }
+        history: { type: array, items: { type: object } }
+        protectedDeleteAfter: { type: string, format: date-time }
+    ProfessionalConnection:
+      type: object
+      additionalProperties: false
+      required: [id, otherParticipant, state, version, acceptedAt]
+      properties:
+        id: { type: string, maxLength: 128 }
+        otherParticipant: { $ref: "#/components/schemas/SafeAccountReference" }
+        state: { enum: [ACCEPTED, REVOKED] }
+        version: { type: integer, minimum: 1 }
+        acceptedAt: { type: string, format: date-time }
+        revokedAt: { type: [string, "null"], format: date-time }
+    ConnectionNotification:
+      type: object
+      additionalProperties: false
+      required: [id, kind, title, message, createdAt, readAt]
+      properties:
+        id: { type: string, maxLength: 128 }
+        kind:
+          {
+            enum:
+              [
+                PROPOSAL_CREATED,
+                PROPOSAL_UPDATED,
+                PROPOSAL_NO_LONGER_ACTIVE,
+                CONNECTION_ACCEPTED,
+                CONNECTION_REVOKED,
+              ],
+          }
+        title: { type: string, maxLength: 120 }
+        message: { type: string, maxLength: 300 }
+        proposalId: { type: [string, "null"], maxLength: 128 }
+        connectionId: { type: [string, "null"], maxLength: 128 }
+        createdAt: { type: string, format: date-time }
+        readAt: { type: [string, "null"], format: date-time }
+    AdminProposalList:
+      type: object
+      additionalProperties: false
+      required: [data, total, calculatedAt]
+      properties:
+        data:
+          { type: array, items: { $ref: "#/components/schemas/AdminProposal" } }
+        total: { type: integer, minimum: 0 }
+        calculatedAt: { type: string, format: date-time }
+    ParticipantProposalList:
+      type: object
+      additionalProperties: false
+      required: [items, nextCursor]
+      properties:
+        items:
+          {
+            type: array,
+            maxItems: 50,
+            items: { $ref: "#/components/schemas/ParticipantProposal" },
+          }
+        nextCursor: { type: [string, "null"], maxLength: 512 }
+    ConnectionList:
+      type: object
+      additionalProperties: false
+      required: [items, nextCursor]
+      properties:
+        items:
+          {
+            type: array,
+            maxItems: 50,
+            items: { $ref: "#/components/schemas/ProfessionalConnection" },
+          }
+        nextCursor: { type: [string, "null"], maxLength: 512 }
+    NotificationList:
+      type: object
+      additionalProperties: false
+      required: [items, nextCursor]
+      properties:
+        items:
+          {
+            type: array,
+            maxItems: 50,
+            items: { $ref: "#/components/schemas/ConnectionNotification" },
+          }
+        nextCursor: { type: [string, "null"], maxLength: 512 }
+    ParticipantProposalEnvelope:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data: { $ref: "#/components/schemas/ParticipantProposal" }
+        deduplicated: { type: boolean }
+    AdminProposalEnvelope:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data: { $ref: "#/components/schemas/AdminProposal" }
+        deduplicated: { type: boolean }
+    ConnectionEnvelope:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data: { $ref: "#/components/schemas/ProfessionalConnection" }
+        deduplicated: { type: boolean }
+    SafeError:
+      type: object
+      additionalProperties: false
+      required: [code]
+      properties:
+        code: { type: string, maxLength: 80 }
+        retryAfterSeconds: { type: integer, minimum: 1 }
+        currentVersion: { type: integer, minimum: 1 }
+  responses:
+    AuthenticationRequired:
+      description: Current exclusive browser session is absent or unusable
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/SafeError" }
+    AuthorityDenied:
+      description: Current actor lacks Platform Administrator authority
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/SafeError" }
+    ValidationFailed:
+      description: Strict request validation failed
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/SafeError" }
+    ResourceUnavailable:
+      description: Neutral unknown, unauthorized, or unavailable resource result
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/SafeError" }
+    StateConflict:
+      description: State, version, expiry, block, cooldown, or invariant conflict
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/SafeError" }
+    RateLimited:
+      description: Safe quota response with bounded retry duration
+      headers:
+        Retry-After:
+          schema: { type: integer, minimum: 1 }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/SafeError" }
+    StepUpRequired:
+      description: Fresh administrator step-up proof is required
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/SafeError" }

@@ -6,7 +6,9 @@ export type AdminWorkerLoop = {
     | "evidence"
     | "verification-deadline"
     | "notification"
-    | "retention";
+    | "retention"
+    | "support"
+    | "connections";
   intervalMs: number;
   run(now: Date): Promise<unknown>;
 };

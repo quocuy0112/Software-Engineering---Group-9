@@ -119,7 +119,9 @@ export const EmailKind = {
   VERIFICATION_REJECTED: 'VERIFICATION_REJECTED',
   VERIFICATION_CANCELLED: 'VERIFICATION_CANCELLED',
   VERIFICATION_DELAYED: 'VERIFICATION_DELAYED',
-  VERIFICATION_EXPIRED: 'VERIFICATION_EXPIRED'
+  VERIFICATION_EXPIRED: 'VERIFICATION_EXPIRED',
+  SUPPORT_CASE_UPDATED: 'SUPPORT_CASE_UPDATED',
+  PROFESSIONAL_CONNECTION_UPDATED: 'PROFESSIONAL_CONNECTION_UPDATED'
 } as const
 
 export type EmailKind = (typeof EmailKind)[keyof typeof EmailKind]
@@ -325,10 +327,90 @@ export type CompanyMembershipStatus = (typeof CompanyMembershipStatus)[keyof typ
 
 
 export const ProfessionalConnectionStatus = {
-  ACCEPTED: 'ACCEPTED'
+  ACCEPTED: 'ACCEPTED',
+  REVOKED: 'REVOKED'
 } as const
 
 export type ProfessionalConnectionStatus = (typeof ProfessionalConnectionStatus)[keyof typeof ProfessionalConnectionStatus]
+
+
+export const ProfessionalConnectionProposalState = {
+  PENDING_BOTH: 'PENDING_BOTH',
+  PARTIALLY_ACCEPTED: 'PARTIALLY_ACCEPTED',
+  ACCEPTED: 'ACCEPTED',
+  DECLINED: 'DECLINED',
+  EXPIRED: 'EXPIRED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type ProfessionalConnectionProposalState = (typeof ProfessionalConnectionProposalState)[keyof typeof ProfessionalConnectionProposalState]
+
+
+export const ProfessionalConnectionDecisionKind = {
+  ACCEPTED: 'ACCEPTED',
+  DECLINED: 'DECLINED'
+} as const
+
+export type ProfessionalConnectionDecisionKind = (typeof ProfessionalConnectionDecisionKind)[keyof typeof ProfessionalConnectionDecisionKind]
+
+
+export const ProfessionalConnectionNotificationKind = {
+  PROPOSAL_CREATED: 'PROPOSAL_CREATED',
+  PROPOSAL_UPDATED: 'PROPOSAL_UPDATED',
+  PROPOSAL_NO_LONGER_ACTIVE: 'PROPOSAL_NO_LONGER_ACTIVE',
+  CONNECTION_ACCEPTED: 'CONNECTION_ACCEPTED',
+  CONNECTION_REVOKED: 'CONNECTION_REVOKED'
+} as const
+
+export type ProfessionalConnectionNotificationKind = (typeof ProfessionalConnectionNotificationKind)[keyof typeof ProfessionalConnectionNotificationKind]
+
+
+export const MessagingConversationArchiveReason = {
+  PROFESSIONAL_CONNECTION_REVOKED: 'PROFESSIONAL_CONNECTION_REVOKED'
+} as const
+
+export type MessagingConversationArchiveReason = (typeof MessagingConversationArchiveReason)[keyof typeof MessagingConversationArchiveReason]
+
+
+export const SupportConversationCategory = {
+  ACCOUNT_ACCESS: 'ACCOUNT_ACCESS',
+  PROFILE: 'PROFILE',
+  JOBS_APPLICATIONS: 'JOBS_APPLICATIONS',
+  RECRUITER: 'RECRUITER',
+  MESSAGING: 'MESSAGING',
+  PRIVACY_SAFETY: 'PRIVACY_SAFETY',
+  OTHER: 'OTHER'
+} as const
+
+export type SupportConversationCategory = (typeof SupportConversationCategory)[keyof typeof SupportConversationCategory]
+
+
+export const SupportConversationState = {
+  OPEN: 'OPEN',
+  WAITING_FOR_USER: 'WAITING_FOR_USER',
+  WAITING_FOR_SUPPORT: 'WAITING_FOR_SUPPORT',
+  RESOLVED: 'RESOLVED',
+  CLOSED: 'CLOSED'
+} as const
+
+export type SupportConversationState = (typeof SupportConversationState)[keyof typeof SupportConversationState]
+
+
+export const SupportMessageSenderKind = {
+  REQUESTER: 'REQUESTER',
+  ADMINISTRATOR: 'ADMINISTRATOR'
+} as const
+
+export type SupportMessageSenderKind = (typeof SupportMessageSenderKind)[keyof typeof SupportMessageSenderKind]
+
+
+export const SupportAssignmentEndReason = {
+  REASSIGNED: 'REASSIGNED',
+  AUTHORITY_LOST: 'AUTHORITY_LOST',
+  CASE_CLOSED: 'CASE_CLOSED'
+} as const
+
+export type SupportAssignmentEndReason = (typeof SupportAssignmentEndReason)[keyof typeof SupportAssignmentEndReason]
 
 
 export const MessagingConversationContextType = {

@@ -8,7 +8,9 @@ import {
 } from "./common";
 
 export const conversationContextInputSchema = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("APPLICATION"), applicationId: opaqueIdSchema }).strict(),
+  z
+    .object({ type: z.literal("APPLICATION"), applicationId: opaqueIdSchema })
+    .strict(),
   z
     .object({
       type: z.literal("PROFESSIONAL_CONNECTION"),
@@ -18,12 +20,15 @@ export const conversationContextInputSchema = z.discriminatedUnion("type", [
 ]);
 
 export const openConversationInputSchema = z
-  .object({ targetUserId: opaqueIdSchema, context: conversationContextInputSchema })
+  .object({
+    targetUserId: opaqueIdSchema,
+    context: conversationContextInputSchema,
+  })
   .strict();
 
 export const messagingListQuerySchema = z
   .object({
-    q: z.string().trim().min(1).max(100).optional(),
+    q: z.string().trim().min(2).max(100).optional(),
     cursor: cursorSchema.optional(),
     limit: messagingPageLimitSchema,
   })
@@ -46,6 +51,8 @@ export const conversationSummarySchema = z
     unreadCount: z.number().int().nonnegative(),
     blocked: z.boolean(),
     presence: z.enum(["ONLINE", "OFFLINE"]),
+    accessMode: z.enum(["READ_WRITE", "READ_ONLY"]),
+    archivedAt: z.iso.datetime().nullable(),
     createdAt: z.iso.datetime(),
   })
   .strict();
@@ -76,7 +83,9 @@ export const eligibleParticipantListSchema = z
   })
   .strict();
 
-export type ConversationContextInput = z.infer<typeof conversationContextInputSchema>;
+export type ConversationContextInput = z.infer<
+  typeof conversationContextInputSchema
+>;
 export type OpenConversationInput = z.infer<typeof openConversationInputSchema>;
 export type ConversationSummary = z.infer<typeof conversationSummarySchema>;
 export type ConversationDetail = z.infer<typeof conversationDetailSchema>;

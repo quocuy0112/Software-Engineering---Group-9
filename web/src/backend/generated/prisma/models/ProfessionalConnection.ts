@@ -20,16 +20,30 @@ export type ProfessionalConnectionModel = runtime.Types.Result.DefaultSelection<
 
 export type AggregateProfessionalConnection = {
   _count: ProfessionalConnectionCountAggregateOutputType | null
+  _avg: ProfessionalConnectionAvgAggregateOutputType | null
+  _sum: ProfessionalConnectionSumAggregateOutputType | null
   _min: ProfessionalConnectionMinAggregateOutputType | null
   _max: ProfessionalConnectionMaxAggregateOutputType | null
+}
+
+export type ProfessionalConnectionAvgAggregateOutputType = {
+  version: number | null
+}
+
+export type ProfessionalConnectionSumAggregateOutputType = {
+  version: number | null
 }
 
 export type ProfessionalConnectionMinAggregateOutputType = {
   id: string | null
   participantLowId: string | null
   participantHighId: string | null
+  sourceProposalId: string | null
   state: $Enums.ProfessionalConnectionStatus | null
+  version: number | null
   acceptedAt: Date | null
+  revokedAt: Date | null
+  revokedByUserId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -38,8 +52,12 @@ export type ProfessionalConnectionMaxAggregateOutputType = {
   id: string | null
   participantLowId: string | null
   participantHighId: string | null
+  sourceProposalId: string | null
   state: $Enums.ProfessionalConnectionStatus | null
+  version: number | null
   acceptedAt: Date | null
+  revokedAt: Date | null
+  revokedByUserId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -48,20 +66,36 @@ export type ProfessionalConnectionCountAggregateOutputType = {
   id: number
   participantLowId: number
   participantHighId: number
+  sourceProposalId: number
   state: number
+  version: number
   acceptedAt: number
+  revokedAt: number
+  revokedByUserId: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
 
+export type ProfessionalConnectionAvgAggregateInputType = {
+  version?: true
+}
+
+export type ProfessionalConnectionSumAggregateInputType = {
+  version?: true
+}
+
 export type ProfessionalConnectionMinAggregateInputType = {
   id?: true
   participantLowId?: true
   participantHighId?: true
+  sourceProposalId?: true
   state?: true
+  version?: true
   acceptedAt?: true
+  revokedAt?: true
+  revokedByUserId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -70,8 +104,12 @@ export type ProfessionalConnectionMaxAggregateInputType = {
   id?: true
   participantLowId?: true
   participantHighId?: true
+  sourceProposalId?: true
   state?: true
+  version?: true
   acceptedAt?: true
+  revokedAt?: true
+  revokedByUserId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -80,8 +118,12 @@ export type ProfessionalConnectionCountAggregateInputType = {
   id?: true
   participantLowId?: true
   participantHighId?: true
+  sourceProposalId?: true
   state?: true
+  version?: true
   acceptedAt?: true
+  revokedAt?: true
+  revokedByUserId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -125,6 +167,18 @@ export type ProfessionalConnectionAggregateArgs<ExtArgs extends runtime.Types.Ex
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: ProfessionalConnectionAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: ProfessionalConnectionSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: ProfessionalConnectionMinAggregateInputType
@@ -155,6 +209,8 @@ export type ProfessionalConnectionGroupByArgs<ExtArgs extends runtime.Types.Exte
   take?: number
   skip?: number
   _count?: ProfessionalConnectionCountAggregateInputType | true
+  _avg?: ProfessionalConnectionAvgAggregateInputType
+  _sum?: ProfessionalConnectionSumAggregateInputType
   _min?: ProfessionalConnectionMinAggregateInputType
   _max?: ProfessionalConnectionMaxAggregateInputType
 }
@@ -163,11 +219,17 @@ export type ProfessionalConnectionGroupByOutputType = {
   id: string
   participantLowId: string
   participantHighId: string
+  sourceProposalId: string | null
   state: $Enums.ProfessionalConnectionStatus
+  version: number
   acceptedAt: Date
+  revokedAt: Date | null
+  revokedByUserId: string | null
   createdAt: Date
   updatedAt: Date
   _count: ProfessionalConnectionCountAggregateOutputType | null
+  _avg: ProfessionalConnectionAvgAggregateOutputType | null
+  _sum: ProfessionalConnectionSumAggregateOutputType | null
   _min: ProfessionalConnectionMinAggregateOutputType | null
   _max: ProfessionalConnectionMaxAggregateOutputType | null
 }
@@ -194,56 +256,85 @@ export type ProfessionalConnectionWhereInput = {
   id?: Prisma.StringFilter<"ProfessionalConnection"> | string
   participantLowId?: Prisma.StringFilter<"ProfessionalConnection"> | string
   participantHighId?: Prisma.StringFilter<"ProfessionalConnection"> | string
+  sourceProposalId?: Prisma.StringNullableFilter<"ProfessionalConnection"> | string | null
   state?: Prisma.EnumProfessionalConnectionStatusFilter<"ProfessionalConnection"> | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFilter<"ProfessionalConnection"> | number
   acceptedAt?: Prisma.DateTimeFilter<"ProfessionalConnection"> | Date | string
+  revokedAt?: Prisma.DateTimeNullableFilter<"ProfessionalConnection"> | Date | string | null
+  revokedByUserId?: Prisma.StringNullableFilter<"ProfessionalConnection"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ProfessionalConnection"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProfessionalConnection"> | Date | string
   participantLow?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   participantHigh?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
+  sourceProposal?: Prisma.XOR<Prisma.ProfessionalConnectionProposalNullableScalarRelationFilter, Prisma.ProfessionalConnectionProposalWhereInput> | null
+  revokedBy?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
   conversations?: Prisma.MessagingConversationListRelationFilter
+  notifications?: Prisma.ProfessionalConnectionNotificationListRelationFilter
+  notificationOutbox?: Prisma.EmailOutboxListRelationFilter
 }
 
 export type ProfessionalConnectionOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   participantLowId?: Prisma.SortOrder
   participantHighId?: Prisma.SortOrder
+  sourceProposalId?: Prisma.SortOrderInput | Prisma.SortOrder
   state?: Prisma.SortOrder
+  version?: Prisma.SortOrder
   acceptedAt?: Prisma.SortOrder
+  revokedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  revokedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   participantLow?: Prisma.UserAccountOrderByWithRelationInput
   participantHigh?: Prisma.UserAccountOrderByWithRelationInput
+  sourceProposal?: Prisma.ProfessionalConnectionProposalOrderByWithRelationInput
+  revokedBy?: Prisma.UserAccountOrderByWithRelationInput
   conversations?: Prisma.MessagingConversationOrderByRelationAggregateInput
+  notifications?: Prisma.ProfessionalConnectionNotificationOrderByRelationAggregateInput
+  notificationOutbox?: Prisma.EmailOutboxOrderByRelationAggregateInput
 }
 
 export type ProfessionalConnectionWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  participantLowId_participantHighId?: Prisma.ProfessionalConnectionParticipantLowIdParticipantHighIdCompoundUniqueInput
+  sourceProposalId?: string
   AND?: Prisma.ProfessionalConnectionWhereInput | Prisma.ProfessionalConnectionWhereInput[]
   OR?: Prisma.ProfessionalConnectionWhereInput[]
   NOT?: Prisma.ProfessionalConnectionWhereInput | Prisma.ProfessionalConnectionWhereInput[]
   participantLowId?: Prisma.StringFilter<"ProfessionalConnection"> | string
   participantHighId?: Prisma.StringFilter<"ProfessionalConnection"> | string
   state?: Prisma.EnumProfessionalConnectionStatusFilter<"ProfessionalConnection"> | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFilter<"ProfessionalConnection"> | number
   acceptedAt?: Prisma.DateTimeFilter<"ProfessionalConnection"> | Date | string
+  revokedAt?: Prisma.DateTimeNullableFilter<"ProfessionalConnection"> | Date | string | null
+  revokedByUserId?: Prisma.StringNullableFilter<"ProfessionalConnection"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ProfessionalConnection"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProfessionalConnection"> | Date | string
   participantLow?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   participantHigh?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
+  sourceProposal?: Prisma.XOR<Prisma.ProfessionalConnectionProposalNullableScalarRelationFilter, Prisma.ProfessionalConnectionProposalWhereInput> | null
+  revokedBy?: Prisma.XOR<Prisma.UserAccountNullableScalarRelationFilter, Prisma.UserAccountWhereInput> | null
   conversations?: Prisma.MessagingConversationListRelationFilter
-}, "id" | "participantLowId_participantHighId">
+  notifications?: Prisma.ProfessionalConnectionNotificationListRelationFilter
+  notificationOutbox?: Prisma.EmailOutboxListRelationFilter
+}, "id" | "sourceProposalId">
 
 export type ProfessionalConnectionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   participantLowId?: Prisma.SortOrder
   participantHighId?: Prisma.SortOrder
+  sourceProposalId?: Prisma.SortOrderInput | Prisma.SortOrder
   state?: Prisma.SortOrder
+  version?: Prisma.SortOrder
   acceptedAt?: Prisma.SortOrder
+  revokedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  revokedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ProfessionalConnectionCountOrderByAggregateInput
+  _avg?: Prisma.ProfessionalConnectionAvgOrderByAggregateInput
   _max?: Prisma.ProfessionalConnectionMaxOrderByAggregateInput
   _min?: Prisma.ProfessionalConnectionMinOrderByAggregateInput
+  _sum?: Prisma.ProfessionalConnectionSumOrderByAggregateInput
 }
 
 export type ProfessionalConnectionScalarWhereWithAggregatesInput = {
@@ -253,8 +344,12 @@ export type ProfessionalConnectionScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"ProfessionalConnection"> | string
   participantLowId?: Prisma.StringWithAggregatesFilter<"ProfessionalConnection"> | string
   participantHighId?: Prisma.StringWithAggregatesFilter<"ProfessionalConnection"> | string
+  sourceProposalId?: Prisma.StringNullableWithAggregatesFilter<"ProfessionalConnection"> | string | null
   state?: Prisma.EnumProfessionalConnectionStatusWithAggregatesFilter<"ProfessionalConnection"> | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntWithAggregatesFilter<"ProfessionalConnection"> | number
   acceptedAt?: Prisma.DateTimeWithAggregatesFilter<"ProfessionalConnection"> | Date | string
+  revokedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ProfessionalConnection"> | Date | string | null
+  revokedByUserId?: Prisma.StringNullableWithAggregatesFilter<"ProfessionalConnection"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ProfessionalConnection"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ProfessionalConnection"> | Date | string
 }
@@ -262,53 +357,81 @@ export type ProfessionalConnectionScalarWhereWithAggregatesInput = {
 export type ProfessionalConnectionCreateInput = {
   id?: string
   state?: $Enums.ProfessionalConnectionStatus
+  version?: number
   acceptedAt?: Date | string
+  revokedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   participantLow: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsLowInput
   participantHigh: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsHighInput
+  sourceProposal?: Prisma.ProfessionalConnectionProposalCreateNestedOneWithoutConnectionInput
+  revokedBy?: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsRevokedInput
   conversations?: Prisma.MessagingConversationCreateNestedManyWithoutProfessionalConnectionInput
+  notifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutConnectionInput
+  notificationOutbox?: Prisma.EmailOutboxCreateNestedManyWithoutProfessionalConnectionInput
 }
 
 export type ProfessionalConnectionUncheckedCreateInput = {
   id?: string
   participantLowId: string
   participantHighId: string
+  sourceProposalId?: string | null
   state?: $Enums.ProfessionalConnectionStatus
+  version?: number
   acceptedAt?: Date | string
+  revokedAt?: Date | string | null
+  revokedByUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   conversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutProfessionalConnectionInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutConnectionInput
+  notificationOutbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutProfessionalConnectionInput
 }
 
 export type ProfessionalConnectionUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   participantLow?: Prisma.UserAccountUpdateOneRequiredWithoutProfessionalConnectionsLowNestedInput
   participantHigh?: Prisma.UserAccountUpdateOneRequiredWithoutProfessionalConnectionsHighNestedInput
+  sourceProposal?: Prisma.ProfessionalConnectionProposalUpdateOneWithoutConnectionNestedInput
+  revokedBy?: Prisma.UserAccountUpdateOneWithoutProfessionalConnectionsRevokedNestedInput
   conversations?: Prisma.MessagingConversationUpdateManyWithoutProfessionalConnectionNestedInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutConnectionNestedInput
+  notificationOutbox?: Prisma.EmailOutboxUpdateManyWithoutProfessionalConnectionNestedInput
 }
 
 export type ProfessionalConnectionUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   participantLowId?: Prisma.StringFieldUpdateOperationsInput | string
   participantHighId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceProposalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutProfessionalConnectionNestedInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutConnectionNestedInput
+  notificationOutbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutProfessionalConnectionNestedInput
 }
 
 export type ProfessionalConnectionCreateManyInput = {
   id?: string
   participantLowId: string
   participantHighId: string
+  sourceProposalId?: string | null
   state?: $Enums.ProfessionalConnectionStatus
+  version?: number
   acceptedAt?: Date | string
+  revokedAt?: Date | string | null
+  revokedByUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -316,7 +439,9 @@ export type ProfessionalConnectionCreateManyInput = {
 export type ProfessionalConnectionUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -325,8 +450,12 @@ export type ProfessionalConnectionUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   participantLowId?: Prisma.StringFieldUpdateOperationsInput | string
   participantHighId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceProposalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -341,27 +470,39 @@ export type ProfessionalConnectionOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type ProfessionalConnectionParticipantLowIdParticipantHighIdCompoundUniqueInput = {
-  participantLowId: string
-  participantHighId: string
+export type ProfessionalConnectionNullableScalarRelationFilter = {
+  is?: Prisma.ProfessionalConnectionWhereInput | null
+  isNot?: Prisma.ProfessionalConnectionWhereInput | null
 }
 
 export type ProfessionalConnectionCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   participantLowId?: Prisma.SortOrder
   participantHighId?: Prisma.SortOrder
+  sourceProposalId?: Prisma.SortOrder
   state?: Prisma.SortOrder
+  version?: Prisma.SortOrder
   acceptedAt?: Prisma.SortOrder
+  revokedAt?: Prisma.SortOrder
+  revokedByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type ProfessionalConnectionAvgOrderByAggregateInput = {
+  version?: Prisma.SortOrder
 }
 
 export type ProfessionalConnectionMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   participantLowId?: Prisma.SortOrder
   participantHighId?: Prisma.SortOrder
+  sourceProposalId?: Prisma.SortOrder
   state?: Prisma.SortOrder
+  version?: Prisma.SortOrder
   acceptedAt?: Prisma.SortOrder
+  revokedAt?: Prisma.SortOrder
+  revokedByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -370,15 +511,18 @@ export type ProfessionalConnectionMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   participantLowId?: Prisma.SortOrder
   participantHighId?: Prisma.SortOrder
+  sourceProposalId?: Prisma.SortOrder
   state?: Prisma.SortOrder
+  version?: Prisma.SortOrder
   acceptedAt?: Prisma.SortOrder
+  revokedAt?: Prisma.SortOrder
+  revokedByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
-export type ProfessionalConnectionNullableScalarRelationFilter = {
-  is?: Prisma.ProfessionalConnectionWhereInput | null
-  isNot?: Prisma.ProfessionalConnectionWhereInput | null
+export type ProfessionalConnectionSumOrderByAggregateInput = {
+  version?: Prisma.SortOrder
 }
 
 export type ProfessionalConnectionCreateNestedManyWithoutParticipantLowInput = {
@@ -395,6 +539,13 @@ export type ProfessionalConnectionCreateNestedManyWithoutParticipantHighInput = 
   connect?: Prisma.ProfessionalConnectionWhereUniqueInput | Prisma.ProfessionalConnectionWhereUniqueInput[]
 }
 
+export type ProfessionalConnectionCreateNestedManyWithoutRevokedByInput = {
+  create?: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutRevokedByInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutRevokedByInput> | Prisma.ProfessionalConnectionCreateWithoutRevokedByInput[] | Prisma.ProfessionalConnectionUncheckedCreateWithoutRevokedByInput[]
+  connectOrCreate?: Prisma.ProfessionalConnectionCreateOrConnectWithoutRevokedByInput | Prisma.ProfessionalConnectionCreateOrConnectWithoutRevokedByInput[]
+  createMany?: Prisma.ProfessionalConnectionCreateManyRevokedByInputEnvelope
+  connect?: Prisma.ProfessionalConnectionWhereUniqueInput | Prisma.ProfessionalConnectionWhereUniqueInput[]
+}
+
 export type ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantLowInput = {
   create?: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutParticipantLowInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutParticipantLowInput> | Prisma.ProfessionalConnectionCreateWithoutParticipantLowInput[] | Prisma.ProfessionalConnectionUncheckedCreateWithoutParticipantLowInput[]
   connectOrCreate?: Prisma.ProfessionalConnectionCreateOrConnectWithoutParticipantLowInput | Prisma.ProfessionalConnectionCreateOrConnectWithoutParticipantLowInput[]
@@ -406,6 +557,13 @@ export type ProfessionalConnectionUncheckedCreateNestedManyWithoutParticipantHig
   create?: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutParticipantHighInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutParticipantHighInput> | Prisma.ProfessionalConnectionCreateWithoutParticipantHighInput[] | Prisma.ProfessionalConnectionUncheckedCreateWithoutParticipantHighInput[]
   connectOrCreate?: Prisma.ProfessionalConnectionCreateOrConnectWithoutParticipantHighInput | Prisma.ProfessionalConnectionCreateOrConnectWithoutParticipantHighInput[]
   createMany?: Prisma.ProfessionalConnectionCreateManyParticipantHighInputEnvelope
+  connect?: Prisma.ProfessionalConnectionWhereUniqueInput | Prisma.ProfessionalConnectionWhereUniqueInput[]
+}
+
+export type ProfessionalConnectionUncheckedCreateNestedManyWithoutRevokedByInput = {
+  create?: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutRevokedByInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutRevokedByInput> | Prisma.ProfessionalConnectionCreateWithoutRevokedByInput[] | Prisma.ProfessionalConnectionUncheckedCreateWithoutRevokedByInput[]
+  connectOrCreate?: Prisma.ProfessionalConnectionCreateOrConnectWithoutRevokedByInput | Prisma.ProfessionalConnectionCreateOrConnectWithoutRevokedByInput[]
+  createMany?: Prisma.ProfessionalConnectionCreateManyRevokedByInputEnvelope
   connect?: Prisma.ProfessionalConnectionWhereUniqueInput | Prisma.ProfessionalConnectionWhereUniqueInput[]
 }
 
@@ -437,6 +595,20 @@ export type ProfessionalConnectionUpdateManyWithoutParticipantHighNestedInput = 
   deleteMany?: Prisma.ProfessionalConnectionScalarWhereInput | Prisma.ProfessionalConnectionScalarWhereInput[]
 }
 
+export type ProfessionalConnectionUpdateManyWithoutRevokedByNestedInput = {
+  create?: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutRevokedByInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutRevokedByInput> | Prisma.ProfessionalConnectionCreateWithoutRevokedByInput[] | Prisma.ProfessionalConnectionUncheckedCreateWithoutRevokedByInput[]
+  connectOrCreate?: Prisma.ProfessionalConnectionCreateOrConnectWithoutRevokedByInput | Prisma.ProfessionalConnectionCreateOrConnectWithoutRevokedByInput[]
+  upsert?: Prisma.ProfessionalConnectionUpsertWithWhereUniqueWithoutRevokedByInput | Prisma.ProfessionalConnectionUpsertWithWhereUniqueWithoutRevokedByInput[]
+  createMany?: Prisma.ProfessionalConnectionCreateManyRevokedByInputEnvelope
+  set?: Prisma.ProfessionalConnectionWhereUniqueInput | Prisma.ProfessionalConnectionWhereUniqueInput[]
+  disconnect?: Prisma.ProfessionalConnectionWhereUniqueInput | Prisma.ProfessionalConnectionWhereUniqueInput[]
+  delete?: Prisma.ProfessionalConnectionWhereUniqueInput | Prisma.ProfessionalConnectionWhereUniqueInput[]
+  connect?: Prisma.ProfessionalConnectionWhereUniqueInput | Prisma.ProfessionalConnectionWhereUniqueInput[]
+  update?: Prisma.ProfessionalConnectionUpdateWithWhereUniqueWithoutRevokedByInput | Prisma.ProfessionalConnectionUpdateWithWhereUniqueWithoutRevokedByInput[]
+  updateMany?: Prisma.ProfessionalConnectionUpdateManyWithWhereWithoutRevokedByInput | Prisma.ProfessionalConnectionUpdateManyWithWhereWithoutRevokedByInput[]
+  deleteMany?: Prisma.ProfessionalConnectionScalarWhereInput | Prisma.ProfessionalConnectionScalarWhereInput[]
+}
+
 export type ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowNestedInput = {
   create?: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutParticipantLowInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutParticipantLowInput> | Prisma.ProfessionalConnectionCreateWithoutParticipantLowInput[] | Prisma.ProfessionalConnectionUncheckedCreateWithoutParticipantLowInput[]
   connectOrCreate?: Prisma.ProfessionalConnectionCreateOrConnectWithoutParticipantLowInput | Prisma.ProfessionalConnectionCreateOrConnectWithoutParticipantLowInput[]
@@ -465,8 +637,86 @@ export type ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighNeste
   deleteMany?: Prisma.ProfessionalConnectionScalarWhereInput | Prisma.ProfessionalConnectionScalarWhereInput[]
 }
 
+export type ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByNestedInput = {
+  create?: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutRevokedByInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutRevokedByInput> | Prisma.ProfessionalConnectionCreateWithoutRevokedByInput[] | Prisma.ProfessionalConnectionUncheckedCreateWithoutRevokedByInput[]
+  connectOrCreate?: Prisma.ProfessionalConnectionCreateOrConnectWithoutRevokedByInput | Prisma.ProfessionalConnectionCreateOrConnectWithoutRevokedByInput[]
+  upsert?: Prisma.ProfessionalConnectionUpsertWithWhereUniqueWithoutRevokedByInput | Prisma.ProfessionalConnectionUpsertWithWhereUniqueWithoutRevokedByInput[]
+  createMany?: Prisma.ProfessionalConnectionCreateManyRevokedByInputEnvelope
+  set?: Prisma.ProfessionalConnectionWhereUniqueInput | Prisma.ProfessionalConnectionWhereUniqueInput[]
+  disconnect?: Prisma.ProfessionalConnectionWhereUniqueInput | Prisma.ProfessionalConnectionWhereUniqueInput[]
+  delete?: Prisma.ProfessionalConnectionWhereUniqueInput | Prisma.ProfessionalConnectionWhereUniqueInput[]
+  connect?: Prisma.ProfessionalConnectionWhereUniqueInput | Prisma.ProfessionalConnectionWhereUniqueInput[]
+  update?: Prisma.ProfessionalConnectionUpdateWithWhereUniqueWithoutRevokedByInput | Prisma.ProfessionalConnectionUpdateWithWhereUniqueWithoutRevokedByInput[]
+  updateMany?: Prisma.ProfessionalConnectionUpdateManyWithWhereWithoutRevokedByInput | Prisma.ProfessionalConnectionUpdateManyWithWhereWithoutRevokedByInput[]
+  deleteMany?: Prisma.ProfessionalConnectionScalarWhereInput | Prisma.ProfessionalConnectionScalarWhereInput[]
+}
+
+export type ProfessionalConnectionCreateNestedOneWithoutNotificationOutboxInput = {
+  create?: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutNotificationOutboxInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutNotificationOutboxInput>
+  connectOrCreate?: Prisma.ProfessionalConnectionCreateOrConnectWithoutNotificationOutboxInput
+  connect?: Prisma.ProfessionalConnectionWhereUniqueInput
+}
+
+export type ProfessionalConnectionUpdateOneWithoutNotificationOutboxNestedInput = {
+  create?: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutNotificationOutboxInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutNotificationOutboxInput>
+  connectOrCreate?: Prisma.ProfessionalConnectionCreateOrConnectWithoutNotificationOutboxInput
+  upsert?: Prisma.ProfessionalConnectionUpsertWithoutNotificationOutboxInput
+  disconnect?: Prisma.ProfessionalConnectionWhereInput | boolean
+  delete?: Prisma.ProfessionalConnectionWhereInput | boolean
+  connect?: Prisma.ProfessionalConnectionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProfessionalConnectionUpdateToOneWithWhereWithoutNotificationOutboxInput, Prisma.ProfessionalConnectionUpdateWithoutNotificationOutboxInput>, Prisma.ProfessionalConnectionUncheckedUpdateWithoutNotificationOutboxInput>
+}
+
 export type EnumProfessionalConnectionStatusFieldUpdateOperationsInput = {
   set?: $Enums.ProfessionalConnectionStatus
+}
+
+export type ProfessionalConnectionCreateNestedOneWithoutSourceProposalInput = {
+  create?: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutSourceProposalInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutSourceProposalInput>
+  connectOrCreate?: Prisma.ProfessionalConnectionCreateOrConnectWithoutSourceProposalInput
+  connect?: Prisma.ProfessionalConnectionWhereUniqueInput
+}
+
+export type ProfessionalConnectionUncheckedCreateNestedOneWithoutSourceProposalInput = {
+  create?: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutSourceProposalInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutSourceProposalInput>
+  connectOrCreate?: Prisma.ProfessionalConnectionCreateOrConnectWithoutSourceProposalInput
+  connect?: Prisma.ProfessionalConnectionWhereUniqueInput
+}
+
+export type ProfessionalConnectionUpdateOneWithoutSourceProposalNestedInput = {
+  create?: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutSourceProposalInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutSourceProposalInput>
+  connectOrCreate?: Prisma.ProfessionalConnectionCreateOrConnectWithoutSourceProposalInput
+  upsert?: Prisma.ProfessionalConnectionUpsertWithoutSourceProposalInput
+  disconnect?: Prisma.ProfessionalConnectionWhereInput | boolean
+  delete?: Prisma.ProfessionalConnectionWhereInput | boolean
+  connect?: Prisma.ProfessionalConnectionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProfessionalConnectionUpdateToOneWithWhereWithoutSourceProposalInput, Prisma.ProfessionalConnectionUpdateWithoutSourceProposalInput>, Prisma.ProfessionalConnectionUncheckedUpdateWithoutSourceProposalInput>
+}
+
+export type ProfessionalConnectionUncheckedUpdateOneWithoutSourceProposalNestedInput = {
+  create?: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutSourceProposalInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutSourceProposalInput>
+  connectOrCreate?: Prisma.ProfessionalConnectionCreateOrConnectWithoutSourceProposalInput
+  upsert?: Prisma.ProfessionalConnectionUpsertWithoutSourceProposalInput
+  disconnect?: Prisma.ProfessionalConnectionWhereInput | boolean
+  delete?: Prisma.ProfessionalConnectionWhereInput | boolean
+  connect?: Prisma.ProfessionalConnectionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProfessionalConnectionUpdateToOneWithWhereWithoutSourceProposalInput, Prisma.ProfessionalConnectionUpdateWithoutSourceProposalInput>, Prisma.ProfessionalConnectionUncheckedUpdateWithoutSourceProposalInput>
+}
+
+export type ProfessionalConnectionCreateNestedOneWithoutNotificationsInput = {
+  create?: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutNotificationsInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.ProfessionalConnectionCreateOrConnectWithoutNotificationsInput
+  connect?: Prisma.ProfessionalConnectionWhereUniqueInput
+}
+
+export type ProfessionalConnectionUpdateOneWithoutNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutNotificationsInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.ProfessionalConnectionCreateOrConnectWithoutNotificationsInput
+  upsert?: Prisma.ProfessionalConnectionUpsertWithoutNotificationsInput
+  disconnect?: Prisma.ProfessionalConnectionWhereInput | boolean
+  delete?: Prisma.ProfessionalConnectionWhereInput | boolean
+  connect?: Prisma.ProfessionalConnectionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProfessionalConnectionUpdateToOneWithWhereWithoutNotificationsInput, Prisma.ProfessionalConnectionUpdateWithoutNotificationsInput>, Prisma.ProfessionalConnectionUncheckedUpdateWithoutNotificationsInput>
 }
 
 export type ProfessionalConnectionCreateNestedOneWithoutConversationsInput = {
@@ -488,21 +738,33 @@ export type ProfessionalConnectionUpdateOneWithoutConversationsNestedInput = {
 export type ProfessionalConnectionCreateWithoutParticipantLowInput = {
   id?: string
   state?: $Enums.ProfessionalConnectionStatus
+  version?: number
   acceptedAt?: Date | string
+  revokedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   participantHigh: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsHighInput
+  sourceProposal?: Prisma.ProfessionalConnectionProposalCreateNestedOneWithoutConnectionInput
+  revokedBy?: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsRevokedInput
   conversations?: Prisma.MessagingConversationCreateNestedManyWithoutProfessionalConnectionInput
+  notifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutConnectionInput
+  notificationOutbox?: Prisma.EmailOutboxCreateNestedManyWithoutProfessionalConnectionInput
 }
 
 export type ProfessionalConnectionUncheckedCreateWithoutParticipantLowInput = {
   id?: string
   participantHighId: string
+  sourceProposalId?: string | null
   state?: $Enums.ProfessionalConnectionStatus
+  version?: number
   acceptedAt?: Date | string
+  revokedAt?: Date | string | null
+  revokedByUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   conversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutProfessionalConnectionInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutConnectionInput
+  notificationOutbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutProfessionalConnectionInput
 }
 
 export type ProfessionalConnectionCreateOrConnectWithoutParticipantLowInput = {
@@ -518,21 +780,33 @@ export type ProfessionalConnectionCreateManyParticipantLowInputEnvelope = {
 export type ProfessionalConnectionCreateWithoutParticipantHighInput = {
   id?: string
   state?: $Enums.ProfessionalConnectionStatus
+  version?: number
   acceptedAt?: Date | string
+  revokedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   participantLow: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsLowInput
+  sourceProposal?: Prisma.ProfessionalConnectionProposalCreateNestedOneWithoutConnectionInput
+  revokedBy?: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsRevokedInput
   conversations?: Prisma.MessagingConversationCreateNestedManyWithoutProfessionalConnectionInput
+  notifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutConnectionInput
+  notificationOutbox?: Prisma.EmailOutboxCreateNestedManyWithoutProfessionalConnectionInput
 }
 
 export type ProfessionalConnectionUncheckedCreateWithoutParticipantHighInput = {
   id?: string
   participantLowId: string
+  sourceProposalId?: string | null
   state?: $Enums.ProfessionalConnectionStatus
+  version?: number
   acceptedAt?: Date | string
+  revokedAt?: Date | string | null
+  revokedByUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   conversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutProfessionalConnectionInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutConnectionInput
+  notificationOutbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutProfessionalConnectionInput
 }
 
 export type ProfessionalConnectionCreateOrConnectWithoutParticipantHighInput = {
@@ -542,6 +816,48 @@ export type ProfessionalConnectionCreateOrConnectWithoutParticipantHighInput = {
 
 export type ProfessionalConnectionCreateManyParticipantHighInputEnvelope = {
   data: Prisma.ProfessionalConnectionCreateManyParticipantHighInput | Prisma.ProfessionalConnectionCreateManyParticipantHighInput[]
+  skipDuplicates?: boolean
+}
+
+export type ProfessionalConnectionCreateWithoutRevokedByInput = {
+  id?: string
+  state?: $Enums.ProfessionalConnectionStatus
+  version?: number
+  acceptedAt?: Date | string
+  revokedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  participantLow: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsLowInput
+  participantHigh: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsHighInput
+  sourceProposal?: Prisma.ProfessionalConnectionProposalCreateNestedOneWithoutConnectionInput
+  conversations?: Prisma.MessagingConversationCreateNestedManyWithoutProfessionalConnectionInput
+  notifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutConnectionInput
+  notificationOutbox?: Prisma.EmailOutboxCreateNestedManyWithoutProfessionalConnectionInput
+}
+
+export type ProfessionalConnectionUncheckedCreateWithoutRevokedByInput = {
+  id?: string
+  participantLowId: string
+  participantHighId: string
+  sourceProposalId?: string | null
+  state?: $Enums.ProfessionalConnectionStatus
+  version?: number
+  acceptedAt?: Date | string
+  revokedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  conversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutProfessionalConnectionInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutConnectionInput
+  notificationOutbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutProfessionalConnectionInput
+}
+
+export type ProfessionalConnectionCreateOrConnectWithoutRevokedByInput = {
+  where: Prisma.ProfessionalConnectionWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutRevokedByInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutRevokedByInput>
+}
+
+export type ProfessionalConnectionCreateManyRevokedByInputEnvelope = {
+  data: Prisma.ProfessionalConnectionCreateManyRevokedByInput | Prisma.ProfessionalConnectionCreateManyRevokedByInput[]
   skipDuplicates?: boolean
 }
 
@@ -568,8 +884,12 @@ export type ProfessionalConnectionScalarWhereInput = {
   id?: Prisma.StringFilter<"ProfessionalConnection"> | string
   participantLowId?: Prisma.StringFilter<"ProfessionalConnection"> | string
   participantHighId?: Prisma.StringFilter<"ProfessionalConnection"> | string
+  sourceProposalId?: Prisma.StringNullableFilter<"ProfessionalConnection"> | string | null
   state?: Prisma.EnumProfessionalConnectionStatusFilter<"ProfessionalConnection"> | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFilter<"ProfessionalConnection"> | number
   acceptedAt?: Prisma.DateTimeFilter<"ProfessionalConnection"> | Date | string
+  revokedAt?: Prisma.DateTimeNullableFilter<"ProfessionalConnection"> | Date | string | null
+  revokedByUserId?: Prisma.StringNullableFilter<"ProfessionalConnection"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ProfessionalConnection"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProfessionalConnection"> | Date | string
 }
@@ -590,24 +910,292 @@ export type ProfessionalConnectionUpdateManyWithWhereWithoutParticipantHighInput
   data: Prisma.XOR<Prisma.ProfessionalConnectionUpdateManyMutationInput, Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighInput>
 }
 
-export type ProfessionalConnectionCreateWithoutConversationsInput = {
+export type ProfessionalConnectionUpsertWithWhereUniqueWithoutRevokedByInput = {
+  where: Prisma.ProfessionalConnectionWhereUniqueInput
+  update: Prisma.XOR<Prisma.ProfessionalConnectionUpdateWithoutRevokedByInput, Prisma.ProfessionalConnectionUncheckedUpdateWithoutRevokedByInput>
+  create: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutRevokedByInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutRevokedByInput>
+}
+
+export type ProfessionalConnectionUpdateWithWhereUniqueWithoutRevokedByInput = {
+  where: Prisma.ProfessionalConnectionWhereUniqueInput
+  data: Prisma.XOR<Prisma.ProfessionalConnectionUpdateWithoutRevokedByInput, Prisma.ProfessionalConnectionUncheckedUpdateWithoutRevokedByInput>
+}
+
+export type ProfessionalConnectionUpdateManyWithWhereWithoutRevokedByInput = {
+  where: Prisma.ProfessionalConnectionScalarWhereInput
+  data: Prisma.XOR<Prisma.ProfessionalConnectionUpdateManyMutationInput, Prisma.ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByInput>
+}
+
+export type ProfessionalConnectionCreateWithoutNotificationOutboxInput = {
   id?: string
   state?: $Enums.ProfessionalConnectionStatus
+  version?: number
   acceptedAt?: Date | string
+  revokedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   participantLow: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsLowInput
   participantHigh: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsHighInput
+  sourceProposal?: Prisma.ProfessionalConnectionProposalCreateNestedOneWithoutConnectionInput
+  revokedBy?: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsRevokedInput
+  conversations?: Prisma.MessagingConversationCreateNestedManyWithoutProfessionalConnectionInput
+  notifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutConnectionInput
+}
+
+export type ProfessionalConnectionUncheckedCreateWithoutNotificationOutboxInput = {
+  id?: string
+  participantLowId: string
+  participantHighId: string
+  sourceProposalId?: string | null
+  state?: $Enums.ProfessionalConnectionStatus
+  version?: number
+  acceptedAt?: Date | string
+  revokedAt?: Date | string | null
+  revokedByUserId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  conversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutProfessionalConnectionInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutConnectionInput
+}
+
+export type ProfessionalConnectionCreateOrConnectWithoutNotificationOutboxInput = {
+  where: Prisma.ProfessionalConnectionWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutNotificationOutboxInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutNotificationOutboxInput>
+}
+
+export type ProfessionalConnectionUpsertWithoutNotificationOutboxInput = {
+  update: Prisma.XOR<Prisma.ProfessionalConnectionUpdateWithoutNotificationOutboxInput, Prisma.ProfessionalConnectionUncheckedUpdateWithoutNotificationOutboxInput>
+  create: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutNotificationOutboxInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutNotificationOutboxInput>
+  where?: Prisma.ProfessionalConnectionWhereInput
+}
+
+export type ProfessionalConnectionUpdateToOneWithWhereWithoutNotificationOutboxInput = {
+  where?: Prisma.ProfessionalConnectionWhereInput
+  data: Prisma.XOR<Prisma.ProfessionalConnectionUpdateWithoutNotificationOutboxInput, Prisma.ProfessionalConnectionUncheckedUpdateWithoutNotificationOutboxInput>
+}
+
+export type ProfessionalConnectionUpdateWithoutNotificationOutboxInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  participantLow?: Prisma.UserAccountUpdateOneRequiredWithoutProfessionalConnectionsLowNestedInput
+  participantHigh?: Prisma.UserAccountUpdateOneRequiredWithoutProfessionalConnectionsHighNestedInput
+  sourceProposal?: Prisma.ProfessionalConnectionProposalUpdateOneWithoutConnectionNestedInput
+  revokedBy?: Prisma.UserAccountUpdateOneWithoutProfessionalConnectionsRevokedNestedInput
+  conversations?: Prisma.MessagingConversationUpdateManyWithoutProfessionalConnectionNestedInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutConnectionNestedInput
+}
+
+export type ProfessionalConnectionUncheckedUpdateWithoutNotificationOutboxInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  participantLowId?: Prisma.StringFieldUpdateOperationsInput | string
+  participantHighId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceProposalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutProfessionalConnectionNestedInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutConnectionNestedInput
+}
+
+export type ProfessionalConnectionCreateWithoutSourceProposalInput = {
+  id?: string
+  state?: $Enums.ProfessionalConnectionStatus
+  version?: number
+  acceptedAt?: Date | string
+  revokedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  participantLow: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsLowInput
+  participantHigh: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsHighInput
+  revokedBy?: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsRevokedInput
+  conversations?: Prisma.MessagingConversationCreateNestedManyWithoutProfessionalConnectionInput
+  notifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutConnectionInput
+  notificationOutbox?: Prisma.EmailOutboxCreateNestedManyWithoutProfessionalConnectionInput
+}
+
+export type ProfessionalConnectionUncheckedCreateWithoutSourceProposalInput = {
+  id?: string
+  participantLowId: string
+  participantHighId: string
+  state?: $Enums.ProfessionalConnectionStatus
+  version?: number
+  acceptedAt?: Date | string
+  revokedAt?: Date | string | null
+  revokedByUserId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  conversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutProfessionalConnectionInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutConnectionInput
+  notificationOutbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutProfessionalConnectionInput
+}
+
+export type ProfessionalConnectionCreateOrConnectWithoutSourceProposalInput = {
+  where: Prisma.ProfessionalConnectionWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutSourceProposalInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutSourceProposalInput>
+}
+
+export type ProfessionalConnectionUpsertWithoutSourceProposalInput = {
+  update: Prisma.XOR<Prisma.ProfessionalConnectionUpdateWithoutSourceProposalInput, Prisma.ProfessionalConnectionUncheckedUpdateWithoutSourceProposalInput>
+  create: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutSourceProposalInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutSourceProposalInput>
+  where?: Prisma.ProfessionalConnectionWhereInput
+}
+
+export type ProfessionalConnectionUpdateToOneWithWhereWithoutSourceProposalInput = {
+  where?: Prisma.ProfessionalConnectionWhereInput
+  data: Prisma.XOR<Prisma.ProfessionalConnectionUpdateWithoutSourceProposalInput, Prisma.ProfessionalConnectionUncheckedUpdateWithoutSourceProposalInput>
+}
+
+export type ProfessionalConnectionUpdateWithoutSourceProposalInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  participantLow?: Prisma.UserAccountUpdateOneRequiredWithoutProfessionalConnectionsLowNestedInput
+  participantHigh?: Prisma.UserAccountUpdateOneRequiredWithoutProfessionalConnectionsHighNestedInput
+  revokedBy?: Prisma.UserAccountUpdateOneWithoutProfessionalConnectionsRevokedNestedInput
+  conversations?: Prisma.MessagingConversationUpdateManyWithoutProfessionalConnectionNestedInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutConnectionNestedInput
+  notificationOutbox?: Prisma.EmailOutboxUpdateManyWithoutProfessionalConnectionNestedInput
+}
+
+export type ProfessionalConnectionUncheckedUpdateWithoutSourceProposalInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  participantLowId?: Prisma.StringFieldUpdateOperationsInput | string
+  participantHighId?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutProfessionalConnectionNestedInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutConnectionNestedInput
+  notificationOutbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutProfessionalConnectionNestedInput
+}
+
+export type ProfessionalConnectionCreateWithoutNotificationsInput = {
+  id?: string
+  state?: $Enums.ProfessionalConnectionStatus
+  version?: number
+  acceptedAt?: Date | string
+  revokedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  participantLow: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsLowInput
+  participantHigh: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsHighInput
+  sourceProposal?: Prisma.ProfessionalConnectionProposalCreateNestedOneWithoutConnectionInput
+  revokedBy?: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsRevokedInput
+  conversations?: Prisma.MessagingConversationCreateNestedManyWithoutProfessionalConnectionInput
+  notificationOutbox?: Prisma.EmailOutboxCreateNestedManyWithoutProfessionalConnectionInput
+}
+
+export type ProfessionalConnectionUncheckedCreateWithoutNotificationsInput = {
+  id?: string
+  participantLowId: string
+  participantHighId: string
+  sourceProposalId?: string | null
+  state?: $Enums.ProfessionalConnectionStatus
+  version?: number
+  acceptedAt?: Date | string
+  revokedAt?: Date | string | null
+  revokedByUserId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  conversations?: Prisma.MessagingConversationUncheckedCreateNestedManyWithoutProfessionalConnectionInput
+  notificationOutbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutProfessionalConnectionInput
+}
+
+export type ProfessionalConnectionCreateOrConnectWithoutNotificationsInput = {
+  where: Prisma.ProfessionalConnectionWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutNotificationsInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutNotificationsInput>
+}
+
+export type ProfessionalConnectionUpsertWithoutNotificationsInput = {
+  update: Prisma.XOR<Prisma.ProfessionalConnectionUpdateWithoutNotificationsInput, Prisma.ProfessionalConnectionUncheckedUpdateWithoutNotificationsInput>
+  create: Prisma.XOR<Prisma.ProfessionalConnectionCreateWithoutNotificationsInput, Prisma.ProfessionalConnectionUncheckedCreateWithoutNotificationsInput>
+  where?: Prisma.ProfessionalConnectionWhereInput
+}
+
+export type ProfessionalConnectionUpdateToOneWithWhereWithoutNotificationsInput = {
+  where?: Prisma.ProfessionalConnectionWhereInput
+  data: Prisma.XOR<Prisma.ProfessionalConnectionUpdateWithoutNotificationsInput, Prisma.ProfessionalConnectionUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type ProfessionalConnectionUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  participantLow?: Prisma.UserAccountUpdateOneRequiredWithoutProfessionalConnectionsLowNestedInput
+  participantHigh?: Prisma.UserAccountUpdateOneRequiredWithoutProfessionalConnectionsHighNestedInput
+  sourceProposal?: Prisma.ProfessionalConnectionProposalUpdateOneWithoutConnectionNestedInput
+  revokedBy?: Prisma.UserAccountUpdateOneWithoutProfessionalConnectionsRevokedNestedInput
+  conversations?: Prisma.MessagingConversationUpdateManyWithoutProfessionalConnectionNestedInput
+  notificationOutbox?: Prisma.EmailOutboxUpdateManyWithoutProfessionalConnectionNestedInput
+}
+
+export type ProfessionalConnectionUncheckedUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  participantLowId?: Prisma.StringFieldUpdateOperationsInput | string
+  participantHighId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceProposalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutProfessionalConnectionNestedInput
+  notificationOutbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutProfessionalConnectionNestedInput
+}
+
+export type ProfessionalConnectionCreateWithoutConversationsInput = {
+  id?: string
+  state?: $Enums.ProfessionalConnectionStatus
+  version?: number
+  acceptedAt?: Date | string
+  revokedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  participantLow: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsLowInput
+  participantHigh: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsHighInput
+  sourceProposal?: Prisma.ProfessionalConnectionProposalCreateNestedOneWithoutConnectionInput
+  revokedBy?: Prisma.UserAccountCreateNestedOneWithoutProfessionalConnectionsRevokedInput
+  notifications?: Prisma.ProfessionalConnectionNotificationCreateNestedManyWithoutConnectionInput
+  notificationOutbox?: Prisma.EmailOutboxCreateNestedManyWithoutProfessionalConnectionInput
 }
 
 export type ProfessionalConnectionUncheckedCreateWithoutConversationsInput = {
   id?: string
   participantLowId: string
   participantHighId: string
+  sourceProposalId?: string | null
   state?: $Enums.ProfessionalConnectionStatus
+  version?: number
   acceptedAt?: Date | string
+  revokedAt?: Date | string | null
+  revokedByUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  notifications?: Prisma.ProfessionalConnectionNotificationUncheckedCreateNestedManyWithoutConnectionInput
+  notificationOutbox?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutProfessionalConnectionInput
 }
 
 export type ProfessionalConnectionCreateOrConnectWithoutConversationsInput = {
@@ -629,28 +1217,44 @@ export type ProfessionalConnectionUpdateToOneWithWhereWithoutConversationsInput 
 export type ProfessionalConnectionUpdateWithoutConversationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   participantLow?: Prisma.UserAccountUpdateOneRequiredWithoutProfessionalConnectionsLowNestedInput
   participantHigh?: Prisma.UserAccountUpdateOneRequiredWithoutProfessionalConnectionsHighNestedInput
+  sourceProposal?: Prisma.ProfessionalConnectionProposalUpdateOneWithoutConnectionNestedInput
+  revokedBy?: Prisma.UserAccountUpdateOneWithoutProfessionalConnectionsRevokedNestedInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutConnectionNestedInput
+  notificationOutbox?: Prisma.EmailOutboxUpdateManyWithoutProfessionalConnectionNestedInput
 }
 
 export type ProfessionalConnectionUncheckedUpdateWithoutConversationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   participantLowId?: Prisma.StringFieldUpdateOperationsInput | string
   participantHighId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceProposalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  notifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutConnectionNestedInput
+  notificationOutbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutProfessionalConnectionNestedInput
 }
 
 export type ProfessionalConnectionCreateManyParticipantLowInput = {
   id?: string
   participantHighId: string
+  sourceProposalId?: string | null
   state?: $Enums.ProfessionalConnectionStatus
+  version?: number
   acceptedAt?: Date | string
+  revokedAt?: Date | string | null
+  revokedByUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -658,8 +1262,25 @@ export type ProfessionalConnectionCreateManyParticipantLowInput = {
 export type ProfessionalConnectionCreateManyParticipantHighInput = {
   id?: string
   participantLowId: string
+  sourceProposalId?: string | null
   state?: $Enums.ProfessionalConnectionStatus
+  version?: number
   acceptedAt?: Date | string
+  revokedAt?: Date | string | null
+  revokedByUserId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ProfessionalConnectionCreateManyRevokedByInput = {
+  id?: string
+  participantLowId: string
+  participantHighId: string
+  sourceProposalId?: string | null
+  state?: $Enums.ProfessionalConnectionStatus
+  version?: number
+  acceptedAt?: Date | string
+  revokedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -667,28 +1288,44 @@ export type ProfessionalConnectionCreateManyParticipantHighInput = {
 export type ProfessionalConnectionUpdateWithoutParticipantLowInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   participantHigh?: Prisma.UserAccountUpdateOneRequiredWithoutProfessionalConnectionsHighNestedInput
+  sourceProposal?: Prisma.ProfessionalConnectionProposalUpdateOneWithoutConnectionNestedInput
+  revokedBy?: Prisma.UserAccountUpdateOneWithoutProfessionalConnectionsRevokedNestedInput
   conversations?: Prisma.MessagingConversationUpdateManyWithoutProfessionalConnectionNestedInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutConnectionNestedInput
+  notificationOutbox?: Prisma.EmailOutboxUpdateManyWithoutProfessionalConnectionNestedInput
 }
 
 export type ProfessionalConnectionUncheckedUpdateWithoutParticipantLowInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   participantHighId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceProposalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutProfessionalConnectionNestedInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutConnectionNestedInput
+  notificationOutbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutProfessionalConnectionNestedInput
 }
 
 export type ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   participantHighId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceProposalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -696,28 +1333,89 @@ export type ProfessionalConnectionUncheckedUpdateManyWithoutParticipantLowInput 
 export type ProfessionalConnectionUpdateWithoutParticipantHighInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   participantLow?: Prisma.UserAccountUpdateOneRequiredWithoutProfessionalConnectionsLowNestedInput
+  sourceProposal?: Prisma.ProfessionalConnectionProposalUpdateOneWithoutConnectionNestedInput
+  revokedBy?: Prisma.UserAccountUpdateOneWithoutProfessionalConnectionsRevokedNestedInput
   conversations?: Prisma.MessagingConversationUpdateManyWithoutProfessionalConnectionNestedInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutConnectionNestedInput
+  notificationOutbox?: Prisma.EmailOutboxUpdateManyWithoutProfessionalConnectionNestedInput
 }
 
 export type ProfessionalConnectionUncheckedUpdateWithoutParticipantHighInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   participantLowId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceProposalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutProfessionalConnectionNestedInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutConnectionNestedInput
+  notificationOutbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutProfessionalConnectionNestedInput
 }
 
 export type ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   participantLowId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceProposalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
   acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProfessionalConnectionUpdateWithoutRevokedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  participantLow?: Prisma.UserAccountUpdateOneRequiredWithoutProfessionalConnectionsLowNestedInput
+  participantHigh?: Prisma.UserAccountUpdateOneRequiredWithoutProfessionalConnectionsHighNestedInput
+  sourceProposal?: Prisma.ProfessionalConnectionProposalUpdateOneWithoutConnectionNestedInput
+  conversations?: Prisma.MessagingConversationUpdateManyWithoutProfessionalConnectionNestedInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUpdateManyWithoutConnectionNestedInput
+  notificationOutbox?: Prisma.EmailOutboxUpdateManyWithoutProfessionalConnectionNestedInput
+}
+
+export type ProfessionalConnectionUncheckedUpdateWithoutRevokedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  participantLowId?: Prisma.StringFieldUpdateOperationsInput | string
+  participantHighId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceProposalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversations?: Prisma.MessagingConversationUncheckedUpdateManyWithoutProfessionalConnectionNestedInput
+  notifications?: Prisma.ProfessionalConnectionNotificationUncheckedUpdateManyWithoutConnectionNestedInput
+  notificationOutbox?: Prisma.EmailOutboxUncheckedUpdateManyWithoutProfessionalConnectionNestedInput
+}
+
+export type ProfessionalConnectionUncheckedUpdateManyWithoutRevokedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  participantLowId?: Prisma.StringFieldUpdateOperationsInput | string
+  participantHighId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceProposalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumProfessionalConnectionStatusFieldUpdateOperationsInput | $Enums.ProfessionalConnectionStatus
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -729,10 +1427,14 @@ export type ProfessionalConnectionUncheckedUpdateManyWithoutParticipantHighInput
 
 export type ProfessionalConnectionCountOutputType = {
   conversations: number
+  notifications: number
+  notificationOutbox: number
 }
 
 export type ProfessionalConnectionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversations?: boolean | ProfessionalConnectionCountOutputTypeCountConversationsArgs
+  notifications?: boolean | ProfessionalConnectionCountOutputTypeCountNotificationsArgs
+  notificationOutbox?: boolean | ProfessionalConnectionCountOutputTypeCountNotificationOutboxArgs
 }
 
 /**
@@ -752,18 +1454,40 @@ export type ProfessionalConnectionCountOutputTypeCountConversationsArgs<ExtArgs 
   where?: Prisma.MessagingConversationWhereInput
 }
 
+/**
+ * ProfessionalConnectionCountOutputType without action
+ */
+export type ProfessionalConnectionCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProfessionalConnectionNotificationWhereInput
+}
+
+/**
+ * ProfessionalConnectionCountOutputType without action
+ */
+export type ProfessionalConnectionCountOutputTypeCountNotificationOutboxArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmailOutboxWhereInput
+}
+
 
 export type ProfessionalConnectionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   participantLowId?: boolean
   participantHighId?: boolean
+  sourceProposalId?: boolean
   state?: boolean
+  version?: boolean
   acceptedAt?: boolean
+  revokedAt?: boolean
+  revokedByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   participantLow?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   participantHigh?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
+  sourceProposal?: boolean | Prisma.ProfessionalConnection$sourceProposalArgs<ExtArgs>
+  revokedBy?: boolean | Prisma.ProfessionalConnection$revokedByArgs<ExtArgs>
   conversations?: boolean | Prisma.ProfessionalConnection$conversationsArgs<ExtArgs>
+  notifications?: boolean | Prisma.ProfessionalConnection$notificationsArgs<ExtArgs>
+  notificationOutbox?: boolean | Prisma.ProfessionalConnection$notificationOutboxArgs<ExtArgs>
   _count?: boolean | Prisma.ProfessionalConnectionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["professionalConnection"]>
 
@@ -771,50 +1495,74 @@ export type ProfessionalConnectionSelectCreateManyAndReturn<ExtArgs extends runt
   id?: boolean
   participantLowId?: boolean
   participantHighId?: boolean
+  sourceProposalId?: boolean
   state?: boolean
+  version?: boolean
   acceptedAt?: boolean
+  revokedAt?: boolean
+  revokedByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   participantLow?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   participantHigh?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
+  sourceProposal?: boolean | Prisma.ProfessionalConnection$sourceProposalArgs<ExtArgs>
+  revokedBy?: boolean | Prisma.ProfessionalConnection$revokedByArgs<ExtArgs>
 }, ExtArgs["result"]["professionalConnection"]>
 
 export type ProfessionalConnectionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   participantLowId?: boolean
   participantHighId?: boolean
+  sourceProposalId?: boolean
   state?: boolean
+  version?: boolean
   acceptedAt?: boolean
+  revokedAt?: boolean
+  revokedByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   participantLow?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   participantHigh?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
+  sourceProposal?: boolean | Prisma.ProfessionalConnection$sourceProposalArgs<ExtArgs>
+  revokedBy?: boolean | Prisma.ProfessionalConnection$revokedByArgs<ExtArgs>
 }, ExtArgs["result"]["professionalConnection"]>
 
 export type ProfessionalConnectionSelectScalar = {
   id?: boolean
   participantLowId?: boolean
   participantHighId?: boolean
+  sourceProposalId?: boolean
   state?: boolean
+  version?: boolean
   acceptedAt?: boolean
+  revokedAt?: boolean
+  revokedByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProfessionalConnectionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "participantLowId" | "participantHighId" | "state" | "acceptedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["professionalConnection"]>
+export type ProfessionalConnectionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "participantLowId" | "participantHighId" | "sourceProposalId" | "state" | "version" | "acceptedAt" | "revokedAt" | "revokedByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["professionalConnection"]>
 export type ProfessionalConnectionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   participantLow?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   participantHigh?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
+  sourceProposal?: boolean | Prisma.ProfessionalConnection$sourceProposalArgs<ExtArgs>
+  revokedBy?: boolean | Prisma.ProfessionalConnection$revokedByArgs<ExtArgs>
   conversations?: boolean | Prisma.ProfessionalConnection$conversationsArgs<ExtArgs>
+  notifications?: boolean | Prisma.ProfessionalConnection$notificationsArgs<ExtArgs>
+  notificationOutbox?: boolean | Prisma.ProfessionalConnection$notificationOutboxArgs<ExtArgs>
   _count?: boolean | Prisma.ProfessionalConnectionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProfessionalConnectionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   participantLow?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   participantHigh?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
+  sourceProposal?: boolean | Prisma.ProfessionalConnection$sourceProposalArgs<ExtArgs>
+  revokedBy?: boolean | Prisma.ProfessionalConnection$revokedByArgs<ExtArgs>
 }
 export type ProfessionalConnectionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   participantLow?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   participantHigh?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
+  sourceProposal?: boolean | Prisma.ProfessionalConnection$sourceProposalArgs<ExtArgs>
+  revokedBy?: boolean | Prisma.ProfessionalConnection$revokedByArgs<ExtArgs>
 }
 
 export type $ProfessionalConnectionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -822,14 +1570,22 @@ export type $ProfessionalConnectionPayload<ExtArgs extends runtime.Types.Extensi
   objects: {
     participantLow: Prisma.$UserAccountPayload<ExtArgs>
     participantHigh: Prisma.$UserAccountPayload<ExtArgs>
+    sourceProposal: Prisma.$ProfessionalConnectionProposalPayload<ExtArgs> | null
+    revokedBy: Prisma.$UserAccountPayload<ExtArgs> | null
     conversations: Prisma.$MessagingConversationPayload<ExtArgs>[]
+    notifications: Prisma.$ProfessionalConnectionNotificationPayload<ExtArgs>[]
+    notificationOutbox: Prisma.$EmailOutboxPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     participantLowId: string
     participantHighId: string
+    sourceProposalId: string | null
     state: $Enums.ProfessionalConnectionStatus
+    version: number
     acceptedAt: Date
+    revokedAt: Date | null
+    revokedByUserId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["professionalConnection"]>
@@ -1228,7 +1984,11 @@ export interface Prisma__ProfessionalConnectionClient<T, Null = never, ExtArgs e
   readonly [Symbol.toStringTag]: "PrismaPromise"
   participantLow<T extends Prisma.UserAccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccountDefaultArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   participantHigh<T extends Prisma.UserAccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccountDefaultArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  sourceProposal<T extends Prisma.ProfessionalConnection$sourceProposalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProfessionalConnection$sourceProposalArgs<ExtArgs>>): Prisma.Prisma__ProfessionalConnectionProposalClient<runtime.Types.Result.GetResult<Prisma.$ProfessionalConnectionProposalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  revokedBy<T extends Prisma.ProfessionalConnection$revokedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProfessionalConnection$revokedByArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   conversations<T extends Prisma.ProfessionalConnection$conversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProfessionalConnection$conversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagingConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notifications<T extends Prisma.ProfessionalConnection$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProfessionalConnection$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfessionalConnectionNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notificationOutbox<T extends Prisma.ProfessionalConnection$notificationOutboxArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProfessionalConnection$notificationOutboxArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailOutboxPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1261,8 +2021,12 @@ export interface ProfessionalConnectionFieldRefs {
   readonly id: Prisma.FieldRef<"ProfessionalConnection", 'String'>
   readonly participantLowId: Prisma.FieldRef<"ProfessionalConnection", 'String'>
   readonly participantHighId: Prisma.FieldRef<"ProfessionalConnection", 'String'>
+  readonly sourceProposalId: Prisma.FieldRef<"ProfessionalConnection", 'String'>
   readonly state: Prisma.FieldRef<"ProfessionalConnection", 'ProfessionalConnectionStatus'>
+  readonly version: Prisma.FieldRef<"ProfessionalConnection", 'Int'>
   readonly acceptedAt: Prisma.FieldRef<"ProfessionalConnection", 'DateTime'>
+  readonly revokedAt: Prisma.FieldRef<"ProfessionalConnection", 'DateTime'>
+  readonly revokedByUserId: Prisma.FieldRef<"ProfessionalConnection", 'String'>
   readonly createdAt: Prisma.FieldRef<"ProfessionalConnection", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ProfessionalConnection", 'DateTime'>
 }
@@ -1666,6 +2430,44 @@ export type ProfessionalConnectionDeleteManyArgs<ExtArgs extends runtime.Types.E
 }
 
 /**
+ * ProfessionalConnection.sourceProposal
+ */
+export type ProfessionalConnection$sourceProposalArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProfessionalConnectionProposal
+   */
+  select?: Prisma.ProfessionalConnectionProposalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProfessionalConnectionProposal
+   */
+  omit?: Prisma.ProfessionalConnectionProposalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalConnectionProposalInclude<ExtArgs> | null
+  where?: Prisma.ProfessionalConnectionProposalWhereInput
+}
+
+/**
+ * ProfessionalConnection.revokedBy
+ */
+export type ProfessionalConnection$revokedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserAccount
+   */
+  select?: Prisma.UserAccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserAccount
+   */
+  omit?: Prisma.UserAccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAccountInclude<ExtArgs> | null
+  where?: Prisma.UserAccountWhereInput
+}
+
+/**
  * ProfessionalConnection.conversations
  */
 export type ProfessionalConnection$conversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1687,6 +2489,54 @@ export type ProfessionalConnection$conversationsArgs<ExtArgs extends runtime.Typ
   take?: number
   skip?: number
   distinct?: Prisma.MessagingConversationScalarFieldEnum | Prisma.MessagingConversationScalarFieldEnum[]
+}
+
+/**
+ * ProfessionalConnection.notifications
+ */
+export type ProfessionalConnection$notificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProfessionalConnectionNotification
+   */
+  select?: Prisma.ProfessionalConnectionNotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProfessionalConnectionNotification
+   */
+  omit?: Prisma.ProfessionalConnectionNotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfessionalConnectionNotificationInclude<ExtArgs> | null
+  where?: Prisma.ProfessionalConnectionNotificationWhereInput
+  orderBy?: Prisma.ProfessionalConnectionNotificationOrderByWithRelationInput | Prisma.ProfessionalConnectionNotificationOrderByWithRelationInput[]
+  cursor?: Prisma.ProfessionalConnectionNotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProfessionalConnectionNotificationScalarFieldEnum | Prisma.ProfessionalConnectionNotificationScalarFieldEnum[]
+}
+
+/**
+ * ProfessionalConnection.notificationOutbox
+ */
+export type ProfessionalConnection$notificationOutboxArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmailOutbox
+   */
+  select?: Prisma.EmailOutboxSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmailOutbox
+   */
+  omit?: Prisma.EmailOutboxOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmailOutboxInclude<ExtArgs> | null
+  where?: Prisma.EmailOutboxWhereInput
+  orderBy?: Prisma.EmailOutboxOrderByWithRelationInput | Prisma.EmailOutboxOrderByWithRelationInput[]
+  cursor?: Prisma.EmailOutboxWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmailOutboxScalarFieldEnum | Prisma.EmailOutboxScalarFieldEnum[]
 }
 
 /**

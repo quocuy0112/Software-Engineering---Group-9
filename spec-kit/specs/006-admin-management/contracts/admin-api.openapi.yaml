@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: SmartHire Feature 006 Administration API
-  version: 0.2.0
+  version: 0.3.0
   description: >-
     Explicit same-origin contracts for React Admin, Candidate employer
     verification/report submission, and the recruiter entitlement boundary.
@@ -17,6 +17,7 @@ tags:
   - name: Companies
   - name: Memberships
   - name: Moderation
+  - name: Support
   - name: RecruiterEntitlement
   - name: CandidateSubmission
 paths:
@@ -692,6 +693,81 @@ paths:
           "409": { $ref: "#/components/responses/StateConflict" },
           "428": { $ref: "#/components/responses/StepUpRequired" },
         }
+  /api/admin/support-cases:
+    get:
+      tags: [Support]
+      operationId: listAdminSupportCases
+      x-react-admin-resource: support-cases
+      x-react-admin-method: getList
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/Page" }
+        - { $ref: "#/components/parameters/PerPage" }
+        - {
+            name: state,
+            in: query,
+            schema: { $ref: "#/components/schemas/SupportState" },
+          }
+        - {
+            name: category,
+            in: query,
+            schema: { $ref: "#/components/schemas/SupportCategory" },
+          }
+        - {
+            name: assigneeId,
+            in: query,
+            schema: { type: string, maxLength: 128 },
+          }
+        - { name: age, in: query, schema: { type: number, minimum: 0 } }
+      responses:
+        "200":
+          description: Authorized prioritized support inbox without private-chat data
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminSupportCaseList" }
+  /api/admin/support-cases/{caseId}:
+    get:
+      tags: [Support]
+      operationId: getAdminSupportCase
+      x-react-admin-method: getOne
+      security: [{ cookieAuth: [] }]
+      parameters: [{ $ref: "#/components/parameters/SupportCaseId" }]
+      responses:
+        "200":
+          description: Authorized support transcript, internal notes, assignments, and lifecycle history
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: "#/components/schemas/AdminSupportCaseDetail" }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+  /api/admin/support-cases/{caseId}/{action}:
+    post:
+      tags: [Support]
+      operationId: changeAdminSupportCase
+      description: Action is claim, reassign, reply, note, resolve, or close. Notes never enter requester projections.
+      x-react-admin-method: claimSupportCase|reassignSupportCase|replySupportCase|noteSupportCase|resolveSupportCase|closeSupportCase
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/SupportCaseId" }
+        - name: action
+          in: path
+          required: true
+          schema: { enum: [claim, reassign, reply, note, resolve, close] }
+        - { $ref: "#/components/parameters/CsrfProof" }
+        - { $ref: "#/components/parameters/IdempotencyKey" }
+        - { $ref: "#/components/parameters/SupportVersion" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SupportAdminCommandInput" }
+      responses:
+        "200": { $ref: "#/components/responses/CommandSucceeded" }
+        "409": { $ref: "#/components/responses/StateConflict" }
+        "428": { $ref: "#/components/responses/StepUpRequired" }
   /api/admin/audit-events/{correlationId}:
     get:
       tags: [Accounts]
@@ -838,6 +914,67 @@ paths:
                   { schema: { $ref: "#/components/schemas/SafeError" } },
               },
           }
+  /api/support/cases:
+    get:
+      tags: [Support]
+      operationId: listRequesterSupportCases
+      security: [{ cookieAuth: [] }]
+      responses:
+        "200":
+          description: Current account's support cases, always identified as SmartHire Support
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RequesterSupportCaseList" }
+    post:
+      tags: [Support]
+      operationId: createRequesterSupportCase
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateSupportCaseInput" }
+      responses:
+        "201":
+          description: Support case created
+          content:
+            application/json:
+              schema:
+                { $ref: "#/components/schemas/RequesterSupportCaseEnvelope" }
+        "409": { $ref: "#/components/responses/StateConflict" }
+  /api/support/cases/{caseId}:
+    get:
+      tags: [Support]
+      operationId: getRequesterSupportCase
+      security: [{ cookieAuth: [] }]
+      parameters: [{ $ref: "#/components/parameters/SupportCaseId" }]
+      responses:
+        "200":
+          description: Requester-owned transcript without internal notes or staff identity
+          content:
+            application/json:
+              schema:
+                { $ref: "#/components/schemas/RequesterSupportCaseEnvelope" }
+        "404": { $ref: "#/components/responses/ResourceUnavailable" }
+  /api/support/cases/{caseId}/messages:
+    post:
+      tags: [Support]
+      operationId: sendRequesterSupportMessage
+      security: [{ cookieAuth: [] }]
+      parameters: [{ $ref: "#/components/parameters/SupportCaseId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SendSupportMessageInput" }
+      responses:
+        "200":
+          description: Message accepted or idempotently replayed
+          content:
+            application/json:
+              schema:
+                { $ref: "#/components/schemas/RequesterSupportCaseEnvelope" }
+        "409": { $ref: "#/components/responses/StateConflict" }
 components:
   securitySchemes:
     cookieAuth:
@@ -871,6 +1008,20 @@ components:
         in: path,
         required: true,
         schema: { type: string, maxLength: 128 },
+      }
+    SupportCaseId:
+      {
+        name: caseId,
+        in: path,
+        required: true,
+        schema: { type: string, maxLength: 128 },
+      }
+    SupportVersion:
+      {
+        name: If-Match-Version,
+        in: header,
+        required: true,
+        schema: { type: integer, minimum: 1 },
       }
     EvidenceId:
       {
@@ -1059,7 +1210,16 @@ components:
         count: { type: integer, minimum: 0 }
         unit:
           {
-            enum: [PEOPLE, ACCOUNTS, COMPANIES, MEMBERSHIPS, REQUESTS, REPORTS, NOTIFICATIONS],
+            enum:
+              [
+                PEOPLE,
+                ACCOUNTS,
+                COMPANIES,
+                MEMBERSHIPS,
+                REQUESTS,
+                REPORTS,
+                NOTIFICATIONS,
+              ],
           }
         filterKey: { type: string }
     AccountList:
@@ -1334,6 +1494,145 @@ components:
           calculatedAt: { type: string, format: date-time },
           stateDefinitionVersion: { type: string },
         }
+    SupportCategory:
+      enum:
+        [
+          ACCOUNT_ACCESS,
+          PROFILE,
+          JOBS_APPLICATIONS,
+          RECRUITER,
+          MESSAGING,
+          PRIVACY_SAFETY,
+          OTHER,
+        ]
+    SupportState:
+      enum: [OPEN, WAITING_FOR_USER, WAITING_FOR_SUPPORT, RESOLVED, CLOSED]
+    CreateSupportCaseInput:
+      type: object
+      additionalProperties: false
+      required: [category, subject, message, clientOperationId]
+      properties:
+        category: { $ref: "#/components/schemas/SupportCategory" }
+        subject: { type: string, minLength: 5, maxLength: 120 }
+        message: { type: string, minLength: 1, maxLength: 4000 }
+        clientOperationId: { type: string, format: uuid }
+    SendSupportMessageInput:
+      type: object
+      additionalProperties: false
+      required: [content, clientOperationId, expectedVersion]
+      properties:
+        content: { type: string, minLength: 1, maxLength: 4000 }
+        clientOperationId: { type: string, format: uuid }
+        expectedVersion: { type: integer, minimum: 1 }
+    RequesterSupportCase:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          id,
+          category,
+          subject,
+          state,
+          version,
+          correspondent,
+          createdAt,
+          updatedAt,
+          contentAvailable,
+        ]
+      properties:
+        id: { type: string, maxLength: 128 }
+        category: { $ref: "#/components/schemas/SupportCategory" }
+        subject: { type: string, maxLength: 120 }
+        state: { $ref: "#/components/schemas/SupportState" }
+        version: { type: integer, minimum: 1 }
+        correspondent: { const: SmartHire Support }
+        lastMessageAt: { type: [string, "null"], format: date-time }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        contentAvailable: { type: boolean }
+        messages: { type: array, items: { type: object } }
+    RequesterSupportCaseList:
+      type: object
+      additionalProperties: false
+      required: [data, total]
+      properties:
+        data:
+          {
+            type: array,
+            items: { $ref: "#/components/schemas/RequesterSupportCase" },
+          }
+        total: { type: integer, minimum: 0 }
+    RequesterSupportCaseEnvelope:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data: { $ref: "#/components/schemas/RequesterSupportCase" }
+        deduplicated: { type: boolean }
+    AdminSupportCaseList:
+      type: object
+      additionalProperties: false
+      required: [data, total, calculatedAt]
+      properties:
+        data:
+          {
+            type: array,
+            items: { $ref: "#/components/schemas/AdminSupportCaseSummary" },
+          }
+        total: { type: integer, minimum: 0 }
+        calculatedAt: { type: string, format: date-time }
+    AdminSupportCaseSummary:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          id,
+          requesterUserId,
+          requesterDisplayName,
+          requesterMaskedEmail,
+          category,
+          subject,
+          state,
+          version,
+          currentAssigneeUserId,
+          createdAt,
+          updatedAt,
+          contentAvailable,
+        ]
+      properties:
+        id: { type: string, maxLength: 128 }
+        requesterUserId: { type: string, maxLength: 128 }
+        requesterDisplayName: { type: string, maxLength: 200 }
+        requesterMaskedEmail: { type: string, maxLength: 320 }
+        category: { $ref: "#/components/schemas/SupportCategory" }
+        subject: { type: string, maxLength: 120 }
+        state: { $ref: "#/components/schemas/SupportState" }
+        version: { type: integer, minimum: 1 }
+        currentAssigneeUserId: { type: [string, "null"], maxLength: 128 }
+        lastMessageAt: { type: [string, "null"], format: date-time }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        contentAvailable: { type: boolean }
+    AdminSupportCaseDetail:
+      allOf:
+        - { $ref: "#/components/schemas/AdminSupportCaseSummary" }
+        - type: object
+          required: [messages, notes, assignments, history]
+          properties:
+            messages: { type: array, items: { type: object } }
+            notes: { type: array, items: { type: object } }
+            assignments: { type: array, items: { type: object } }
+            history: { type: array, items: { type: object } }
+    SupportAdminCommandInput:
+      type: object
+      additionalProperties: false
+      properties:
+        confirmation: { type: boolean }
+        content: { type: string, minLength: 1, maxLength: 4000 }
+        clientOperationId: { type: string, format: uuid }
+        note: { type: string, minLength: 1, maxLength: 2000 }
+        assigneeAdminUserId: { type: string, maxLength: 128 }
+        reason: { enum: [STAFF_HANDOFF, WORKLOAD_BALANCE, EXPERTISE_REQUIRED] }
     RecruiterEntitlement:
       type: object
       additionalProperties: false

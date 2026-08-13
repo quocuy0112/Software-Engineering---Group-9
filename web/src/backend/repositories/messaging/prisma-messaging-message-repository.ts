@@ -4,9 +4,7 @@ import { prisma } from "@/backend/database/prisma";
 import { MessagingError } from "@/backend/messaging/messaging-errors";
 import type { MessagingMessageRepositoryPort } from "@/backend/messaging/ports/messaging-repository";
 
-export class PrismaMessagingMessageRepository
-  implements MessagingMessageRepositoryPort
-{
+export class PrismaMessagingMessageRepository implements MessagingMessageRepositoryPort {
   constructor(private readonly db: typeof prisma = prisma) {}
 
   async accept(input: Parameters<MessagingMessageRepositoryPort["accept"]>[0]) {
@@ -17,6 +15,33 @@ export class PrismaMessagingMessageRepository
       try {
         const message = await this.db.$transaction(
           async (tx) => {
+            const initial = await tx.messagingConversation.findUnique({
+              where: { id: input.conversationId },
+              select: { professionalConnectionId: true },
+            });
+            if (initial?.professionalConnectionId) {
+              await tx.$queryRaw(
+                Prisma.sql`SELECT "id" FROM "ProfessionalConnection" WHERE "id" = ${initial.professionalConnectionId} FOR UPDATE`,
+              );
+            }
+            await tx.$queryRaw(
+              Prisma.sql`SELECT "id" FROM "MessagingConversation" WHERE "id" = ${input.conversationId} FOR UPDATE`,
+            );
+            const authority = await tx.messagingConversation.findUnique({
+              where: { id: input.conversationId },
+              select: {
+                archivedAt: true,
+                professionalConnection: { select: { state: true } },
+              },
+            });
+            if (
+              !authority ||
+              authority.archivedAt ||
+              (authority.professionalConnection &&
+                authority.professionalConnection.state !== "ACCEPTED")
+            ) {
+              throw new MessagingError("CONFLICT", 409);
+            }
             const updated = await tx.messagingConversation.update({
               where: { id: input.conversationId },
               data: { nextMessageSequence: { increment: 1 } },
@@ -54,7 +79,10 @@ export class PrismaMessagingMessageRepository
         );
         return { message, deduplicated: false };
       } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === "P2002"
+        ) {
           const replayAfterConflict = await this.findReplay(input);
           if (replayAfterConflict) return replayAfterConflict;
         }
