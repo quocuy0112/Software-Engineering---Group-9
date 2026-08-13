@@ -723,12 +723,10 @@ export function RecruiterWorkspaceNavigation({
   collapsed,
   busy,
   onSignOut,
-  onExit,
 }: {
   collapsed: boolean;
   busy: boolean;
   onSignOut: () => void;
-  onExit: () => void;
 }) {
   const destinations = [
     { label: "Overview", icon: "✦", active: false },
@@ -768,14 +766,6 @@ export function RecruiterWorkspaceNavigation({
         ))}
       </div>
       <div className="workspace-navigation-footer">
-        <button type="button" onClick={onExit}>
-          <span className="nav-icon" aria-hidden="true">
-            ←
-          </span>
-          <span className="workspace-navigation-label">
-            Candidate workspace
-          </span>
-        </button>
         <button
           type="button"
           onClick={onSignOut}

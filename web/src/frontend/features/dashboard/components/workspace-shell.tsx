@@ -33,6 +33,10 @@ import { RecruiterHeaderAction } from "@/frontend/features/recruiter-header/comp
 import type { RecruiterHeaderStatus } from "@/shared/contracts/recruiter-header-status";
 import type { RecruiterJobManagementData } from "@/shared/contracts/recruiter-job-posting";
 import {
+  WORKSPACE_MODE_COOKIE,
+  type WorkspaceMode,
+} from "@/shared/utils/workspace-mode";
+import {
   RecruiterJobPostingManagement,
   RecruiterWorkspaceNavigation,
 } from "@/frontend/features/recruiter-workspace/job-posting-management";
@@ -210,6 +214,15 @@ function WorkspaceShellContent({
           signOutError: "Unable to sign out. Please try again.",
         };
 
+  function persistWorkspaceMode(mode: WorkspaceMode) {
+    setWorkspaceMode(mode);
+    document.cookie = `${WORKSPACE_MODE_COOKIE}=${mode}; Path=/; Max-Age=31536000; SameSite=Lax`;
+  }
+
+  function clearPersistedWorkspaceMode() {
+    document.cookie = `${WORKSPACE_MODE_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax`;
+  }
+
   async function signOut() {
     if (busy || navigating) return;
     setBusy(true);
@@ -224,6 +237,7 @@ function WorkspaceShellContent({
         return;
       }
       closeMessagingConnectionOnLogout();
+      clearPersistedWorkspaceMode();
       startNavigation(() => router.replace("/login"));
     } catch {
       setStatus(copy.signOutError);
@@ -345,7 +359,6 @@ function WorkspaceShellContent({
             <RecruiterWorkspaceNavigation
               busy={busy || navigating}
               collapsed={sidebarCollapsed}
-              onExit={() => setWorkspaceMode("candidate")}
               onSignOut={() => void signOut()}
             />
           ) : (
@@ -356,7 +369,12 @@ function WorkspaceShellContent({
             />
           )}
         </aside>
-        <div className="workspace-main" data-content-mode={contentMode}>
+        <div
+          className="workspace-main"
+          data-content-mode={
+            workspaceMode === "recruiter" ? "default" : contentMode
+          }
+        >
           <header className="workspace-header">
             <div>
               <p className="workspace-topbar-kicker">
@@ -370,7 +388,7 @@ function WorkspaceShellContent({
                   : copy.greeting}
               </p>
             </div>
-            {contentMode === "job-board" ? (
+            {workspaceMode === "candidate" && contentMode === "job-board" ? (
               <GlobalImageSearch csrfProof={csrfProof} />
             ) : null}
             <div className="workspace-header-actions">
@@ -410,7 +428,7 @@ function WorkspaceShellContent({
                 <button
                   className="recruiter-header-action recruiter-header-action--secondary"
                   type="button"
-                  onClick={() => setWorkspaceMode("candidate")}
+                  onClick={() => persistWorkspaceMode("candidate")}
                 >
                   <span
                     className="recruiter-header-action__icon"
@@ -425,7 +443,7 @@ function WorkspaceShellContent({
               ) : (
                 <RecruiterHeaderAction
                   initialStatus={initialRecruiterStatus}
-                  onOpenWorkspace={() => setWorkspaceMode("recruiter")}
+                  onOpenWorkspace={() => persistWorkspaceMode("recruiter")}
                 />
               )}
             </div>
@@ -435,7 +453,9 @@ function WorkspaceShellContent({
           </div>
           <section
             className="workspace-content"
-            data-content-mode={contentMode}
+            data-content-mode={
+              workspaceMode === "recruiter" ? "default" : contentMode
+            }
             data-workspace-mode={workspaceMode}
           >
             <CsrfProofProvider value={csrfProof}>
