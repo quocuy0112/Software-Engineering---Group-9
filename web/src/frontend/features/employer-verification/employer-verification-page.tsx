@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import styles from "./employer-verification-page.module.css";
 
 type Item = {
   id: string;
@@ -12,10 +13,46 @@ type Item = {
   createdAt: string;
 };
 
+const statusPresentation: Record<
+  string,
+  {
+    label: string;
+    tone: "info" | "warning" | "success" | "danger" | "neutral";
+  }
+> = {
+  PENDING_CHECKS: { label: "Safety checks", tone: "info" },
+  PENDING_REVIEW: { label: "Under review", tone: "warning" },
+  CHANGES_REQUESTED: { label: "Changes requested", tone: "warning" },
+  APPROVED: { label: "Approved", tone: "success" },
+  REJECTED: { label: "Not approved", tone: "danger" },
+  CANCELLED: { label: "Cancelled", tone: "neutral" },
+};
+
+function presentStatus(state: string) {
+  return (
+    statusPresentation[state] ?? {
+      label: state.replaceAll("_", " ").toLowerCase(),
+      tone: "neutral" as const,
+    }
+  );
+}
+
+function formatSubmittedAt(value: string) {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(value));
+}
+
 export function EmployerVerificationPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [message, setMessage] = useState("");
+  const [messageTone, setMessageTone] = useState<"success" | "error">(
+    "success",
+  );
   const [busyRequestId, setBusyRequestId] = useState<string>();
+  const [submitting, setSubmitting] = useState(false);
 
   async function load() {
     const response = await fetch("/api/employer-verifications", {
@@ -41,11 +78,13 @@ export function EmployerVerificationPage() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
+    setSubmitting(true);
     const response = await fetch("/api/employer-verifications", {
       method: "POST",
       body: new FormData(form),
       credentials: "same-origin",
     });
+    setMessageTone(response.ok ? "success" : "error");
     setMessage(
       response.ok
         ? "Verification request received."
@@ -55,6 +94,7 @@ export function EmployerVerificationPage() {
       form.reset();
       await load();
     }
+    setSubmitting(false);
   }
 
   async function cancel(requestId: string) {
@@ -63,6 +103,7 @@ export function EmployerVerificationPage() {
       `/api/employer-verifications/${encodeURIComponent(requestId)}/cancel`,
       { method: "POST", credentials: "same-origin" },
     );
+    setMessageTone(response.ok ? "success" : "error");
     setMessage(
       response.ok ? "Verification request cancelled." : "Cancellation failed.",
     );
@@ -84,6 +125,7 @@ export function EmployerVerificationPage() {
         credentials: "same-origin",
       },
     );
+    setMessageTone(response.ok ? "success" : "error");
     setMessage(
       response.ok
         ? "Replacement evidence received."
@@ -95,88 +137,225 @@ export function EmployerVerificationPage() {
   }
 
   return (
-    <main className="mx-auto grid max-w-3xl gap-8 p-6">
-      <section>
-        <h1 className="text-3xl font-semibold">Recruiter application</h1>
-        <p>
-          Apply to become a recruiter by submitting one PDF, PNG, or JPEG
-          business license from 1 byte through 5 MB. Documents remain private
-          and are safety checked before review.
+    <main className={styles.page}>
+      <header className={styles.hero}>
+        <div className={styles.heroCopy}>
+          <p className={styles.eyebrow}>Employer verification</p>
+          <h1>Recruiter application</h1>
+          <p className={styles.intro}>
+            Verify your business once to unlock recruiter tools, publish jobs,
+            and manage candidates with a trusted company identity.
+          </p>
+        </div>
+        <div className={styles.trustNote}>
+          <span className={styles.trustIcon} aria-hidden="true">
+            ✓
+          </span>
+          <div>
+            <strong>Private and protected</strong>
+            <span>Your document is safety checked before human review.</span>
+          </div>
+        </div>
+      </header>
+
+      {message && (
+        <p className={styles.message} data-tone={messageTone} role="status">
+          {message}
         </p>
-        {message && <p role="status">{message}</p>}
-        <form onSubmit={submit} className="grid gap-4">
-          <input type="hidden" name="requestedRole" value="RECRUITER" />
-          <label>
-            Legal company name
-            <input name="companyName" required maxLength={240} />
-          </label>
-          <label>
-            Vietnamese tax identifier
-            <input
-              name="taxIdentifier"
-              required
-              inputMode="numeric"
-              pattern="[0-9]{10}"
-              maxLength={10}
-            />
-          </label>
-          <label>
-            Business license
-            <input
-              name="document"
-              type="file"
-              accept="application/pdf,image/png,image/jpeg"
-              required
-            />
-          </label>
-          <button type="submit">Submit recruiter application</button>
-        </form>
-      </section>
-      <section>
-        <h2 className="text-2xl font-semibold">Your recruiter applications</h2>
+      )}
+
+      <div className={styles.applicationGrid}>
+        <section className={`${styles.card} ${styles.formCard}`}>
+          <div className={styles.sectionHeading}>
+            <span className={styles.sectionNumber}>1</span>
+            <div>
+              <h2>Business information</h2>
+              <p>Use the legal details shown on your business license.</p>
+            </div>
+          </div>
+
+          <form onSubmit={submit} className={styles.form}>
+            <input type="hidden" name="requestedRole" value="RECRUITER" />
+            <label className={styles.field}>
+              <span>Legal company name</span>
+              <input
+                name="companyName"
+                required
+                maxLength={240}
+                placeholder="Example Technology Company Ltd."
+              />
+            </label>
+            <label className={styles.field}>
+              <span>Vietnamese tax identifier</span>
+              <input
+                aria-label="Vietnamese tax identifier"
+                name="taxIdentifier"
+                required
+                inputMode="numeric"
+                pattern="[0-9]{10}"
+                maxLength={10}
+                placeholder="10-digit tax identifier"
+              />
+              <small>
+                Enter exactly 10 digits without spaces or separators.
+              </small>
+            </label>
+            <label className={`${styles.field} ${styles.fileField}`}>
+              <span>Business license</span>
+              <input
+                aria-label="Business license"
+                aria-describedby="business-license-help"
+                name="document"
+                type="file"
+                accept="application/pdf,image/png,image/jpeg"
+                required
+              />
+              <small id="business-license-help">
+                PDF, PNG, or JPEG · Maximum file size 5 MB
+              </small>
+            </label>
+            <button
+              className={styles.primaryButton}
+              disabled={submitting}
+              type="submit"
+            >
+              {submitting ? "Submitting…" : "Submit recruiter application"}
+            </button>
+          </form>
+        </section>
+
+        <aside className={`${styles.card} ${styles.processCard}`}>
+          <p className={styles.eyebrow}>What happens next</p>
+          <h2>A clear verification process</h2>
+          <ol className={styles.processList}>
+            <li>
+              <span>1</span>
+              <div>
+                <strong>Automated safety check</strong>
+                <p>We validate the file type and scan the document.</p>
+              </div>
+            </li>
+            <li>
+              <span>2</span>
+              <div>
+                <strong>Administrator review</strong>
+                <p>Your company details are reviewed securely.</p>
+              </div>
+            </li>
+            <li>
+              <span>3</span>
+              <div>
+                <strong>Recruiter access</strong>
+                <p>Approved accounts can start publishing jobs.</p>
+              </div>
+            </li>
+          </ol>
+          <div className={styles.requirementNote}>
+            <strong>Before uploading</strong>
+            <p>Make sure the company name and tax ID are clearly readable.</p>
+          </div>
+        </aside>
+      </div>
+
+      <section className={styles.historySection}>
+        <div className={styles.historyHeading}>
+          <div>
+            <p className={styles.eyebrow}>Application history</p>
+            <h2>Your recruiter applications</h2>
+          </div>
+          {items.length > 0 && (
+            <span className={styles.applicationCount}>
+              {items.length} {items.length === 1 ? "request" : "requests"}
+            </span>
+          )}
+        </div>
+
         {items.length ? (
-          <ul>
-            {items.map((item) => (
-              <li key={item.id}>
-                <strong>{item.submittedCompanyName}</strong> — {item.state} —
-                role {item.requestedRole}
-                {[
-                  "PENDING_CHECKS",
-                  "PENDING_REVIEW",
-                  "CHANGES_REQUESTED",
-                ].includes(item.state) && (
-                  <button
-                    disabled={busyRequestId === item.id}
-                    onClick={() => void cancel(item.id)}
-                  >
-                    Cancel
-                  </button>
-                )}
-                {item.state === "CHANGES_REQUESTED" &&
-                  item.resubmissionCount < 3 && (
-                    <form onSubmit={(event) => void resubmit(item.id, event)}>
-                      <label>
-                        Replacement business license
-                        <input
-                          name="document"
-                          type="file"
-                          accept="application/pdf,image/png,image/jpeg"
-                          required
-                        />
-                      </label>
-                      <button
-                        disabled={busyRequestId === item.id}
-                        type="submit"
-                      >
-                        Resubmit evidence
-                      </button>
-                    </form>
+          <ul className={styles.applicationList}>
+            {items.map((item) => {
+              const status = presentStatus(item.state);
+              return (
+                <li className={styles.applicationCard} key={item.id}>
+                  <div className={styles.applicationHeader}>
+                    <div>
+                      <strong>{item.submittedCompanyName}</strong>
+                      <span>Submitted {formatSubmittedAt(item.createdAt)}</span>
+                    </div>
+                    <span
+                      className={styles.statusBadge}
+                      data-tone={status.tone}
+                    >
+                      {status.label}
+                    </span>
+                  </div>
+                  <dl className={styles.applicationMeta}>
+                    <div>
+                      <dt>Tax identifier</dt>
+                      <dd>{item.normalizedTaxIdentifier}</dd>
+                    </div>
+                    <div>
+                      <dt>Requested role</dt>
+                      <dd>{item.requestedRole.toLowerCase()}</dd>
+                    </div>
+                    <div>
+                      <dt>Resubmissions</dt>
+                      <dd>{item.resubmissionCount} of 3</dd>
+                    </div>
+                  </dl>
+
+                  {[
+                    "PENDING_CHECKS",
+                    "PENDING_REVIEW",
+                    "CHANGES_REQUESTED",
+                  ].includes(item.state) && (
+                    <button
+                      className={styles.secondaryButton}
+                      disabled={busyRequestId === item.id}
+                      onClick={() => void cancel(item.id)}
+                      type="button"
+                    >
+                      {busyRequestId === item.id
+                        ? "Working…"
+                        : "Cancel request"}
+                    </button>
                   )}
-              </li>
-            ))}
+
+                  {item.state === "CHANGES_REQUESTED" &&
+                    item.resubmissionCount < 3 && (
+                      <form
+                        className={styles.resubmitForm}
+                        onSubmit={(event) => void resubmit(item.id, event)}
+                      >
+                        <label className={styles.field}>
+                          <span>Replacement business license</span>
+                          <input
+                            name="document"
+                            type="file"
+                            accept="application/pdf,image/png,image/jpeg"
+                            required
+                          />
+                        </label>
+                        <button
+                          className={styles.primaryButton}
+                          disabled={busyRequestId === item.id}
+                          type="submit"
+                        >
+                          Resubmit evidence
+                        </button>
+                      </form>
+                    )}
+                </li>
+              );
+            })}
           </ul>
         ) : (
-          <p>No verification requests.</p>
+          <div className={styles.emptyState}>
+            <span aria-hidden="true">⌁</span>
+            <div>
+              <strong>No verification requests.</strong>
+              <p>Your submitted applications will appear here.</p>
+            </div>
+          </div>
         )}
       </section>
     </main>
