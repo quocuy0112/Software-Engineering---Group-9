@@ -14,6 +14,11 @@ describe("recruiter header status contract", () => {
       "/dashboard/employer-verification",
     ],
     ["PENDING_REVIEW", "NONE", null],
+    [
+      "CHANGES_REQUESTED",
+      "EMPLOYER_VERIFICATION",
+      "/dashboard/employer-verification",
+    ],
     ["REJECTED", "EMPLOYER_VERIFICATION", "/dashboard/employer-verification"],
     ["APPROVED", "RECRUITER_WORKSPACE", "https://recruiter.example.test"],
   ])("accepts %s projection", (state, destinationKind, href) => {

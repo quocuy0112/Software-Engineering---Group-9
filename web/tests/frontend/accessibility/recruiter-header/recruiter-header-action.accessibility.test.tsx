@@ -15,6 +15,11 @@ describe("recruiter header action accessibility", () => {
       href: null,
     },
     {
+      state: "CHANGES_REQUESTED" as const,
+      destinationKind: "EMPLOYER_VERIFICATION" as const,
+      href: "/dashboard/employer-verification" as const,
+    },
+    {
       state: "REJECTED" as const,
       destinationKind: "EMPLOYER_VERIFICATION" as const,
       href: "/dashboard/employer-verification" as const,
