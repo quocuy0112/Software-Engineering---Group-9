@@ -10,6 +10,16 @@
 
 **Input**: Build a complete in-app notification center without changing existing email notification behavior. Every existing event-notification email must also be represented in-app, while in-app-only events do not have to send email. Action and proof emails remain private delivery mechanisms and are not copied into the notification center.
 
+## Clarifications
+
+### Session 2026-08-14
+
+- **Q: Which existing emails must also appear in-app?** → **A:** Every email that reports a completed or changed event must have a safe in-app counterpart; emails whose purpose is to deliver a token, proof, link, or one-time code are excluded.
+- **Q: Does introducing in-app notification change current email behavior?** → **A:** No. Existing email recipients, content, preferences, queueing, and retries remain unchanged. In-app is the canonical user notification record for supported events, while email remains an optional or mandatory companion according to the existing event rule.
+- **Q: When may a contextual notification be cleared automatically?** → **A:** Only after the represented content has loaded successfully for the authorized recipient. Route entry, failed loading, and forbidden access do not clear it.
+- **Q: How long are user-visible in-app notifications retained?** → **A:** Ninety days from creation. Originating audit and workflow records keep their independent retention rules.
+- **Q: Which new emails are added by this feature?** → **A:** None by default. Feature 016 adds in-app coverage and may only add a new email if a separately identified critical off-app safety gap is proven during implementation and covered by an explicit requirement update.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Receive Security and Account Events In-App (Priority: P1)
@@ -170,7 +180,7 @@ Operators can diagnose notification creation and delivery failures without expos
 - **FR-036**: Notification creation MUST not convert a failed business operation into success or a successful committed business operation into an incorrect business state.
 - **FR-037**: Email-channel failure MUST NOT delete or hide a committed in-app notification, and in-app-channel failure MUST NOT alter existing email retry semantics.
 - **FR-038**: Notification creation, retry, deduplication, and failure MUST produce sanitized structured operational records containing event kind, recipient reference, outcome, and correlation identity but no secret payload.
-- **FR-039**: The system MUST retain user-visible notifications for a bounded policy period and remove expired records without removing the authoritative audit history required by the originating feature.
+- **FR-039**: The system MUST retain user-visible notifications for 90 days from creation and remove expired records without removing the authoritative audit history required by the originating feature.
 - **FR-040**: The notification experience MUST be keyboard operable, expose meaningful accessible labels and live status, and not communicate severity or read state by color alone.
 - **FR-041**: User-facing notification copy MUST use the application's localization mechanism and provide a safe fallback when a translation key is unavailable.
 - **FR-042**: Existing feature-specific unread indicators MUST remain consistent with the unified read state during migration.
@@ -221,6 +231,6 @@ Operators can diagnose notification creation and delivery failures without expos
 - Existing authentication, authorization, application shells, localization, job, messaging, support, moderation, verification, connection, and email-outbox capabilities are extended rather than replaced.
 - Notification copy is a concise event summary, not a copy of an email body.
 - New email templates are out of scope unless implementation analysis finds a critical off-app safety event that has no existing email and cannot be adequately handled in-app; any such addition must not alter existing templates or delivery rules.
-- User-visible notification retention is bounded; exact category-specific periods and cleanup scheduling are determined during planning while originating audit records retain their own policies.
+- User-visible notifications use one 90-day retention period; cleanup scheduling is determined during planning while originating audit records retain their own policies.
 - Normal freshness may use polling or an existing real-time transport; the specification requires the outcome, not a particular transport.
 - Desktop and responsive web are in scope. Native mobile push notifications are out of scope.
