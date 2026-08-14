@@ -28,6 +28,14 @@ describe("job search policy", () => {
     ).toThrow();
   });
 
+  it("accepts only an approved career-path filter", () => {
+    expect(
+      parseJobSearchCriteria({ careerPath: "software-engineering" })
+        .careerPath,
+    ).toBe("software-engineering");
+    expect(() => parseJobSearchCriteria({ careerPath: "made-up-path" })).toThrow();
+  });
+
   it("treats empty browser filter controls as omitted criteria", () => {
     const result = parseJobSearchCriteria({
       q: "",

@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import { JobDiscoveryService } from "@/backend/services/jobs/job-discovery-service";
-import { buildHomeJobSearch, emptyHomeSearchDraft } from "@/frontend/features/home/home-search-config";
+import {
+  buildHomeJobSearch,
+  emptyHomeSearchDraft,
+} from "@/frontend/features/home/home-search-config";
 
 function queryInput(params: URLSearchParams) {
   return {
@@ -14,17 +17,15 @@ function queryInput(params: URLSearchParams) {
 }
 
 describe("Home search to existing Job Discovery handoff", () => {
-  it("accepts the complete allowlisted criteria and preserves an editable empty result", async () => {
+  it("accepts concise hero criteria and preserves an editable empty result", async () => {
     const params = buildHomeJobSearch({
       ...emptyHomeSearchDraft,
       keyword: "Frontend",
       location: "Hà Nội",
-      workArrangement: "HYBRID",
-      employmentType: "INTERNSHIP",
-      experienceLevel: "ENTRY",
-      skills: "React, TypeScript",
     });
-    const search = vi.fn().mockResolvedValue({ rows: [], total: 0, nextCursor: null });
+    const search = vi
+      .fn()
+      .mockResolvedValue({ rows: [], total: 0, nextCursor: null });
     const result = await new JobDiscoveryService({ search } as never).search(
       queryInput(params),
       { kind: "visitor" },
@@ -34,10 +35,10 @@ describe("Home search to existing Job Discovery handoff", () => {
     expect(result.criteria).toMatchObject({
       q: "frontend",
       location: "ha noi",
-      workArrangement: ["HYBRID"],
-      employmentType: ["INTERNSHIP"],
-      experienceLevel: ["ENTRY"],
-      skills: ["react", "typescript"],
+      workArrangement: [],
+      employmentType: [],
+      experienceLevel: [],
+      skills: [],
     });
     expect(search).toHaveBeenCalledOnce();
   });

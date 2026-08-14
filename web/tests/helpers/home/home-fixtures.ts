@@ -1,8 +1,10 @@
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
 import type { JobCard } from "@/shared/contracts/jobs/discovery";
 import type { RecruiterHeaderStatus } from "@/shared/contracts/recruiter-header-status";
+import { careerPathSlugs } from "@/shared/contracts/jobs/career-paths";
 import type {
   EmployerSpotlight,
+  HomeCareerPath,
   HomeJob,
   HomePageModel,
   HomeViewer,
@@ -85,6 +87,8 @@ export function homeJob(overrides: Partial<HomeJob> = {}): HomeJob {
     workArrangement: "HYBRID",
     employmentType: "INTERNSHIP",
     skills: ["TypeScript", "React", "CSS"],
+    salary: null,
+    publishedAt: "2026-08-12T00:00:00.000Z",
     saved: false,
     canSave: true,
     ...overrides,
@@ -126,22 +130,36 @@ export const illustrativeMatch: SmartMatchInsight = {
   score: 82,
 };
 
+export const homeCareerPaths: readonly HomeCareerPath[] = careerPathSlugs.map(
+  (slug) => ({ slug, openJobCount: 0 }),
+);
+
 export function homeModel({
   viewer = { kind: "guest" },
   match = illustrativeMatch,
   jobs = [homeJob()],
   companies = [companySpotlight()],
+  companyCount = companies.length,
+  careerPaths = homeCareerPaths,
 }: {
   viewer?: HomeViewer;
   match?: SmartMatchInsight;
   jobs?: readonly HomeJob[];
   companies?: readonly EmployerSpotlight[];
+  companyCount?: number | null;
+  careerPaths?: readonly HomeCareerPath[];
 } = {}): HomePageModel {
   return {
     viewer,
     initialLocale: "en",
-    jobs: jobs.length ? { status: "ready", items: jobs } : { status: "empty", items: [] },
-    spotlights: companies.length ? { status: "ready", items: companies } : { status: "empty", items: [] },
+    careerPaths,
+    jobs: jobs.length
+      ? { status: "ready", items: jobs }
+      : { status: "empty", items: [] },
+    spotlights: companies.length
+      ? { status: "ready", items: companies }
+      : { status: "empty", items: [] },
+    companyCount,
     smartMatch: match,
   };
 }

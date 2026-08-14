@@ -40,6 +40,9 @@ function query(input: Record<string, string | string[] | undefined>) {
     employmentType: array("employmentType").filter(Boolean),
     experienceLevel: array("experienceLevel").filter(Boolean),
     workArrangement: array("workArrangement").filter(Boolean),
+    careerPath: Array.isArray(input.careerPath)
+      ? input.careerPath[0]
+      : input.careerPath,
     skills: array("skills").filter(Boolean),
     salaryMin: Array.isArray(input.salaryMin)
       ? input.salaryMin[0]
