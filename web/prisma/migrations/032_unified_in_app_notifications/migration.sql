@@ -1,6 +1,16 @@
-CREATE TYPE "InAppNotificationSeverity" AS ENUM ('CRITICAL', 'HIGH', 'MEDIUM', 'LOW');
-CREATE TYPE "InAppNotificationCategory" AS ENUM ('SECURITY', 'ACCOUNT', 'APPLICATION', 'VERIFICATION', 'SUPPORT', 'CONNECTION', 'MESSAGING', 'MODERATION', 'SYSTEM');
-CREATE TYPE "InAppNotificationContextType" AS ENUM ('ACCOUNT', 'MEMBERSHIP', 'APPLICATION', 'VERIFICATION_REQUEST', 'SUPPORT_CASE', 'CONNECTION_PROPOSAL', 'CONNECTION', 'CONVERSATION', 'MESSAGING_REPORT', 'MODERATION_REPORT');
+DO $$ BEGIN
+  CREATE TYPE "InAppNotificationSeverity" AS ENUM ('CRITICAL', 'HIGH', 'MEDIUM', 'LOW');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE "InAppNotificationCategory" AS ENUM ('SECURITY', 'ACCOUNT', 'APPLICATION', 'VERIFICATION', 'SUPPORT', 'CONNECTION', 'MESSAGING', 'MODERATION', 'SYSTEM');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE "InAppNotificationContextType" AS ENUM ('ACCOUNT', 'MEMBERSHIP', 'APPLICATION', 'VERIFICATION_REQUEST', 'SUPPORT_CASE', 'CONNECTION_PROPOSAL', 'CONNECTION', 'CONVERSATION', 'MESSAGING_REPORT', 'MODERATION_REPORT');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
 CREATE TYPE "InAppNotificationKind" AS ENUM (
   'EMAIL_CHANGE_REQUESTED_ALERT', 'PASSWORD_CHANGED', 'RECOVERY_PENDING',
   'RECOVERY_CANCELLED', 'RECOVERY_COMPLETED', 'ACCOUNT_SUSPENDED',
@@ -16,8 +26,10 @@ CREATE TYPE "InAppNotificationKind" AS ENUM (
   'MESSAGE_REPORT_DISMISSED', 'MODERATION_REPORT_RECEIVED',
   'MODERATION_REPORT_RESOLVED', 'MODERATION_REPORT_DISMISSED'
 );
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TABLE "InAppNotification" (
+CREATE TABLE IF NOT EXISTS "InAppNotification" (
   "id" TEXT NOT NULL,
   "recipientUserId" TEXT NOT NULL,
   "kind" "InAppNotificationKind" NOT NULL,
@@ -42,15 +54,23 @@ CREATE TABLE "InAppNotification" (
   CONSTRAINT "InAppNotification_internal_href_check" CHECK ("href" IS NULL OR ("href" LIKE '/%' AND "href" NOT LIKE '//%'))
 );
 
-CREATE UNIQUE INDEX "InAppNotification_deduplicationKey_key" ON "InAppNotification"("deduplicationKey");
-CREATE INDEX "InAppNotification_recipientUserId_lastOccurredAt_id_idx" ON "InAppNotification"("recipientUserId", "lastOccurredAt" DESC, "id" DESC);
-CREATE INDEX "InAppNotification_recipientUserId_readAt_expiresAt_idx" ON "InAppNotification"("recipientUserId", "readAt", "expiresAt");
-CREATE INDEX "InAppNotification_recipientUserId_contextType_contextId_readAt_idx" ON "InAppNotification"("recipientUserId", "contextType", "contextId", "readAt");
-CREATE INDEX "InAppNotification_expiresAt_id_idx" ON "InAppNotification"("expiresAt", "id");
+CREATE UNIQUE INDEX IF NOT EXISTS "InAppNotification_deduplicationKey_key" ON "InAppNotification"("deduplicationKey");
+CREATE INDEX IF NOT EXISTS "InAppNotification_recipientUserId_lastOccurredAt_id_idx" ON "InAppNotification"("recipientUserId", "lastOccurredAt" DESC, "id" DESC);
+CREATE INDEX IF NOT EXISTS "InAppNotification_recipientUserId_readAt_expiresAt_idx" ON "InAppNotification"("recipientUserId", "readAt", "expiresAt");
+CREATE INDEX IF NOT EXISTS "InAppNotification_recipientUserId_contextType_contextId_readAt_idx" ON "InAppNotification"("recipientUserId", "contextType", "contextId", "readAt");
+CREATE INDEX IF NOT EXISTS "InAppNotification_expiresAt_id_idx" ON "InAppNotification"("expiresAt", "id");
 
-ALTER TABLE "InAppNotification"
-  ADD CONSTRAINT "InAppNotification_recipientUserId_fkey"
-  FOREIGN KEY ("recipientUserId") REFERENCES "UserAccount"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DELETE FROM "InAppNotification" notification
+WHERE NOT EXISTS (
+  SELECT 1 FROM "user" account WHERE account."id" = notification."recipientUserId"
+);
+
+DO $$ BEGIN
+  ALTER TABLE "InAppNotification"
+    ADD CONSTRAINT "InAppNotification_recipientUserId_fkey"
+    FOREIGN KEY ("recipientUserId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 INSERT INTO "InAppNotification" (
   "id", "recipientUserId", "kind", "category", "severity", "title", "summary",

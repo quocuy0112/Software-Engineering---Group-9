@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 
-config({ path: ".env.local", quiet: true });
+config({ path: new URL("../.env.local", import.meta.url), quiet: true });
 
 const { prisma } = await import("../src/backend/database/prisma.ts");
 const { createInAppNotification } =
@@ -24,7 +24,7 @@ try {
             id: true,
             candidateUserId: true,
             stage: true,
-            job: { select: { companyId: true } },
+            jobPosting: { select: { companyId: true } },
           },
         },
       },
@@ -38,7 +38,9 @@ try {
               ? [row.application.candidateUserId]
               : await new NotificationRecipientPolicy(
                   tx,
-                ).activeCompanyRecipients(row.application.job.companyId);
+                ).activeCompanyRecipients(
+                  row.application.jobPosting.companyId,
+                );
           for (const recipientUserId of recipients) {
             await createInAppNotification(tx, {
               recipientUserId,

@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 
-config({ path: ".env.local", quiet: true });
+config({ path: new URL("../.env.local", import.meta.url), quiet: true });
 
 const { prisma } = await import("../src/backend/database/prisma.ts");
 
