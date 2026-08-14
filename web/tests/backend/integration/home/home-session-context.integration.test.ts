@@ -1,11 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { getHomePageContext, type HomeContextDependencies } from "@/backend/services/home/get-home-page-context";
-import { approvedRecruiterStatus, candidateProfile, jobCard } from "../../../helpers/home/home-fixtures";
+import {
+  approvedRecruiterStatus,
+  candidateProfile,
+  homeCareerPaths,
+  jobCard,
+} from "../../../helpers/home/home-fixtures";
 
 function deps(session: HomeContextDependencies["session"], recruiter = approvedRecruiterStatus): HomeContextDependencies {
   return {
     requestHeaders: async () => new Headers(), session,
-    searchJobs: async () => [jobCard()], listCompanies: async () => [],
+    searchJobs: async () => [jobCard()], careerPaths: async () => homeCareerPaths, listCompanies: async () => [],
     account: async () => ({ name: "Nguyễn An", image: null, language: "VI" }),
     profile: async () => candidateProfile(), recruiterStatus: async () => recruiter,
     proof: () => "proof", now: () => new Date("2026-08-12T00:00:00.000Z"),

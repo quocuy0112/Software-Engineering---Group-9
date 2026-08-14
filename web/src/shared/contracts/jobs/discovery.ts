@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { careerPathSlugSchema } from "./career-paths";
 
 export const employmentTypeSchema = z.enum([
   "FULL_TIME",
@@ -51,6 +52,10 @@ export const jobSearchQuerySchema = z
     employmentType: stringArray(employmentTypeSchema, 5).default([]),
     experienceLevel: stringArray(experienceLevelSchema, 6).default([]),
     workArrangement: stringArray(workArrangementSchema, 3).default([]),
+    careerPath: z.preprocess(
+      omitEmptyControlValue,
+      careerPathSlugSchema.optional(),
+    ),
     skills: stringArray(z.string().trim().min(1).max(80), 20).default([]),
     salaryMin: optionalNumber(z.number().finite().min(0)),
     salaryMax: optionalNumber(z.number().finite().min(0)),

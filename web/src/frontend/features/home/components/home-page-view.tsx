@@ -10,14 +10,13 @@ import type { HomePageModel } from "../home-page-model";
 import { HomeHeader } from "./home-header";
 import { HomeHeroSearch } from "./home-hero-search";
 import { HomeHeroCtas } from "./home-hero-ctas";
-import { HomeOpportunityRadar } from "./home-opportunity-radar";
-import { HomeWhatsNew } from "./home-whats-new";
+import { HomeCvScan } from "./home-cv-scan";
+import { HomeHowItWorks } from "./home-how-it-works";
 import { HomeSmartMatch } from "./home-smart-match";
 import { HomeCareerPaths } from "./home-career-paths";
-import { HomeEmployerSpotlight } from "./home-employer-spotlight";
 import { HomeTrendingJobs } from "./home-trending-jobs";
-import { HomeGrowthHub } from "./home-growth-hub";
-import { HomeCareerEvents } from "./home-career-events";
+import { HomeCandidateTrust } from "./home-candidate-trust";
+import { HomeCompaniesHiring } from "./home-companies-hiring";
 import { HomeFinalCta } from "./home-final-cta";
 import { HomeFooter } from "./home-footer";
 
@@ -26,26 +25,31 @@ function HomeContent({ model }: { model: HomePageModel }) {
   const copy = homeCopy[locale];
   return (
     <main className="home-page">
-      <HomeHeader viewer={model.viewer} />
+      <HomeHeader
+        viewer={model.viewer}
+        showCompanies={model.spotlights.items.length > 0}
+      />
       <section className="home-hero" aria-labelledby="home-title">
         <div className="home-hero-copy">
           <p>{copy.hero.eyebrow}</p>
           <h1 id="home-title">{copy.hero.title}</h1>
           <p className="home-hero-description">{copy.hero.description}</p>
+          <HomeHeroCtas locale={locale} />
           <HomeHeroSearch />
-          <HomeHeroCtas viewer={model.viewer} locale={locale} />
         </div>
-        <HomeOpportunityRadar locale={locale} />
+        <HomeCvScan locale={locale} />
       </section>
-      <HomeWhatsNew locale={locale} />
-      <HomeSmartMatch model={model} locale={locale} />
-      <HomeCareerPaths locale={locale} />
-      <HomeEmployerSpotlight model={model} locale={locale} />
+      <HomeCareerPaths locale={locale} paths={model.careerPaths} />
       <HomeTrendingJobs model={model} locale={locale} />
-      <HomeGrowthHub locale={locale} />
-      <HomeCareerEvents locale={locale} />
+      <HomeSmartMatch model={model} locale={locale} />
+      <HomeHowItWorks locale={locale} />
+      <HomeCandidateTrust locale={locale} />
+      <HomeCompaniesHiring model={model} locale={locale} />
       <HomeFinalCta viewer={model.viewer} locale={locale} />
-      <HomeFooter locale={locale} />
+      <HomeFooter
+        locale={locale}
+        showCompanies={model.spotlights.items.length > 0}
+      />
     </main>
   );
 }

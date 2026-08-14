@@ -6,6 +6,7 @@ import type {
   PublicJobState,
 } from "@/backend/services/jobs/job-types";
 import { encodeJobCursor } from "@/backend/services/jobs/search-normalization";
+import { careerPathSearchTerms } from "@/shared/contracts/jobs/career-paths";
 
 const publicInclude = (actorUserId: string | null) =>
   ({
@@ -129,6 +130,18 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
   if (input.workArrangement.length) {
     clauses.push(
       Prisma.sql`j."workArrangement"::text IN (${Prisma.join(input.workArrangement)})`,
+    );
+  }
+  if (input.careerPath) {
+    const terms = careerPathSearchTerms[input.careerPath];
+    clauses.push(
+      Prisma.sql`(${Prisma.join(
+        terms.map(
+          (term) =>
+            Prisma.sql`j."searchDocumentNormalized" LIKE ${`%${term}%`}`,
+        ),
+        " OR ",
+      )})`,
     );
   }
   for (const skill of input.normalizedSkills) {

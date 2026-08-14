@@ -63,6 +63,7 @@ export function parseJobSearchCriteria(raw: unknown): NormalizedJobSearch {
     employmentType: parsed.employmentType,
     experienceLevel: parsed.experienceLevel,
     workArrangement: parsed.workArrangement,
+    careerPath: parsed.careerPath,
     salaryMin: parsed.salaryMin,
     salaryMax: parsed.salaryMax,
     salaryCurrency: parsed.salaryCurrency,

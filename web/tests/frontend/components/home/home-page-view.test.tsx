@@ -13,19 +13,21 @@ vi.mock("next/navigation", () => ({
 }));
 
 const orderedHeadings = [
-  "What's New Today?",
-  "Smart Match",
   "Career Paths",
-  "Employer Spotlight",
   "Trending Opportunities",
-  "Career Growth Hub",
-  "Career Events",
+  "Smart Match",
+  "How Smart Hire works",
+  "Why candidates trust Smart Hire",
+  "Companies hiring now",
 ];
 
 describe("HomePageView shared shell", () => {
   it.each([
     ["guest", homeModel()],
-    ["candidate", homeModel({ viewer: candidateViewer, match: personalMatch() })],
+    [
+      "candidate",
+      homeModel({ viewer: candidateViewer, match: personalMatch() }),
+    ],
     ["employer", homeModel({ viewer: employerViewer })],
     ["expired session", homeModel({ viewer: { kind: "guest" } })],
   ])("keeps the same ordered Home sections for %s", (_name, model) => {
@@ -40,13 +42,33 @@ describe("HomePageView shared shell", () => {
       cursor = next;
     }
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Find the right job. Meet the right team. Grow in the right direction.",
+      "AI understands your CV. You choose what’s next.",
     );
+  });
+
+  it("keeps the active-company section directly above the final CTA", () => {
+    const companies = [
+      { ...homeModel().spotlights.items[0]!, slug: "company-one" },
+      { ...homeModel().spotlights.items[0]!, slug: "company-two" },
+      { ...homeModel().spotlights.items[0]!, slug: "company-three" },
+    ];
+    const { container } = render(
+      <HomePageView model={homeModel({ companies })} />,
+    );
+    const headings = [...container.querySelectorAll("h2")].map((node) =>
+      node.textContent?.trim(),
+    );
+    expect(headings.indexOf("Companies hiring now")).toBeGreaterThan(
+      headings.indexOf("Why candidates trust Smart Hire"),
+    );
+    expect(headings).not.toContain("Employer Spotlight");
   });
 
   it("keeps private account slots conditional without duplicating the page", () => {
     const { rerender } = render(<HomePageView model={homeModel()} />);
-    expect(screen.getAllByRole("link", { name: "Log in" }).length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByRole("link", { name: "Log in" }).length,
+    ).toBeGreaterThan(0);
     expect(screen.queryByText("My Applications")).not.toBeInTheDocument();
 
     rerender(
@@ -54,7 +76,9 @@ describe("HomePageView shared shell", () => {
         model={homeModel({ viewer: candidateViewer, match: personalMatch() })}
       />,
     );
-    expect(screen.queryByRole("link", { name: "Log in" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Log in" }),
+    ).not.toBeInTheDocument();
     expect(screen.getAllByText("My Applications").length).toBeGreaterThan(0);
   });
 });

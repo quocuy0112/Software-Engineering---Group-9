@@ -15,6 +15,7 @@ function query(request: Request) {
     employmentType: params.getAll("employmentType"),
     experienceLevel: params.getAll("experienceLevel"),
     workArrangement: params.getAll("workArrangement"),
+    careerPath: value("careerPath"),
     skills: params.getAll("skills"),
     salaryMin: value("salaryMin"),
     salaryMax: value("salaryMax"),
