@@ -8,6 +8,7 @@ import type {
 } from "@/shared/contracts/support";
 import { useSupportInvalidation } from "../client/use-support-invalidation";
 import { handleSupportMessageKeyDown } from "./support-message-keyboard";
+import { useNotificationContextRead } from "@/frontend/features/notifications/client/use-notification-context-read";
 
 const categories: Array<{ value: SupportCategory; label: string }> = [
   { value: "ACCOUNT_ACCESS", label: "Account access" },
@@ -57,6 +58,13 @@ export function SupportWorkspace({
   const [initialMessage, setInitialMessage] = useState("");
   const [reply, setReply] = useState("");
   const messagesRef = useRef<HTMLDivElement>(null);
+
+  useNotificationContextRead({
+    enabled: Boolean(detail) && !error,
+    contextType: "SUPPORT_CASE",
+    contextId: detail?.id,
+    csrfProof,
+  });
 
   const refreshCases = useCallback(async () => {
     const body = await supportApi("/api/support/cases", csrfProof);

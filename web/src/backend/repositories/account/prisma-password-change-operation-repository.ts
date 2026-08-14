@@ -12,6 +12,7 @@ import { PrismaOutboxRepository } from "@/backend/repositories/email/outbox-repo
 import { PrismaPasswordChangeAttemptRepository } from "./prisma-password-change-attempt-repository";
 import { ProtectedOutboxRecipient } from "@/backend/security/protected-recipient/protected-outbox-recipient";
 import type { PasswordChangeRequest } from "@/shared/contracts/account/password-change";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
 
 const SESSION_IDLE_MS = 30 * 60 * 1_000;
 
@@ -348,6 +349,15 @@ export class PrismaPasswordChangeOperationRepository {
         templateVersion: "password-changed.v2",
         payloadRef: {},
         idempotencyKey: current.notificationIdempotencyKey,
+      });
+      await createInAppNotification(tx, {
+        recipientUserId: current.userId,
+        kind: "PASSWORD_CHANGED",
+        deduplicationKey: current.notificationIdempotencyKey,
+        correlationId: input.correlationId,
+        occurredAt: input.now,
+        contextType: "ACCOUNT",
+        contextId: current.userId,
       });
       const finalAuditId = `password-change-final:${current.id}`;
       await new PrismaAuditRepository(tx).appendIdempotent(finalAuditId, {

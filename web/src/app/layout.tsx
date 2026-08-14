@@ -10,6 +10,7 @@ import { ThemeProvider } from "@/frontend/providers/theme-provider";
 import "./globals.css";
 import { Toaster } from "sonner";
 import "@/frontend/features/jobs/image-search/styles/image-search.css";
+import "@/frontend/features/notifications/styles/notifications.css";
 
 export const metadata: Metadata = {
   title: "SmartHire - A secure talent workspace",

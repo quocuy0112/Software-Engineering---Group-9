@@ -3,6 +3,8 @@ import { Prisma } from "@/backend/generated/prisma/client";
 import { prisma } from "@/backend/database/prisma";
 import { MessagingError } from "@/backend/messaging/messaging-errors";
 import type { MessagingMessageRepositoryPort } from "@/backend/messaging/ports/messaging-repository";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
+import { NotificationRecipientPolicy } from "@/backend/notifications/notification-recipient-policy";
 
 export class PrismaMessagingMessageRepository implements MessagingMessageRepositoryPort {
   constructor(private readonly db: typeof prisma = prisma) {}
@@ -73,6 +75,24 @@ export class PrismaMessagingMessageRepository implements MessagingMessageReposit
                 lastMessageAt: input.now,
               },
             });
+            const recipient =
+              await new NotificationRecipientPolicy(
+                tx,
+              ).otherConversationParticipant(
+                input.conversationId,
+                input.senderId,
+              );
+            if (recipient) {
+              await createInAppNotification(tx, {
+                recipientUserId: recipient.userId,
+                kind: "MESSAGE_RECEIVED",
+                deduplicationKey: `message:${input.conversationId}:${recipient.userId}:after:${recipient.lastReadSequence}`,
+                correlationId: created.id,
+                occurredAt: input.now,
+                contextType: "CONVERSATION",
+                contextId: input.conversationId,
+              });
+            }
             return created;
           },
           { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },

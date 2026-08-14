@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   applicationStageLabel,
@@ -5,6 +7,7 @@ import {
   type CandidateApplicationDetail,
 } from "@/shared/contracts/jobs/applications";
 import { ApplicationStageBadge } from "./application-stage-badge";
+import { useNotificationContextRead } from "@/frontend/features/notifications/client/use-notification-context-read";
 
 function formatDateTime(value: string) {
   return new Intl.DateTimeFormat("en", {
@@ -15,9 +18,17 @@ function formatDateTime(value: string) {
 
 export function ApplicationDetailPage({
   application,
+  csrfProof,
 }: {
   application: CandidateApplicationDetail;
+  csrfProof: string;
 }) {
+  useNotificationContextRead({
+    enabled: true,
+    contextType: "APPLICATION",
+    contextId: application.applicationId,
+    csrfProof,
+  });
   return (
     <section
       className="application-detail"

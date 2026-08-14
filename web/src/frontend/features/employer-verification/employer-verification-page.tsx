@@ -8,6 +8,7 @@ import {
   type EmployerVerificationPreparationResponse,
 } from "@/shared/contracts/employer-verification/business-verification-responses";
 import styles from "./employer-verification-page.module.css";
+import { useNotificationContextRead } from "@/frontend/features/notifications/client/use-notification-context-read";
 
 type Item = {
   id: string;
@@ -71,7 +72,27 @@ function draftFieldError(name: string) {
   return messages[name] ?? "This field is invalid. Review it and try again.";
 }
 
-export function EmployerVerificationPage() {
+function VerificationContextRead({
+  requestId,
+  csrfProof,
+}: {
+  requestId: string;
+  csrfProof: string;
+}) {
+  useNotificationContextRead({
+    enabled: true,
+    contextType: "VERIFICATION_REQUEST",
+    contextId: requestId,
+    csrfProof,
+  });
+  return null;
+}
+
+export function EmployerVerificationPage({
+  csrfProof = "",
+}: {
+  csrfProof?: string;
+}) {
   const [items, setItems] = useState<Item[]>([]);
   const [preparation, setPreparation] = useState<Preparation | null>(null);
   const [draft, setDraft] = useState<Record<string, string | boolean | null>>({});
@@ -440,7 +461,7 @@ export function EmployerVerificationPage() {
         <aside className={`${styles.card} ${styles.processCard}`}><p className={styles.eyebrow}>Review signals</p><h2>What the administrator sees</h2><ol className={styles.processList}><li><span>1</span><div><strong>Registry snapshot</strong><p>Source, checked time, and exact field differences.</p></div></li><li><span>2</span><div><strong>Contact control</strong><p>Verified mailbox plus unverified phone and website-domain signals.</p></div></li><li><span>3</span><div><strong>Authority evidence</strong><p>Your relationship, explanation, consent, and protected license.</p></div></li></ol><div className={styles.requirementNote}><strong>Human decision only</strong><p>No lookup, email, phone, or website signal can approve or reject this request automatically.</p></div></aside>
       </div>
 
-      <section className={styles.historySection}><div className={styles.historyHeading}><div><p className={styles.eyebrow}>Application history</p><h2>Your recruiter applications</h2></div>{items.length > 0 && <span className={styles.applicationCount}>{items.length} requests</span>}</div>{items.length ? <ul className={styles.applicationList}>{items.map((item) => { const status = presentStatus(item.state); return <li className={styles.applicationCard} key={item.id}><div className={styles.applicationHeader}><div><strong>{item.submittedCompanyName}</strong><span>Submitted {new Date(item.createdAt).toLocaleDateString()}</span></div><span className={styles.statusBadge} data-tone={status.tone}>{status.label}</span></div><dl className={styles.applicationMeta}><div><dt>Tax identifier</dt><dd>{item.normalizedTaxIdentifier}</dd></div><div><dt>Requested role</dt><dd>{item.requestedRole.toLowerCase()}</dd></div><div><dt>Resubmissions</dt><dd>{item.resubmissionCount} of 3</dd></div></dl>{["PENDING_CHECKS", "PENDING_REVIEW", "CHANGES_REQUESTED"].includes(item.state) && <button className={styles.secondaryButton} disabled={busy === item.id} onClick={() => void cancel(item.id)} type="button">Cancel request</button>}{item.state === "CHANGES_REQUESTED" && item.resubmissionCount < 3 && <form className={styles.resubmitForm} onSubmit={(event) => void resubmit(item.id, event)}><label className={styles.field}><span>Replacement business license</span><input name="document" type="file" accept="application/pdf,image/png,image/jpeg" required /></label><button className={styles.primaryButton} disabled={busy === item.id} type="submit">Resubmit evidence</button></form>}</li>; })}</ul> : <div className={styles.emptyState}><span aria-hidden="true">⌁</span><div><strong>No verification requests.</strong><p>Your submitted applications will appear here.</p></div></div>}</section>
+      <section className={styles.historySection}><div className={styles.historyHeading}><div><p className={styles.eyebrow}>Application history</p><h2>Your recruiter applications</h2></div>{items.length > 0 && <span className={styles.applicationCount}>{items.length} requests</span>}</div>{items.length ? <ul className={styles.applicationList}>{items.map((item) => { const status = presentStatus(item.state); return <li className={styles.applicationCard} key={item.id}><VerificationContextRead requestId={item.id} csrfProof={csrfProof} /><div className={styles.applicationHeader}><div><strong>{item.submittedCompanyName}</strong><span>Submitted {new Date(item.createdAt).toLocaleDateString()}</span></div><span className={styles.statusBadge} data-tone={status.tone}>{status.label}</span></div><dl className={styles.applicationMeta}><div><dt>Tax identifier</dt><dd>{item.normalizedTaxIdentifier}</dd></div><div><dt>Requested role</dt><dd>{item.requestedRole.toLowerCase()}</dd></div><div><dt>Resubmissions</dt><dd>{item.resubmissionCount} of 3</dd></div></dl>{["PENDING_CHECKS", "PENDING_REVIEW", "CHANGES_REQUESTED"].includes(item.state) && <button className={styles.secondaryButton} disabled={busy === item.id} onClick={() => void cancel(item.id)} type="button">Cancel request</button>}{item.state === "CHANGES_REQUESTED" && item.resubmissionCount < 3 && <form className={styles.resubmitForm} onSubmit={(event) => void resubmit(item.id, event)}><label className={styles.field}><span>Replacement business license</span><input name="document" type="file" accept="application/pdf,image/png,image/jpeg" required /></label><button className={styles.primaryButton} disabled={busy === item.id} type="submit">Resubmit evidence</button></form>}</li>; })}</ul> : <div className={styles.emptyState}><span aria-hidden="true">⌁</span><div><strong>No verification requests.</strong><p>Your submitted applications will appear here.</p></div></div>}</section>
     </main>
   );
 }

@@ -6,7 +6,10 @@ import {
 } from "@/backend/repositories/admin/prisma-admin-command-repository";
 import { CompanyRelationshipPrerequisiteGateway } from "./company-relationship-prerequisite-gateway";
 import { AuditWriter } from "@/backend/admin/audit/audit-writer";
-import { buildVerificationOutbox } from "@/backend/admin/notifications/verification-outbox";
+import {
+  buildVerificationOutbox,
+  createVerificationInAppNotification,
+} from "@/backend/admin/notifications/verification-outbox";
 type Command = {
   expectedVersion: number;
   idempotencyKey: string;
@@ -196,8 +199,7 @@ export class VerificationApprovalTransaction {
             companyReference: companyId,
           },
         });
-        await tx.emailOutbox.create({
-          data: buildVerificationOutbox({
+        const notification = {
             requestId: row.id,
             userId: row.applicantUserId,
             eventKind: "VERIFICATION_APPROVED",
@@ -207,8 +209,15 @@ export class VerificationApprovalTransaction {
             nextAction: "OPEN_RECRUITER_WORKSPACE",
             companyDisplayName: companyDisplayName!,
             approvedMembershipRole: role,
-          }),
+          } as const;
+        await tx.emailOutbox.create({
+          data: buildVerificationOutbox(notification),
         });
+        await createVerificationInAppNotification(
+          tx,
+          notification,
+          correlationId,
+        );
         return { version, state: "APPROVED", companyId, role };
       },
     );

@@ -3,6 +3,7 @@ import { MessageComposer } from "./message-composer";
 import { BlockParticipantDialog } from "./block-participant-dialog";
 import { ReportMessagingDialog } from "./report-messaging-dialog";
 import { ConversationHeader } from "./conversation-header";
+import { useNotificationContextRead } from "@/frontend/features/notifications/client/use-notification-context-read";
 
 export function MessageThread({
   currentUserId,
@@ -21,6 +22,12 @@ export function MessageThread({
   csrfProof: string;
   onBlockedChanged: (blocked: boolean) => void;
 }) {
+  useNotificationContextRead({
+    enabled: Boolean(page) && !error,
+    contextType: "CONVERSATION",
+    contextId: page?.conversation.id,
+    csrfProof,
+  });
   if (error)
     return (
       <section

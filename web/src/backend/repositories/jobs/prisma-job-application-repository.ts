@@ -14,6 +14,8 @@ import type {
   ApplicationSubmission,
   ApplicationOutcome,
 } from "@/shared/contracts/jobs/actions";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
+import { NotificationRecipientPolicy } from "@/backend/notifications/notification-recipient-policy";
 
 type CandidateApplicationForm = {
   job: {
@@ -426,34 +428,32 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
                   metadata: { v: 1, source: "application-submission" },
                 },
               },
-              notificationWork: {
-                create: [
-                  {
-                    audience: "CANDIDATE",
-                    kind: "APPLICATION_SUBMITTED",
-                    targetReference: input.candidateUserId,
-                    payloadRef: {
-                      v: 1,
-                      jobId: input.jobId,
-                      templateVersion: "1",
-                    },
-                    idempotencyKey: `application:${input.candidateUserId}:${input.jobId}:candidate`,
-                  },
-                  {
-                    audience: "COMPANY",
-                    kind: "APPLICATION_RECEIVED",
-                    targetReference: job.company.id,
-                    payloadRef: {
-                      v: 1,
-                      jobId: input.jobId,
-                      templateVersion: "1",
-                    },
-                    idempotencyKey: `application:${input.candidateUserId}:${input.jobId}:company`,
-                  },
-                ],
-              },
             },
           });
+          await createInAppNotification(tx, {
+            recipientUserId: input.candidateUserId,
+            kind: "APPLICATION_SUBMITTED",
+            deduplicationKey: `application:${input.candidateUserId}:${input.jobId}:candidate`,
+            correlationId: input.correlationId,
+            occurredAt: input.occurredAt,
+            contextType: "APPLICATION",
+            contextId: created.id,
+          });
+          const companyRecipients =
+            await new NotificationRecipientPolicy(tx).activeCompanyRecipients(
+              job.company.id,
+            );
+          for (const recipientUserId of companyRecipients) {
+            await createInAppNotification(tx, {
+              recipientUserId,
+              kind: "APPLICATION_RECEIVED",
+              deduplicationKey: `application:${input.candidateUserId}:${input.jobId}:company:${recipientUserId}`,
+              correlationId: input.correlationId,
+              occurredAt: input.occurredAt,
+              contextType: "APPLICATION",
+              contextId: created.id,
+            });
+          }
           if (input.directCv) {
             await tx.candidateCv.update({
               where: { id: input.directCv.id },
@@ -470,7 +470,10 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
             targetId: created.id,
             result: "SUCCESS",
             correlationId: input.correlationId,
-            context: { stage: "APPLIED", notificationWorkCount: 2 },
+            context: {
+              stage: "APPLIED",
+              notificationWorkCount: companyRecipients.length + 1,
+            },
           });
           return { application: outcome(created, true), created: true };
         },

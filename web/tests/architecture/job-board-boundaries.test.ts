@@ -68,7 +68,12 @@ describe("Feature 003 architecture boundaries", () => {
     ]) {
       expect(schema).toContain(indexName);
     }
-    expect(schema.match(/ops: raw\("gin_trgm_ops"\)/gu)).toHaveLength(3);
+    const jobPostingModel = schema.match(
+      /model JobPosting \{[\s\S]*?\n\}/u,
+    )?.[0];
+    expect(jobPostingModel?.match(/ops: raw\("gin_trgm_ops"\)/gu)).toHaveLength(
+      3,
+    );
   });
 
   it("keeps application attachments behind the durable CandidateCv projection", () => {

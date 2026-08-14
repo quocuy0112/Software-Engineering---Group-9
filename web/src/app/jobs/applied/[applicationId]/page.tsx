@@ -42,7 +42,10 @@ export default async function CandidateApplicationDetailRoute({
   );
   return (
     <JobsWorkspace activeTab="applied">
-      <ApplicationDetailPage application={application} />
+      <ApplicationDetailPage
+        application={application}
+        csrfProof={context.csrfProof}
+      />
     </JobsWorkspace>
   );
 }

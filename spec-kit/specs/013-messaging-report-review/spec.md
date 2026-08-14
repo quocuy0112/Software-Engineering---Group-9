@@ -143,3 +143,9 @@ As a reporting participant, I receive clear confirmation that my report was acce
 - Administrators need only the specifically submitted evidence message for this workflow; full-conversation review remains out of scope.
 - Existing moderation enforcement workflows remain authoritative for account suspension or other consequences.
 - This feature is an additive protected review workflow and does not replace the existing moderation queue for jobs, companies, memberships, and candidates.
+
+## Feature 016 Notification Integration
+
+- A newly accepted messaging report creates an in-app-only neutral receipt for its reporter; deduplicated submissions reuse the original receipt.
+- Resolution and dismissal create one terminal in-app outcome for the reporter without exposing administrator identity, notes, evidence content, review state internals, or enforcement references.
+- No new messaging-report email is introduced.
