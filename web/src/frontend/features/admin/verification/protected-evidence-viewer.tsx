@@ -42,6 +42,7 @@ export function ProtectedEvidenceViewer(props: {
   createdAt: string;
   submissionVersion: number;
   accessible: boolean;
+  readOnly?: boolean;
 }) {
   const [imageUrl, setImageUrl] = useState<string>();
   const [pdf, setPdf] = useState<PdfDocument>();
@@ -52,6 +53,7 @@ export function ProtectedEvidenceViewer(props: {
   const [failed, setFailed] = useState(false);
   const [failureMessage, setFailureMessage] = useState("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const headingId = `business-license-evidence-${props.evidenceId}`;
 
   const evidenceUrl = `/api/admin/verification-requests/${encodeURIComponent(props.requestId)}/evidence/${encodeURIComponent(props.evidenceId)}`;
 
@@ -64,30 +66,53 @@ export function ProtectedEvidenceViewer(props: {
     setPdfPage(1);
     try {
       if (props.mediaType === "application/pdf") {
-        const response = await fetch(`${evidenceUrl}/download?disposition=inline`, {
-          cache: "no-store",
-          credentials: "same-origin",
-        });
-        if (!response.ok) throw new Error(response.status === 410 ? "Evidence was deleted or is no longer available." : "Protected PDF is unavailable.");
+        const response = await fetch(
+          `${evidenceUrl}/download?disposition=inline`,
+          {
+            cache: "no-store",
+            credentials: "same-origin",
+          },
+        );
+        if (!response.ok)
+          throw new Error(
+            response.status === 410
+              ? "Evidence was deleted or is no longer available."
+              : "Protected PDF is unavailable.",
+          );
         const document = (await loadProtectedPdf(
           await response.arrayBuffer(),
         )) as PdfDocument;
         setPdf(document);
-      } else if (props.mediaType === "image/png" || props.mediaType === "image/jpeg") {
+      } else if (
+        props.mediaType === "image/png" ||
+        props.mediaType === "image/jpeg"
+      ) {
         const response = await fetch(`${evidenceUrl}/preview`, {
           cache: "no-store",
           credentials: "same-origin",
         });
-        if (!response.ok) throw new Error(response.status === 410 ? "Evidence was deleted or is no longer available." : "Protected image is unavailable.");
+        if (!response.ok)
+          throw new Error(
+            response.status === 410
+              ? "Evidence was deleted or is no longer available."
+              : "Protected image is unavailable.",
+          );
         const blob = await response.blob();
-        if (blob.type !== "image/png") throw new Error("The protected preview format is unavailable.");
+        if (blob.type !== "image/png")
+          throw new Error("The protected preview format is unavailable.");
         setImageUrl(URL.createObjectURL(blob));
       } else {
-        throw new Error("This evidence type is unsupported for protected preview.");
+        throw new Error(
+          "This evidence type is unsupported for protected preview.",
+        );
       }
     } catch (error) {
       setFailed(true);
-      setFailureMessage(error instanceof Error ? error.message : "Protected evidence is unavailable.");
+      setFailureMessage(
+        error instanceof Error
+          ? error.message
+          : "Protected evidence is unavailable.",
+      );
     } finally {
       setLoading(false);
     }
@@ -138,19 +163,37 @@ export function ProtectedEvidenceViewer(props: {
   return (
     <Paper
       component="section"
-      aria-labelledby="business-license-evidence"
+      aria-labelledby={headingId}
       variant="outlined"
       sx={{ p: 2, display: "grid", gap: 1.5 }}
     >
-      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }}>
-        <Typography id="business-license-evidence" component="h2" variant="h6" sx={{ mr: "auto" }}>
+      <Box
+        sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }}
+      >
+        <Typography
+          id={headingId}
+          component="h2"
+          variant="h6"
+          sx={{ mr: "auto" }}
+        >
           Business license evidence
         </Typography>
-        <Chip label={props.accessible ? "Ready for admin review" : "Unavailable for review"} color={props.accessible ? "success" : "warning"} />
+        <Chip
+          label={
+            props.accessible
+              ? props.readOnly
+                ? "Available"
+                : "Ready for admin review"
+              : "Unavailable for review"
+          }
+          color={props.accessible ? "success" : "warning"}
+        />
         <Chip label={props.mediaType} variant="outlined" />
       </Box>
       <Typography color="text.secondary" variant="body2">
-        Submission {props.submissionVersion}; uploaded {new Date(props.createdAt).toLocaleString()}; size {formatBytes(props.byteSize)}.
+        Submission {props.submissionVersion}; uploaded{" "}
+        {new Date(props.createdAt).toLocaleString()}; size{" "}
+        {formatBytes(props.byteSize)}.
       </Typography>
       <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
         <Chip label={`Malware scan: ${props.malwareStatus}`} size="small" />
@@ -159,36 +202,119 @@ export function ProtectedEvidenceViewer(props: {
         <Chip label={`Preview: ${props.previewStatus}`} size="small" />
       </Box>
       {!props.accessible && (
-        <Alert severity="warning">This evidence is not qualified, has expired, or is inaccessible. Decisions are disabled.</Alert>
+        <Alert severity="warning">
+          This evidence is not qualified, has expired, or is inaccessible.
+          {!props.readOnly && " Decisions are disabled."}
+        </Alert>
       )}
-      {failed && <Alert severity="error">{failureMessage || "Protected evidence is unavailable; decisions remain disabled."}</Alert>}
+      {failed && (
+        <Alert severity="error">
+          {failureMessage ||
+            `Protected evidence is unavailable${props.readOnly ? "." : "; decisions remain disabled."}`}
+        </Alert>
+      )}
       {props.accessible && (
-        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            flexWrap: "wrap",
+            alignItems: "center",
+          }}
+        >
           <Button onClick={() => void load()} disabled={loading}>
-            {loading ? "Opening protected evidence" : props.mediaType === "application/pdf" ? "Open PDF.js viewer" : "Preview document"}
+            {loading
+              ? "Opening protected evidence"
+              : props.mediaType === "application/pdf"
+                ? "Open PDF.js viewer"
+                : "Preview document"}
           </Button>
-          <Button component="a" href={`${evidenceUrl}/download?disposition=inline`} target="_blank" rel="noopener noreferrer">
+          <Button
+            component="a"
+            href={`${evidenceUrl}/download?disposition=inline`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Open full document
           </Button>
-          <Button component="a" href={`${evidenceUrl}/download`}>Download authenticated copy</Button>
+          <Button component="a" href={`${evidenceUrl}/download`}>
+            Download authenticated copy
+          </Button>
         </Box>
       )}
       {loading && <CircularProgress aria-label="Loading protected evidence" />}
       {(imageUrl || pdf) && (
-        <Box component="section" aria-label="Protected evidence controls" sx={{ display: "grid", gap: 1 }}>
-          <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", alignItems: "center" }}>
-            <Button onClick={() => setZoom((value) => Math.min(4, value + 0.25))} aria-label="Zoom in">Zoom in</Button>
-            <Button onClick={() => setZoom((value) => Math.max(0.5, value - 0.25))} aria-label="Zoom out">Zoom out</Button>
-            <Button onClick={resetView} aria-label="Reset evidence view">Reset</Button>
-            <IconButton onClick={() => panBy(0, -40)} aria-label="Pan evidence up">↑</IconButton>
-            <IconButton onClick={() => panBy(-40, 0)} aria-label="Pan evidence left">←</IconButton>
-            <IconButton onClick={() => panBy(40, 0)} aria-label="Pan evidence right">→</IconButton>
-            <IconButton onClick={() => panBy(0, 40)} aria-label="Pan evidence down">↓</IconButton>
+        <Box
+          component="section"
+          aria-label="Protected evidence controls"
+          sx={{ display: "grid", gap: 1 }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              gap: 0.5,
+              flexWrap: "wrap",
+              alignItems: "center",
+            }}
+          >
+            <Button
+              onClick={() => setZoom((value) => Math.min(4, value + 0.25))}
+              aria-label="Zoom in"
+            >
+              Zoom in
+            </Button>
+            <Button
+              onClick={() => setZoom((value) => Math.max(0.5, value - 0.25))}
+              aria-label="Zoom out"
+            >
+              Zoom out
+            </Button>
+            <Button onClick={resetView} aria-label="Reset evidence view">
+              Reset
+            </Button>
+            <IconButton
+              onClick={() => panBy(0, -40)}
+              aria-label="Pan evidence up"
+            >
+              ↑
+            </IconButton>
+            <IconButton
+              onClick={() => panBy(-40, 0)}
+              aria-label="Pan evidence left"
+            >
+              ←
+            </IconButton>
+            <IconButton
+              onClick={() => panBy(40, 0)}
+              aria-label="Pan evidence right"
+            >
+              →
+            </IconButton>
+            <IconButton
+              onClick={() => panBy(0, 40)}
+              aria-label="Pan evidence down"
+            >
+              ↓
+            </IconButton>
             {pdf && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1, ml: 1 }}>
-                <Button disabled={pdfPage <= 1} onClick={() => setPdfPage((value) => value - 1)}>Previous page</Button>
-                <Typography aria-live="polite">Page {pdfPage} of {pdf.numPages}</Typography>
-                <Button disabled={pdfPage >= pdf.numPages} onClick={() => setPdfPage((value) => value + 1)}>Next page</Button>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, ml: 1 }}
+              >
+                <Button
+                  disabled={pdfPage <= 1}
+                  onClick={() => setPdfPage((value) => value - 1)}
+                >
+                  Previous page
+                </Button>
+                <Typography aria-live="polite">
+                  Page {pdfPage} of {pdf.numPages}
+                </Typography>
+                <Button
+                  disabled={pdfPage >= pdf.numPages}
+                  onClick={() => setPdfPage((value) => value + 1)}
+                >
+                  Next page
+                </Button>
               </Box>
             )}
           </Box>
@@ -201,7 +327,13 @@ export function ProtectedEvidenceViewer(props: {
               if (event.key === "ArrowLeft") panBy(-40, 0);
               if (event.key === "ArrowRight") panBy(40, 0);
             }}
-            sx={{ overflow: "auto", maxHeight: "60vh", border: 1, borderColor: "divider", p: 1 }}
+            sx={{
+              overflow: "auto",
+              maxHeight: "60vh",
+              border: 1,
+              borderColor: "divider",
+              p: 1,
+            }}
           >
             {imageUrl && (
               // The URL is an in-memory blob produced only from authenticated,
@@ -210,10 +342,20 @@ export function ProtectedEvidenceViewer(props: {
               <img
                 src={imageUrl}
                 alt="Protected business license preview"
-                style={{ maxWidth: "100%", transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`, transformOrigin: "top left" }}
+                style={{
+                  maxWidth: "100%",
+                  transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+                  transformOrigin: "top left",
+                }}
               />
             )}
-            {pdf && <canvas ref={canvasRef} aria-label={`Protected PDF page ${pdfPage}`} style={{ transform: `translate(${pan.x}px, ${pan.y}px)` }} />}
+            {pdf && (
+              <canvas
+                ref={canvasRef}
+                aria-label={`Protected PDF page ${pdfPage}`}
+                style={{ transform: `translate(${pan.x}px, ${pan.y}px)` }}
+              />
+            )}
           </Box>
         </Box>
       )}

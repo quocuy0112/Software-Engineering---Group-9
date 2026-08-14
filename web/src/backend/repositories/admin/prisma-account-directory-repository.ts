@@ -41,6 +41,47 @@ function asObject(value: unknown): Record<string, unknown> {
     : {};
 }
 
+function evidenceSafetyState(item: {
+  malwareStatus: string;
+  typeStatus: string;
+  structureStatus: string;
+  previewStatus: string;
+}) {
+  const values = [
+    item.malwareStatus,
+    item.typeStatus,
+    item.structureStatus,
+    item.previewStatus,
+  ];
+  if (values.some((value) => value === "FAIL")) return "FAIL" as const;
+  if (values.some((value) => value === "INDETERMINATE"))
+    return "ERROR" as const;
+  if (values.every((value) => value === "PASS")) return "PASS" as const;
+  return "PENDING" as const;
+}
+
+function evidenceAccessibility(item: {
+  contentInaccessibleAt: Date | null;
+  deletedAt: Date | null;
+  supersededAt: Date | null;
+  qualified: boolean;
+}) {
+  if (item.deletedAt) return "DELETED" as const;
+  if (item.contentInaccessibleAt || item.supersededAt || !item.qualified)
+    return "INACCESSIBLE" as const;
+  return "AVAILABLE" as const;
+}
+
+function evidenceFileName(mediaType: string, version: number) {
+  const extension =
+    mediaType === "application/pdf"
+      ? "pdf"
+      : mediaType === "image/png"
+        ? "png"
+        : "jpg";
+  return `business-license-${version}.${extension}`;
+}
+
 export class PrismaAccountDirectoryRepository {
   constructor(private readonly db: Client = prisma) {}
 
@@ -48,9 +89,7 @@ export class PrismaAccountDirectoryRepository {
     const q = input.q?.trim();
     return {
       state:
-        input.status === "ALL"
-          ? { in: ["ACTIVE", "SUSPENDED"] }
-          : input.status,
+        input.status === "ALL" ? { in: ["ACTIVE", "SUSPENDED"] } : input.status,
       ...(q
         ? {
             OR: [
@@ -134,10 +173,18 @@ export class PrismaAccountDirectoryRepository {
     let candidate:
       | Map<string, { cvCount: number; applicationCount: number }>
       | undefined;
-    let recruiter: Map<
-      string,
-      { active: number; pendingReview: number; rejected: number; draft: number; closed: number }
-    > | undefined;
+    let recruiter:
+      | Map<
+          string,
+          {
+            active: number;
+            pendingReview: number;
+            rejected: number;
+            draft: number;
+            closed: number;
+          }
+        >
+      | undefined;
     let candidateUnavailable = false;
     let recruiterUnavailable = false;
     try {
@@ -222,6 +269,104 @@ export class PrismaAccountDirectoryRepository {
     return { ...page, aggregates: await this.aggregatesFor(aggregateRows) };
   }
 
+  private async approvedVerificationEvidenceFor(accountId: string) {
+    const requests = await this.db.recruiterVerificationRequest.findMany({
+      where: {
+        applicantUserId: accountId,
+        state: "APPROVED",
+        currentEvidenceId: { not: null },
+      },
+      orderBy: [{ decidedAt: "desc" }, { id: "asc" }],
+      take: 25,
+      select: {
+        id: true,
+        submittedCompanyName: true,
+        normalizedTaxIdentifier: true,
+        currentEvidenceId: true,
+        currentSubmissionVersion: true,
+        decidedAt: true,
+        targetCompany: {
+          select: {
+            displayName: true,
+            legalName: true,
+            verificationState: true,
+          },
+        },
+      },
+    });
+    const evidenceIds = requests.flatMap((request) =>
+      request.currentEvidenceId ? [request.currentEvidenceId] : [],
+    );
+    if (evidenceIds.length === 0) return [];
+
+    const evidenceRows = await this.db.businessLicenseEvidence.findMany({
+      where: { id: { in: evidenceIds } },
+      select: {
+        id: true,
+        requestId: true,
+        submissionVersion: true,
+        declaredMediaType: true,
+        detectedMediaType: true,
+        byteSize: true,
+        malwareStatus: true,
+        typeStatus: true,
+        structureStatus: true,
+        previewStatus: true,
+        contentInaccessibleAt: true,
+        deletedAt: true,
+        supersededAt: true,
+        createdAt: true,
+      },
+    });
+    const evidenceById = new Map(
+      evidenceRows.map((evidence) => [evidence.id, evidence]),
+    );
+
+    return requests.flatMap((request) => {
+      const evidence = request.currentEvidenceId
+        ? evidenceById.get(request.currentEvidenceId)
+        : undefined;
+      if (
+        !evidence ||
+        evidence.requestId !== request.id ||
+        !/^\d{10}$/u.test(request.normalizedTaxIdentifier)
+      )
+        return [];
+      const mediaType =
+        evidence.detectedMediaType ?? evidence.declaredMediaType;
+      const safetyState = evidenceSafetyState(evidence);
+      const qualified =
+        evidence.id === request.currentEvidenceId &&
+        evidence.submissionVersion === request.currentSubmissionVersion &&
+        safetyState === "PASS" &&
+        request.targetCompany?.verificationState === "ACTIVE";
+      return [
+        {
+          requestId: request.id,
+          evidenceId: evidence.id,
+          companyName:
+            request.targetCompany?.displayName ||
+            request.targetCompany?.legalName ||
+            request.submittedCompanyName,
+          taxIdentifier: request.normalizedTaxIdentifier,
+          submittedAt: evidence.createdAt.toISOString(),
+          approvedAt: request.decidedAt?.toISOString() ?? null,
+          version: evidence.submissionVersion,
+          fileName: evidenceFileName(mediaType, evidence.submissionVersion),
+          mediaType,
+          byteSize: evidence.byteSize,
+          safetyState,
+          accessibility: evidenceAccessibility({
+            contentInaccessibleAt: evidence.contentInaccessibleAt,
+            deletedAt: evidence.deletedAt,
+            supersededAt: evidence.supersededAt,
+            qualified,
+          }),
+        },
+      ];
+    });
+  }
+
   async detail(accountId: string) {
     const account = await this.db.userAccount.findFirst({
       where: { id: accountId, state: { in: ["ACTIVE", "SUSPENDED"] } },
@@ -264,42 +409,45 @@ export class PrismaAccountDirectoryRepository {
     });
     if (!account) return null;
 
-    const [aggregates, history] = await Promise.all([
-      this.aggregatesFor([
-        {
-          id: account.id,
-          recruiterCompanyIds: account.companyMemberships
-            .filter((membership) => membership.status === "ACTIVE")
-            .map((membership) => membership.company.id),
-          isCandidate: account.candidateIdentity !== null,
-        },
-      ]),
-      this.db.auditEvent.findMany({
-        where: {
-          targetType: "user_account",
-          targetId: account.id,
-          action: {
-            in: [
-              "admin.account_suspended",
-              "admin.account_restored",
-              "admin.account_reinstated",
-            ],
+    const [aggregates, history, approvedVerificationEvidence] =
+      await Promise.all([
+        this.aggregatesFor([
+          {
+            id: account.id,
+            recruiterCompanyIds: account.companyMemberships
+              .filter((membership) => membership.status === "ACTIVE")
+              .map((membership) => membership.company.id),
+            isCandidate: account.candidateIdentity !== null,
           },
-        },
-        orderBy: [{ occurredAt: "desc" }, { id: "desc" }],
-        take: 50,
-        select: {
-          id: true,
-          action: true,
-          actorUserId: true,
-          result: true,
-          occurredAt: true,
-          correlationId: true,
-          context: true,
-        },
-      }),
-    ]);
-    const protectedAdministrator = account.platformAdministratorGrants.length > 0;
+        ]),
+        this.db.auditEvent.findMany({
+          where: {
+            targetType: "user_account",
+            targetId: account.id,
+            action: {
+              in: [
+                "admin.account_suspended",
+                "admin.account_restored",
+                "admin.account_reinstated",
+              ],
+            },
+          },
+          orderBy: [{ occurredAt: "desc" }, { id: "desc" }],
+          take: 50,
+          select: {
+            id: true,
+            action: true,
+            actorUserId: true,
+            result: true,
+            occurredAt: true,
+            correlationId: true,
+            context: true,
+          },
+        }),
+        this.approvedVerificationEvidenceFor(account.id),
+      ]);
+    const protectedAdministrator =
+      account.platformAdministratorGrants.length > 0;
     return {
       account: {
         ...account,
@@ -313,11 +461,13 @@ export class PrismaAccountDirectoryRepository {
       protectedAdministrator,
       authorities: account.companyMemberships.map((membership) => ({
         companyId: membership.company.id,
-        companyName: membership.company.displayName || membership.company.legalName,
+        companyName:
+          membership.company.displayName || membership.company.legalName,
         membershipRole: membership.role,
         membershipState: membership.status,
         verificationState: membership.company.verificationState,
       })),
+      approvedVerificationEvidence,
       history: history.map((event) => {
         const context = asObject(event.context);
         const action =

@@ -57,9 +57,13 @@ export class AccountDetailService {
         ? recruiterActivitySchema(recruiterActivity)
         : null,
       authorities: result.authorities,
+      approvedVerificationEvidence: result.approvedVerificationEvidence,
       moderation: {
-        canSuspend: result.account.state === "ACTIVE" && !result.protectedAdministrator,
-        canRestore: result.account.state === "SUSPENDED" && !result.protectedAdministrator,
+        canSuspend:
+          result.account.state === "ACTIVE" && !result.protectedAdministrator,
+        canRestore:
+          result.account.state === "SUSPENDED" &&
+          !result.protectedAdministrator,
         protectedAdministrator: result.protectedAdministrator,
         reasonCode: result.protectedAdministrator
           ? "PROTECTED_ADMINISTRATOR"

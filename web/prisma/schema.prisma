@@ -1315,7 +1315,7 @@ model InAppNotification {
 
   @@index([recipientUserId, lastOccurredAt(sort: Desc), id(sort: Desc)])
   @@index([recipientUserId, readAt, expiresAt])
-  @@index([recipientUserId, contextType, contextId, readAt])
+  @@index([recipientUserId, contextType, contextId, readAt], map: "InAppNotification_recipientUserId_contextType_contextId_readAt_")
   @@index([expiresAt, id])
 }
 

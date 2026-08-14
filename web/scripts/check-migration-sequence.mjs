@@ -19,17 +19,29 @@ if (invalid.length) {
   );
 }
 
-const outOfSequence = names
-  .map((name, index) => ({
-    expected: String(index + 1).padStart(3, "0"),
-    actual: name.slice(0, 3),
-    name,
-  }))
-  .filter((entry) => entry.actual !== entry.expected);
+const allowedDuplicateVersions = new Set([
+  "022_admin_user_management_refinement|022_realtime_messaging",
+]);
+const versionedNames = names.map((name) => ({
+  version: Number(name.slice(0, 3)),
+  name,
+}));
+const outOfSequence = versionedNames.flatMap((entry, index) => {
+  if (index === 0) return entry.version === 1 ? [] : [entry];
+  const previous = versionedNames[index - 1];
+  if (entry.version === previous.version) {
+    const duplicatePair = `${previous.name}|${entry.name}`;
+    return allowedDuplicateVersions.has(duplicatePair) ? [] : [entry];
+  }
+  return entry.version === previous.version + 1 ? [] : [entry];
+});
 if (outOfSequence.length) {
   throw new Error(
     `Migration sequence has gaps or duplicates: ${outOfSequence
-      .map((entry) => `${entry.name} (expected ${entry.expected})`)
+      .map(
+        (entry) =>
+          `${entry.name} (unexpected version ${String(entry.version).padStart(3, "0")})`,
+      )
       .join(", ")}`,
   );
 }

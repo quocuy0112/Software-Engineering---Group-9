@@ -11,6 +11,7 @@ import {
   reportCategorySchema,
   verificationStateSchema,
 } from "./common";
+import { evidenceMetadataSchema } from "./verification";
 
 export const accountListItemSchema = z
   .object({
@@ -33,8 +34,7 @@ export const accountDirectoryFilterSchema = z
     registeredFrom: z.string().date().optional(),
     registeredTo: z.string().date().optional(),
     page: z.coerce.number().int().min(1).default(1),
-    pageSize: z
-      .coerce
+    pageSize: z.coerce
       .number()
       .pipe(z.union([z.literal(25), z.literal(50), z.literal(100)]))
       .default(25),
@@ -95,7 +95,10 @@ export const accountDirectoryItemSchema = z
     type: z.enum(["CANDIDATE", "RECRUITER"]),
     status: z.enum(["ACTIVE", "SUSPENDED"]),
     version: z.number().int().min(0),
-    counts: z.union([candidateActivityCountsSchema, recruiterActivityCountsSchema]),
+    counts: z.union([
+      candidateActivityCountsSchema,
+      recruiterActivityCountsSchema,
+    ]),
   })
   .strict();
 
@@ -132,12 +135,25 @@ export const moderationHistoryItemSchema = z
   })
   .strict();
 
+export const approvedVerificationEvidenceSchema = evidenceMetadataSchema
+  .omit({ id: true })
+  .extend({
+    requestId: adminReferenceSchema,
+    evidenceId: adminReferenceSchema,
+    companyName: z.string().max(240),
+    taxIdentifier: z.string().regex(/^\d{10}$/u),
+    submittedAt: adminTimestampSchema,
+    approvedAt: adminTimestampSchema.nullable(),
+  })
+  .strict();
+
 export const accountDetailSchema = z
   .object({
     account: accountDirectoryItemSchema,
     candidateActivity: candidateActivityCountsSchema.nullable(),
     recruiterActivity: recruiterActivityCountsSchema.nullable(),
     authorities: z.array(companyAuthoritySchema),
+    approvedVerificationEvidence: z.array(approvedVerificationEvidenceSchema),
     moderation: moderationEligibilitySchema,
     history: z.array(moderationHistoryItemSchema),
     calculatedAt: adminTimestampSchema,
@@ -237,6 +253,8 @@ export const dashboardSnapshotSchema = z
 
 export type AccountListItem = z.infer<typeof accountListItemSchema>;
 export type CompanyMembershipResource = z.infer<typeof companyMembershipSchema>;
-export type AccountDirectoryFilter = z.infer<typeof accountDirectoryFilterSchema>;
+export type AccountDirectoryFilter = z.infer<
+  typeof accountDirectoryFilterSchema
+>;
 export type AccountDirectoryItem = z.infer<typeof accountDirectoryItemSchema>;
 export type AccountDetail = z.infer<typeof accountDetailSchema>;

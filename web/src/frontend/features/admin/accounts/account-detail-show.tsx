@@ -3,6 +3,7 @@
 import { Alert, Box, Button, Chip, Divider, Typography } from "@mui/material";
 import { Show, useRecordContext, useRefresh } from "react-admin";
 import { AccountModerationPanel } from "./account-moderation-panel";
+import { ProtectedEvidenceViewer } from "../verification/protected-evidence-viewer";
 
 type CountProjection =
   | { kind: "CANDIDATE"; cvCount: number; applicationCount: number }
@@ -37,6 +38,20 @@ type AccountDetail = {
     membershipState: string;
     verificationState: string;
   }>;
+  approvedVerificationEvidence: Array<{
+    requestId: string;
+    evidenceId: string;
+    companyName: string;
+    taxIdentifier: string;
+    submittedAt: string;
+    approvedAt: string | null;
+    version: number;
+    fileName: string;
+    mediaType: "image/png" | "image/jpeg" | "application/pdf";
+    byteSize: number;
+    safetyState: "PENDING" | "PASS" | "FAIL" | "ERROR";
+    accessibility: "AVAILABLE" | "INACCESSIBLE" | "DELETED";
+  }>;
   moderation: {
     canSuspend: boolean;
     canRestore: boolean;
@@ -57,14 +72,21 @@ type AccountDetail = {
   calculatedAt: string;
 };
 
-function Count({ value, label }: { value: CountProjection | null; label: string }) {
+function Count({
+  value,
+  label,
+}: {
+  value: CountProjection | null;
+  label: string;
+}) {
   if (!value) return null;
   if ("unavailable" in value)
     return <Typography>{label}: Unavailable — retry to confirm</Typography>;
   if (value.kind === "CANDIDATE")
     return (
       <Typography>
-        {label}: CVs {value.cvCount}; submitted applications {value.applicationCount}
+        {label}: CVs {value.cvCount}; submitted applications{" "}
+        {value.applicationCount}
       </Typography>
     );
   return (
@@ -98,22 +120,34 @@ function Content() {
   const { account } = record;
   return (
     <Box sx={{ p: 2, display: "grid", gap: 2, maxWidth: 960 }}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+      <Box
+        sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}
+      >
         <Typography component="h1" variant="h5" sx={{ mr: "auto" }}>
           Account details
         </Typography>
         <Button onClick={() => refresh()}>Refresh</Button>
       </Box>
-      <Box component="section" aria-labelledby="account-identity-heading" sx={{ display: "grid", gap: 1 }}>
+      <Box
+        component="section"
+        aria-labelledby="account-identity-heading"
+        sx={{ display: "grid", gap: 1 }}
+      >
         <Typography id="account-identity-heading" component="h2" variant="h6">
           {account.displayName}
         </Typography>
         <Typography>Account reference: {account.accountReference}</Typography>
         <Typography>Masked email: {account.maskedEmail}</Typography>
-        <Typography>Registered: {new Date(account.registeredAt).toLocaleString()}</Typography>
+        <Typography>
+          Registered: {new Date(account.registeredAt).toLocaleString()}
+        </Typography>
         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-          <Chip label={account.type === "RECRUITER" ? "Recruiter" : "Candidate"} />
-          <Chip label={account.status === "SUSPENDED" ? "Suspended" : "Active"} />
+          <Chip
+            label={account.type === "RECRUITER" ? "Recruiter" : "Candidate"}
+          />
+          <Chip
+            label={account.status === "SUSPENDED" ? "Suspended" : "Active"}
+          />
         </Box>
       </Box>
       <Divider />
@@ -125,36 +159,103 @@ function Content() {
       </Box>
       {record.recruiterActivity && (
         <Box component="section" aria-labelledby="recruiter-activity-heading">
-          <Typography id="recruiter-activity-heading" component="h2" variant="h6">
+          <Typography
+            id="recruiter-activity-heading"
+            component="h2"
+            variant="h6"
+          >
             Recruiter activity
           </Typography>
           <Count value={record.recruiterActivity} label="Job postings" />
         </Box>
       )}
       {record.authorities.length > 0 && (
-        <Box component="section" aria-labelledby="authority-heading" sx={{ display: "grid", gap: 1 }}>
+        <Box
+          component="section"
+          aria-labelledby="authority-heading"
+          sx={{ display: "grid", gap: 1 }}
+        >
           <Typography id="authority-heading" component="h2" variant="h6">
             Company authority
           </Typography>
           {record.authorities.map((authority) => (
-            <Box key={authority.companyId} sx={{ border: 1, borderColor: "divider", p: 1 }}>
+            <Box
+              key={authority.companyId}
+              sx={{ border: 1, borderColor: "divider", p: 1 }}
+            >
               <Typography>{authority.companyName}</Typography>
               <Typography variant="body2">
-                {authority.membershipRole}; membership {authority.membershipState}; company {authority.verificationState}
+                {authority.membershipRole}; membership{" "}
+                {authority.membershipState}; company{" "}
+                {authority.verificationState}
               </Typography>
             </Box>
           ))}
         </Box>
       )}
+      <Box
+        component="section"
+        aria-labelledby="approved-verification-evidence-heading"
+        sx={{ display: "grid", gap: 1.5 }}
+      >
+        <Typography
+          id="approved-verification-evidence-heading"
+          component="h2"
+          variant="h6"
+        >
+          Approved verification evidence
+        </Typography>
+        {record.approvedVerificationEvidence.length === 0 ? (
+          <Typography>
+            No approved verification document is available for this account.
+          </Typography>
+        ) : (
+          record.approvedVerificationEvidence.map((evidence) => (
+            <Box
+              key={`${evidence.requestId}:${evidence.evidenceId}`}
+              sx={{ display: "grid", gap: 1 }}
+            >
+              <Typography>
+                {evidence.companyName} — tax code {evidence.taxIdentifier}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {evidence.fileName}; approved{" "}
+                {evidence.approvedAt
+                  ? new Date(evidence.approvedAt).toLocaleString()
+                  : "date unavailable"}
+              </Typography>
+              <ProtectedEvidenceViewer
+                requestId={evidence.requestId}
+                evidenceId={evidence.evidenceId}
+                mediaType={evidence.mediaType}
+                byteSize={evidence.byteSize}
+                malwareStatus={evidence.safetyState}
+                typeStatus={evidence.safetyState}
+                structureStatus={evidence.safetyState}
+                previewStatus={evidence.safetyState}
+                createdAt={evidence.submittedAt}
+                submissionVersion={evidence.version}
+                accessible={evidence.accessibility === "AVAILABLE"}
+                readOnly
+              />
+            </Box>
+          ))
+        )}
+      </Box>
       <Box component="section" aria-labelledby="moderation-heading">
         <Typography id="moderation-heading" component="h2" variant="h6">
           Moderation eligibility
         </Typography>
         {record.moderation.protectedAdministrator ? (
-          <Alert severity="info">This account is protected by current platform administrator authority.</Alert>
+          <Alert severity="info">
+            This account is protected by current platform administrator
+            authority.
+          </Alert>
         ) : (
           <Typography>
-            Suspend: {record.moderation.canSuspend ? "Eligible" : "Unavailable"}; Restore: {record.moderation.canRestore ? "Eligible" : "Unavailable"}
+            Suspend: {record.moderation.canSuspend ? "Eligible" : "Unavailable"}
+            ; Restore:{" "}
+            {record.moderation.canRestore ? "Eligible" : "Unavailable"}
           </Typography>
         )}
         <AccountModerationPanel
@@ -172,13 +273,15 @@ function Content() {
         ) : (
           record.history.map((item) => (
             <Typography key={item.id}>
-              {item.action} — {item.result} — {item.category} — {new Date(item.occurredAt).toLocaleString()} ({item.actorRef})
+              {item.action} — {item.result} — {item.category} —{" "}
+              {new Date(item.occurredAt).toLocaleString()} ({item.actorRef})
             </Typography>
           ))
         )}
       </Box>
       <Typography variant="caption" color="text.secondary">
-        Calculated {new Date(record.calculatedAt).toLocaleString()}. Protected CV/application content and session data are not displayed.
+        Calculated {new Date(record.calculatedAt).toLocaleString()}. Protected
+        CV/application content and session data are not displayed.
       </Typography>
     </Box>
   );
