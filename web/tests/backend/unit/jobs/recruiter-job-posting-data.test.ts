@@ -176,6 +176,17 @@ describe("recruiter JSON job persistence", () => {
 
     expect(saved.profileComplete).toBe(true);
     expect(saved.missingProfileFields).toEqual([]);
+    const companiesWrite = fsMocks.writeFile.mock.calls.find(([path]) =>
+      String(path).endsWith("companies.json"),
+    );
+    expect(companiesWrite).toBeDefined();
+    expect(JSON.parse(String(companiesWrite?.[1]))).toContainEqual(
+      expect.objectContaining({
+        id: "db-company-1",
+        name: "Dava",
+        taxCode: "2000000000",
+      }),
+    );
     expect(prismaMocks.company.update).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: "db-company-1" } }),
     );
