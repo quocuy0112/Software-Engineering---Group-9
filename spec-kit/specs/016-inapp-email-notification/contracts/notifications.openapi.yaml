@@ -72,19 +72,7 @@ paths:
       summary: Idempotently mark one owned notification read
       parameters:
         - $ref: '#/components/parameters/NotificationId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties: false
-              required: [csrfProof]
-              properties:
-                csrfProof:
-                  type: string
-                  minLength: 1
-                  maxLength: 2048
+        - $ref: '#/components/parameters/CsrfToken'
       responses:
         '200':
           description: Read-state result; repeated requests return the same state
@@ -102,19 +90,8 @@ paths:
     post:
       operationId: markAllNotificationsRead
       summary: Idempotently mark all non-expired owned notifications read
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties: false
-              required: [csrfProof]
-              properties:
-                csrfProof:
-                  type: string
-                  minLength: 1
-                  maxLength: 2048
+      parameters:
+        - $ref: '#/components/parameters/CsrfToken'
       responses:
         '200':
           description: Number changed by this request and resulting unread count
@@ -130,6 +107,8 @@ paths:
     post:
       operationId: markNotificationContextRead
       summary: Mark matching owned notifications read after protected content loads
+      parameters:
+        - $ref: '#/components/parameters/CsrfToken'
       requestBody:
         required: true
         content:
@@ -137,7 +116,7 @@ paths:
             schema:
               type: object
               additionalProperties: false
-              required: [contextType, contextId, csrfProof]
+              required: [contextType, contextId]
               properties:
                 contextType:
                   $ref: '#/components/schemas/NotificationContextType'
@@ -145,10 +124,6 @@ paths:
                   type: string
                   minLength: 1
                   maxLength: 128
-                csrfProof:
-                  type: string
-                  minLength: 1
-                  maxLength: 2048
       responses:
         '200':
           description: Context read result
@@ -172,6 +147,15 @@ components:
         type: string
         minLength: 1
         maxLength: 128
+    CsrfToken:
+      name: x-csrf-token
+      in: header
+      required: true
+      description: Proof derived from the authenticated server session; never a second session credential.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 2048
   schemas:
     NotificationCategory:
       type: string
@@ -181,11 +165,11 @@ components:
       enum: [CRITICAL, HIGH, MEDIUM, LOW]
     NotificationContextType:
       type: string
-      enum: [ACCOUNT, MEMBERSHIP, APPLICATION, VERIFICATION_REQUEST, SUPPORT_CASE, CONNECTION_PROPOSAL, CONNECTION, CONVERSATION, MESSAGING_REPORT]
+      enum: [ACCOUNT, MEMBERSHIP, APPLICATION, VERIFICATION_REQUEST, SUPPORT_CASE, CONNECTION_PROPOSAL, CONNECTION, CONVERSATION, MESSAGING_REPORT, MODERATION_REPORT]
     NotificationItem:
       type: object
       additionalProperties: false
-      required: [id, kind, category, severity, title, summary, readAt, createdAt, expiresAt]
+      required: [id, kind, category, severity, title, summary, occurrenceCount, readAt, createdAt, lastOccurredAt, expiresAt]
       properties:
         id:
           type: string
@@ -201,6 +185,9 @@ components:
         summary:
           type: string
           maxLength: 500
+        occurrenceCount:
+          type: integer
+          minimum: 1
         href:
           type: [string, 'null']
           maxLength: 500
@@ -215,6 +202,9 @@ components:
           type: [string, 'null']
           format: date-time
         createdAt:
+          type: string
+          format: date-time
+        lastOccurredAt:
           type: string
           format: date-time
         expiresAt:

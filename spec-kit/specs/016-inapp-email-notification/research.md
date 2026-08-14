@@ -71,7 +71,7 @@
 
 ## Decision 7: Cursor Pagination and Indexed Unread Count
 
-**Decision**: Use a stable `(createdAt, id)` descending cursor, a bounded page size of 20 by default and 50 maximum, and recipient/read/expiry indexes.
+**Decision**: Use a stable `(lastOccurredAt, id)` descending cursor, a bounded page size of 20 by default and 50 maximum, and recipient/read/expiry indexes. Groupable unread message bursts update `occurrenceCount`, safe summary, and `lastOccurredAt`; all other event kinds remain immutable insert-once records.
 
 **Rationale**: Offset pagination becomes slower and unstable when new notifications arrive. The composite cursor is deterministic and supports thousands of records per user.
 
@@ -133,6 +133,7 @@
 | Application submitted/received | Existing recruitment work only | Convert to in-app only |
 | New conversation message | Existing unread state/socket | Add grouped in-app only |
 | Message report receipt/outcome | Existing report data/toast | Add safe in-app only |
+| General moderation report receipt/outcome | Existing report data/toast/admin queue | Add safe in-app only |
 
 ## Recipient Rules
 
@@ -143,5 +144,5 @@
 - Support: conversation requester.
 - Connection: intended participants from the existing connection event.
 - Message: the other active conversation participant, excluding sender.
-- Message report: reporter only; administrators use their existing report queue rather than a private-evidence notification.
+- Messaging/general report: reporter only; administrators use their existing report queues rather than a private-evidence notification.
 - Administrator account events: administrator receives the same account-level notification through their ordinary user identity when still authorized to authenticate.

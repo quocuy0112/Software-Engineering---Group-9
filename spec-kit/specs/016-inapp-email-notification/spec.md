@@ -71,7 +71,7 @@ Users receive in-app updates for job applications, recruiter verification, suppo
 2. **Given** a recruiter verification request is approved, rejected, delayed, expired, cancelled, or returned for changes, **When** the state transition succeeds, **Then** the requester receives the corresponding in-app outcome.
 3. **Given** a support case needs user input or is resolved, **When** support records the transition, **Then** the case owner receives an in-app notification linked to the case.
 4. **Given** a professional connection proposal is created, updated, accepted, revoked, or becomes inactive, **When** the event succeeds, **Then** every intended recipient receives exactly one unified in-app notification and existing connection emails remain unchanged.
-5. **Given** a user reports a conversation message, **When** the report is accepted or later resolved, **Then** the reporter receives an in-app receipt or outcome without receiving restricted moderation details.
+5. **Given** a user submits a messaging or general moderation report, **When** the report is accepted or later reaches a safe terminal outcome, **Then** the reporter receives an in-app receipt or outcome without receiving restricted moderation details.
 
 ---
 
@@ -143,7 +143,7 @@ Operators can diagnose notification creation and delivery failures without expos
 ### Functional Requirements
 
 - **FR-001**: The system MUST provide one unified in-app notification inbox for authenticated candidate, recruiter, and administrator experiences.
-- **FR-002**: The system MUST persist recipient, event kind, category, severity, safe title, safe summary, safe destination, read timestamp, creation timestamp, expiry policy, and an idempotency identity for every unified notification.
+- **FR-002**: The system MUST persist recipient, event kind, category, severity, safe title, safe summary, safe destination, occurrence count, first and latest occurrence timestamps, read timestamp, expiry policy, and an idempotency identity for every unified notification.
 - **FR-003**: The system MUST treat PostgreSQL notification records as the authoritative source for notification history and unread state.
 - **FR-004**: The system MUST prevent duplicate notifications for the same recipient and logical business event, including request retries and worker retries.
 - **FR-005**: The system MUST create an in-app notification for every existing email that communicates a completed or changed business, account, security, support, verification, application, moderation, or connection event.
@@ -156,7 +156,7 @@ Operators can diagnose notification creation and delivery failures without expos
 - **FR-012**: The system MUST assign one of four user-visible severity levels—critical, high, medium, or low—according to a centrally maintained event policy.
 - **FR-013**: Critical and high notifications MUST remain enabled regardless of optional marketing or recommendation preferences.
 - **FR-014**: Optional medium or low notification categories MUST honor applicable user preferences, with safe defaults when no preference record exists.
-- **FR-015**: The system MUST expose a paginated, newest-first list limited to notifications owned by the authenticated recipient.
+- **FR-015**: The system MUST expose a paginated list ordered by latest occurrence first and limited to notifications owned by the authenticated recipient.
 - **FR-016**: The system MUST expose the authenticated recipient's unread count without returning full notification payloads.
 - **FR-017**: Users MUST be able to mark one owned notification as read using an idempotent operation.
 - **FR-018**: Users MUST be able to mark all accessible notifications as read using an idempotent operation.
@@ -174,7 +174,7 @@ Operators can diagnose notification creation and delivery failures without expos
 - **FR-030**: Professional connection proposal created, updated, inactive, accepted, and revoked events MUST be represented in the unified inbox without changing their existing email behavior.
 - **FR-031**: New conversation messages MUST produce in-app updates for offline or out-of-context recipients while avoiding unbounded duplicate notification growth for one unread conversation.
 - **FR-032**: Successfully displaying a conversation MUST mark that conversation's message notifications read and synchronize the existing conversation unread indicator.
-- **FR-033**: Message-report receipt and safe outcome events MUST notify the reporter in-app without exposing private moderator reasoning or evidence.
+- **FR-033**: Messaging-report and general moderation-report receipt and safe terminal outcome events MUST notify the reporter in-app without exposing private moderator reasoning or evidence.
 - **FR-034**: Account suspension, reinstatement, session revocation, company-membership suspension, restoration, removal, password changed, and account-recovery state events MUST create severity-appropriate in-app notifications when an authenticated recipient account remains available.
 - **FR-035**: The system MUST use explicit authorized recipient rules for company-scoped events and MUST collapse duplicate recipient identities caused by multiple roles.
 - **FR-036**: Notification creation MUST not convert a failed business operation into success or a successful committed business operation into an incorrect business state.

@@ -18,7 +18,7 @@
 
 **Purpose**: Register focused commands and shared contracts without changing runtime behavior.
 
-- [ ] T001 Add `test:notifications`, `perf:notifications`, and `notifications:migration:verify` commands in `web/package.json` and root `package.json`
+- [ ] T001 Add `test:notifications`, `perf:notifications`, `notifications:migrate:legacy`, and `notifications:migration:verify` commands in `web/package.json` and root `package.json`
 - [ ] T002 [P] Create exhaustive Zod API/event types matching OpenAPI in `web/src/shared/contracts/notifications/index.ts`
 - [ ] T003 [P] Add OpenAPI-to-Zod parity and response-shape tests in `web/tests/backend/contract/notifications/notification-openapi-parity.test.ts`
 - [ ] T004 [P] Add notification test builders and authenticated fixtures in `web/tests/helpers/notifications/notification-fixtures.ts`
@@ -42,7 +42,7 @@
 
 - [ ] T009 Add notification enums, `InAppNotification`, indexes, constraints, and `UserAccount` relation in `web/prisma/schema.prisma`
 - [ ] T010 Create additive unified notification and legacy connection backfill SQL in `web/prisma/migrations/20260814090000_unified_in_app_notifications/migration.sql`
-- [ ] T011 Add re-runnable source/target/read-state/challenge-exclusion verifier in `web/scripts/verify-in-app-notification-migration.mjs`
+- [ ] T011 Add read-only source/target/read-state/challenge-exclusion verifier in `web/scripts/verify-in-app-notification-migration.mjs`
 - [ ] T012 Regenerate Prisma client output in `web/src/backend/generated/prisma/`
 - [ ] T013 [P] Define safe error codes and transport mapping helpers in `web/src/backend/notifications/notification-errors.ts`
 - [ ] T014 [P] Implement server-only event kinds, safe schemas, severity/category/copy/destination rules, and email classification in `web/src/backend/notifications/event-policy.ts`
@@ -128,7 +128,7 @@
 - [ ] T049 [P] [US3] Add all seven recruiter verification outcome tests in `web/tests/backend/integration/notifications/verification-notification-events.test.ts`
 - [ ] T050 [P] [US3] Add support waiting/resolved event tests in `web/tests/backend/integration/notifications/support-notification-events.test.ts`
 - [ ] T051 [P] [US3] Add five connection event, legacy read-state, and duplicate migration tests in `web/tests/backend/integration/notifications/connection-notification-events.test.ts`
-- [ ] T052 [P] [US3] Add report receipt/resolved/dismissed restricted-content tests in `web/tests/backend/integration/notifications/messaging-report-notification-events.test.ts`
+- [ ] T052 [P] [US3] Add messaging/general report receipt/resolved/dismissed restricted-content tests in `web/tests/backend/integration/notifications/report-notification-events.test.ts`
 
 ### Implementation
 
@@ -140,8 +140,8 @@
 - [ ] T058 [US3] Add support waiting/resolved unified records beside unchanged support email writes in `web/src/backend/repositories/support/prisma-support-repository.ts`
 - [ ] T059 [US3] Switch connection producer writes to unified notifications while preserving email outbox writes in `web/src/backend/repositories/connections/prisma-connection-repository.ts`
 - [ ] T060 [US3] Adapt connection notification list/read compatibility routes to unified service in `web/src/app/api/connections/notifications/route.ts` and `web/src/app/api/connections/notifications/[notificationId]/read/route.ts`
-- [ ] T061 [US3] Add safe report receipt and terminal outcome notifications in `web/src/backend/repositories/messaging/prisma-messaging-report-repository.ts` and `web/src/backend/admin/messaging-reports/admin-messaging-report-review-service.ts`
-- [ ] T062 [US3] Bridge pending recruitment work and mark rows delivered only after complete fanout in `web/scripts/verify-in-app-notification-migration.mjs`
+- [ ] T061 [US3] Add safe messaging/general report receipt and terminal outcome notifications in `web/src/backend/repositories/messaging/prisma-messaging-report-repository.ts`, `web/src/backend/admin/messaging-reports/admin-messaging-report-review-service.ts`, `web/src/backend/admin/moderation/moderation-submission-service.ts`, and `web/src/backend/admin/moderation/moderation-review-service.ts`
+- [ ] T062 [US3] Bridge pending recruitment work idempotently and mark rows delivered only after complete fanout in `web/scripts/migrate-in-app-notification-legacy-data.mjs`
 
 **Checkpoint**: Existing workflow email events and specified report/application events are represented exactly once in the unified inbox.
 

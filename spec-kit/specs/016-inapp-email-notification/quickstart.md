@@ -15,6 +15,7 @@ npm run db:validate
 npm run db:generate
 npm run db:deploy
 npm run db:migrations:check
+npm run notifications:migrate:legacy --workspace @smarthire/web
 npm run notifications:migration:verify --workspace @smarthire/web
 ```
 

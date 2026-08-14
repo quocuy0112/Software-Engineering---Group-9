@@ -117,8 +117,8 @@ Existing event producers in identity/account, admin security, recruiter verifica
 1. The originating service validates and commits its business transition using its existing transaction.
 2. Existing email outbox writes remain exactly as they are.
 3. The producer invokes a transaction-compatible notification writer with an allow-listed event kind, recipient, business event key, context, and safe variables.
-4. The policy resolves category, severity, locale copy, safe destination, and 90-day expiry.
-5. The repository inserts using a unique recipient/event deduplication identity; a replay returns the existing record without error.
+4. The policy resolves category, severity, locale copy, safe destination, grouping rule, and 90-day expiry.
+5. The repository inserts using a unique recipient/event deduplication identity; a replay returns the existing record without error. Only a policy-approved unread message burst may increment its occurrence count, refresh safe summary, and move its last-occurrence ordering timestamp.
 6. An in-app write failure rolls back only when still inside the originating transaction. Failures in asynchronous legacy backfill are retried without changing already-committed business state.
 
 ### Channel Classification
@@ -140,8 +140,9 @@ Existing event producers in identity/account, admin security, recruiter verifica
 ### Legacy Migration
 
 - Add the unified table and indexes without dropping old tables.
-- Backfill unexpired `ProfessionalConnectionNotification` rows using their existing deduplication key and read state.
+- Backfill unexpired `ProfessionalConnectionNotification` rows using their existing deduplication key unchanged and preserve read state; new producers use the same key derivation so deployment overlap remains idempotent.
 - Backfill `RecruitmentNotificationWork` rows: candidate targets map directly; company targets fan out only to active company memberships with hiring authority. Existing rows are marked delivered only after all idempotent recipient inserts succeed.
+- Perform recruitment fanout through a dedicated re-runnable legacy migration command; keep the separate verification command read-only.
 - Switch new connection and recruitment producers to the unified writer.
 - Keep old tables read-only for one release and provide a verification script comparing source rows, resolved recipients, and unified rows. Destructive removal is deferred to a separate migration.
 

@@ -32,17 +32,18 @@
 - `CONNECTION`
 - `CONVERSATION`
 - `MESSAGING_REPORT`
+- `MODERATION_REPORT`
 
 ### InAppNotificationKind
 
 The database enum is exhaustive for Feature 016 and mirrors the server event-policy union:
 
-- Account/security: `EMAIL_CHANGED_ALERT`, `PASSWORD_CHANGED`, `RECOVERY_PENDING`, `RECOVERY_CANCELLED`, `RECOVERY_COMPLETED`, `ACCOUNT_SUSPENDED`, `ACCOUNT_REINSTATED`, `ALL_SESSIONS_REVOKED`, `MEMBERSHIP_SUSPENDED`, `MEMBERSHIP_RESTORED`, `MEMBERSHIP_REMOVED`
+- Account/security: `EMAIL_CHANGE_REQUESTED_ALERT`, `PASSWORD_CHANGED`, `RECOVERY_PENDING`, `RECOVERY_CANCELLED`, `RECOVERY_COMPLETED`, `ACCOUNT_SUSPENDED`, `ACCOUNT_REINSTATED`, `ALL_SESSIONS_REVOKED`, `MEMBERSHIP_SUSPENDED`, `MEMBERSHIP_RESTORED`, `MEMBERSHIP_REMOVED`
 - Applications: `APPLICATION_SUBMITTED`, `APPLICATION_RECEIVED`, `APPLICATION_STAGE_CHANGED`
 - Verification: `VERIFICATION_RECEIVED`, `VERIFICATION_CHANGES_REQUESTED`, `VERIFICATION_APPROVED`, `VERIFICATION_REJECTED`, `VERIFICATION_CANCELLED`, `VERIFICATION_DELAYED`, `VERIFICATION_EXPIRED`
 - Support: `SUPPORT_WAITING_FOR_USER`, `SUPPORT_RESOLVED`
 - Connections: `CONNECTION_PROPOSAL_CREATED`, `CONNECTION_PROPOSAL_UPDATED`, `CONNECTION_PROPOSAL_INACTIVE`, `CONNECTION_ACCEPTED`, `CONNECTION_REVOKED`
-- Messaging/moderation: `MESSAGE_RECEIVED`, `MESSAGE_REPORT_RECEIVED`, `MESSAGE_REPORT_RESOLVED`, `MESSAGE_REPORT_DISMISSED`
+- Messaging/moderation: `MESSAGE_RECEIVED`, `MESSAGE_REPORT_RECEIVED`, `MESSAGE_REPORT_RESOLVED`, `MESSAGE_REPORT_DISMISSED`, `MODERATION_REPORT_RECEIVED`, `MODERATION_REPORT_RESOLVED`, `MODERATION_REPORT_DISMISSED`
 
 ## New Entity: InAppNotification
 
@@ -60,9 +61,11 @@ The database enum is exhaustive for Feature 016 and mirrors the server event-pol
 | `contextId` | String? | Optional opaque aggregate identifier, maximum 128 characters |
 | `deduplicationKey` | String | Unique server-derived identity, maximum 255 characters |
 | `correlationId` | String | Sanitized event correlation identity, maximum 128 characters |
+| `occurrenceCount` | Integer | Starts at 1; incremented only by policy-approved grouped events such as one unread conversation burst |
 | `readAt` | DateTime? | Null means unread; set once through idempotent read mutation |
 | `expiresAt` | DateTime | Exactly 90 days after creation for Feature 016 |
 | `createdAt` | DateTime | Event-visible creation time |
+| `lastOccurredAt` | DateTime | Latest event time for grouped display and stable newest-first ordering |
 | `updatedAt` | DateTime | Mutation timestamp |
 
 ### Relations
@@ -74,7 +77,7 @@ The database enum is exhaustive for Feature 016 and mirrors the server event-pol
 ### Constraints and Indexes
 
 - Unique `deduplicationKey` prevents duplicate recipient/event records.
-- Index `(recipientUserId, createdAt DESC, id DESC)` supports cursor listing.
+- Index `(recipientUserId, lastOccurredAt DESC, id DESC)` supports cursor listing and grouped-event reordering.
 - Index `(recipientUserId, readAt, expiresAt)` supports unread count and read-all.
 - Index `(recipientUserId, contextType, contextId, readAt)` supports context clearing.
 - Index `(expiresAt, id)` supports bounded cleanup.
@@ -92,7 +95,7 @@ Feature 016 does not add a broad master switch. Mandatory critical/high notifica
 
 ### ProfessionalConnectionNotification
 
-No schema removal. Existing unexpired records are copied to `InAppNotification` using `connection-legacy:<deduplicationKey>`, preserving `createdAt`, `readAt`, and `deleteAfter` capped to the 90-day policy. New producers stop writing this table after migration.
+No schema removal. Existing unexpired records are copied to `InAppNotification` using the existing `deduplicationKey` unchanged, preserving `createdAt`, `readAt`, and `deleteAfter` capped to the 90-day policy. New producers use the same key derivation and stop writing this table after migration, preventing a deployment overlap from creating a second visible record.
 
 ### RecruitmentNotificationWork
 
@@ -124,6 +127,7 @@ Expiration never deletes originating audit, email outbox, message, application, 
 - `href` must begin with one approved internal route prefix and must not contain credentials or token-like query parameters.
 - `contextType` and `contextId` must both be null or both be present.
 - `deduplicationKey` includes recipient identity and logical event identity.
+- Only policy kinds marked groupable may increment `occurrenceCount`, refresh `lastOccurredAt`, update their safe summary, and return an existing unread record; all other kinds remain insert-once.
 - Untrusted names and text are normalized, bounded, and rendered as text.
 - Client input never supplies notification kind, title, summary, recipient, severity, expiry, or deduplication identity.
 - Read endpoints accept only IDs/context references and always scope mutations to the authenticated user.
