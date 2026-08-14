@@ -81,7 +81,18 @@ export class PrismaNotificationRepository {
         },
       });
     }
-    if (existing.readAt) return this.db.inAppNotification.findUniqueOrThrow({ where: { id: existing.id } });
+    if (existing.readAt) {
+      return this.db.inAppNotification.update({
+        where: { id: existing.id },
+        data: {
+          readAt: null,
+          occurrenceCount: 1,
+          correlationId: input.correlationId,
+          lastOccurredAt: input.occurredAt,
+          expiresAt,
+        },
+      });
+    }
     return this.db.inAppNotification.update({
       where: { id: existing.id },
       data: {
@@ -154,6 +165,17 @@ export class PrismaNotificationRepository {
         expiresAt: { gt: now },
       },
       data: { readAt: now },
+    });
+  }
+
+  hasAvailable(recipientUserId: string, notificationId: string, now: Date) {
+    return this.db.inAppNotification.findFirst({
+      where: {
+        id: notificationId,
+        recipientUserId,
+        expiresAt: { gt: now },
+      },
+      select: { id: true },
     });
   }
 

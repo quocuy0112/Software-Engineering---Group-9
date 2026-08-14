@@ -22,6 +22,10 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/profile/security",
   useRouter: () => navigation,
 }));
+vi.mock(
+  "@/frontend/features/notifications/components/notification-center",
+  () => ({ NotificationCenter: () => <div data-testid="notification-center" /> }),
+);
 
 const emptyProfile = {
   revision: 0,

@@ -124,6 +124,16 @@ describe.skipIf(!databaseAvailable)(
             kind: "APPLICATION_STAGE_CHANGED",
           },
         }),
+      ).toBe(0);
+      expect(
+        await prisma.inAppNotification.count({
+          where: {
+            recipientUserId: fixture.userIds[0]!,
+            kind: "APPLICATION_STAGE_CHANGED",
+            contextType: "APPLICATION",
+            contextId: applicationId,
+          },
+        }),
       ).toBe(1);
       expect(
         await prisma.emailOutbox.count({

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AppProviders } from "@/frontend/providers/app-providers";
 import { useCsrfProof } from "@/frontend/features/authentication/client/csrf-proof-context";
@@ -42,10 +43,22 @@ function NotificationInboxContent({
   locale: "vi" | "en";
 }) {
   const [state, setState] = useState<"all" | "unread" | "read">("all");
+  const router = useRouter();
   const copy = notificationCopy[locale];
   const pages = useNotificationPages({ enabled: true, limit: 20, state });
   const { markRead, markAllRead } = useNotificationMutations(auth);
   const items = pages.data?.pages.flatMap((page) => page.items) ?? [];
+
+  async function openItem(item: (typeof items)[number]) {
+    try {
+      if (!item.readAt) {
+        await markRead.mutateAsync({ notificationId: item.id });
+      }
+      if (item.href) router.push(item.href);
+    } catch {
+      toast.error(copy.error);
+    }
+  }
 
   return (
     <section className="notification-inbox" aria-labelledby="notification-inbox-title">
@@ -88,7 +101,11 @@ function NotificationInboxContent({
         <ul className="notification-inbox__list">
           {items.map((item) => (
             <li key={item.id} data-read={Boolean(item.readAt)} data-severity={item.severity}>
-              <div>
+              <button
+                type="button"
+                className="notification-inbox__open"
+                onClick={() => void openItem(item)}
+              >
                 <span className="notification-item__meta">
                   <span>{copy.severities[item.severity]}</span>
                   <span>{item.readAt ? copy.read : copy.unread}</span>
@@ -96,10 +113,11 @@ function NotificationInboxContent({
                 <h2>{item.title}</h2>
                 <p>{item.summary}</p>
                 <time dateTime={item.lastOccurredAt}>{notificationTime(item.lastOccurredAt, locale)}</time>
-              </div>
+              </button>
               {!item.readAt ? (
                 <button
                   type="button"
+                  className="notification-inbox__mark-read"
                   onClick={() =>
                     markRead
                       .mutateAsync({ notificationId: item.id })

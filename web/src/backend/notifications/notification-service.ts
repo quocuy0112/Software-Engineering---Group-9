@@ -12,6 +12,7 @@ import type {
   NotificationContextType,
   NotificationItem,
 } from "@/shared/contracts/notifications";
+import { emitNotificationOperation } from "@/backend/notifications/notification-operations";
 
 type NotificationDb = PrismaClient | Prisma.TransactionClient;
 
@@ -42,15 +43,38 @@ export async function createInAppNotification(
   db: NotificationDb,
   input: NotificationEventInput,
 ) {
-  const preferences = await db.accountPreferences.findUnique({
-    where: { userId: input.recipientUserId },
-    select: { language: true },
-  });
-  const built = buildNotification(input, preferences?.language ?? "VI");
-  return new PrismaNotificationRepository(db).create({
-    ...built,
-    recipientUserId: input.recipientUserId,
-  });
+  const startedAt = performance.now();
+  try {
+    const preferences = await db.accountPreferences.findUnique({
+      where: { userId: input.recipientUserId },
+      select: { language: true },
+    });
+    const built = buildNotification(input, preferences?.language ?? "VI");
+    const result = await new PrismaNotificationRepository(db).create({
+      ...built,
+      recipientUserId: input.recipientUserId,
+    });
+    emitNotificationOperation({
+      operation: "create",
+      outcome: "success",
+      correlationId: input.correlationId,
+      durationMs: performance.now() - startedAt,
+      affectedCount: 1,
+    });
+    return result;
+  } catch (error) {
+    emitNotificationOperation({
+      operation: "create",
+      outcome: "failure",
+      correlationId: input.correlationId,
+      durationMs: performance.now() - startedAt,
+      errorCode:
+        error instanceof NotificationError
+          ? error.code
+          : "NOTIFICATION_OPERATION_FAILED",
+    });
+    throw error;
+  }
 }
 
 export class NotificationService {
@@ -99,8 +123,16 @@ export class NotificationService {
       notificationId,
       observedAt,
     );
-    if (changed.count === 0)
+    if (
+      changed.count === 0 &&
+      !(await this.repository.hasAvailable(
+        recipientUserId,
+        notificationId,
+        observedAt,
+      ))
+    ) {
       throw new NotificationError("NOTIFICATION_UNAVAILABLE", 404);
+    }
     return this.readResult(recipientUserId, changed.count, observedAt);
   }
 
@@ -119,6 +151,41 @@ export class NotificationService {
     contextId: string,
   ) {
     const observedAt = this.now();
+    if (contextType === "CONVERSATION") {
+      const changedCount = await prisma.$transaction(async (tx) => {
+        const conversation = await tx.messagingConversation.findFirst({
+          where: {
+            id: contextId,
+            participants: { some: { userId: recipientUserId } },
+          },
+          select: { lastMessageSequence: true },
+        });
+        if (conversation) {
+          const lastMessageSequence = conversation.lastMessageSequence ?? 0;
+          await tx.messagingConversationParticipant.updateMany({
+            where: {
+              conversationId: contextId,
+              userId: recipientUserId,
+              lastReadSequence: { lt: lastMessageSequence },
+            },
+            data: {
+              lastReadSequence: lastMessageSequence,
+              lastReadAt: observedAt,
+            },
+          });
+        }
+        const changed = await new PrismaNotificationRepository(
+          tx,
+        ).markContextRead(
+          recipientUserId,
+          contextType,
+          contextId,
+          observedAt,
+        );
+        return changed.count;
+      });
+      return this.readResult(recipientUserId, changedCount, observedAt);
+    }
     const changed = await this.repository.markContextRead(
       recipientUserId,
       contextType,

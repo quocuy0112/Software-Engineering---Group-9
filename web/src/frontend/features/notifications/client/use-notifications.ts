@@ -12,6 +12,8 @@ import {
   notificationUnreadCountSchema,
   type NotificationContextType,
 } from "@/shared/contracts/notifications";
+import { useEffect } from "react";
+import { NOTIFICATION_CHANGED_EVENT } from "./use-notification-context-read";
 
 const visibleInterval = () =>
   typeof document === "undefined" || document.visibilityState === "visible"
@@ -35,6 +37,16 @@ export type NotificationMutationAuth = {
 const tokenFor = (auth: NotificationMutationAuth) =>
   auth.getCsrfProof?.() ?? auth.csrfProof ?? "";
 
+function useNotificationRefreshEvents() {
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    const refresh = () =>
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    window.addEventListener(NOTIFICATION_CHANGED_EVENT, refresh);
+    return () => window.removeEventListener(NOTIFICATION_CHANGED_EVENT, refresh);
+  }, [queryClient]);
+}
+
 type MutationInput = {
   notificationId?: string;
   contextType?: NotificationContextType;
@@ -56,6 +68,7 @@ function useNotificationMutation(
 }
 
 export function useNotificationUnreadCount() {
+  useNotificationRefreshEvents();
   return useQuery({
     queryKey: ["notifications", "unread-count"],
     queryFn: async () =>
@@ -76,6 +89,7 @@ export function useNotificationPages(input: {
   limit?: number;
   state?: "all" | "unread" | "read";
 }) {
+  useNotificationRefreshEvents();
   return useInfiniteQuery({
     queryKey: ["notifications", "pages", input.limit ?? 20, input.state ?? "all"],
     enabled: input.enabled,

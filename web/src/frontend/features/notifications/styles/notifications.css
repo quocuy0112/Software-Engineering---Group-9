@@ -246,10 +246,16 @@
   background: var(--sh-color-surface-card, #fff);
 }
 
-.notification-inbox__list li > div {
+.notification-inbox__open {
   display: grid;
   flex: 1;
   gap: 7px;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  text-align: left;
+  background: transparent;
+  cursor: pointer;
 }
 
 .notification-inbox__list h2 {
@@ -260,7 +266,7 @@
   color: var(--sh-color-text-muted, #667085);
 }
 
-.notification-inbox__list li > button {
+.notification-inbox__mark-read {
   flex: 0 0 auto;
   min-height: 40px;
   padding: 8px 12px;
