@@ -2,6 +2,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 import { requireSession } from "@/backend/auth/session/require-session";
 import type { EmployerVerificationPreparationRepository } from "./employer-verification-preparation-repository";
+import { registryLookupConfirmsBusiness } from "@/shared/contracts/employer-verification/business-verification-responses";
 import { PrismaEmployerVerificationPreparationRepository } from "@/backend/repositories/admin/prisma-employer-verification-preparation-repository";
 import { PrismaRateLimitRepository } from "@/backend/repositories/rate-limit/prisma-rate-limit-repository";
 import { ProtectedOutboxRecipient } from "@/backend/security/protected-recipient/protected-outbox-recipient";
@@ -23,7 +24,8 @@ import {
 const rateLimits = new PrismaRateLimitRepository();
 const tokens = new TokenProtector();
 const recipients = new ProtectedOutboxRecipient();
-const preparationRepository = new PrismaEmployerVerificationPreparationRepository();
+const preparationRepository =
+  new PrismaEmployerVerificationPreparationRepository();
 
 async function activeCandidate(
   request: Request,
@@ -32,7 +34,8 @@ async function activeCandidate(
 ) {
   const session = await requireSession(request.headers, now);
   if (!session) throw new Error("UNAUTHORIZED");
-  if (!(await repository.isActiveUser(session.userId))) throw new Error("UNAUTHORIZED");
+  if (!(await repository.isActiveUser(session.userId)))
+    throw new Error("UNAUTHORIZED");
   return session.userId;
 }
 
@@ -42,8 +45,7 @@ function canonicalDigest(value: unknown) {
 
 export class EmployerVerificationPreparationService {
   constructor(
-    private readonly repository: EmployerVerificationPreparationRepository =
-      preparationRepository,
+    private readonly repository: EmployerVerificationPreparationRepository = preparationRepository,
   ) {}
 
   async get(request: Request) {
@@ -84,9 +86,7 @@ export class EmployerVerificationPreparationService {
     const expiresAt = new Date(
       now.getTime() + businessVerificationConfig.lookupLifetimeMs,
     );
-    const deleteAfter = new Date(
-      expiresAt.getTime() + 2 * 24 * 60 * 60_000,
-    );
+    const deleteAfter = new Date(expiresAt.getTime() + 2 * 24 * 60 * 60_000);
     await this.repository.replaceLookup({
       userId,
       taxIdentifier: input.taxIdentifier,
@@ -109,6 +109,18 @@ export class EmployerVerificationPreparationService {
     const now = new Date();
     const userId = await activeCandidate(request, now, this.repository);
     const input = preparationPatchSchema.parse(raw);
+    const preparation = await this.repository.findPreparationForChallenge({
+      userId,
+      version: input.version,
+      now,
+    });
+    if (
+      preparation?.id !== input.preparationId ||
+      !preparation.lookupSnapshot ||
+      !registryLookupConfirmsBusiness(preparation.lookupSnapshot.outcome)
+    ) {
+      throw new Error("LOOKUP_REQUIRED");
+    }
     const changed = await this.repository.updateDraft({
       userId,
       preparationId: input.preparationId,
@@ -132,7 +144,11 @@ export class EmployerVerificationPreparationService {
       version: input.preparationVersion,
       now,
     });
-    if (!preparation?.lookupSnapshot || preparation.lookupSnapshot.expiresAt <= now) {
+    if (
+      !preparation?.lookupSnapshot ||
+      preparation.lookupSnapshot.expiresAt <= now ||
+      !registryLookupConfirmsBusiness(preparation.lookupSnapshot.outcome)
+    ) {
       throw new Error("LOOKUP_REQUIRED");
     }
     await this.admit("company-email-account", userId, 5, 60 * 60, now);
@@ -205,6 +221,19 @@ export class EmployerVerificationPreparationService {
     };
   }
 
+  async reset(request: Request) {
+    const now = new Date();
+    const userId = await activeCandidate(request, now, this.repository);
+    await this.repository.invalidateCurrentPreparation({
+      userId,
+      now,
+      sensitiveDeleteAfter: new Date(
+        now.getTime() + businessVerificationConfig.sensitiveScrubDelayMs,
+      ),
+    });
+    return this.project(userId, now);
+  }
+
   private async admit(
     scope: string,
     subject: string,
@@ -230,7 +259,10 @@ export class EmployerVerificationPreparationService {
     userId: string,
     now: Date,
   ): Promise<EmployerVerificationPreparationResponse> {
-    const preparation = await this.repository.findCurrentPreparation(userId, now);
+    const preparation = await this.repository.findCurrentPreparation(
+      userId,
+      now,
+    );
     if (!preparation) {
       return {
         data: {
@@ -261,14 +293,15 @@ export class EmployerVerificationPreparationService {
               sourceLabel:
                 snapshot.providerKey === "vietqr-v2"
                   ? "VietQR"
-                  : "Manual fallback",
+                  : "Registry unavailable",
               checkedAt: snapshot.checkedAt.toISOString(),
               expiresAt: snapshot.expiresAt.toISOString(),
               facts: {
                 legalName: snapshot.registryLegalName,
                 registeredAddress: snapshot.registryRegisteredAddress,
                 establishmentDate:
-                  snapshot.registryEstablishedAt?.toISOString().slice(0, 10) ?? null,
+                  snapshot.registryEstablishedAt?.toISOString().slice(0, 10) ??
+                  null,
                 legalStatus: snapshot.registryLegalStatus,
                 entityType: snapshot.registryEntityType,
               },

@@ -43,6 +43,20 @@ paths:
         '400': { $ref: '#/components/responses/ValidationFailed' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '409': { $ref: '#/components/responses/StaleConflict' }
+    delete:
+      operationId: resetEmployerVerificationPreparation
+      summary: Invalidate all current tax-bound preparation progress before changing identifier
+      responses:
+        '200':
+          description: Empty preparation after current draft, snapshot, and challenge invalidation
+          headers:
+            Cache-Control:
+              schema: { type: string, const: 'private, no-store' }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreparationResponse'
+        '401': { $ref: '#/components/responses/Unauthorized' }
   /api/employer-verifications/registry-lookups:
     post:
       operationId: lookupEmployerBusinessRegistry
@@ -61,7 +75,7 @@ paths:
                   pattern: '^[0-9]{10}$'
       responses:
         '200':
-          description: Matched, partial, not-found, or manual-fallback snapshot
+          description: Snapshot whose matched/partial outcome alone may unlock later steps
           headers:
             Cache-Control:
               schema: { type: string, const: 'private, no-store' }
@@ -259,7 +273,7 @@ components:
         snapshotId: { type: string }
         taxIdentifier: { type: string, pattern: '^[0-9]{10}$' }
         outcome: { $ref: '#/components/schemas/RegistryOutcome' }
-        sourceLabel: { type: string, enum: [VietQR, 'Manual fallback'] }
+        sourceLabel: { type: string, enum: [VietQR, 'Registry unavailable'] }
         checkedAt: { type: string, format: date-time }
         expiresAt: { type: string, format: date-time }
         facts: { $ref: '#/components/schemas/RegistryFacts' }

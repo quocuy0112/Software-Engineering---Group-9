@@ -48,17 +48,17 @@
 
 ## Phase 3: User Story 1 - Confirm Registered Business Facts (Priority: P1)
 
-**Goal**: A Candidate can enter a valid tax identifier first, receive bounded source facts or deterministic manual fallback, and recover normalized draft progress.
+**Goal**: A Candidate can enter a valid tax identifier first, continue only after an exact registry record is confirmed, and reset all bound progress before changing that identifier.
 
-**Independent Test**: Exercise matched, partial, not-found, timeout, 429, malformed, oversized, disabled, invalid-tax-ID, changed-tax-ID, and refresh cases; verify source facts are immutable/non-decisive and manual entry always remains available.
+**Independent Test**: Exercise matched, partial, not-found, timeout, 429, malformed, oversized, disabled, invalid-tax-ID, changed-tax-ID, reset, refresh, and direct-command bypass cases; verify only matched/partial exact records unlock later steps and source facts remain non-decisive for recruiter approval.
 
 ### Tests for User Story 1
 
 - [X] T015 [P] [US1] Add tax, plain-text, website, phone, multipart boolean, and mismatch normalizer tests in `web/tests/shared/unit/employer-verification/business-verification-normalization.test.ts`
 - [X] T016 [P] [US1] Add gateway mapping, response-cap, and allowlist tests in `web/tests/backend/unit/employer-verification/vietqr-business-registry-adapter.test.ts`
 - [X] T017 [P] [US1] Add lookup and preparation route contract tests in `web/tests/backend/contract/employer-verification/registry-lookup.contract.test.ts`
-- [X] T018 [P] [US1] Add lookup ownership, rate-limit, snapshot immutability, invalidation, and fallback integration tests in `web/tests/backend/integration/employer-verification/registry-lookup.test.ts`
-- [X] T019 [P] [US1] Add matched/manual/unavailable/refresh Candidate UI tests in `web/tests/frontend/components/employer-verification/business-registry-section.test.tsx`
+- [X] T018 [P] [US1] Add lookup ownership, rate-limit, snapshot immutability, failed-outcome blocking, and invalidation integration tests in `web/tests/backend/integration/employer-verification/registry-lookup.test.ts`
+- [X] T019 [P] [US1] Add matched/not-found/unavailable/reset/refresh Candidate UI tests in `web/tests/frontend/components/employer-verification/business-registry-section.test.tsx`
 
 ### Implementation for User Story 1
 
@@ -70,10 +70,10 @@
 - [X] T025 [US1] Add no-store GET/PATCH preparation Route Handler in `web/src/app/api/employer-verifications/preparation/route.ts`
 - [X] T026 [US1] Add no-store POST registry lookup Route Handler in `web/src/app/api/employer-verifications/registry-lookups/route.ts`
 - [X] T027 [US1] Add Candidate preparation API client and safe error translation in `web/src/frontend/features/employer-verification/employer-verification-page.tsx`
-- [X] T028 [US1] Build tax-first registry/manual-fallback UI section in `web/src/frontend/features/employer-verification/employer-verification-page.tsx`
+- [X] T028 [US1] Build tax-first registry UI with strict progression gate in `web/src/frontend/features/employer-verification/employer-verification-page.tsx`
 - [X] T029 [US1] Integrate restored preparation and normalized on-blur autosave in `web/src/frontend/features/employer-verification/employer-verification-page.tsx`
 
-**Checkpoint**: Registry lookup and manual fallback work independently; no request/evidence or automatic decision is created.
+**Checkpoint**: Exact registry confirmation unlocks preparation, all failed outcomes remain blocking, and no automatic recruiter decision is created.
 
 ---
 
@@ -141,13 +141,13 @@
 
 **Goal**: An authorized administrator can compare immutable source and applicant facts while all existing human decision gates remain unchanged.
 
-**Independent Test**: Open matched, partial, manual, unavailable, mismatch, free-email, domain-mismatch, legacy, stale-snapshot, and existing-company requests; verify bounded display and that approve/reject still re-evaluate Feature 006 prerequisites and evidence.
+**Independent Test**: Open matched, partial, legacy-unconfirmed, unavailable-source, mismatch, free-email, domain-mismatch, stale-snapshot, and existing-company requests; verify bounded display and that approve/reject still re-evaluate Feature 006 prerequisites and evidence.
 
 ### Tests for User Story 4
 
 - [X] T058 [P] [US4] Add enriched admin repository projection and privacy tests in `web/tests/backend/integration/admin-management/verification-enriched-detail.test.ts`
 - [X] T059 [P] [US4] Add enriched admin detail contract tests in `web/tests/backend/contract/admin-management/verification-enriched-detail.contract.test.ts`
-- [X] T060 [P] [US4] Add matched/manual/legacy comparison panel UI tests in `web/tests/frontend/components/admin-management/verification-enriched-detail.test.tsx`
+- [X] T060 [P] [US4] Add matched/legacy-unconfirmed comparison panel UI tests in `web/tests/frontend/components/admin-management/verification-enriched-detail.test.tsx`
 - [X] T061 [P] [US4] Add administrator detail accessibility tests in `web/tests/frontend/accessibility/admin-management/verification-enriched-detail.accessibility.test.tsx`
 - [X] T062 [P] [US4] Add approval regression tests proving all Feature 006 gates remain authoritative in `web/tests/backend/integration/admin-management/verification-enriched-approval.test.ts`
 
@@ -174,10 +174,12 @@
 - [X] T072 [P] Add lookup/challenge P95 measurement harness in `web/scripts/measure-business-verification-performance.mjs`
 - [X] T073 [P] Add representative performance assertions and metadata checks in `web/tests/performance/employer-verification/business-verification-performance.test.ts`
 - [X] T074 Synchronize implemented API/status details in `spec-kit/specs/006-admin-management/spec.md`, `spec-kit/specs/009-user-management-and-recruiter-verification/spec-group-2-business-verification-approval.md`, and `spec-kit/specs/014-business-verification-enrichment/quickstart.md`
-- [X] T075 Run migration verifier, Prisma validation/generation, focused Feature 014 tests, typecheck, lint, build, and manual disabled-provider quickstart from `spec-kit/specs/014-business-verification-enrichment/quickstart.md`
+- [X] T075 Run migration verifier, Prisma validation/generation, focused Feature 014 tests, typecheck, lint, build, and fail-closed disabled-provider quickstart from `spec-kit/specs/014-business-verification-enrichment/quickstart.md`
 - [X] T076 Review generated diffs for secrets, raw provider/token data, unrelated changes, and local-only commit status from repository root `.`
 - [X] T077 [US4] Add an administrator review checklist and current evidence metadata to the verification detail UI
 - [X] T078 [US4] Add sensitive-authorized full-document inline viewing while preserving protected preview and download behavior
+- [X] T079 [US1] Require matched/partial exact registry confirmation in draft, email, evidence, and final submission service gates
+- [X] T080 [US1] Lock confirmed tax identifiers and add transactional preparation reset before identifier changes
 
 ---
 
@@ -200,7 +202,7 @@ Foundational -> US1 -> US2 -> US3 -> US4 -> Polish
                   \-----------> US3
 ```
 
-- US1 independently demonstrates lookup/manual fallback without accepting authority.
+- US1 independently demonstrates exact-record progression blocking without accepting recruiter authority.
 - US2 independently demonstrates company-contact proof against a prepared lookup.
 - US3 joins the previous preparation capabilities into the authoritative Feature 006 request.
 - US4 consumes accepted immutable facts and never changes Candidate preparation.
@@ -271,7 +273,7 @@ T062 approval regression tests
 ### Technical Checkpoint First
 
 1. Complete Setup and Foundational.
-2. Complete US1 and verify lookup/manual fallback in isolation.
+2. Complete US1 and verify exact-record progression, failed-outcome blocking, and reset in isolation.
 3. Complete US2 and verify company-email binding in isolation.
 4. Complete US3 and verify authoritative atomic submission.
 5. Complete US4 and verify human-only administration.

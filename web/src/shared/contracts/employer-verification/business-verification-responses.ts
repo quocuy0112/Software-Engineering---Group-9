@@ -4,6 +4,10 @@ export type RegistryLookupOutcome =
   | "NOT_FOUND"
   | "UNAVAILABLE";
 
+export function registryLookupConfirmsBusiness(outcome: RegistryLookupOutcome) {
+  return outcome === "MATCHED" || outcome === "PARTIAL";
+}
+
 export type EmployerVerificationPreparationResponse = {
   data: {
     preparationId: string | null;
@@ -12,7 +16,7 @@ export type EmployerVerificationPreparationResponse = {
       snapshotId: string;
       taxIdentifier: string;
       outcome: RegistryLookupOutcome;
-      sourceLabel: "VietQR" | "Manual fallback";
+      sourceLabel: "VietQR" | "Registry unavailable";
       checkedAt: string;
       expiresAt: string;
       facts: {

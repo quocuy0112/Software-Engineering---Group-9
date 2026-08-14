@@ -14,6 +14,7 @@ import { S3PrivateBusinessEvidenceStorage } from "@/backend/storage/business-evi
 import { CompanyRelationshipPrerequisiteGateway } from "./company-relationship-prerequisite-gateway";
 import { buildVerificationOutbox } from "@/backend/admin/notifications/verification-outbox";
 import { businessVerificationConfig } from "./business-verification-config";
+import { registryLookupConfirmsBusiness } from "@/shared/contracts/employer-verification/business-verification-responses";
 import { companyEmailSignals } from "./company-email-verification";
 function storage() {
   return process.env.ADMIN_EVIDENCE_STORAGE_ADAPTER === "s3"
@@ -116,7 +117,8 @@ export class ApplicantVerificationService {
       preparation.lookupSnapshot.normalizedTaxIdentifier !==
         input.taxIdentifier ||
       preparation.lookupSnapshot.expiresAt <= now ||
-      preparation.lookupSnapshot.acceptedRequestId
+      preparation.lookupSnapshot.acceptedRequestId ||
+      !registryLookupConfirmsBusiness(preparation.lookupSnapshot.outcome)
     ) {
       throw new Error("LOOKUP_REQUIRED");
     }

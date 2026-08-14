@@ -18,12 +18,12 @@
 
 **Source**: [VietQR Tax ID Lookup API](https://vietqr.io/danh-sach-api/tax-id-lookup/), reviewed 2026-08-14.
 
-**Limitations**: VietQR is operated by CASSO rather than being SmartHire's authoritative government registry. Its current documented response does not include establishment date, legal status, entity type, or representative. Those fields remain null and visibly unavailable. No decision depends on provider availability or correctness.
+**Limitations**: VietQR is operated by CASSO rather than being SmartHire's authoritative government registry. Its current documented response does not include establishment date, legal status, entity type, or representative. Those fields remain null and visibly unavailable. Workflow progression depends on an exact returned identifier record, while final recruiter approval remains solely an administrator decision.
 
 **Alternatives considered**:
 - Scrape Vietnamese tax websites: rejected by the user's public-API-only requirement and operational/legal fragility.
 - Require a paid commercial registry: rejected because Feature 014 permits only public no-cost sources.
-- Remove lookup: rejected because a replaceable supporting lookup materially reduces applicant/admin retyping while manual fallback still protects availability.
+- Remove lookup: rejected because exact public-record confirmation is now a required completeness gate before collecting the remaining recruiter-verification facts.
 
 ## Decision 3: Keep lookup server-side and strictly bounded
 
@@ -45,15 +45,15 @@
 - Live lookup on every admin view: rejected because results may change and provider downtime would block review.
 - Copy only a match boolean: rejected because it cannot support transparent field comparison.
 
-## Decision 5: Provide deterministic manual fallback
+## Decision 5: Require confirmed registry existence before progression
 
-**Decision**: `NOT_FOUND`, `PARTIAL`, `UNAVAILABLE`, rate limit, timeout, malformed response, and disabled provider all allow manual legal name/address entry with a visible limitation.
+**Decision**: Only `MATCHED` or `PARTIAL` outcomes with an exact returned identifier unlock later steps. `NOT_FOUND`, `UNAVAILABLE`, rate limit, timeout, malformed response, identifier mismatch, and disabled provider remain blocking and retryable. A confirmed identifier is read-only until an explicit reset invalidates the current preparation, snapshot, and email challenge.
 
-**Rationale**: An external public service must not become an authorization dependency or prevent legitimate applications.
+**Rationale**: The product requirement treats existence of a VietQR business record as mandatory application completeness. Applying the same check to UI rendering, draft persistence, email challenge issuance, and final submission prevents client-side bypass while preserving human-only recruiter approval.
 
 **Alternatives considered**:
-- Block until provider recovers: rejected because availability and free-tier policies are outside SmartHire control.
-- Treat not-found as rejection: rejected because the provider is non-authoritative and human review is mandatory.
+- Manual continuation: rejected because any client could otherwise advance with an unconfirmed or fabricated tax identifier.
+- Treat not-found as final recruiter rejection: rejected because it blocks only preparation progression and does not create or decide a recruiter request.
 
 ## Decision 6: Persist recoverable preparation on the server
 

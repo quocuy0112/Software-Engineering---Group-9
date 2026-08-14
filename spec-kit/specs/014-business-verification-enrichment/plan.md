@@ -6,7 +6,7 @@
 
 ## Summary
 
-Feature 014 enriches the existing Feature 006 employer-verification workflow without replacing its lifecycle, evidence processing, administrator decision, or membership transaction. Candidates first look up a ten-digit Vietnamese enterprise tax identifier through a replaceable server-side gateway, verify control of a company email through the existing durable email outbox, provide normalized contact and relationship facts, explicitly consent, and submit the existing protected business-license evidence. VietQR is the initial public no-cost lookup adapter and supplies only legal name and registered address today; missing registry fields remain visibly unavailable and provider failure always falls back to manual entry. Accepted enriched facts are copied into an immutable request-owned record for administrator comparison.
+Feature 014 enriches the existing Feature 006 employer-verification workflow without replacing its lifecycle, evidence processing, administrator decision, or membership transaction. Candidates first confirm that a ten-digit Vietnamese enterprise tax identifier has an exact VietQR business record through a replaceable server-side gateway, verify control of a company email through the existing durable email outbox, provide normalized contact and relationship facts, explicitly consent, and submit the existing protected business-license evidence. VietQR is the initial public no-cost lookup adapter and supplies only legal name and registered address today; missing optional registry fields remain visibly unavailable, while not-found or unavailable lookup outcomes block later preparation steps. Accepted enriched facts are copied into an immutable request-owned record for administrator comparison.
 
 ## Technical Context
 
@@ -22,9 +22,9 @@ Feature 014 enriches the existing Feature 006 employer-verification workflow wit
 
 **Project Type**: Modular full-stack application in the existing `web/` workspace
 
-**Performance Goals**: Lookup feedback P95 within 3 seconds under normal provider conditions and fallback P95 within 6 seconds; preparation/email commands P95 within 2 seconds excluding delivery; page/navigation remain within constitution targets
+**Performance Goals**: Lookup feedback P95 within 3 seconds under normal provider conditions and unavailable-result feedback P95 within 6 seconds; preparation/email commands P95 within 2 seconds excluding delivery; page/navigation remain within constitution targets
 
-**Constraints**: Public no-cost provider only; no scraping or CAPTCHA bypass; ten-digit enterprise tax identifiers only; provider response is non-decisive; all accepted strings normalize before persistence; single-use 24-hour email proof; no phone OTP; exactly one active request and receipt; no secrets, raw provider bodies, or tokens in logs/browser persistence
+**Constraints**: Public no-cost provider only; no scraping or CAPTCHA bypass; ten-digit enterprise tax identifiers only; exact provider record required for preparation progression but never sufficient for recruiter approval; all accepted strings normalize before persistence; single-use 24-hour email proof; no phone OTP; exactly one active request and receipt; no secrets, raw provider bodies, or tokens in logs/browser persistence
 
 **Scale/Scope**: One Candidate preparation flow, four preparation/verification commands, enriched final submission, one additive migration, one provider adapter, one new email template, administrator detail enrichment, cleanup work, and focused tests
 
@@ -42,7 +42,7 @@ _GATE: Passed before research and re-checked after design._
 |---|---|---:|
 | I. Human-controlled recruitment | Registry, domain, phone, and website signals are labelled supporting evidence and cannot invoke decisions or membership changes. | PASS |
 | II. Security/privacy/tenant isolation | Active Candidate authorization is server-side; tokens are digested; sensitive preparation data is no-store and applicant-bound; admin facts require current authority. | PASS |
-| III. Deterministic core | Validation, normalization, mismatch rules, fallback, expiry, challenge consumption, and request uniqueness are deterministic and AI-free. | PASS |
+| III. Deterministic core | Validation, normalization, exact-record progression gates, reset invalidation, expiry, challenge consumption, and request uniqueness are deterministic and AI-free. | PASS |
 | IV. State/audit/integrity | PostgreSQL owns preparation and request state; final acceptance is transactional; immutable snapshots and idempotency prevent duplicate authority. | PASS |
 | V. Scope discipline | The feature extends the approved P0 verification workflow and excludes paid lookup, OTP, branch tax IDs, scoring, and automatic decisions. | PASS |
 | VI. Quality/accessibility | Measured P95 targets, field errors, focus recovery, live toast feedback, responsive sections, and accessibility tests are defined. | PASS |
@@ -54,7 +54,7 @@ _GATE: Passed before research and re-checked after design._
 
 ```text
 Candidate employer-verification page
-  |-- GET/PATCH /api/employer-verifications/preparation
+  |-- GET/PATCH/DELETE /api/employer-verifications/preparation
   |-- POST /api/employer-verifications/registry-lookups
   |-- POST /api/employer-verifications/company-email/challenges
   |-- POST /api/employer-verifications/company-email/confirm
@@ -86,15 +86,15 @@ Administrator verification detail
 
 `BusinessRegistryLookupGateway.lookup(normalizedTaxIdentifier, signal)` returns one of `MATCHED`, `NOT_FOUND`, `PARTIAL`, or `UNAVAILABLE` plus allowlisted bounded facts. The initial adapter calls `GET https://api.vietqr.io/v2/business/{taxCode}` with a four-second abort deadline and a 64 KiB response cap. It accepts only `data.id`, `data.name`, `data.internationalName`, `data.shortName`, and `data.address`; current VietQR documentation does not supply establishment date, status, entity type, or representative, so those values remain null.
 
-The adapter is enabled by `BUSINESS_REGISTRY_PROVIDER=vietqr`; `disabled` forces deterministic manual fallback. Network errors, timeout, HTTP 429/5xx, malformed JSON, oversized payload, identifier mismatch, or missing required matched fields map to safe unavailable/partial outcomes. The provider is never called from the browser and never becomes an authorization dependency.
+The adapter is enabled by `BUSINESS_REGISTRY_PROVIDER=vietqr`; `disabled` produces a deterministic blocking unavailable outcome. Network errors, timeout, HTTP 429/5xx, malformed JSON, oversized payload, or identifier mismatch map to safe unavailable/not-found outcomes; an exact returned identifier with missing optional facts maps to `PARTIAL` and still confirms record existence. The provider is never called from the browser. Provider confirmation gates preparation completeness but cannot decide recruiter authority or membership.
 
 Admission uses the existing PostgreSQL `RateLimitBucket`: 10 account lookups per 15 minutes and 30 identifier lookups per 15 minutes, plus 5 challenge sends per account/email binding per hour. Subject values are HMAC-digested before rate-limit persistence. Successful matched results may avoid another provider call for the same applicant and identifier for 15 minutes, while the immutable submission snapshot remains valid for 24 hours so the documented email-verification window is usable. Every returned preparation reference is an opaque server ID and responses are private/no-store.
 
 ## Preparation and Submission Flow
 
 1. `GET preparation` restores the applicant's current normalized server-side draft, current safe registry projection, and masked company-email status. No token, provider raw body, or administrator-only representative fact is returned.
-2. `POST registry-lookups` validates exactly ten ASCII digits, applies rate limits, calls or bypasses the configured gateway, creates an immutable 24-hour snapshot, replaces the current preparation binding, and supersedes prior email challenges.
-3. `PATCH preparation` accepts allowlisted partial draft fields, normalizes each provided value, recomputes deterministic mismatch/domain/free-email signals, and stores only normalized values. Tax identifier and verified-email state cannot be patched.
+2. `POST registry-lookups` validates exactly ten ASCII digits, applies rate limits, calls or bypasses the configured gateway, creates an immutable 24-hour snapshot, replaces the current preparation binding, and supersedes prior email challenges. Only exact-identifier `MATCHED` or `PARTIAL` outcomes unlock later steps.
+3. `PATCH preparation` accepts allowlisted partial draft fields only for a current confirmed snapshot, normalizes each provided value, recomputes deterministic mismatch/domain/free-email signals, and stores only normalized values. Tax identifier and verified-email state cannot be patched. `DELETE preparation` invalidates the current draft, unaccepted snapshots, and active challenges before unlocking tax-identifier editing.
 4. `POST company-email/challenges` normalizes the email, binds a random 256-bit token digest to applicant + current snapshot + tax identifier + email, supersedes earlier active challenges, and transactionally queues one `COMPANY_EMAIL_VERIFY` outbox item. The email link targets the dedicated `/verify-company-email` landing page and places the raw token in the URL fragment so it is not sent in HTTP referrers or initial server requests.
 5. The public landing page removes the fragment with `history.replaceState`, keeps the token only in component memory, and posts it to `company-email/confirm`. The service atomically verifies the digest, applicant, current binding, status, and expiry. A signed-out browser receives no business details and can open sign-in in a separate tab before retrying without persisting the token.
 6. Final multipart submission revalidates every field, challenge age, snapshot expiry, current preparation version, evidence, company match, and prerequisite. `applicantLegalName` is the sole submitted legal-name input and is copied into the legacy `submittedCompanyName` request column for compatibility. It stores evidence through the existing adapter and then transactionally creates request facts, request, evidence metadata, one receipt, challenge consumption, and snapshot acceptance. Storage is deleted if the transaction fails.
@@ -116,7 +116,7 @@ Admission uses the existing PostgreSQL `RateLimitBucket`: 10 account lookups per
 2. Keep `RecruiterVerificationRequest.businessFacts` optional at the database layer so existing rows and rollback-safe deployments remain readable. Enforce required facts for new submissions in the service.
 3. Add a PostgreSQL partial unique index for one active request per `(applicantUserId, normalizedTaxIdentifier)` across non-terminal states. Existing duplicates are detected by a pre-deploy verification script; migration does not silently delete data.
 4. Add challenge uniqueness and indexes for current binding, token digest, expiry/scrubbing, preparation expiry, and accepted snapshot ownership.
-5. Deploy schema/server code before exposing the new Candidate form. The server may run with `BUSINESS_REGISTRY_PROVIDER=disabled` and still accept manual preparation.
+5. Deploy schema/server code before exposing the new Candidate form. Running with `BUSINESS_REGISTRY_PROVIDER=disabled` remains safe but intentionally blocks new enriched preparations until a supported provider is enabled.
 6. Rollback disables UI/routes/provider while retaining additive records. Recovery uses forward migrations; accepted facts and audit evidence are never destructively rolled back.
 
 ## Authorization, Privacy, and Audit
@@ -129,7 +129,7 @@ Admission uses the existing PostgreSQL `RateLimitBucket`: 10 account lookups per
 
 ## Candidate and Administrator UI
 
-The Candidate page becomes four responsive sections: registered business, company contact, applicant authority, and evidence/declarations. Tax lookup precedes the remaining sections. Registry values are labelled read-only source facts; fallback and limitations use text plus icons, never color alone. Inline errors use `aria-describedby`; failed validation focuses the first invalid control and emits one Sonner summary toast. Async actions have stable toast IDs, disabled duplicate controls, visible progress, and actionable retry copy.
+The Candidate page becomes four responsive sections: registered business, company contact, applicant authority, and evidence/declarations. Exact registry confirmation precedes and gates the remaining sections. A confirmed tax identifier is read-only until an explicit reset invalidates all bound progress. Registry values are labelled read-only source facts; blocking limitations use text plus icons, never color alone. Inline errors use `aria-describedby`; failed validation focuses the first invalid control and emits one Sonner summary toast. Async actions have stable toast IDs, disabled duplicate controls, visible progress, and actionable retry copy.
 
 The administrator detail adds a bounded comparison panel and non-color checklist showing source/outcome/age, registry versus applicant values, explicit differences, email verification/domain signals, unverified phone, website, relationship/title/explanations, and consent version/time. Current qualified business-license evidence also shows bounded metadata and safety states and supports a normalized preview plus authenticated full-document inline viewing or download. No signal changes the existing approve/reject controls or server decision gates.
 
@@ -173,7 +173,7 @@ web/
 - Contract tests validate Zod/OpenAPI parity, candidate-origin/auth checks, no-store headers, fragment-token confirmation contract, field errors, and bounded projections.
 - Integration tests prove lookup/challenge ownership, resend supersession, expiry/replay/wrong-account denial, autosave recovery, final atomicity, evidence cleanup, request uniqueness, receipt uniqueness, legacy request compatibility, and cleanup deadlines.
 - Provider tests use deterministic mocked HTTP responses only; CI never depends on VietQR availability. One optional manual smoke check is documented separately.
-- Frontend tests cover matched/manual/unavailable flows, invalid fields, focus and toast behavior, narrow screens, refresh recovery, token-fragment removal, duplicate actions, and administrator comparison rendering.
+- Frontend tests cover matched/partial progression, not-found/unavailable blocking, confirmed-identifier locking and reset, invalid fields, focus and toast behavior, narrow screens, refresh recovery, token-fragment removal, duplicate actions, and administrator comparison rendering.
 - Security/architecture tests prove no raw provider body/token/storage locator in logs, URLs, browser persistence, applicant responses, notifications, or audit context and prevent direct provider imports outside the adapter composition root.
 - Performance scripts document environment, dataset, sample size, warm-up, concurrency, P50/P95/P99/max, external condition, and error rate for 200 lookup and challenge measurements.
 
