@@ -334,6 +334,28 @@ function replaceRawJob(rawJobs: unknown[], updated: JobCatalogItem) {
   return next;
 }
 
+function replaceOrAppendRawCompany(
+  rawCompanies: unknown[],
+  updated: CompanyCatalogItem,
+) {
+  let replaced = false;
+  const next = rawCompanies.map((value) => {
+    if (
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      (value as Record<string, unknown>).id === updated.id
+    ) {
+      replaced = true;
+      return updated;
+    }
+    return value;
+  });
+
+  if (!replaced) next.push(updated);
+  return next;
+}
+
 async function readApplications(): Promise<JobApplicationRecord[]> {
   try {
     const value = await readJson(applicationsPath);
@@ -597,17 +619,7 @@ export async function updateRecruiterCompanySettings(
     });
     await writeJson(
       companiesPath,
-      rawCompanies.map((value) => {
-        if (
-          value &&
-          typeof value === "object" &&
-          !Array.isArray(value) &&
-          (value as Record<string, unknown>).id === updated.id
-        ) {
-          return updated;
-        }
-        return value;
-      }),
+      replaceOrAppendRawCompany(rawCompanies, updated),
     );
     if (company.databaseBacked && company.databaseId) {
       await prisma.company.update({
