@@ -7,6 +7,7 @@ import {
 import { AuditWriter } from "@/backend/admin/audit/audit-writer";
 import { normalizeAdminPlainText } from "@/shared/contracts/admin/common";
 import { PrismaModerationRepository } from "@/backend/repositories/admin/prisma-moderation-repository";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
 type Command = {
   expectedVersion: number;
   idempotencyKey: string;
@@ -116,6 +117,20 @@ export class ModerationReviewService {
             occurredAt: now,
           },
         });
+        if (action === "resolve" || action === "dismiss") {
+          await createInAppNotification(tx, {
+            recipientUserId: row.reporterUserId,
+            kind:
+              action === "resolve"
+                ? "MODERATION_REPORT_RESOLVED"
+                : "MODERATION_REPORT_DISMISSED",
+            deduplicationKey: `moderation-report:${row.id}:${state.toLowerCase()}:v${version}`,
+            correlationId,
+            occurredAt: now,
+            contextType: "MODERATION_REPORT",
+            contextId: row.id,
+          });
+        }
         await new AuditWriter(tx).append({
           occurredAt: now,
           actorType: "user",

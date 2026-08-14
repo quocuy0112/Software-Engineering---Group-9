@@ -56,8 +56,8 @@ describe("in-app notification event policy", () => {
       },
       "EN",
     );
-    expect(vi.summary).toContain("2 tin nhắn");
-    expect(en.summary).toContain("2 unread messages");
+    expect(vi.summary).toContain("tin nhắn chưa đọc");
+    expect(en.summary).toContain("unread messages");
     expect(en.href).toBe("/messages?conversation=conversation%201");
     expect(en.groupable).toBe(true);
   });

@@ -6,6 +6,7 @@ import {
   moderationSubmissionSchema,
   moderationPriority,
 } from "@/shared/contracts/admin/moderation";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
 const acknowledgement = "Thanks. Your concern was received for review.";
 type Actor = { userId: string; sessionId: string };
 function unavailable() {
@@ -116,6 +117,15 @@ export class ModerationSubmissionService {
             },
           });
         }
+        await createInAppNotification(tx, {
+          recipientUserId: actor.userId,
+          kind: "MODERATION_REPORT_RECEIVED",
+          deduplicationKey: `moderation-report:${created.id}:received`,
+          correlationId: created.id,
+          occurredAt: now,
+          contextType: "MODERATION_REPORT",
+          contextId: created.id,
+        });
         return created;
       });
       return {

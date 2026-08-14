@@ -8,6 +8,7 @@ import {
   securityNotificationIdempotencyKey,
   type AdminSecurityEventKind,
 } from "@/backend/admin/notifications/notification-events";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
 export async function recordMembershipCommand(
   tx: Prisma.TransactionClient,
   input: {
@@ -68,29 +69,23 @@ export async function recordMembershipCommand(
       occurredAt: input.occurredAt,
     },
   });
+  const eventKind: Extract<
+    AdminSecurityEventKind,
+    "MEMBERSHIP_SUSPENDED" | "MEMBERSHIP_RESTORED" | "MEMBERSHIP_REMOVED"
+  > =
+    input.action === "admin.membership_suspended"
+      ? "MEMBERSHIP_SUSPENDED"
+      : input.action === "admin.membership_restored"
+        ? "MEMBERSHIP_RESTORED"
+        : "MEMBERSHIP_REMOVED";
+  const idempotencyKey = securityNotificationIdempotencyKey(
+    membershipBusinessEventKey(input.membershipId, eventKind, input.version),
+  );
   await new PrismaSecurityNotificationRepository(tx).enqueue({
-    idempotencyKey: securityNotificationIdempotencyKey(
-      membershipBusinessEventKey(
-        input.membershipId,
-        (input.action === "admin.membership_suspended"
-          ? "MEMBERSHIP_SUSPENDED"
-          : input.action === "admin.membership_restored"
-            ? "MEMBERSHIP_RESTORED"
-            : "MEMBERSHIP_REMOVED") satisfies Extract<
-          AdminSecurityEventKind,
-          "MEMBERSHIP_SUSPENDED" | "MEMBERSHIP_RESTORED" | "MEMBERSHIP_REMOVED"
-        >,
-        input.version,
-      ),
-    ),
+    idempotencyKey,
     originatingCorrelationId: input.correlationId,
     targetUserId: input.targetUserId,
-    kind:
-      input.action === "admin.membership_suspended"
-        ? "MEMBERSHIP_SUSPENDED"
-        : input.action === "admin.membership_restored"
-          ? "MEMBERSHIP_RESTORED"
-          : "MEMBERSHIP_REMOVED",
+    kind: eventKind,
     payloadRef: {
       companyDisplayName: input.companyDisplayName,
       resultingState: input.resultingState,
@@ -100,5 +95,18 @@ export async function recordMembershipCommand(
     attemptCount: 0,
     nextAttemptAt: input.occurredAt,
     deliveryDeadline: new Date(input.occurredAt.getTime() + 24 * 60 * 60_000),
+  });
+  await createInAppNotification(tx, {
+    recipientUserId: input.targetUserId,
+    kind: eventKind,
+    deduplicationKey: idempotencyKey,
+    correlationId: input.correlationId,
+    occurredAt: input.occurredAt,
+    contextType: "MEMBERSHIP",
+    contextId: input.membershipId,
+    variables: {
+      companyName: input.companyDisplayName,
+      state: input.resultingState,
+    },
   });
 }

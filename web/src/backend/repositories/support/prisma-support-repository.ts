@@ -13,6 +13,7 @@ import type {
   SupportInvalidation,
 } from "@/shared/contracts/support";
 import { SupportError } from "@/backend/support/support-errors";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
 
 type SupportDb = typeof prisma | Prisma.TransactionClient;
 type SupportState =
@@ -1030,6 +1031,18 @@ export class PrismaSupportRepository {
         payloadRef: { caseId, state, occurredAt: occurredAt.toISOString() },
         idempotencyKey: `support:${caseId}:${identity}`,
       },
+    });
+    await createInAppNotification(this.db, {
+      recipientUserId: requesterUserId,
+      kind:
+        state === "WAITING_FOR_USER"
+          ? "SUPPORT_WAITING_FOR_USER"
+          : "SUPPORT_RESOLVED",
+      deduplicationKey: `support:${caseId}:${identity}`,
+      correlationId: caseId,
+      occurredAt,
+      contextType: "SUPPORT_CASE",
+      contextId: caseId,
     });
   }
 

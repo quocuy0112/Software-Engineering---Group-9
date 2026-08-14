@@ -7,6 +7,7 @@ import {
   EmailAddressUnavailableError,
 } from "@/backend/repositories/account/email-address-claim-coordinator";
 import { ProtectedOutboxRecipient } from "@/backend/security/protected-recipient/protected-outbox-recipient";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
 
 export class EmailChangeIdempotencyConflictError extends Error {
   constructor() {
@@ -178,6 +179,15 @@ export class PrismaEmailChangeRepository {
           idempotencyKey: `email-change:${requestId}:old-address`,
           nextAttemptAt: input.now,
         },
+      });
+      await createInAppNotification(tx, {
+        recipientUserId: input.userId,
+        kind: "EMAIL_CHANGE_REQUESTED_ALERT",
+        deduplicationKey: `email-change:${requestId}:old-address`,
+        correlationId: input.correlationId,
+        occurredAt: input.now,
+        contextType: "ACCOUNT",
+        contextId: input.userId,
       });
       await tx.emailChangeRequest.update({
         where: { id: requestId },

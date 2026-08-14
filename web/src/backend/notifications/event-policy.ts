@@ -311,10 +311,10 @@ const policies = {
     severity: "MEDIUM",
     groupable: true,
     title: { vi: "Tin nhắn mới", en: "New message" },
-    summary: (locale, variables) =>
-      locale === "vi"
-        ? `Bạn có ${variables.count ?? 1} tin nhắn chưa đọc trong cuộc trò chuyện này.`
-        : `You have ${variables.count ?? 1} unread message${(variables.count ?? 1) === 1 ? "" : "s"} in this conversation.`,
+    summary: generic(
+      "Bạn có tin nhắn chưa đọc trong cuộc trò chuyện này.",
+      "You have unread messages in this conversation.",
+    ),
   },
   MESSAGE_REPORT_RECEIVED: {
     category: "MODERATION",
@@ -373,13 +373,17 @@ const policies = {
 } satisfies Record<NotificationKind, Policy>;
 
 const hrefForContext = (
+  kind: NotificationKind,
   contextType?: NotificationContextType,
   contextId?: string,
 ) => {
   if (!contextType || !contextId) return null;
   if (contextType === "ACCOUNT") return "/profile/security";
   if (contextType === "MEMBERSHIP") return "/recruiter";
-  if (contextType === "APPLICATION") return "/dashboard";
+  if (contextType === "APPLICATION")
+    return kind === "APPLICATION_RECEIVED"
+      ? "/recruiter"
+      : `/jobs/applied/${encodeURIComponent(contextId)}`;
   if (contextType === "VERIFICATION_REQUEST")
     return "/dashboard/employer-verification";
   if (contextType === "SUPPORT_CASE") return "/support";
@@ -435,7 +439,11 @@ export function buildNotification(
     severity: policy.severity,
     title,
     summary,
-    href: hrefForContext(contextType ?? undefined, contextId ?? undefined),
+    href: hrefForContext(
+      kind,
+      contextType ?? undefined,
+      contextId ?? undefined,
+    ),
     contextType,
     contextId,
     deduplicationKey: input.deduplicationKey,
