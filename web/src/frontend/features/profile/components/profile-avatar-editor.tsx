@@ -68,10 +68,12 @@ export function ProfileAvatarEditor({
   accountName,
   initialAvatar,
   csrfProof,
+  onAvatarChanged,
 }: {
   accountName: string;
   initialAvatar?: string | null;
   csrfProof: string;
+  onAvatarChanged?: (image: string | null) => void;
 }) {
   const locale = useWorkspaceLocale();
   const copy =
@@ -179,6 +181,7 @@ export function ProfileAvatarEditor({
         throw new Error(message);
       }
       setAvatar(parsed.data.image);
+      onAvatarChanged?.(parsed.data.image);
       setSource(null);
       if (inputRef.current) inputRef.current.value = "";
       setFeedbackTone("success");
@@ -213,6 +216,7 @@ export function ProfileAvatarEditor({
         throw new Error(copy.removeError);
       }
       setAvatar(null);
+      onAvatarChanged?.(null);
       setSource(null);
       if (inputRef.current) inputRef.current.value = "";
       setFeedbackTone("success");

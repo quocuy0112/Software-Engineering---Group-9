@@ -217,6 +217,7 @@
   background: var(--sh-color-surface-card);
   box-shadow: var(--sh-shadow-card);
   font: inherit;
+  font-family: var(--sh-font-family);
   font-size: var(--sh-font-size-body-sm);
   font-weight: var(--sh-font-weight-semibold);
   line-height: var(--sh-line-height-body-sm);

@@ -50,21 +50,14 @@
 
 @media (max-width: 479px) {
   .profile-navigation {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    overflow-x: visible;
+    gap: var(--sh-space-1);
+    overflow-x: auto;
+    scrollbar-width: thin;
   }
 
   .profile-navigation a {
-    min-width: 0;
     padding-inline: var(--sh-space-2);
-    line-height: var(--sh-line-height-body-sm);
-    text-align: center;
-    white-space: normal;
-  }
-
-  .profile-navigation a:last-child {
-    grid-column: 1 / -1;
+    white-space: nowrap;
   }
 }
 

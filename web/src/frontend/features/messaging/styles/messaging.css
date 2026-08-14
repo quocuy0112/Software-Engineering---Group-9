@@ -92,6 +92,7 @@
 .messaging-recent-heading h2 {
   margin: 0;
   color: var(--sh-color-text-primary);
+  font-family: var(--sh-font-family);
   font-size: var(--sh-font-size-body);
   font-weight: var(--sh-font-weight-bold);
   line-height: var(--sh-line-height-body);
@@ -488,6 +489,7 @@
 .messaging-conversation-name-row strong {
   min-width: 0;
   color: var(--sh-color-text-primary);
+  font-family: var(--sh-font-family);
   font-size: var(--sh-font-size-body-sm);
   line-height: var(--sh-line-height-body-sm);
 }
