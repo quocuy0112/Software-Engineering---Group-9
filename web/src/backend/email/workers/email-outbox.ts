@@ -204,7 +204,7 @@ export async function deliverClaimedOutbox(
       if (!payload.protectedToken) throw new Error("MISSING_PROTECTED_TOKEN");
       const token = protector.unseal(payload.protectedToken);
       const verificationUrl = new URL(
-        "/dashboard/employer-verification",
+        "/verify-company-email",
         serverEnvironment.NEXT_PUBLIC_APP_URL,
       );
       verificationUrl.hash = `company-email-token=${encodeURIComponent(token)}`;

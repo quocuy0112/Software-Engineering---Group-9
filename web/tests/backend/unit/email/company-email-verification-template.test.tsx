@@ -8,7 +8,7 @@ import {
 describe("company email verification template", () => {
   it("renders one fragment-only verification link without approval claims", () => {
     const url =
-      "http://localhost:3001/dashboard/employer-verification#company-email-token=opaque-token";
+      "http://localhost:3001/verify-company-email#company-email-token=opaque-token";
     const html = renderToStaticMarkup(
       <CompanyEmailVerificationTemplate verificationUrl={url} />,
     );

@@ -78,7 +78,7 @@
 
 ## Decision 8: Use fragment links and POST confirmation
 
-**Decision**: Email links use `/dashboard/employer-verification#company-email-token=<token>`. The client removes the fragment immediately and submits the token in a no-store POST body.
+**Decision**: Email links use `/verify-company-email#company-email-token=<token>`. The dedicated public client landing removes the fragment immediately, keeps the token only in component memory, and submits it in a no-store POST body. If authentication is absent, the landing offers sign-in in a separate tab and an in-memory retry so the fragment is not lost through a server redirect.
 
 **Rationale**: URL fragments are not sent in the initial HTTP request or referrer, reducing token exposure in server access logs and RSC requests. POST confirmation allows strict body redaction and same-account session checks.
 
