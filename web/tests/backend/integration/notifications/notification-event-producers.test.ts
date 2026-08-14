@@ -56,6 +56,20 @@ describe("notification event producer coverage", () => {
     }
   });
 
+  it("fans recruiter verification submissions out to active administrators", () => {
+    const submission = read(
+      "src/backend/admin/verification/applicant-verification-service.ts",
+    );
+    const outbox = read(
+      "src/backend/admin/notifications/verification-outbox.ts",
+    );
+    expect(submission).toContain(
+      "notifyActiveAdministratorsOfVerificationSubmission",
+    );
+    expect(outbox).toContain('language: "EN"');
+    expect(outbox).toContain('state: "ACTIVE"');
+  });
+
   it("keeps application, message, and report receipts in-app-only", () => {
     const message = read(
       "src/backend/repositories/messaging/prisma-messaging-message-repository.ts",

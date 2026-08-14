@@ -58,7 +58,10 @@ export async function createInAppNotification(
       where: { userId: input.recipientUserId },
       select: { language: true },
     });
-    const built = buildNotification(input, preferences?.language ?? "VI");
+    const built = buildNotification(
+      input,
+      input.language ?? preferences?.language ?? "VI",
+    );
     const result = await new PrismaNotificationRepository(db).create({
       ...built,
       recipientUserId: input.recipientUserId,

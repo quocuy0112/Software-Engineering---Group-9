@@ -3,6 +3,7 @@ import { prisma } from "@/backend/database/prisma";
 
 const fixture = vi.hoisted(() => ({
   userId: `enriched-submit-${crypto.randomUUID()}`,
+  adminId: `enriched-submit-admin-${crypto.randomUUID()}`,
   deleted: vi.fn(),
 }));
 
@@ -34,6 +35,7 @@ const taxIdentifier = `8${String(Date.now()).slice(-9)}`;
 const snapshotId = `snapshot-${fixture.userId}`;
 const preparationId = `preparation-${fixture.userId}`;
 const challengeId = `challenge-${fixture.userId}`;
+const adminGrantId = `grant-${fixture.adminId}`;
 const now = new Date();
 
 const raw = {
@@ -64,6 +66,17 @@ describe("enriched employer verification submission transaction", () => {
         normalizedEmail: `${fixture.userId}@example.test`,
         emailVerified: true,
         state: "ACTIVE",
+      },
+    });
+    await prisma.userAccount.create({
+      data: {
+        id: fixture.adminId,
+        name: "Verification Administrator",
+        email: `${fixture.adminId}@example.test`,
+        normalizedEmail: `${fixture.adminId}@example.test`,
+        emailVerified: true,
+        state: "ACTIVE",
+        platformAdministratorGrants: { create: { id: adminGrantId } },
       },
     });
     await prisma.businessRegistryLookupSnapshot.create({
@@ -106,11 +119,18 @@ describe("enriched employer verification submission transaction", () => {
   });
 
   afterAll(async () => {
+    await prisma.inAppNotification.deleteMany({
+      where: { recipientUserId: fixture.adminId },
+    });
     await prisma.emailOutbox.deleteMany({ where: { userId: fixture.userId } });
     await prisma.recruiterVerificationRequest.deleteMany({ where: { applicantUserId: fixture.userId } });
     await prisma.companyContactEmailChallenge.deleteMany({ where: { applicantUserId: fixture.userId } });
     await prisma.employerVerificationPreparation.deleteMany({ where: { applicantUserId: fixture.userId } });
     await prisma.businessRegistryLookupSnapshot.deleteMany({ where: { applicantUserId: fixture.userId } });
+    await prisma.platformAdministratorGrant.deleteMany({
+      where: { id: adminGrantId },
+    });
+    await prisma.userAccount.deleteMany({ where: { id: fixture.adminId } });
     await prisma.userAccount.deleteMany({ where: { id: fixture.userId } });
   });
 
@@ -175,5 +195,21 @@ describe("enriched employer verification submission transaction", () => {
     expect(request.evidence).toHaveLength(1);
     expect((await prisma.companyContactEmailChallenge.findUniqueOrThrow({ where: { id: challengeId } })).state).toBe("CONSUMED");
     expect(await prisma.emailOutbox.count({ where: { verificationRequestId: result.requestId } })).toBe(1);
+    await expect(
+      prisma.inAppNotification.findMany({
+        where: {
+          recipientUserId: fixture.adminId,
+          contextType: "VERIFICATION_REQUEST",
+          contextId: result.requestId,
+        },
+      }),
+    ).resolves.toMatchObject([
+      {
+        kind: "VERIFICATION_RECEIVED",
+        title: "Verification received",
+        summary:
+          "A new business verification request was submitted and is awaiting review.",
+      },
+    ]);
   });
 });

@@ -15,6 +15,7 @@ import { CompanyRelationshipPrerequisiteGateway } from "./company-relationship-p
 import {
   buildVerificationOutbox,
   createVerificationInAppNotification,
+  notifyActiveAdministratorsOfVerificationSubmission,
 } from "@/backend/admin/notifications/verification-outbox";
 import { businessVerificationConfig } from "./business-verification-config";
 import { registryLookupConfirmsBusiness } from "@/shared/contracts/employer-verification/business-verification-responses";
@@ -302,6 +303,12 @@ export class ApplicantVerificationService {
           },
           requestId,
         );
+        await notifyActiveAdministratorsOfVerificationSubmission(tx, {
+          requestId,
+          submissionVersion: 1,
+          occurredAt: now,
+          correlationId: requestId,
+        });
         return { requestId: row.id, state: row.state, version: row.version };
       });
     } catch (error) {
@@ -493,6 +500,12 @@ export class ApplicantVerificationService {
           },
           requestId,
         );
+        await notifyActiveAdministratorsOfVerificationSubmission(tx, {
+          requestId,
+          submissionVersion: version,
+          occurredAt: now,
+          correlationId: requestId,
+        });
         return { requestId, state: result.state, version: result.version };
       });
     } catch (error) {

@@ -7,6 +7,7 @@ import type { Prisma } from "@/backend/generated/prisma/client";
 import type { PrivateBusinessEvidenceStorage } from "@/backend/storage/business-evidence/private-business-evidence-storage";
 import { randomUUID } from "node:crypto";
 import { createVerificationNotificationEvent } from "@/backend/admin/notifications/verification-notification-event";
+import { notifyActiveAdministratorsOfVerificationSubmission } from "@/backend/admin/notifications/verification-outbox";
 
 async function makeEvidenceInaccessible(
   tx: Prisma.TransactionClient,
@@ -260,6 +261,39 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
     }
   }
   return { scanned: pending.length, changed };
+}
+
+/**
+ * Reconciles the Admin inbox for requests submitted before the notification
+ * fan-out was deployed, and for admins whose grant became active later.
+ * Notification creation is idempotent per request submission version.
+ */
+export async function runVerificationAdminNotificationCycle(
+  now = new Date(),
+  limit = 100,
+) {
+  const requests = await prisma.recruiterVerificationRequest.findMany({
+    where: {
+      state: { in: ["PENDING_CHECKS", "PENDING_REVIEW", "RESUBMITTED"] },
+      currentEvidenceId: { not: null },
+    },
+    select: { id: true, currentSubmissionVersion: true },
+    orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+    take: limit,
+  });
+  let processed = 0;
+  for (const request of requests) {
+    await prisma.$transaction((tx) =>
+      notifyActiveAdministratorsOfVerificationSubmission(tx, {
+        requestId: request.id,
+        submissionVersion: request.currentSubmissionVersion,
+        occurredAt: now,
+        correlationId: `admin-verification-reconcile:${request.id}:${request.currentSubmissionVersion}`,
+      }),
+    );
+    processed += 1;
+  }
+  return { scanned: requests.length, processed };
 }
 
 export async function runBusinessVerificationPreparationCleanupCycle(
