@@ -601,3 +601,9 @@ account-security notifications remain enabled.
   this feature.
 - Recruitment-related preference fields beyond the three specified
   notification categories are out of scope.
+
+## Feature 016 Notification Integration
+
+- Completed password, recovery, old-address email-change alert, account-state, session-revocation, and membership-state events also create a safe in-app notification in the authoritative transaction.
+- Verification links, reset links, company-email proofs, and other challenge-bearing emails remain email-only and never persist their token or proof in the inbox.
+- Existing email recipients, preferences, templates, retry behavior, and mandatory security-email rules are unchanged.

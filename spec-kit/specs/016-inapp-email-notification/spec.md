@@ -6,7 +6,7 @@
 
 **Created**: 2026-08-14
 
-**Status**: Draft
+**Status**: Implemented
 
 **Input**: Build a complete in-app notification center without changing existing email notification behavior. Every existing event-notification email must also be represented in-app, while in-app-only events do not have to send email. Action and proof emails remain private delivery mechanisms and are not copied into the notification center.
 

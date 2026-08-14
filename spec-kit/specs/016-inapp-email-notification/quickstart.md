@@ -12,7 +12,8 @@
 ```powershell
 npm run db:up
 npm run db:validate
-npm run db:generate
+npm run db:generate --workspace @smarthire/web
+npm run db:migrations:reconcile-names --
 npm run db:deploy
 npm run db:migrations:check
 npm run notifications:migrate:legacy --workspace @smarthire/web
@@ -68,6 +69,20 @@ Document environment, seeded row counts, warm-up, sample size, and P95 values. R
 - unread-count API: P95 at or below 500 milliseconds;
 - first 20-item page API: P95 at or below 500 milliseconds;
 - context read convergence across two polling clients: P95 at or below five seconds.
+
+## Validated Release Results
+
+Validated on 2026-08-14 against local PostgreSQL and the production Next.js build:
+
+- Prisma schema validation and generation passed.
+- Migration sequence passed with 33 migrations from `001_identity_foundation` through `033_email_outbox_retention_fk_cleanup`; deploy reported no pending migrations after application.
+- Idempotent legacy bridge rerun reported `migratedRows: 0` and `createdRecipients: 0` after the initial conversion.
+- Migration verifier reported zero duplicate keys, missing connection rows, pending recruitment work, unsafe rows, and invalid retention rows.
+- Notification performance used 5,000 retained rows, 5 warm-up samples, and 30 measured samples; list-page P95 was 17.11 ms and unread-count P95 was 7.74 ms against 500 ms targets.
+- Feature notification suite passed 19 files and 36 tests.
+- Affected job, messaging, connections, support, business-verification, admin-management, profile/account, and navigation-shell suites passed after Feature 016 integration fixes.
+- TypeScript, full ESLint, Prisma gates, focused security/privacy/accessibility tests, and the optimized production build passed.
+- The repository-wide parallel Vitest command was attempted and reached its 20-minute execution limit in unrelated pre-existing CV-import, image-search, architecture, salary-parser, and infrastructure tests; all failures attributable to Feature 016 were isolated, fixed, and rerun successfully.
 
 ## Email Non-Regression Check
 
