@@ -5,6 +5,40 @@ import {
   verificationRejectionCategorySchema,
   verificationStateSchema,
 } from "./common";
+export type VerificationBusinessFactsProjection = {
+  applicantLegalName: string;
+  applicantRegisteredAddress: string;
+  operatingAddress: string | null;
+  companyEmail: string;
+  companyEmailVerifiedAt: string;
+  companyEmailFreeProvider: boolean;
+  companyEmailWebsiteDomainMatch: boolean | null;
+  companyPhoneE164: string;
+  companyPhoneVerified: boolean;
+  websiteOrigin: string | null;
+  relationship: string;
+  currentJobTitle: string;
+  authorityExplanation: string | null;
+  legalNameDiffers: boolean;
+  registeredAddressDiffers: boolean;
+  mismatchExplanation: string | null;
+  accuracyDeclaredAt: string;
+  documentConsentAt: string;
+  policyVersion: string;
+  registry: {
+    outcome: string;
+    providerKey: string;
+    checkedAt: string;
+    expiresAt: string;
+    stale: boolean;
+    legalName: string | null;
+    registeredAddress: string | null;
+    establishedAt: string | null;
+    legalStatus: string | null;
+    entityType: string | null;
+    representativeName: string | null;
+  };
+};
 export const normalizedTaxIdentifierSchema = z
   .string()
   .transform((value) => value.trim())

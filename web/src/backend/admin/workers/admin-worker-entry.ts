@@ -2,6 +2,7 @@ import "server-only";
 import { AdminWorkerRuntime } from "./admin-worker-runtime";
 import { runDashboardSnapshotCycle } from "./dashboard-snapshot-loop";
 import {
+  runBusinessVerificationPreparationCleanupCycle,
   runEvidenceSafetyCycle,
   runVerificationDeadlineCycle,
 } from "./verification-lifecycle-loop";
@@ -20,6 +21,11 @@ export async function startAdminWorker(options: { probe?: boolean } = {}) {
       name: "verification-deadline",
       intervalMs: 60_000,
       run: runVerificationDeadlineCycle,
+    },
+    {
+      name: "business-verification-preparation-cleanup",
+      intervalMs: 60_000,
+      run: runBusinessVerificationPreparationCleanupCycle,
     },
     {
       name: "notification",

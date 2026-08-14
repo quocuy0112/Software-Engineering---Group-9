@@ -57,11 +57,17 @@ export class PrismaAdminCommandRepository {
         ) {
           throw new AdminCommandConflict("IDEMPOTENCY_CONFLICT");
         }
+        const result =
+          existing.resultPayload &&
+          typeof existing.resultPayload === "object" &&
+          !Array.isArray(existing.resultPayload)
+            ? existing.resultPayload
+            : { version: existing.resultingVersion ?? undefined };
         return {
-          version: existing.resultingVersion ?? undefined,
+          ...result,
           correlationId: existing.correlationId,
           replayed: true,
-        } as unknown as T & { correlationId: string; replayed: true };
+        } as T & { correlationId: string; replayed: true };
       }
       const correlationId = crypto.randomUUID();
       const result = await operation(tx, correlationId);
@@ -74,6 +80,7 @@ export class PrismaAdminCommandRepository {
           normalizedBodyDigest,
           resultCode: "SUCCESS",
           resultingVersion: result.version ?? null,
+          resultPayload: JSON.parse(JSON.stringify(result)) as Prisma.InputJsonValue,
           correlationId,
         },
       });

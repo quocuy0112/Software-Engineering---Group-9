@@ -8,6 +8,7 @@ export type JobSimilarityInput = {
   salaryMin?: number | null;
   salaryMax?: number | null;
   experienceMinYears?: number | null;
+  education?: string | null;
   industry?: string;
   companyId?: string;
   title?: string;

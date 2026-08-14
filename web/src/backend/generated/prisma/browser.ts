@@ -173,6 +173,26 @@ export type CompanyAccessPrerequisite = Prisma.CompanyAccessPrerequisiteModel
  */
 export type RecruiterVerificationRequest = Prisma.RecruiterVerificationRequestModel
 /**
+ * Model EmployerVerificationPreparation
+ * 
+ */
+export type EmployerVerificationPreparation = Prisma.EmployerVerificationPreparationModel
+/**
+ * Model BusinessRegistryLookupSnapshot
+ * 
+ */
+export type BusinessRegistryLookupSnapshot = Prisma.BusinessRegistryLookupSnapshotModel
+/**
+ * Model CompanyContactEmailChallenge
+ * 
+ */
+export type CompanyContactEmailChallenge = Prisma.CompanyContactEmailChallengeModel
+/**
+ * Model VerificationBusinessFacts
+ * 
+ */
+export type VerificationBusinessFacts = Prisma.VerificationBusinessFactsModel
+/**
  * Model BusinessLicenseEvidence
  * 
  */
@@ -342,6 +362,16 @@ export type UserMessagingBlock = Prisma.UserMessagingBlockModel
  * 
  */
 export type MessagingReport = Prisma.MessagingReportModel
+/**
+ * Model MessagingReportReviewEvent
+ * 
+ */
+export type MessagingReportReviewEvent = Prisma.MessagingReportReviewEventModel
+/**
+ * Model MessagingReportPrivateNote
+ * 
+ */
+export type MessagingReportPrivateNote = Prisma.MessagingReportPrivateNoteModel
 /**
  * Model ApplicationStageEvent
  * 

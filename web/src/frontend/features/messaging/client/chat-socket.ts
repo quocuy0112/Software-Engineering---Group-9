@@ -5,6 +5,7 @@ import type {
   ChatClientToServerEvents,
   ChatServerToClientEvents,
 } from "@/shared/contracts/messaging/socket-events";
+import { REALTIME_SOCKET_PATH } from "@/shared/contracts/realtime/socket-transport";
 
 export type ChatClientSocket = Socket<
   ChatServerToClientEvents,
@@ -18,7 +19,7 @@ export function getChatSocket(): ChatClientSocket {
     throw new Error("CHAT_SOCKET_BROWSER_ONLY");
   }
   singleton ??= io("/chat", {
-    path: "/chat",
+    path: REALTIME_SOCKET_PATH,
     autoConnect: false,
     transports: ["websocket"],
     withCredentials: true,

@@ -219,6 +219,7 @@ export const authenticationAuditEventSchema = z
       "company_membership",
       "recruiter_verification",
       "moderation_report",
+      "messaging_report",
       "privileged_action",
       "security_notification",
       "support_case",

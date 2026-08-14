@@ -7,6 +7,7 @@ import type {
   JobDetail,
   JobSearchResponse,
 } from "@/shared/contracts/jobs/discovery";
+import type { CareerPathSlug } from "@/shared/contracts/jobs/career-paths";
 
 export type CandidateActor = { userId: string; sessionId: string };
 export type JobActor =
@@ -26,6 +27,7 @@ export type NormalizedJobSearch = {
     "ENTRY" | "JUNIOR" | "MID" | "SENIOR" | "LEAD" | "MANAGER"
   >;
   workArrangement: Array<"ONSITE" | "HYBRID" | "REMOTE">;
+  careerPath?: CareerPathSlug;
   salaryMin?: number;
   salaryMax?: number;
   salaryCurrency: string;

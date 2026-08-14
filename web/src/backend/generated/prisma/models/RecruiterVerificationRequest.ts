@@ -40,6 +40,7 @@ export type RecruiterVerificationRequestSumAggregateOutputType = {
 
 export type RecruiterVerificationRequestMinAggregateOutputType = {
   id: string | null
+  submissionIdempotencyKey: string | null
   applicantUserId: string | null
   submittedCompanyName: string | null
   normalizedTaxIdentifier: string | null
@@ -66,6 +67,7 @@ export type RecruiterVerificationRequestMinAggregateOutputType = {
 
 export type RecruiterVerificationRequestMaxAggregateOutputType = {
   id: string | null
+  submissionIdempotencyKey: string | null
   applicantUserId: string | null
   submittedCompanyName: string | null
   normalizedTaxIdentifier: string | null
@@ -92,6 +94,7 @@ export type RecruiterVerificationRequestMaxAggregateOutputType = {
 
 export type RecruiterVerificationRequestCountAggregateOutputType = {
   id: number
+  submissionIdempotencyKey: number
   applicantUserId: number
   submittedCompanyName: number
   normalizedTaxIdentifier: number
@@ -132,6 +135,7 @@ export type RecruiterVerificationRequestSumAggregateInputType = {
 
 export type RecruiterVerificationRequestMinAggregateInputType = {
   id?: true
+  submissionIdempotencyKey?: true
   applicantUserId?: true
   submittedCompanyName?: true
   normalizedTaxIdentifier?: true
@@ -158,6 +162,7 @@ export type RecruiterVerificationRequestMinAggregateInputType = {
 
 export type RecruiterVerificationRequestMaxAggregateInputType = {
   id?: true
+  submissionIdempotencyKey?: true
   applicantUserId?: true
   submittedCompanyName?: true
   normalizedTaxIdentifier?: true
@@ -184,6 +189,7 @@ export type RecruiterVerificationRequestMaxAggregateInputType = {
 
 export type RecruiterVerificationRequestCountAggregateInputType = {
   id?: true
+  submissionIdempotencyKey?: true
   applicantUserId?: true
   submittedCompanyName?: true
   normalizedTaxIdentifier?: true
@@ -297,6 +303,7 @@ export type RecruiterVerificationRequestGroupByArgs<ExtArgs extends runtime.Type
 
 export type RecruiterVerificationRequestGroupByOutputType = {
   id: string
+  submissionIdempotencyKey: string | null
   applicantUserId: string
   submittedCompanyName: string
   normalizedTaxIdentifier: string
@@ -346,6 +353,7 @@ export type RecruiterVerificationRequestWhereInput = {
   OR?: Prisma.RecruiterVerificationRequestWhereInput[]
   NOT?: Prisma.RecruiterVerificationRequestWhereInput | Prisma.RecruiterVerificationRequestWhereInput[]
   id?: Prisma.StringFilter<"RecruiterVerificationRequest"> | string
+  submissionIdempotencyKey?: Prisma.StringNullableFilter<"RecruiterVerificationRequest"> | string | null
   applicantUserId?: Prisma.StringFilter<"RecruiterVerificationRequest"> | string
   submittedCompanyName?: Prisma.StringFilter<"RecruiterVerificationRequest"> | string
   normalizedTaxIdentifier?: Prisma.StringFilter<"RecruiterVerificationRequest"> | string
@@ -375,10 +383,13 @@ export type RecruiterVerificationRequestWhereInput = {
   decisions?: Prisma.VerificationDecisionHistoryListRelationFilter
   notes?: Prisma.VerificationPrivateNoteListRelationFilter
   notifications?: Prisma.EmailOutboxListRelationFilter
+  businessFacts?: Prisma.XOR<Prisma.VerificationBusinessFactsNullableScalarRelationFilter, Prisma.VerificationBusinessFactsWhereInput> | null
+  acceptedRegistrySnapshot?: Prisma.XOR<Prisma.BusinessRegistryLookupSnapshotNullableScalarRelationFilter, Prisma.BusinessRegistryLookupSnapshotWhereInput> | null
 }
 
 export type RecruiterVerificationRequestOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  submissionIdempotencyKey?: Prisma.SortOrderInput | Prisma.SortOrder
   applicantUserId?: Prisma.SortOrder
   submittedCompanyName?: Prisma.SortOrder
   normalizedTaxIdentifier?: Prisma.SortOrder
@@ -408,10 +419,13 @@ export type RecruiterVerificationRequestOrderByWithRelationInput = {
   decisions?: Prisma.VerificationDecisionHistoryOrderByRelationAggregateInput
   notes?: Prisma.VerificationPrivateNoteOrderByRelationAggregateInput
   notifications?: Prisma.EmailOutboxOrderByRelationAggregateInput
+  businessFacts?: Prisma.VerificationBusinessFactsOrderByWithRelationInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotOrderByWithRelationInput
 }
 
 export type RecruiterVerificationRequestWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  submissionIdempotencyKey?: string
   AND?: Prisma.RecruiterVerificationRequestWhereInput | Prisma.RecruiterVerificationRequestWhereInput[]
   OR?: Prisma.RecruiterVerificationRequestWhereInput[]
   NOT?: Prisma.RecruiterVerificationRequestWhereInput | Prisma.RecruiterVerificationRequestWhereInput[]
@@ -444,10 +458,13 @@ export type RecruiterVerificationRequestWhereUniqueInput = Prisma.AtLeast<{
   decisions?: Prisma.VerificationDecisionHistoryListRelationFilter
   notes?: Prisma.VerificationPrivateNoteListRelationFilter
   notifications?: Prisma.EmailOutboxListRelationFilter
-}, "id">
+  businessFacts?: Prisma.XOR<Prisma.VerificationBusinessFactsNullableScalarRelationFilter, Prisma.VerificationBusinessFactsWhereInput> | null
+  acceptedRegistrySnapshot?: Prisma.XOR<Prisma.BusinessRegistryLookupSnapshotNullableScalarRelationFilter, Prisma.BusinessRegistryLookupSnapshotWhereInput> | null
+}, "id" | "submissionIdempotencyKey">
 
 export type RecruiterVerificationRequestOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  submissionIdempotencyKey?: Prisma.SortOrderInput | Prisma.SortOrder
   applicantUserId?: Prisma.SortOrder
   submittedCompanyName?: Prisma.SortOrder
   normalizedTaxIdentifier?: Prisma.SortOrder
@@ -482,6 +499,7 @@ export type RecruiterVerificationRequestScalarWhereWithAggregatesInput = {
   OR?: Prisma.RecruiterVerificationRequestScalarWhereWithAggregatesInput[]
   NOT?: Prisma.RecruiterVerificationRequestScalarWhereWithAggregatesInput | Prisma.RecruiterVerificationRequestScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"RecruiterVerificationRequest"> | string
+  submissionIdempotencyKey?: Prisma.StringNullableWithAggregatesFilter<"RecruiterVerificationRequest"> | string | null
   applicantUserId?: Prisma.StringWithAggregatesFilter<"RecruiterVerificationRequest"> | string
   submittedCompanyName?: Prisma.StringWithAggregatesFilter<"RecruiterVerificationRequest"> | string
   normalizedTaxIdentifier?: Prisma.StringWithAggregatesFilter<"RecruiterVerificationRequest"> | string
@@ -508,6 +526,7 @@ export type RecruiterVerificationRequestScalarWhereWithAggregatesInput = {
 
 export type RecruiterVerificationRequestCreateInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   submittedCompanyName: string
   normalizedTaxIdentifier: string
   requestedRole: $Enums.CompanyMembershipRole
@@ -535,10 +554,13 @@ export type RecruiterVerificationRequestCreateInput = {
   decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
 }
 
 export type RecruiterVerificationRequestUncheckedCreateInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   applicantUserId: string
   submittedCompanyName: string
   normalizedTaxIdentifier: string
@@ -566,10 +588,13 @@ export type RecruiterVerificationRequestUncheckedCreateInput = {
   decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
 }
 
 export type RecruiterVerificationRequestUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
   requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
@@ -597,10 +622,13 @@ export type RecruiterVerificationRequestUpdateInput = {
   decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
 }
 
 export type RecruiterVerificationRequestUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicantUserId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
@@ -628,10 +656,13 @@ export type RecruiterVerificationRequestUncheckedUpdateInput = {
   decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
 }
 
 export type RecruiterVerificationRequestCreateManyInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   applicantUserId: string
   submittedCompanyName: string
   normalizedTaxIdentifier: string
@@ -658,6 +689,7 @@ export type RecruiterVerificationRequestCreateManyInput = {
 
 export type RecruiterVerificationRequestUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
   requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
@@ -682,6 +714,7 @@ export type RecruiterVerificationRequestUpdateManyMutationInput = {
 
 export type RecruiterVerificationRequestUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicantUserId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
@@ -723,6 +756,7 @@ export type RecruiterVerificationRequestNullableScalarRelationFilter = {
 
 export type RecruiterVerificationRequestCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  submissionIdempotencyKey?: Prisma.SortOrder
   applicantUserId?: Prisma.SortOrder
   submittedCompanyName?: Prisma.SortOrder
   normalizedTaxIdentifier?: Prisma.SortOrder
@@ -755,6 +789,7 @@ export type RecruiterVerificationRequestAvgOrderByAggregateInput = {
 
 export type RecruiterVerificationRequestMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  submissionIdempotencyKey?: Prisma.SortOrder
   applicantUserId?: Prisma.SortOrder
   submittedCompanyName?: Prisma.SortOrder
   normalizedTaxIdentifier?: Prisma.SortOrder
@@ -781,6 +816,7 @@ export type RecruiterVerificationRequestMaxOrderByAggregateInput = {
 
 export type RecruiterVerificationRequestMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  submissionIdempotencyKey?: Prisma.SortOrder
   applicantUserId?: Prisma.SortOrder
   submittedCompanyName?: Prisma.SortOrder
   normalizedTaxIdentifier?: Prisma.SortOrder
@@ -920,6 +956,36 @@ export type EnumRecruiterVerificationStateFieldUpdateOperationsInput = {
   set?: $Enums.RecruiterVerificationState
 }
 
+export type RecruiterVerificationRequestCreateNestedOneWithoutAcceptedRegistrySnapshotInput = {
+  create?: Prisma.XOR<Prisma.RecruiterVerificationRequestCreateWithoutAcceptedRegistrySnapshotInput, Prisma.RecruiterVerificationRequestUncheckedCreateWithoutAcceptedRegistrySnapshotInput>
+  connectOrCreate?: Prisma.RecruiterVerificationRequestCreateOrConnectWithoutAcceptedRegistrySnapshotInput
+  connect?: Prisma.RecruiterVerificationRequestWhereUniqueInput
+}
+
+export type RecruiterVerificationRequestUpdateOneWithoutAcceptedRegistrySnapshotNestedInput = {
+  create?: Prisma.XOR<Prisma.RecruiterVerificationRequestCreateWithoutAcceptedRegistrySnapshotInput, Prisma.RecruiterVerificationRequestUncheckedCreateWithoutAcceptedRegistrySnapshotInput>
+  connectOrCreate?: Prisma.RecruiterVerificationRequestCreateOrConnectWithoutAcceptedRegistrySnapshotInput
+  upsert?: Prisma.RecruiterVerificationRequestUpsertWithoutAcceptedRegistrySnapshotInput
+  disconnect?: Prisma.RecruiterVerificationRequestWhereInput | boolean
+  delete?: Prisma.RecruiterVerificationRequestWhereInput | boolean
+  connect?: Prisma.RecruiterVerificationRequestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RecruiterVerificationRequestUpdateToOneWithWhereWithoutAcceptedRegistrySnapshotInput, Prisma.RecruiterVerificationRequestUpdateWithoutAcceptedRegistrySnapshotInput>, Prisma.RecruiterVerificationRequestUncheckedUpdateWithoutAcceptedRegistrySnapshotInput>
+}
+
+export type RecruiterVerificationRequestCreateNestedOneWithoutBusinessFactsInput = {
+  create?: Prisma.XOR<Prisma.RecruiterVerificationRequestCreateWithoutBusinessFactsInput, Prisma.RecruiterVerificationRequestUncheckedCreateWithoutBusinessFactsInput>
+  connectOrCreate?: Prisma.RecruiterVerificationRequestCreateOrConnectWithoutBusinessFactsInput
+  connect?: Prisma.RecruiterVerificationRequestWhereUniqueInput
+}
+
+export type RecruiterVerificationRequestUpdateOneRequiredWithoutBusinessFactsNestedInput = {
+  create?: Prisma.XOR<Prisma.RecruiterVerificationRequestCreateWithoutBusinessFactsInput, Prisma.RecruiterVerificationRequestUncheckedCreateWithoutBusinessFactsInput>
+  connectOrCreate?: Prisma.RecruiterVerificationRequestCreateOrConnectWithoutBusinessFactsInput
+  upsert?: Prisma.RecruiterVerificationRequestUpsertWithoutBusinessFactsInput
+  connect?: Prisma.RecruiterVerificationRequestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RecruiterVerificationRequestUpdateToOneWithWhereWithoutBusinessFactsInput, Prisma.RecruiterVerificationRequestUpdateWithoutBusinessFactsInput>, Prisma.RecruiterVerificationRequestUncheckedUpdateWithoutBusinessFactsInput>
+}
+
 export type RecruiterVerificationRequestCreateNestedOneWithoutEvidenceInput = {
   create?: Prisma.XOR<Prisma.RecruiterVerificationRequestCreateWithoutEvidenceInput, Prisma.RecruiterVerificationRequestUncheckedCreateWithoutEvidenceInput>
   connectOrCreate?: Prisma.RecruiterVerificationRequestCreateOrConnectWithoutEvidenceInput
@@ -978,6 +1044,7 @@ export type RecruiterVerificationRequestUpdateOneRequiredWithoutNotesNestedInput
 
 export type RecruiterVerificationRequestCreateWithoutApplicantInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   submittedCompanyName: string
   normalizedTaxIdentifier: string
   requestedRole: $Enums.CompanyMembershipRole
@@ -1004,10 +1071,13 @@ export type RecruiterVerificationRequestCreateWithoutApplicantInput = {
   decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
 }
 
 export type RecruiterVerificationRequestUncheckedCreateWithoutApplicantInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   submittedCompanyName: string
   normalizedTaxIdentifier: string
   targetCompanyId?: string | null
@@ -1034,6 +1104,8 @@ export type RecruiterVerificationRequestUncheckedCreateWithoutApplicantInput = {
   decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
 }
 
 export type RecruiterVerificationRequestCreateOrConnectWithoutApplicantInput = {
@@ -1067,6 +1139,7 @@ export type RecruiterVerificationRequestScalarWhereInput = {
   OR?: Prisma.RecruiterVerificationRequestScalarWhereInput[]
   NOT?: Prisma.RecruiterVerificationRequestScalarWhereInput | Prisma.RecruiterVerificationRequestScalarWhereInput[]
   id?: Prisma.StringFilter<"RecruiterVerificationRequest"> | string
+  submissionIdempotencyKey?: Prisma.StringNullableFilter<"RecruiterVerificationRequest"> | string | null
   applicantUserId?: Prisma.StringFilter<"RecruiterVerificationRequest"> | string
   submittedCompanyName?: Prisma.StringFilter<"RecruiterVerificationRequest"> | string
   normalizedTaxIdentifier?: Prisma.StringFilter<"RecruiterVerificationRequest"> | string
@@ -1093,6 +1166,7 @@ export type RecruiterVerificationRequestScalarWhereInput = {
 
 export type RecruiterVerificationRequestCreateWithoutNotificationsInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   submittedCompanyName: string
   normalizedTaxIdentifier: string
   requestedRole: $Enums.CompanyMembershipRole
@@ -1119,10 +1193,13 @@ export type RecruiterVerificationRequestCreateWithoutNotificationsInput = {
   safetyAttempts?: Prisma.VerificationSafetyAttemptCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
 }
 
 export type RecruiterVerificationRequestUncheckedCreateWithoutNotificationsInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   applicantUserId: string
   submittedCompanyName: string
   normalizedTaxIdentifier: string
@@ -1149,6 +1226,8 @@ export type RecruiterVerificationRequestUncheckedCreateWithoutNotificationsInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
 }
 
 export type RecruiterVerificationRequestCreateOrConnectWithoutNotificationsInput = {
@@ -1169,6 +1248,7 @@ export type RecruiterVerificationRequestUpdateToOneWithWhereWithoutNotifications
 
 export type RecruiterVerificationRequestUpdateWithoutNotificationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
   requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
@@ -1195,10 +1275,13 @@ export type RecruiterVerificationRequestUpdateWithoutNotificationsInput = {
   safetyAttempts?: Prisma.VerificationSafetyAttemptUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
 }
 
 export type RecruiterVerificationRequestUncheckedUpdateWithoutNotificationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicantUserId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1225,10 +1308,13 @@ export type RecruiterVerificationRequestUncheckedUpdateWithoutNotificationsInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
 }
 
 export type RecruiterVerificationRequestCreateWithoutTargetCompanyInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   submittedCompanyName: string
   normalizedTaxIdentifier: string
   requestedRole: $Enums.CompanyMembershipRole
@@ -1255,10 +1341,13 @@ export type RecruiterVerificationRequestCreateWithoutTargetCompanyInput = {
   decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
 }
 
 export type RecruiterVerificationRequestUncheckedCreateWithoutTargetCompanyInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   applicantUserId: string
   submittedCompanyName: string
   normalizedTaxIdentifier: string
@@ -1285,6 +1374,8 @@ export type RecruiterVerificationRequestUncheckedCreateWithoutTargetCompanyInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
 }
 
 export type RecruiterVerificationRequestCreateOrConnectWithoutTargetCompanyInput = {
@@ -1313,8 +1404,305 @@ export type RecruiterVerificationRequestUpdateManyWithWhereWithoutTargetCompanyI
   data: Prisma.XOR<Prisma.RecruiterVerificationRequestUpdateManyMutationInput, Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutTargetCompanyInput>
 }
 
+export type RecruiterVerificationRequestCreateWithoutAcceptedRegistrySnapshotInput = {
+  id?: string
+  submissionIdempotencyKey?: string | null
+  submittedCompanyName: string
+  normalizedTaxIdentifier: string
+  requestedRole: $Enums.CompanyMembershipRole
+  prerequisiteId?: string | null
+  state?: $Enums.RecruiterVerificationState
+  currentEvidenceId?: string | null
+  currentSubmissionVersion?: number
+  resubmissionCount?: number
+  assignedAdminUserId?: string | null
+  changesRequestedAt?: Date | string | null
+  delayedAt?: Date | string | null
+  expiredAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  decidedAt?: Date | string | null
+  viewerUnavailableSince?: Date | string | null
+  viewerEscalatedAt?: Date | string | null
+  viewerDelayNotifiedAt?: Date | string | null
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  applicant: Prisma.UserAccountCreateNestedOneWithoutRecruiterVerificationRequestsInput
+  targetCompany?: Prisma.CompanyCreateNestedOneWithoutRecruiterVerificationRequestsInput
+  evidence?: Prisma.BusinessLicenseEvidenceCreateNestedManyWithoutRequestInput
+  safetyAttempts?: Prisma.VerificationSafetyAttemptCreateNestedManyWithoutRequestInput
+  decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
+  notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
+  notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
+}
+
+export type RecruiterVerificationRequestUncheckedCreateWithoutAcceptedRegistrySnapshotInput = {
+  id?: string
+  submissionIdempotencyKey?: string | null
+  applicantUserId: string
+  submittedCompanyName: string
+  normalizedTaxIdentifier: string
+  targetCompanyId?: string | null
+  requestedRole: $Enums.CompanyMembershipRole
+  prerequisiteId?: string | null
+  state?: $Enums.RecruiterVerificationState
+  currentEvidenceId?: string | null
+  currentSubmissionVersion?: number
+  resubmissionCount?: number
+  assignedAdminUserId?: string | null
+  changesRequestedAt?: Date | string | null
+  delayedAt?: Date | string | null
+  expiredAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  decidedAt?: Date | string | null
+  viewerUnavailableSince?: Date | string | null
+  viewerEscalatedAt?: Date | string | null
+  viewerDelayNotifiedAt?: Date | string | null
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  evidence?: Prisma.BusinessLicenseEvidenceUncheckedCreateNestedManyWithoutRequestInput
+  safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedCreateNestedManyWithoutRequestInput
+  decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
+  notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
+  notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
+}
+
+export type RecruiterVerificationRequestCreateOrConnectWithoutAcceptedRegistrySnapshotInput = {
+  where: Prisma.RecruiterVerificationRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.RecruiterVerificationRequestCreateWithoutAcceptedRegistrySnapshotInput, Prisma.RecruiterVerificationRequestUncheckedCreateWithoutAcceptedRegistrySnapshotInput>
+}
+
+export type RecruiterVerificationRequestUpsertWithoutAcceptedRegistrySnapshotInput = {
+  update: Prisma.XOR<Prisma.RecruiterVerificationRequestUpdateWithoutAcceptedRegistrySnapshotInput, Prisma.RecruiterVerificationRequestUncheckedUpdateWithoutAcceptedRegistrySnapshotInput>
+  create: Prisma.XOR<Prisma.RecruiterVerificationRequestCreateWithoutAcceptedRegistrySnapshotInput, Prisma.RecruiterVerificationRequestUncheckedCreateWithoutAcceptedRegistrySnapshotInput>
+  where?: Prisma.RecruiterVerificationRequestWhereInput
+}
+
+export type RecruiterVerificationRequestUpdateToOneWithWhereWithoutAcceptedRegistrySnapshotInput = {
+  where?: Prisma.RecruiterVerificationRequestWhereInput
+  data: Prisma.XOR<Prisma.RecruiterVerificationRequestUpdateWithoutAcceptedRegistrySnapshotInput, Prisma.RecruiterVerificationRequestUncheckedUpdateWithoutAcceptedRegistrySnapshotInput>
+}
+
+export type RecruiterVerificationRequestUpdateWithoutAcceptedRegistrySnapshotInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
+  prerequisiteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumRecruiterVerificationStateFieldUpdateOperationsInput | $Enums.RecruiterVerificationState
+  currentEvidenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentSubmissionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  resubmissionCount?: Prisma.IntFieldUpdateOperationsInput | number
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changesRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  delayedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerUnavailableSince?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerEscalatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerDelayNotifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  applicant?: Prisma.UserAccountUpdateOneRequiredWithoutRecruiterVerificationRequestsNestedInput
+  targetCompany?: Prisma.CompanyUpdateOneWithoutRecruiterVerificationRequestsNestedInput
+  evidence?: Prisma.BusinessLicenseEvidenceUpdateManyWithoutRequestNestedInput
+  safetyAttempts?: Prisma.VerificationSafetyAttemptUpdateManyWithoutRequestNestedInput
+  decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
+  notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
+  notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
+}
+
+export type RecruiterVerificationRequestUncheckedUpdateWithoutAcceptedRegistrySnapshotInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicantUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
+  targetCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
+  prerequisiteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumRecruiterVerificationStateFieldUpdateOperationsInput | $Enums.RecruiterVerificationState
+  currentEvidenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentSubmissionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  resubmissionCount?: Prisma.IntFieldUpdateOperationsInput | number
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changesRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  delayedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerUnavailableSince?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerEscalatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerDelayNotifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  evidence?: Prisma.BusinessLicenseEvidenceUncheckedUpdateManyWithoutRequestNestedInput
+  safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedUpdateManyWithoutRequestNestedInput
+  decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
+  notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
+  notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
+}
+
+export type RecruiterVerificationRequestCreateWithoutBusinessFactsInput = {
+  id?: string
+  submissionIdempotencyKey?: string | null
+  submittedCompanyName: string
+  normalizedTaxIdentifier: string
+  requestedRole: $Enums.CompanyMembershipRole
+  prerequisiteId?: string | null
+  state?: $Enums.RecruiterVerificationState
+  currentEvidenceId?: string | null
+  currentSubmissionVersion?: number
+  resubmissionCount?: number
+  assignedAdminUserId?: string | null
+  changesRequestedAt?: Date | string | null
+  delayedAt?: Date | string | null
+  expiredAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  decidedAt?: Date | string | null
+  viewerUnavailableSince?: Date | string | null
+  viewerEscalatedAt?: Date | string | null
+  viewerDelayNotifiedAt?: Date | string | null
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  applicant: Prisma.UserAccountCreateNestedOneWithoutRecruiterVerificationRequestsInput
+  targetCompany?: Prisma.CompanyCreateNestedOneWithoutRecruiterVerificationRequestsInput
+  evidence?: Prisma.BusinessLicenseEvidenceCreateNestedManyWithoutRequestInput
+  safetyAttempts?: Prisma.VerificationSafetyAttemptCreateNestedManyWithoutRequestInput
+  decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
+  notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
+  notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
+}
+
+export type RecruiterVerificationRequestUncheckedCreateWithoutBusinessFactsInput = {
+  id?: string
+  submissionIdempotencyKey?: string | null
+  applicantUserId: string
+  submittedCompanyName: string
+  normalizedTaxIdentifier: string
+  targetCompanyId?: string | null
+  requestedRole: $Enums.CompanyMembershipRole
+  prerequisiteId?: string | null
+  state?: $Enums.RecruiterVerificationState
+  currentEvidenceId?: string | null
+  currentSubmissionVersion?: number
+  resubmissionCount?: number
+  assignedAdminUserId?: string | null
+  changesRequestedAt?: Date | string | null
+  delayedAt?: Date | string | null
+  expiredAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  decidedAt?: Date | string | null
+  viewerUnavailableSince?: Date | string | null
+  viewerEscalatedAt?: Date | string | null
+  viewerDelayNotifiedAt?: Date | string | null
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  evidence?: Prisma.BusinessLicenseEvidenceUncheckedCreateNestedManyWithoutRequestInput
+  safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedCreateNestedManyWithoutRequestInput
+  decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
+  notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
+  notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
+}
+
+export type RecruiterVerificationRequestCreateOrConnectWithoutBusinessFactsInput = {
+  where: Prisma.RecruiterVerificationRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.RecruiterVerificationRequestCreateWithoutBusinessFactsInput, Prisma.RecruiterVerificationRequestUncheckedCreateWithoutBusinessFactsInput>
+}
+
+export type RecruiterVerificationRequestUpsertWithoutBusinessFactsInput = {
+  update: Prisma.XOR<Prisma.RecruiterVerificationRequestUpdateWithoutBusinessFactsInput, Prisma.RecruiterVerificationRequestUncheckedUpdateWithoutBusinessFactsInput>
+  create: Prisma.XOR<Prisma.RecruiterVerificationRequestCreateWithoutBusinessFactsInput, Prisma.RecruiterVerificationRequestUncheckedCreateWithoutBusinessFactsInput>
+  where?: Prisma.RecruiterVerificationRequestWhereInput
+}
+
+export type RecruiterVerificationRequestUpdateToOneWithWhereWithoutBusinessFactsInput = {
+  where?: Prisma.RecruiterVerificationRequestWhereInput
+  data: Prisma.XOR<Prisma.RecruiterVerificationRequestUpdateWithoutBusinessFactsInput, Prisma.RecruiterVerificationRequestUncheckedUpdateWithoutBusinessFactsInput>
+}
+
+export type RecruiterVerificationRequestUpdateWithoutBusinessFactsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
+  prerequisiteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumRecruiterVerificationStateFieldUpdateOperationsInput | $Enums.RecruiterVerificationState
+  currentEvidenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentSubmissionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  resubmissionCount?: Prisma.IntFieldUpdateOperationsInput | number
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changesRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  delayedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerUnavailableSince?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerEscalatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerDelayNotifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  applicant?: Prisma.UserAccountUpdateOneRequiredWithoutRecruiterVerificationRequestsNestedInput
+  targetCompany?: Prisma.CompanyUpdateOneWithoutRecruiterVerificationRequestsNestedInput
+  evidence?: Prisma.BusinessLicenseEvidenceUpdateManyWithoutRequestNestedInput
+  safetyAttempts?: Prisma.VerificationSafetyAttemptUpdateManyWithoutRequestNestedInput
+  decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
+  notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
+  notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
+}
+
+export type RecruiterVerificationRequestUncheckedUpdateWithoutBusinessFactsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicantUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
+  targetCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
+  prerequisiteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumRecruiterVerificationStateFieldUpdateOperationsInput | $Enums.RecruiterVerificationState
+  currentEvidenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentSubmissionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  resubmissionCount?: Prisma.IntFieldUpdateOperationsInput | number
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changesRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  delayedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerUnavailableSince?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerEscalatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerDelayNotifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  evidence?: Prisma.BusinessLicenseEvidenceUncheckedUpdateManyWithoutRequestNestedInput
+  safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedUpdateManyWithoutRequestNestedInput
+  decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
+  notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
+  notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
+}
+
 export type RecruiterVerificationRequestCreateWithoutEvidenceInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   submittedCompanyName: string
   normalizedTaxIdentifier: string
   requestedRole: $Enums.CompanyMembershipRole
@@ -1341,10 +1729,13 @@ export type RecruiterVerificationRequestCreateWithoutEvidenceInput = {
   decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
 }
 
 export type RecruiterVerificationRequestUncheckedCreateWithoutEvidenceInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   applicantUserId: string
   submittedCompanyName: string
   normalizedTaxIdentifier: string
@@ -1371,6 +1762,8 @@ export type RecruiterVerificationRequestUncheckedCreateWithoutEvidenceInput = {
   decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
 }
 
 export type RecruiterVerificationRequestCreateOrConnectWithoutEvidenceInput = {
@@ -1391,6 +1784,7 @@ export type RecruiterVerificationRequestUpdateToOneWithWhereWithoutEvidenceInput
 
 export type RecruiterVerificationRequestUpdateWithoutEvidenceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
   requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
@@ -1417,10 +1811,13 @@ export type RecruiterVerificationRequestUpdateWithoutEvidenceInput = {
   decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
 }
 
 export type RecruiterVerificationRequestUncheckedUpdateWithoutEvidenceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicantUserId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1447,10 +1844,13 @@ export type RecruiterVerificationRequestUncheckedUpdateWithoutEvidenceInput = {
   decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
 }
 
 export type RecruiterVerificationRequestCreateWithoutSafetyAttemptsInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   submittedCompanyName: string
   normalizedTaxIdentifier: string
   requestedRole: $Enums.CompanyMembershipRole
@@ -1477,10 +1877,13 @@ export type RecruiterVerificationRequestCreateWithoutSafetyAttemptsInput = {
   decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
 }
 
 export type RecruiterVerificationRequestUncheckedCreateWithoutSafetyAttemptsInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   applicantUserId: string
   submittedCompanyName: string
   normalizedTaxIdentifier: string
@@ -1507,6 +1910,8 @@ export type RecruiterVerificationRequestUncheckedCreateWithoutSafetyAttemptsInpu
   decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
 }
 
 export type RecruiterVerificationRequestCreateOrConnectWithoutSafetyAttemptsInput = {
@@ -1527,6 +1932,7 @@ export type RecruiterVerificationRequestUpdateToOneWithWhereWithoutSafetyAttempt
 
 export type RecruiterVerificationRequestUpdateWithoutSafetyAttemptsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
   requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
@@ -1553,10 +1959,13 @@ export type RecruiterVerificationRequestUpdateWithoutSafetyAttemptsInput = {
   decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
 }
 
 export type RecruiterVerificationRequestUncheckedUpdateWithoutSafetyAttemptsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicantUserId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1583,10 +1992,13 @@ export type RecruiterVerificationRequestUncheckedUpdateWithoutSafetyAttemptsInpu
   decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
 }
 
 export type RecruiterVerificationRequestCreateWithoutDecisionsInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   submittedCompanyName: string
   normalizedTaxIdentifier: string
   requestedRole: $Enums.CompanyMembershipRole
@@ -1613,10 +2025,13 @@ export type RecruiterVerificationRequestCreateWithoutDecisionsInput = {
   safetyAttempts?: Prisma.VerificationSafetyAttemptCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
 }
 
 export type RecruiterVerificationRequestUncheckedCreateWithoutDecisionsInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   applicantUserId: string
   submittedCompanyName: string
   normalizedTaxIdentifier: string
@@ -1643,6 +2058,8 @@ export type RecruiterVerificationRequestUncheckedCreateWithoutDecisionsInput = {
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
 }
 
 export type RecruiterVerificationRequestCreateOrConnectWithoutDecisionsInput = {
@@ -1663,6 +2080,7 @@ export type RecruiterVerificationRequestUpdateToOneWithWhereWithoutDecisionsInpu
 
 export type RecruiterVerificationRequestUpdateWithoutDecisionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
   requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
@@ -1689,10 +2107,13 @@ export type RecruiterVerificationRequestUpdateWithoutDecisionsInput = {
   safetyAttempts?: Prisma.VerificationSafetyAttemptUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
 }
 
 export type RecruiterVerificationRequestUncheckedUpdateWithoutDecisionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicantUserId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1719,10 +2140,13 @@ export type RecruiterVerificationRequestUncheckedUpdateWithoutDecisionsInput = {
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
 }
 
 export type RecruiterVerificationRequestCreateWithoutNotesInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   submittedCompanyName: string
   normalizedTaxIdentifier: string
   requestedRole: $Enums.CompanyMembershipRole
@@ -1749,10 +2173,13 @@ export type RecruiterVerificationRequestCreateWithoutNotesInput = {
   safetyAttempts?: Prisma.VerificationSafetyAttemptCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
 }
 
 export type RecruiterVerificationRequestUncheckedCreateWithoutNotesInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   applicantUserId: string
   submittedCompanyName: string
   normalizedTaxIdentifier: string
@@ -1779,6 +2206,8 @@ export type RecruiterVerificationRequestUncheckedCreateWithoutNotesInput = {
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
 }
 
 export type RecruiterVerificationRequestCreateOrConnectWithoutNotesInput = {
@@ -1799,6 +2228,7 @@ export type RecruiterVerificationRequestUpdateToOneWithWhereWithoutNotesInput = 
 
 export type RecruiterVerificationRequestUpdateWithoutNotesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
   requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
@@ -1825,10 +2255,13 @@ export type RecruiterVerificationRequestUpdateWithoutNotesInput = {
   safetyAttempts?: Prisma.VerificationSafetyAttemptUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
 }
 
 export type RecruiterVerificationRequestUncheckedUpdateWithoutNotesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicantUserId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1855,10 +2288,13 @@ export type RecruiterVerificationRequestUncheckedUpdateWithoutNotesInput = {
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
 }
 
 export type RecruiterVerificationRequestCreateManyApplicantInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   submittedCompanyName: string
   normalizedTaxIdentifier: string
   targetCompanyId?: string | null
@@ -1884,6 +2320,7 @@ export type RecruiterVerificationRequestCreateManyApplicantInput = {
 
 export type RecruiterVerificationRequestUpdateWithoutApplicantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
   requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
@@ -1910,10 +2347,13 @@ export type RecruiterVerificationRequestUpdateWithoutApplicantInput = {
   decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
 }
 
 export type RecruiterVerificationRequestUncheckedUpdateWithoutApplicantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
   targetCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1940,10 +2380,13 @@ export type RecruiterVerificationRequestUncheckedUpdateWithoutApplicantInput = {
   decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
 }
 
 export type RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
   targetCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1969,6 +2412,7 @@ export type RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantInput
 
 export type RecruiterVerificationRequestCreateManyTargetCompanyInput = {
   id?: string
+  submissionIdempotencyKey?: string | null
   applicantUserId: string
   submittedCompanyName: string
   normalizedTaxIdentifier: string
@@ -1994,6 +2438,7 @@ export type RecruiterVerificationRequestCreateManyTargetCompanyInput = {
 
 export type RecruiterVerificationRequestUpdateWithoutTargetCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
   requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
@@ -2020,10 +2465,13 @@ export type RecruiterVerificationRequestUpdateWithoutTargetCompanyInput = {
   decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
 }
 
 export type RecruiterVerificationRequestUncheckedUpdateWithoutTargetCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicantUserId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2050,10 +2498,13 @@ export type RecruiterVerificationRequestUncheckedUpdateWithoutTargetCompanyInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
 }
 
 export type RecruiterVerificationRequestUncheckedUpdateManyWithoutTargetCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicantUserId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
   normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2146,6 +2597,7 @@ export type RecruiterVerificationRequestCountOutputTypeCountNotificationsArgs<Ex
 
 export type RecruiterVerificationRequestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  submissionIdempotencyKey?: boolean
   applicantUserId?: boolean
   submittedCompanyName?: boolean
   normalizedTaxIdentifier?: boolean
@@ -2175,11 +2627,14 @@ export type RecruiterVerificationRequestSelect<ExtArgs extends runtime.Types.Ext
   decisions?: boolean | Prisma.RecruiterVerificationRequest$decisionsArgs<ExtArgs>
   notes?: boolean | Prisma.RecruiterVerificationRequest$notesArgs<ExtArgs>
   notifications?: boolean | Prisma.RecruiterVerificationRequest$notificationsArgs<ExtArgs>
+  businessFacts?: boolean | Prisma.RecruiterVerificationRequest$businessFactsArgs<ExtArgs>
+  acceptedRegistrySnapshot?: boolean | Prisma.RecruiterVerificationRequest$acceptedRegistrySnapshotArgs<ExtArgs>
   _count?: boolean | Prisma.RecruiterVerificationRequestCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["recruiterVerificationRequest"]>
 
 export type RecruiterVerificationRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  submissionIdempotencyKey?: boolean
   applicantUserId?: boolean
   submittedCompanyName?: boolean
   normalizedTaxIdentifier?: boolean
@@ -2208,6 +2663,7 @@ export type RecruiterVerificationRequestSelectCreateManyAndReturn<ExtArgs extend
 
 export type RecruiterVerificationRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  submissionIdempotencyKey?: boolean
   applicantUserId?: boolean
   submittedCompanyName?: boolean
   normalizedTaxIdentifier?: boolean
@@ -2236,6 +2692,7 @@ export type RecruiterVerificationRequestSelectUpdateManyAndReturn<ExtArgs extend
 
 export type RecruiterVerificationRequestSelectScalar = {
   id?: boolean
+  submissionIdempotencyKey?: boolean
   applicantUserId?: boolean
   submittedCompanyName?: boolean
   normalizedTaxIdentifier?: boolean
@@ -2260,7 +2717,7 @@ export type RecruiterVerificationRequestSelectScalar = {
   updatedAt?: boolean
 }
 
-export type RecruiterVerificationRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicantUserId" | "submittedCompanyName" | "normalizedTaxIdentifier" | "targetCompanyId" | "requestedRole" | "prerequisiteId" | "state" | "currentEvidenceId" | "currentSubmissionVersion" | "resubmissionCount" | "assignedAdminUserId" | "changesRequestedAt" | "delayedAt" | "expiredAt" | "cancelledAt" | "decidedAt" | "viewerUnavailableSince" | "viewerEscalatedAt" | "viewerDelayNotifiedAt" | "version" | "createdAt" | "updatedAt", ExtArgs["result"]["recruiterVerificationRequest"]>
+export type RecruiterVerificationRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "submissionIdempotencyKey" | "applicantUserId" | "submittedCompanyName" | "normalizedTaxIdentifier" | "targetCompanyId" | "requestedRole" | "prerequisiteId" | "state" | "currentEvidenceId" | "currentSubmissionVersion" | "resubmissionCount" | "assignedAdminUserId" | "changesRequestedAt" | "delayedAt" | "expiredAt" | "cancelledAt" | "decidedAt" | "viewerUnavailableSince" | "viewerEscalatedAt" | "viewerDelayNotifiedAt" | "version" | "createdAt" | "updatedAt", ExtArgs["result"]["recruiterVerificationRequest"]>
 export type RecruiterVerificationRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   applicant?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   targetCompany?: boolean | Prisma.RecruiterVerificationRequest$targetCompanyArgs<ExtArgs>
@@ -2269,6 +2726,8 @@ export type RecruiterVerificationRequestInclude<ExtArgs extends runtime.Types.Ex
   decisions?: boolean | Prisma.RecruiterVerificationRequest$decisionsArgs<ExtArgs>
   notes?: boolean | Prisma.RecruiterVerificationRequest$notesArgs<ExtArgs>
   notifications?: boolean | Prisma.RecruiterVerificationRequest$notificationsArgs<ExtArgs>
+  businessFacts?: boolean | Prisma.RecruiterVerificationRequest$businessFactsArgs<ExtArgs>
+  acceptedRegistrySnapshot?: boolean | Prisma.RecruiterVerificationRequest$acceptedRegistrySnapshotArgs<ExtArgs>
   _count?: boolean | Prisma.RecruiterVerificationRequestCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RecruiterVerificationRequestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2290,9 +2749,12 @@ export type $RecruiterVerificationRequestPayload<ExtArgs extends runtime.Types.E
     decisions: Prisma.$VerificationDecisionHistoryPayload<ExtArgs>[]
     notes: Prisma.$VerificationPrivateNotePayload<ExtArgs>[]
     notifications: Prisma.$EmailOutboxPayload<ExtArgs>[]
+    businessFacts: Prisma.$VerificationBusinessFactsPayload<ExtArgs> | null
+    acceptedRegistrySnapshot: Prisma.$BusinessRegistryLookupSnapshotPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    submissionIdempotencyKey: string | null
     applicantUserId: string
     submittedCompanyName: string
     normalizedTaxIdentifier: string
@@ -2716,6 +3178,8 @@ export interface Prisma__RecruiterVerificationRequestClient<T, Null = never, Ext
   decisions<T extends Prisma.RecruiterVerificationRequest$decisionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RecruiterVerificationRequest$decisionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VerificationDecisionHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notes<T extends Prisma.RecruiterVerificationRequest$notesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RecruiterVerificationRequest$notesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VerificationPrivateNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.RecruiterVerificationRequest$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RecruiterVerificationRequest$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailOutboxPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  businessFacts<T extends Prisma.RecruiterVerificationRequest$businessFactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RecruiterVerificationRequest$businessFactsArgs<ExtArgs>>): Prisma.Prisma__VerificationBusinessFactsClient<runtime.Types.Result.GetResult<Prisma.$VerificationBusinessFactsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  acceptedRegistrySnapshot<T extends Prisma.RecruiterVerificationRequest$acceptedRegistrySnapshotArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RecruiterVerificationRequest$acceptedRegistrySnapshotArgs<ExtArgs>>): Prisma.Prisma__BusinessRegistryLookupSnapshotClient<runtime.Types.Result.GetResult<Prisma.$BusinessRegistryLookupSnapshotPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2746,6 +3210,7 @@ export interface Prisma__RecruiterVerificationRequestClient<T, Null = never, Ext
  */
 export interface RecruiterVerificationRequestFieldRefs {
   readonly id: Prisma.FieldRef<"RecruiterVerificationRequest", 'String'>
+  readonly submissionIdempotencyKey: Prisma.FieldRef<"RecruiterVerificationRequest", 'String'>
   readonly applicantUserId: Prisma.FieldRef<"RecruiterVerificationRequest", 'String'>
   readonly submittedCompanyName: Prisma.FieldRef<"RecruiterVerificationRequest", 'String'>
   readonly normalizedTaxIdentifier: Prisma.FieldRef<"RecruiterVerificationRequest", 'String'>
@@ -3305,6 +3770,44 @@ export type RecruiterVerificationRequest$notificationsArgs<ExtArgs extends runti
   take?: number
   skip?: number
   distinct?: Prisma.EmailOutboxScalarFieldEnum | Prisma.EmailOutboxScalarFieldEnum[]
+}
+
+/**
+ * RecruiterVerificationRequest.businessFacts
+ */
+export type RecruiterVerificationRequest$businessFactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VerificationBusinessFacts
+   */
+  select?: Prisma.VerificationBusinessFactsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VerificationBusinessFacts
+   */
+  omit?: Prisma.VerificationBusinessFactsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VerificationBusinessFactsInclude<ExtArgs> | null
+  where?: Prisma.VerificationBusinessFactsWhereInput
+}
+
+/**
+ * RecruiterVerificationRequest.acceptedRegistrySnapshot
+ */
+export type RecruiterVerificationRequest$acceptedRegistrySnapshotArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BusinessRegistryLookupSnapshot
+   */
+  select?: Prisma.BusinessRegistryLookupSnapshotSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BusinessRegistryLookupSnapshot
+   */
+  omit?: Prisma.BusinessRegistryLookupSnapshotOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BusinessRegistryLookupSnapshotInclude<ExtArgs> | null
+  where?: Prisma.BusinessRegistryLookupSnapshotWhereInput
 }
 
 /**

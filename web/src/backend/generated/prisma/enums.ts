@@ -121,7 +121,8 @@ export const EmailKind = {
   VERIFICATION_DELAYED: 'VERIFICATION_DELAYED',
   VERIFICATION_EXPIRED: 'VERIFICATION_EXPIRED',
   SUPPORT_CASE_UPDATED: 'SUPPORT_CASE_UPDATED',
-  PROFESSIONAL_CONNECTION_UPDATED: 'PROFESSIONAL_CONNECTION_UPDATED'
+  PROFESSIONAL_CONNECTION_UPDATED: 'PROFESSIONAL_CONNECTION_UPDATED',
+  COMPANY_EMAIL_VERIFY: 'COMPANY_EMAIL_VERIFY'
 } as const
 
 export type EmailKind = (typeof EmailKind)[keyof typeof EmailKind]
@@ -460,6 +461,38 @@ export const RecruiterVerificationState = {
 } as const
 
 export type RecruiterVerificationState = (typeof RecruiterVerificationState)[keyof typeof RecruiterVerificationState]
+
+
+export const BusinessRegistryLookupOutcome = {
+  MATCHED: 'MATCHED',
+  PARTIAL: 'PARTIAL',
+  NOT_FOUND: 'NOT_FOUND',
+  UNAVAILABLE: 'UNAVAILABLE'
+} as const
+
+export type BusinessRegistryLookupOutcome = (typeof BusinessRegistryLookupOutcome)[keyof typeof BusinessRegistryLookupOutcome]
+
+
+export const CompanyEmailChallengeState = {
+  PENDING: 'PENDING',
+  VERIFIED: 'VERIFIED',
+  CONSUMED: 'CONSUMED',
+  SUPERSEDED: 'SUPERSEDED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type CompanyEmailChallengeState = (typeof CompanyEmailChallengeState)[keyof typeof CompanyEmailChallengeState]
+
+
+export const EmployerApplicantRelationship = {
+  LEGAL_OWNER: 'LEGAL_OWNER',
+  AUTHORIZED_EMPLOYEE: 'AUTHORIZED_EMPLOYEE',
+  INVITED_MEMBER: 'INVITED_MEMBER',
+  EXISTING_OWNER_APPROVAL: 'EXISTING_OWNER_APPROVAL',
+  OTHER: 'OTHER'
+} as const
+
+export type EmployerApplicantRelationship = (typeof EmployerApplicantRelationship)[keyof typeof EmployerApplicantRelationship]
 
 
 export const VerificationCheckState = {

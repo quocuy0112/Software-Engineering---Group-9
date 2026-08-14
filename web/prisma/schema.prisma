@@ -93,6 +93,7 @@ enum EmailKind {
   VERIFICATION_EXPIRED
   SUPPORT_CASE_UPDATED
   PROFESSIONAL_CONNECTION_UPDATED
+  COMPANY_EMAIL_VERIFY
 }
 
 enum PreferenceLanguage {
@@ -329,6 +330,29 @@ enum RecruiterVerificationState {
   REJECTED
   CANCELLED
   EXPIRED
+}
+
+enum BusinessRegistryLookupOutcome {
+  MATCHED
+  PARTIAL
+  NOT_FOUND
+  UNAVAILABLE
+}
+
+enum CompanyEmailChallengeState {
+  PENDING
+  VERIFIED
+  CONSUMED
+  SUPERSEDED
+  EXPIRED
+}
+
+enum EmployerApplicantRelationship {
+  LEGAL_OWNER
+  AUTHORIZED_EMPLOYEE
+  INVITED_MEMBER
+  EXISTING_OWNER_APPROVAL
+  OTHER
 }
 
 enum VerificationCheckState {
@@ -696,6 +720,9 @@ model UserAccount {
   companyMemberships             CompanyMembership[]
   platformAdministratorGrants    PlatformAdministratorGrant[]
   recruiterVerificationRequests  RecruiterVerificationRequest[]
+  employerVerificationPreparation EmployerVerificationPreparation?
+  businessRegistrySnapshots      BusinessRegistryLookupSnapshot[]
+  companyEmailChallenges         CompanyContactEmailChallenge[]
   submittedModerationReports     ModerationReport[]                      @relation("ModerationReporter")
   professionalConnectionsLow     ProfessionalConnection[]                @relation("ProfessionalConnectionLow")
   professionalConnectionsHigh    ProfessionalConnection[]                @relation("ProfessionalConnectionHigh")
@@ -715,6 +742,10 @@ model UserAccount {
   messagingBlocksReceived        UserMessagingBlock[]                    @relation("MessagingBlocked")
   submittedMessagingReports      MessagingReport[]                       @relation("MessagingReporter")
   targetedMessagingReports       MessagingReport[]                       @relation("MessagingTarget")
+  assignedMessagingReports       MessagingReport[]                       @relation("MessagingReportAssignee")
+  handledMessagingReports        MessagingReport[]                       @relation("MessagingReportHandler")
+  messagingReportReviewEvents    MessagingReportReviewEvent[]            @relation("MessagingReportReviewActor")
+  messagingReportPrivateNotes    MessagingReportPrivateNote[]            @relation("MessagingReportNoteAuthor")
   supportConversationsRequested  SupportConversation[]                   @relation("SupportRequester")
   supportConversationsAssigned   SupportConversation[]                   @relation("SupportCurrentAssignee")
   supportMessages                SupportMessage[]
@@ -1137,6 +1168,7 @@ model EmailOutbox {
   supportConversationId            String?
   professionalConnectionProposalId String?
   professionalConnectionId         String?
+  companyEmailChallengeId          String?                         @unique
   recipientRef                     String
   recipientCiphertext              String?
   recipientPurpose                 String?
@@ -1161,6 +1193,7 @@ model EmailOutbox {
   supportConversation              SupportConversation?            @relation(fields: [supportConversationId], references: [id], onDelete: SetNull)
   professionalConnectionProposal   ProfessionalConnectionProposal? @relation(fields: [professionalConnectionProposalId], references: [id], onDelete: SetNull)
   professionalConnection           ProfessionalConnection?         @relation(fields: [professionalConnectionId], references: [id], onDelete: SetNull)
+  companyEmailChallenge            CompanyContactEmailChallenge?    @relation("CompanyEmailChallengeOutbox", fields: [companyEmailChallengeId], references: [id], onDelete: SetNull)
   securityNotificationWork         SecurityNotificationWork?
 
   @@index([status, nextAttemptAt])
@@ -1169,6 +1202,7 @@ model EmailOutbox {
   @@index([supportConversationId, kind])
   @@index([professionalConnectionProposalId, kind])
   @@index([professionalConnectionId, kind])
+  @@index([companyEmailChallengeId, kind])
 }
 
 model AuditEvent {
@@ -1311,6 +1345,7 @@ model CompanyAccessPrerequisite {
 
 model RecruiterVerificationRequest {
   id                       String                        @id @default(cuid())
+  submissionIdempotencyKey String?                       @unique
   applicantUserId          String
   submittedCompanyName     String
   normalizedTaxIdentifier  String
@@ -1340,11 +1375,132 @@ model RecruiterVerificationRequest {
   decisions                VerificationDecisionHistory[]
   notes                    VerificationPrivateNote[]
   notifications            EmailOutbox[]
+  businessFacts            VerificationBusinessFacts?
+  acceptedRegistrySnapshot BusinessRegistryLookupSnapshot? @relation("AcceptedRegistrySnapshot")
 
   @@index([state, createdAt, id])
   @@index([normalizedTaxIdentifier, state])
   @@index([applicantUserId, normalizedTaxIdentifier, state])
   @@index([assignedAdminUserId, state])
+}
+
+model EmployerVerificationPreparation {
+  id                         String                          @id @default(cuid())
+  applicantUserId            String                          @unique
+  lookupSnapshotId           String?                         @unique
+  version                    Int                             @default(1)
+  applicantLegalName         String?
+  applicantRegisteredAddress String?
+  operatingAddressDiffers    Boolean                         @default(false)
+  operatingAddress           String?
+  companyPhoneE164           String?
+  websiteOrigin              String?
+  relationship               EmployerApplicantRelationship?
+  currentJobTitle            String?
+  authorityExplanation       String?
+  mismatchExplanation        String?
+  expiresAt                  DateTime
+  inaccessibleAt             DateTime?
+  deleteAfter                DateTime?
+  deletedAt                  DateTime?
+  createdAt                  DateTime                        @default(now())
+  updatedAt                  DateTime                        @updatedAt
+  applicant                  UserAccount                     @relation(fields: [applicantUserId], references: [id], onDelete: Cascade)
+  lookupSnapshot             BusinessRegistryLookupSnapshot? @relation("CurrentPreparationSnapshot", fields: [lookupSnapshotId], references: [id], onDelete: SetNull)
+
+  @@index([expiresAt, inaccessibleAt])
+  @@index([deleteAfter, deletedAt])
+}
+
+model BusinessRegistryLookupSnapshot {
+  id                           String                         @id @default(cuid())
+  applicantUserId              String
+  normalizedTaxIdentifier      String
+  providerKey                  String
+  outcome                      BusinessRegistryLookupOutcome
+  registryLegalName            String?
+  registryInternationalName    String?
+  registryShortName            String?
+  registryRegisteredAddress    String?
+  registryEstablishedAt        DateTime?
+  registryLegalStatus          String?
+  registryEntityType           String?
+  registryRepresentativeName   String?
+  responseDigest               String
+  checkedAt                    DateTime
+  expiresAt                    DateTime
+  acceptedRequestId            String?                        @unique
+  acceptedAt                   DateTime?
+  inaccessibleAt               DateTime?
+  deleteAfter                  DateTime?
+  deletedAt                    DateTime?
+  createdAt                    DateTime                       @default(now())
+  applicant                    UserAccount                    @relation(fields: [applicantUserId], references: [id], onDelete: Restrict)
+  currentPreparation           EmployerVerificationPreparation? @relation("CurrentPreparationSnapshot")
+  emailChallenges              CompanyContactEmailChallenge[]
+  acceptedRequest              RecruiterVerificationRequest?  @relation("AcceptedRegistrySnapshot", fields: [acceptedRequestId], references: [id], onDelete: SetNull)
+  businessFacts                VerificationBusinessFacts?
+
+  @@index([applicantUserId, normalizedTaxIdentifier, expiresAt])
+  @@index([expiresAt, acceptedRequestId, inaccessibleAt])
+  @@index([deleteAfter, deletedAt])
+}
+
+model CompanyContactEmailChallenge {
+  id                         String                     @id @default(cuid())
+  applicantUserId            String
+  lookupSnapshotId           String
+  normalizedTaxIdentifier    String
+  normalizedEmail            String?
+  emailDigest                String
+  tokenDigest                String?                    @unique
+  state                      CompanyEmailChallengeState @default(PENDING)
+  expiresAt                  DateTime
+  verifiedAt                 DateTime?
+  consumedAt                 DateTime?
+  supersededAt               DateTime?
+  sensitiveInaccessibleAt    DateTime?
+  sensitiveDeleteAfter       DateTime?
+  metadataDeleteAfter        DateTime
+  createdAt                  DateTime                    @default(now())
+  updatedAt                  DateTime                    @updatedAt
+  applicant                  UserAccount                 @relation(fields: [applicantUserId], references: [id], onDelete: Cascade)
+  lookupSnapshot             BusinessRegistryLookupSnapshot @relation(fields: [lookupSnapshotId], references: [id], onDelete: Cascade)
+  outbox                     EmailOutbox[]               @relation("CompanyEmailChallengeOutbox")
+
+  @@index([applicantUserId, lookupSnapshotId, state])
+  @@index([expiresAt, state])
+  @@index([sensitiveDeleteAfter])
+  @@index([metadataDeleteAfter])
+}
+
+model VerificationBusinessFacts {
+  requestId                       String                        @id
+  lookupSnapshotId                String                        @unique
+  applicantLegalName              String
+  applicantRegisteredAddress      String
+  operatingAddress                String?
+  companyEmail                    String
+  companyEmailVerifiedAt          DateTime
+  companyEmailFreeProvider        Boolean
+  companyEmailWebsiteDomainMatch  Boolean?
+  emailSignalVersion              String
+  companyPhoneE164                String
+  companyPhoneVerified            Boolean                       @default(false)
+  websiteOrigin                   String?
+  relationship                    EmployerApplicantRelationship
+  currentJobTitle                 String
+  authorityExplanation            String?
+  legalNameDiffers                Boolean
+  registeredAddressDiffers        Boolean
+  mismatchExplanation             String?
+  accuracyDeclaredAt              DateTime
+  documentConsentAt               DateTime
+  policyVersion                   String
+  normalizationVersion            String
+  createdAt                       DateTime                       @default(now())
+  request                         RecruiterVerificationRequest  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  lookupSnapshot                  BusinessRegistryLookupSnapshot @relation(fields: [lookupSnapshotId], references: [id], onDelete: Restrict)
 }
 
 model BusinessLicenseEvidence {
@@ -1459,6 +1615,7 @@ model AdminCommandReceipt {
   normalizedBodyDigest String
   resultCode           String
   resultingVersion     Int?
+  resultPayload        Json?
   correlationId        String
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
@@ -2028,28 +2185,68 @@ model UserMessagingBlock {
 }
 
 model MessagingReport {
-  id                String                    @id @default(cuid())
-  reporterUserId    String
-  targetUserId      String
-  conversationId    String
-  targetType        MessagingReportTargetType
-  evidenceMessageId String?
-  category          ModerationReportCategory
-  normalizedDetail  String?
-  state             ModerationReportState     @default(PENDING_REVIEW)
-  unresolvedKey     String?                   @unique
-  handledAt         DateTime?
-  preserveUntil     DateTime?
-  createdAt         DateTime                  @default(now())
-  updatedAt         DateTime                  @updatedAt
-  reporter          UserAccount               @relation("MessagingReporter", fields: [reporterUserId], references: [id], onDelete: Restrict)
-  target            UserAccount               @relation("MessagingTarget", fields: [targetUserId], references: [id], onDelete: Restrict)
-  conversation      MessagingConversation     @relation(fields: [conversationId], references: [id], onDelete: Restrict)
-  evidenceMessage   MessagingMessage?         @relation("MessagingReportEvidence", fields: [evidenceMessageId], references: [id], onDelete: SetNull)
+  id                       String                       @id @default(cuid())
+  reporterUserId           String
+  targetUserId             String
+  conversationId           String
+  targetType               MessagingReportTargetType
+  evidenceMessageId        String?
+  category                 ModerationReportCategory
+  normalizedDetail         String?
+  state                    ModerationReportState        @default(PENDING_REVIEW)
+  assignedAdminUserId      String?
+  handledByAdminUserId     String?
+  enforcementCorrelationId String?                      @db.VarChar(128)
+  version                  Int                          @default(1)
+  unresolvedKey            String?                      @unique
+  handledAt                DateTime?
+  preserveUntil            DateTime?
+  createdAt                DateTime                     @default(now())
+  updatedAt                DateTime                     @updatedAt
+  reporter                 UserAccount                  @relation("MessagingReporter", fields: [reporterUserId], references: [id], onDelete: Restrict)
+  target                   UserAccount                  @relation("MessagingTarget", fields: [targetUserId], references: [id], onDelete: Restrict)
+  assignedAdmin            UserAccount?                 @relation("MessagingReportAssignee", fields: [assignedAdminUserId], references: [id], onDelete: SetNull)
+  handledByAdmin           UserAccount?                 @relation("MessagingReportHandler", fields: [handledByAdminUserId], references: [id], onDelete: SetNull)
+  conversation             MessagingConversation        @relation(fields: [conversationId], references: [id], onDelete: Restrict)
+  evidenceMessage          MessagingMessage?            @relation("MessagingReportEvidence", fields: [evidenceMessageId], references: [id], onDelete: SetNull)
+  reviewEvents             MessagingReportReviewEvent[]
+  privateNotes             MessagingReportPrivateNote[]
 
   @@index([reporterUserId, createdAt(sort: Desc)])
   @@index([conversationId, state, createdAt])
+  @@index([state, createdAt, id])
+  @@index([assignedAdminUserId, state, createdAt, id])
   @@index([preserveUntil])
+}
+
+model MessagingReportReviewEvent {
+  id                       String                @id @default(cuid())
+  reportId                 String
+  actorAdminUserId         String
+  action                   String                @db.VarChar(80)
+  priorState               ModerationReportState
+  resultingState           ModerationReportState
+  resultingVersion         Int
+  enforcementCorrelationId String?               @db.VarChar(128)
+  occurredAt               DateTime              @default(now())
+  report                   MessagingReport       @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  actorAdmin               UserAccount           @relation("MessagingReportReviewActor", fields: [actorAdminUserId], references: [id], onDelete: Restrict)
+
+  @@unique([reportId, resultingVersion])
+  @@index([reportId, occurredAt, id])
+  @@index([actorAdminUserId, occurredAt])
+}
+
+model MessagingReportPrivateNote {
+  id                String          @id @default(cuid())
+  reportId          String
+  authorAdminUserId String
+  normalizedText    String          @db.VarChar(2000)
+  createdAt         DateTime        @default(now())
+  report            MessagingReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  authorAdmin       UserAccount      @relation("MessagingReportNoteAuthor", fields: [authorAdminUserId], references: [id], onDelete: Restrict)
+
+  @@index([reportId, createdAt, id])
 }
 
 model ApplicationStageEvent {

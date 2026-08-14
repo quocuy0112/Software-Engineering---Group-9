@@ -1,0 +1,408 @@
+openapi: 3.1.0
+info:
+  title: SmartHire Business Verification Enrichment API
+  version: 014.1.0
+  description: Candidate preparation and enriched submission contracts extending Feature 006.
+servers:
+  - url: http://localhost:3001
+paths:
+  /api/employer-verifications/preparation:
+    get:
+      operationId: getEmployerVerificationPreparation
+      summary: Restore the current applicant-bound normalized preparation
+      responses:
+        '200':
+          description: Current preparation or an empty preparation
+          headers:
+            Cache-Control:
+              schema: { type: string, const: 'private, no-store' }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreparationResponse'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    patch:
+      operationId: patchEmployerVerificationPreparation
+      summary: Normalize and persist allowlisted non-file draft fields
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreparationPatch'
+      responses:
+        '200':
+          description: Updated normalized preparation
+          headers:
+            Cache-Control:
+              schema: { type: string, const: 'private, no-store' }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreparationResponse'
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/StaleConflict' }
+  /api/employer-verifications/registry-lookups:
+    post:
+      operationId: lookupEmployerBusinessRegistry
+      summary: Create an applicant-bound immutable registry snapshot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [taxIdentifier]
+              properties:
+                taxIdentifier:
+                  type: string
+                  pattern: '^[0-9]{10}$'
+      responses:
+        '200':
+          description: Matched, partial, not-found, or manual-fallback snapshot
+          headers:
+            Cache-Control:
+              schema: { type: string, const: 'private, no-store' }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreparationResponse'
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/employer-verifications/company-email/challenges:
+    post:
+      operationId: requestCompanyEmailChallenge
+      summary: Queue one company-email verification message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [preparationVersion, email]
+              properties:
+                preparationVersion: { type: integer, minimum: 1 }
+                email: { type: string, minLength: 3, maxLength: 254 }
+      responses:
+        '202':
+          description: Challenge accepted and message queued
+          headers:
+            Cache-Control:
+              schema: { type: string, const: 'private, no-store' }
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [status, expiresAt, maskedEmail]
+                properties:
+                  status: { type: string, const: PENDING }
+                  expiresAt: { type: string, format: date-time }
+                  maskedEmail: { type: string }
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/StaleConflict' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/employer-verifications/company-email/confirm:
+    post:
+      operationId: confirmCompanyEmailChallenge
+      summary: Consume a fragment-delivered token for the current Candidate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [token]
+              properties:
+                token: { type: string, minLength: 43, maxLength: 128 }
+      responses:
+        '200':
+          description: Mailbox control verified for the current binding
+          headers:
+            Cache-Control:
+              schema: { type: string, const: 'private, no-store' }
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [status, verifiedAt, expiresAt, maskedEmail]
+                properties:
+                  status: { type: string, const: VERIFIED }
+                  verifiedAt: { type: string, format: date-time }
+                  expiresAt: { type: string, format: date-time }
+                  maskedEmail: { type: string }
+        '400': { $ref: '#/components/responses/ChallengeUnavailable' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/employer-verifications:
+    get:
+      operationId: listApplicantEmployerVerifications
+      summary: Existing applicant request list with safe enrichment summary
+      responses:
+        '200':
+          description: Applicant-owned requests
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApplicantRequestSummary'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: submitEmployerVerification
+      summary: Accept one enriched request and existing protected evidence
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema: { type: string, minLength: 16, maxLength: 128 }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - preparationId
+                - preparationVersion
+                - lookupSnapshotId
+                - taxIdentifier
+                - applicantLegalName
+                - applicantRegisteredAddress
+                - companyPhone
+                - relationship
+                - currentJobTitle
+                - accuracyDeclaration
+                - documentProcessingConsent
+                - policyVersion
+                - requestedRole
+                - document
+              properties:
+                preparationId: { type: string, minLength: 1 }
+                preparationVersion: { type: integer, minimum: 1 }
+                lookupSnapshotId: { type: string, minLength: 1 }
+                taxIdentifier: { type: string, pattern: '^[0-9]{10}$' }
+                applicantLegalName: { type: string, minLength: 1, maxLength: 240 }
+                applicantRegisteredAddress: { type: string, minLength: 5, maxLength: 500 }
+                operatingAddressDiffers: { type: boolean, default: false }
+                operatingAddress: { type: string, minLength: 5, maxLength: 500 }
+                companyPhone: { type: string, minLength: 9, maxLength: 32 }
+                website: { type: string, maxLength: 2048 }
+                relationship: { $ref: '#/components/schemas/ApplicantRelationship' }
+                currentJobTitle: { type: string, minLength: 2, maxLength: 120 }
+                authorityExplanation: { type: string, minLength: 20, maxLength: 500 }
+                mismatchExplanation: { type: string, minLength: 20, maxLength: 500 }
+                accuracyDeclaration: { type: boolean, const: true }
+                documentProcessingConsent: { type: boolean, const: true }
+                policyVersion: { type: string, minLength: 1, maxLength: 40 }
+                requestedRole: { type: string, const: RECRUITER }
+                targetCompanyId: { type: string, minLength: 1 }
+                prerequisiteId: { type: string, minLength: 1 }
+                document:
+                  type: string
+                  format: binary
+      responses:
+        '202':
+          description: Existing Feature 006 request accepted in PENDING_CHECKS
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [requestId, state, version]
+                properties:
+                  requestId: { type: string }
+                  state: { type: string, const: PENDING_CHECKS }
+                  version: { type: integer, minimum: 1 }
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/SubmissionConflict' }
+        '413':
+          description: Evidence exceeds transport or exact file-size bound
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+components:
+  schemas:
+    ApplicantRelationship:
+      type: string
+      enum: [LEGAL_OWNER, AUTHORIZED_EMPLOYEE, INVITED_MEMBER, EXISTING_OWNER_APPROVAL, OTHER]
+    RegistryOutcome:
+      type: string
+      enum: [MATCHED, PARTIAL, NOT_FOUND, UNAVAILABLE]
+    RegistryFacts:
+      type: object
+      additionalProperties: false
+      required: [legalName, registeredAddress, establishmentDate, legalStatus, entityType]
+      properties:
+        legalName: { type: [string, 'null'], maxLength: 240 }
+        registeredAddress: { type: [string, 'null'], maxLength: 500 }
+        establishmentDate: { type: [string, 'null'], format: date }
+        legalStatus: { type: [string, 'null'], maxLength: 120 }
+        entityType: { type: [string, 'null'], maxLength: 120 }
+    LookupProjection:
+      type: object
+      additionalProperties: false
+      required: [snapshotId, taxIdentifier, outcome, sourceLabel, checkedAt, expiresAt, facts]
+      properties:
+        snapshotId: { type: string }
+        taxIdentifier: { type: string, pattern: '^[0-9]{10}$' }
+        outcome: { $ref: '#/components/schemas/RegistryOutcome' }
+        sourceLabel: { type: string, enum: [VietQR, 'Manual fallback'] }
+        checkedAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+        facts: { $ref: '#/components/schemas/RegistryFacts' }
+    EmailStatus:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status: { type: string, enum: [NONE, PENDING, VERIFIED, EXPIRED] }
+        maskedEmail: { type: [string, 'null'] }
+        verifiedAt: { type: [string, 'null'], format: date-time }
+        expiresAt: { type: [string, 'null'], format: date-time }
+    PreparationDraft:
+      type: object
+      additionalProperties: false
+      properties:
+        applicantLegalName:
+          type: [string, 'null']
+          minLength: 1
+          maxLength: 240
+        applicantRegisteredAddress:
+          type: [string, 'null']
+          minLength: 5
+          maxLength: 500
+        operatingAddressDiffers: { type: boolean }
+        operatingAddress:
+          type: [string, 'null']
+          minLength: 5
+          maxLength: 500
+        companyPhone:
+          type: [string, 'null']
+          minLength: 9
+          maxLength: 32
+        website:
+          type: [string, 'null']
+          maxLength: 2048
+        relationship:
+          anyOf:
+            - $ref: '#/components/schemas/ApplicantRelationship'
+            - type: 'null'
+        currentJobTitle:
+          type: [string, 'null']
+          minLength: 2
+          maxLength: 120
+        authorityExplanation:
+          type: [string, 'null']
+          minLength: 20
+          maxLength: 500
+        mismatchExplanation:
+          type: [string, 'null']
+          minLength: 20
+          maxLength: 500
+    PreparationResponse:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data:
+          type: object
+          additionalProperties: false
+          required: [preparationId, version, lookup, email, draft]
+          properties:
+            preparationId: { type: [string, 'null'] }
+            version: { type: integer, minimum: 0 }
+            lookup:
+              anyOf:
+                - $ref: '#/components/schemas/LookupProjection'
+                - type: 'null'
+            email: { $ref: '#/components/schemas/EmailStatus' }
+            draft: { $ref: '#/components/schemas/PreparationDraft' }
+    PreparationPatch:
+      type: object
+      additionalProperties: false
+      required: [preparationId, version, changes]
+      properties:
+        preparationId: { type: string, minLength: 1 }
+        version: { type: integer, minimum: 1 }
+        changes: { $ref: '#/components/schemas/PreparationDraft' }
+    ApplicantRequestSummary:
+      type: object
+      additionalProperties: false
+      required: [id, submittedCompanyName, taxIdentifier, requestedRole, state, submissionVersion, resubmissionCount, legacyRequest, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        submittedCompanyName: { type: string }
+        taxIdentifier: { type: string }
+        requestedRole: { type: string }
+        state: { type: string }
+        submissionVersion: { type: integer }
+        resubmissionCount: { type: integer }
+        legacyRequest: { type: boolean }
+        registryOutcome: { type: [string, 'null'] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    FieldIssue:
+      type: object
+      additionalProperties: false
+      required: [field, code, message]
+      properties:
+        field: { type: string }
+        code: { type: string }
+        message: { type: string }
+    ErrorEnvelope:
+      type: object
+      additionalProperties: false
+      required: [code]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        fieldErrors:
+          type: array
+          items: { $ref: '#/components/schemas/FieldIssue' }
+  responses:
+    Unauthorized:
+      description: Active Candidate session required
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+    ValidationFailed:
+      description: One or more normalized fields are invalid
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+    ChallengeUnavailable:
+      description: Token is invalid, expired, consumed, superseded, or belongs to another binding
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+    StaleConflict:
+      description: Preparation changed and must be refreshed
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+    SubmissionConflict:
+      description: Duplicate active authority, stale binding, or unavailable prerequisite
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+    RateLimited:
+      description: Bounded retry required
+      headers:
+        Retry-After:
+          schema: { type: integer, minimum: 1 }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }

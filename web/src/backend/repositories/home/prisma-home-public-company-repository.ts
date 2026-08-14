@@ -15,6 +15,38 @@ export type HomePublicCompanyRow = {
 
 export interface HomePublicCompanyRepository {
   list(now: Date, limit: number): Promise<readonly HomePublicCompanyRow[]>;
+  count(now: Date): Promise<number>;
+}
+
+function activeCompanyWhere(now: Date) {
+  return {
+    verificationState: "ACTIVE" as const,
+    verifiedAt: { not: null },
+    verificationInactiveAt: null,
+    jobPostings: {
+      some: {
+        status: "ACTIVE" as const,
+        approvedAt: { not: null },
+        publishedAt: { not: null, lte: now },
+        OR: [
+          { applicationDeadline: null },
+          { applicationDeadline: { gt: now } },
+        ],
+      },
+    },
+  };
+}
+
+function activeJobWhere(now: Date) {
+  return {
+    status: "ACTIVE" as const,
+    approvedAt: { not: null },
+    publishedAt: { not: null, lte: now },
+    OR: [
+      { applicationDeadline: null },
+      { applicationDeadline: { gt: now } },
+    ],
+  };
 }
 
 export class PrismaHomePublicCompanyRepository
@@ -22,11 +54,7 @@ export class PrismaHomePublicCompanyRepository
 {
   async list(now: Date, limit = 6): Promise<readonly HomePublicCompanyRow[]> {
     const rows = await prisma.company.findMany({
-      where: {
-        verificationState: "ACTIVE",
-        verifiedAt: { not: null },
-        verificationInactiveAt: null,
-      },
+      where: activeCompanyWhere(now),
       orderBy: [{ verifiedAt: "desc" }, { id: "asc" }],
       take: Math.min(Math.max(limit, 1), 6),
       select: {
@@ -40,15 +68,7 @@ export class PrismaHomePublicCompanyRepository
         _count: {
           select: {
             jobPostings: {
-              where: {
-                status: "ACTIVE",
-                approvedAt: { not: null },
-                publishedAt: { not: null, lte: now },
-                OR: [
-                  { applicationDeadline: null },
-                  { applicationDeadline: { gt: now } },
-                ],
-              },
+              where: activeJobWhere(now),
             },
           },
         },
@@ -58,5 +78,9 @@ export class PrismaHomePublicCompanyRepository
       ...company,
       openPositionCount: _count.jobPostings,
     }));
+  }
+
+  count(now: Date): Promise<number> {
+    return prisma.company.count({ where: activeCompanyWhere(now) });
   }
 }

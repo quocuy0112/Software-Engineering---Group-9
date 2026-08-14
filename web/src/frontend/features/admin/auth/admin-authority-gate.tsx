@@ -8,16 +8,27 @@ export function AdminAuthorityGate({ children }: { children: ReactNode }) {
   const logout = useLogout();
   useEffect(() => {
     if (!auth) return;
+    let disposed = false;
+    let validationPending = false;
     const validate = () => {
-      void auth.checkAuth({}).catch(async () => {
-        createAdminQueryClient().clear();
-        await logout(undefined, "/login");
-      });
+      if (validationPending) return;
+      validationPending = true;
+      void auth
+        .checkAuth({})
+        .catch(async () => {
+          if (disposed) return;
+          createAdminQueryClient().clear();
+          await logout(undefined, "/login").catch(() => undefined);
+        })
+        .finally(() => {
+          validationPending = false;
+        });
     };
     validate();
     window.addEventListener("popstate", validate);
     window.addEventListener("focus", validate);
     return () => {
+      disposed = true;
       window.removeEventListener("popstate", validate);
       window.removeEventListener("focus", validate);
     };

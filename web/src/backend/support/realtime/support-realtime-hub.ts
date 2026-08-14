@@ -9,14 +9,17 @@ export interface SupportRealtimePublisherPort {
 }
 
 const noop: SupportRealtimePublisherPort = { publish: () => undefined };
-let publisher: SupportRealtimePublisherPort = noop;
+const publisherKey = Symbol.for("smarthire.support.realtime.publisher");
+type SupportRuntime = NodeJS.Process & {
+  [publisherKey]?: SupportRealtimePublisherPort;
+};
 
 export function installSupportRealtimePublisher(
   next: SupportRealtimePublisherPort,
 ) {
-  publisher = next;
+  (process as SupportRuntime)[publisherKey] = next;
 }
 
 export function supportRealtimePublisher(): SupportRealtimePublisherPort {
-  return publisher;
+  return (process as SupportRuntime)[publisherKey] ?? noop;
 }

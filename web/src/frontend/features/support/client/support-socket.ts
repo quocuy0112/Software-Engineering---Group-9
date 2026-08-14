@@ -5,6 +5,7 @@ import type {
   SupportClientToServerEvents,
   SupportServerToClientEvents,
 } from "@/shared/contracts/support";
+import { REALTIME_SOCKET_PATH } from "@/shared/contracts/realtime/socket-transport";
 
 let socket: Socket<
   SupportServerToClientEvents,
@@ -13,7 +14,7 @@ let socket: Socket<
 
 export function getSupportSocket() {
   socket ??= io("/support", {
-    path: "/socket.io",
+    path: REALTIME_SOCKET_PATH,
     transports: ["websocket"],
     upgrade: false,
     autoConnect: false,

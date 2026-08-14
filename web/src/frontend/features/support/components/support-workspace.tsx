@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type {
   SupportCaseDetail,
   SupportCaseSummary,
   SupportCategory,
 } from "@/shared/contracts/support";
 import { useSupportInvalidation } from "../client/use-support-invalidation";
+import { handleSupportMessageKeyDown } from "./support-message-keyboard";
 
 const categories: Array<{ value: SupportCategory; label: string }> = [
   { value: "ACCOUNT_ACCESS", label: "Account access" },
@@ -55,6 +56,7 @@ export function SupportWorkspace({
   const [subject, setSubject] = useState("");
   const [initialMessage, setInitialMessage] = useState("");
   const [reply, setReply] = useState("");
+  const messagesRef = useRef<HTMLDivElement>(null);
 
   const refreshCases = useCallback(async () => {
     const body = await supportApi("/api/support/cases", csrfProof);
@@ -98,6 +100,11 @@ export function SupportWorkspace({
       [refreshCases, refreshDetail, selectedId],
     ),
   );
+
+  useEffect(() => {
+    const messages = messagesRef.current;
+    if (messages) messages.scrollTop = messages.scrollHeight;
+  }, [detail?.id, detail?.messages.length]);
 
   async function createCase(event: React.FormEvent) {
     event.preventDefault();
@@ -177,8 +184,8 @@ export function SupportWorkspace({
           {connection === "CONNECTED"
             ? "Realtime connected"
             : connection === "OFFLINE"
-              ? "Offline"
-              : "Connecting"}
+              ? "24/7"
+              : "24/7"}
         </span>
       </header>
 
@@ -269,12 +276,19 @@ export function SupportWorkspace({
                 <div>
                   <p>{detail.correspondent}</p>
                   <h2>{detail.subject}</h2>
+                  <span className="support-online-status">
+                    <span aria-hidden="true" /> Online
+                  </span>
                 </div>
                 <span className="support-status">
                   {detail.state.replaceAll("_", " ")}
                 </span>
               </header>
-              <div className="support-messages">
+              <div
+                ref={messagesRef}
+                className="support-messages"
+                aria-label="Support conversation messages"
+              >
                 {!detail.contentAvailable ? (
                   <p>Message content was deleted under the retention policy.</p>
                 ) : (
@@ -300,9 +314,16 @@ export function SupportWorkspace({
                     id="support-reply"
                     value={reply}
                     onChange={(event) => setReply(event.target.value)}
+                    onKeyDown={(event) =>
+                      handleSupportMessageKeyDown(event, () => {
+                        if (!busy && reply.trim())
+                          event.currentTarget.form?.requestSubmit();
+                      })
+                    }
                     maxLength={4000}
                     required
                   />
+                  <small>Enter to send; Shift+Enter for a new line</small>
                   <button type="submit" disabled={busy || !reply.trim()}>
                     {busy
                       ? "Sending…"

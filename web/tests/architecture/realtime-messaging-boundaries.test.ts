@@ -22,7 +22,13 @@ describe("Feature 008 architecture boundaries", () => {
 
   it("keeps post-MVP capabilities outside executable messaging paths", () => {
     const sources = globSync("src/**/*.{ts,tsx}")
-      .filter((path) => path.includes("messaging"))
+      .filter(
+        (path) =>
+          path.includes("messaging") &&
+          !path
+            .replaceAll("\\", "/")
+            .includes("features/admin/messaging-reports"),
+      )
       .map(readIfPresent)
       .join("\n");
     expect(sources).not.toMatch(/typing:|group:|voiceCall|videoCall|attachmentUpload|messageSearch|exportChat|pinConversation/iu);
@@ -51,5 +57,20 @@ describe("Feature 008 architecture boundaries", () => {
     const client = readIfPresent("src/frontend/features/messaging/client/chat-socket.ts");
     expect(client).toContain('withCredentials: true');
     expect(client).not.toMatch(/jwt|bearer|token/iu);
+  });
+
+  it("keeps the message composer outside the scrollable history row", () => {
+    const styles = readIfPresent(
+      "src/frontend/features/messaging/styles/messaging.css",
+    );
+    expect(styles).toMatch(
+      /\.messaging-thread\s*\{[^}]*grid-template-areas:[^}]*"header"[^}]*"status"[^}]*"history"[^}]*"composer"/u,
+    );
+    expect(styles).toMatch(
+      /\.messaging-history\s*\{[^}]*grid-area:\s*history[^}]*overflow-y:\s*auto/u,
+    );
+    expect(styles).toMatch(
+      /\.messaging-composer\s*\{[^}]*grid-area:\s*composer/u,
+    );
   });
 });

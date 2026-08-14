@@ -145,6 +145,7 @@
   display: grid;
   grid-template-rows: auto 1fr auto;
   min-width: 0;
+  min-height: 0;
 }
 .support-thread > header {
   display: flex;
@@ -162,12 +163,32 @@
   font-size: 0.78rem;
   font-weight: 800;
 }
+.support-online-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 7px;
+  color: #15803d;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+.support-online-status > span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 0 3px #dcfce7;
+}
 .support-messages {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: 0;
+  max-height: 560px;
   padding: 24px;
-  overflow: auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   background: linear-gradient(#fff, #f8fafc);
 }
 .support-messages article {
@@ -199,6 +220,10 @@
 .support-reply textarea {
   min-height: 88px;
   resize: vertical;
+}
+.support-reply small {
+  color: #64748b;
+  font-size: 0.75rem;
 }
 .support-empty,
 .support-closed {

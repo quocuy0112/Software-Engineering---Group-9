@@ -71,6 +71,7 @@ export type AdminCommandReceiptCountAggregateOutputType = {
   normalizedBodyDigest: number
   resultCode: number
   resultingVersion: number
+  resultPayload: number
   correlationId: number
   createdAt: number
   updatedAt: number
@@ -123,6 +124,7 @@ export type AdminCommandReceiptCountAggregateInputType = {
   normalizedBodyDigest?: true
   resultCode?: true
   resultingVersion?: true
+  resultPayload?: true
   correlationId?: true
   createdAt?: true
   updatedAt?: true
@@ -224,6 +226,7 @@ export type AdminCommandReceiptGroupByOutputType = {
   normalizedBodyDigest: string
   resultCode: string
   resultingVersion: number | null
+  resultPayload: runtime.JsonValue | null
   correlationId: string
   createdAt: Date
   updatedAt: Date
@@ -261,6 +264,7 @@ export type AdminCommandReceiptWhereInput = {
   normalizedBodyDigest?: Prisma.StringFilter<"AdminCommandReceipt"> | string
   resultCode?: Prisma.StringFilter<"AdminCommandReceipt"> | string
   resultingVersion?: Prisma.IntNullableFilter<"AdminCommandReceipt"> | number | null
+  resultPayload?: Prisma.JsonNullableFilter<"AdminCommandReceipt">
   correlationId?: Prisma.StringFilter<"AdminCommandReceipt"> | string
   createdAt?: Prisma.DateTimeFilter<"AdminCommandReceipt"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AdminCommandReceipt"> | Date | string
@@ -275,6 +279,7 @@ export type AdminCommandReceiptOrderByWithRelationInput = {
   normalizedBodyDigest?: Prisma.SortOrder
   resultCode?: Prisma.SortOrder
   resultingVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  resultPayload?: Prisma.SortOrderInput | Prisma.SortOrder
   correlationId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -293,6 +298,7 @@ export type AdminCommandReceiptWhereUniqueInput = Prisma.AtLeast<{
   normalizedBodyDigest?: Prisma.StringFilter<"AdminCommandReceipt"> | string
   resultCode?: Prisma.StringFilter<"AdminCommandReceipt"> | string
   resultingVersion?: Prisma.IntNullableFilter<"AdminCommandReceipt"> | number | null
+  resultPayload?: Prisma.JsonNullableFilter<"AdminCommandReceipt">
   correlationId?: Prisma.StringFilter<"AdminCommandReceipt"> | string
   createdAt?: Prisma.DateTimeFilter<"AdminCommandReceipt"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AdminCommandReceipt"> | Date | string
@@ -307,6 +313,7 @@ export type AdminCommandReceiptOrderByWithAggregationInput = {
   normalizedBodyDigest?: Prisma.SortOrder
   resultCode?: Prisma.SortOrder
   resultingVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  resultPayload?: Prisma.SortOrderInput | Prisma.SortOrder
   correlationId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -329,6 +336,7 @@ export type AdminCommandReceiptScalarWhereWithAggregatesInput = {
   normalizedBodyDigest?: Prisma.StringWithAggregatesFilter<"AdminCommandReceipt"> | string
   resultCode?: Prisma.StringWithAggregatesFilter<"AdminCommandReceipt"> | string
   resultingVersion?: Prisma.IntNullableWithAggregatesFilter<"AdminCommandReceipt"> | number | null
+  resultPayload?: Prisma.JsonNullableWithAggregatesFilter<"AdminCommandReceipt">
   correlationId?: Prisma.StringWithAggregatesFilter<"AdminCommandReceipt"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"AdminCommandReceipt"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"AdminCommandReceipt"> | Date | string
@@ -343,6 +351,7 @@ export type AdminCommandReceiptCreateInput = {
   normalizedBodyDigest: string
   resultCode: string
   resultingVersion?: number | null
+  resultPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   correlationId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -357,6 +366,7 @@ export type AdminCommandReceiptUncheckedCreateInput = {
   normalizedBodyDigest: string
   resultCode: string
   resultingVersion?: number | null
+  resultPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   correlationId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -371,6 +381,7 @@ export type AdminCommandReceiptUpdateInput = {
   normalizedBodyDigest?: Prisma.StringFieldUpdateOperationsInput | string
   resultCode?: Prisma.StringFieldUpdateOperationsInput | string
   resultingVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  resultPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   correlationId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -385,6 +396,7 @@ export type AdminCommandReceiptUncheckedUpdateInput = {
   normalizedBodyDigest?: Prisma.StringFieldUpdateOperationsInput | string
   resultCode?: Prisma.StringFieldUpdateOperationsInput | string
   resultingVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  resultPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   correlationId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -399,6 +411,7 @@ export type AdminCommandReceiptCreateManyInput = {
   normalizedBodyDigest: string
   resultCode: string
   resultingVersion?: number | null
+  resultPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   correlationId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -413,6 +426,7 @@ export type AdminCommandReceiptUpdateManyMutationInput = {
   normalizedBodyDigest?: Prisma.StringFieldUpdateOperationsInput | string
   resultCode?: Prisma.StringFieldUpdateOperationsInput | string
   resultingVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  resultPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   correlationId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -427,6 +441,7 @@ export type AdminCommandReceiptUncheckedUpdateManyInput = {
   normalizedBodyDigest?: Prisma.StringFieldUpdateOperationsInput | string
   resultCode?: Prisma.StringFieldUpdateOperationsInput | string
   resultingVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  resultPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   correlationId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -446,6 +461,7 @@ export type AdminCommandReceiptCountOrderByAggregateInput = {
   normalizedBodyDigest?: Prisma.SortOrder
   resultCode?: Prisma.SortOrder
   resultingVersion?: Prisma.SortOrder
+  resultPayload?: Prisma.SortOrder
   correlationId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -506,6 +522,7 @@ export type AdminCommandReceiptSelect<ExtArgs extends runtime.Types.Extensions.I
   normalizedBodyDigest?: boolean
   resultCode?: boolean
   resultingVersion?: boolean
+  resultPayload?: boolean
   correlationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -520,6 +537,7 @@ export type AdminCommandReceiptSelectCreateManyAndReturn<ExtArgs extends runtime
   normalizedBodyDigest?: boolean
   resultCode?: boolean
   resultingVersion?: boolean
+  resultPayload?: boolean
   correlationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -534,6 +552,7 @@ export type AdminCommandReceiptSelectUpdateManyAndReturn<ExtArgs extends runtime
   normalizedBodyDigest?: boolean
   resultCode?: boolean
   resultingVersion?: boolean
+  resultPayload?: boolean
   correlationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -548,12 +567,13 @@ export type AdminCommandReceiptSelectScalar = {
   normalizedBodyDigest?: boolean
   resultCode?: boolean
   resultingVersion?: boolean
+  resultPayload?: boolean
   correlationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type AdminCommandReceiptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "actorSubjectDigest" | "commandKind" | "targetReference" | "idempotencyKey" | "normalizedBodyDigest" | "resultCode" | "resultingVersion" | "correlationId" | "createdAt" | "updatedAt", ExtArgs["result"]["adminCommandReceipt"]>
+export type AdminCommandReceiptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "actorSubjectDigest" | "commandKind" | "targetReference" | "idempotencyKey" | "normalizedBodyDigest" | "resultCode" | "resultingVersion" | "resultPayload" | "correlationId" | "createdAt" | "updatedAt", ExtArgs["result"]["adminCommandReceipt"]>
 
 export type $AdminCommandReceiptPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AdminCommandReceipt"
@@ -567,6 +587,7 @@ export type $AdminCommandReceiptPayload<ExtArgs extends runtime.Types.Extensions
     normalizedBodyDigest: string
     resultCode: string
     resultingVersion: number | null
+    resultPayload: runtime.JsonValue | null
     correlationId: string
     createdAt: Date
     updatedAt: Date
@@ -1001,6 +1022,7 @@ export interface AdminCommandReceiptFieldRefs {
   readonly normalizedBodyDigest: Prisma.FieldRef<"AdminCommandReceipt", 'String'>
   readonly resultCode: Prisma.FieldRef<"AdminCommandReceipt", 'String'>
   readonly resultingVersion: Prisma.FieldRef<"AdminCommandReceipt", 'Int'>
+  readonly resultPayload: Prisma.FieldRef<"AdminCommandReceipt", 'Json'>
   readonly correlationId: Prisma.FieldRef<"AdminCommandReceipt", 'String'>
   readonly createdAt: Prisma.FieldRef<"AdminCommandReceipt", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"AdminCommandReceipt", 'DateTime'>

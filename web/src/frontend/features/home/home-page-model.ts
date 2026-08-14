@@ -1,4 +1,8 @@
 import type { RecruiterHeaderStatus } from "@/shared/contracts/recruiter-header-status";
+import {
+  careerPathSlugs,
+  type CareerPathSlug,
+} from "@/shared/contracts/jobs/career-paths";
 
 export type HomeLocale = "vi" | "en";
 
@@ -29,6 +33,20 @@ export type HomeViewer =
       recruiterStatus: RecruiterHeaderStatus;
     };
 
+export type HomeJobMatchBreakdown = Readonly<{
+  skills: number;
+  experience: number;
+  education: number;
+}>;
+
+export type HomeJobSalary = Readonly<{
+  minimum: number;
+  maximum: number;
+  currency: string;
+  period: "HOUR" | "MONTH" | "YEAR";
+  isNegotiable?: boolean;
+}>;
+
 export type HomeJob = Readonly<{
   id: string;
   slug: string;
@@ -42,6 +60,9 @@ export type HomeJob = Readonly<{
   employmentType: string;
   skills: readonly string[];
   matchScore?: number;
+  matchBreakdown?: HomeJobMatchBreakdown;
+  salary: HomeJobSalary | null;
+  publishedAt: string;
   saved: boolean;
   canSave: boolean;
 }>;
@@ -73,11 +94,18 @@ export type SmartMatchInsight =
       score: number;
     }>;
 
+export type HomeCareerPath = Readonly<{
+  slug: CareerPathSlug;
+  openJobCount: number | null;
+}>;
+
 export type HomePageModel = Readonly<{
   viewer: HomeViewer;
   initialLocale: HomeLocale;
+  careerPaths: readonly HomeCareerPath[];
   jobs: HomeSectionState<HomeJob>;
   spotlights: HomeSectionState<EmployerSpotlight>;
+  companyCount: number | null;
   smartMatch: SmartMatchInsight;
 }>;
 
@@ -89,19 +117,44 @@ function validScore(score: number) {
   return Number.isInteger(score) && score >= 0 && score <= 100;
 }
 
+function validBreakdown(breakdown: HomeJobMatchBreakdown) {
+  const values = Object.values(breakdown);
+  return (
+    values.length === 3 &&
+    values.every(validScore) &&
+    values.reduce((total, value) => total + value, 0) === 100
+  );
+}
+
+function validCareerPaths(paths: readonly HomeCareerPath[]) {
+  return (
+    paths.length === careerPathSlugs.length &&
+    new Set(paths.map((path) => path.slug)).size === careerPathSlugs.length &&
+    careerPathSlugs.every((slug) =>
+      paths.some(
+        (path) =>
+          path.slug === slug &&
+          (path.openJobCount === null ||
+            (Number.isInteger(path.openJobCount) && path.openJobCount >= 0)),
+      ),
+    )
+  );
+}
+
 export function validateHomePageModel(model: HomePageModel) {
   if (model.jobs.items.length > 6 || model.spotlights.items.length > 6)
     throw new Error("HOME_SECTION_LIMIT");
+  if (
+    model.companyCount !== null &&
+    (!Number.isInteger(model.companyCount) || model.companyCount < 0)
+  )
+    throw new Error("HOME_COMPANY_COUNT_INVALID");
+  if (!validCareerPaths(model.careerPaths))
+    throw new Error("HOME_CAREER_PATHS_INVALID");
   const viewerKeys =
     model.viewer.kind === "guest"
       ? ["kind"]
-      : [
-          "kind",
-          "displayName",
-          "avatarUrl",
-          "csrfProof",
-          "recruiterStatus",
-        ];
+      : ["kind", "displayName", "avatarUrl", "csrfProof", "recruiterStatus"];
   if (!hasOnlyKeys(model.viewer, viewerKeys))
     throw new Error("HOME_VIEWER_PRIVATE_FIELD");
   if (model.smartMatch.kind === "personal" && model.viewer.kind !== "candidate")
@@ -110,7 +163,9 @@ export function validateHomePageModel(model: HomePageModel) {
     throw new Error("HOME_MATCH_SCORE_INVALID");
   if (
     model.smartMatch.kind !== "personal" &&
-    model.jobs.items.some((job) => job.matchScore !== undefined)
+    model.jobs.items.some(
+      (job) => job.matchScore !== undefined || job.matchBreakdown !== undefined,
+    )
   )
     throw new Error("HOME_JOB_SCORE_AUTHORITY");
   if (model.smartMatch.kind === "personal") {
@@ -118,10 +173,14 @@ export function validateHomePageModel(model: HomePageModel) {
     if (
       model.jobs.items.some(
         (job) =>
-          job.matchScore !== undefined &&
-          (job.slug !== personal.jobSlug ||
-            job.matchScore !== personal.score ||
-            !validScore(job.matchScore)),
+          job.matchScore === undefined ||
+          !validScore(job.matchScore) ||
+          (job.matchBreakdown !== undefined &&
+            !validBreakdown(job.matchBreakdown)),
+      ) ||
+      !model.jobs.items.some(
+        (job) =>
+          job.slug === personal.jobSlug && job.matchScore === personal.score,
       )
     )
       throw new Error("HOME_JOB_SCORE_ASSOCIATION");

@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ findMany: vi.fn() }));
+const mocks = vi.hoisted(() => ({ findMany: vi.fn(), count: vi.fn() }));
 vi.mock("@/backend/database/prisma", () => ({
-  prisma: { company: { findMany: mocks.findMany } },
+  prisma: { company: { findMany: mocks.findMany, count: mocks.count } },
 }));
 
 import { PrismaHomePublicCompanyRepository } from "@/backend/repositories/home/prisma-home-public-company-repository";
@@ -10,7 +10,7 @@ import { PrismaHomePublicCompanyRepository } from "@/backend/repositories/home/p
 describe("Home public company repository", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it("selects only active verified public fields and an authoritative job count", async () => {
+  it("selects active verified companies with open positions and an authoritative job count", async () => {
     mocks.findMany.mockResolvedValue([
       {
         slug: "verified-company",
@@ -30,6 +30,17 @@ describe("Home public company repository", () => {
         verificationState: "ACTIVE",
         verifiedAt: { not: null },
         verificationInactiveAt: null,
+        jobPostings: {
+          some: {
+            status: "ACTIVE",
+            approvedAt: { not: null },
+            publishedAt: { not: null, lte: now },
+            OR: [
+              { applicationDeadline: null },
+              { applicationDeadline: { gt: now } },
+            ],
+          },
+        },
       },
       orderBy: [{ verifiedAt: "desc" }, { id: "asc" }],
       take: 6,
@@ -73,5 +84,18 @@ describe("Home public company repository", () => {
     expect(JSON.stringify(mocks.findMany.mock.calls[0][0])).not.toMatch(
       /tax|membership|private|address|culture|badge/iu,
     );
+  });
+
+  it("counts with the same active-company criteria as the preview", async () => {
+    mocks.count.mockResolvedValue(42);
+    const now = new Date("2026-08-12T00:00:00.000Z");
+
+    await expect(new PrismaHomePublicCompanyRepository().count(now)).resolves.toBe(42);
+    expect(mocks.count).toHaveBeenCalledWith({
+      where: expect.objectContaining({
+        verificationState: "ACTIVE",
+        jobPostings: expect.objectContaining({ some: expect.any(Object) }),
+      }),
+    });
   });
 });

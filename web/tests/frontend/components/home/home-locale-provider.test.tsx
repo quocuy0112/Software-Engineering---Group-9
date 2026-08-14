@@ -23,7 +23,7 @@ function Harness() {
 }
 
 describe("Home locale provider", () => {
-  it("preserves all six discovery values when the Home language changes", () => {
+  it("preserves concise discovery values when the Home language changes", () => {
     render(
       <HomeLocaleProvider initialLocale="en">
         <Harness />
@@ -32,10 +32,6 @@ describe("Home locale provider", () => {
     const values = {
       Keyword: "frontend",
       Location: "Hà Nội",
-      "Work arrangement": "HYBRID",
-      "Employment type": "INTERNSHIP",
-      "Experience level": "ENTRY",
-      Skills: "React, TypeScript",
     } as const;
     for (const [label, value] of Object.entries(values))
       fireEvent.change(screen.getByLabelText(label), { target: { value } });
@@ -47,10 +43,6 @@ describe("Home locale provider", () => {
     expect(screen.getByText("vi")).toBeInTheDocument();
     expect(screen.getByLabelText("Từ khóa")).toHaveValue("frontend");
     expect(screen.getByLabelText("Địa điểm")).toHaveValue("Hà Nội");
-    expect(screen.getByLabelText("Hình thức làm việc")).toHaveValue("HYBRID");
-    expect(screen.getByLabelText("Loại việc làm")).toHaveValue("INTERNSHIP");
-    expect(screen.getByLabelText("Cấp độ kinh nghiệm")).toHaveValue("ENTRY");
-    expect(screen.getByLabelText("Kỹ năng")).toHaveValue("React, TypeScript");
     expect(window.localStorage).toHaveLength(0);
     expect(window.sessionStorage).toHaveLength(0);
   });

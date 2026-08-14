@@ -18,6 +18,8 @@ web/.env.local
 **/build/
 
 # Python OCR engine
+**/.pytest_cache/
+**/.ruff_cache/
 **/__pycache__/
 **/*.py[cod]
 **/.venv/

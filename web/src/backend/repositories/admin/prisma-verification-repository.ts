@@ -80,6 +80,7 @@ export class PrismaVerificationRepository {
         evidence: { orderBy: { submissionVersion: "desc" } },
         decisions: { orderBy: [{ decidedAt: "asc" }, { id: "asc" }] },
         notes: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
+        businessFacts: { include: { lookupSnapshot: true } },
       },
     });
     if (!row) return null;
@@ -98,6 +99,66 @@ export class PrismaVerificationRepository {
       assignedAdministratorId: row.assignedAdminUserId,
       viewerUnavailableSince: row.viewerUnavailableSince?.toISOString() ?? null,
       version: row.version,
+      legacyRequest: !row.submissionIdempotencyKey,
+      enrichmentStatus: !row.submissionIdempotencyKey
+        ? "LEGACY"
+        : row.businessFacts
+          ? "COMPLETE"
+          : "INCOMPLETE",
+      businessFacts: row.businessFacts
+        ? {
+            applicantLegalName: row.businessFacts.applicantLegalName,
+            applicantRegisteredAddress:
+              row.businessFacts.applicantRegisteredAddress,
+            operatingAddress: row.businessFacts.operatingAddress,
+            companyEmail: row.businessFacts.companyEmail,
+            companyEmailVerifiedAt:
+              row.businessFacts.companyEmailVerifiedAt.toISOString(),
+            companyEmailFreeProvider:
+              row.businessFacts.companyEmailFreeProvider,
+            companyEmailWebsiteDomainMatch:
+              row.businessFacts.companyEmailWebsiteDomainMatch,
+            companyPhoneE164: row.businessFacts.companyPhoneE164,
+            companyPhoneVerified: row.businessFacts.companyPhoneVerified,
+            websiteOrigin: row.businessFacts.websiteOrigin,
+            relationship: row.businessFacts.relationship,
+            currentJobTitle: row.businessFacts.currentJobTitle,
+            authorityExplanation: row.businessFacts.authorityExplanation,
+            legalNameDiffers: row.businessFacts.legalNameDiffers,
+            registeredAddressDiffers:
+              row.businessFacts.registeredAddressDiffers,
+            mismatchExplanation: row.businessFacts.mismatchExplanation,
+            accuracyDeclaredAt:
+              row.businessFacts.accuracyDeclaredAt.toISOString(),
+            documentConsentAt:
+              row.businessFacts.documentConsentAt.toISOString(),
+            policyVersion: row.businessFacts.policyVersion,
+            registry: {
+              outcome: row.businessFacts.lookupSnapshot.outcome,
+              providerKey: row.businessFacts.lookupSnapshot.providerKey,
+              checkedAt:
+                row.businessFacts.lookupSnapshot.checkedAt.toISOString(),
+              expiresAt:
+                row.businessFacts.lookupSnapshot.expiresAt.toISOString(),
+              stale:
+                row.businessFacts.lookupSnapshot.expiresAt.getTime() <=
+                Date.now(),
+              legalName:
+                row.businessFacts.lookupSnapshot.registryLegalName,
+              registeredAddress:
+                row.businessFacts.lookupSnapshot.registryRegisteredAddress,
+              establishedAt:
+                row.businessFacts.lookupSnapshot.registryEstablishedAt?.toISOString() ??
+                null,
+              legalStatus:
+                row.businessFacts.lookupSnapshot.registryLegalStatus,
+              entityType:
+                row.businessFacts.lookupSnapshot.registryEntityType,
+              representativeName:
+                row.businessFacts.lookupSnapshot.registryRepresentativeName,
+            },
+          }
+        : null,
       evidence: row.evidence.map((item) => ({
         id: item.id,
         requestId: item.requestId,

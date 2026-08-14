@@ -1,39 +1,146 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { HomePageView } from "@/frontend/features/home/components/home-page-view";
-import { candidateViewer, employerViewer, homeModel } from "../../../helpers/home/home-fixtures";
+import {
+  candidateViewer,
+  employerViewer,
+  homeModel,
+} from "../../../helpers/home/home-fixtures";
 
-vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn(), replace: vi.fn(), refresh: vi.fn() }) }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), refresh: vi.fn() }),
+}));
 
 describe("Home destination map", () => {
+  it("smoothly centres a fitting in-page section and top-aligns a longer one", () => {
+    const { container } = render(<HomePageView model={homeModel()} />);
+    const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    const howItWorks = container.querySelector("#how-it-works") as HTMLElement;
+    const companies = container.querySelector("#companies-hiring") as HTMLElement;
+
+    Object.defineProperty(window, "innerHeight", {
+      configurable: true,
+      value: 800,
+    });
+    Object.defineProperty(window, "scrollY", {
+      configurable: true,
+      value: 100,
+    });
+    vi.spyOn(howItWorks, "getBoundingClientRect").mockReturnValue({
+      top: 600,
+      height: 400,
+      bottom: 1000,
+      left: 0,
+      right: 0,
+      width: 0,
+      x: 0,
+      y: 600,
+      toJSON: () => ({}),
+    });
+    vi.spyOn(companies, "getBoundingClientRect").mockReturnValue({
+      top: 900,
+      height: 900,
+      bottom: 1800,
+      left: 0,
+      right: 0,
+      width: 0,
+      x: 0,
+      y: 900,
+      toJSON: () => ({}),
+    });
+
+    fireEvent.click(screen.getAllByRole("link", { name: "How it works" })[0]!);
+    expect(scrollTo).toHaveBeenLastCalledWith({ top: 500, behavior: "smooth" });
+    expect(window.location.hash).toBe("#how-it-works");
+
+    fireEvent.click(
+      screen.getAllByRole("link", { name: "Hiring companies" })[0]!,
+    );
+    expect(scrollTo).toHaveBeenLastCalledWith({ top: 956, behavior: "smooth" });
+
+    scrollTo.mockRestore();
+  });
+
   it("uses only existing public routes and matching in-page anchors", () => {
     const { container } = render(<HomePageView model={homeModel()} />);
-    for (const id of ["community", "employer-spotlight", "events", "jobs"])
+    for (const id of [
+      "career-paths",
+      "jobs",
+      "smart-match",
+      "how-it-works",
+      "candidate-trust",
+      "companies-hiring",
+    ])
       expect(container.querySelector(`#${id}`)).toBeInTheDocument();
-    const hrefs = [...container.querySelectorAll("a")].map((link) => link.getAttribute("href"));
+    const hrefs = [...container.querySelectorAll("a")].map((link) =>
+      link.getAttribute("href"),
+    );
     for (const destination of [
       "/jobs",
-      "#community",
-      "#employer-spotlight",
-      "#events",
+      "/legal/ai-cv-analysis-policy",
+      "#career-paths",
+      "#jobs",
+      "#smart-match",
+      "#how-it-works",
+      "#candidate-trust",
+      "#companies-hiring",
       "/jobs/frontend-intern",
+      "/business",
       "/register",
       "/login?returnTo=%2Fdashboard%2Femployer-verification",
-    ]) expect(hrefs).toContain(destination);
+    ])
+      expect(hrefs).toContain(destination);
     expect(hrefs).not.toContain("/companies");
-    for (const selector of [".home-feed-grid", ".home-path-grid", ".home-spotlight-grid", ".home-growth-grid", ".home-events-grid"])
-      expect(within(container.querySelector(selector) as HTMLElement).queryByRole("link")).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/© 2026(?:–\d{4})? Smart Hire\. All rights reserved\./u),
+    ).toBeInTheDocument();
+    for (const selector of [
+      ".home-process-list",
+      ".home-candidate-trust-grid",
+      ".home-companies-hiring-grid",
+    ])
+      expect(
+        within(container.querySelector(selector) as HTMLElement).queryByRole(
+          "link",
+        ),
+      ).not.toBeInTheDocument();
+    expect(
+      within(
+        container.querySelector(".home-path-grid") as HTMLElement,
+      ).getAllByRole("link"),
+    ).toHaveLength(6);
+    expect(hrefs).toContain("/jobs?careerPath=software-engineering");
+    expect(hrefs).not.toContain("#employer-spotlight");
   });
 
   it("maps candidate shortcuts/profile and preserves recruiter authority separately", () => {
-    const { rerender } = render(<HomePageView model={homeModel({ viewer: candidateViewer })} />);
+    const { container, rerender } = render(
+      <HomePageView model={homeModel({ viewer: candidateViewer })} />,
+    );
+    expect(container.querySelector(".home-header-actions .home-shortcuts")).toBeNull();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Open navigation menu" }),
+    );
+    const mobileLinks = container.querySelector("#home-mobile-links");
+    expect(mobileLinks).toBeInTheDocument();
+
     for (const [name, href] of [
       ["My Dashboard", "/dashboard"],
       ["My Applications", "/jobs/applied"],
       ["Saved Jobs", "/jobs/saved"],
-      ["Create Profile", "/profile"],
-    ]) expect(screen.getAllByRole("link", { name })[0]).toHaveAttribute("href", href);
+    ])
+      expect(within(mobileLinks as HTMLElement).getByRole("link", { name })).toHaveAttribute(
+        "href",
+        href,
+      );
+    expect(screen.getAllByRole("link", { name: "Create Profile" })[0]).toHaveAttribute(
+      "href",
+      "/profile",
+    );
     rerender(<HomePageView model={homeModel({ viewer: employerViewer })} />);
-    expect(screen.getAllByRole("link", { name: "Post a Job" })[0]).toHaveAttribute("href", "https://recruiter.example.test");
+    expect(
+      screen.getAllByRole("link", { name: "Post a Job" })[0],
+    ).toHaveAttribute("href", "https://recruiter.example.test");
   });
 });
