@@ -12,8 +12,12 @@ import {
 import { FilesystemPrivateBusinessEvidenceStorage } from "@/backend/storage/business-evidence/filesystem";
 import { S3PrivateBusinessEvidenceStorage } from "@/backend/storage/business-evidence/s3";
 import { CompanyRelationshipPrerequisiteGateway } from "./company-relationship-prerequisite-gateway";
-import { buildVerificationOutbox } from "@/backend/admin/notifications/verification-outbox";
+import {
+  buildVerificationOutbox,
+  createVerificationInAppNotification,
+} from "@/backend/admin/notifications/verification-outbox";
 import { businessVerificationConfig } from "./business-verification-config";
+import { registryLookupConfirmsBusiness } from "@/shared/contracts/employer-verification/business-verification-responses";
 import { companyEmailSignals } from "./company-email-verification";
 function storage() {
   return process.env.ADMIN_EVIDENCE_STORAGE_ADAPTER === "s3"
@@ -116,7 +120,8 @@ export class ApplicantVerificationService {
       preparation.lookupSnapshot.normalizedTaxIdentifier !==
         input.taxIdentifier ||
       preparation.lookupSnapshot.expiresAt <= now ||
-      preparation.lookupSnapshot.acceptedRequestId
+      preparation.lookupSnapshot.acceptedRequestId ||
+      !registryLookupConfirmsBusiness(preparation.lookupSnapshot.outcome)
     ) {
       throw new Error("LOOKUP_REQUIRED");
     }
@@ -275,16 +280,28 @@ export class ApplicantVerificationService {
             deleteAfter: new Date(now.getTime() + 24 * 60 * 60_000),
           },
         });
-        await tx.emailOutbox.create({
-          data: receiptData(
+        const receipt = receiptData(
             requestId,
             session.userId,
             "PENDING_CHECKS",
             "VERIFICATION_RECEIPT",
             row.version,
             now,
-          ),
-        });
+          );
+        await tx.emailOutbox.create({ data: receipt });
+        await createVerificationInAppNotification(
+          tx,
+          {
+            requestId,
+            userId: session.userId,
+            eventKind: "VERIFICATION_RECEIPT",
+            resultingState: "PENDING_CHECKS",
+            resultingVersion: row.version,
+            occurredAt: now,
+            nextAction: "WAIT_FOR_REVIEW",
+          },
+          requestId,
+        );
         return { requestId: row.id, state: row.state, version: row.version };
       });
     } catch (error) {
@@ -360,16 +377,28 @@ export class ApplicantVerificationService {
           },
         },
       });
-      await tx.emailOutbox.create({
-        data: receiptData(
+      const receipt = receiptData(
           row.id,
           session.userId,
           "CANCELLED",
           "VERIFICATION_CANCELLED",
           updated.version,
           now,
-        ),
-      });
+        );
+      await tx.emailOutbox.create({ data: receipt });
+      await createVerificationInAppNotification(
+        tx,
+        {
+          requestId: row.id,
+          userId: session.userId,
+          eventKind: "VERIFICATION_CANCELLED",
+          resultingState: "CANCELLED",
+          resultingVersion: updated.version,
+          occurredAt: now,
+          nextAction: "SUBMIT_NEW_REQUEST",
+        },
+        row.id,
+      );
       return {
         requestId: updated.id,
         state: updated.state,
@@ -442,16 +471,28 @@ export class ApplicantVerificationService {
             delayedAt: null,
           },
         });
-        await tx.emailOutbox.create({
-          data: receiptData(
+        const receipt = receiptData(
             requestId,
             session.userId,
             "PENDING_CHECKS",
             "VERIFICATION_RECEIPT",
             result.version,
             now,
-          ),
-        });
+          );
+        await tx.emailOutbox.create({ data: receipt });
+        await createVerificationInAppNotification(
+          tx,
+          {
+            requestId,
+            userId: session.userId,
+            eventKind: "VERIFICATION_RECEIPT",
+            resultingState: "PENDING_CHECKS",
+            resultingVersion: result.version,
+            occurredAt: now,
+            nextAction: "WAIT_FOR_REVIEW",
+          },
+          requestId,
+        );
         return { requestId, state: result.state, version: result.version };
       });
     } catch (error) {

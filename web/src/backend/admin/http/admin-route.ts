@@ -3,6 +3,7 @@ import { ZodError, type z } from "zod";
 import { AdminBoundaryError } from "@/backend/security/admin-request-boundary";
 import { AdminCommandConflict } from "@/backend/repositories/admin/prisma-admin-command-repository";
 import { SupportError } from "@/backend/support/support-errors";
+import { NotificationError } from "@/backend/notifications/notification-errors";
 
 export function adminNoStoreHeaders(extra: HeadersInit = {}) {
   const headers = new Headers({
@@ -51,6 +52,9 @@ export function adminJson(value: unknown, init: ResponseInit = {}) {
 }
 
 export function adminRouteError(error: unknown) {
+  if (error instanceof NotificationError) {
+    return adminJson({ code: error.code }, { status: error.status });
+  }
   if (error instanceof SupportError) {
     return adminJson(
       {

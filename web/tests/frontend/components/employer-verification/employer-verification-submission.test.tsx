@@ -1,6 +1,21 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { EmployerVerificationPage } from "@/frontend/features/employer-verification/employer-verification-page";
+
+const { toast } = vi.hoisted(() => ({
+  toast: {
+    error: vi.fn(),
+    success: vi.fn(),
+  },
+}));
+
+vi.mock("sonner", () => ({ toast }));
 
 const preparation = {
   data: {
@@ -43,16 +58,24 @@ const preparation = {
 };
 
 describe("employer verification submission UI", () => {
-  afterEach(() => vi.unstubAllGlobals());
+  afterEach(() => {
+    vi.clearAllMocks();
+    vi.unstubAllGlobals();
+  });
 
   it("renders four responsive sections and explicit trust limitations", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn(async (input: RequestInfo | URL) =>
-        new Response(
-          JSON.stringify(String(input).endsWith("/preparation") ? preparation : { data: [] }),
-          { status: 200, headers: { "Content-Type": "application/json" } },
-        ),
+      vi.fn(
+        async (input: RequestInfo | URL) =>
+          new Response(
+            JSON.stringify(
+              String(input).endsWith("/preparation")
+                ? preparation
+                : { data: [] },
+            ),
+            { status: 200, headers: { "Content-Type": "application/json" } },
+          ),
       ),
     );
     render(<EmployerVerificationPage />);
@@ -62,27 +85,168 @@ describe("employer verification submission UI", () => {
       "Company contact",
       "Your authority and evidence",
     ]) {
-      expect(await screen.findByRole("heading", { name: heading })).toBeVisible();
+      expect(
+        await screen.findByRole("heading", { name: heading }),
+      ).toBeVisible();
     }
-    expect(screen.getByText(/No OTP is performed; this phone is unverified/i)).toBeVisible();
+    expect(
+      screen.getByText(/No OTP is performed; this phone is unverified/i),
+    ).toBeVisible();
     expect(screen.getByText(/never auto-approves access/i)).toBeVisible();
-    expect(screen.getByRole("button", { name: "Submit recruiter application" })).toBeEnabled();
+    expect(
+      screen.getByRole("button", { name: "Submit recruiter application" }),
+    ).toBeEnabled();
   });
 
   it("focuses the first invalid field before issuing a request", async () => {
-    const fetcher = vi.fn(async (input: RequestInfo | URL) =>
-      new Response(
-        JSON.stringify(String(input).endsWith("/preparation") ? preparation : { data: [] }),
-        { status: 200, headers: { "Content-Type": "application/json" } },
-      ),
+    const fetcher = vi.fn(
+      async (input: RequestInfo | URL) =>
+        new Response(
+          JSON.stringify(
+            String(input).endsWith("/preparation") ? preparation : { data: [] },
+          ),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
     );
     vi.stubGlobal("fetch", fetcher);
     render(<EmployerVerificationPage />);
-    const submit = await screen.findByRole("button", { name: "Submit recruiter application" });
-    const firstInvalid = submit.closest("form")?.querySelector<HTMLElement>(":invalid");
+    const submit = await screen.findByRole("button", {
+      name: "Submit recruiter application",
+    });
+    const firstInvalid = submit
+      .closest("form")
+      ?.querySelector<HTMLElement>(":invalid");
     expect(firstInvalid).not.toBeNull();
     fireEvent.click(submit);
     await waitFor(() => expect(firstInvalid).toHaveFocus());
     expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+
+  it("sends replacement evidence only once when the form is submitted twice", async () => {
+    let finishResubmit!: (response: Response) => void;
+    let resubmitted = false;
+    const pendingResponse = new Promise<Response>((resolve) => {
+      finishResubmit = resolve;
+    });
+    const fetcher = vi.fn((input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.endsWith("/resubmit")) return pendingResponse;
+      if (url.endsWith("/preparation"))
+        return Promise.resolve(
+          new Response(JSON.stringify(preparation), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }),
+        );
+      return Promise.resolve(
+        new Response(
+          JSON.stringify({
+            data: [
+              {
+                id: "request-1",
+                submittedCompanyName: "Example Company",
+                normalizedTaxIdentifier: "0316794479",
+                requestedRole: "RECRUITER",
+                state: resubmitted ? "PENDING_CHECKS" : "CHANGES_REQUESTED",
+                resubmissionCount: resubmitted ? 1 : 0,
+                createdAt: "2026-08-14T00:00:00.000Z",
+              },
+            ],
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
+      );
+    });
+    vi.stubGlobal("fetch", fetcher);
+    render(<EmployerVerificationPage />);
+
+    const submit = await screen.findByRole("button", {
+      name: "Resubmit evidence",
+    });
+    const form = submit.closest("form");
+    expect(form).not.toBeNull();
+    fireEvent.change(screen.getByLabelText("Replacement business license"), {
+      target: {
+        files: [
+          new File(["evidence"], "license.pdf", { type: "application/pdf" }),
+        ],
+      },
+    });
+    fireEvent.submit(form!);
+    fireEvent.submit(form!);
+
+    await waitFor(() => {
+      expect(
+        fetcher.mock.calls.filter(([url]) => String(url).endsWith("/resubmit")),
+      ).toHaveLength(1);
+    });
+
+    resubmitted = true;
+    await act(async () => {
+      finishResubmit(
+        new Response(
+          JSON.stringify({ requestId: "request-1", state: "PENDING_CHECKS" }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
+      );
+    });
+
+    expect(await screen.findByText("Safety checks")).toBeVisible();
+    expect(toast.error).not.toHaveBeenCalled();
+  });
+
+  it("recognizes an already accepted replacement after a stale duplicate response", async () => {
+    let requestReads = 0;
+    const fetcher = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.endsWith("/resubmit"))
+        return new Response(JSON.stringify({ code: "TARGET_UNAVAILABLE" }), {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        });
+      if (url.endsWith("/preparation"))
+        return new Response(JSON.stringify(preparation), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      requestReads += 1;
+      return new Response(
+        JSON.stringify({
+          data: [
+            {
+              id: "request-1",
+              submittedCompanyName: "Example Company",
+              normalizedTaxIdentifier: "0316794479",
+              requestedRole: "RECRUITER",
+              state:
+                requestReads === 1 ? "CHANGES_REQUESTED" : "PENDING_REVIEW",
+              resubmissionCount: requestReads === 1 ? 0 : 1,
+              createdAt: "2026-08-14T00:00:00.000Z",
+            },
+          ],
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    });
+    vi.stubGlobal("fetch", fetcher);
+    render(<EmployerVerificationPage />);
+
+    const submit = await screen.findByRole("button", {
+      name: "Resubmit evidence",
+    });
+    fireEvent.change(screen.getByLabelText("Replacement business license"), {
+      target: {
+        files: [
+          new File(["evidence"], "license.pdf", { type: "application/pdf" }),
+        ],
+      },
+    });
+    fireEvent.submit(submit.closest("form")!);
+
+    expect(await screen.findByText("Under review")).toBeVisible();
+    expect(toast.success).toHaveBeenCalledWith(
+      "Replacement evidence was already received and is under review.",
+    );
+    expect(toast.error).not.toHaveBeenCalled();
   });
 });

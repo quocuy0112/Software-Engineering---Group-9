@@ -9,14 +9,19 @@
 
 ## Environment
 
-Use one of:
+Local development enables VietQR with:
 
 ```text
 BUSINESS_REGISTRY_PROVIDER=vietqr
+```
+
+To test fail-closed provider handling, temporarily use:
+
+```text
 BUSINESS_REGISTRY_PROVIDER=disabled
 ```
 
-`vietqr` enables the initial public adapter. `disabled` is the supported deterministic manual-fallback mode and must remain fully usable.
+`vietqr` enables the initial public adapter. `disabled` deterministically returns an unavailable outcome and must keep steps two onward locked.
 
 Optional bounded configuration keeps safe defaults when omitted:
 
@@ -51,21 +56,22 @@ http://localhost:3001/dashboard/employer-verification
 Administrator verification resource:
 
 ```text
-http://console.admin.localhost:3001/#/recruiter-verifications
+http://console.admin.localhost:3001/#/verification-requests
 ```
 
 ## Manual Acceptance Flow
 
 1. Sign in as an active Candidate.
 2. Enter a ten-digit enterprise tax identifier and run lookup.
-3. Confirm that matched VietQR fields are read-only and missing registry fields are labelled unavailable.
-4. Repeat with `BUSINESS_REGISTRY_PROVIDER=disabled`; confirm manual legal name/address remain available.
+3. Confirm the matched identifier is read-only; use `Change tax identifier` and verify all business, email, and draft progress disappears before the identifier unlocks.
+4. Repeat lookup with an unknown identifier and with `BUSINESS_REGISTRY_PROVIDER=disabled`; confirm no business-information, email, evidence, or submission section becomes available.
 5. Enter a company email, request verification, and inspect the local email sink/worker output.
 6. Open the fragment-based verification link while signed in as the same Candidate; confirm the fragment is removed and the page shows verified status.
 7. Enter phone, optional website, relationship, title, required explanations, declarations, and a supported business-license file.
 8. Submit twice rapidly; confirm one active request, one evidence version, and one receipt exist.
-9. Open admin detail and confirm applicant/registry values, differences, email/domain signals, unverified phone, relationship, and consent are clearly separated.
-10. Confirm no lookup or contact signal automatically approves or rejects the request.
+9. Open admin detail and confirm the checklist, applicant/registry values, differences, email/domain signals, unverified phone, relationship, and consent are clearly separated.
+10. Confirm the current business-license metadata and safety checks are visible, preview the normalized document, then open the authenticated full PDF/image in a separate tab.
+11. Confirm no lookup or contact signal automatically approves or rejects the request.
 
 ## Focused Validation
 
@@ -89,6 +95,6 @@ Provider tests must mock HTTP and must not require live VietQR availability. A l
 ## Provider Disable/Replacement Drill
 
 1. Set `BUSINESS_REGISTRY_PROVIDER=disabled` and restart the server.
-2. Verify lookup returns `UNAVAILABLE` with safe manual-fallback guidance.
-3. Verify email challenge and final submission still work.
+2. Verify lookup returns `UNAVAILABLE` with retry guidance and every later preparation step remains locked.
+3. Verify direct draft PATCH, email challenge, and final submission attempts fail with `LOOKUP_REQUIRED`.
 4. To replace the provider, implement `BusinessRegistryLookupGateway`, register it in the server-only composition root, add mocked contract tests, and update the reviewed provider/source/version documentation. No route, service, or UI contract should require provider-specific changes.

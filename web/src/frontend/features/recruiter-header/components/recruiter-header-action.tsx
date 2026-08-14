@@ -4,22 +4,26 @@ import { useRecruiterHeaderNavigation } from "../client/use-recruiter-header-nav
 import { useRecruiterHeaderStatus } from "../client/use-recruiter-header-status";
 import type { RecruiterHeaderStatus } from "@/shared/contracts/recruiter-header-status";
 
-
 type RecruiterHeaderIconName = "pending" | "approved" | "apply";
 
 function RecruiterHeaderIcon({ name }: { name: RecruiterHeaderIconName }) {
-  const content = name === "pending" ? (
-    <>
-      <circle cx="12" cy="12" r="8" />
-      <path d="M12 7v5l3 2" />
-    </>
-  ) : name === "approved" ? (
-    <path d="M5 12h13m-5-5 5 5-5 5" />
-  ) : (
-    <path d="M12 5v14M5 12h14" />
-  );
+  const content =
+    name === "pending" ? (
+      <>
+        <circle cx="12" cy="12" r="8" />
+        <path d="M12 7v5l3 2" />
+      </>
+    ) : name === "approved" ? (
+      <path d="M5 12h13m-5-5 5 5-5 5" />
+    ) : (
+      <path d="M12 5v14M5 12h14" />
+    );
   return (
-    <svg className="recruiter-header-action__svg" viewBox="0 0 24 24" aria-hidden="true">
+    <svg
+      className="recruiter-header-action__svg"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
       {content}
     </svg>
   );
@@ -55,13 +59,15 @@ export function RecruiterHeaderAction({
   const approved = status.state === "APPROVED";
   const label = pending
     ? "Application Under Review"
-    : status.state === "REJECTED"
-      ? "Reapply as Recruiter"
-      : approved
-        ? onOpenWorkspace
-          ? "Post a Job"
-          : "Recruiter Workspace"
-        : "Apply as Recruiter";
+    : status.state === "CHANGES_REQUESTED"
+      ? "Update Application"
+      : status.state === "REJECTED"
+        ? "Reapply as Recruiter"
+        : approved
+          ? onOpenWorkspace
+            ? "Post a Job"
+            : "Recruiter Workspace"
+          : "Apply as Recruiter";
   const busy = checking || navigation.busy;
   const state = unavailable
     ? "unavailable"
@@ -99,7 +105,9 @@ export function RecruiterHeaderAction({
       }}
     >
       <span className="recruiter-header-action__icon" aria-hidden="true">
-        <RecruiterHeaderIcon name={pending ? "pending" : approved ? "approved" : "apply"} />
+        <RecruiterHeaderIcon
+          name={pending ? "pending" : approved ? "approved" : "apply"}
+        />
       </span>
       <span className="recruiter-header-action__label">{label}</span>
     </button>

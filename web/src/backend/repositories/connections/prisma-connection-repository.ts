@@ -13,6 +13,8 @@ import type {
   ParticipantProposal,
   ProfessionalConnectionProjection,
 } from "@/shared/contracts/connections";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
+import type { NotificationKind } from "@/shared/contracts/notifications";
 
 type ConnectionDb = typeof prisma | Prisma.TransactionClient;
 type ProposalState =
@@ -35,7 +37,6 @@ const activeProposalStates: ProposalState[] = [
   "PENDING_BOTH",
   "PARTIALLY_ACCEPTED",
 ];
-const notificationRetentionMs = 90 * 24 * 60 * 60_000;
 const ordinaryRetentionMs = 90 * 24 * 60 * 60_000;
 const protectedRetentionMs = 365 * 24 * 60 * 60_000;
 
@@ -266,18 +267,24 @@ export class PrismaConnectionRepository {
     eventKey: string;
     now: Date;
   }) {
-    const deleteAfter = new Date(input.now.getTime() + notificationRetentionMs);
+    const notificationKind: Record<ConnectionNotificationKind, NotificationKind> = {
+      PROPOSAL_CREATED: "CONNECTION_PROPOSAL_CREATED",
+      PROPOSAL_UPDATED: "CONNECTION_PROPOSAL_UPDATED",
+      PROPOSAL_NO_LONGER_ACTIVE: "CONNECTION_PROPOSAL_INACTIVE",
+      CONNECTION_ACCEPTED: "CONNECTION_ACCEPTED",
+      CONNECTION_REVOKED: "CONNECTION_REVOKED",
+    };
     for (const recipientUserId of input.recipientUserIds) {
-      await this.db.professionalConnectionNotification.create({
-        data: {
-          recipientUserId,
-          proposalId: input.proposalId,
-          connectionId: input.connectionId,
-          kind: input.kind,
-          deduplicationKey: `${input.eventKey}:${recipientUserId}`,
-          deleteAfter,
-          createdAt: input.now,
-        },
+      await createInAppNotification(this.db, {
+        recipientUserId,
+        kind: notificationKind[input.kind],
+        deduplicationKey: `${input.eventKey}:${recipientUserId}`,
+        correlationId: input.eventKey,
+        occurredAt: input.now,
+        contextType: input.connectionId
+          ? "CONNECTION"
+          : "CONNECTION_PROPOSAL",
+        contextId: input.connectionId ?? input.proposalId,
       });
       await this.db.emailOutbox.create({
         data: {
@@ -1321,10 +1328,11 @@ export class PrismaConnectionRepository {
     const cursor = decodeCursor(cursorValue);
     if (cursorValue && !cursor)
       throw new ConnectionError("VALIDATION_ERROR", 400);
-    const rows = await this.db.professionalConnectionNotification.findMany({
+    const rows = await this.db.inAppNotification.findMany({
       where: {
         recipientUserId: userId,
-        deleteAfter: { gt: now },
+        category: "CONNECTION",
+        expiresAt: { gt: now },
         ...(cursor
           ? {
               OR: [
@@ -1341,13 +1349,25 @@ export class PrismaConnectionRepository {
     const last = page.at(-1);
     return {
       items: page.map((row) => {
-        const copy = notificationCopy(row.kind);
+        const kind: ConnectionNotificationKind =
+          row.kind === "CONNECTION_PROPOSAL_CREATED"
+            ? "PROPOSAL_CREATED"
+            : row.kind === "CONNECTION_PROPOSAL_UPDATED"
+              ? "PROPOSAL_UPDATED"
+              : row.kind === "CONNECTION_PROPOSAL_INACTIVE"
+                ? "PROPOSAL_NO_LONGER_ACTIVE"
+                : row.kind === "CONNECTION_ACCEPTED"
+                  ? "CONNECTION_ACCEPTED"
+                  : "CONNECTION_REVOKED";
+        const copy = notificationCopy(kind);
         return {
           id: row.id,
-          kind: row.kind,
+          kind,
           ...copy,
-          proposalId: row.proposalId,
-          connectionId: row.connectionId,
+          proposalId:
+            row.contextType === "CONNECTION_PROPOSAL" ? row.contextId : null,
+          connectionId:
+            row.contextType === "CONNECTION" ? row.contextId : null,
           createdAt: row.createdAt.toISOString(),
           readAt: row.readAt?.toISOString() ?? null,
         };
@@ -1365,11 +1385,12 @@ export class PrismaConnectionRepository {
     idempotencyKey: string;
     now: Date;
   }) {
-    const row = await this.db.professionalConnectionNotification.findFirst({
+    const row = await this.db.inAppNotification.findFirst({
       where: {
         id: input.notificationId,
         recipientUserId: input.actor.userId,
-        deleteAfter: { gt: input.now },
+        category: "CONNECTION",
+        expiresAt: { gt: input.now },
       },
     });
     if (!row) throw new ConnectionError("RESOURCE_UNAVAILABLE", 404);
@@ -1380,7 +1401,7 @@ export class PrismaConnectionRepository {
       payload: { notificationId: input.notificationId },
     });
     if (duplicate) return { deduplicated: true };
-    await this.db.professionalConnectionNotification.update({
+    await this.db.inAppNotification.update({
       where: { id: row.id },
       data: { readAt: row.readAt ?? input.now },
     });

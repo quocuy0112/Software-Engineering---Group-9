@@ -11,10 +11,11 @@ describe("Feature 006 approval gates remain authoritative", () => {
     for (const gate of [
       'row.state !== "PENDING_REVIEW"',
       'row.applicant.state !== "ACTIVE"',
-      'row.evidence.malwareStatus !== "PASS"',
-      'row.evidence.typeStatus !== "PASS"',
-      'row.evidence.structureStatus !== "PASS"',
-      'row.evidence.previewStatus !== "PASS"',
+      "evidence.malwareStatus",
+      "evidence.typeStatus",
+      "evidence.structureStatus",
+      "evidence.previewStatus",
+      '.some((value) => value !== "PASS")',
       "row.submissionIdempotencyKey && !row.businessFacts",
     ]) {
       expect(source).toContain(gate);

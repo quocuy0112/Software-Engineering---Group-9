@@ -15,10 +15,18 @@ export async function GET(
       p.requestId,
       p.evidenceId,
     );
+    const inline =
+      new URL(request.url).searchParams.get("disposition") === "inline";
     return new Response(result.bytes, {
       headers: adminNoStoreHeaders({
-        "content-type": "application/octet-stream",
-        "content-disposition": `attachment; filename="${result.filename}"`,
+        "content-type": inline ? result.mediaType : "application/octet-stream",
+        "content-disposition": `${inline ? "inline" : "attachment"}; filename="${result.filename}"`,
+        ...(inline
+          ? {
+              "content-security-policy":
+                "sandbox; default-src 'none'; object-src 'none'; frame-ancestors 'none'",
+            }
+          : {}),
       }),
     });
   } catch (error) {

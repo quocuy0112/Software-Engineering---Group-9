@@ -51,6 +51,12 @@ paths:
                     destinationKind: NONE
                     href: null
                     observedAt: 2026-08-11T10:00:00+07:00
+                changesRequested:
+                  value:
+                    state: CHANGES_REQUESTED
+                    destinationKind: EMPLOYER_VERIFICATION
+                    href: /dashboard/employer-verification
+                    observedAt: 2026-08-11T10:00:00+07:00
                 rejected:
                   value:
                     state: REJECTED
@@ -115,6 +121,7 @@ components:
       enum:
         - NEVER_APPLIED
         - PENDING_REVIEW
+        - CHANGES_REQUESTED
         - REJECTED
         - APPROVED
     RecruiterHeaderDestinationKind:
@@ -160,7 +167,7 @@ components:
         - if:
             properties:
               state:
-                enum: [NEVER_APPLIED, REJECTED]
+                enum: [NEVER_APPLIED, CHANGES_REQUESTED, REJECTED]
           then:
             properties:
               destinationKind:

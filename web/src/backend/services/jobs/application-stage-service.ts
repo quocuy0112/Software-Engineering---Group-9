@@ -11,6 +11,7 @@ import {
 import type { CandidateActor } from "./job-types";
 import { JobServiceError } from "./job-types";
 import { canTransitionApplicationStage } from "./application-stage-policy";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
 
 const allowedRoles = new Set([
   "OWNER",
@@ -145,21 +146,15 @@ export class ApplicationStageService {
           },
         });
 
-        await tx.recruitmentNotificationWork.create({
-          data: {
-            applicationId: application.id,
-            audience: "CANDIDATE",
-            kind: "APPLICATION_STAGE_CHANGED",
-            targetReference: application.candidateUserId,
-            payloadRef: {
-              v: 1,
-              applicationId: application.id,
-              stage: command.targetStage,
-              applicationVersion: nextVersion,
-              templateVersion: "1",
-            },
-            idempotencyKey: `application:${application.id}:stage:${nextVersion}:candidate`,
-          },
+        await createInAppNotification(tx, {
+          recipientUserId: application.candidateUserId,
+          kind: "APPLICATION_STAGE_CHANGED",
+          deduplicationKey: `application:${application.id}:stage:${nextVersion}:candidate`,
+          correlationId: event.id,
+          occurredAt: now,
+          contextType: "APPLICATION",
+          contextId: application.id,
+          variables: { stage: command.targetStage },
         });
 
         const emailUpdatesEnabled =

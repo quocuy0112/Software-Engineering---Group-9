@@ -62,6 +62,7 @@ export type HomeCopy = {
     createProfile: string;
     postJob: string;
     postJobPending: string;
+    postJobChangesRequested: string;
     postJobUnavailable: string;
   };
   filters: Record<string, string>;
@@ -262,6 +263,7 @@ export const homeCopy = {
       createProfile: "Create Profile",
       postJob: "Post a Job",
       postJobPending: "Under review",
+      postJobChangesRequested: "Update application",
       postJobUnavailable: "Status unavailable",
     },
     filters: {
@@ -552,11 +554,9 @@ export const homeCopy = {
     },
     finalCta: {
       seekerEyebrow: "YOUR NEXT STEP",
-      seekerTitle:
-        "Build a profile so the right opportunities can find you.",
+      seekerTitle: "Build a profile so the right opportunities can find you.",
       employerEyebrow: "FOR EMPLOYERS",
-      employerTitle:
-        "Find the right candidates for your open roles.",
+      employerTitle: "Find the right candidates for your open roles.",
     },
     footer: {
       description:
@@ -622,6 +622,7 @@ export const homeCopy = {
       createProfile: "Tạo hồ sơ",
       postJob: "Đăng tin tuyển dụng",
       postJobPending: "Đang xét duyệt",
+      postJobChangesRequested: "Cập nhật hồ sơ",
       postJobUnavailable: "Chưa thể kiểm tra trạng thái",
     },
     filters: {
@@ -912,8 +913,7 @@ export const homeCopy = {
       seekerEyebrow: "BƯỚC TIẾP THEO",
       seekerTitle: "Xây dựng hồ sơ để cơ hội phù hợp tìm thấy bạn.",
       employerEyebrow: "DÀNH CHO DOANH NGHIỆP",
-      employerTitle:
-        "Tìm ứng viên phù hợp cho vị trí đang tuyển.",
+      employerTitle: "Tìm ứng viên phù hợp cho vị trí đang tuyển.",
     },
     footer: {
       description:

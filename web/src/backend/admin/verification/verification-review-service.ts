@@ -6,7 +6,10 @@ import {
 } from "@/backend/repositories/admin/prisma-admin-command-repository";
 import { AuditWriter } from "@/backend/admin/audit/audit-writer";
 import { PrismaVerificationRepository } from "@/backend/repositories/admin/prisma-verification-repository";
-import { buildVerificationOutbox } from "@/backend/admin/notifications/verification-outbox";
+import {
+  buildVerificationOutbox,
+  createVerificationInAppNotification,
+} from "@/backend/admin/notifications/verification-outbox";
 type Base = {
   expectedVersion: number;
   idempotencyKey: string;
@@ -118,8 +121,7 @@ export class VerificationReviewService {
             targetVersion: version,
           },
         });
-        await tx.emailOutbox.create({
-          data: buildVerificationOutbox({
+        const notification = {
             requestId: row.id,
             userId: row.applicantUserId,
             eventKind:
@@ -133,8 +135,15 @@ export class VerificationReviewService {
               action === "changes"
                 ? "RESUBMIT_OR_CANCEL"
                 : "SUBMIT_NEW_REQUEST",
-          }),
+          } as const;
+        await tx.emailOutbox.create({
+          data: buildVerificationOutbox(notification),
         });
+        await createVerificationInAppNotification(
+          tx,
+          notification,
+          correlationId,
+        );
         return { version, state: resultingState };
       },
     );

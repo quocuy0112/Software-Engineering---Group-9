@@ -11,6 +11,21 @@ import type {
 } from "@/shared/contracts/connections";
 import { useConnectionInvalidation } from "../client/use-connection-invalidation";
 
+function formatConnectionDate(value: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeZone: "Asia/Ho_Chi_Minh",
+  }).format(new Date(value));
+}
+
+function formatConnectionDateTime(value: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Ho_Chi_Minh",
+  }).format(new Date(value));
+}
+
 async function connectionApi(
   path: string,
   csrfProof: string,
@@ -147,7 +162,7 @@ function connectionCopy(locale: "vi" | "en") {
           `End your connection with ${name}? Existing chat history becomes read-only.`,
         saveError: "Unable to save your decision.",
         disconnectError: "Unable to end this connection.",
-        locale: "en-US",
+        locale: "en-GB",
       };
 }
 
@@ -385,7 +400,8 @@ export function ConnectionsWorkspace({
                       <div>
                         <dt>{copy.expires}</dt>
                         <dd>
-                          {new Date(proposal.expiresAt).toLocaleDateString(
+                          {formatConnectionDate(
+                            proposal.expiresAt,
                             copy.locale,
                           )}
                         </dd>
@@ -510,7 +526,8 @@ export function ConnectionsWorkspace({
                   <strong>{notification.title}</strong>
                   <span>{notification.message}</span>
                   <time dateTime={notification.createdAt}>
-                    {new Date(notification.createdAt).toLocaleString(
+                    {formatConnectionDateTime(
+                      notification.createdAt,
                       copy.locale,
                     )}
                   </time>

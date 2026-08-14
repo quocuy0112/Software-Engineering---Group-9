@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "@fontsource/be-vietnam-pro/400.css";
 import "@fontsource/be-vietnam-pro/500.css";
 import "@fontsource/be-vietnam-pro/600.css";
@@ -9,6 +10,7 @@ import { ThemeProvider } from "@/frontend/providers/theme-provider";
 import "./globals.css";
 import { Toaster } from "sonner";
 import "@/frontend/features/jobs/image-search/styles/image-search.css";
+import "@/frontend/features/notifications/styles/notifications.css";
 
 export const metadata: Metadata = {
   title: "SmartHire - A secure talent workspace",
@@ -46,9 +48,11 @@ export default function RootLayout({
     >
       <head>
         <meta charSet="utf-8" />
-        <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
       </head>
       <body suppressHydrationWarning>
+        <Script id="smarthire-theme-bootstrap" strategy="beforeInteractive">
+          {themeBootstrapScript}
+        </Script>
         <ThemeProvider>
           {children}
           <Toaster

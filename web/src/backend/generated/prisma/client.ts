@@ -157,6 +157,11 @@ export type RateLimitBucket = Prisma.RateLimitBucketModel
  */
 export type EmailOutbox = Prisma.EmailOutboxModel
 /**
+ * Model InAppNotification
+ * 
+ */
+export type InAppNotification = Prisma.InAppNotificationModel
+/**
  * Model AuditEvent
  * 
  */

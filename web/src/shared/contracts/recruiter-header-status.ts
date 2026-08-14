@@ -3,6 +3,7 @@ import { z } from "zod";
 export const recruiterHeaderStateSchema = z.enum([
   "NEVER_APPLIED",
   "PENDING_REVIEW",
+  "CHANGES_REQUESTED",
   "REJECTED",
   "APPROVED",
 ]);
@@ -29,6 +30,14 @@ export const recruiterHeaderStatusSchema = z.discriminatedUnion("state", [
       state: z.literal("PENDING_REVIEW"),
       destinationKind: z.literal("NONE"),
       href: z.null(),
+      observedAt: observedAtSchema,
+    })
+    .strict(),
+  z
+    .object({
+      state: z.literal("CHANGES_REQUESTED"),
+      destinationKind: z.literal("EMPLOYER_VERIFICATION"),
+      href: z.literal("/dashboard/employer-verification"),
       observedAt: observedAtSchema,
     })
     .strict(),

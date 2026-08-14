@@ -24,9 +24,15 @@ describe("business registry preparation persistence", () => {
 
   afterAll(async () => {
     await prisma.emailOutbox.deleteMany({ where: { userId } });
-    await prisma.companyContactEmailChallenge.deleteMany({ where: { applicantUserId: userId } });
-    await prisma.employerVerificationPreparation.deleteMany({ where: { applicantUserId: userId } });
-    await prisma.businessRegistryLookupSnapshot.deleteMany({ where: { applicantUserId: userId } });
+    await prisma.companyContactEmailChallenge.deleteMany({
+      where: { applicantUserId: userId },
+    });
+    await prisma.employerVerificationPreparation.deleteMany({
+      where: { applicantUserId: userId },
+    });
+    await prisma.businessRegistryLookupSnapshot.deleteMany({
+      where: { applicantUserId: userId },
+    });
     await prisma.userAccount.deleteMany({ where: { id: userId } });
   });
 
@@ -54,7 +60,9 @@ describe("business registry preparation persistence", () => {
     });
 
     const preparation = await repository.findCurrentPreparation(userId, now);
-    expect(preparation?.lookupSnapshot?.registryLegalName).toBe("Example Company");
+    expect(preparation?.lookupSnapshot?.registryLegalName).toBe(
+      "Example Company",
+    );
     expect(preparation?.applicantRegisteredAddress).toContain("Nguyen Hue");
     expect(
       await repository.hasReusableLookup({
@@ -107,7 +115,11 @@ describe("business registry preparation persistence", () => {
     await repository.replaceLookup({
       userId,
       taxIdentifier: "0316794480",
-      result: { providerKey: "disabled-manual-v1", outcome: "UNAVAILABLE", facts: null },
+      result: {
+        providerKey: "disabled-manual-v1",
+        outcome: "UNAVAILABLE",
+        facts: null,
+      },
       responseDigest: "3".repeat(64),
       now: new Date(now.getTime() + 1_000),
       expiresAt: new Date(now.getTime() + 86_401_000),
@@ -115,12 +127,30 @@ describe("business registry preparation persistence", () => {
       preparationExpiresAt: new Date(now.getTime() + 172_801_000),
       sensitiveDeleteAfter: new Date(now.getTime() + 86_401_000),
     });
-    const oldSnapshot = await prisma.businessRegistryLookupSnapshot.findUniqueOrThrow({
-      where: { id: previousSnapshotId },
-    });
+    const oldSnapshot =
+      await prisma.businessRegistryLookupSnapshot.findUniqueOrThrow({
+        where: { id: previousSnapshotId },
+      });
     expect(oldSnapshot.registryLegalName).toBe("Example Company");
     expect(oldSnapshot.inaccessibleAt).not.toBeNull();
-    expect((await repository.findCurrentPreparation(userId, now))?.lookupSnapshot?.normalizedTaxIdentifier).toBe("0316794480");
+    expect(
+      (await repository.findCurrentPreparation(userId, now))?.lookupSnapshot
+        ?.normalizedTaxIdentifier,
+    ).toBe("0316794480");
+  });
+
+  it("invalidates all current progress before the identifier can change", async () => {
+    await repository.invalidateCurrentPreparation({
+      userId,
+      now: new Date(now.getTime() + 2_000),
+      sensitiveDeleteAfter: new Date(now.getTime() + 86_402_000),
+    });
+    expect(
+      await repository.findCurrentPreparation(
+        userId,
+        new Date(now.getTime() + 2_000),
+      ),
+    ).toBeNull();
   });
 
   it("keeps documented account and identifier admission limits", () => {
@@ -128,7 +158,9 @@ describe("business registry preparation persistence", () => {
       "src/backend/admin/verification/employer-verification-preparation-service.ts",
       "utf8",
     );
-    expect(service).toContain('"business-registry-account", userId, 10, 15 * 60');
+    expect(service).toContain(
+      '"business-registry-account", userId, 10, 15 * 60',
+    );
     expect(service).toContain('"business-registry-identifier"');
     expect(service).toContain("30,");
   });

@@ -2,6 +2,7 @@
 import { Layout, type LayoutProps } from "react-admin";
 import { Box } from "@mui/material";
 import { AdminAuthorityGate } from "../auth/admin-authority-gate";
+import { AdminAppBar } from "./admin-app-bar";
 
 export function AdminLayout(props: LayoutProps) {
   return (
@@ -18,7 +19,7 @@ export function AdminLayout(props: LayoutProps) {
         <a href="#admin-main" style={{ position: "absolute", left: -10000 }}>
           Skip to administration content
         </a>
-        <Layout {...props} />
+        <Layout {...props} appBar={AdminAppBar} />
       </Box>
     </AdminAuthorityGate>
   );

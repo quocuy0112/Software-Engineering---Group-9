@@ -1,6 +1,7 @@
 export type RecruiterHeaderFixtureState =
   | "NEVER_APPLIED"
   | "PENDING_REVIEW"
+  | "CHANGES_REQUESTED"
   | "REJECTED"
   | "APPROVED";
 
@@ -29,11 +30,13 @@ export function makeRecruiterHeaderFixture(
       state:
         state === "PENDING_REVIEW"
           ? "PENDING_REVIEW"
-          : state === "REJECTED"
-            ? "REJECTED"
-            : state === "APPROVED"
-              ? "APPROVED"
-              : null,
+          : state === "CHANGES_REQUESTED"
+            ? "CHANGES_REQUESTED"
+            : state === "REJECTED"
+              ? "REJECTED"
+              : state === "APPROVED"
+                ? "APPROVED"
+                : null,
     },
   };
   return { ...base, ...overrides };

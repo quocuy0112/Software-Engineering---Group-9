@@ -3,8 +3,12 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { preparationPatchSchema } from "@/shared/contracts/employer-verification/business-verification";
-import type { EmployerVerificationPreparationResponse } from "@/shared/contracts/employer-verification/business-verification-responses";
+import {
+  registryLookupConfirmsBusiness,
+  type EmployerVerificationPreparationResponse,
+} from "@/shared/contracts/employer-verification/business-verification-responses";
 import styles from "./employer-verification-page.module.css";
+import { useNotificationContextRead } from "@/frontend/features/notifications/client/use-notification-context-read";
 
 type Item = {
   id: string;
@@ -68,18 +72,43 @@ function draftFieldError(name: string) {
   return messages[name] ?? "This field is invalid. Review it and try again.";
 }
 
-export function EmployerVerificationPage() {
+function VerificationContextRead({
+  requestId,
+  csrfProof,
+}: {
+  requestId: string;
+  csrfProof: string;
+}) {
+  useNotificationContextRead({
+    enabled: true,
+    contextType: "VERIFICATION_REQUEST",
+    contextId: requestId,
+    csrfProof,
+  });
+  return null;
+}
+
+export function EmployerVerificationPage({
+  csrfProof = "",
+}: {
+  csrfProof?: string;
+}) {
   const [items, setItems] = useState<Item[]>([]);
   const [preparation, setPreparation] = useState<Preparation | null>(null);
   const [draft, setDraft] = useState<Record<string, string | boolean | null>>({});
   const [companyEmail, setCompanyEmail] = useState("");
+  const [taxIdentifier, setTaxIdentifier] = useState("");
   const [busy, setBusy] = useState<string>();
   const preparationRef = useRef<Preparation | null>(null);
   const draftSaveQueueRef = useRef<Promise<void>>(Promise.resolve());
+  const resubmitInFlightRef = useRef(new Set<string>());
 
   async function loadRequests() {
-    const body = await requestJson("/api/employer-verifications");
+    const body = (await requestJson("/api/employer-verifications")) as {
+      data: Item[];
+    };
     setItems(body.data);
+    return body.data;
   }
 
   async function loadPreparation() {
@@ -89,6 +118,7 @@ export function EmployerVerificationPage() {
     preparationRef.current = body.data;
     setPreparation(body.data);
     setDraft(body.data.draft);
+    setTaxIdentifier(body.data.lookup?.taxIdentifier ?? "");
   }
 
   useEffect(() => {
@@ -103,6 +133,7 @@ export function EmployerVerificationPage() {
         setItems(requests.data);
         setPreparation(current.data);
         setDraft(current.data.draft);
+        setTaxIdentifier(current.data.lookup?.taxIdentifier ?? "");
       })
       .catch(() => toast.error("Employer verification could not be loaded."));
     return () => {
@@ -134,24 +165,52 @@ export function EmployerVerificationPage() {
 
   async function lookup(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const value = new FormData(event.currentTarget).get("taxIdentifier");
     setBusy("lookup");
     try {
       const body = (await requestJson(
         "/api/employer-verifications/registry-lookups",
-        { method: "POST", body: JSON.stringify({ taxIdentifier: value }) },
+        { method: "POST", body: JSON.stringify({ taxIdentifier }) },
       )) as EmployerVerificationPreparationResponse;
       preparationRef.current = body.data;
       setPreparation(body.data);
       setDraft(body.data.draft);
-      toast.success(
-        body.data.lookup?.outcome === "MATCHED"
-          ? "Registered business facts found."
-          : "Manual business details are available.",
-        { id: "business-lookup" },
-      );
+      setCompanyEmail("");
+      setTaxIdentifier(body.data.lookup?.taxIdentifier ?? taxIdentifier);
+      if (body.data.lookup && registryLookupConfirmsBusiness(body.data.lookup.outcome)) {
+        toast.success("Registered business record found.", { id: "business-lookup" });
+      } else {
+        toast.error(
+          body.data.lookup?.outcome === "NOT_FOUND"
+            ? "This tax identifier was not found in the business registry."
+            : "The registry could not confirm this tax identifier. Try again later.",
+          { id: "business-lookup" },
+        );
+      }
     } catch {
       toast.error("Enter a valid 10-digit tax identifier and try again.", {
+        id: "business-lookup",
+      });
+    } finally {
+      setBusy(undefined);
+    }
+  }
+
+  async function resetTaxIdentifier() {
+    setBusy("reset-lookup");
+    try {
+      const body = (await requestJson("/api/employer-verifications/preparation", {
+        method: "DELETE",
+      })) as EmployerVerificationPreparationResponse;
+      preparationRef.current = body.data;
+      setPreparation(body.data);
+      setDraft(body.data.draft);
+      setCompanyEmail("");
+      setTaxIdentifier("");
+      toast.success("Tax identifier cleared. Start the verification again.", {
+        id: "business-lookup",
+      });
+    } catch {
+      toast.error("The tax identifier could not be changed. Try again.", {
         id: "business-lookup",
       });
     } finally {
@@ -276,23 +335,51 @@ export function EmployerVerificationPage() {
     event: FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
+    if (resubmitInFlightRef.current.has(requestId)) return;
+    resubmitInFlightRef.current.add(requestId);
+    const form = event.currentTarget;
     setBusy(requestId);
     try {
       await requestJson(
         `/api/employer-verifications/${encodeURIComponent(requestId)}/resubmit`,
-        { method: "POST", body: new FormData(event.currentTarget) },
+        { method: "POST", body: new FormData(form) },
       );
-      event.currentTarget.reset();
+      form.reset();
       toast.success("Replacement evidence received.");
       await loadRequests();
-    } catch {
+    } catch (error) {
+      const code = (
+        error as Error & { body?: { code?: string }; status?: number }
+      ).body?.code;
+      if (code === "TARGET_UNAVAILABLE") {
+        const refreshed = await loadRequests().catch(() => undefined);
+        const current = refreshed?.find((item) => item.id === requestId);
+        if (
+          current &&
+          ["PENDING_CHECKS", "PENDING_REVIEW", "RESUBMITTED"].includes(
+            current.state,
+          )
+        ) {
+          form.reset();
+          toast.success(
+            "Replacement evidence was already received and is under review.",
+          );
+          return;
+        }
+      }
       toast.error("Replacement evidence could not be accepted.");
     } finally {
+      resubmitInFlightRef.current.delete(requestId);
       setBusy(undefined);
     }
   }
 
   const lookupFacts = preparation?.lookup?.facts;
+  const registryConfirmed = Boolean(
+    preparation?.lookup &&
+      taxIdentifier === preparation.lookup.taxIdentifier &&
+      registryLookupConfirmsBusiness(preparation.lookup.outcome),
+  );
   const emailVerified = preparation?.email.status === "VERIFIED";
   const relationship = String(draft.relationship ?? "");
   const authorityExplanationRequired = ["AUTHORIZED_EMPLOYEE", "OTHER"].includes(relationship);
@@ -319,13 +406,15 @@ export function EmployerVerificationPage() {
           <section className={`${styles.card} ${styles.formCard}`}>
             <div className={styles.sectionHeading}><span className={styles.sectionNumber}>1</span><div><h2>Registered business</h2><p>Start with the exact 10-digit enterprise tax identifier.</p></div></div>
             <form className={styles.inlineForm} onSubmit={lookup}>
-              <label className={styles.field}><span>Vietnamese tax identifier</span><input name="taxIdentifier" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} required defaultValue={preparation?.lookup?.taxIdentifier ?? ""} aria-describedby="tax-help" /><small id="tax-help">Ten ASCII digits. Branch identifiers are not supported yet.</small></label>
-              <button className={styles.primaryButton} disabled={busy === "lookup"} type="submit">{busy === "lookup" ? "Looking up…" : "Look up business"}</button>
+              <label className={styles.field}><span>Vietnamese tax identifier</span><input name="taxIdentifier" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} required value={taxIdentifier} readOnly={registryConfirmed} onChange={(event) => setTaxIdentifier(event.target.value)} aria-describedby="tax-help" /><small id="tax-help">Ten ASCII digits. A confirmed identifier is locked until you restart verification.</small></label>
+              {registryConfirmed
+                ? <button className={styles.secondaryButton} disabled={busy === "reset-lookup"} type="button" onClick={() => void resetTaxIdentifier()}>{busy === "reset-lookup" ? "Resetting…" : "Change tax identifier"}</button>
+                : <button className={styles.primaryButton} disabled={busy === "lookup"} type="submit">{busy === "lookup" ? "Looking up…" : "Look up business"}</button>}
             </form>
-            {preparation?.lookup && <div className={styles.registryPanel} data-outcome={preparation.lookup.outcome}><strong>{preparation.lookup.outcome === "MATCHED" ? "Registered facts found" : "Registry confirmation unavailable"}</strong><span>Source: {preparation.lookup.sourceLabel} · checked {new Date(preparation.lookup.checkedAt).toLocaleString()}</span><dl><div><dt>Legal name</dt><dd>{lookupFacts?.legalName ?? "Not supplied by source"}</dd></div><div><dt>Registered address</dt><dd>{lookupFacts?.registeredAddress ?? "Not supplied by source"}</dd></div><div><dt>Established</dt><dd>{lookupFacts?.establishmentDate ?? "Not supplied by source"}</dd></div></dl></div>}
+            {preparation?.lookup && <div className={styles.registryPanel} data-outcome={preparation.lookup.outcome}><strong>{registryConfirmed ? "Registered business record found" : preparation.lookup.outcome === "NOT_FOUND" ? "Tax identifier not found" : "Registry confirmation unavailable"}</strong><span>Source: {preparation.lookup.sourceLabel} · checked {new Date(preparation.lookup.checkedAt).toLocaleString()}</span><dl><div><dt>Legal name</dt><dd>{lookupFacts?.legalName ?? "Not supplied by source"}</dd></div><div><dt>Registered address</dt><dd>{lookupFacts?.registeredAddress ?? "Not supplied by source"}</dd></div><div><dt>Established</dt><dd>{lookupFacts?.establishmentDate ?? "Not supplied by source"}</dd></div></dl>{!registryConfirmed && <p>Complete registry confirmation before continuing to company details.</p>}</div>}
           </section>
 
-          {preparation?.lookup && <form className={styles.formStack} onSubmit={submit} noValidate>
+          {registryConfirmed && preparation?.lookup && <form className={styles.formStack} onSubmit={submit} noValidate>
             <input type="hidden" name="preparationId" value={preparation.preparationId ?? ""} />
             <input type="hidden" name="preparationVersion" value={preparation.version} />
             <input type="hidden" name="lookupSnapshotId" value={preparation.lookup.snapshotId} />
@@ -334,7 +423,7 @@ export function EmployerVerificationPage() {
             <input type="hidden" name="policyVersion" value="business-verification-consent-v1" />
 
             <section className={`${styles.card} ${styles.formCard}`}>
-              <div className={styles.sectionHeading}><span className={styles.sectionNumber}>2</span><div><h2>Business information</h2><p>Review source values or provide normalized manual facts.</p></div></div>
+              <div className={styles.sectionHeading}><span className={styles.sectionNumber}>2</span><div><h2>Business information</h2><p>Review the confirmed registry values and provide the remaining normalized facts.</p></div></div>
               <div className={styles.form}>
                 <label className={styles.field}><span>Legal company name</span><input name="applicantLegalName" required minLength={1} maxLength={240} value={String(draft.applicantLegalName ?? "")} onChange={(e) => setDraft({ ...draft, applicantLegalName: e.target.value })} onBlur={(e) => void saveDraft("applicantLegalName", e.target.value)} /></label>
                 <label className={styles.field}><span>Registered address</span><textarea name="applicantRegisteredAddress" required minLength={5} maxLength={500} value={String(draft.applicantRegisteredAddress ?? "")} onChange={(e) => setDraft({ ...draft, applicantRegisteredAddress: e.target.value })} onBlur={(e) => void saveDraft("applicantRegisteredAddress", e.target.value)} /></label>
@@ -372,7 +461,7 @@ export function EmployerVerificationPage() {
         <aside className={`${styles.card} ${styles.processCard}`}><p className={styles.eyebrow}>Review signals</p><h2>What the administrator sees</h2><ol className={styles.processList}><li><span>1</span><div><strong>Registry snapshot</strong><p>Source, checked time, and exact field differences.</p></div></li><li><span>2</span><div><strong>Contact control</strong><p>Verified mailbox plus unverified phone and website-domain signals.</p></div></li><li><span>3</span><div><strong>Authority evidence</strong><p>Your relationship, explanation, consent, and protected license.</p></div></li></ol><div className={styles.requirementNote}><strong>Human decision only</strong><p>No lookup, email, phone, or website signal can approve or reject this request automatically.</p></div></aside>
       </div>
 
-      <section className={styles.historySection}><div className={styles.historyHeading}><div><p className={styles.eyebrow}>Application history</p><h2>Your recruiter applications</h2></div>{items.length > 0 && <span className={styles.applicationCount}>{items.length} requests</span>}</div>{items.length ? <ul className={styles.applicationList}>{items.map((item) => { const status = presentStatus(item.state); return <li className={styles.applicationCard} key={item.id}><div className={styles.applicationHeader}><div><strong>{item.submittedCompanyName}</strong><span>Submitted {new Date(item.createdAt).toLocaleDateString()}</span></div><span className={styles.statusBadge} data-tone={status.tone}>{status.label}</span></div><dl className={styles.applicationMeta}><div><dt>Tax identifier</dt><dd>{item.normalizedTaxIdentifier}</dd></div><div><dt>Requested role</dt><dd>{item.requestedRole.toLowerCase()}</dd></div><div><dt>Resubmissions</dt><dd>{item.resubmissionCount} of 3</dd></div></dl>{["PENDING_CHECKS", "PENDING_REVIEW", "CHANGES_REQUESTED"].includes(item.state) && <button className={styles.secondaryButton} disabled={busy === item.id} onClick={() => void cancel(item.id)} type="button">Cancel request</button>}{item.state === "CHANGES_REQUESTED" && item.resubmissionCount < 3 && <form className={styles.resubmitForm} onSubmit={(event) => void resubmit(item.id, event)}><label className={styles.field}><span>Replacement business license</span><input name="document" type="file" accept="application/pdf,image/png,image/jpeg" required /></label><button className={styles.primaryButton} disabled={busy === item.id} type="submit">Resubmit evidence</button></form>}</li>; })}</ul> : <div className={styles.emptyState}><span aria-hidden="true">⌁</span><div><strong>No verification requests.</strong><p>Your submitted applications will appear here.</p></div></div>}</section>
+      <section className={styles.historySection}><div className={styles.historyHeading}><div><p className={styles.eyebrow}>Application history</p><h2>Your recruiter applications</h2></div>{items.length > 0 && <span className={styles.applicationCount}>{items.length} requests</span>}</div>{items.length ? <ul className={styles.applicationList}>{items.map((item) => { const status = presentStatus(item.state); return <li className={styles.applicationCard} key={item.id}><VerificationContextRead requestId={item.id} csrfProof={csrfProof} /><div className={styles.applicationHeader}><div><strong>{item.submittedCompanyName}</strong><span>Submitted {new Date(item.createdAt).toLocaleDateString()}</span></div><span className={styles.statusBadge} data-tone={status.tone}>{status.label}</span></div><dl className={styles.applicationMeta}><div><dt>Tax identifier</dt><dd>{item.normalizedTaxIdentifier}</dd></div><div><dt>Requested role</dt><dd>{item.requestedRole.toLowerCase()}</dd></div><div><dt>Resubmissions</dt><dd>{item.resubmissionCount} of 3</dd></div></dl>{["PENDING_CHECKS", "PENDING_REVIEW", "CHANGES_REQUESTED"].includes(item.state) && <button className={styles.secondaryButton} disabled={busy === item.id} onClick={() => void cancel(item.id)} type="button">Cancel request</button>}{item.state === "CHANGES_REQUESTED" && item.resubmissionCount < 3 && <form className={styles.resubmitForm} onSubmit={(event) => void resubmit(item.id, event)}><label className={styles.field}><span>Replacement business license</span><input name="document" type="file" accept="application/pdf,image/png,image/jpeg" required /></label><button className={styles.primaryButton} disabled={busy === item.id} type="submit">Resubmit evidence</button></form>}</li>; })}</ul> : <div className={styles.emptyState}><span aria-hidden="true">⌁</span><div><strong>No verification requests.</strong><p>Your submitted applications will appear here.</p></div></div>}</section>
     </main>
   );
 }

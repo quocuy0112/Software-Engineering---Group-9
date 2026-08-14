@@ -74,6 +74,7 @@ export const ModelName = {
   AuthenticationChallenge: 'AuthenticationChallenge',
   RateLimitBucket: 'RateLimitBucket',
   EmailOutbox: 'EmailOutbox',
+  InAppNotification: 'InAppNotification',
   AuditEvent: 'AuditEvent',
   Company: 'Company',
   CompanyMembership: 'CompanyMembership',
@@ -574,6 +575,30 @@ export const EmailOutboxScalarFieldEnum = {
 } as const
 
 export type EmailOutboxScalarFieldEnum = (typeof EmailOutboxScalarFieldEnum)[keyof typeof EmailOutboxScalarFieldEnum]
+
+
+export const InAppNotificationScalarFieldEnum = {
+  id: 'id',
+  recipientUserId: 'recipientUserId',
+  kind: 'kind',
+  category: 'category',
+  severity: 'severity',
+  title: 'title',
+  summary: 'summary',
+  href: 'href',
+  contextType: 'contextType',
+  contextId: 'contextId',
+  deduplicationKey: 'deduplicationKey',
+  correlationId: 'correlationId',
+  occurrenceCount: 'occurrenceCount',
+  readAt: 'readAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  lastOccurredAt: 'lastOccurredAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InAppNotificationScalarFieldEnum = (typeof InAppNotificationScalarFieldEnum)[keyof typeof InAppNotificationScalarFieldEnum]
 
 
 export const AuditEventScalarFieldEnum = {

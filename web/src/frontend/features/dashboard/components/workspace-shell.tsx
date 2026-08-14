@@ -40,6 +40,7 @@ import {
   RecruiterJobPostingManagement,
   RecruiterWorkspaceNavigation,
 } from "@/frontend/features/recruiter-workspace/job-posting-management";
+import { NotificationCenter } from "@/frontend/features/notifications/components/notification-center";
 const SIDEBAR_MINIMUM_WIDTH = 220;
 const SIDEBAR_WIDTH_STEP = 16;
 const SIDEBAR_MAXIMUM_FALLBACK_WIDTH = 360;
@@ -425,6 +426,7 @@ function WorkspaceShellContent({
               <GlobalImageSearch csrfProof={csrfProof} />
             ) : null}
             <div className="workspace-header-actions">
+              <NotificationCenter csrfProof={csrfProof} locale={locale} />
               <ThemeToggle compact />
               <Link
                 className="workspace-account-chip"

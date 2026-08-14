@@ -35,11 +35,17 @@ try {
         FOR UPDATE`,
       [[legacyName, currentName]],
     );
-    const legacy = history.rows.find(
+    const legacyRows = history.rows.filter(
       (row) => row.migration_name === legacyName,
     );
-    const current = history.rows.find(
+    const currentRows = history.rows.filter(
       (row) => row.migration_name === currentName,
+    );
+    const legacy = legacyRows.find(
+      (row) => row.finished_at && !row.rolled_back_at,
+    );
+    const current = currentRows.find(
+      (row) => row.finished_at && !row.rolled_back_at,
     );
     if (legacy && current) {
       throw new Error(
@@ -48,13 +54,13 @@ try {
     }
     const applied = current ?? legacy;
     if (!applied) {
-      results.push({ legacyName, currentName, status: "NOT_APPLIED" });
+      results.push({
+        legacyName,
+        currentName,
+        status: "NOT_APPLIED",
+        rolledBackAttempts: legacyRows.length + currentRows.length,
+      });
       continue;
-    }
-    if (!applied.finished_at || applied.rolled_back_at) {
-      throw new Error(
-        `Migration ${applied.migration_name} is not a completed applied migration`,
-      );
     }
     if (applied.checksum !== sourceChecksum) {
       throw new Error(
@@ -62,7 +68,12 @@ try {
       );
     }
     if (current) {
-      results.push({ legacyName, currentName, status: "ALREADY_CURRENT" });
+      results.push({
+        legacyName,
+        currentName,
+        status: "ALREADY_CURRENT",
+        rolledBackAttempts: currentRows.length - 1,
+      });
       continue;
     }
     if (!apply) {
@@ -75,7 +86,12 @@ try {
         WHERE migration_name = $2`,
       [currentName, legacyName],
     );
-    results.push({ legacyName, currentName, status: "RENAMED" });
+    results.push({
+      legacyName,
+      currentName,
+      status: "RENAMED",
+      historyRows: legacyRows.length,
+    });
   }
   if (apply) await client.query("COMMIT");
   else await client.query("ROLLBACK");

@@ -45,6 +45,7 @@ describe("recruiter header action", () => {
 
   it.each([
     ["NEVER_APPLIED", "Apply as Recruiter"],
+    ["CHANGES_REQUESTED", "Update Application"],
     ["REJECTED", "Reapply as Recruiter"],
     ["APPROVED", "Recruiter Workspace"],
   ] as const)("renders the %s label", (state, label) => {
@@ -67,6 +68,23 @@ describe("recruiter header action", () => {
       />,
     );
     expect(screen.getByRole("button", { name: label })).toBeVisible();
+  });
+
+  it("keeps a changes-requested application actionable", () => {
+    render(
+      <RecruiterHeaderAction
+        initialStatus={{
+          state: "CHANGES_REQUESTED",
+          destinationKind: "EMPLOYER_VERIFICATION",
+          href: "/dashboard/employer-verification",
+          observedAt,
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Update Application" }),
+    ).not.toHaveAttribute("aria-disabled");
   });
 
   it("opens the approved external destination once", () => {

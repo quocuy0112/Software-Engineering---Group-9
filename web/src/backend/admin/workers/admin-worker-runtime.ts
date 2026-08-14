@@ -7,6 +7,7 @@ export type AdminWorkerLoop = {
     | "verification-deadline"
     | "business-verification-preparation-cleanup"
     | "notification"
+    | "in-app-notification-retention"
     | "retention"
     | "support"
     | "connections";

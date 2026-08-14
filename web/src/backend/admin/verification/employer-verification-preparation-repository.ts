@@ -78,6 +78,11 @@ export interface EmployerVerificationPreparationRepository {
     preparationExpiresAt: Date;
     sensitiveDeleteAfter: Date;
   }): Promise<void>;
+  invalidateCurrentPreparation(input: {
+    userId: string;
+    now: Date;
+    sensitiveDeleteAfter: Date;
+  }): Promise<void>;
   updateDraft(input: {
     userId: string;
     preparationId: string;

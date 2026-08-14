@@ -32,13 +32,20 @@ export class RecruiterHeaderStatusService {
     if (
       latestRequestState === "PENDING_CHECKS" ||
       latestRequestState === "PENDING_REVIEW" ||
-      latestRequestState === "CHANGES_REQUESTED" ||
       latestRequestState === "RESUBMITTED"
     ) {
       return {
         state: "PENDING_REVIEW",
         destinationKind: "NONE",
         href: null,
+        observedAt,
+      };
+    }
+    if (latestRequestState === "CHANGES_REQUESTED") {
+      return {
+        state: "CHANGES_REQUESTED",
+        destinationKind: "EMPLOYER_VERIFICATION",
+        href: EMPLOYER_VERIFICATION_HREF,
         observedAt,
       };
     }

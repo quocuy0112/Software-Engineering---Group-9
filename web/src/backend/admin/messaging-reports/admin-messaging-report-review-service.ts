@@ -7,6 +7,7 @@ import {
 import { PrismaAdminMessagingReportRepository } from "@/backend/repositories/admin/prisma-admin-messaging-report-repository";
 import { AuditWriter } from "@/backend/admin/audit/audit-writer";
 import { normalizeAdminPlainText } from "@/shared/contracts/admin/common";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
 
 export type AdminMessagingReportAction =
   | "assign"
@@ -147,6 +148,20 @@ export class AdminMessagingReportReviewService {
             occurredAt: now,
           },
         });
+        if (action === "resolve" || action === "dismiss") {
+          await createInAppNotification(tx, {
+            recipientUserId: row.reporterUserId,
+            kind:
+              action === "resolve"
+                ? "MESSAGE_REPORT_RESOLVED"
+                : "MESSAGE_REPORT_DISMISSED",
+            deduplicationKey: `messaging-report:${row.id}:${state.toLowerCase()}:v${version}`,
+            correlationId,
+            occurredAt: now,
+            contextType: "MESSAGING_REPORT",
+            contextId: row.id,
+          });
+        }
         const auditAction = (
           {
             assign: "admin.report_assigned",

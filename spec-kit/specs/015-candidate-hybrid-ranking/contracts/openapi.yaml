@@ -1,0 +1,403 @@
+openapi: 3.1.0
+info:
+  title: SmartHire Candidate Hybrid Ranking API — Groups 2–4 Addendum
+  version: 1.0.0
+  description: Additive contract to Feature 012 Group 1. Merge these paths/schemas without removing or changing Group 1 operations.
+paths:
+  /api/recruiter/jobs/{jobId}/applications/ranked:
+    get:
+      operationId: listRankedCandidates
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+        - { name: sort, in: query, schema: { type: string, enum: [FINAL_SCORE_DESC, SUBMITTED_AT_DESC, MANUAL_PRIORITY], default: FINAL_SCORE_DESC } }
+        - { name: minScore, in: query, schema: { type: number, minimum: 0, maximum: 100 } }
+        - { name: maxScore, in: query, schema: { type: number, minimum: 0, maximum: 100 } }
+        - { name: skills, in: query, schema: { type: array, maxItems: 25, items: { type: string, maxLength: 80 } } }
+        - { name: minimumExperienceYears, in: query, schema: { type: number, minimum: 0, maximum: 80 } }
+        - { name: stage, in: query, schema: { type: array, items: { $ref: '#/components/schemas/ApplicationStage' } } }
+        - { name: scoringStatus, in: query, schema: { type: array, items: { type: string, enum: [NOT_CALCULATED, PROCESSING, UNAVAILABLE, SCORED] } } }
+        - { name: pipeline, in: query, schema: { type: string, enum: [ACTIVE_PIPELINE, ALL, REJECTED], default: ACTIVE_PIPELINE } }
+      responses:
+        '200':
+          description: Snapshot-stable ranked page; score filters explicitly report non-final exclusions
+          headers: { Cache-Control: { schema: { type: string, const: 'private, no-store' } } }
+          content: { application/json: { schema: { $ref: '#/components/schemas/RankedApplicationPage' } } }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/recruiter/jobs/{jobId}/scoring/rescore:
+    post:
+      operationId: triggerJobRescore
+      security: [{ sessionCookie: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/JobId' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/RescoreRequest' } } }
+      responses:
+        '202': { description: Background rescore accepted or idempotently replayed, content: { application/json: { schema: { $ref: '#/components/schemas/ScoringOperation' } } } }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/recruiter/jobs/{jobId}/scoring/rescore/{operationId}:
+    get:
+      operationId: getRescoreStatus
+      security: [{ sessionCookie: [] }]
+      parameters: [{ $ref: '#/components/parameters/JobId' }, { $ref: '#/components/parameters/OperationId' }]
+      responses:
+        '200': { description: Current background-operation counts, content: { application/json: { schema: { $ref: '#/components/schemas/ScoringOperation' } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+  /api/recruiter/applications/{applicationId}/scoring:
+    get:
+      operationId: getApplicationScoring
+      security: [{ sessionCookie: [] }]
+      parameters: [{ $ref: '#/components/parameters/ApplicationId' }]
+      responses:
+        '200':
+          description: Mutually exclusive scoring detail with deterministic fallback
+          headers: { Cache-Control: { schema: { type: string, const: 'private, no-store' } } }
+          content: { application/json: { schema: { $ref: '#/components/schemas/ApplicationScoringDetail' } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+  /api/recruiter/applications/{applicationId}/scoring/retry-ai:
+    post:
+      operationId: retryApplicationAi
+      security: [{ sessionCookie: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/ApplicationId' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/ConfirmedCommand' } } }
+      responses:
+        '202': { description: AI-only retry accepted; automatic result is reused, content: { application/json: { schema: { $ref: '#/components/schemas/AiRetryAccepted' } } } }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/recruiter/applications/{applicationId}/priority:
+    put:
+      operationId: setManualPriority
+      security: [{ sessionCookie: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/ApplicationId' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/SetPriorityRequest' } } } }
+      responses:
+        '200': { description: Priority set or changed without score mutation, content: { application/json: { schema: { $ref: '#/components/schemas/ManualPriority' } } } }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+    delete:
+      operationId: removeManualPriority
+      security: [{ sessionCookie: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/ApplicationId' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/RemovePriorityRequest' } } } }
+      responses:
+        '200': { description: Priority removed with immutable history, content: { application/json: { schema: { $ref: '#/components/schemas/RemovedPriority' } } } }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/recruiter/applications/{applicationId}/decisions/interview:
+    post:
+      operationId: moveApplicationToInterview
+      security: [{ sessionCookie: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/ApplicationId' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/InterviewDecisionRequest' } } } }
+      responses:
+        '200': { description: Canonical stage/event/audit committed and candidate notification enqueued, content: { application/json: { schema: { $ref: '#/components/schemas/DecisionOutcome' } } } }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/recruiter/applications/{applicationId}/decisions/reject:
+    post:
+      operationId: rejectApplication
+      security: [{ sessionCookie: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/ApplicationId' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/RejectDecisionRequest' } } } }
+      responses:
+        '200': { description: Canonical rejection stage/event/audit committed; internal note remains recruiter-only, content: { application/json: { schema: { $ref: '#/components/schemas/DecisionOutcome' } } } }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+components:
+  securitySchemes:
+    sessionCookie: { $ref: '../../012-candidate-filtering-and-hybrid-scoring-system/contracts/openapi.yaml#/components/securitySchemes/sessionCookie' }
+    csrfToken: { $ref: '../../012-candidate-filtering-and-hybrid-scoring-system/contracts/openapi.yaml#/components/securitySchemes/csrfToken' }
+  parameters:
+    JobId: { $ref: '../../012-candidate-filtering-and-hybrid-scoring-system/contracts/openapi.yaml#/components/parameters/JobId' }
+    ApplicationId: { $ref: '../../012-candidate-filtering-and-hybrid-scoring-system/contracts/openapi.yaml#/components/parameters/ApplicationId' }
+    IdempotencyKey: { $ref: '../../012-candidate-filtering-and-hybrid-scoring-system/contracts/openapi.yaml#/components/parameters/IdempotencyKey' }
+    OperationId: { name: operationId, in: path, required: true, schema: { type: string, minLength: 1, maxLength: 128 } }
+    Cursor: { name: cursor, in: query, schema: { type: string, maxLength: 1024 } }
+    Limit: { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 25 } }
+  schemas:
+    SafeError: { $ref: '../../012-candidate-filtering-and-hybrid-scoring-system/contracts/openapi.yaml#/components/schemas/SafeError' }
+    ApplicationStage: { type: string, enum: [APPLIED, VIEWED, SHORTLISTED, INTERVIEWING, OFFERED, HIRED, OFFER_DECLINED, REJECTED, WAITLISTED] }
+    ExplicitLabel:
+      type: object
+      additionalProperties: false
+      required: [code, label, iconLabel]
+      properties: { code: { type: string }, label: { type: string, minLength: 1, maxLength: 120 }, iconLabel: { type: string, minLength: 1, maxLength: 80 } }
+    NotCalculatedState:
+      type: object
+      additionalProperties: false
+      required: [kind, label]
+      properties: { kind: { const: NOT_CALCULATED }, label: { const: Not calculated } }
+    PendingState:
+      type: object
+      additionalProperties: false
+      required: [kind, label, operationId, automaticMatch]
+      properties:
+        kind: { const: PENDING }
+        label: { const: Pending }
+        operationId: { type: string }
+        automaticMatch: { oneOf: [{ $ref: '#/components/schemas/AutomaticMatch' }, { type: 'null' }] }
+    ProcessingState:
+      type: object
+      additionalProperties: false
+      required: [kind, label, operationId]
+      properties: { kind: { const: PROCESSING }, label: { const: Processing }, operationId: { type: string } }
+    UnavailableState:
+      type: object
+      additionalProperties: false
+      required: [kind, label, automaticMatch, aiAssessment, finalScore, retryAllowed, consecutiveFailures]
+      properties:
+        kind: { const: UNAVAILABLE }
+        label: { const: Unavailable }
+        automaticMatch: { $ref: '#/components/schemas/AutomaticMatch' }
+        aiAssessment: { type: object, additionalProperties: false, required: [kind, label, safeFailureCode], properties: { kind: { const: UNAVAILABLE }, label: { const: Unavailable }, safeFailureCode: { type: string }, supportGuidance: { type: [string, 'null'] } } }
+        finalScore: { type: object, additionalProperties: false, required: [kind, label], properties: { kind: { const: NOT_CALCULATED }, label: { const: Not calculated } } }
+        retryAllowed: { type: boolean }
+        consecutiveFailures: { type: integer, minimum: 1 }
+    ScoredState:
+      type: object
+      additionalProperties: false
+      required: [kind, label, automaticMatch, aiAssessment, finalScore]
+      properties:
+        kind: { const: SCORED }
+        label: { const: Scored }
+        automaticMatch: { $ref: '#/components/schemas/AutomaticMatch' }
+        aiAssessment: { $ref: '#/components/schemas/AiAssessment' }
+        finalScore: { $ref: '#/components/schemas/FinalScore' }
+    ScoringState:
+      oneOf:
+        - $ref: '#/components/schemas/NotCalculatedState'
+        - $ref: '#/components/schemas/PendingState'
+        - $ref: '#/components/schemas/ProcessingState'
+        - $ref: '#/components/schemas/UnavailableState'
+        - $ref: '#/components/schemas/ScoredState'
+      discriminator: { propertyName: kind }
+    ParseStatus:
+      type: object
+      additionalProperties: false
+      required: [code, label, parserVersion, processingMilliseconds, snapshotVersion]
+      properties:
+        code: { type: string, enum: [PARSED_SUCCESSFULLY, PARSED_WITH_ERRORS, FAILED] }
+        label: { type: string, enum: [Parsed successfully, Parsed with errors, Failed] }
+        parserVersion: { type: string }
+        processingMilliseconds: { type: integer, minimum: 0 }
+        snapshotVersion: { type: string }
+    EvidenceExcerpt:
+      type: object
+      additionalProperties: false
+      required: [excerpt, cvSnapshotVersion, parserVersion]
+      anyOf: [{ required: [pageNumber] }, { required: [sectionLabel] }]
+      properties: { excerpt: { type: string, minLength: 1 }, pageNumber: { type: integer, minimum: 1 }, sectionLabel: { type: string }, cvSnapshotVersion: { type: string }, parserVersion: { type: string } }
+    SkillEvidence:
+      type: object
+      additionalProperties: false
+      required: [skillCode, label, requirementKind, matchState, evidence]
+      properties:
+        skillCode: { type: string }
+        label: { type: string }
+        requirementKind: { type: string, enum: [REQUIRED, PREFERRED] }
+        matchState: { type: string, enum: [FOUND, MISSING, NEUTRAL_PREFERRED] }
+        evidence: { type: array, items: { $ref: '#/components/schemas/EvidenceExcerpt' } }
+    AutomaticMatch:
+      type: object
+      additionalProperties: false
+      required: [resultId, score, cvVersion, jdVersion, configVersion, parserVersion, cvParse, jdParse, mayBeIncomplete, foundRequiredSkills, missingRequiredSkills, preferredSkills, detectedExperience]
+      properties:
+        resultId: { type: string }
+        score: { type: number, minimum: 0, maximum: 100 }
+        cvVersion: { type: string }
+        jdVersion: { type: string }
+        configVersion: { type: string }
+        parserVersion: { type: string }
+        cvParse: { $ref: '#/components/schemas/ParseStatus' }
+        jdParse: { $ref: '#/components/schemas/ParseStatus' }
+        mayBeIncomplete: { type: boolean }
+        incompletenessLabel: { type: [string, 'null'] }
+        foundRequiredSkills: { type: array, items: { $ref: '#/components/schemas/SkillEvidence' } }
+        missingRequiredSkills: { type: array, items: { $ref: '#/components/schemas/SkillEvidence' } }
+        preferredSkills: { type: array, items: { $ref: '#/components/schemas/SkillEvidence' } }
+        minimumExperienceYears: { type: [number, 'null'], minimum: 0 }
+        detectedExperience: { oneOf: [{ type: object, required: [kind, years, label], properties: { kind: { const: DETECTED }, years: { type: number, minimum: 0 }, label: { type: string } } }, { type: object, required: [kind, label], properties: { kind: { const: NOT_DETECTED }, label: { const: Not detected } } }], discriminator: { propertyName: kind } }
+    AiFinding:
+      type: object
+      additionalProperties: false
+      required: [id, kind, title, evidence]
+      properties: { id: { type: string }, kind: { type: string, enum: [STRENGTH, POINT_TO_VERIFY] }, title: { type: string }, evidence: { type: string } }
+    AiAssessment:
+      type: object
+      additionalProperties: false
+      required: [assessmentId, score, confidencePercent, confidenceLevel, confidenceLabel, provider, modelVersion, promptVersion, policyVersion, overallSummary, breakdown, findings, compliance, questions]
+      properties:
+        assessmentId: { type: string }
+        score: { type: number, minimum: 0, maximum: 100 }
+        confidencePercent: { type: integer, minimum: 0, maximum: 100 }
+        confidenceLevel: { type: string, enum: [LOW, STANDARD] }
+        confidenceLabel: { type: string }
+        humanReviewGuidance: { type: [string, 'null'] }
+        provider: { type: string }
+        modelVersion: { type: string }
+        promptVersion: { type: string }
+        policyVersion: { type: string }
+        overallSummary: { type: string }
+        breakdown: { type: array, minItems: 3, maxItems: 3, items: { type: string } }
+        findings: { type: array, items: { $ref: '#/components/schemas/AiFinding' } }
+        compliance: { type: object, required: [code, label], properties: { code: { const: SENSITIVE_ATTRIBUTES_EXCLUDED }, label: { const: Sensitive personal attributes are excluded from scoring. } } }
+        questions: { oneOf: [{ type: object, required: [kind, items], properties: { kind: { const: GENERATED }, items: { type: array, minItems: 1, items: { type: object, required: [question, pointToVerifyId], properties: { question: { type: string }, pointToVerifyId: { type: string } } } } } }, { type: object, required: [kind, fallbackMessage], properties: { kind: { const: INSUFFICIENT_DATA }, fallbackMessage: { type: string, minLength: 1 } } }], discriminator: { propertyName: kind } }
+    FinalScore:
+      type: object
+      additionalProperties: false
+      required: [value, formulaText, formulaVersion, automaticWeight, aiWeight, band, cvVersion, jdVersion, configVersion, computedAt]
+      properties:
+        value: { type: number, minimum: 0, maximum: 100, multipleOf: 0.1 }
+        formulaText: { type: string, pattern: '^.+ × 0\\.6 \+ .+ × 0\\.4 = .+$' }
+        formulaVersion: { type: string }
+        automaticWeight: { const: 0.6 }
+        aiWeight: { const: 0.4 }
+        band: { $ref: '#/components/schemas/ExplicitLabel' }
+        cvVersion: { type: string }
+        jdVersion: { type: string }
+        configVersion: { type: string }
+        computedAt: { type: string, format: date-time }
+    ApplicationScoringDetail:
+      type: object
+      additionalProperties: false
+      required: [applicationId, humanDecisionNotice, scoring, rescoreInProgress, documentAccess]
+      properties:
+        applicationId: { type: string }
+        humanDecisionNotice: { const: Scores support decision-making only. The recruiter makes the final decision. }
+        scoring: { $ref: '#/components/schemas/ScoringState' }
+        rescoreInProgress: { type: boolean }
+        documentAccess: { type: object, description: Reuses Group 1 viewer paths; contains no second document locator, required: [cvViewerPath], properties: { cvViewerPath: { type: string }, coverLetterViewerPath: { type: [string, 'null'] } } }
+    ActiveFilterChip:
+      type: object
+      additionalProperties: false
+      required: [code, label, removeToken]
+      properties: { code: { type: string }, label: { type: string }, removeToken: { type: string } }
+    RankedApplicationRow:
+      type: object
+      additionalProperties: false
+      required: [applicationId, stage, stageVersion, submittedAt, scoring, manuallyPrioritized, allowedActions]
+      properties:
+        applicationId: { type: string }
+        stage: { $ref: '#/components/schemas/ApplicationStage' }
+        stageVersion: { type: integer, minimum: 1 }
+        submittedAt: { type: string, format: date-time }
+        scoring: { $ref: '#/components/schemas/ScoringState' }
+        manuallyPrioritized: { type: boolean }
+        manualPriority: { oneOf: [{ $ref: '#/components/schemas/ManualPriority' }, { type: 'null' }] }
+        allowedActions: { type: object, required: [moveToInterview, reject], properties: { moveToInterview: { $ref: '#/components/schemas/ActionAvailability' }, reject: { $ref: '#/components/schemas/ActionAvailability' } } }
+    ActionAvailability:
+      oneOf:
+        - { type: object, required: [allowed, label], properties: { allowed: { const: true }, label: { type: string } } }
+        - { type: object, required: [allowed, label, reasonCode, reasonLabel], properties: { allowed: { const: false }, label: { type: string }, reasonCode: { type: string }, reasonLabel: { type: string } } }
+      discriminator: { propertyName: allowed }
+    RankedApplicationPage:
+      type: object
+      additionalProperties: false
+      required: [items, nextCursor, rankingSnapshotId, activeFilters, processingExcludedCount, processingExclusionLabel, defaultRejectedExclusionLabel]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/RankedApplicationRow' } }
+        nextCursor: { type: [string, 'null'] }
+        rankingSnapshotId: { type: string }
+        activeFilters: { type: array, items: { $ref: '#/components/schemas/ActiveFilterChip' } }
+        processingExcludedCount: { type: integer, minimum: 0 }
+        processingExclusionLabel: { type: [string, 'null'] }
+        defaultRejectedExclusionLabel: { type: [string, 'null'] }
+    ConfirmedCommand:
+      type: object
+      additionalProperties: false
+      required: [confirmed]
+      properties: { confirmed: { const: true } }
+    RescoreRequest:
+      allOf:
+        - $ref: '#/components/schemas/ConfirmedCommand'
+        - { type: object, required: [jdVersion, scoringConfigVersion], properties: { jdVersion: { type: string }, scoringConfigVersion: { type: string } } }
+    ScoringOperation:
+      type: object
+      additionalProperties: false
+      required: [operationId, kind, state, totalCount, succeededCount, deterministicOnlyCount, failedCount, requestedAt]
+      properties:
+        operationId: { type: string }
+        kind: { type: string, enum: [INITIAL, JOB_RESCORE, AI_RETRY] }
+        state: { type: string, enum: [QUEUED, RUNNING, COMPLETED, COMPLETED_WITH_FAILURES, FAILED] }
+        totalCount: { type: integer, minimum: 0 }
+        succeededCount: { type: integer, minimum: 0 }
+        deterministicOnlyCount: { type: integer, minimum: 0 }
+        failedCount: { type: integer, minimum: 0 }
+        requestedAt: { type: string, format: date-time }
+        completedAt: { type: [string, 'null'], format: date-time }
+    AiRetryAccepted:
+      type: object
+      additionalProperties: false
+      required: [operation, reusedAutomaticMatchResultId, scoring]
+      properties: { operation: { $ref: '#/components/schemas/ScoringOperation' }, reusedAutomaticMatchResultId: { type: string }, scoring: { $ref: '#/components/schemas/PendingState' } }
+    ManualPriority:
+      type: object
+      additionalProperties: false
+      required: [id, value, label, reason, actorUserId, setAt, version, active]
+      properties: { id: { type: string }, value: { type: string, enum: [HIGH, NORMAL, LOW, HOLD] }, label: { type: string }, reason: { type: string }, actorUserId: { type: string }, setAt: { type: string, format: date-time }, version: { type: integer, minimum: 1 }, active: { const: true } }
+    SetPriorityRequest:
+      allOf:
+        - $ref: '#/components/schemas/ConfirmedCommand'
+        - { type: object, additionalProperties: false, required: [confirmed, value, reason, expectedVersion], properties: { confirmed: { const: true }, value: { type: string, enum: [HIGH, NORMAL, LOW, HOLD] }, reason: { type: string, minLength: 1, maxLength: 1000 }, expectedVersion: { type: integer, minimum: 0 } } }
+    RemovePriorityRequest:
+      allOf:
+        - $ref: '#/components/schemas/ConfirmedCommand'
+        - { type: object, additionalProperties: false, required: [confirmed, reason, expectedVersion], properties: { confirmed: { const: true }, reason: { type: string, minLength: 1, maxLength: 1000 }, expectedVersion: { type: integer, minimum: 1 } } }
+    RemovedPriority:
+      type: object
+      additionalProperties: false
+      required: [id, active, removedByUserId, removedAt, removalReason]
+      properties: { id: { type: string }, active: { const: false }, removedByUserId: { type: string }, removedAt: { type: string, format: date-time }, removalReason: { type: string } }
+    InterviewDecisionRequest:
+      allOf:
+        - $ref: '#/components/schemas/ConfirmedCommand'
+        - { type: object, additionalProperties: false, required: [confirmed, expectedStageVersion], properties: { confirmed: { const: true }, expectedStageVersion: { type: integer, minimum: 1 } } }
+    RejectionReasonCode:
+      type: string
+      enum: [REQUIRED_TECHNICAL_EXPERIENCE_NOT_DEMONSTRATED, INSUFFICIENT_EXPERIENCE, REQUIRED_SKILLS_NOT_DEMONSTRATED, POSITION_FILLED, APPLICATION_WITHDRAWN_BY_CANDIDATE, OTHER_JOB_RELATED_REASON]
+    RejectDecisionRequest:
+      allOf:
+        - $ref: '#/components/schemas/ConfirmedCommand'
+        - { type: object, additionalProperties: false, required: [confirmed, expectedStageVersion, reasonCode], properties: { confirmed: { const: true }, expectedStageVersion: { type: integer, minimum: 1 }, reasonCode: { $ref: '#/components/schemas/RejectionReasonCode' }, internalNote: { type: string, maxLength: 2000, description: Recruiter-only; never candidate-visible or notification content } } }
+    DecisionOutcome:
+      type: object
+      additionalProperties: false
+      required: [applicationId, fromStage, toStage, stageVersion, stageEventId, auditEventId, actorUserId, decidedAt, notification]
+      properties:
+        applicationId: { type: string }
+        fromStage: { $ref: '#/components/schemas/ApplicationStage' }
+        toStage: { $ref: '#/components/schemas/ApplicationStage' }
+        stageVersion: { type: integer, minimum: 2 }
+        stageEventId: { type: string }
+        auditEventId: { type: string }
+        actorUserId: { type: string }
+        decidedAt: { type: string, format: date-time }
+        reasonCode: { type: [string, 'null'] }
+        notification: { type: object, required: [required, status], properties: { required: { type: boolean }, status: { type: string, enum: [NOT_REQUIRED, PENDING, SENT, FAILED_RETRYING] } } }
+  responses:
+    InvalidRequest: { description: Invalid bounded input or missing explicit confirmation/reason, content: { application/json: { schema: { $ref: '#/components/schemas/SafeError' } } } }
+    Unauthenticated: { description: No valid current session, content: { application/json: { schema: { $ref: '#/components/schemas/SafeError' } } } }
+    Unavailable: { description: Neutral unavailable result for unknown or unauthorized resource, content: { application/json: { schema: { $ref: '#/components/schemas/SafeError' } } } }
+    Conflict: { description: Stale version, incompatible cursor, operation already running, or invalid current state, content: { application/json: { schema: { $ref: '#/components/schemas/SafeError' } } } }

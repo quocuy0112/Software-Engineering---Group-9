@@ -11,6 +11,7 @@ import type {
 } from "@/shared/contracts/support";
 import { useSupportInvalidation } from "../client/use-support-invalidation";
 import { handleSupportMessageKeyDown } from "./support-message-keyboard";
+import { useNotificationContextRead } from "@/frontend/features/notifications/client/use-notification-context-read";
 
 function supportCopy(locale: "vi" | "en") {
   return locale === "vi"
@@ -171,6 +172,13 @@ export function SupportWorkspace({
   const messagesRef = useRef<HTMLDivElement>(null);
   const canCreateCase =
     !busy && subject.trim().length >= 5 && Boolean(initialMessage.trim());
+
+  useNotificationContextRead({
+    enabled: Boolean(detail) && !error,
+    contextType: "SUPPORT_CASE",
+    contextId: detail?.id,
+    csrfProof,
+  });
   const refreshCases = useCallback(async () => {
     const body = await supportApi("/api/support/cases", csrfProof);
     setCases(body.data);

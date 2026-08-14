@@ -5,9 +5,7 @@ import type {
   VerificationPreparationDraftChanges,
 } from "@/backend/admin/verification/employer-verification-preparation-repository";
 
-export class PrismaEmployerVerificationPreparationRepository
-  implements EmployerVerificationPreparationRepository
-{
+export class PrismaEmployerVerificationPreparationRepository implements EmployerVerificationPreparationRepository {
   async isActiveUser(userId: string) {
     return Boolean(
       await prisma.userAccount.findFirst({
@@ -17,7 +15,11 @@ export class PrismaEmployerVerificationPreparationRepository
     );
   }
 
-  async hasReusableLookup(input: Parameters<EmployerVerificationPreparationRepository["hasReusableLookup"]>[0]) {
+  async hasReusableLookup(
+    input: Parameters<
+      EmployerVerificationPreparationRepository["hasReusableLookup"]
+    >[0],
+  ) {
     return Boolean(
       await prisma.employerVerificationPreparation.findFirst({
         where: {
@@ -37,7 +39,11 @@ export class PrismaEmployerVerificationPreparationRepository
     );
   }
 
-  async replaceLookup(input: Parameters<EmployerVerificationPreparationRepository["replaceLookup"]>[0]) {
+  async replaceLookup(
+    input: Parameters<
+      EmployerVerificationPreparationRepository["replaceLookup"]
+    >[0],
+  ) {
     await prisma.$transaction(async (transaction) => {
       await transaction.companyContactEmailChallenge.updateMany({
         where: {
@@ -93,7 +99,8 @@ export class PrismaEmployerVerificationPreparationRepository
           lookupSnapshotId: snapshot.id,
           version: { increment: 1 },
           applicantLegalName: input.result.facts?.legalName ?? null,
-          applicantRegisteredAddress: input.result.facts?.registeredAddress ?? null,
+          applicantRegisteredAddress:
+            input.result.facts?.registeredAddress ?? null,
           mismatchExplanation: null,
           inaccessibleAt: null,
           deleteAfter: null,
@@ -104,7 +111,50 @@ export class PrismaEmployerVerificationPreparationRepository
     });
   }
 
-  async updateDraft(input: Parameters<EmployerVerificationPreparationRepository["updateDraft"]>[0]) {
+  async invalidateCurrentPreparation(
+    input: Parameters<
+      EmployerVerificationPreparationRepository["invalidateCurrentPreparation"]
+    >[0],
+  ) {
+    const deleteAfter = new Date(input.now.getTime() + 24 * 60 * 60_000);
+    await prisma.$transaction(async (transaction) => {
+      await transaction.companyContactEmailChallenge.updateMany({
+        where: {
+          applicantUserId: input.userId,
+          state: { in: ["PENDING", "VERIFIED"] },
+        },
+        data: {
+          state: "SUPERSEDED",
+          supersededAt: input.now,
+          normalizedEmail: null,
+          tokenDigest: null,
+          sensitiveInaccessibleAt: input.now,
+          sensitiveDeleteAfter: input.sensitiveDeleteAfter,
+        },
+      });
+      await transaction.businessRegistryLookupSnapshot.updateMany({
+        where: {
+          applicantUserId: input.userId,
+          acceptedRequestId: null,
+          inaccessibleAt: null,
+        },
+        data: { inaccessibleAt: input.now, deleteAfter },
+      });
+      await transaction.employerVerificationPreparation.updateMany({
+        where: {
+          applicantUserId: input.userId,
+          inaccessibleAt: null,
+        },
+        data: { inaccessibleAt: input.now, deleteAfter },
+      });
+    });
+  }
+
+  async updateDraft(
+    input: Parameters<
+      EmployerVerificationPreparationRepository["updateDraft"]
+    >[0],
+  ) {
     const changes: VerificationPreparationDraftChanges = input.changes;
     const changed = await prisma.employerVerificationPreparation.updateMany({
       where: {
@@ -152,7 +202,11 @@ export class PrismaEmployerVerificationPreparationRepository
     return changed.count === 1;
   }
 
-  findPreparationForChallenge(input: Parameters<EmployerVerificationPreparationRepository["findPreparationForChallenge"]>[0]) {
+  findPreparationForChallenge(
+    input: Parameters<
+      EmployerVerificationPreparationRepository["findPreparationForChallenge"]
+    >[0],
+  ) {
     return prisma.employerVerificationPreparation.findFirst({
       where: {
         applicantUserId: input.userId,
@@ -164,7 +218,11 @@ export class PrismaEmployerVerificationPreparationRepository
     });
   }
 
-  async issueEmailChallenge(input: Parameters<EmployerVerificationPreparationRepository["issueEmailChallenge"]>[0]) {
+  async issueEmailChallenge(
+    input: Parameters<
+      EmployerVerificationPreparationRepository["issueEmailChallenge"]
+    >[0],
+  ) {
     return prisma.$transaction(async (transaction) => {
       await transaction.companyContactEmailChallenge.updateMany({
         where: {
@@ -212,7 +270,11 @@ export class PrismaEmployerVerificationPreparationRepository
     });
   }
 
-  findPendingEmailChallenge(input: Parameters<EmployerVerificationPreparationRepository["findPendingEmailChallenge"]>[0]) {
+  findPendingEmailChallenge(
+    input: Parameters<
+      EmployerVerificationPreparationRepository["findPendingEmailChallenge"]
+    >[0],
+  ) {
     return prisma.companyContactEmailChallenge.findFirst({
       where: {
         applicantUserId: input.userId,
@@ -230,7 +292,11 @@ export class PrismaEmployerVerificationPreparationRepository
     });
   }
 
-  async verifyEmailChallenge(input: Parameters<EmployerVerificationPreparationRepository["verifyEmailChallenge"]>[0]) {
+  async verifyEmailChallenge(
+    input: Parameters<
+      EmployerVerificationPreparationRepository["verifyEmailChallenge"]
+    >[0],
+  ) {
     const changed = await prisma.companyContactEmailChallenge.updateMany({
       where: {
         id: input.challengeId,

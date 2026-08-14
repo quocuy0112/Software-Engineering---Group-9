@@ -13,6 +13,14 @@ describe("recruiter header route contract", () => {
     ).toBe("/dashboard/employer-verification");
     expect(
       recruiterHeaderStatusSchema.parse({
+        state: "CHANGES_REQUESTED",
+        destinationKind: "EMPLOYER_VERIFICATION",
+        href: "/dashboard/employer-verification",
+        observedAt: "2026-08-11T00:00:00.000Z",
+      }).href,
+    ).toBe("/dashboard/employer-verification");
+    expect(
+      recruiterHeaderStatusSchema.parse({
         state: "APPROVED",
         destinationKind: "RECRUITER_WORKSPACE",
         href: "https://recruiter.example.test",

@@ -428,7 +428,7 @@ Tests are separated by concern under `web/tests/`: `backend/unit`, `backend/inte
 
 Templates: `.env.example` (Docker, PostgreSQL, CV, OCR, image-search) and `web/.env.example` (application, auth, origin, email, storage, provider, admin, messaging). Local generated files are `.env` and `web/.env.local` — never commit either. The environment parser fails closed when required fixed values, key separation, storage paths, production approvals, or exact origins are invalid.
 
-Feature 014 business-registry lookup defaults to the no-cost manual fallback with `BUSINESS_REGISTRY_PROVIDER=disabled`. Set it to `vietqr` to use VietQR's public business endpoint; `BUSINESS_REGISTRY_TIMEOUT_MS` and `BUSINESS_REGISTRY_RESPONSE_LIMIT_BYTES` bound server-side requests and responses. Registry data remains supporting evidence and never auto-approves an employer.
+Feature 014 business-registry lookup is enabled in the environment template with `BUSINESS_REGISTRY_PROVIDER=vietqr` and uses VietQR's public business endpoint; set it to `disabled` to test fail-closed provider handling. `BUSINESS_REGISTRY_TIMEOUT_MS` and `BUSINESS_REGISTRY_RESPONSE_LIMIT_BYTES` bound server-side requests and responses. Only a matched or partial exact-identifier result unlocks later preparation steps, and it never auto-approves an employer.
 
 ### Specification workflow
 

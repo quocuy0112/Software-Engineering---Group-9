@@ -1,5 +1,7 @@
 import "server-only";
 import type { Prisma } from "@/backend/generated/prisma/client";
+import type { PrismaClient } from "@/backend/generated/prisma/client";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
 import {
   emailDeliveryIdempotencyKey,
   verificationBusinessEventKey,
@@ -17,7 +19,7 @@ const databaseKind = {
   VERIFICATION_EXPIRED: "VERIFICATION_EXPIRED",
 } as const;
 
-export function buildVerificationOutbox(input: {
+export type VerificationNotificationInput = {
   requestId: string;
   userId: string;
   eventKind: VerificationEventKind;
@@ -27,7 +29,11 @@ export function buildVerificationOutbox(input: {
   nextAction: string;
   companyDisplayName?: string;
   approvedMembershipRole?: CompanyMembershipRole;
-}): Prisma.EmailOutboxUncheckedCreateInput {
+};
+
+export function buildVerificationOutbox(
+  input: VerificationNotificationInput,
+): Prisma.EmailOutboxUncheckedCreateInput {
   const businessEventKey = verificationBusinessEventKey(
     input.requestId,
     input.eventKind,
@@ -56,4 +62,34 @@ export function buildVerificationOutbox(input: {
     status: "PENDING",
     nextAttemptAt: input.occurredAt,
   };
+}
+
+export function createVerificationInAppNotification(
+  db: PrismaClient | Prisma.TransactionClient,
+  input: VerificationNotificationInput,
+  correlationId: string,
+) {
+  const businessEventKey = verificationBusinessEventKey(
+    input.requestId,
+    input.eventKind,
+    input.resultingVersion,
+  );
+  return createInAppNotification(db, {
+    recipientUserId: input.userId,
+    kind:
+      input.eventKind === "VERIFICATION_RECEIPT"
+        ? "VERIFICATION_RECEIVED"
+        : input.eventKind,
+    deduplicationKey: businessEventKey,
+    correlationId,
+    occurredAt: input.occurredAt,
+    contextType: "VERIFICATION_REQUEST",
+    contextId: input.requestId,
+    variables: {
+      state: input.resultingState,
+      ...(input.companyDisplayName
+        ? { companyName: input.companyDisplayName }
+        : {}),
+    },
+  });
 }
