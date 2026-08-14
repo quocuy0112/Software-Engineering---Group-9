@@ -25,18 +25,26 @@ function service(
 }
 
 describe("recruiter header status service", () => {
-  it.each([
-    ["PENDING_CHECKS"],
-    ["PENDING_REVIEW"],
-    ["CHANGES_REQUESTED"],
-    ["RESUBMITTED"],
-  ])("maps %s to pending review", async (state) => {
+  it.each([["PENDING_CHECKS"], ["PENDING_REVIEW"], ["RESUBMITTED"]])(
+    "maps %s to pending review",
+    async (state) => {
+      await expect(
+        service(false, state as never).resolveForUser("u-1"),
+      ).resolves.toMatchObject({
+        state: "PENDING_REVIEW",
+        destinationKind: "NONE",
+        href: null,
+      });
+    },
+  );
+
+  it("routes changes-requested applications back to employer verification", async () => {
     await expect(
-      service(false, state as never).resolveForUser("u-1"),
+      service(false, "CHANGES_REQUESTED").resolveForUser("u-1"),
     ).resolves.toMatchObject({
-      state: "PENDING_REVIEW",
-      destinationKind: "NONE",
-      href: null,
+      state: "CHANGES_REQUESTED",
+      destinationKind: "EMPLOYER_VERIFICATION",
+      href: "/dashboard/employer-verification",
     });
   });
 

@@ -6,6 +6,23 @@ import {
 } from "@/frontend/features/recruiter-header/client/use-recruiter-header-navigation";
 
 describe("recruiter header navigation hook", () => {
+  it("opens employer verification in the current Candidate workspace", () => {
+    const adapter: NavigationAdapter = {
+      openSameOrigin: vi.fn(),
+      openExternal: vi.fn(),
+    };
+    const { result } = renderHook(() => useRecruiterHeaderNavigation(adapter));
+
+    act(() => {
+      result.current.open("/dashboard/employer-verification");
+    });
+
+    expect(adapter.openSameOrigin).toHaveBeenCalledWith(
+      "/dashboard/employer-verification",
+    );
+    expect(adapter.openExternal).not.toHaveBeenCalled();
+  });
+
   it("opens an approved external destination once and recovers on focus", () => {
     const adapter: NavigationAdapter = {
       openSameOrigin: vi.fn(),

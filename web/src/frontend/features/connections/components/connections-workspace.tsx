@@ -9,6 +9,25 @@ import type {
 } from "@/shared/contracts/connections";
 import { useConnectionInvalidation } from "../client/use-connection-invalidation";
 
+const connectionDateFormatter = new Intl.DateTimeFormat("en-GB", {
+  dateStyle: "medium",
+  timeZone: "Asia/Ho_Chi_Minh",
+});
+
+const connectionDateTimeFormatter = new Intl.DateTimeFormat("en-GB", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "Asia/Ho_Chi_Minh",
+});
+
+function formatConnectionDate(value: string) {
+  return connectionDateFormatter.format(new Date(value));
+}
+
+function formatConnectionDateTime(value: string) {
+  return connectionDateTimeFormatter.format(new Date(value));
+}
+
 async function connectionApi(
   path: string,
   csrfProof: string,
@@ -228,9 +247,7 @@ export function ConnectionsWorkspace({
                       </div>
                       <div>
                         <dt>Expires</dt>
-                        <dd>
-                          {new Date(proposal.expiresAt).toLocaleDateString()}
-                        </dd>
+                        <dd>{formatConnectionDate(proposal.expiresAt)}</dd>
                       </div>
                     </dl>
                     {active ? (
@@ -355,7 +372,7 @@ export function ConnectionsWorkspace({
                   <strong>{notification.title}</strong>
                   <span>{notification.message}</span>
                   <time dateTime={notification.createdAt}>
-                    {new Date(notification.createdAt).toLocaleString()}
+                    {formatConnectionDateTime(notification.createdAt)}
                   </time>
                 </button>
               ))}

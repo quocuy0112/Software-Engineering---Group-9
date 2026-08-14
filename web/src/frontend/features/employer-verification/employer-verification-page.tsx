@@ -80,10 +80,14 @@ export function EmployerVerificationPage() {
   const [busy, setBusy] = useState<string>();
   const preparationRef = useRef<Preparation | null>(null);
   const draftSaveQueueRef = useRef<Promise<void>>(Promise.resolve());
+  const resubmitInFlightRef = useRef(new Set<string>());
 
   async function loadRequests() {
-    const body = await requestJson("/api/employer-verifications");
+    const body = (await requestJson("/api/employer-verifications")) as {
+      data: Item[];
+    };
     setItems(body.data);
+    return body.data;
   }
 
   async function loadPreparation() {
@@ -310,18 +314,41 @@ export function EmployerVerificationPage() {
     event: FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
+    if (resubmitInFlightRef.current.has(requestId)) return;
+    resubmitInFlightRef.current.add(requestId);
+    const form = event.currentTarget;
     setBusy(requestId);
     try {
       await requestJson(
         `/api/employer-verifications/${encodeURIComponent(requestId)}/resubmit`,
-        { method: "POST", body: new FormData(event.currentTarget) },
+        { method: "POST", body: new FormData(form) },
       );
-      event.currentTarget.reset();
+      form.reset();
       toast.success("Replacement evidence received.");
       await loadRequests();
-    } catch {
+    } catch (error) {
+      const code = (
+        error as Error & { body?: { code?: string }; status?: number }
+      ).body?.code;
+      if (code === "TARGET_UNAVAILABLE") {
+        const refreshed = await loadRequests().catch(() => undefined);
+        const current = refreshed?.find((item) => item.id === requestId);
+        if (
+          current &&
+          ["PENDING_CHECKS", "PENDING_REVIEW", "RESUBMITTED"].includes(
+            current.state,
+          )
+        ) {
+          form.reset();
+          toast.success(
+            "Replacement evidence was already received and is under review.",
+          );
+          return;
+        }
+      }
       toast.error("Replacement evidence could not be accepted.");
     } finally {
+      resubmitInFlightRef.current.delete(requestId);
       setBusy(undefined);
     }
   }

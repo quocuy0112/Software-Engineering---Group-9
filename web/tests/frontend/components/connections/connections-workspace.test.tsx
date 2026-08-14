@@ -26,8 +26,8 @@ describe("Connections workspace", () => {
             state: "PENDING_BOTH",
             version: 1,
             myDecision: null,
-            expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
-            createdAt: new Date().toISOString(),
+            expiresAt: "2026-08-20T00:00:00.000Z",
+            createdAt: "2026-08-19T00:00:00.000Z",
             terminalAt: null,
             detailAvailable: true,
           },
@@ -39,6 +39,31 @@ describe("Connections workspace", () => {
     ).toBeVisible();
     expect(screen.getByRole("button", { name: "Accept" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Decline" })).toBeEnabled();
+    expect(screen.getByText("20 Aug 2026")).toBeVisible();
+  });
+
+  it("formats notification timestamps deterministically", () => {
+    render(
+      <ConnectionsWorkspace
+        csrfProof="csrf"
+        initialConnections={[]}
+        initialProposals={[]}
+        initialNotifications={[
+          {
+            id: "notification-1",
+            kind: "PROPOSAL_CREATED",
+            title: "New proposal",
+            message: "A new professional connection was proposed.",
+            proposalId: "proposal-1",
+            connectionId: null,
+            createdAt: "2026-08-20T00:00:00.000Z",
+            readAt: null,
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("20 Aug 2026, 07:00")).toBeVisible();
   });
 
   it("requires disconnect confirmation and labels revoked history read-only", () => {

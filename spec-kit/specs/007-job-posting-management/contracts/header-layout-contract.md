@@ -9,22 +9,23 @@
 
 ## Input contract
 
-| Input | Type | Meaning |
-|---|---|---|
-| `initialStatus` | `RecruiterHeaderStatus \| null` | Initial server-confirmed projection; `null` selects the loading placeholder |
-| `locale` | existing workspace locale | Used only for accessible support text; the four approved visible labels remain the exact English labels from the specification |
+| Input           | Type                            | Meaning                                                                                                                        |
+| --------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `initialStatus` | `RecruiterHeaderStatus \| null` | Initial server-confirmed projection; `null` selects the loading placeholder                                                    |
+| `locale`        | existing workspace locale       | Used only for accessible support text; the four approved visible labels remain the exact English labels from the specification |
 
 The server supplies `initialStatus` only after the workspace layout's shared exact Candidate-host predicate and existing session boundary pass. The component obtains later projections only from `GET /api/recruiter/header-status`, whose route applies the same host predicate before session/status access, and validates every successful response against the shared strict schema.
 
 ## State-to-presentation mapping
 
-| Projection | Visible label | Tone | Activation | Destination |
-|---|---|---|---|---|
-| `NEVER_APPLIED` | `Post a Job` | Primary | Enabled | Employer Verification |
-| `PENDING_REVIEW` | `Application Under Review` | Neutral disabled | Never | None |
-| `REJECTED` | `Reapply as Recruiter` | Secondary outlined | Enabled | Employer Verification |
-| `APPROVED` | `Post a Job` | Primary | Enabled | Exact Recruiter workspace origin |
-| Loading/unavailable | Visual placeholder; no state label | Neutral disabled | Never | None |
+| Projection          | Visible label                      | Tone               | Activation | Destination                      |
+| ------------------- | ---------------------------------- | ------------------ | ---------- | -------------------------------- |
+| `NEVER_APPLIED`     | `Post a Job`                       | Primary            | Enabled    | Employer Verification            |
+| `PENDING_REVIEW`    | `Application Under Review`         | Neutral disabled   | Never      | None                             |
+| `CHANGES_REQUESTED` | `Update Application`               | Secondary outlined | Enabled    | Employer Verification            |
+| `REJECTED`          | `Reapply as Recruiter`             | Secondary outlined | Enabled    | Employer Verification            |
+| `APPROVED`          | `Post a Job`                       | Primary            | Enabled    | Exact Recruiter workspace origin |
+| Loading/unavailable | Visual placeholder; no state label | Neutral disabled   | Never      | None                             |
 
 ## DOM and focus order
 
@@ -47,16 +48,16 @@ Requirements:
 
 ## Revalidation behavior
 
-| Event | Required behavior |
-|---|---|
-| Initial projection is present | Render it immediately; schedule revalidation |
-| Initial projection is absent | Render the reserved disabled placeholder and request status |
-| Revalidation begins | Preserve current label/width but suppress activation |
-| Revalidation succeeds | Atomically replace state, destination, and observation time |
-| Revalidation fails or response is invalid | Replace action with disabled placeholder; retain no guessed destination |
-| Window regains focus or visibility | Request a fresh projection |
-| Visible 30-second interval elapses | Request a fresh projection; never overlap requests |
-| Action activation is accepted | Preserve dimensions and suppress repeat activation until navigation settles, fails, is cancelled, or returns to the still-active document |
+| Event                                     | Required behavior                                                                                                                         |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Initial projection is present             | Render it immediately; schedule revalidation                                                                                              |
+| Initial projection is absent              | Render the reserved disabled placeholder and request status                                                                               |
+| Revalidation begins                       | Preserve current label/width but suppress activation                                                                                      |
+| Revalidation succeeds                     | Atomically replace state, destination, and observation time                                                                               |
+| Revalidation fails or response is invalid | Replace action with disabled placeholder; retain no guessed destination                                                                   |
+| Window regains focus or visibility        | Request a fresh projection                                                                                                                |
+| Visible 30-second interval elapses        | Request a fresh projection; never overlap requests                                                                                        |
+| Action activation is accepted             | Preserve dimensions and suppress repeat activation until navigation settles, fails, is cancelled, or returns to the still-active document |
 
 Revalidation must stop when the component unmounts or the document is hidden. Responses from an obsolete request must not overwrite a newer confirmed projection.
 
@@ -97,6 +98,7 @@ Every known action state exposes one stable state attribute or class so componen
 
 - `data-recruiter-state="never-applied"`
 - `data-recruiter-state="pending-review"`
+- `data-recruiter-state="changes-requested"`
 - `data-recruiter-state="rejected"`
 - `data-recruiter-state="approved"`
 - `data-recruiter-state="loading"`
