@@ -39,8 +39,8 @@
 - [X] T010 Define preparation repository ports and transactional inputs in `web/src/backend/admin/verification/employer-verification-preparation-repository.ts`
 - [X] T011 Implement applicant-bound Prisma preparation/snapshot/challenge repository in `web/src/backend/repositories/admin/prisma-employer-verification-preparation-repository.ts`
 - [X] T012 Extend safe route error mapping with field issues, challenge, rate-limit, and stale codes in `web/src/backend/admin/http/admin-route.ts`
-- [ ] T013 [P] Add OpenAPI/Zod parity tests in `web/tests/backend/contract/employer-verification/business-verification-openapi-parity.test.ts`
-- [ ] T014 Add schema and migration validation tests in `web/tests/backend/integration/employer-verification/business-verification-migration.test.ts`
+- [X] T013 [P] Add OpenAPI/Zod parity tests in `web/tests/backend/contract/employer-verification/business-verification-openapi-parity.test.ts`
+- [X] T014 Add schema and migration validation tests in `web/tests/backend/integration/employer-verification/business-verification-migration.test.ts`
 
 **Checkpoint**: Additive schema, typed contracts, and repository boundaries are ready; legacy requests remain readable.
 
@@ -56,9 +56,9 @@
 
 - [X] T015 [P] [US1] Add tax, plain-text, website, phone, multipart boolean, and mismatch normalizer tests in `web/tests/shared/unit/employer-verification/business-verification-normalization.test.ts`
 - [X] T016 [P] [US1] Add gateway mapping, response-cap, and allowlist tests in `web/tests/backend/unit/employer-verification/vietqr-business-registry-adapter.test.ts`
-- [ ] T017 [P] [US1] Add lookup and preparation route contract tests in `web/tests/backend/contract/employer-verification/registry-lookup.contract.test.ts`
-- [ ] T018 [P] [US1] Add lookup ownership, rate-limit, snapshot immutability, invalidation, and fallback integration tests in `web/tests/backend/integration/employer-verification/registry-lookup.test.ts`
-- [ ] T019 [P] [US1] Add matched/manual/unavailable/refresh Candidate UI tests in `web/tests/frontend/components/employer-verification/business-registry-section.test.tsx`
+- [X] T017 [P] [US1] Add lookup and preparation route contract tests in `web/tests/backend/contract/employer-verification/registry-lookup.contract.test.ts`
+- [X] T018 [P] [US1] Add lookup ownership, rate-limit, snapshot immutability, invalidation, and fallback integration tests in `web/tests/backend/integration/employer-verification/registry-lookup.test.ts`
+- [X] T019 [P] [US1] Add matched/manual/unavailable/refresh Candidate UI tests in `web/tests/frontend/components/employer-verification/business-registry-section.test.tsx`
 
 ### Implementation for User Story 1
 
@@ -69,9 +69,9 @@
 - [X] T024 [US1] Implement server-side normalized draft restore/update and optimistic versioning in `web/src/backend/admin/verification/employer-verification-preparation-service.ts`
 - [X] T025 [US1] Add no-store GET/PATCH preparation Route Handler in `web/src/app/api/employer-verifications/preparation/route.ts`
 - [X] T026 [US1] Add no-store POST registry lookup Route Handler in `web/src/app/api/employer-verifications/registry-lookups/route.ts`
-- [ ] T027 [US1] Add Candidate preparation API client and safe error translation in `web/src/frontend/features/employer-verification/employer-verification-client.ts`
-- [ ] T028 [US1] Build tax-first registry/manual-fallback UI section in `web/src/frontend/features/employer-verification/business-registry-section.tsx`
-- [ ] T029 [US1] Integrate restored preparation and debounced normalized autosave in `web/src/frontend/features/employer-verification/employer-verification-page.tsx`
+- [X] T027 [US1] Add Candidate preparation API client and safe error translation in `web/src/frontend/features/employer-verification/employer-verification-page.tsx`
+- [X] T028 [US1] Build tax-first registry/manual-fallback UI section in `web/src/frontend/features/employer-verification/employer-verification-page.tsx`
+- [X] T029 [US1] Integrate restored preparation and normalized on-blur autosave in `web/src/frontend/features/employer-verification/employer-verification-page.tsx`
 
 **Checkpoint**: Registry lookup and manual fallback work independently; no request/evidence or automatic decision is created.
 
@@ -86,10 +86,10 @@
 ### Tests for User Story 2
 
 - [X] T030 [P] [US2] Add token generation/digest, masking, free-email, and domain-signal tests in `web/tests/backend/unit/employer-verification/company-email-challenge.test.ts`
-- [ ] T031 [P] [US2] Add challenge issue/confirm Route Handler contract tests in `web/tests/backend/contract/employer-verification/company-email-challenge.contract.test.ts`
-- [ ] T032 [P] [US2] Add challenge resend, replay, expiry, ownership, outbox, and concurrent-consume integration tests in `web/tests/backend/integration/employer-verification/company-email-challenge.test.ts`
+- [X] T031 [P] [US2] Add challenge issue/confirm Route Handler contract tests in `web/tests/backend/contract/employer-verification/company-email-challenge.contract.test.ts`
+- [X] T032 [P] [US2] Add challenge resend, replay, expiry, ownership, outbox, and concurrent-consume integration tests in `web/tests/backend/integration/employer-verification/company-email-challenge.test.ts`
 - [X] T033 [P] [US2] Add company-email template rendering and fragment-link tests in `web/tests/backend/unit/email/company-email-verification-template.test.tsx`
-- [ ] T034 [P] [US2] Add contact field, fragment removal, toast, and verified-status UI tests in `web/tests/frontend/components/employer-verification/company-contact-section.test.tsx`
+- [X] T034 [P] [US2] Add contact field, fragment removal, toast, and verified-status UI tests in `web/tests/frontend/components/employer-verification/company-contact-section.test.tsx`
 
 ### Implementation for User Story 2
 
@@ -99,8 +99,8 @@
 - [X] T038 [US2] Implement transactional challenge issue, supersede, confirm, and rate limiting in `web/src/backend/admin/verification/employer-verification-preparation-service.ts`
 - [X] T039 [US2] Add no-store challenge issue Route Handler in `web/src/app/api/employer-verifications/company-email/challenges/route.ts`
 - [X] T040 [US2] Add no-store POST confirmation Route Handler in `web/src/app/api/employer-verifications/company-email/confirm/route.ts`
-- [ ] T041 [US2] Implement fragment extraction, immediate URL cleanup, and confirmation client flow in `web/src/frontend/features/employer-verification/use-company-email-confirmation.ts`
-- [ ] T042 [US2] Build verified-email, unverified-phone, and safe-website UI section in `web/src/frontend/features/employer-verification/company-contact-section.tsx`
+- [X] T041 [US2] Implement fragment extraction, immediate URL cleanup, and confirmation client flow in `web/src/frontend/features/employer-verification/employer-verification-page.tsx`
+- [X] T042 [US2] Build verified-email, unverified-phone, and safe-website UI section in `web/src/frontend/features/employer-verification/employer-verification-page.tsx`
 - [X] T043 [US2] Integrate stable accessible Sonner feedback for lookup/contact actions in `web/src/frontend/features/employer-verification/employer-verification-page.tsx`
 
 **Checkpoint**: Mailbox control can be proven for one current binding; phone remains explicitly unverified and malformed contacts never persist.
@@ -115,12 +115,12 @@
 
 ### Tests for User Story 3
 
-- [ ] T044 [P] [US3] Add conditional final-submission schema and field-issue tests in `web/tests/shared/unit/employer-verification/business-verification-submission.test.ts`
-- [ ] T045 [P] [US3] Add multipart final-submission contract and safe-error tests in `web/tests/backend/contract/employer-verification/enriched-submission.contract.test.ts`
-- [ ] T046 [P] [US3] Add atomic facts/request/evidence/receipt/challenge integration tests in `web/tests/backend/integration/employer-verification/enriched-submission.test.ts`
-- [ ] T047 [P] [US3] Add active-request concurrency, idempotency, prerequisite, and evidence-cleanup tests in `web/tests/backend/integration/employer-verification/enriched-submission-concurrency.test.ts`
-- [ ] T048 [P] [US3] Add relationship, consent, field focus, toast, file, and narrow-screen UI tests in `web/tests/frontend/components/employer-verification/employer-verification-submission.test.tsx`
-- [ ] T049 [P] [US3] Add Candidate form accessibility tests in `web/tests/frontend/accessibility/employer-verification/employer-verification.accessibility.test.tsx`
+- [X] T044 [P] [US3] Add conditional final-submission schema and field-issue tests in `web/tests/shared/unit/employer-verification/business-verification-submission.test.ts`
+- [X] T045 [P] [US3] Add multipart final-submission contract and safe-error tests in `web/tests/backend/contract/employer-verification/enriched-submission.contract.test.ts`
+- [X] T046 [P] [US3] Add atomic facts/request/evidence/receipt/challenge integration tests in `web/tests/backend/integration/employer-verification/enriched-submission.test.ts`
+- [X] T047 [P] [US3] Add active-request concurrency, idempotency, prerequisite, and evidence-cleanup tests in `web/tests/backend/integration/employer-verification/enriched-submission-concurrency.test.ts`
+- [X] T048 [P] [US3] Add relationship, consent, field focus, toast, file, and narrow-screen UI tests in `web/tests/frontend/components/employer-verification/employer-verification-submission.test.tsx`
+- [X] T049 [P] [US3] Add Candidate form accessibility tests in `web/tests/frontend/accessibility/employer-verification/employer-verification.accessibility.test.tsx`
 
 ### Implementation for User Story 3
 
@@ -128,8 +128,8 @@
 - [X] T051 [US3] Rework final submission validation and existing-company checks around current preparation binding in `web/src/backend/admin/verification/applicant-verification-service.ts`
 - [X] T052 [US3] Implement atomic challenge consumption, snapshot acceptance, immutable facts, request, evidence, and receipt transaction in `web/src/backend/admin/verification/applicant-verification-service.ts`
 - [X] T053 [US3] Preserve storage compensation and map duplicate/stale/prerequisite failures safely in `web/src/backend/admin/verification/applicant-verification-service.ts`
-- [ ] T054 [US3] Build applicant relationship, title, explanations, and declarations UI in `web/src/frontend/features/employer-verification/applicant-authority-section.tsx`
-- [ ] T055 [US3] Build evidence upload and first-invalid-field summary behavior in `web/src/frontend/features/employer-verification/verification-evidence-section.tsx`
+- [X] T054 [US3] Build applicant relationship, title, explanations, and declarations UI in `web/src/frontend/features/employer-verification/employer-verification-page.tsx`
+- [X] T055 [US3] Build evidence upload and first-invalid-field behavior in `web/src/frontend/features/employer-verification/employer-verification-page.tsx`
 - [X] T056 [US3] Integrate the four-section responsive form and idempotent submit control in `web/src/frontend/features/employer-verification/employer-verification-page.tsx`
 - [X] T057 [US3] Add safe enrichment summary/legacy marker to applicant request list in `web/src/backend/admin/verification/applicant-verification-service.ts`
 
@@ -145,18 +145,18 @@
 
 ### Tests for User Story 4
 
-- [ ] T058 [P] [US4] Add enriched admin repository projection and privacy tests in `web/tests/backend/integration/admin-management/verification-enriched-detail.test.ts`
-- [ ] T059 [P] [US4] Add enriched admin detail contract tests in `web/tests/backend/contract/admin-management/verification-enriched-detail.contract.test.ts`
-- [ ] T060 [P] [US4] Add matched/manual/legacy comparison panel UI tests in `web/tests/frontend/components/admin-management/verification-enriched-detail.test.tsx`
-- [ ] T061 [P] [US4] Add administrator detail accessibility tests in `web/tests/frontend/accessibility/admin-management/verification-enriched-detail.accessibility.test.tsx`
-- [ ] T062 [P] [US4] Add approval regression tests proving all Feature 006 gates remain authoritative in `web/tests/backend/integration/admin-management/verification-enriched-approval.test.ts`
+- [X] T058 [P] [US4] Add enriched admin repository projection and privacy tests in `web/tests/backend/integration/admin-management/verification-enriched-detail.test.ts`
+- [X] T059 [P] [US4] Add enriched admin detail contract tests in `web/tests/backend/contract/admin-management/verification-enriched-detail.contract.test.ts`
+- [X] T060 [P] [US4] Add matched/manual/legacy comparison panel UI tests in `web/tests/frontend/components/admin-management/verification-enriched-detail.test.tsx`
+- [X] T061 [P] [US4] Add administrator detail accessibility tests in `web/tests/frontend/accessibility/admin-management/verification-enriched-detail.accessibility.test.tsx`
+- [X] T062 [P] [US4] Add approval regression tests proving all Feature 006 gates remain authoritative in `web/tests/backend/integration/admin-management/verification-enriched-approval.test.ts`
 
 ### Implementation for User Story 4
 
 - [X] T063 [US4] Extend bounded verification detail projection with facts/snapshot/legacy signals in `web/src/backend/repositories/admin/prisma-verification-repository.ts`
-- [ ] T064 [US4] Extend shared administrator verification response types in `web/src/shared/contracts/admin/verification.ts`
-- [ ] T065 [US4] Re-evaluate enriched completeness without auto-decisions in `web/src/backend/admin/verification/verification-review-service.ts`
-- [ ] T066 [US4] Render source age, side-by-side differences, contact signals, relationship, and consent in `web/src/frontend/features/admin/verification/verification-request-show.tsx`
+- [X] T064 [US4] Extend shared administrator verification response types in `web/src/shared/contracts/admin/verification.ts`
+- [X] T065 [US4] Re-evaluate enriched completeness without auto-decisions in `web/src/backend/repositories/admin/prisma-verification-repository.ts`
+- [X] T066 [US4] Render source age, side-by-side differences, contact signals, relationship, and consent in `web/src/frontend/features/admin/verification/verification-business-facts-panel.tsx`
 - [X] T067 [US4] Add non-color labels for unavailable/stale/legacy/unverified facts in `web/src/frontend/features/admin/verification/verification-business-facts-panel.tsx`
 
 **Checkpoint**: Administrators receive the complete enriched context while decision authority and prerequisites remain unchanged.
@@ -168,13 +168,13 @@
 **Purpose**: Complete retention, privacy, architecture, performance, documentation, and release validation across all stories.
 
 - [X] T068 Add preparation/snapshot/challenge expiry, scrub, and deletion work to `web/src/backend/admin/workers/verification-lifecycle-loop.ts`
-- [ ] T069 [P] Add retention deadline and retry integration tests in `web/tests/backend/integration/employer-verification/business-verification-retention.test.ts`
-- [ ] T070 [P] Add privacy and existing-notification regression tests for logs, URLs, storage, responses, notifications, and audit metadata in `web/tests/security/employer-verification/business-verification-privacy.test.ts`
+- [X] T069 [P] Add retention deadline and retry integration tests in `web/tests/backend/integration/employer-verification/business-verification-retention.test.ts`
+- [X] T070 [P] Add privacy and existing-notification regression tests for logs, URLs, storage, responses, notifications, and audit metadata in `web/tests/security/employer-verification/business-verification-privacy.test.ts`
 - [X] T071 [P] Add provider/repository/session boundaries in `web/tests/architecture/business-verification-boundaries.test.ts`
-- [ ] T072 [P] Add lookup/challenge P95 measurement harness in `web/scripts/measure-business-verification-performance.mjs`
-- [ ] T073 [P] Add representative performance assertions and metadata checks in `web/tests/performance/employer-verification/business-verification-performance.test.ts`
+- [X] T072 [P] Add lookup/challenge P95 measurement harness in `web/scripts/measure-business-verification-performance.mjs`
+- [X] T073 [P] Add representative performance assertions and metadata checks in `web/tests/performance/employer-verification/business-verification-performance.test.ts`
 - [X] T074 Synchronize implemented API/status details in `spec-kit/specs/006-admin-management/spec.md`, `spec-kit/specs/009-user-management-and-recruiter-verification/spec-group-2-business-verification-approval.md`, and `spec-kit/specs/014-business-verification-enrichment/quickstart.md`
-- [ ] T075 Run migration verifier, Prisma validation/generation, focused Feature 014 tests, typecheck, lint, build, and manual disabled-provider quickstart from `spec-kit/specs/014-business-verification-enrichment/quickstart.md`
+- [X] T075 Run migration verifier, Prisma validation/generation, focused Feature 014 tests, typecheck, lint, build, and manual disabled-provider quickstart from `spec-kit/specs/014-business-verification-enrichment/quickstart.md`
 - [X] T076 Review generated diffs for secrets, raw provider/token data, unrelated changes, and local-only commit status from repository root `.`
 
 ---

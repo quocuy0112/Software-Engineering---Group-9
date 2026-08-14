@@ -1,39 +1,7 @@
 "use client";
 
 import { Alert, Box, Chip, Paper, Typography } from "@mui/material";
-
-type Facts = {
-  applicantLegalName: string;
-  applicantRegisteredAddress: string;
-  operatingAddress: string | null;
-  companyEmail: string;
-  companyEmailVerifiedAt: string;
-  companyEmailFreeProvider: boolean;
-  companyEmailWebsiteDomainMatch: boolean | null;
-  companyPhoneE164: string;
-  companyPhoneVerified: boolean;
-  websiteOrigin: string | null;
-  relationship: string;
-  currentJobTitle: string;
-  authorityExplanation: string | null;
-  legalNameDiffers: boolean;
-  registeredAddressDiffers: boolean;
-  mismatchExplanation: string | null;
-  accuracyDeclaredAt: string;
-  documentConsentAt: string;
-  policyVersion: string;
-  registry: {
-    outcome: string;
-    providerKey: string;
-    checkedAt: string;
-    legalName: string | null;
-    registeredAddress: string | null;
-    establishedAt: string | null;
-    legalStatus: string | null;
-    entityType: string | null;
-    representativeName: string | null;
-  };
-};
+import type { VerificationBusinessFactsProjection } from "@/shared/contracts/admin/verification";
 
 function Fact({ label, value }: { label: string; value: string | null }) {
   return (
@@ -47,10 +15,15 @@ function Fact({ label, value }: { label: string; value: string | null }) {
 export function VerificationBusinessFactsPanel({
   facts,
   legacyRequest,
+  enrichmentStatus,
 }: {
-  facts: Facts | null;
+  facts: VerificationBusinessFactsProjection | null;
   legacyRequest: boolean;
+  enrichmentStatus?: "LEGACY" | "COMPLETE" | "INCOMPLETE";
 }) {
+  if (enrichmentStatus === "INCOMPLETE") {
+    return <Alert severity="error">Enriched request is incomplete and cannot be approved.</Alert>;
+  }
   if (legacyRequest || !facts) {
     return <Alert severity="info">Legacy request: enriched Feature 014 facts were not collected.</Alert>;
   }
@@ -59,6 +32,7 @@ export function VerificationBusinessFactsPanel({
       <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
         <Typography component="h2" variant="h6" sx={{ mr: "auto" }}>Business verification facts</Typography>
         <Chip label={`Registry: ${facts.registry.outcome}`} />
+        <Chip label={facts.registry.stale ? "Registry snapshot stale" : "Registry snapshot current"} color={facts.registry.stale ? "warning" : "default"} />
         <Chip label="Email verified" color="success" />
         <Chip label="Phone unverified" color="warning" />
       </Box>

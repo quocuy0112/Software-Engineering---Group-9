@@ -99,7 +99,12 @@ export class PrismaVerificationRepository {
       assignedAdministratorId: row.assignedAdminUserId,
       viewerUnavailableSince: row.viewerUnavailableSince?.toISOString() ?? null,
       version: row.version,
-      legacyRequest: !row.businessFacts,
+      legacyRequest: !row.submissionIdempotencyKey,
+      enrichmentStatus: !row.submissionIdempotencyKey
+        ? "LEGACY"
+        : row.businessFacts
+          ? "COMPLETE"
+          : "INCOMPLETE",
       businessFacts: row.businessFacts
         ? {
             applicantLegalName: row.businessFacts.applicantLegalName,
@@ -135,6 +140,9 @@ export class PrismaVerificationRepository {
                 row.businessFacts.lookupSnapshot.checkedAt.toISOString(),
               expiresAt:
                 row.businessFacts.lookupSnapshot.expiresAt.toISOString(),
+              stale:
+                row.businessFacts.lookupSnapshot.expiresAt.getTime() <=
+                Date.now(),
               legalName:
                 row.businessFacts.lookupSnapshot.registryLegalName,
               registeredAddress:

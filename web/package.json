@@ -22,6 +22,7 @@
     "admin:revoke": "node --conditions=react-server --import tsx scripts/revoke-platform-administrator.mjs",
     "admin:moderation:migration:verify": "node --conditions=react-server --import tsx scripts/verify-moderation-report-migration.mjs",
     "business-verification:migration:verify": "node --conditions=react-server --import tsx scripts/verify-business-verification-enrichment-migration.mjs",
+    "perf:business-verification": "node --conditions=react-server --import tsx scripts/measure-business-verification-performance.mjs",
     "admin:notifications:reconcile": "node scripts/reconcile-security-notifications.mjs",
     "image-search:storage:preflight": "node --conditions=react-server --import tsx scripts/check-image-search-production-storage.mjs",
     "ocr:corpus:evaluate": "node scripts/evaluate-ocr-corpus.mjs",
@@ -85,7 +86,7 @@
     "test:recruiter-header": "vitest run tests/shared/unit/contracts/recruiter-header-status.test.ts tests/backend/unit/auth/candidate-host-boundary.test.ts tests/backend/unit/recruiter-header tests/backend/contract/recruiter-header tests/backend/integration/recruiter-header tests/frontend/components/recruiter-header tests/frontend/accessibility/recruiter-header tests/architecture/recruiter-header-boundaries.test.ts tests/security/recruiter-header tests/performance/recruiter-header --passWithNoTests",
     "test:recruiter-header:e2e": "playwright test tests/system/e2e/recruiter-header",
     "perf:recruiter-header": "node scripts/measure-recruiter-header-performance.mjs",
-    "test:business-verification": "vitest run tests/shared/unit/employer-verification tests/backend/unit/employer-verification tests/backend/unit/email/company-email-verification-template.test.tsx tests/backend/contract/employer-verification tests/backend/integration/employer-verification tests/frontend/components/employer-verification tests/frontend/accessibility/employer-verification tests/security/employer-verification tests/architecture/business-verification-boundaries.test.ts --passWithNoTests"
+    "test:business-verification": "vitest run tests/shared/unit/employer-verification tests/backend/unit/employer-verification tests/backend/unit/email/company-email-verification-template.test.tsx tests/backend/contract/employer-verification tests/backend/integration/employer-verification tests/frontend/components/employer-verification tests/frontend/components/admin-management/verification-enriched-detail.test.tsx tests/frontend/accessibility/employer-verification tests/security/employer-verification tests/architecture/business-verification-boundaries.test.ts tests/performance/employer-verification --passWithNoTests"
   },
   "dependencies": {
     "@aws-sdk/client-iam": "3.1101.0",

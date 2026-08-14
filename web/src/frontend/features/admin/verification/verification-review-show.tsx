@@ -17,6 +17,7 @@ type Verification = {
   version: number;
   viewerUnavailableSince: string | null;
   legacyRequest: boolean;
+  enrichmentStatus: "LEGACY" | "COMPLETE" | "INCOMPLETE";
   businessFacts: React.ComponentProps<
     typeof VerificationBusinessFactsPanel
   >["facts"];
@@ -54,6 +55,7 @@ function Review() {
       <VerificationBusinessFactsPanel
         facts={record.businessFacts}
         legacyRequest={record.legacyRequest}
+        enrichmentStatus={record.enrichmentStatus}
       />
       {evidence && (
         <ProtectedEvidenceViewer

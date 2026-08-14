@@ -289,6 +289,42 @@ export class ApplicantVerificationService {
       });
     } catch (error) {
       await storage().delete(stored.storageLocator);
+      if (
+        error &&
+        typeof error === "object" &&
+        "code" in error &&
+        error.code === "P2002"
+      ) {
+        const idempotent = await prisma.recruiterVerificationRequest.findUnique({
+          where: { submissionIdempotencyKey: idempotencyKey },
+        });
+        if (idempotent?.applicantUserId === session.userId) {
+          return {
+            requestId: idempotent.id,
+            state: idempotent.state,
+            version: idempotent.version,
+          };
+        }
+        const active = await prisma.recruiterVerificationRequest.findFirst({
+          where: {
+            applicantUserId: session.userId,
+            normalizedTaxIdentifier: input.taxIdentifier,
+            state: {
+              in: [
+                "PENDING_CHECKS",
+                "PENDING_REVIEW",
+                "CHANGES_REQUESTED",
+                "RESUBMITTED",
+                "APPROVED",
+              ],
+            },
+          },
+          select: { id: true },
+        });
+        if (active) {
+          throw new Error("ACTIVE_REQUEST_EXISTS", { cause: error });
+        }
+      }
       throw error;
     }
   }
