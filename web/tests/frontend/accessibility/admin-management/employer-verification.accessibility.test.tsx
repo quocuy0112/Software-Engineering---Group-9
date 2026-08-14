@@ -9,6 +9,13 @@ describe("employer verification accessibility", () => {
         requestId="r1"
         evidenceId="e1"
         mediaType="application/pdf"
+        byteSize={1_000}
+        malwareStatus="FAIL"
+        typeStatus="PASS"
+        structureStatus="PASS"
+        previewStatus="FAIL"
+        createdAt="2026-08-14T01:00:00.000Z"
+        submissionVersion={1}
         accessible={false}
       />,
     );

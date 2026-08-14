@@ -1,5 +1,5 @@
 "use client";
-import { Box, Typography } from "@mui/material";
+import { Alert, Box, Typography } from "@mui/material";
 import { Show, useRecordContext, useRefresh } from "react-admin";
 import { ProtectedEvidenceViewer } from "./protected-evidence-viewer";
 import { VerificationDecisionPanel } from "./verification-decision-panel";
@@ -26,6 +26,12 @@ type Verification = {
     submissionVersion: number;
     declaredMediaType: string;
     detectedMediaType: string | null;
+    byteSize: number;
+    malwareStatus: string;
+    typeStatus: string;
+    structureStatus: string;
+    previewStatus: string;
+    createdAt: string;
     accessible: boolean;
   }>;
 };
@@ -62,8 +68,21 @@ function Review() {
           requestId={record.id}
           evidenceId={evidence.id}
           mediaType={evidence.detectedMediaType ?? evidence.declaredMediaType}
+          byteSize={evidence.byteSize}
+          malwareStatus={evidence.malwareStatus}
+          typeStatus={evidence.typeStatus}
+          structureStatus={evidence.structureStatus}
+          previewStatus={evidence.previewStatus}
+          createdAt={evidence.createdAt}
+          submissionVersion={evidence.submissionVersion}
           accessible={evidence.accessible}
         />
+      )}
+      {!evidence && (
+        <Alert severity="warning">
+          No current business license evidence is available. Decisions are
+          disabled.
+        </Alert>
       )}
       <VerificationDecisionPanel
         requestId={record.id}

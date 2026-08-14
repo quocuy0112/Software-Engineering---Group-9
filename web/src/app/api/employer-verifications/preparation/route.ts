@@ -27,3 +27,14 @@ export async function PATCH(request: Request) {
     return adminRouteError(error);
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    return adminJson(
+      await new EmployerVerificationPreparationService().reset(request),
+      { headers: noStore },
+    );
+  } catch (error) {
+    return adminRouteError(error);
+  }
+}

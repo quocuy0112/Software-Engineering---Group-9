@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { VerificationBusinessFactsPanel } from "@/frontend/features/admin/verification/verification-business-facts-panel";
+import { ProtectedEvidenceViewer } from "@/frontend/features/admin/verification/protected-evidence-viewer";
 
 const facts = {
   applicantLegalName: "Applicant Company",
@@ -39,12 +40,51 @@ const facts = {
 
 describe("administrator enriched verification detail", () => {
   it("shows side-by-side differences and non-color contact labels", () => {
-    render(<VerificationBusinessFactsPanel facts={facts} legacyRequest={false} enrichmentStatus="COMPLETE" />);
+    render(
+      <VerificationBusinessFactsPanel
+        facts={facts}
+        legacyRequest={false}
+        enrichmentStatus="COMPLETE"
+      />,
+    );
     expect(screen.getByText("Registry snapshot")).toBeVisible();
     expect(screen.getByText("Applicant claims")).toBeVisible();
     expect(screen.getByText("Phone unverified")).toBeVisible();
     expect(screen.getAllByText(/differs/i)).toHaveLength(2);
     expect(screen.getByText(/human decision only/i)).toBeVisible();
+    expect(screen.getByText("Admin review checklist")).toBeVisible();
+    expect(screen.getByText("Tax registry record: PASS")).toBeVisible();
+    expect(screen.getByText("Registry comparison: REVIEW")).toBeVisible();
+  });
+
+  it("shows evidence safety state and permits full authorized review", () => {
+    render(
+      <ProtectedEvidenceViewer
+        requestId="request-1"
+        evidenceId="evidence-1"
+        mediaType="application/pdf"
+        byteSize={1_250_000}
+        malwareStatus="PASS"
+        typeStatus="PASS"
+        structureStatus="PASS"
+        previewStatus="PASS"
+        createdAt="2026-08-14T01:00:00.000Z"
+        submissionVersion={2}
+        accessible
+      />,
+    );
+    expect(screen.getByText("Business license evidence")).toBeVisible();
+    expect(screen.getByText("Ready for admin review")).toBeVisible();
+    expect(screen.getByText("Malware scan: PASS")).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: "Open full document" }),
+    ).toHaveAttribute(
+      "href",
+      "/api/admin/verification-requests/request-1/evidence/evidence-1/download?disposition=inline",
+    );
+    expect(
+      screen.getByRole("link", { name: "Download authenticated copy" }),
+    ).toBeVisible();
   });
 
   it("labels legacy requests without inventing facts", () => {

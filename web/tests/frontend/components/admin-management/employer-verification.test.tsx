@@ -5,31 +5,22 @@ import { ProtectedEvidenceViewer } from "@/frontend/features/admin/verification/
 import { VerificationDecisionPanel } from "@/frontend/features/admin/verification/verification-decision-panel";
 
 describe("employer verification components", () => {
-  it("labels applicant submission fields and file constraints", async () => {
+  it("starts with the registered-business lookup step", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [] }) }),
     );
     render(<EmployerVerificationPage />);
     expect(
-      screen.getByRole("heading", { name: "Recruiter application" }),
+      screen.getByRole("heading", { name: "Build a trusted company identity" }),
     ).toBeVisible();
-    expect(screen.getByLabelText("Vietnamese tax identifier")).toHaveAttribute(
-      "pattern",
-      "[0-9]{10}",
-    );
-    expect(screen.getByLabelText("Business license")).toHaveAttribute(
-      "accept",
-      "application/pdf,image/png,image/jpeg",
-    );
-    expect(screen.queryByLabelText("Requested role")).not.toBeInTheDocument();
-    expect(screen.getByDisplayValue("RECRUITER")).toHaveAttribute(
-      "type",
-      "hidden",
-    );
     expect(
-      screen.getByRole("button", { name: "Submit recruiter application" }),
+      screen.getByRole("textbox", { name: /Vietnamese tax identifier/u }),
+    ).toHaveAttribute("pattern", "[0-9]{10}");
+    expect(
+      screen.getByRole("button", { name: "Look up business" }),
     ).toBeVisible();
+    expect(screen.queryByLabelText("Business license")).not.toBeInTheDocument();
   });
 
   it("disables review when evidence is not qualified or accessible", () => {
@@ -38,6 +29,13 @@ describe("employer verification components", () => {
         requestId="r1"
         evidenceId="e1"
         mediaType="application/pdf"
+        byteSize={1_000}
+        malwareStatus="FAIL"
+        typeStatus="PASS"
+        structureStatus="PASS"
+        previewStatus="FAIL"
+        createdAt="2026-08-14T01:00:00.000Z"
+        submissionVersion={1}
         accessible={false}
       />,
     );

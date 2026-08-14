@@ -13,7 +13,7 @@
 ### Session 2026-08-14
 
 - Q: Should a registry lookup result automatically approve or reject an applicant? → A: No. Registry information is supporting evidence only; an authorized administrator remains the sole decision maker.
-- Q: Should unavailable or rate-limited public lookup providers prevent submission? → A: No. The applicant may continue with normalized manual facts, while the request records an unavailable or unconfirmed registry result for administrator review.
+- Q: Should unavailable, not-found, or rate-limited public lookup outcomes prevent later verification steps? → A: Yes. Only an exact identifier-confirmed `MATCHED` or `PARTIAL` VietQR record may unlock business details, company-email verification, evidence upload, or final submission; the applicant must retry when the provider cannot confirm a record.
 - Q: When must company-email verification occur? → A: Before the authoritative verification request and business-license evidence are accepted, using a short-lived single-use link bound to the applicant, normalized tax identifier, and normalized email.
 - Q: Does a syntactically valid company phone become verified? → A: No. It is normalized to Vietnamese international format and explicitly remains unverified because Feature 014 adds no OTP flow.
 - Q: Which tax identifiers are supported? → A: Exactly ten ASCII digits for Vietnamese enterprises. Thirteen-digit branch and dependent-unit identifiers remain out of scope until the company model represents parent/dependent entities.
@@ -33,14 +33,14 @@ As a Candidate applying for recruiter authority, I want to enter a tax identifie
 
 **Why this priority**: The tax identifier is the existing company-matching boundary. Enriching it first reduces applicant error and gives administrators traceable third-party context without changing human decision authority.
 
-**Independent Test**: Enter a valid, unknown, malformed, rate-limited, and unavailable-provider tax identifier; verify normalized lookup, public-data display, safe fallback, no automatic decision, and no persistence of unprocessed input.
+**Independent Test**: Enter a valid, unknown, malformed, rate-limited, and unavailable-provider tax identifier; verify normalized lookup, public-data display, strict progression blocking, no automatic recruiter decision, and no persistence of unprocessed input.
 
 **Acceptance Scenarios**:
 
 1. **Given** an authenticated Candidate enters an exact ten-digit identifier and the configured public registry source returns a business, **When** lookup completes, **Then** legal name, registered address, establishment date when available, legal status, and entity type are displayed as source-provided read-only facts with source and checked time.
-2. **Given** the source returns no business, **When** lookup completes, **Then** the applicant sees a non-blocking warning, may enter legal name and registered address manually, and the eventual request is visibly marked registry-unconfirmed for administrator review.
-3. **Given** the source is unavailable, times out, or rate-limits the application, **When** lookup cannot complete, **Then** the applicant sees a retryable toast, may continue manually, and the failure neither approves nor rejects the application.
-4. **Given** the applicant changes the tax identifier after a successful lookup, **When** the field changes, **Then** all previously displayed registry facts, contact verification, and lookup reference are invalidated before submission.
+2. **Given** the source returns no business, **When** lookup completes, **Then** the applicant sees a blocking warning and no later verification section or submission command becomes available.
+3. **Given** the source is unavailable, times out, or rate-limits the application, **When** lookup cannot complete, **Then** the applicant sees retry guidance and no business details, contact verification, evidence, or submission step becomes available.
+4. **Given** the applicant has a confirmed identifier, **When** they choose to change it, **Then** the identifier is first unlocked only by transactionally invalidating the current draft, lookup snapshot, and email challenge, after which the workflow restarts at step one.
 5. **Given** source facts differ from applicant-provided legal or operating facts, **When** the applicant continues, **Then** a 20–500-character mismatch explanation becomes mandatory and both normalized value sets remain available to the administrator.
 
 ---
@@ -93,10 +93,11 @@ As a Platform Administrator, I want registry, applicant, contact, relationship, 
 
 **Acceptance Scenarios**:
 
-1. **Given** an authorized administrator opens a request, **When** detail loads, **Then** it separately labels applicant claims, registry facts, source/check time, field differences, email-verification time, email-domain signals, unverified phone, website, relationship, title, explanations, and consent time.
+1. **Given** an authorized administrator opens a request, **When** detail loads, **Then** it separately labels applicant claims, registry facts, source/check time, field differences, email-verification time, email-domain signals, unverified phone, website, relationship, title, explanations, consent time, and a non-color review checklist.
 2. **Given** registry facts are missing, stale, or provider-unavailable, **When** detail loads, **Then** the limitation is visible and no company field is silently presented as registry-confirmed.
 3. **Given** all enriched facts appear credible, **When** the administrator reviews them, **Then** no lookup, email-domain, phone, or website signal can automatically invoke approval, rejection, membership creation, or evidence qualification.
 4. **Given** an existing-company application lacks the exact valid invitation or request-bound OWNER approval, **When** approval is attempted, **Then** the existing Feature 006 relationship prerequisite still blocks approval regardless of enriched facts.
+5. **Given** the current business-license evidence passed every safety check, **When** the administrator reviews it, **Then** the detail shows file metadata and safety states and permits both a normalized preview and an authenticated full-document view or download; inaccessible evidence keeps decisions disabled.
 
 ### Edge Cases
 
@@ -108,7 +109,7 @@ As a Platform Administrator, I want registry, applicant, contact, relationship, 
 - A verification link is opened signed out or by another account; it reveals no applicant or company details and requires the intended authenticated account.
 - A website uses an IP literal, localhost, credentials, non-HTTPS scheme, deceptive Unicode host, or excessive redirect syntax; it is rejected.
 - Browser refresh or narrow-screen use occurs mid-form; non-file progress is recoverable without persisting secrets or verification tokens in browser storage.
-- The public API changes terms, requires payment, or stops being public; the adapter is disabled and manual submission remains available.
+- The public API changes terms, requires payment, or stops being public; the adapter is disabled, new preparations fail closed with retry guidance, and unrelated product workflows remain available.
 
 ## Requirements *(mandatory)*
 
@@ -122,7 +123,8 @@ As a Platform Administrator, I want registry, applicant, contact, relationship, 
 - **FR-006**: A lookup MUST produce an immutable bounded snapshot containing provider identifier, outcome, normalized tax identifier, accepted registry facts, checked time, expiry time, and a digest suitable for detecting accidental mutation; raw provider bodies MUST NOT be persisted or logged.
 - **FR-007**: Registry legal name, registered address, establishment date, legal status, entity type, and representative name MAY be accepted only when supplied by the provider; representative name is administrator-only and MUST NOT be required from applicants.
 - **FR-008**: Registry data MUST be supporting evidence only. It MUST NOT automatically approve, reject, qualify evidence, grant membership, or bypass a relationship prerequisite.
-- **FR-009**: Provider not-found, timeout, rate limit, invalid-response, and unavailable outcomes MUST allow normalized manual legal name and registered address submission with a visible registry-unconfirmed limitation.
+- **FR-009**: Only an unexpired `MATCHED` or `PARTIAL` snapshot whose provider identifier exactly equals the submitted ten-digit tax identifier MAY unlock draft persistence, company-email challenge issuance, evidence upload, or final submission; not-found, timeout, rate-limit, invalid-response, disabled-provider, and unavailable outcomes MUST remain blocking and visibly retryable.
+- **FR-009A**: After confirmation, the tax identifier control MUST be read-only. Changing it MUST require an explicit reset command that transactionally invalidates the current preparation, unaccepted lookup snapshots, and active email challenges before returning the applicant to step one.
 - **FR-010**: Applicant legal name, registered address, and optional operating address MUST be normalized bounded plain text before persistence; operating address is collected only when the applicant declares it differs from the registered address.
 - **FR-011**: A 20–500-character normalized mismatch explanation MUST be required when the applicant overrides or materially differs from available registry legal name or registered address.
 - **FR-012**: Company email MUST be normalized, syntax validated, length bounded, and verified by a short-lived single-use challenge before final request submission.
@@ -145,11 +147,12 @@ As a Platform Administrator, I want registry, applicant, contact, relationship, 
 - **FR-027**: Candidate UI MUST use field-level errors associated with inputs plus a non-color summary toast for validation failures; lookup, email, upload, and command success/failure MUST use accessible toast announcements without exposing internal codes.
 - **FR-028**: Candidate UI MUST preserve normalized non-file progress across recoverable component or network failure without storing verification tokens, document bytes, or sensitive server responses in localStorage or sessionStorage.
 - **FR-029**: Administrator queue/detail projections MUST expose bounded enriched review fields and difference indicators only after current admin authorization; public and applicant projections MUST not expose provider internals or administrator-only representative information.
-- **FR-030**: Administrator detail MUST show snapshot source and age, applicant versus registry values, mismatch explanation, email verification and domain signals, unverified phone label, website, relationship, title, authority explanation, and consent policy/time.
+- **FR-030**: Administrator detail MUST show snapshot source and age, applicant versus registry values, mismatch explanation, email verification and domain signals, unverified phone label, website, relationship, title, authority explanation, consent policy/time, and an explicit review checklist.
+- **FR-030A**: Administrator detail MUST show current business-license metadata and safety states and, only after current sensitive-admin authorization and successful evidence qualification, provide a normalized preview plus an authenticated full-document inline view or download with private no-store responses.
 - **FR-031**: Decision commands MUST re-evaluate applicant account eligibility, request version/state, evidence qualification/accessibility, existing-company relationship prerequisite, and required enriched facts; stale lookup age MAY warn but MUST NOT silently mutate submitted facts.
 - **FR-032**: Lookup and email events MUST create privacy-safe operational records sufficient to diagnose outcome, provider, latency class, and retry behavior without recording email tokens, raw responses, full evidence, or unnecessary contact data.
 - **FR-033**: Existing applicant receipt, change, approval, rejection, cancellation, delay, and expiry notifications MUST remain idempotent and MUST NOT disclose registry representative, internal lookup failures, evidence locators, admin identity, or private notes.
-- **FR-034**: Feature 014 MUST provide deterministic manual fallback whenever the external public lookup is disabled or unavailable; lookup availability MUST NOT be an authorization dependency.
+- **FR-034**: Feature 014 MUST fail closed for progression whenever the configured public lookup is disabled or unavailable while preserving safe retry guidance; registry confirmation gates workflow completeness but MUST NOT automatically approve, reject, or grant recruiter authority.
 - **FR-035**: The implementation MUST document and test how the public provider can be disabled or replaced if it becomes paid, non-public, incompatible, or unavailable.
 - **FR-035A**: Unused lookup snapshots MUST become inaccessible 24 hours after expiry and be deleted within the following 24 hours. Expired, superseded, and consumed email challenges MAY retain content-free security/delivery metadata for 30 days, but token digests and normalized email MUST become inaccessible immediately and be deleted within 24 hours. A snapshot accepted into a request follows the request's authorized review/history lifetime.
 - **FR-036**: Feature 006 documentation MUST identify Feature 014 as the owner of enriched Candidate business facts and contact verification, and Feature 009 Group 2 MUST replace its old Candidate-side field assumption with the Feature 014 contract while preserving its planned admin decision scope.
@@ -169,12 +172,12 @@ As a Platform Administrator, I want registry, applicant, contact, relationship, 
 
 - **SC-001**: At least 90% of 20 representative applicants complete tax lookup, company-email verification, and final submission without facilitator help; at least 10 participants use a narrow-screen layout.
 - **SC-002**: In 100% of malformed-field tests, no unprocessed value reaches authoritative persistence and every rejected field receives specific accessible text plus one summary toast.
-- **SC-003**: In 100% of provider timeout, rate-limit, malformed-response, not-found, and disabled-provider tests, manual fallback remains available and no automatic decision or authority grant occurs.
-- **SC-004**: Lookup feedback becomes usable within 3 seconds at P95 across 200 measurements under documented normal public-provider conditions; timeout fallback becomes usable within 6 seconds at P95.
+- **SC-003**: In 100% of provider timeout, rate-limit, malformed-response, not-found, identifier-mismatch, and disabled-provider tests, steps two onward remain unavailable and no draft, email challenge, evidence, request, decision, or authority grant bypass occurs.
+- **SC-004**: Lookup feedback becomes usable within 3 seconds at P95 across 200 measurements under documented normal public-provider conditions; blocking timeout feedback becomes usable within 6 seconds at P95.
 - **SC-005**: Email challenge request and verification confirmation each become usable within 2 seconds at P95 excluding external mail-delivery time, with no more than 1% unplanned errors across 200 measurements.
 - **SC-006**: In 100% of token expiry, replay, wrong-account, changed-email, changed-tax-ID, resend, and concurrent-consume tests, at most one current binding becomes verified and no token or contact detail is disclosed.
 - **SC-007**: In 100% of retry and concurrency tests, one applicant and tax identifier produce at most one active request, one current evidence version, and one receipt notification.
-- **SC-008**: Administrator detail shows every required source, applicant, contact, relationship, mismatch, and consent field for 100% of representative matched, partial, manual, and unavailable-source fixtures.
+- **SC-008**: Administrator detail shows every required source, applicant, contact, relationship, mismatch, and consent field for 100% of representative matched, partial, legacy-unconfirmed, and unavailable-source fixtures.
 - **SC-009**: Automated privacy checks find zero raw provider bodies, verification tokens, reusable evidence capabilities, storage locators, or unnecessary registry personal data in public URLs, browser-persistent storage, ordinary logs, analytics, applicant notifications, or audit context.
 - **SC-010**: All Candidate and administrator tasks are keyboard-completable with visible focus, descriptive labels, non-color status text, toast live announcements, and zero serious or critical automated accessibility violations.
 

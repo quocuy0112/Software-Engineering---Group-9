@@ -23,7 +23,17 @@ describe("company email challenge concurrency", () => {
     await repository.replaceLookup({
       userId,
       taxIdentifier: "0316794479",
-      result: { providerKey: "disabled-manual-v1", outcome: "UNAVAILABLE", facts: null },
+      result: {
+        providerKey: "vietqr-v2",
+        outcome: "MATCHED",
+        facts: {
+          taxIdentifier: "0316794479",
+          legalName: "Example Company",
+          internationalName: null,
+          shortName: null,
+          registeredAddress: "Example address",
+        },
+      },
       responseDigest: "b".repeat(64),
       now,
       expiresAt: new Date(now.getTime() + 86_400_000),
@@ -31,14 +41,21 @@ describe("company email challenge concurrency", () => {
       preparationExpiresAt: new Date(now.getTime() + 172_800_000),
       sensitiveDeleteAfter: new Date(now.getTime() + 86_400_000),
     });
-    snapshotId = (await repository.findCurrentPreparation(userId, now))!.lookupSnapshotId!;
+    snapshotId = (await repository.findCurrentPreparation(userId, now))!
+      .lookupSnapshotId!;
   });
 
   afterAll(async () => {
     await prisma.emailOutbox.deleteMany({ where: { userId } });
-    await prisma.companyContactEmailChallenge.deleteMany({ where: { applicantUserId: userId } });
-    await prisma.employerVerificationPreparation.deleteMany({ where: { applicantUserId: userId } });
-    await prisma.businessRegistryLookupSnapshot.deleteMany({ where: { applicantUserId: userId } });
+    await prisma.companyContactEmailChallenge.deleteMany({
+      where: { applicantUserId: userId },
+    });
+    await prisma.employerVerificationPreparation.deleteMany({
+      where: { applicantUserId: userId },
+    });
+    await prisma.businessRegistryLookupSnapshot.deleteMany({
+      where: { applicantUserId: userId },
+    });
     await prisma.userAccount.deleteMany({ where: { id: userId } });
   });
 
@@ -71,7 +88,13 @@ describe("company email challenge concurrency", () => {
       sensitiveDeleteAfter: new Date(now.getTime() + 86_400_000),
       metadataDeleteAfter: new Date(now.getTime() + 2_592_000_000),
     });
-    expect((await prisma.companyContactEmailChallenge.findUnique({ where: { id: first.id } }))?.state).toBe("SUPERSEDED");
+    expect(
+      (
+        await prisma.companyContactEmailChallenge.findUnique({
+          where: { id: first.id },
+        })
+      )?.state,
+    ).toBe("SUPERSEDED");
     expect(await prisma.emailOutbox.count({ where: { userId } })).toBe(2);
     expect(
       await repository.findPendingEmailChallenge({
@@ -88,8 +111,16 @@ describe("company email challenge concurrency", () => {
       }),
     ).toBeNull();
     const results = await Promise.all([
-      repository.verifyEmailChallenge({ challengeId: second.id, tokenDigest: "e".repeat(64), now }),
-      repository.verifyEmailChallenge({ challengeId: second.id, tokenDigest: "e".repeat(64), now }),
+      repository.verifyEmailChallenge({
+        challengeId: second.id,
+        tokenDigest: "e".repeat(64),
+        now,
+      }),
+      repository.verifyEmailChallenge({
+        challengeId: second.id,
+        tokenDigest: "e".repeat(64),
+        now,
+      }),
     ]);
     expect(results.filter(Boolean)).toHaveLength(1);
   });
