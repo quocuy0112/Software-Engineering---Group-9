@@ -3,11 +3,9 @@ import { existsSync, lstatSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import process from "node:process";
 
-const npmCli = process.env.npm_execpath;
 const shutdownTimeoutMs = 5_000;
 const commandLineArgs = new Set(process.argv.slice(2));
-
-if (!npmCli) throw new Error("npm_execpath is required");
+const webRoot = join(process.cwd(), "web");
 
 const children = new Map();
 let shutdownPromise;
@@ -149,11 +147,12 @@ function workerImageNeedsBuild(service) {
   return latestInputChange > createdAt + 1_000;
 }
 
-function startProcess(name, executable, args, fatal = true) {
+function startProcess(name, executable, args, fatal = true, options = {}) {
   const child = spawn(executable, args, {
     stdio: "inherit",
     windowsHide: true,
     detached: process.platform !== "win32",
+    ...options,
   });
   children.set(name, child);
   child.once("error", (error) => {
@@ -168,6 +167,14 @@ function startProcess(name, executable, args, fatal = true) {
   });
   child.once("exit", (code, signal) => {
     if (!shutdownPromise) {
+      if (
+        signal === "SIGINT" ||
+        signal === "SIGTERM" ||
+        signal === "SIGBREAK"
+      ) {
+        void shutdown(0, `${name} ${signal}`);
+        return;
+      }
       if (!fatal) {
         console.error(
           `[dev] ${name} stopped (${signal ?? `code ${code ?? "unknown"}`}); continuing with reduced OCR/image-search capability`,
@@ -185,13 +192,23 @@ function startProcess(name, executable, args, fatal = true) {
 }
 
 function start(name, command) {
-  return startProcess(name, process.execPath, [
-    npmCli,
-    "run",
-    command,
-    "--workspace",
-    "@smarthire/web",
-  ]);
+  const commandArgs = {
+    "dev:web": [
+      "--import",
+      "./scripts/register-server-runtime.mjs",
+      "--import",
+      "tsx",
+      "server.ts",
+    ],
+    "email:worker": ["--import", "tsx", "scripts/run-email-worker.mjs"],
+  }[command];
+
+  if (!commandArgs)
+    throw new Error(`Unsupported local development command: ${command}`);
+
+  return startProcess(name, process.execPath, commandArgs, true, {
+    cwd: webRoot,
+  });
 }
 
 function isRunning(child) {
@@ -229,33 +246,59 @@ async function terminate(child, force = false) {
   }
 }
 
+async function shutdownChildren(force = false) {
+  const runningChildren = [...children.values()].filter(isRunning);
+  if (runningChildren.length === 0) return;
+
+  // Register exit listeners before sending the signal so a fast child cannot
+  // exit between the termination request and waitForExit().
+  const exited = runningChildren.map(waitForExit);
+  await Promise.all(runningChildren.map((child) => terminate(child, force)));
+  await Promise.all(exited);
+}
+
 async function shutdown(exitCode, reason) {
   if (shutdownPromise) return shutdownPromise;
   shutdownPromise = (async () => {
     console.log(`[dev] shutting down (${reason})`);
-    await Promise.all([...children.values()].map((child) => terminate(child)));
-    const exited = Promise.all([...children.values()].map(waitForExit)).then(
-      () => true,
-    );
-    const timedOut = new Promise((resolve) =>
-      setTimeout(() => resolve(false), shutdownTimeoutMs),
-    );
-    if (!(await Promise.race([exited, timedOut]))) {
-      console.error(
-        "[dev] graceful shutdown timed out; terminating remaining process trees",
-      );
-      await Promise.all(
-        [...children.values()].map((child) => terminate(child, true)),
-      );
-      await Promise.all([...children.values()].map(waitForExit));
+    let timeout;
+    try {
+      const graceful = shutdownChildren();
+      const timedOut = new Promise((resolve) => {
+        timeout = setTimeout(() => resolve(false), shutdownTimeoutMs);
+      });
+
+      if (!(await Promise.race([graceful, timedOut]))) {
+        console.error(
+          "[dev] graceful shutdown timed out; force-terminating remaining process trees",
+        );
+        await shutdownChildren(true);
+      }
+    } finally {
+      if (timeout) clearTimeout(timeout);
+      // npm waits for this supervisor process. Explicitly exit only after all
+      // tracked descendants have been asked to terminate.
+      process.exit(exitCode);
     }
-    process.exitCode = exitCode;
   })();
   return shutdownPromise;
 }
 
-process.once("SIGINT", () => void shutdown(0, "SIGINT"));
-process.once("SIGTERM", () => void shutdown(0, "SIGTERM"));
+const requestShutdown = (signal) => {
+  void shutdown(0, signal).catch((error) => {
+    console.error(
+      "[dev] local development shutdown failed: " +
+        (error instanceof Error ? error.message : "UNKNOWN_ERROR"),
+    );
+    process.exit(1);
+  });
+};
+
+process.once("SIGINT", () => requestShutdown("SIGINT"));
+process.once("SIGTERM", () => requestShutdown("SIGTERM"));
+if (process.platform === "win32") {
+  process.once("SIGBREAK", () => requestShutdown("SIGBREAK"));
+}
 
 async function main() {
   const infrastructureServices = ["postgres", "clamav"];
