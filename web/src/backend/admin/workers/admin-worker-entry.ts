@@ -8,6 +8,7 @@ import {
 } from "./verification-lifecycle-loop";
 import { runEvidenceRetentionCycle } from "./evidence-retention-loop";
 import { runSecurityNotificationCycle } from "./security-notification-loop";
+import { runVerificationNotificationCycle } from "./verification-notification-loop";
 import { runRationaleRetentionCycle } from "./rationale-retention-loop";
 import { runSupportLifecycleCycle } from "./support-lifecycle-loop";
 import { runProposalLifecycleCycle } from "@/backend/connections/workers/proposal-lifecycle-loop";
@@ -31,6 +32,11 @@ export async function startAdminWorker(options: { probe?: boolean } = {}) {
       name: "notification",
       intervalMs: 30_000,
       run: runSecurityNotificationCycle,
+    },
+    {
+      name: "verification-notification",
+      intervalMs: 30_000,
+      run: runVerificationNotificationCycle,
     },
     {
       name: "retention",

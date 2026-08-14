@@ -1,73 +1,78 @@
 "use client";
+
 import { useRef, useState } from "react";
 import { Alert, Box, Button, MenuItem, TextField } from "@mui/material";
 import { adminDataProvider } from "../app/data-provider";
 import { StepUpDialog } from "../auth/step-up-dialog";
 import { createAdminOperationIdController } from "../shared/admin-operation-id";
 
-const roleChoices = [
-  "OWNER",
-  "HR_MANAGER",
-  "RECRUITER",
-  "HIRING_MANAGER",
+const categories = [
+  "DOCUMENT_UNREADABLE",
+  "TAX_ID_MISMATCH",
+  "DOCUMENT_EXPIRED",
+  "COMPANY_INFORMATION_MISMATCH",
+  "DUPLICATE_OR_CONFLICTING_REQUEST",
+  "POLICY_INELIGIBLE",
+  "OTHER",
 ] as const;
-type DecisionAction = "request-changes" | "reject" | "approve";
-type MembershipRole = (typeof roleChoices)[number];
 
 export function VerificationDecisionPanel(props: {
   requestId: string;
   version: number;
   state: string;
-  resubmissionCount: number;
+  applicantEligibility?: "ACTIVE" | "SUSPENDED";
+  canDecide?: boolean;
+  blockReason?: string | null;
+  /** @deprecated accepted for compatibility with the previous panel contract */
   requestedRole?: string;
-  disabled: boolean;
+  /** @deprecated accepted for compatibility with the previous panel contract */
+  resubmissionCount?: number;
+  /** @deprecated use canDecide */
+  disabled?: boolean;
   onDone: () => void;
 }) {
-  const initialRole = roleChoices.includes(
-    props.requestedRole as MembershipRole,
-  )
-    ? (props.requestedRole as MembershipRole)
-    : "RECRUITER";
-  const [action, setAction] = useState<DecisionAction>("request-changes");
-  const [text, setText] = useState("");
-  const [category, setCategory] = useState("DOCUMENT_UNREADABLE");
-  const [role, setRole] = useState<MembershipRole>(initialRole);
-  const [note, setNote] = useState("");
+  const [category, setCategory] = useState<(typeof categories)[number]>(
+    "DOCUMENT_UNREADABLE",
+  );
+  const [comment, setComment] = useState("");
+  const [protectedNote, setProtectedNote] = useState("");
   const [stepUp, setStepUp] = useState(false);
-  const [stepUpAction, setStepUpAction] = useState<DecisionAction>("approve");
+  const [pendingAction, setPendingAction] = useState<"approve" | "reject">();
   const [error, setError] = useState("");
   const operation = useRef(createAdminOperationIdController());
 
-  async function submit(nextAction: DecisionAction = action) {
+  async function submit(action: "approve" | "reject") {
     const body =
-      nextAction === "request-changes"
-        ? { confirmation: true, guidance: text, privateNote: note || undefined }
-        : nextAction === "reject"
-          ? {
-              confirmation: true,
-              category,
-              reason: text,
-              privateNote: note || undefined,
-            }
-          : { confirmation: true, role, privateNote: note || undefined };
+      action === "reject"
+        ? {
+            category,
+            applicantComment: comment,
+            protectedNote: protectedNote || undefined,
+          }
+        : {
+            protectedNote: protectedNote || undefined,
+          };
     try {
       await adminDataProvider.command(
-        `/api/admin/verification-requests/${encodeURIComponent(props.requestId)}/${nextAction}`,
+        `/api/admin/verification-requests/${encodeURIComponent(props.requestId)}/${action}`,
         body,
         props.version,
         operation.current.current(),
       );
       operation.current.complete();
       props.onDone();
-    } catch (e) {
-      if (
-        (e as { body?: { code?: string } }).body?.code === "STEP_UP_REQUIRED"
-      ) {
-        setStepUpAction(nextAction);
+    } catch (value) {
+      const errorValue = value as { body?: { code?: string }; status?: number };
+      if (errorValue.body?.code === "STEP_UP_REQUIRED") {
+        setPendingAction(action);
         setStepUp(true);
       } else {
-        if ((e as { status?: number }).status) operation.current.complete();
-        setError("The decision did not commit. Refresh current state.");
+        if (errorValue.status) operation.current.complete();
+        setError(
+          errorValue.body?.code === "APPLICANT_SUSPENDED"
+            ? "The applicant account is suspended. Refresh after the account state changes."
+            : "The decision did not commit. Refresh the current review state.",
+        );
       }
     }
   }
@@ -75,125 +80,94 @@ export function VerificationDecisionPanel(props: {
   if (props.state !== "PENDING_REVIEW")
     return (
       <Alert severity="info">
-        {props.state === "PENDING_CHECKS"
-          ? "Safety checks are still running. Approve recruiter becomes available when this request reaches Pending review."
-          : "This request is not currently actionable."}
+        <span>This request is not currently actionable.</span>{" "}
+        <span>Historical lifecycle states remain readable.</span>
       </Alert>
     );
 
+  const blocked =
+    props.disabled === true ||
+    props.canDecide === false ||
+    props.applicantEligibility === "SUSPENDED";
   return (
     <Box sx={{ display: "grid", gap: 2 }}>
       {error && <Alert severity="warning">{error}</Alert>}
-      <Button
-        variant="contained"
-        color="success"
-        disabled={props.disabled}
-        onClick={() => {
-          operation.current.begin();
-          void submit("approve");
-        }}
-      >
-        Approve recruiter
-      </Button>
+      {blocked && (
+        <Alert severity="warning">
+          {props.blockReason === "APPLICANT_SUSPENDED" ||
+          props.applicantEligibility === "SUSPENDED"
+            ? "Applicant account is suspended; Approve and Reject are disabled."
+            : `Decision unavailable: ${props.blockReason ?? "current eligibility changed"}.`}
+        </Alert>
+      )}
+      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+        <Button
+          variant="contained"
+          color="success"
+          disabled={blocked}
+          onClick={() => {
+            operation.current.begin();
+            void submit("approve");
+          }}
+        >
+          {props.requestedRole ? "Approve recruiter" : "Approve"}
+        </Button>
+        <Button
+          variant="outlined"
+          color="error"
+          disabled={blocked || Array.from(comment.trim()).length < 10}
+          onClick={() => {
+            operation.current.begin();
+            void submit("reject");
+          }}
+        >
+          Reject
+        </Button>
+      </Box>
       <TextField
         select
-        label="Decision"
-        value={action}
-        onChange={(e) => {
-          operation.current.cancel();
-          setAction(e.target.value as DecisionAction);
-        }}
+        label="Rejection category"
+        value={category}
+        onChange={(event) =>
+          setCategory(event.target.value as (typeof categories)[number])
+        }
+        disabled={blocked}
       >
-        <MenuItem
-          value="request-changes"
-          disabled={props.resubmissionCount >= 3}
-        >
-          Request changes
-        </MenuItem>
-        <MenuItem value="reject">Reject</MenuItem>
-        <MenuItem value="approve">Approve</MenuItem>
+        {categories.map((value) => (
+          <MenuItem key={value} value={value}>
+            {value}
+          </MenuItem>
+        ))}
       </TextField>
-      {action === "reject" && (
-        <TextField
-          select
-          label="Rejection category"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          {[
-            "DOCUMENT_UNREADABLE",
-            "TAX_ID_MISMATCH",
-            "DOCUMENT_EXPIRED",
-            "COMPANY_INFORMATION_MISMATCH",
-            "DUPLICATE_OR_CONFLICTING_REQUEST",
-            "POLICY_INELIGIBLE",
-            "OTHER",
-          ].map((v) => (
-            <MenuItem key={v} value={v}>
-              {v}
-            </MenuItem>
-          ))}
-        </TextField>
-      )}
-      {action === "approve" && (
-        <TextField
-          select
-          label="Approved role"
-          value={role}
-          onChange={(e) => setRole(e.target.value as MembershipRole)}
-        >
-          {roleChoices.map((v) => (
-            <MenuItem key={v} value={v}>
-              {v}
-            </MenuItem>
-          ))}
-        </TextField>
-      )}
-      {action !== "approve" && (
-        <TextField
-          multiline
-          minRows={3}
-          label={
-            action === "reject"
-              ? "Applicant-visible reason"
-              : "Applicant-visible guidance"
-          }
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          inputProps={{ maxLength: 500 }}
-        />
-      )}
+      <TextField
+        multiline
+        minRows={3}
+        label="Applicant-visible rejection reason"
+        value={comment}
+        onChange={(event) => setComment(event.target.value)}
+        inputProps={{ maxLength: 500 }}
+        helperText={`${Array.from(comment).length}/500 characters; minimum 10`}
+        disabled={blocked}
+      />
       <TextField
         multiline
         minRows={2}
-        label="Optional private note"
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
+        label="Protected administrator note (optional)"
+        value={protectedNote}
+        onChange={(event) => setProtectedNote(event.target.value)}
         inputProps={{ maxLength: 2000 }}
+        disabled={blocked}
       />
-      <Button
-        variant="contained"
-        color={action === "approve" ? "success" : "primary"}
-        disabled={
-          props.disabled ||
-          (action !== "approve" && Array.from(text.trim()).length < 10)
-        }
-        onClick={() => {
-          operation.current.begin();
-          void submit();
-        }}
-      >
-        {action === "approve" ? "Confirm approve" : `Confirm ${action}`}
-      </Button>
       <StepUpDialog
         open={stepUp}
         onCancel={() => {
           operation.current.cancel();
           setStepUp(false);
+          setPendingAction(undefined);
         }}
         onVerified={() => {
           setStepUp(false);
-          void submit(stepUpAction);
+          if (pendingAction) void submit(pendingAction);
         }}
       />
     </Box>

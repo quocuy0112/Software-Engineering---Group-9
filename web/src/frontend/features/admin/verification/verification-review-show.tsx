@@ -1,103 +1,115 @@
 "use client";
+
 import { Alert, Box, Typography } from "@mui/material";
 import { Show, useRecordContext, useRefresh } from "react-admin";
 import { ProtectedEvidenceViewer } from "./protected-evidence-viewer";
 import { VerificationDecisionPanel } from "./verification-decision-panel";
-import { VerificationBusinessFactsPanel } from "./verification-business-facts-panel";
-type Verification = {
-  id: string;
-  applicantDisplayName: string;
-  applicantAccountId: string;
-  companyName: string;
-  normalizedTaxIdentifier: string;
-  requestedRole: string;
-  state: string;
-  currentSubmissionVersion: number;
-  resubmissionCount: number;
-  version: number;
-  viewerUnavailableSince: string | null;
-  legacyRequest: boolean;
-  enrichmentStatus: "LEGACY" | "COMPLETE" | "INCOMPLETE";
-  businessFacts: React.ComponentProps<
-    typeof VerificationBusinessFactsPanel
-  >["facts"];
-  evidence: Array<{
+
+type VerificationReview = {
+  request: {
     id: string;
-    submissionVersion: number;
-    declaredMediaType: string;
-    detectedMediaType: string | null;
+    applicantId: string;
+    companyName: string;
+    taxCode: string;
+    state: string;
+    applicantEligibility: "ACTIVE" | "SUSPENDED";
+    submittedAt: string;
+    resubmissionCount: number;
+    assignedAdminRef: string | null;
+    version: number;
+  };
+  company: {
+    name: string;
+    taxCode: string;
+    targetKind: string;
+    prerequisiteState: string;
+  };
+  evidence: {
+    id: string;
+    version: number;
+    fileName: string;
+    mediaType: "image/png" | "image/jpeg" | "application/pdf";
     byteSize: number;
-    malwareStatus: string;
-    typeStatus: string;
-    structureStatus: string;
-    previewStatus: string;
-    createdAt: string;
-    accessible: boolean;
+    safetyState: "PENDING" | "PASS" | "FAIL" | "ERROR";
+    accessibility: "AVAILABLE" | "INACCESSIBLE" | "DELETED";
+  } | null;
+  versions: VerificationReview["evidence"][];
+  decisions: Array<{
+    id: string;
+    decision: string;
+    category: string | null;
+    applicantComment: string | null;
+    decidedAt: string;
+    reviewerRef: string;
   }>;
+  notes: Array<{ id: string; reviewerRef: string; text: string; createdAt: string }>;
+  applicantComment: string | null;
+  canDecide: boolean;
+  blockReason: string | null;
+  calculatedAt: string;
 };
+
 function Review() {
-  const record = useRecordContext<Verification>();
+  const record = useRecordContext<VerificationReview>();
   const refresh = useRefresh();
   if (!record) return null;
-  const evidence = record.evidence.find(
-    (item) => item.submissionVersion === record.currentSubmissionVersion,
-  );
+  const current = record.request;
   return (
     <Box sx={{ p: 2, display: "grid", gap: 2 }}>
       <Typography component="h1" variant="h5">
-        Verification request {record.id}
+        Recruiter verification review
+      </Typography>
+      <Typography>Applicant reference: {current.applicantId}</Typography>
+      <Typography>
+        Company: {record.company.name}; tax code: {record.company.taxCode}; target: {record.company.targetKind}
       </Typography>
       <Typography>
-        Applicant: {record.applicantDisplayName} ({record.applicantAccountId})
+        Applicant account: {current.applicantEligibility}; lifecycle: {current.state}; version: {current.version}
       </Typography>
-      <Typography>
-        Company: {record.companyName}; tax identifier:{" "}
-        {record.normalizedTaxIdentifier}; requested role: {record.requestedRole}
+      <Typography variant="body2" color="text.secondary">
+        Submitted {new Date(current.submittedAt).toLocaleString()}; resubmissions: {current.resubmissionCount}; calculated {new Date(record.calculatedAt).toLocaleString()}.
       </Typography>
-      <Typography>
-        State: {record.state}; submission: {record.currentSubmissionVersion};
-        resubmissions: {record.resubmissionCount}/3
-      </Typography>
-      <VerificationBusinessFactsPanel
-        facts={record.businessFacts}
-        legacyRequest={record.legacyRequest}
-        enrichmentStatus={record.enrichmentStatus}
-      />
-      {evidence && (
+      {record.evidence ? (
         <ProtectedEvidenceViewer
-          requestId={record.id}
-          evidenceId={evidence.id}
-          mediaType={evidence.detectedMediaType ?? evidence.declaredMediaType}
-          byteSize={evidence.byteSize}
-          malwareStatus={evidence.malwareStatus}
-          typeStatus={evidence.typeStatus}
-          structureStatus={evidence.structureStatus}
-          previewStatus={evidence.previewStatus}
-          createdAt={evidence.createdAt}
-          submissionVersion={evidence.submissionVersion}
-          accessible={evidence.accessible}
+          requestId={current.id}
+          evidenceId={record.evidence.id}
+          mediaType={record.evidence.mediaType}
+          byteSize={record.evidence.byteSize}
+          malwareStatus={record.evidence.safetyState}
+          typeStatus={record.evidence.safetyState}
+          structureStatus={record.evidence.safetyState}
+          previewStatus={record.evidence.safetyState}
+          createdAt={current.submittedAt}
+          submissionVersion={record.evidence.version}
+          accessible={record.evidence.accessibility === "AVAILABLE"}
         />
+      ) : (
+        <Alert severity="warning">No current qualified evidence is available.</Alert>
       )}
-      {!evidence && (
-        <Alert severity="warning">
-          No current business license evidence is available. Decisions are
-          disabled.
-        </Alert>
+      {record.applicantComment !== null ? (
+        <Alert severity="info">Recorded applicant-visible outcome: {record.applicantComment}</Alert>
+      ) : record.decisions.some((decision) => decision.decision === "REJECTED") ? (
+        <Alert severity="info">Applicant-visible rejection reason: unavailable for this legacy record.</Alert>
+      ) : null}
+      {record.notes.length > 0 && (
+        <Box component="section" aria-labelledby="protected-notes-heading">
+          <Typography id="protected-notes-heading" component="h2" variant="h6">Protected administrator notes</Typography>
+          {record.notes.map((note) => <Typography key={note.id}>{note.text}</Typography>)}
+        </Box>
       )}
       <VerificationDecisionPanel
-        requestId={record.id}
-        version={record.version}
-        state={record.state}
-        requestedRole={record.requestedRole}
-        resubmissionCount={record.resubmissionCount}
-        disabled={
-          !evidence?.accessible || Boolean(record.viewerUnavailableSince)
-        }
+        requestId={current.id}
+        version={current.version}
+        state={current.state}
+        applicantEligibility={current.applicantEligibility}
+        canDecide={record.canDecide}
+        blockReason={record.blockReason}
         onDone={refresh}
       />
     </Box>
   );
 }
+
 export function VerificationReviewShow() {
   return (
     <Show>

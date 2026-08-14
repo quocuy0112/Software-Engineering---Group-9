@@ -27,6 +27,8 @@ export function buildVerificationOutbox(input: {
   nextAction: string;
   companyDisplayName?: string;
   approvedMembershipRole?: CompanyMembershipRole;
+  rejectionCategory?: string;
+  applicantComment?: string;
 }): Prisma.EmailOutboxUncheckedCreateInput {
   const businessEventKey = verificationBusinessEventKey(
     input.requestId,
@@ -50,6 +52,12 @@ export function buildVerificationOutbox(input: {
         : {}),
       ...(input.approvedMembershipRole
         ? { approvedMembershipRole: input.approvedMembershipRole }
+        : {}),
+      ...(input.rejectionCategory
+        ? { rejectionCategory: input.rejectionCategory }
+        : {}),
+      ...(input.applicantComment
+        ? { applicantComment: input.applicantComment }
         : {}),
     },
     idempotencyKey: emailDeliveryIdempotencyKey(businessEventKey),

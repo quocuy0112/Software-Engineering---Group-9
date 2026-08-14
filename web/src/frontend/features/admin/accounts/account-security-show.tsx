@@ -46,7 +46,7 @@ type RecordShape = {
 function Content() {
   const record = useRecordContext<RecordShape>();
   const [action, setAction] = useState<{
-    kind: "suspend" | "reinstate" | "revoke-all" | "revoke-one";
+    kind: "suspend" | "restore" | "revoke-all" | "revoke-one";
     session?: SafeSession;
   }>();
   const [conflict, setConflict] = useState(false);
@@ -75,7 +75,13 @@ function Content() {
     try {
       await adminDataProvider.command(
         path,
-        value,
+        action.kind === "suspend" || action.kind === "restore"
+          ? {
+              confirmation: true,
+              category: value.reasonCategory,
+              reason: value.explanation,
+            }
+          : value,
         current.version,
         operation.current.current(),
       );
@@ -126,11 +132,11 @@ function Content() {
           onClick={() => {
             operation.current.begin();
             setAction({
-              kind: record.state === "ACTIVE" ? "suspend" : "reinstate",
+              kind: record.state === "ACTIVE" ? "suspend" : "restore",
             });
           }}
         >
-          {record.state === "ACTIVE" ? "Suspend account" : "Reinstate account"}
+          {record.state === "ACTIVE" ? "Suspend account" : "Restore account"}
         </Button>
         <Button
           color="error"
@@ -202,15 +208,15 @@ function Content() {
           title={
             action?.kind === "suspend"
               ? "Suspend account"
-              : action?.kind === "reinstate"
-                ? "Reinstate account"
+              : action?.kind === "restore"
+                ? "Restore account"
                 : "Revoke all sessions"
           }
           actionLabel={
             action?.kind === "suspend"
               ? "Suspend"
-              : action?.kind === "reinstate"
-                ? "Reinstate"
+              : action?.kind === "restore"
+                ? "Restore"
                 : "Revoke all"
           }
           targetLabel={`${record.displayName} (${record.id})`}

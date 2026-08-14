@@ -5,6 +5,7 @@ import {
   createHash,
   randomBytes,
 } from "node:crypto";
+import { existsSync } from "node:fs";
 import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import { isAbsolute, relative, resolve } from "node:path";
 import type {
@@ -21,10 +22,24 @@ function key() {
     .digest();
 }
 
+function defaultRoot() {
+  const workingDirectory = resolve(process.cwd());
+  const workspaceWebRoot = resolve(workingDirectory, "web");
+
+  // The root development supervisor starts the web workspace with the
+  // repository root as cwd, while direct workspace commands use web/ as cwd.
+  // Keep both entry points on the same private directory so an evidence row
+  // never becomes unreadable merely because the server was restarted from a
+  // different workspace directory.
+  return existsSync(resolve(workspaceWebRoot, "package.json"))
+    ? resolve(workspaceWebRoot, ".private-admin-evidence")
+    : resolve(workingDirectory, ".private-admin-evidence");
+}
+
 export class FilesystemPrivateBusinessEvidenceStorage implements PrivateBusinessEvidenceStorage {
   constructor(
     private readonly root = process.env.ADMIN_EVIDENCE_STORAGE_ROOT ??
-      resolve(process.cwd(), ".private-admin-evidence"),
+      defaultRoot(),
   ) {}
 
   private path(locator: string) {

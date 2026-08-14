@@ -31,9 +31,7 @@ describe("ClamAV Unix-socket boundary", () => {
       "utf8",
     );
 
-    const synchronousRefresh = entrypoint.indexOf(
-      "freshclam \\\n  --stdout \\",
-    );
+    const synchronousRefresh = entrypoint.indexOf("if ! freshclam");
     const clamdStart = entrypoint.indexOf(
       'clamd --foreground --config-file="${CLAMD_CONFIG}" &',
     );
@@ -47,8 +45,9 @@ describe("ClamAV Unix-socket boundary", () => {
     expect(daemonRefresh).toBeGreaterThan(-1);
     expect(daemonStart).toBeGreaterThan(synchronousRefresh);
     expect(clamdStart).toBeGreaterThan(daemonStart);
-    expect(entrypoint).not.toMatch(
-      /if ! find [\s\S]*?then\s+freshclam[\s\S]*?fi/u,
+    expect(entrypoint).toContain("has_signature_database");
+    expect(entrypoint).toContain(
+      "ClamAV signatures already cached; skipping initial refresh.",
     );
     expect(entrypoint).toContain("if ! freshclam");
     expect(entrypoint).toContain("#!/bin/sh\nset -eu");

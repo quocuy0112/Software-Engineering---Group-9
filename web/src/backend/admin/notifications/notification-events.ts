@@ -3,6 +3,7 @@ import "server-only";
 export const adminSecurityEventKinds = [
   "ACCOUNT_SUSPENDED",
   "ACCOUNT_REINSTATED",
+  "ACCOUNT_RESTORED",
   "ALL_SESSIONS_REVOKED",
   "MEMBERSHIP_SUSPENDED",
   "MEMBERSHIP_RESTORED",
@@ -46,7 +47,10 @@ export const accountBusinessEventKey = (
   accountId: string,
   eventKind: Extract<
     AdminSecurityEventKind,
-    "ACCOUNT_SUSPENDED" | "ACCOUNT_REINSTATED" | "ALL_SESSIONS_REVOKED"
+    | "ACCOUNT_SUSPENDED"
+    | "ACCOUNT_REINSTATED"
+    | "ACCOUNT_RESTORED"
+    | "ALL_SESSIONS_REVOKED"
   >,
   resultingVersion: number,
 ) => versionedKey("account", accountId, eventKind, resultingVersion);

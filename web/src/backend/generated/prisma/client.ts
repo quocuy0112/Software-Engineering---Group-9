@@ -197,6 +197,11 @@ export type CompanyAccessPrerequisite = Prisma.CompanyAccessPrerequisiteModel
  */
 export type RecruiterVerificationRequest = Prisma.RecruiterVerificationRequestModel
 /**
+ * Model VerificationNotificationEvent
+ * 
+ */
+export type VerificationNotificationEvent = Prisma.VerificationNotificationEventModel
+/**
  * Model EmployerVerificationPreparation
  * 
  */

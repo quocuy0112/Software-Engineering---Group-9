@@ -8,12 +8,12 @@ export async function GET(
 ) {
   try {
     await new AdminRequestBoundary().require(request);
-    const data = await new VerificationReviewService().detail(
+    const data = await new VerificationReviewService().reviewDetail(
       (await context.params).requestId,
     );
     if (!data)
       return adminJson({ code: "TARGET_UNAVAILABLE" }, { status: 404 });
-    return adminJson({ data });
+    return adminJson(data);
   } catch (error) {
     return adminRouteError(error);
   }

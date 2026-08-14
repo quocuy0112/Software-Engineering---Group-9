@@ -30,8 +30,15 @@ export function VerificationRequestList() {
           ].map((id) => ({ id, name: id }))}
         />,
         <TextInput key="company" source="company" />,
-        <TextInput key="taxIdentifier" source="taxIdentifier" />,
-        <TextInput key="applicantId" source="applicantId" />,
+        <TextInput key="taxCode" source="taxCode" />,
+        <SelectInput
+          key="applicantEligibility"
+          source="applicantEligibility"
+          choices={["ACTIVE_ONLY", "SUSPENDED_ONLY", "ANY"].map((id) => ({
+            id,
+            name: id,
+          }))}
+        />,
         <SelectInput
           key="assignment"
           source="assignment"
@@ -45,13 +52,14 @@ export function VerificationRequestList() {
       <CurrentListSnapshotDifference />
       <Datagrid bulkActionButtons={false} rowClick="show">
         <TextField source="id" />
+        <TextField source="applicantId" label="Applicant" />
         <TextField source="companyName" />
-        <TextField source="requestedRole" />
-        <TextField source="normalizedTaxIdentifier" />
+        <TextField source="taxCode" />
         <TextField source="state" />
-        <TextField source="submissionVersion" />
-        <TextField source="assignedAdministratorId" />
-        <DateField source="createdAt" showTime />
+        <TextField source="applicantEligibility" label="Applicant account" />
+        <TextField source="resubmissionCount" />
+        <TextField source="assignedAdminRef" label="Assigned administrator" />
+        <DateField source="submittedAt" showTime />
       </Datagrid>
     </List>
   );

@@ -82,6 +82,7 @@ export const ModelName = {
   CompanyMembershipHistory: 'CompanyMembershipHistory',
   CompanyAccessPrerequisite: 'CompanyAccessPrerequisite',
   RecruiterVerificationRequest: 'RecruiterVerificationRequest',
+  VerificationNotificationEvent: 'VerificationNotificationEvent',
   EmployerVerificationPreparation: 'EmployerVerificationPreparation',
   BusinessRegistryLookupSnapshot: 'BusinessRegistryLookupSnapshot',
   CompanyContactEmailChallenge: 'CompanyContactEmailChallenge',
@@ -722,10 +723,30 @@ export const RecruiterVerificationRequestScalarFieldEnum = {
   viewerDelayNotifiedAt: 'viewerDelayNotifiedAt',
   version: 'version',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  adminComment: 'adminComment'
 } as const
 
 export type RecruiterVerificationRequestScalarFieldEnum = (typeof RecruiterVerificationRequestScalarFieldEnum)[keyof typeof RecruiterVerificationRequestScalarFieldEnum]
+
+
+export const VerificationNotificationEventScalarFieldEnum = {
+  id: 'id',
+  verificationRequestId: 'verificationRequestId',
+  idempotencyKey: 'idempotencyKey',
+  eventKind: 'eventKind',
+  resultingStatus: 'resultingStatus',
+  eventTime: 'eventTime',
+  payloadRef: 'payloadRef',
+  emailStatus: 'emailStatus',
+  inAppStatus: 'inAppStatus',
+  emailOutboxId: 'emailOutboxId',
+  inAppNotificationRef: 'inAppNotificationRef',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VerificationNotificationEventScalarFieldEnum = (typeof VerificationNotificationEventScalarFieldEnum)[keyof typeof VerificationNotificationEventScalarFieldEnum]
 
 
 export const EmployerVerificationPreparationScalarFieldEnum = {

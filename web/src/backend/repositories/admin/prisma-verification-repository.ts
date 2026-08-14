@@ -1,8 +1,273 @@
 import "server-only";
+import type { Prisma } from "@/backend/generated/prisma/client";
 import { prisma } from "@/backend/database/prisma";
 import { calculationMetadata } from "@/backend/admin/dashboard/dashboard-definition";
+import {
+  verificationQueueFilterSchema,
+  verificationQueuePageSchema,
+  verificationReviewDetailSchema,
+} from "@/shared/contracts/admin/verification";
+
+function dayStart(value: string | undefined) {
+  return value ? new Date(`${value}T00:00:00.000Z`) : undefined;
+}
+
+function dayEndExclusive(value: string | undefined) {
+  if (!value) return undefined;
+  const end = new Date(`${value}T00:00:00.000Z`);
+  end.setUTCDate(end.getUTCDate() + 1);
+  return end;
+}
+
+function evidenceSafetyState(item: {
+  malwareStatus: string;
+  typeStatus: string;
+  structureStatus: string;
+  previewStatus: string;
+}) {
+  const values = [
+    item.malwareStatus,
+    item.typeStatus,
+    item.structureStatus,
+    item.previewStatus,
+  ];
+  if (values.some((value) => value === "FAIL")) return "FAIL" as const;
+  if (values.some((value) => value === "INDETERMINATE")) return "ERROR" as const;
+  if (values.every((value) => value === "PASS")) return "PASS" as const;
+  return "PENDING" as const;
+}
+
+function evidenceAccessibility(item: {
+  contentInaccessibleAt: Date | null;
+  deletedAt: Date | null;
+  supersededAt: Date | null;
+  qualified: boolean;
+}) {
+  if (item.deletedAt) return "DELETED" as const;
+  if (item.contentInaccessibleAt || item.supersededAt || !item.qualified)
+    return "INACCESSIBLE" as const;
+  return "AVAILABLE" as const;
+}
+
+function evidenceFileName(mediaType: string, version: number) {
+  const extension =
+    mediaType === "application/pdf"
+      ? "pdf"
+      : mediaType === "image/png"
+        ? "png"
+        : "jpg";
+  return `business-license-${version}.${extension}`;
+}
 
 export class PrismaVerificationRepository {
+  async listQueue(input: {
+    page: number;
+    pageSize: number;
+    filter: Record<string, unknown>;
+    adminUserId: string;
+  }) {
+    const filter = verificationQueueFilterSchema.parse({
+      ...input.filter,
+      page: input.page,
+      pageSize: input.pageSize,
+    });
+    const taxCode = filter.taxCode ?? filter.taxIdentifier;
+    const where: Prisma.RecruiterVerificationRequestWhereInput = {
+      state: filter.state,
+      applicant: {
+        state:
+          filter.applicantEligibility === "ACTIVE_ONLY"
+            ? "ACTIVE"
+            : filter.applicantEligibility === "SUSPENDED_ONLY"
+              ? "SUSPENDED"
+              : { in: ["ACTIVE", "SUSPENDED"] },
+      },
+      ...(filter.company
+        ? {
+            submittedCompanyName: {
+              contains: filter.company,
+              mode: "insensitive",
+            },
+          }
+        : {}),
+      ...(taxCode ? { normalizedTaxIdentifier: taxCode } : {}),
+      ...(filter.applicantId ? { applicantUserId: filter.applicantId } : {}),
+      ...(filter.submittedFrom || filter.submittedTo
+        ? {
+            createdAt: {
+              ...(dayStart(filter.submittedFrom)
+                ? { gte: dayStart(filter.submittedFrom) }
+                : {}),
+              ...(dayEndExclusive(filter.submittedTo)
+                ? { lt: dayEndExclusive(filter.submittedTo) }
+                : {}),
+            },
+          }
+        : {}),
+      ...(filter.assignment === "UNASSIGNED"
+        ? { assignedAdminUserId: null }
+        : filter.assignment === "MINE"
+          ? { assignedAdminUserId: input.adminUserId }
+          : {}),
+    };
+    const [rows, total] = await Promise.all([
+      prisma.recruiterVerificationRequest.findMany({
+        where,
+        include: { applicant: { select: { state: true } } },
+        skip: (filter.page - 1) * filter.pageSize,
+        take: filter.pageSize,
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      }),
+      prisma.recruiterVerificationRequest.count({ where }),
+    ]);
+    return verificationQueuePageSchema.parse({
+      data: rows.map((row) => ({
+        id: row.id,
+        applicantId: row.applicantUserId,
+        companyName: row.submittedCompanyName,
+        taxCode: row.normalizedTaxIdentifier,
+        state: row.state,
+        applicantEligibility: row.applicant.state,
+        submittedAt: row.createdAt.toISOString(),
+        resubmissionCount: row.resubmissionCount,
+        assignedAdminRef: row.assignedAdminUserId,
+        version: row.version,
+      })),
+      page: filter.page,
+      pageSize: filter.pageSize,
+      total,
+      calculatedAt: new Date().toISOString(),
+    });
+  }
+
+  async reviewDetail(id: string) {
+    const now = new Date();
+    const row = await prisma.recruiterVerificationRequest.findUnique({
+      where: { id },
+      include: {
+        applicant: { select: { name: true, state: true, deletedAt: true } },
+        targetCompany: {
+          select: { id: true, displayName: true, verificationState: true },
+        },
+        evidence: { orderBy: { submissionVersion: "desc" } },
+        decisions: { orderBy: [{ decidedAt: "asc" }, { id: "asc" }] },
+        notes: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
+        businessFacts: { select: { requestId: true } },
+      },
+    });
+    if (!row) return null;
+    const prerequisite = row.prerequisiteId
+      ? await prisma.companyAccessPrerequisite.findUnique({
+          where: { id: row.prerequisiteId },
+          select: { state: true, expiresAt: true },
+        })
+      : null;
+    const currentEvidence = row.evidence.find(
+      (item) => item.id === row.currentEvidenceId,
+    );
+    const metadata = row.evidence.map((item) => {
+      const safetyState = evidenceSafetyState(item);
+      const qualified =
+        item.id === row.currentEvidenceId &&
+        item.submissionVersion === row.currentSubmissionVersion &&
+        safetyState === "PASS" &&
+        (!row.targetCompany || row.targetCompany.verificationState === "ACTIVE");
+      return {
+        id: item.id,
+        version: item.submissionVersion,
+        fileName: evidenceFileName(
+          item.detectedMediaType ?? item.declaredMediaType,
+          item.submissionVersion,
+        ),
+        mediaType: item.detectedMediaType ?? item.declaredMediaType,
+        byteSize: item.byteSize,
+        safetyState,
+        accessibility: evidenceAccessibility({
+          contentInaccessibleAt: item.contentInaccessibleAt,
+          deletedAt: item.deletedAt,
+          supersededAt: item.supersededAt,
+          qualified,
+        }),
+      };
+    });
+    const current = metadata.find((item) => item.id === currentEvidence?.id) ?? null;
+    const applicantActive = row.applicant.state === "ACTIVE" && !row.applicant.deletedAt;
+    const prerequisiteAvailable =
+      !row.targetCompanyId ||
+      (prerequisite?.state === "AVAILABLE" &&
+        (!prerequisite.expiresAt || prerequisite.expiresAt > now));
+    const evidenceAvailable = current?.accessibility === "AVAILABLE";
+    const canDecide =
+      row.state === "PENDING_REVIEW" &&
+      applicantActive &&
+      Boolean(evidenceAvailable) &&
+      prerequisiteAvailable &&
+      (!row.submissionIdempotencyKey || Boolean(row.businessFacts));
+    const blockReason = canDecide
+      ? null
+      : !applicantActive
+        ? "APPLICANT_SUSPENDED"
+        : row.state !== "PENDING_REVIEW"
+          ? "INVALID_STATE"
+          : !evidenceAvailable
+            ? "EVIDENCE_UNAVAILABLE"
+            : !prerequisiteAvailable
+              ? "RELATIONSHIP_REQUIRED"
+              : "ENRICHED_FACTS_REQUIRED";
+    const request = {
+      id: row.id,
+      applicantId: row.applicantUserId,
+      companyName: row.submittedCompanyName,
+      taxCode: row.normalizedTaxIdentifier,
+      state: row.state,
+      applicantEligibility:
+        row.applicant.state === "ACTIVE" ? "ACTIVE" : "SUSPENDED",
+      submittedAt: row.createdAt.toISOString(),
+      resubmissionCount: row.resubmissionCount,
+      assignedAdminRef: row.assignedAdminUserId,
+      version: row.version,
+    };
+    return verificationReviewDetailSchema.parse({
+      request,
+      company: {
+        name: row.submittedCompanyName,
+        taxCode: row.normalizedTaxIdentifier,
+        targetKind: row.targetCompanyId ? "EXISTING_COMPANY" : "NEW_COMPANY",
+        prerequisiteState: row.targetCompanyId
+          ? prerequisite?.state ?? "UNAVAILABLE"
+          : "NOT_REQUIRED",
+      },
+      evidence: current,
+      versions: metadata,
+      decisions: row.decisions.map((decision) => ({
+        id: decision.id,
+        decision:
+          decision.resultingState === "APPROVED"
+            ? "APPROVED"
+            : decision.resultingState === "REJECTED"
+              ? "REJECTED"
+              : "CHANGES_REQUESTED",
+        category: decision.rejectionCategory,
+        applicantComment:
+          decision.resultingState === "REJECTED"
+            ? row.adminComment ?? null
+            : null,
+        decidedAt: decision.decidedAt.toISOString(),
+        reviewerRef: decision.actorAdminUserId,
+      })),
+      notes: row.notes.map((note) => ({
+        id: note.id,
+        reviewerRef: note.authorAdminUserId,
+        text: note.normalizedText,
+        createdAt: note.createdAt.toISOString(),
+      })),
+      applicantComment: row.adminComment ?? null,
+      canDecide,
+      blockReason,
+      calculatedAt: now.toISOString(),
+    });
+  }
+
   async list(input: {
     page: number;
     perPage: number;

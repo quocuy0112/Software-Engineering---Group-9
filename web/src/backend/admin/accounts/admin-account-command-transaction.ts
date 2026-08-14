@@ -19,6 +19,7 @@ export async function recordAccountCommand(
     action:
       | "admin.account_suspended"
       | "admin.account_reinstated"
+      | "admin.account_restored"
       | "admin.session_revoked"
       | "admin.sessions_revoked_all";
     reasonCategory: string;
@@ -54,12 +55,17 @@ export async function recordAccountCommand(
   if (input.notify) {
     const eventKind: Extract<
       AdminSecurityEventKind,
-      "ACCOUNT_SUSPENDED" | "ACCOUNT_REINSTATED" | "ALL_SESSIONS_REVOKED"
+      | "ACCOUNT_SUSPENDED"
+      | "ACCOUNT_REINSTATED"
+      | "ACCOUNT_RESTORED"
+      | "ALL_SESSIONS_REVOKED"
     > =
       input.action === "admin.account_suspended"
         ? "ACCOUNT_SUSPENDED"
         : input.action === "admin.account_reinstated"
           ? "ACCOUNT_REINSTATED"
+          : input.action === "admin.account_restored"
+            ? "ACCOUNT_RESTORED"
           : "ALL_SESSIONS_REVOKED";
     const businessEventKey = accountBusinessEventKey(
       input.targetUserId,
@@ -74,6 +80,8 @@ export async function recordAccountCommand(
       payloadRef: {
         resultingState: input.resultingState,
         occurredAt: input.occurredAt.toISOString(),
+        reasonCategory: input.reasonCategory,
+        supportPath: "/support/account-security",
       },
       status: "PENDING",
       attemptCount: 0,

@@ -1,20 +1,21 @@
 import { AdminRequestBoundary } from "@/backend/security/admin-request-boundary";
 import { adminJson, adminRouteError } from "@/backend/admin/http/admin-route";
-import { VerificationReviewService } from "@/backend/admin/verification/verification-review-service";
-import { readVerificationCommand } from "@/backend/admin/verification/verification-command-http";
+import { AdminAccountService } from "@/backend/admin/accounts/admin-account-service";
+import { readAccountModerationCommand } from "@/backend/admin/accounts/account-command-http";
+
 export async function POST(
   request: Request,
-  context: { params: Promise<{ requestId: string }> },
+  context: { params: Promise<{ accountId: string }> },
 ) {
   try {
     const authority = await new AdminRequestBoundary().require(request, {
       sensitive: true,
     });
     return adminJson(
-      await new VerificationReviewService().requestChanges(
+      await new AdminAccountService().restore(
         authority,
-        (await context.params).requestId,
-        (await readVerificationCommand(request, "request-changes")) as never,
+        (await context.params).accountId,
+        await readAccountModerationCommand(request),
       ),
     );
   } catch (error) {

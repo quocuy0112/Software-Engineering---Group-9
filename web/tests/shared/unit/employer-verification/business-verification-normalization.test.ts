@@ -11,6 +11,7 @@ import {
 describe("business verification normalization", () => {
   it("retains a leading zero and rejects non-ASCII or branch tax identifiers", () => {
     expect(businessTaxIdentifierSchema.parse(" 0316794479 ")).toBe("0316794479");
+    expect(businessTaxIdentifierSchema.parse("0109934230")).toBe("0109934230");
     expect(businessTaxIdentifierSchema.safeParse("0316794479001").success).toBe(false);
     expect(businessTaxIdentifierSchema.safeParse("０316794479").success).toBe(false);
   });

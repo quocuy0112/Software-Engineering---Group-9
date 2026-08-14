@@ -6,27 +6,7 @@ import { S3PrivateBusinessEvidenceStorage } from "@/backend/storage/business-evi
 import type { Prisma } from "@/backend/generated/prisma/client";
 import type { PrivateBusinessEvidenceStorage } from "@/backend/storage/business-evidence/private-business-evidence-storage";
 import { randomUUID } from "node:crypto";
-import { buildVerificationOutbox } from "@/backend/admin/notifications/verification-outbox";
-
-function outbox(
-  requestId: string,
-  userId: string,
-  eventKind: "VERIFICATION_DELAYED" | "VERIFICATION_EXPIRED",
-  resultingVersion: number,
-  now: Date,
-) {
-  return buildVerificationOutbox({
-    requestId,
-    userId,
-    eventKind,
-    resultingState:
-      eventKind === "VERIFICATION_EXPIRED" ? "EXPIRED" : "PROCESSING_DELAYED",
-    resultingVersion,
-    occurredAt: now,
-    nextAction:
-      eventKind === "VERIFICATION_EXPIRED" ? "SUBMIT_NEW_REQUEST" : "WAIT",
-  });
-}
+import { createVerificationNotificationEvent } from "@/backend/admin/notifications/verification-notification-event";
 
 async function makeEvidenceInaccessible(
   tx: Prisma.TransactionClient,
@@ -158,24 +138,14 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
         });
         if (update.count) {
           await makeEvidenceInaccessible(tx, row.id, now);
-          await tx.emailOutbox.upsert({
-            where: {
-              idempotencyKey: outbox(
-                row.id,
-                row.applicantUserId,
-                "VERIFICATION_EXPIRED",
-                row.version + 1,
-                now,
-              ).idempotencyKey,
-            },
-            update: {},
-            create: outbox(
-              row.id,
-              row.applicantUserId,
-              "VERIFICATION_EXPIRED",
-              row.version + 1,
-              now,
-            ),
+          await createVerificationNotificationEvent(tx, {
+            requestId: row.id,
+            userId: row.applicantUserId,
+            eventKind: "VERIFICATION_EXPIRED",
+            resultingState: "EXPIRED",
+            resultingVersion: row.version + 1,
+            occurredAt: now,
+            nextAction: "SUBMIT_NEW_REQUEST",
           });
         }
       });
@@ -192,24 +162,14 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
           where: { id: row.id, state: "PENDING_CHECKS", delayedAt: null },
           data: { delayedAt: now },
         });
-        await tx.emailOutbox.upsert({
-          where: {
-            idempotencyKey: outbox(
-              row.id,
-              row.applicantUserId,
-              "VERIFICATION_DELAYED",
-              row.version,
-              now,
-            ).idempotencyKey,
-          },
-          update: {},
-          create: outbox(
-            row.id,
-            row.applicantUserId,
-            "VERIFICATION_DELAYED",
-            row.version,
-            now,
-          ),
+        await createVerificationNotificationEvent(tx, {
+          requestId: row.id,
+          userId: row.applicantUserId,
+          eventKind: "VERIFICATION_DELAYED",
+          resultingState: "PENDING_CHECKS",
+          resultingVersion: row.version,
+          occurredAt: now,
+          nextAction: "WAIT",
         });
       });
       changed += 1;
@@ -232,24 +192,14 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
           });
           if (update.count) {
             await makeEvidenceInaccessible(tx, row.id, now);
-            await tx.emailOutbox.upsert({
-              where: {
-                idempotencyKey: outbox(
-                  row.id,
-                  row.applicantUserId,
-                  "VERIFICATION_EXPIRED",
-                  row.version + 1,
-                  now,
-                ).idempotencyKey,
-              },
-              update: {},
-              create: outbox(
-                row.id,
-                row.applicantUserId,
-                "VERIFICATION_EXPIRED",
-                row.version + 1,
-                now,
-              ),
+            await createVerificationNotificationEvent(tx, {
+              requestId: row.id,
+              userId: row.applicantUserId,
+              eventKind: "VERIFICATION_EXPIRED",
+              resultingState: "EXPIRED",
+              resultingVersion: row.version + 1,
+              occurredAt: now,
+              nextAction: "SUBMIT_NEW_REQUEST",
             });
           }
         });
@@ -260,24 +210,14 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
             where: { id: row.id },
             data: { viewerDelayNotifiedAt: now },
           });
-          await tx.emailOutbox.upsert({
-            where: {
-              idempotencyKey: outbox(
-                row.id,
-                row.applicantUserId,
-                "VERIFICATION_DELAYED",
-                row.version,
-                now,
-              ).idempotencyKey,
-            },
-            update: {},
-            create: outbox(
-              row.id,
-              row.applicantUserId,
-              "VERIFICATION_DELAYED",
-              row.version,
-              now,
-            ),
+          await createVerificationNotificationEvent(tx, {
+            requestId: row.id,
+            userId: row.applicantUserId,
+            eventKind: "VERIFICATION_DELAYED",
+            resultingState: "PENDING_CHECKS",
+            resultingVersion: row.version,
+            occurredAt: now,
+            nextAction: "WAIT",
           });
         });
         changed += 1;
@@ -305,24 +245,14 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
         });
         if (update.count) {
           await makeEvidenceInaccessible(tx, row.id, now);
-          await tx.emailOutbox.upsert({
-            where: {
-              idempotencyKey: outbox(
-                row.id,
-                row.applicantUserId,
-                "VERIFICATION_EXPIRED",
-                row.version + 1,
-                now,
-              ).idempotencyKey,
-            },
-            update: {},
-            create: outbox(
-              row.id,
-              row.applicantUserId,
-              "VERIFICATION_EXPIRED",
-              row.version + 1,
-              now,
-            ),
+          await createVerificationNotificationEvent(tx, {
+            requestId: row.id,
+            userId: row.applicantUserId,
+            eventKind: "VERIFICATION_EXPIRED",
+            resultingState: "EXPIRED",
+            resultingVersion: row.version + 1,
+            occurredAt: now,
+            nextAction: "SUBMIT_NEW_REQUEST",
           });
         }
       });
