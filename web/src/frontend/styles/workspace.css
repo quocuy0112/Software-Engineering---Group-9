@@ -136,7 +136,9 @@
   content: "";
   opacity: 0.4;
   transform: translateY(-50%);
-  transition: opacity var(--sh-motion-fast) ease, transform var(--sh-motion-fast) ease;
+  transition:
+    opacity var(--sh-motion-fast) ease,
+    transform var(--sh-motion-fast) ease;
 }
 
 .workspace-sidebar:hover .workspace-sidebar-resize-handle::after,
@@ -524,6 +526,151 @@
   color: var(--sh-color-text-secondary);
   font-size: var(--sh-font-size-body-sm);
   line-height: var(--sh-line-height-body-sm);
+}
+
+/* Shared compact header for workspace utility pages. */
+.workspace-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sh-space-5);
+  margin-bottom: var(--sh-space-5);
+}
+
+.workspace-page-header__eyebrow,
+.workspace-page-header__subtitle,
+.workspace-page-header h1 {
+  margin: 0;
+}
+
+.workspace-page-header__eyebrow {
+  color: var(--sh-color-brand-primary);
+  font-family: var(--sh-font-family-label);
+  font-size: 11px;
+  font-weight: var(--sh-font-weight-bold);
+  line-height: var(--sh-line-height-caption);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.workspace-page-header__eyebrow::before {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin: 0 7px 1px 0;
+  border-radius: var(--sh-radius-full);
+  background: currentColor;
+  content: "";
+}
+
+.workspace-page-header h1 {
+  margin-top: var(--sh-space-2);
+  color: var(--sh-color-text-primary);
+  font-size: 24px;
+  font-weight: var(--sh-font-weight-bold);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.workspace-page-header__subtitle {
+  max-width: 680px;
+  margin-top: var(--sh-space-2);
+  color: var(--sh-color-text-secondary);
+  font-size: var(--sh-font-size-body-sm);
+  line-height: var(--sh-line-height-body-sm);
+}
+
+.workspace-page-header__status {
+  display: inline-flex;
+  min-height: 34px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+  padding: 0 var(--sh-space-3);
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-full);
+  color: var(--sh-color-text-secondary);
+  background: var(--sh-color-surface-card);
+  box-shadow: var(--sh-shadow-control);
+  font-size: var(--sh-font-size-caption);
+  font-weight: var(--sh-font-weight-semibold);
+  line-height: var(--sh-line-height-caption);
+  white-space: nowrap;
+}
+
+.workspace-page-header__status > span {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--sh-radius-full);
+  background: var(--sh-color-text-muted);
+}
+
+.workspace-page-header__status[data-state="connected"] {
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-success) 28%,
+    var(--sh-color-border-subtle)
+  );
+  color: var(--sh-color-success);
+  background: var(--sh-color-success-bg);
+}
+
+.workspace-page-header__status[data-state="connected"] > span {
+  background: var(--sh-color-success);
+  box-shadow: 0 0 0 4px
+    color-mix(in srgb, var(--sh-color-success) 14%, transparent);
+  animation: workspace-status-pulse 2.1s ease-out infinite;
+}
+
+.workspace-page-header__status[data-state="connected"] > span::after {
+  position: absolute;
+  inset: -6px;
+  border: 1px solid color-mix(in srgb, var(--sh-color-success) 56%, transparent);
+  border-radius: inherit;
+  content: "";
+  animation: workspace-status-ripple 2.1s ease-out infinite;
+}
+
+.workspace-page-header__status[data-state="connecting"] > span,
+.workspace-page-header__status[data-state="reconnecting"] > span {
+  background: var(--sh-color-warning);
+  animation: workspace-status-pending 1.5s ease-in-out infinite;
+}
+
+.workspace-page-header__status[data-state="offline"] {
+  color: var(--sh-color-error);
+  background: var(--sh-color-error-bg);
+}
+
+.workspace-page-header__status[data-state="offline"] > span {
+  background: var(--sh-color-error);
+}
+
+@keyframes workspace-status-pulse {
+  50% {
+    box-shadow: 0 0 0 6px
+      color-mix(in srgb, var(--sh-color-success) 8%, transparent);
+  }
+}
+
+@keyframes workspace-status-ripple {
+  0% {
+    opacity: 0.75;
+    transform: scale(0.6);
+  }
+
+  75%,
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+@keyframes workspace-status-pending {
+  50% {
+    opacity: 0.45;
+  }
 }
 
 /* Dashboard */
@@ -1084,6 +1231,16 @@
   .workspace-content {
     padding-top: var(--sh-space-6);
     padding-bottom: var(--sh-space-10);
+  }
+
+  .workspace-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--sh-space-3);
+  }
+
+  .workspace-page-header__subtitle {
+    max-width: none;
   }
 
   .workspace-content[data-content-mode="job-board"] {

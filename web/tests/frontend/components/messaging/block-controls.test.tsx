@@ -15,6 +15,7 @@ describe("BlockParticipantDialog", () => {
     const changed = vi.fn();
     render(
       <BlockParticipantDialog
+        locale="vi"
         csrfProof="csrf"
         targetUserId="user-b"
         targetName="Recruiter B"
@@ -22,10 +23,12 @@ describe("BlockParticipantDialog", () => {
         onChanged={changed}
       />,
     );
-    const trigger = screen.getByRole("button", { name: "Block Recruiter B" });
+    const trigger = screen.getByRole("button", { name: "Chặn Recruiter B" });
     fireEvent.click(trigger);
-    expect(screen.getByRole("dialog")).toHaveTextContent(/existing message history is retained/i);
-    fireEvent.click(screen.getByRole("button", { name: /confirm block/i }));
+    expect(screen.getByRole("dialog")).toHaveTextContent(
+      /lịch sử tin nhắn vẫn được lưu/i,
+    );
+    fireEvent.click(screen.getByRole("button", { name: /xác nhận chặn/i }));
     await waitFor(() => expect(changed).toHaveBeenCalledWith(true));
     await waitFor(() => expect(trigger).toHaveFocus());
   });

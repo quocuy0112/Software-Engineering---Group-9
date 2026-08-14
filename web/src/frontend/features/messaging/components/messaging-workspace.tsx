@@ -1,11 +1,17 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import type { ConversationSummary, EligibleParticipant } from "@/shared/contracts/messaging/conversations";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { WorkspacePageHeader } from "@/frontend/features/dashboard/components/page-header";
+import type {
+  ConversationSummary,
+  EligibleParticipant,
+} from "@/shared/contracts/messaging/conversations";
 import { useConversations } from "../client/use-conversations";
 import { useMessageHistory } from "../client/use-message-history";
 import { useChatConnection } from "../client/use-chat-connection";
 import { useChatEvents } from "../client/use-chat-events";
+import { messagingCopy } from "../messaging-copy";
 import { ConversationList } from "./conversation-list";
 import { MessageThread } from "./message-thread";
 import { StartConversation } from "./start-conversation";
@@ -23,12 +29,15 @@ export function MessagingWorkspace({
   initialEligibleParticipants: EligibleParticipant[];
   initialConversationId?: string | null;
 }) {
-  const conversations = useConversations(initialConversations);
+  const locale = useWorkspaceLocale();
+  const copy = messagingCopy(locale);
+  const conversations = useConversations(initialConversations, locale);
   const [selectedId, setSelectedId] = useState(initialConversationId);
   const history = useMessageHistory(
     selectedId,
     csrfProof,
     conversations.clearUnread,
+    locale,
   );
   const {
     addMessage,
@@ -46,7 +55,10 @@ export function MessagingWorkspace({
     [selectedId, setPage],
   );
   const connectionInput = useMemo(
-    () => ({ onAuthoritativeRefetch: refreshConversations, onProtectedCachePurge: purge }),
+    () => ({
+      onAuthoritativeRefetch: refreshConversations,
+      onProtectedCachePurge: purge,
+    }),
     [purge, refreshConversations],
   );
   const connectionState = useChatConnection(connectionInput);
@@ -90,41 +102,49 @@ export function MessagingWorkspace({
   );
   useChatEvents(eventInput);
 
+  const connectionLabel =
+    connectionState === "CONNECTED"
+      ? copy.connected
+      : connectionState === "CONNECTING"
+        ? copy.connecting
+        : connectionState === "RECONNECTING"
+          ? copy.reconnecting
+          : copy.offline;
+
   return (
-    <main className="messaging-workspace" data-thread-open={Boolean(selectedId)}>
-      <header className="messaging-heading">
-        <div>
-          <p className="workspace-kicker">PROFESSIONAL COMMUNICATION</p>
-          <h1 id="workspace-page-title">Messages</h1>
-          <p className="messaging-heading-copy">
-            Stay connected with candidates and hiring teams in one secure workspace.
-          </p>
-        </div>
-        <span
-          className="messaging-connection-status"
-          data-state={connectionState.toLocaleLowerCase()}
-          role="status"
-        >
-          <span aria-hidden="true" />
-          {connectionState === "CONNECTED"
-            ? "Realtime connected"
-            : connectionState === "CONNECTING"
-              ? "Connecting"
-              : connectionState === "RECONNECTING"
-                ? "Reconnecting"
-                : "Offline"}
-        </span>
-      </header>
+    <main
+      className="messaging-workspace"
+      data-thread-open={Boolean(selectedId)}
+    >
+      <WorkspacePageHeader
+        eyebrow={copy.workspaceKicker}
+        title={copy.pageTitle}
+        subtitle={copy.pageDescription}
+        statusBadge={{
+          label: connectionLabel,
+          state: connectionState.toLocaleLowerCase() as
+            | "connected"
+            | "connecting"
+            | "reconnecting"
+            | "offline",
+        }}
+      />
       {conversations.error ? (
         <p className="messaging-page-alert" role="alert">
           {conversations.error}
         </p>
       ) : null}
       <div className="messaging-grid">
-        <aside className="messaging-sidebar" aria-label="Messaging navigation">
+        <aside
+          className="messaging-sidebar"
+          aria-label={
+            locale === "vi" ? "Điều hướng tin nhắn" : "Messaging navigation"
+          }
+        >
           <StartConversation
             csrfProof={csrfProof}
             initialItems={initialEligibleParticipants}
+            locale={locale}
             onOpened={(conversationId) => {
               setSelectedId(conversationId);
               void refreshConversations();
@@ -134,6 +154,7 @@ export function MessagingWorkspace({
             currentUserId={currentUserId}
             items={conversations.items}
             selectedId={selectedId}
+            locale={locale}
             onSelect={setSelectedId}
             onLoadMore={() => void loadMore()}
             hasMore={Boolean(conversations.nextCursor)}
@@ -142,6 +163,7 @@ export function MessagingWorkspace({
         <MessageThread
           currentUserId={currentUserId}
           csrfProof={csrfProof}
+          locale={locale}
           page={history.page}
           error={history.error}
           onLoadOlder={() => void loadOlder()}
@@ -150,6 +172,7 @@ export function MessagingWorkspace({
             void refreshHistory();
             void refreshConversations();
           }}
+          hasConversations={conversations.items.length > 0}
         />
       </div>
     </main>

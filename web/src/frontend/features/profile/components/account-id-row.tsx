@@ -29,8 +29,32 @@ export function AccountIdRow({
 
   async function copyAccountId() {
     try {
-      if (!navigator.clipboard) throw new Error("CLIPBOARD_UNAVAILABLE");
-      await navigator.clipboard.writeText(accountId);
+      let copied = false;
+      if (navigator.clipboard?.writeText) {
+        try {
+          await navigator.clipboard.writeText(accountId);
+          copied = true;
+        } catch {
+          // Some non-secure or embedded contexts expose Clipboard but reject writes.
+        }
+      }
+
+      if (!copied) {
+        const fallback = document.createElement("textarea");
+        fallback.value = accountId;
+        fallback.setAttribute("readonly", "");
+        fallback.style.position = "fixed";
+        fallback.style.opacity = "0";
+        document.body.append(fallback);
+        try {
+          fallback.select();
+          copied = document.execCommand("copy");
+        } finally {
+          fallback.remove();
+        }
+      }
+
+      if (!copied) throw new Error("CLIPBOARD_UNAVAILABLE");
       setCopyState("copied");
     } catch {
       setCopyState("failed");
@@ -55,7 +79,6 @@ export function AccountIdRow({
         <button
           type="button"
           aria-label={copyState === "copied" ? copiedLabel : copyLabel}
-          title={copyState === "copied" ? copiedLabel : copyLabel}
           data-state={copyState}
           onClick={() => void copyAccountId()}
         >

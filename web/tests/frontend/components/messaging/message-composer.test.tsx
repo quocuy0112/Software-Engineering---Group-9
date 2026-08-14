@@ -26,12 +26,12 @@ describe("MessageComposer", () => {
         },
       },
     });
-    render(<MessageComposer conversationId="conversation-1" />);
-    fireEvent.change(screen.getByRole("textbox", { name: "Message" }), {
+    render(<MessageComposer conversationId="conversation-1" locale="vi" />);
+    fireEvent.change(screen.getByRole("textbox", { name: "Tin nhắn" }), {
       target: { value: "  Hello  " },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Send" }));
-    await waitFor(() => expect(screen.getByText("sent")).toBeVisible());
+    fireEvent.click(screen.getByRole("button", { name: "Gửi" }));
+    await waitFor(() => expect(screen.getByText("Đã gửi")).toBeVisible());
     expect(emitWithAck).toHaveBeenCalledWith(
       "message:send",
       expect.objectContaining({ content: "Hello" }),
@@ -48,13 +48,15 @@ describe("MessageComposer", () => {
         retryAfterSeconds: null,
       },
     });
-    render(<MessageComposer conversationId="conversation-1" />);
-    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+    render(<MessageComposer conversationId="conversation-1" locale="vi" />);
+    fireEvent.click(screen.getByRole("button", { name: "Gửi" }));
     expect(screen.getByRole("alert")).toBeVisible();
-    fireEvent.change(screen.getByRole("textbox", { name: "Message" }), {
+    fireEvent.change(screen.getByRole("textbox", { name: "Tin nhắn" }), {
       target: { value: "Retry me" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Send" }));
-    await waitFor(() => expect(screen.getByRole("button", { name: "Retry" })).toBeVisible());
+    fireEvent.click(screen.getByRole("button", { name: "Gửi" }));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Thử lại" })).toBeVisible(),
+    );
   });
 });

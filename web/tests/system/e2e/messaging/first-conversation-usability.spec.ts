@@ -9,7 +9,9 @@ async function signIn(page: Page, email: string, password: string) {
     },
     data: { email, password, returnTo: "/dashboard" },
   });
-  expect(response.ok(), `Login failed with status ${response.status()}.`).toBe(true);
+  expect(response.ok(), `Login failed with status ${response.status()}.`).toBe(
+    true,
+  );
 }
 
 async function executeFirstConversationRun(
@@ -20,7 +22,10 @@ async function executeFirstConversationRun(
   await page.goto("/dashboard");
   await expect(page).toHaveURL(/\/dashboard$/);
   const startedAt = Date.now();
-  const messagesLink = page.getByRole("link", { name: "Messages", exact: true });
+  const messagesLink = page.getByRole("link", {
+    name: "Tin nhắn",
+    exact: true,
+  });
   if (inputMode === "keyboard") {
     await messagesLink.focus();
     await page.keyboard.press("Enter");
@@ -28,8 +33,12 @@ async function executeFirstConversationRun(
     await messagesLink.click();
   }
   await expect(page).toHaveURL(/\/messages$/);
-  await expect(page.getByRole("status").filter({ hasText: "connected" })).toBeVisible();
-  const openButton = page.getByRole("button", { name: /^Message / }).first();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Đang kết nối trực tuyến" }),
+  ).toBeVisible();
+  const openButton = page
+    .getByRole("button", { name: /^Nhắn tin cho / })
+    .first();
   const openResponse = page.waitForResponse(
     (response) =>
       response.url().endsWith("/api/messaging/conversations") &&
@@ -42,27 +51,30 @@ async function executeFirstConversationRun(
     await openButton.click();
   }
   const opened = await openResponse;
-  expect(opened.ok(), `Conversation open failed with status ${opened.status()}.`).toBe(true);
+  expect(
+    opened.ok(),
+    `Conversation open failed with status ${opened.status()}.`,
+  ).toBe(true);
   await expect(
-    page.getByLabel("Message composer"),
+    page.getByLabel("Soạn tin nhắn"),
     `Run ${run} (${inputMode}) did not render the opened thread.`,
   ).toBeVisible({ timeout: 10_000 });
   const content = `Usability protocol run ${run} ${Date.now()}`;
-  const editor = page.getByRole("textbox", { name: "Message" });
+  const editor = page.getByRole("textbox", { name: "Tin nhắn" });
   if (inputMode === "keyboard") {
     await editor.focus();
     await page.keyboard.type(content);
-    await page.getByRole("button", { name: "Send" }).focus();
+    await page.getByRole("button", { name: "Gửi" }).focus();
     await page.keyboard.press("Enter");
   } else {
     await editor.fill(content);
-    await page.getByRole("button", { name: "Send" }).click();
+    await page.getByRole("button", { name: "Gửi" }).click();
   }
   const outboxItem = page
-    .getByRole("list", { name: "Outgoing messages" })
+    .getByRole("list", { name: "Tin nhắn đang gửi" })
     .getByRole("listitem")
     .filter({ hasText: content });
-  await expect(outboxItem).toContainText("sent");
+  await expect(outboxItem).toContainText("Đã gửi");
   return Date.now() - startedAt;
 }
 
@@ -76,10 +88,22 @@ test("ten representative engineering actors complete a first conversation withou
     const candidate = await candidateContext.newPage();
     const recruiter = await recruiterContext.newPage();
     await Promise.all([
-      signIn(candidate, messagingE2eUsers.candidate.email, messagingE2eUsers.candidate.password),
-      signIn(recruiter, messagingE2eUsers.recruiter.email, messagingE2eUsers.recruiter.password),
+      signIn(
+        candidate,
+        messagingE2eUsers.candidate.email,
+        messagingE2eUsers.candidate.password,
+      ),
+      signIn(
+        recruiter,
+        messagingE2eUsers.recruiter.email,
+        messagingE2eUsers.recruiter.password,
+      ),
     ]);
-    const results: Array<{ run: number; actor: "Candidate" | "Recruiter"; elapsedMs: number }> = [];
+    const results: Array<{
+      run: number;
+      actor: "Candidate" | "Recruiter";
+      elapsedMs: number;
+    }> = [];
     for (let run = 1; run <= 10; run += 1) {
       const candidateFirst = run % 2 === 1;
       const actor = candidateFirst ? candidate : recruiter;
@@ -94,8 +118,12 @@ test("ten representative engineering actors complete a first conversation withou
       });
     }
     expect(results).toHaveLength(10);
-    expect(results.filter((result) => result.actor === "Candidate")).toHaveLength(5);
-    expect(results.filter((result) => result.actor === "Recruiter")).toHaveLength(5);
+    expect(
+      results.filter((result) => result.actor === "Candidate"),
+    ).toHaveLength(5);
+    expect(
+      results.filter((result) => result.actor === "Recruiter"),
+    ).toHaveLength(5);
     expect(results.every((result) => result.elapsedMs < 120_000)).toBe(true);
   } finally {
     await Promise.all([candidateContext.close(), recruiterContext.close()]);
