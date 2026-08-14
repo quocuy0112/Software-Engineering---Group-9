@@ -1,5 +1,5 @@
 import "server-only";
-import type { z } from "zod";
+import { ZodError, type z } from "zod";
 import { AdminBoundaryError } from "@/backend/security/admin-request-boundary";
 import { AdminCommandConflict } from "@/backend/repositories/admin/prisma-admin-command-repository";
 import { SupportError } from "@/backend/support/support-errors";
@@ -97,6 +97,14 @@ export function adminRouteError(error: unknown) {
       PREREQUISITE_INTEGRATION_UNAVAILABLE: 503,
       EVIDENCE_UNAVAILABLE: 409,
       RESUBMISSION_LIMIT: 409,
+      LOOKUP_REQUIRED: 409,
+      EMAIL_VERIFICATION_REQUIRED: 409,
+      CHALLENGE_UNAVAILABLE: 400,
+      IDEMPOTENCY_KEY_INVALID: 400,
+      IDEMPOTENCY_CONFLICT: 409,
+      POLICY_VERSION_INVALID: 409,
+      MISMATCH_EXPLANATION_REQUIRED: 400,
+      ENRICHED_FACTS_REQUIRED: 409,
     };
     if (known[error.message])
       return adminJson(
@@ -114,6 +122,19 @@ export function adminRouteError(error: unknown) {
         },
         { status: 429 },
       );
+  }
+  if (error instanceof ZodError) {
+    return adminJson(
+      {
+        code: "VALIDATION_FAILED",
+        fieldErrors: error.issues.map((issue) => ({
+          field: issue.path.join("."),
+          code: issue.message,
+          message: issue.message,
+        })),
+      },
+      { status: 400 },
+    );
   }
   if (error && typeof error === "object" && "issues" in error) {
     return adminJson({ code: "VALIDATION_FAILED" }, { status: 400 });

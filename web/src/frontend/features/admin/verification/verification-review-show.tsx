@@ -3,6 +3,7 @@ import { Box, Typography } from "@mui/material";
 import { Show, useRecordContext, useRefresh } from "react-admin";
 import { ProtectedEvidenceViewer } from "./protected-evidence-viewer";
 import { VerificationDecisionPanel } from "./verification-decision-panel";
+import { VerificationBusinessFactsPanel } from "./verification-business-facts-panel";
 type Verification = {
   id: string;
   applicantDisplayName: string;
@@ -15,6 +16,11 @@ type Verification = {
   resubmissionCount: number;
   version: number;
   viewerUnavailableSince: string | null;
+  legacyRequest: boolean;
+  enrichmentStatus: "LEGACY" | "COMPLETE" | "INCOMPLETE";
+  businessFacts: React.ComponentProps<
+    typeof VerificationBusinessFactsPanel
+  >["facts"];
   evidence: Array<{
     id: string;
     submissionVersion: number;
@@ -46,6 +52,11 @@ function Review() {
         State: {record.state}; submission: {record.currentSubmissionVersion};
         resubmissions: {record.resubmissionCount}/3
       </Typography>
+      <VerificationBusinessFactsPanel
+        facts={record.businessFacts}
+        legacyRequest={record.legacyRequest}
+        enrichmentStatus={record.enrichmentStatus}
+      />
       {evidence && (
         <ProtectedEvidenceViewer
           requestId={record.id}

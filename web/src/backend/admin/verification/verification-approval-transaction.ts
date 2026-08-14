@@ -39,12 +39,22 @@ export class VerificationApprovalTransaction {
       async (tx, correlationId) => {
         const row = await tx.recruiterVerificationRequest.findUnique({
           where: { id: requestId },
-          include: { targetCompany: { select: { displayName: true } } },
+          include: {
+            targetCompany: { select: { displayName: true } },
+            businessFacts: true,
+            applicant: { select: { state: true, deletedAt: true } },
+          },
         });
         if (!row) throw new Error("TARGET_UNAVAILABLE");
         if (row.version !== command.expectedVersion)
           throw new AdminCommandConflict("STALE_CONFLICT", row.version);
         if (row.state !== "PENDING_REVIEW") throw new Error("INVALID_STATE");
+        if (row.applicant.state !== "ACTIVE" || row.applicant.deletedAt) {
+          throw new Error("TARGET_UNAVAILABLE");
+        }
+        if (row.submissionIdempotencyKey && !row.businessFacts) {
+          throw new Error("ENRICHED_FACTS_REQUIRED");
+        }
         const evidence = await tx.businessLicenseEvidence.findUnique({
           where: { id: row.currentEvidenceId ?? "" },
         });

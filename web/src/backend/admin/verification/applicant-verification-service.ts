@@ -3,13 +3,18 @@ import { randomUUID } from "node:crypto";
 import { prisma } from "@/backend/database/prisma";
 import { requireSession } from "@/backend/auth/session/require-session";
 import {
-  verificationSubmissionSchema,
   validateEvidenceFile,
 } from "@/shared/contracts/admin/verification";
+import {
+  businessFactsDiffer,
+  enrichedVerificationSubmissionSchema,
+} from "@/shared/contracts/employer-verification/business-verification";
 import { FilesystemPrivateBusinessEvidenceStorage } from "@/backend/storage/business-evidence/filesystem";
 import { S3PrivateBusinessEvidenceStorage } from "@/backend/storage/business-evidence/s3";
 import { CompanyRelationshipPrerequisiteGateway } from "./company-relationship-prerequisite-gateway";
 import { buildVerificationOutbox } from "@/backend/admin/notifications/verification-outbox";
+import { businessVerificationConfig } from "./business-verification-config";
+import { companyEmailSignals } from "./company-email-verification";
 function storage() {
   return process.env.ADMIN_EVIDENCE_STORAGE_ADAPTER === "s3"
     ? new S3PrivateBusinessEvidenceStorage()
@@ -50,18 +55,111 @@ export class ApplicantVerificationService {
         resubmissionCount: true,
         createdAt: true,
         updatedAt: true,
+        businessFacts: {
+          select: {
+            lookupSnapshot: { select: { outcome: true } },
+          },
+        },
       },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-    });
+    }).then((rows) =>
+      rows.map(({ businessFacts, ...row }) => ({
+        ...row,
+        legacyRequest: !businessFacts,
+        registryOutcome: businessFacts?.lookupSnapshot.outcome ?? null,
+      })),
+    );
   }
-  async submit(request: Request, raw: unknown, file: File) {
+  async submit(
+    request: Request,
+    raw: unknown,
+    file: File,
+    idempotencyKey: string,
+  ) {
     const now = new Date();
     const session = await requireSession(request.headers, now);
     if (!session) throw new Error("UNAUTHORIZED");
-    const input = verificationSubmissionSchema.parse(raw);
+    const input = enrichedVerificationSubmissionSchema.parse(raw);
+    if (!/^[A-Za-z0-9._:-]{16,128}$/u.test(idempotencyKey)) {
+      throw new Error("IDEMPOTENCY_KEY_INVALID");
+    }
+    if (input.policyVersion !== businessVerificationConfig.policyVersion) {
+      throw new Error("POLICY_VERSION_INVALID");
+    }
+    const replay = await prisma.recruiterVerificationRequest.findUnique({
+      where: { submissionIdempotencyKey: idempotencyKey },
+    });
+    if (replay) {
+      if (replay.applicantUserId !== session.userId) {
+        throw new Error("IDEMPOTENCY_CONFLICT");
+      }
+      return { requestId: replay.id, state: replay.state, version: replay.version };
+    }
     const mediaType = validateEvidenceFile(file);
     const bytes = Buffer.from(await file.arrayBuffer());
     const requestId = randomUUID();
+    const preparation = await prisma.employerVerificationPreparation.findFirst({
+      where: {
+        id: input.preparationId,
+        applicantUserId: session.userId,
+        version: input.preparationVersion,
+        lookupSnapshotId: input.lookupSnapshotId,
+        inaccessibleAt: null,
+        expiresAt: { gt: now },
+      },
+      include: {
+        lookupSnapshot: true,
+      },
+    });
+    if (
+      !preparation?.lookupSnapshot ||
+      preparation.lookupSnapshot.normalizedTaxIdentifier !==
+        input.taxIdentifier ||
+      preparation.lookupSnapshot.expiresAt <= now ||
+      preparation.lookupSnapshot.acceptedRequestId
+    ) {
+      throw new Error("LOOKUP_REQUIRED");
+    }
+    const lookupSnapshot = preparation.lookupSnapshot;
+    const challenge = await prisma.companyContactEmailChallenge.findFirst({
+      where: {
+        applicantUserId: session.userId,
+        lookupSnapshotId: input.lookupSnapshotId,
+        normalizedTaxIdentifier: input.taxIdentifier,
+        state: "VERIFIED",
+        verifiedAt: {
+          gt: new Date(
+            now.getTime() - businessVerificationConfig.challengeLifetimeMs,
+          ),
+        },
+        expiresAt: { gt: now },
+        normalizedEmail: { not: null },
+      },
+      orderBy: { verifiedAt: "desc" },
+    });
+    if (!challenge?.normalizedEmail || !challenge.verifiedAt) {
+      throw new Error("EMAIL_VERIFICATION_REQUIRED");
+    }
+    const companyEmail = challenge.normalizedEmail;
+    const companyEmailVerifiedAt = challenge.verifiedAt;
+    const legalNameDiffers = businessFactsDiffer(
+      input.applicantLegalName,
+      lookupSnapshot.registryLegalName,
+    );
+    const registeredAddressDiffers = businessFactsDiffer(
+      input.applicantRegisteredAddress,
+      lookupSnapshot.registryRegisteredAddress,
+    );
+    if (
+      (legalNameDiffers || registeredAddressDiffers) &&
+      !input.mismatchExplanation
+    ) {
+      throw new Error("MISMATCH_EXPLANATION_REQUIRED");
+    }
+    const emailSignals = companyEmailSignals(
+      companyEmail,
+      input.website,
+    );
     const existing = await prisma.company.findUnique({
       where: { normalizedTaxIdentifier: input.taxIdentifier },
     });
@@ -92,13 +190,65 @@ export class ApplicantVerificationService {
         const row = await tx.recruiterVerificationRequest.create({
           data: {
             id: requestId,
+            submissionIdempotencyKey: idempotencyKey,
             applicantUserId: session.userId,
-            submittedCompanyName: input.companyName,
+            submittedCompanyName: input.applicantLegalName,
             normalizedTaxIdentifier: input.taxIdentifier,
             targetCompanyId: existing?.id,
             requestedRole: input.requestedRole,
             prerequisiteId: input.prerequisiteId,
           },
+        });
+        const consumed = await tx.companyContactEmailChallenge.updateMany({
+          where: {
+            id: challenge.id,
+            state: "VERIFIED",
+            expiresAt: { gt: now },
+            normalizedEmail: challenge.normalizedEmail,
+          },
+          data: {
+            state: "CONSUMED",
+            consumedAt: now,
+            sensitiveInaccessibleAt: now,
+            sensitiveDeleteAfter: new Date(
+              now.getTime() + businessVerificationConfig.sensitiveScrubDelayMs,
+            ),
+          },
+        });
+        if (consumed.count !== 1) throw new Error("STALE_CONFLICT");
+        await tx.verificationBusinessFacts.create({
+          data: {
+            requestId,
+            lookupSnapshotId: lookupSnapshot.id,
+            applicantLegalName: input.applicantLegalName,
+            applicantRegisteredAddress: input.applicantRegisteredAddress,
+            operatingAddress: input.operatingAddressDiffers
+              ? input.operatingAddress
+              : null,
+            companyEmail,
+            companyEmailVerifiedAt,
+            companyEmailFreeProvider: emailSignals.freeProvider,
+            companyEmailWebsiteDomainMatch: emailSignals.websiteDomainMatch,
+            emailSignalVersion: businessVerificationConfig.emailSignalVersion,
+            companyPhoneE164: input.companyPhone,
+            companyPhoneVerified: false,
+            websiteOrigin: input.website || null,
+            relationship: input.relationship,
+            currentJobTitle: input.currentJobTitle,
+            authorityExplanation: input.authorityExplanation,
+            legalNameDiffers,
+            registeredAddressDiffers,
+            mismatchExplanation: input.mismatchExplanation,
+            accuracyDeclaredAt: now,
+            documentConsentAt: now,
+            policyVersion: input.policyVersion,
+            normalizationVersion:
+              businessVerificationConfig.normalizationVersion,
+          },
+        });
+        await tx.businessRegistryLookupSnapshot.update({
+          where: { id: lookupSnapshot.id },
+          data: { acceptedRequestId: requestId, acceptedAt: now },
         });
         const evidence = await tx.businessLicenseEvidence.create({
           data: {
@@ -118,6 +268,13 @@ export class ApplicantVerificationService {
           where: { id: requestId },
           data: { currentEvidenceId: evidence.id },
         });
+        await tx.employerVerificationPreparation.update({
+          where: { id: preparation.id },
+          data: {
+            inaccessibleAt: now,
+            deleteAfter: new Date(now.getTime() + 24 * 60 * 60_000),
+          },
+        });
         await tx.emailOutbox.create({
           data: receiptData(
             requestId,
@@ -132,6 +289,42 @@ export class ApplicantVerificationService {
       });
     } catch (error) {
       await storage().delete(stored.storageLocator);
+      if (
+        error &&
+        typeof error === "object" &&
+        "code" in error &&
+        error.code === "P2002"
+      ) {
+        const idempotent = await prisma.recruiterVerificationRequest.findUnique({
+          where: { submissionIdempotencyKey: idempotencyKey },
+        });
+        if (idempotent?.applicantUserId === session.userId) {
+          return {
+            requestId: idempotent.id,
+            state: idempotent.state,
+            version: idempotent.version,
+          };
+        }
+        const active = await prisma.recruiterVerificationRequest.findFirst({
+          where: {
+            applicantUserId: session.userId,
+            normalizedTaxIdentifier: input.taxIdentifier,
+            state: {
+              in: [
+                "PENDING_CHECKS",
+                "PENDING_REVIEW",
+                "CHANGES_REQUESTED",
+                "RESUBMITTED",
+                "APPROVED",
+              ],
+            },
+          },
+          select: { id: true },
+        });
+        if (active) {
+          throw new Error("ACTIVE_REQUEST_EXISTS", { cause: error });
+        }
+      }
       throw error;
     }
   }

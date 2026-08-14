@@ -6,7 +6,8 @@ process.env.NODE_ENV = "production";
 process.env.HOSTNAME = hostname;
 process.env.PORT = port;
 
-await import("../server.ts");
+const { start } = await import("../server.ts");
+const server = await start();
 
 try {
   const deadline = Date.now() + 60_000;
@@ -61,6 +62,8 @@ try {
   process.exitCode = 1;
   console.error(error);
 } finally {
-  process.emit("SIGTERM");
+  await server.close();
 }
 import { io } from "socket.io-client";
+
+process.exit(process.exitCode ?? 0);
