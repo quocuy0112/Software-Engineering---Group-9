@@ -11,6 +11,7 @@ export const protectedRecipientPurposes = [
   "email-change-verification.v1",
   "email-change-old-address.v1",
   "password-change-notice.v1",
+  "company-email-verification.v1",
 ] as const;
 
 export type ProtectedRecipientPurpose =

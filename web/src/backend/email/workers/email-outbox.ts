@@ -39,6 +39,10 @@ import {
   emailChangeAlertText,
 } from "../templates/email-change-alert";
 import {
+  CompanyEmailVerificationTemplate,
+  companyEmailVerificationText,
+} from "../templates/company-email-verification";
+import {
   ApplicationStageChangedTemplate,
   applicationStageChangedEmailText,
 } from "../templates/application-stage-changed";
@@ -196,6 +200,21 @@ export async function deliverClaimedOutbox(
         createElement(ApplicationStageChangedTemplate, templateProps),
       );
       text = applicationStageChangedEmailText(templateProps);
+    } else if (row.templateVersion === "company-email-verification.v1") {
+      if (!payload.protectedToken) throw new Error("MISSING_PROTECTED_TOKEN");
+      const token = protector.unseal(payload.protectedToken);
+      const verificationUrl = new URL(
+        "/dashboard/employer-verification",
+        serverEnvironment.NEXT_PUBLIC_APP_URL,
+      );
+      verificationUrl.hash = `company-email-token=${encodeURIComponent(token)}`;
+      subject = "Verify your SmartHire company email";
+      html = await render(
+        createElement(CompanyEmailVerificationTemplate, {
+          verificationUrl: verificationUrl.toString(),
+        }),
+      );
+      text = companyEmailVerificationText(verificationUrl.toString());
     } else if (row.templateVersion === "email-change-verification.v1") {
       const emailChangePayload = row.payloadRef as {
         protectedProof?: string;

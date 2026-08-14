@@ -82,6 +82,10 @@ export const ModelName = {
   CompanyMembershipHistory: 'CompanyMembershipHistory',
   CompanyAccessPrerequisite: 'CompanyAccessPrerequisite',
   RecruiterVerificationRequest: 'RecruiterVerificationRequest',
+  EmployerVerificationPreparation: 'EmployerVerificationPreparation',
+  BusinessRegistryLookupSnapshot: 'BusinessRegistryLookupSnapshot',
+  CompanyContactEmailChallenge: 'CompanyContactEmailChallenge',
+  VerificationBusinessFacts: 'VerificationBusinessFacts',
   BusinessLicenseEvidence: 'BusinessLicenseEvidence',
   VerificationSafetyAttempt: 'VerificationSafetyAttempt',
   VerificationDecisionHistory: 'VerificationDecisionHistory',
@@ -551,6 +555,7 @@ export const EmailOutboxScalarFieldEnum = {
   supportConversationId: 'supportConversationId',
   professionalConnectionProposalId: 'professionalConnectionProposalId',
   professionalConnectionId: 'professionalConnectionId',
+  companyEmailChallengeId: 'companyEmailChallengeId',
   recipientRef: 'recipientRef',
   recipientCiphertext: 'recipientCiphertext',
   recipientPurpose: 'recipientPurpose',
@@ -695,6 +700,7 @@ export type CompanyAccessPrerequisiteScalarFieldEnum = (typeof CompanyAccessPrer
 
 export const RecruiterVerificationRequestScalarFieldEnum = {
   id: 'id',
+  submissionIdempotencyKey: 'submissionIdempotencyKey',
   applicantUserId: 'applicantUserId',
   submittedCompanyName: 'submittedCompanyName',
   normalizedTaxIdentifier: 'normalizedTaxIdentifier',
@@ -720,6 +726,113 @@ export const RecruiterVerificationRequestScalarFieldEnum = {
 } as const
 
 export type RecruiterVerificationRequestScalarFieldEnum = (typeof RecruiterVerificationRequestScalarFieldEnum)[keyof typeof RecruiterVerificationRequestScalarFieldEnum]
+
+
+export const EmployerVerificationPreparationScalarFieldEnum = {
+  id: 'id',
+  applicantUserId: 'applicantUserId',
+  lookupSnapshotId: 'lookupSnapshotId',
+  version: 'version',
+  applicantLegalName: 'applicantLegalName',
+  applicantRegisteredAddress: 'applicantRegisteredAddress',
+  operatingAddressDiffers: 'operatingAddressDiffers',
+  operatingAddress: 'operatingAddress',
+  companyPhoneE164: 'companyPhoneE164',
+  websiteOrigin: 'websiteOrigin',
+  relationship: 'relationship',
+  currentJobTitle: 'currentJobTitle',
+  authorityExplanation: 'authorityExplanation',
+  mismatchExplanation: 'mismatchExplanation',
+  expiresAt: 'expiresAt',
+  inaccessibleAt: 'inaccessibleAt',
+  deleteAfter: 'deleteAfter',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EmployerVerificationPreparationScalarFieldEnum = (typeof EmployerVerificationPreparationScalarFieldEnum)[keyof typeof EmployerVerificationPreparationScalarFieldEnum]
+
+
+export const BusinessRegistryLookupSnapshotScalarFieldEnum = {
+  id: 'id',
+  applicantUserId: 'applicantUserId',
+  normalizedTaxIdentifier: 'normalizedTaxIdentifier',
+  providerKey: 'providerKey',
+  outcome: 'outcome',
+  registryLegalName: 'registryLegalName',
+  registryInternationalName: 'registryInternationalName',
+  registryShortName: 'registryShortName',
+  registryRegisteredAddress: 'registryRegisteredAddress',
+  registryEstablishedAt: 'registryEstablishedAt',
+  registryLegalStatus: 'registryLegalStatus',
+  registryEntityType: 'registryEntityType',
+  registryRepresentativeName: 'registryRepresentativeName',
+  responseDigest: 'responseDigest',
+  checkedAt: 'checkedAt',
+  expiresAt: 'expiresAt',
+  acceptedRequestId: 'acceptedRequestId',
+  acceptedAt: 'acceptedAt',
+  inaccessibleAt: 'inaccessibleAt',
+  deleteAfter: 'deleteAfter',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type BusinessRegistryLookupSnapshotScalarFieldEnum = (typeof BusinessRegistryLookupSnapshotScalarFieldEnum)[keyof typeof BusinessRegistryLookupSnapshotScalarFieldEnum]
+
+
+export const CompanyContactEmailChallengeScalarFieldEnum = {
+  id: 'id',
+  applicantUserId: 'applicantUserId',
+  lookupSnapshotId: 'lookupSnapshotId',
+  normalizedTaxIdentifier: 'normalizedTaxIdentifier',
+  normalizedEmail: 'normalizedEmail',
+  emailDigest: 'emailDigest',
+  tokenDigest: 'tokenDigest',
+  state: 'state',
+  expiresAt: 'expiresAt',
+  verifiedAt: 'verifiedAt',
+  consumedAt: 'consumedAt',
+  supersededAt: 'supersededAt',
+  sensitiveInaccessibleAt: 'sensitiveInaccessibleAt',
+  sensitiveDeleteAfter: 'sensitiveDeleteAfter',
+  metadataDeleteAfter: 'metadataDeleteAfter',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CompanyContactEmailChallengeScalarFieldEnum = (typeof CompanyContactEmailChallengeScalarFieldEnum)[keyof typeof CompanyContactEmailChallengeScalarFieldEnum]
+
+
+export const VerificationBusinessFactsScalarFieldEnum = {
+  requestId: 'requestId',
+  lookupSnapshotId: 'lookupSnapshotId',
+  applicantLegalName: 'applicantLegalName',
+  applicantRegisteredAddress: 'applicantRegisteredAddress',
+  operatingAddress: 'operatingAddress',
+  companyEmail: 'companyEmail',
+  companyEmailVerifiedAt: 'companyEmailVerifiedAt',
+  companyEmailFreeProvider: 'companyEmailFreeProvider',
+  companyEmailWebsiteDomainMatch: 'companyEmailWebsiteDomainMatch',
+  emailSignalVersion: 'emailSignalVersion',
+  companyPhoneE164: 'companyPhoneE164',
+  companyPhoneVerified: 'companyPhoneVerified',
+  websiteOrigin: 'websiteOrigin',
+  relationship: 'relationship',
+  currentJobTitle: 'currentJobTitle',
+  authorityExplanation: 'authorityExplanation',
+  legalNameDiffers: 'legalNameDiffers',
+  registeredAddressDiffers: 'registeredAddressDiffers',
+  mismatchExplanation: 'mismatchExplanation',
+  accuracyDeclaredAt: 'accuracyDeclaredAt',
+  documentConsentAt: 'documentConsentAt',
+  policyVersion: 'policyVersion',
+  normalizationVersion: 'normalizationVersion',
+  createdAt: 'createdAt'
+} as const
+
+export type VerificationBusinessFactsScalarFieldEnum = (typeof VerificationBusinessFactsScalarFieldEnum)[keyof typeof VerificationBusinessFactsScalarFieldEnum]
 
 
 export const BusinessLicenseEvidenceScalarFieldEnum = {

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import { toast } from "sonner";
+import type { EmployerVerificationPreparationResponse } from "@/shared/contracts/employer-verification/business-verification-responses";
 import styles from "./employer-verification-page.module.css";
 
 type Item = {
@@ -13,13 +15,9 @@ type Item = {
   createdAt: string;
 };
 
-const statusPresentation: Record<
-  string,
-  {
-    label: string;
-    tone: "info" | "warning" | "success" | "danger" | "neutral";
-  }
-> = {
+type Preparation = EmployerVerificationPreparationResponse["data"];
+
+const statusPresentation: Record<string, { label: string; tone: string }> = {
   PENDING_CHECKS: { label: "Safety checks", tone: "info" },
   PENDING_REVIEW: { label: "Under review", tone: "warning" },
   CHANGES_REQUESTED: { label: "Changes requested", tone: "warning" },
@@ -29,86 +27,205 @@ const statusPresentation: Record<
 };
 
 function presentStatus(state: string) {
-  return (
-    statusPresentation[state] ?? {
-      label: state.replaceAll("_", " ").toLowerCase(),
-      tone: "neutral" as const,
-    }
-  );
+  return statusPresentation[state] ?? {
+    label: state.replaceAll("_", " ").toLowerCase(),
+    tone: "neutral",
+  };
 }
 
-function formatSubmittedAt(value: string) {
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(value));
+async function requestJson(url: string, init?: RequestInit) {
+  const response = await fetch(url, {
+    credentials: "same-origin",
+    cache: "no-store",
+    ...init,
+    headers: init?.body instanceof FormData
+      ? init.headers
+      : { "Content-Type": "application/json", ...init?.headers },
+  });
+  const body = await response.json().catch(() => ({ code: "REQUEST_FAILED" }));
+  if (!response.ok) throw Object.assign(new Error(body.code ?? "REQUEST_FAILED"), { body });
+  return body;
 }
 
 export function EmployerVerificationPage() {
   const [items, setItems] = useState<Item[]>([]);
-  const [message, setMessage] = useState("");
-  const [messageTone, setMessageTone] = useState<"success" | "error">(
-    "success",
-  );
-  const [busyRequestId, setBusyRequestId] = useState<string>();
-  const [submitting, setSubmitting] = useState(false);
+  const [preparation, setPreparation] = useState<Preparation | null>(null);
+  const [draft, setDraft] = useState<Record<string, string | boolean | null>>({});
+  const [companyEmail, setCompanyEmail] = useState("");
+  const [busy, setBusy] = useState<string>();
 
-  async function load() {
-    const response = await fetch("/api/employer-verifications", {
-      cache: "no-store",
-      credentials: "same-origin",
-    });
-    if (response.ok) setItems((await response.json()).data);
+  async function loadRequests() {
+    const body = await requestJson("/api/employer-verifications");
+    setItems(body.data);
+  }
+
+  async function loadPreparation() {
+    const body = (await requestJson(
+      "/api/employer-verifications/preparation",
+    )) as EmployerVerificationPreparationResponse;
+    setPreparation(body.data);
+    setDraft(body.data.draft);
   }
 
   useEffect(() => {
     let active = true;
-    void fetch("/api/employer-verifications", {
-      cache: "no-store",
-      credentials: "same-origin",
-    }).then(async (response) => {
-      if (active && response.ok) setItems((await response.json()).data);
-    });
+    void Promise.all([
+      requestJson("/api/employer-verifications"),
+      requestJson("/api/employer-verifications/preparation"),
+    ])
+      .then(([requests, current]) => {
+        if (!active) return;
+        setItems(requests.data);
+        setPreparation(current.data);
+        setDraft(current.data.draft);
+      })
+      .catch(() => toast.error("Employer verification could not be loaded."));
     return () => {
       active = false;
     };
   }, []);
 
+  useEffect(() => {
+    const token = new URLSearchParams(window.location.hash.slice(1)).get(
+      "company-email-token",
+    );
+    if (!token) return;
+    history.replaceState(null, "", window.location.pathname + window.location.search);
+    void requestJson("/api/employer-verifications/company-email/confirm", {
+      method: "POST",
+      body: JSON.stringify({ token }),
+    })
+      .then(async () => {
+        toast.success("Company email verified.", { id: "company-email" });
+        await loadPreparation();
+      })
+      .catch(() =>
+        toast.error("This verification link is invalid or expired.", {
+          id: "company-email",
+        }),
+      )
+      .finally(() => undefined);
+  }, []);
+
+  async function lookup(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const value = new FormData(event.currentTarget).get("taxIdentifier");
+    setBusy("lookup");
+    try {
+      const body = (await requestJson(
+        "/api/employer-verifications/registry-lookups",
+        { method: "POST", body: JSON.stringify({ taxIdentifier: value }) },
+      )) as EmployerVerificationPreparationResponse;
+      setPreparation(body.data);
+      setDraft(body.data.draft);
+      toast.success(
+        body.data.lookup?.outcome === "MATCHED"
+          ? "Registered business facts found."
+          : "Manual business details are available.",
+        { id: "business-lookup" },
+      );
+    } catch {
+      toast.error("Enter a valid 10-digit tax identifier and try again.", {
+        id: "business-lookup",
+      });
+    } finally {
+      setBusy(undefined);
+    }
+  }
+
+  async function saveDraft(name: string, value: string | boolean | null) {
+    if (!preparation?.preparationId) return;
+    const next = { ...draft, [name]: value };
+    setDraft(next);
+    try {
+      const body = (await requestJson(
+        "/api/employer-verifications/preparation",
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            preparationId: preparation.preparationId,
+            version: preparation.version,
+            changes: { [name]: value },
+          }),
+        },
+      )) as EmployerVerificationPreparationResponse;
+      setPreparation(body.data);
+      setDraft(body.data.draft);
+    } catch {
+      toast.error("This field could not be saved. Refresh and try again.", {
+        id: "verification-draft",
+      });
+    }
+  }
+
+  async function issueEmail() {
+    if (!preparation) return;
+    setBusy("email");
+    try {
+      await requestJson(
+        "/api/employer-verifications/company-email/challenges",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            preparationVersion: preparation.version,
+            email: companyEmail,
+          }),
+        },
+      );
+      toast.success("Verification email queued. Check the company inbox.", {
+        id: "company-email",
+      });
+      await loadPreparation();
+    } catch {
+      toast.error("Use a valid company email and try again later.", {
+        id: "company-email",
+      });
+    } finally {
+      setBusy(undefined);
+    }
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
-    setSubmitting(true);
-    const response = await fetch("/api/employer-verifications", {
-      method: "POST",
-      body: new FormData(form),
-      credentials: "same-origin",
-    });
-    setMessageTone(response.ok ? "success" : "error");
-    setMessage(
-      response.ok
-        ? "Verification request received."
-        : "The request could not be accepted.",
-    );
-    if (response.ok) {
-      form.reset();
-      await load();
+    if (!form.checkValidity()) {
+      form.querySelector<HTMLElement>(":invalid")?.focus();
+      toast.error("Correct the highlighted fields before submitting.");
+      return;
     }
-    setSubmitting(false);
+    setBusy("submit");
+    try {
+      await requestJson("/api/employer-verifications", {
+        method: "POST",
+        headers: { "Idempotency-Key": crypto.randomUUID() },
+        body: new FormData(form),
+      });
+      toast.success("Verification request received.");
+      form.reset();
+      setPreparation(null);
+      setDraft({});
+      await Promise.all([loadRequests(), loadPreparation()]);
+    } catch {
+      toast.error("The request needs attention. Check each field and retry.");
+    } finally {
+      setBusy(undefined);
+    }
   }
 
   async function cancel(requestId: string) {
-    setBusyRequestId(requestId);
-    const response = await fetch(
-      `/api/employer-verifications/${encodeURIComponent(requestId)}/cancel`,
-      { method: "POST", credentials: "same-origin" },
-    );
-    setMessageTone(response.ok ? "success" : "error");
-    setMessage(
-      response.ok ? "Verification request cancelled." : "Cancellation failed.",
-    );
-    await load();
-    setBusyRequestId(undefined);
+    setBusy(requestId);
+    try {
+      await requestJson(
+        `/api/employer-verifications/${encodeURIComponent(requestId)}/cancel`,
+        { method: "POST" },
+      );
+      toast.success("Verification request cancelled.");
+      await loadRequests();
+    } catch {
+      toast.error("Cancellation failed.");
+    } finally {
+      setBusy(undefined);
+    }
   }
 
   async function resubmit(
@@ -116,248 +233,103 @@ export function EmployerVerificationPage() {
     event: FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
-    setBusyRequestId(requestId);
-    const response = await fetch(
-      `/api/employer-verifications/${encodeURIComponent(requestId)}/resubmit`,
-      {
-        method: "POST",
-        body: new FormData(event.currentTarget),
-        credentials: "same-origin",
-      },
-    );
-    setMessageTone(response.ok ? "success" : "error");
-    setMessage(
-      response.ok
-        ? "Replacement evidence received."
-        : "Replacement evidence could not be accepted.",
-    );
-    if (response.ok) event.currentTarget.reset();
-    await load();
-    setBusyRequestId(undefined);
+    setBusy(requestId);
+    try {
+      await requestJson(
+        `/api/employer-verifications/${encodeURIComponent(requestId)}/resubmit`,
+        { method: "POST", body: new FormData(event.currentTarget) },
+      );
+      event.currentTarget.reset();
+      toast.success("Replacement evidence received.");
+      await loadRequests();
+    } catch {
+      toast.error("Replacement evidence could not be accepted.");
+    } finally {
+      setBusy(undefined);
+    }
   }
+
+  const lookupFacts = preparation?.lookup?.facts;
+  const emailVerified = preparation?.email.status === "VERIFIED";
+  const relationship = String(draft.relationship ?? "");
+  const authorityExplanationRequired = ["AUTHORIZED_EMPLOYEE", "OTHER"].includes(relationship);
 
   return (
     <main className={styles.page}>
       <header className={styles.hero}>
         <div className={styles.heroCopy}>
           <p className={styles.eyebrow}>Employer verification</p>
-          <h1>Recruiter application</h1>
+          <h1>Build a trusted company identity</h1>
           <p className={styles.intro}>
-            Verify your business once to unlock recruiter tools, publish jobs,
-            and manage candidates with a trusted company identity.
+            Confirm registered facts, a reachable company mailbox, your
+            relationship to the business, and one protected license document.
           </p>
         </div>
         <div className={styles.trustNote}>
-          <span className={styles.trustIcon} aria-hidden="true">
-            ✓
-          </span>
-          <div>
-            <strong>Private and protected</strong>
-            <span>Your document is safety checked before human review.</span>
-          </div>
+          <span className={styles.trustIcon} aria-hidden="true">✓</span>
+          <div><strong>Human-reviewed</strong><span>Registry data supports review; it never auto-approves access.</span></div>
         </div>
       </header>
 
-      {message && (
-        <p className={styles.message} data-tone={messageTone} role="status">
-          {message}
-        </p>
-      )}
-
       <div className={styles.applicationGrid}>
-        <section className={`${styles.card} ${styles.formCard}`}>
-          <div className={styles.sectionHeading}>
-            <span className={styles.sectionNumber}>1</span>
-            <div>
-              <h2>Business information</h2>
-              <p>Use the legal details shown on your business license.</p>
-            </div>
-          </div>
+        <div className={styles.formStack}>
+          <section className={`${styles.card} ${styles.formCard}`}>
+            <div className={styles.sectionHeading}><span className={styles.sectionNumber}>1</span><div><h2>Registered business</h2><p>Start with the exact 10-digit enterprise tax identifier.</p></div></div>
+            <form className={styles.inlineForm} onSubmit={lookup}>
+              <label className={styles.field}><span>Vietnamese tax identifier</span><input name="taxIdentifier" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} required defaultValue={preparation?.lookup?.taxIdentifier ?? ""} aria-describedby="tax-help" /><small id="tax-help">Ten ASCII digits. Branch identifiers are not supported yet.</small></label>
+              <button className={styles.primaryButton} disabled={busy === "lookup"} type="submit">{busy === "lookup" ? "Looking up…" : "Look up business"}</button>
+            </form>
+            {preparation?.lookup && <div className={styles.registryPanel} data-outcome={preparation.lookup.outcome}><strong>{preparation.lookup.outcome === "MATCHED" ? "Registered facts found" : "Registry confirmation unavailable"}</strong><span>Source: {preparation.lookup.sourceLabel} · checked {new Date(preparation.lookup.checkedAt).toLocaleString()}</span><dl><div><dt>Legal name</dt><dd>{lookupFacts?.legalName ?? "Not supplied by source"}</dd></div><div><dt>Registered address</dt><dd>{lookupFacts?.registeredAddress ?? "Not supplied by source"}</dd></div><div><dt>Established</dt><dd>{lookupFacts?.establishmentDate ?? "Not supplied by source"}</dd></div></dl></div>}
+          </section>
 
-          <form onSubmit={submit} className={styles.form}>
+          {preparation?.lookup && <form className={styles.formStack} onSubmit={submit} noValidate>
+            <input type="hidden" name="preparationId" value={preparation.preparationId ?? ""} />
+            <input type="hidden" name="preparationVersion" value={preparation.version} />
+            <input type="hidden" name="lookupSnapshotId" value={preparation.lookup.snapshotId} />
+            <input type="hidden" name="taxIdentifier" value={preparation.lookup.taxIdentifier} />
             <input type="hidden" name="requestedRole" value="RECRUITER" />
-            <label className={styles.field}>
-              <span>Legal company name</span>
-              <input
-                name="companyName"
-                required
-                maxLength={240}
-                placeholder="Example Technology Company Ltd."
-              />
-            </label>
-            <label className={styles.field}>
-              <span>Vietnamese tax identifier</span>
-              <input
-                aria-label="Vietnamese tax identifier"
-                name="taxIdentifier"
-                required
-                inputMode="numeric"
-                pattern="[0-9]{10}"
-                maxLength={10}
-                placeholder="10-digit tax identifier"
-              />
-              <small>
-                Enter exactly 10 digits without spaces or separators.
-              </small>
-            </label>
-            <label className={`${styles.field} ${styles.fileField}`}>
-              <span>Business license</span>
-              <input
-                aria-label="Business license"
-                aria-describedby="business-license-help"
-                name="document"
-                type="file"
-                accept="application/pdf,image/png,image/jpeg"
-                required
-              />
-              <small id="business-license-help">
-                PDF, PNG, or JPEG · Maximum file size 5 MB
-              </small>
-            </label>
-            <button
-              className={styles.primaryButton}
-              disabled={submitting}
-              type="submit"
-            >
-              {submitting ? "Submitting…" : "Submit recruiter application"}
-            </button>
-          </form>
-        </section>
+            <input type="hidden" name="policyVersion" value="business-verification-consent-v1" />
 
-        <aside className={`${styles.card} ${styles.processCard}`}>
-          <p className={styles.eyebrow}>What happens next</p>
-          <h2>A clear verification process</h2>
-          <ol className={styles.processList}>
-            <li>
-              <span>1</span>
-              <div>
-                <strong>Automated safety check</strong>
-                <p>We validate the file type and scan the document.</p>
+            <section className={`${styles.card} ${styles.formCard}`}>
+              <div className={styles.sectionHeading}><span className={styles.sectionNumber}>2</span><div><h2>Business information</h2><p>Review source values or provide normalized manual facts.</p></div></div>
+              <div className={styles.form}>
+                <label className={styles.field}><span>Legal company name</span><input name="applicantLegalName" required minLength={1} maxLength={240} value={String(draft.applicantLegalName ?? "")} onChange={(e) => setDraft({ ...draft, applicantLegalName: e.target.value })} onBlur={(e) => void saveDraft("applicantLegalName", e.target.value)} /></label>
+                <label className={styles.field}><span>Registered address</span><textarea name="applicantRegisteredAddress" required minLength={5} maxLength={500} value={String(draft.applicantRegisteredAddress ?? "")} onChange={(e) => setDraft({ ...draft, applicantRegisteredAddress: e.target.value })} onBlur={(e) => void saveDraft("applicantRegisteredAddress", e.target.value)} /></label>
+                <label className={styles.checkboxField}><input name="operatingAddressDiffers" type="checkbox" value="true" checked={Boolean(draft.operatingAddressDiffers)} onChange={(e) => void saveDraft("operatingAddressDiffers", e.target.checked)} /><span>Operating location differs from registered address</span></label>
+                {Boolean(draft.operatingAddressDiffers) && <label className={styles.field}><span>Operating address</span><textarea name="operatingAddress" required minLength={5} maxLength={500} value={String(draft.operatingAddress ?? "")} onChange={(e) => setDraft({ ...draft, operatingAddress: e.target.value })} onBlur={(e) => void saveDraft("operatingAddress", e.target.value)} /></label>}
+                <label className={styles.field}><span>Explain differences from registry (if any)</span><textarea name="mismatchExplanation" minLength={20} maxLength={500} value={String(draft.mismatchExplanation ?? "")} onChange={(e) => setDraft({ ...draft, mismatchExplanation: e.target.value })} onBlur={(e) => void saveDraft("mismatchExplanation", e.target.value || null)} /><small>Required when legal name or registered address differs from source facts.</small></label>
               </div>
-            </li>
-            <li>
-              <span>2</span>
-              <div>
-                <strong>Administrator review</strong>
-                <p>Your company details are reviewed securely.</p>
-              </div>
-            </li>
-            <li>
-              <span>3</span>
-              <div>
-                <strong>Recruiter access</strong>
-                <p>Approved accounts can start publishing jobs.</p>
-              </div>
-            </li>
-          </ol>
-          <div className={styles.requirementNote}>
-            <strong>Before uploading</strong>
-            <p>Make sure the company name and tax ID are clearly readable.</p>
-          </div>
-        </aside>
-      </div>
+            </section>
 
-      <section className={styles.historySection}>
-        <div className={styles.historyHeading}>
-          <div>
-            <p className={styles.eyebrow}>Application history</p>
-            <h2>Your recruiter applications</h2>
-          </div>
-          {items.length > 0 && (
-            <span className={styles.applicationCount}>
-              {items.length} {items.length === 1 ? "request" : "requests"}
-            </span>
-          )}
+            <section className={`${styles.card} ${styles.formCard}`}>
+              <div className={styles.sectionHeading}><span className={styles.sectionNumber}>3</span><div><h2>Company contact</h2><p>Verify mailbox control; phone remains clearly unverified.</p></div></div>
+              <div className={styles.form}>
+                <div className={styles.verifiedRow}><span>Email status</span><strong data-verified={emailVerified}>{emailVerified ? `Verified: ${preparation.email.maskedEmail}` : preparation.email.status === "PENDING" ? `Pending: ${preparation.email.maskedEmail}` : "Not verified"}</strong></div>
+                {!emailVerified && <div className={styles.emailForm} role="group" aria-label="Verify company email"><label className={styles.field}><span>Company email</span><input type="email" maxLength={254} required value={companyEmail} onChange={(e) => setCompanyEmail(e.target.value)} /></label><button className={styles.secondaryButton} disabled={busy === "email"} type="button" onClick={() => void issueEmail()}>{busy === "email" ? "Queuing…" : "Send verification link"}</button></div>}
+                <label className={styles.field}><span>Company phone</span><input name="companyPhone" required maxLength={32} placeholder="0901 234 567" value={String(draft.companyPhone ?? "")} onChange={(e) => setDraft({ ...draft, companyPhone: e.target.value })} onBlur={(e) => void saveDraft("companyPhone", e.target.value)} /><small>Stored in +84 format. No OTP is performed; this phone is unverified.</small></label>
+                <label className={styles.field}><span>Company website (optional)</span><input name="website" type="text" maxLength={2048} placeholder="company.vn" value={String(draft.website ?? "")} onChange={(e) => setDraft({ ...draft, website: e.target.value })} onBlur={(e) => void saveDraft("website", e.target.value || null)} /></label>
+              </div>
+            </section>
+
+            <section className={`${styles.card} ${styles.formCard}`}>
+              <div className={styles.sectionHeading}><span className={styles.sectionNumber}>4</span><div><h2>Your authority and evidence</h2><p>Explain your relationship and consent to protected document processing.</p></div></div>
+              <div className={styles.form}>
+                <label className={styles.field}><span>Relationship to company</span><select name="relationship" required value={relationship} onChange={(e) => { setDraft({ ...draft, relationship: e.target.value }); void saveDraft("relationship", e.target.value); }}><option value="">Select relationship</option><option value="LEGAL_OWNER">Legal owner</option><option value="AUTHORIZED_EMPLOYEE">Authorized employee</option><option value="INVITED_MEMBER">Invited member</option><option value="EXISTING_OWNER_APPROVAL">Existing owner approval</option><option value="OTHER">Other</option></select></label>
+                <label className={styles.field}><span>Current job title</span><input name="currentJobTitle" required minLength={2} maxLength={120} value={String(draft.currentJobTitle ?? "")} onChange={(e) => setDraft({ ...draft, currentJobTitle: e.target.value })} onBlur={(e) => void saveDraft("currentJobTitle", e.target.value)} /></label>
+                {authorityExplanationRequired && <label className={styles.field}><span>Authority explanation</span><textarea name="authorityExplanation" required minLength={20} maxLength={500} value={String(draft.authorityExplanation ?? "")} onChange={(e) => setDraft({ ...draft, authorityExplanation: e.target.value })} onBlur={(e) => void saveDraft("authorityExplanation", e.target.value)} /></label>}
+                <label className={`${styles.field} ${styles.fileField}`}><span>Business license</span><input name="document" type="file" accept="application/pdf,image/png,image/jpeg" required /><small>PDF, PNG, or JPEG · 1 byte to 5,000,000 bytes.</small></label>
+                <label className={styles.checkboxField}><input name="accuracyDeclaration" type="checkbox" value="true" required /><span>I declare that these business and authority details are accurate.</span></label>
+                <label className={styles.checkboxField}><input name="documentProcessingConsent" type="checkbox" value="true" required /><span>I consent to safety checking and human review of this business document.</span></label>
+                <button className={styles.primaryButton} disabled={busy === "submit" || !emailVerified} type="submit">{busy === "submit" ? "Submitting…" : emailVerified ? "Submit recruiter application" : "Verify company email to submit"}</button>
+              </div>
+            </section>
+          </form>}
         </div>
 
-        {items.length ? (
-          <ul className={styles.applicationList}>
-            {items.map((item) => {
-              const status = presentStatus(item.state);
-              return (
-                <li className={styles.applicationCard} key={item.id}>
-                  <div className={styles.applicationHeader}>
-                    <div>
-                      <strong>{item.submittedCompanyName}</strong>
-                      <span>Submitted {formatSubmittedAt(item.createdAt)}</span>
-                    </div>
-                    <span
-                      className={styles.statusBadge}
-                      data-tone={status.tone}
-                    >
-                      {status.label}
-                    </span>
-                  </div>
-                  <dl className={styles.applicationMeta}>
-                    <div>
-                      <dt>Tax identifier</dt>
-                      <dd>{item.normalizedTaxIdentifier}</dd>
-                    </div>
-                    <div>
-                      <dt>Requested role</dt>
-                      <dd>{item.requestedRole.toLowerCase()}</dd>
-                    </div>
-                    <div>
-                      <dt>Resubmissions</dt>
-                      <dd>{item.resubmissionCount} of 3</dd>
-                    </div>
-                  </dl>
+        <aside className={`${styles.card} ${styles.processCard}`}><p className={styles.eyebrow}>Review signals</p><h2>What the administrator sees</h2><ol className={styles.processList}><li><span>1</span><div><strong>Registry snapshot</strong><p>Source, checked time, and exact field differences.</p></div></li><li><span>2</span><div><strong>Contact control</strong><p>Verified mailbox plus unverified phone and website-domain signals.</p></div></li><li><span>3</span><div><strong>Authority evidence</strong><p>Your relationship, explanation, consent, and protected license.</p></div></li></ol><div className={styles.requirementNote}><strong>Human decision only</strong><p>No lookup, email, phone, or website signal can approve or reject this request automatically.</p></div></aside>
+      </div>
 
-                  {[
-                    "PENDING_CHECKS",
-                    "PENDING_REVIEW",
-                    "CHANGES_REQUESTED",
-                  ].includes(item.state) && (
-                    <button
-                      className={styles.secondaryButton}
-                      disabled={busyRequestId === item.id}
-                      onClick={() => void cancel(item.id)}
-                      type="button"
-                    >
-                      {busyRequestId === item.id
-                        ? "Working…"
-                        : "Cancel request"}
-                    </button>
-                  )}
-
-                  {item.state === "CHANGES_REQUESTED" &&
-                    item.resubmissionCount < 3 && (
-                      <form
-                        className={styles.resubmitForm}
-                        onSubmit={(event) => void resubmit(item.id, event)}
-                      >
-                        <label className={styles.field}>
-                          <span>Replacement business license</span>
-                          <input
-                            name="document"
-                            type="file"
-                            accept="application/pdf,image/png,image/jpeg"
-                            required
-                          />
-                        </label>
-                        <button
-                          className={styles.primaryButton}
-                          disabled={busyRequestId === item.id}
-                          type="submit"
-                        >
-                          Resubmit evidence
-                        </button>
-                      </form>
-                    )}
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <div className={styles.emptyState}>
-            <span aria-hidden="true">⌁</span>
-            <div>
-              <strong>No verification requests.</strong>
-              <p>Your submitted applications will appear here.</p>
-            </div>
-          </div>
-        )}
-      </section>
+      <section className={styles.historySection}><div className={styles.historyHeading}><div><p className={styles.eyebrow}>Application history</p><h2>Your recruiter applications</h2></div>{items.length > 0 && <span className={styles.applicationCount}>{items.length} requests</span>}</div>{items.length ? <ul className={styles.applicationList}>{items.map((item) => { const status = presentStatus(item.state); return <li className={styles.applicationCard} key={item.id}><div className={styles.applicationHeader}><div><strong>{item.submittedCompanyName}</strong><span>Submitted {new Date(item.createdAt).toLocaleDateString()}</span></div><span className={styles.statusBadge} data-tone={status.tone}>{status.label}</span></div><dl className={styles.applicationMeta}><div><dt>Tax identifier</dt><dd>{item.normalizedTaxIdentifier}</dd></div><div><dt>Requested role</dt><dd>{item.requestedRole.toLowerCase()}</dd></div><div><dt>Resubmissions</dt><dd>{item.resubmissionCount} of 3</dd></div></dl>{["PENDING_CHECKS", "PENDING_REVIEW", "CHANGES_REQUESTED"].includes(item.state) && <button className={styles.secondaryButton} disabled={busy === item.id} onClick={() => void cancel(item.id)} type="button">Cancel request</button>}{item.state === "CHANGES_REQUESTED" && item.resubmissionCount < 3 && <form className={styles.resubmitForm} onSubmit={(event) => void resubmit(item.id, event)}><label className={styles.field}><span>Replacement business license</span><input name="document" type="file" accept="application/pdf,image/png,image/jpeg" required /></label><button className={styles.primaryButton} disabled={busy === item.id} type="submit">Resubmit evidence</button></form>}</li>; })}</ul> : <div className={styles.emptyState}><span aria-hidden="true">⌁</span><div><strong>No verification requests.</strong><p>Your submitted applications will appear here.</p></div></div>}</section>
     </main>
   );
 }

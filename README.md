@@ -428,6 +428,8 @@ Tests are separated by concern under `web/tests/`: `backend/unit`, `backend/inte
 
 Templates: `.env.example` (Docker, PostgreSQL, CV, OCR, image-search) and `web/.env.example` (application, auth, origin, email, storage, provider, admin, messaging). Local generated files are `.env` and `web/.env.local` — never commit either. The environment parser fails closed when required fixed values, key separation, storage paths, production approvals, or exact origins are invalid.
 
+Feature 014 business-registry lookup defaults to the no-cost manual fallback with `BUSINESS_REGISTRY_PROVIDER=disabled`. Set it to `vietqr` to use VietQR's public business endpoint; `BUSINESS_REGISTRY_TIMEOUT_MS` and `BUSINESS_REGISTRY_RESPONSE_LIMIT_BYTES` bound server-side requests and responses. Registry data remains supporting evidence and never auto-approves an employer.
+
 ### Specification workflow
 
 Feature artifacts live under `spec-kit/specs/<number>-<feature>/` and typically include `spec.md`, `plan.md`, `research.md`, `data-model.md`, `contracts/`, `tasks.md`, and `quickstart.md`. Documented functional groups include identity, candidate profile, job-board/search, CV import, OCR/image search, platform administration, and realtime messaging. `spec-kit/.specify/memory/constitution.md` is authoritative for security, privacy, human control, data integrity, quality, and architecture boundaries.

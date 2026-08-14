@@ -163,7 +163,7 @@ New submissions require facts in service code. Legacy rows with no facts remain 
 
 ## Active Request Uniqueness
 
-PostgreSQL partial unique index:
+Feature 014 reuses the existing Feature 006 PostgreSQL partial unique index:
 
 ```sql
 CREATE UNIQUE INDEX "RecruiterVerificationRequest_active_applicant_tax_key"

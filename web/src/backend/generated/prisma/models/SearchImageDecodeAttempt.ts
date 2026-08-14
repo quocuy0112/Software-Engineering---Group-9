@@ -938,10 +938,6 @@ export type EnumSearchDecodeStatusFieldUpdateOperationsInput = {
   set?: $Enums.SearchDecodeStatus
 }
 
-export type NullableBoolFieldUpdateOperationsInput = {
-  set?: boolean | null
-}
-
 export type SearchImageDecodeAttemptCreateWithoutQueryInput = {
   id?: string
   attemptNumber: number
