@@ -4,6 +4,7 @@ import { Prisma } from "@/backend/generated/prisma/client";
 import { prisma } from "@/backend/database/prisma";
 import { MessagingError, unavailableConversation } from "@/backend/messaging/messaging-errors";
 import type { MessagingReportInput } from "@/shared/contracts/messaging/safety";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
 
 const REPORT_WINDOW_MS = 24 * 60 * 60 * 1_000;
 const REPORT_QUOTA = 10;
@@ -103,6 +104,15 @@ export class PrismaMessagingReportRepository {
               createdAt: input.now,
             },
             select: { id: true },
+          });
+          await createInAppNotification(tx, {
+            recipientUserId: input.reporterUserId,
+            kind: "MESSAGE_REPORT_RECEIVED",
+            deduplicationKey: `messaging-report:${report.id}:received`,
+            correlationId: report.id,
+            occurredAt: input.now,
+            contextType: "MESSAGING_REPORT",
+            contextId: report.id,
           });
           return { reportId: report.id, deduplicated: false };
         },

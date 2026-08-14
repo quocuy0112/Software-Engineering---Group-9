@@ -420,6 +420,7 @@ export const ModelName = {
   AuthenticationChallenge: 'AuthenticationChallenge',
   RateLimitBucket: 'RateLimitBucket',
   EmailOutbox: 'EmailOutbox',
+  InAppNotification: 'InAppNotification',
   AuditEvent: 'AuditEvent',
   Company: 'Company',
   CompanyMembership: 'CompanyMembership',
@@ -507,7 +508,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "auditEvent" | "company" | "companyMembership" | "platformAdministratorGrant" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "verificationNotificationEvent" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence"
+    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "inAppNotification" | "auditEvent" | "company" | "companyMembership" | "platformAdministratorGrant" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "verificationNotificationEvent" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2210,6 +2211,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.EmailOutboxCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.EmailOutboxCountAggregateOutputType> | number
+        }
+      }
+    }
+    InAppNotification: {
+      payload: Prisma.$InAppNotificationPayload<ExtArgs>
+      fields: Prisma.InAppNotificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.InAppNotificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.InAppNotificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>
+        }
+        findFirst: {
+          args: Prisma.InAppNotificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.InAppNotificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>
+        }
+        findMany: {
+          args: Prisma.InAppNotificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>[]
+        }
+        create: {
+          args: Prisma.InAppNotificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>
+        }
+        createMany: {
+          args: Prisma.InAppNotificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.InAppNotificationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>[]
+        }
+        delete: {
+          args: Prisma.InAppNotificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>
+        }
+        update: {
+          args: Prisma.InAppNotificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.InAppNotificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.InAppNotificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.InAppNotificationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>[]
+        }
+        upsert: {
+          args: Prisma.InAppNotificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>
+        }
+        aggregate: {
+          args: Prisma.InAppNotificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateInAppNotification>
+        }
+        groupBy: {
+          args: Prisma.InAppNotificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InAppNotificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.InAppNotificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InAppNotificationCountAggregateOutputType> | number
         }
       }
     }
@@ -7993,6 +8068,30 @@ export const EmailOutboxScalarFieldEnum = {
 export type EmailOutboxScalarFieldEnum = (typeof EmailOutboxScalarFieldEnum)[keyof typeof EmailOutboxScalarFieldEnum]
 
 
+export const InAppNotificationScalarFieldEnum = {
+  id: 'id',
+  recipientUserId: 'recipientUserId',
+  kind: 'kind',
+  category: 'category',
+  severity: 'severity',
+  title: 'title',
+  summary: 'summary',
+  href: 'href',
+  contextType: 'contextType',
+  contextId: 'contextId',
+  deduplicationKey: 'deduplicationKey',
+  correlationId: 'correlationId',
+  occurrenceCount: 'occurrenceCount',
+  readAt: 'readAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  lastOccurredAt: 'lastOccurredAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InAppNotificationScalarFieldEnum = (typeof InAppNotificationScalarFieldEnum)[keyof typeof InAppNotificationScalarFieldEnum]
+
+
 export const AuditEventScalarFieldEnum = {
   id: 'id',
   occurredAt: 'occurredAt',
@@ -9774,6 +9873,62 @@ export type ListEnumOutboxStatusFieldRefInput<$PrismaModel> = FieldRefInputType<
 
 
 /**
+ * Reference to a field of type 'InAppNotificationKind'
+ */
+export type EnumInAppNotificationKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InAppNotificationKind'>
+    
+
+
+/**
+ * Reference to a field of type 'InAppNotificationKind[]'
+ */
+export type ListEnumInAppNotificationKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InAppNotificationKind[]'>
+    
+
+
+/**
+ * Reference to a field of type 'InAppNotificationCategory'
+ */
+export type EnumInAppNotificationCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InAppNotificationCategory'>
+    
+
+
+/**
+ * Reference to a field of type 'InAppNotificationCategory[]'
+ */
+export type ListEnumInAppNotificationCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InAppNotificationCategory[]'>
+    
+
+
+/**
+ * Reference to a field of type 'InAppNotificationSeverity'
+ */
+export type EnumInAppNotificationSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InAppNotificationSeverity'>
+    
+
+
+/**
+ * Reference to a field of type 'InAppNotificationSeverity[]'
+ */
+export type ListEnumInAppNotificationSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InAppNotificationSeverity[]'>
+    
+
+
+/**
+ * Reference to a field of type 'InAppNotificationContextType'
+ */
+export type EnumInAppNotificationContextTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InAppNotificationContextType'>
+    
+
+
+/**
+ * Reference to a field of type 'InAppNotificationContextType[]'
+ */
+export type ListEnumInAppNotificationContextTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InAppNotificationContextType[]'>
+    
+
+
+/**
  * Reference to a field of type 'AuditResult'
  */
 export type EnumAuditResultFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuditResult'>
@@ -11024,6 +11179,7 @@ export type GlobalOmitConfig = {
   authenticationChallenge?: Prisma.AuthenticationChallengeOmit
   rateLimitBucket?: Prisma.RateLimitBucketOmit
   emailOutbox?: Prisma.EmailOutboxOmit
+  inAppNotification?: Prisma.InAppNotificationOmit
   auditEvent?: Prisma.AuditEventOmit
   company?: Prisma.CompanyOmit
   companyMembership?: Prisma.CompanyMembershipOmit

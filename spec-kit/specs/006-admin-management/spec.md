@@ -433,7 +433,13 @@ As a Platform Administrator, I want a protected Support Inbox where I can claim,
 - **[FR-003, FR-006, FR-013–FR-015, FR-025, FR-027, FR-029–FR-031, FR-036–FR-037, FR-050, FR-052–FR-054, FR-057, FR-060 Modify]** — Replaced residual unqualified terms with exact origins, denial outcomes, field sets, page sizes, deterministic ordering, evidence access/deletion deadlines, decision categories, notification contents, retained report references, visibility boundaries, and post-revocation display behavior — additional ambiguity review requested after the seven clarifications.
 - **[FR-001–FR-062 traceability review]** — Every requirement maps to at least one acceptance scenario in User Stories 1–7 and to SC-001–SC-018 either directly or through its functional group; no orphan requirement was found. Detailed group mapping is recorded in the specification checklist notes.
 
-### Residual Abstraction Review
+## Feature 016 Notification Integration
+
+- Existing account, all-session, membership, and recruiter-verification email/security work remains authoritative and unchanged; the same committed event also creates one deduplicated in-app record for the affected account.
+- The administrator shell consumes the same recipient-isolated notification APIs as the workspace shell and gains no ability to inspect another user's inbox.
+- Moderation notification summaries exclude administrator identity, assignment, private notes, enforcement references, and submitted protected detail.
+
+## Residual Abstraction Review
 
 - No unqualified occurrence of `reasonable`, `appropriate`, `timely`, `sufficient`, `bounded`, `minimal`, or `stable` remains in a Functional Requirement, Acceptance Scenario, or Success Criterion.
 - `current` and `authoritative` remain as domain-state terms meaning the latest effective state at the instant an authorization check or transition is evaluated; stale and concurrent outcomes are fixed by User Story 3 scenario 7, User Story 4 scenario 8, FR-020, FR-034, FR-045, FR-052, and SC-010.

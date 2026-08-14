@@ -6,7 +6,10 @@ import {
 } from "@/backend/repositories/admin/prisma-admin-command-repository";
 import { AuditWriter } from "@/backend/admin/audit/audit-writer";
 import { PrismaVerificationRepository } from "@/backend/repositories/admin/prisma-verification-repository";
-import { buildVerificationOutbox } from "@/backend/admin/notifications/verification-outbox";
+import {
+  buildVerificationOutbox,
+  createVerificationInAppNotification,
+} from "@/backend/admin/notifications/verification-outbox";
 import { createVerificationDecisionNotification } from "@/backend/admin/notifications/verification-notification-event";
 import { loadVerificationDecisionEligibility } from "./verification-decision-eligibility";
 import {
@@ -135,23 +138,27 @@ export class VerificationReviewService {
             targetVersion: version,
           },
         });
+        const notification = {
+          requestId: row.id,
+          userId: row.applicantUserId,
+          eventKind:
+            action === "changes"
+              ? "VERIFICATION_CHANGES_REQUESTED"
+              : "VERIFICATION_REJECTED",
+          resultingState,
+          resultingVersion: version,
+          occurredAt: now,
+          nextAction:
+            action === "changes" ? "RESUBMIT_OR_CANCEL" : "SUBMIT_NEW_REQUEST",
+        } as const;
         await tx.emailOutbox.create({
-          data: buildVerificationOutbox({
-            requestId: row.id,
-            userId: row.applicantUserId,
-            eventKind:
-              action === "changes"
-                ? "VERIFICATION_CHANGES_REQUESTED"
-                : "VERIFICATION_REJECTED",
-            resultingState,
-            resultingVersion: version,
-            occurredAt: now,
-            nextAction:
-              action === "changes"
-                ? "RESUBMIT_OR_CANCEL"
-                : "SUBMIT_NEW_REQUEST",
-          }),
+          data: buildVerificationOutbox(notification),
         });
+        await createVerificationInAppNotification(
+          tx,
+          notification,
+          correlationId,
+        );
         return { version, state: resultingState };
       },
     );

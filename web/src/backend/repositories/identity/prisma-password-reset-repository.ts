@@ -10,6 +10,7 @@ import { prisma } from "@/backend/database/prisma";
 import { TokenProtector } from "@/backend/security/security-token/security-tokens";
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
 import { PrismaOutboxRepository } from "@/backend/repositories/email/outbox-repository";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
 
 export const PASSWORD_RESET_LIFETIME_MS = 30 * 60 * 1000;
 export const PASSWORD_RESET_OPERATION_LEASE_MS = 60 * 1000;
@@ -322,6 +323,15 @@ export class PrismaPasswordResetRepository {
         templateVersion: "password-changed.v1",
         payloadRef: {},
         idempotencyKey: operation.notificationIdempotencyKey,
+      });
+      await createInAppNotification(tx, {
+        recipientUserId: operation.userId,
+        kind: "PASSWORD_CHANGED",
+        deduplicationKey: operation.notificationIdempotencyKey,
+        correlationId: operation.id,
+        occurredAt: now,
+        contextType: "ACCOUNT",
+        contextId: operation.userId,
       });
       const changed = await tx.passwordResetOperation.updateMany({
         where: {

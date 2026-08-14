@@ -10,6 +10,7 @@ import { prisma } from "@/backend/database/prisma";
 import { TokenProtector } from "@/backend/security/security-token/security-tokens";
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
 import { PrismaOutboxRepository } from "@/backend/repositories/email/outbox-repository";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
 
 export const ACCOUNT_RECOVERY_CONFIRMATION_LIFETIME_MS = 30 * 60 * 1000;
 export const ACCOUNT_RECOVERY_HOLD_MS = 24 * 60 * 60 * 1000;
@@ -463,6 +464,15 @@ export class PrismaAccountRecoveryRepository {
         },
         idempotencyKey: operation.pendingNotificationIdempotencyKey,
       });
+      await createInAppNotification(tx, {
+        recipientUserId: operation.userId,
+        kind: "RECOVERY_PENDING",
+        deduplicationKey: operation.pendingNotificationIdempotencyKey,
+        correlationId: operation.id,
+        occurredAt: now,
+        contextType: "ACCOUNT",
+        contextId: operation.userId,
+      });
       const finalAuditId = `account-recovery-confirmed:${operation.id}`;
       await this.auditFactory(tx).appendIdempotent(finalAuditId, {
         occurredAt: now,
@@ -545,6 +555,15 @@ export class PrismaAccountRecoveryRepository {
         templateVersion: "account-recovery-cancelled.v1",
         payloadRef: { event: "account-recovery-cancelled" },
         idempotencyKey: operation.cancellationNotificationIdempotencyKey,
+      });
+      await createInAppNotification(tx, {
+        recipientUserId: operation.userId,
+        kind: "RECOVERY_CANCELLED",
+        deduplicationKey: operation.cancellationNotificationIdempotencyKey,
+        correlationId: operation.id,
+        occurredAt: now,
+        contextType: "ACCOUNT",
+        contextId: operation.userId,
       });
       const auditId = `account-recovery-cancelled:${operation.id}`;
       await this.auditFactory(tx).appendIdempotent(auditId, {
@@ -774,6 +793,15 @@ export class PrismaAccountRecoveryRepository {
         templateVersion: "account-recovery-completed.v1",
         payloadRef: { event: "account-recovery-completed" },
         idempotencyKey: operation.completionNotificationIdempotencyKey,
+      });
+      await createInAppNotification(tx, {
+        recipientUserId: operation.userId,
+        kind: "RECOVERY_COMPLETED",
+        deduplicationKey: operation.completionNotificationIdempotencyKey,
+        correlationId: operation.id,
+        occurredAt: now,
+        contextType: "ACCOUNT",
+        contextId: operation.userId,
       });
       const changed = await tx.fullAccountRecoveryOperation.updateMany({
         where: {

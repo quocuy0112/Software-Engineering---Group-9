@@ -8,6 +8,7 @@ export type AdminWorkerLoop = {
     | "business-verification-preparation-cleanup"
     | "notification"
     | "verification-notification"
+    | "in-app-notification-retention"
     | "retention"
     | "support"
     | "connections";

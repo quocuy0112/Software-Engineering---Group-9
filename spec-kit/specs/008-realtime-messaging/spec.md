@@ -504,3 +504,9 @@ Candidate, Recruiter, and unrestricted Administrator views.
 - Administrator report review and legal-preservation procedures are separate
   privileged workflows. Feature 008 creates sufficient protected references
   for those workflows without exposing a general conversation reader.
+
+## Feature 016 Notification Integration
+
+- A durably accepted message creates or updates one bounded unread-conversation in-app notification for the other participant and never creates email.
+- Opening successfully rendered message history atomically advances the existing participant read boundary and clears only that conversation's unified notifications; failed or forbidden loads do neither.
+- Notification polling reuses safe `message:new` invalidation but does not add a second realtime transport or expose message content in notification payloads.

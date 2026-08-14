@@ -1,7 +1,10 @@
 import "server-only";
 import type { Prisma } from "@/backend/generated/prisma/client";
 import { verificationBusinessEventKey } from "./notification-events";
-import { buildVerificationOutbox } from "./verification-outbox";
+import {
+  buildVerificationOutbox,
+  createVerificationInAppNotification,
+} from "./verification-outbox";
 
 export type VerificationDecisionNotificationInput = {
   requestId: string;
@@ -92,6 +95,11 @@ export async function createVerificationNotificationEvent(
       inAppStatus: true,
     },
   });
+  const inApp = await createVerificationInAppNotification(
+    tx,
+    input,
+    `verification:${businessEventKey}`,
+  );
   if (existing) return existing;
 
   const email = await tx.emailOutbox.upsert({
@@ -128,7 +136,7 @@ export async function createVerificationNotificationEvent(
       emailStatus: "QUEUED",
       inAppStatus: "QUEUED",
       emailOutboxId: email.id,
-      inAppNotificationRef: `verification-in-app:${idempotencyKey}`,
+      inAppNotificationRef: inApp.id,
     },
   });
 

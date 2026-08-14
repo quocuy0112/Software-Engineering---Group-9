@@ -208,3 +208,9 @@ As a Platform Administrator, I want registry, applicant, contact, relationship, 
 - Bank-account verification, capital, revenue, employee count, social profiles, logo, representative identity documents, or full business-industry lists.
 - Applicant editing of an accepted request; corrections continue through the existing request-changes/resubmission lifecycle.
 - Replacing Feature 006 protected evidence or Feature 009 administrator decision requirements.
+
+## Feature 016 Notification Integration
+
+- Business registry lookup and company-email challenge delivery do not themselves create in-app notifications; the challenge remains email-only because it carries proof.
+- Submitted verification requests and subsequent applicant-visible lifecycle outcomes create safe in-app counterparts while existing verification email templates, recipients, and retries remain unchanged.
+- Viewing the applicant's successfully loaded verification history clears only matching request notifications and never grants access to protected business-license evidence.

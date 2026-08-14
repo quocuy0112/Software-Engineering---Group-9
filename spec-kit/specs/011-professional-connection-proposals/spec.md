@@ -212,4 +212,6 @@ As an authorized Platform Administrator or auditor, I can review an appropriate,
 
 ## Change Log
 
+- **2026-08-14** — Feature 016 moves future proposal/connection notifications to the unified inbox, preserves existing connection emails and compatibility routes, and idempotently backfills retained legacy rows with their original read state and deduplication key.
+
 - **2026-08-13** — Initial Feature 011 specification created from the approved bilateral-consent, lifecycle, privacy, retention, Support linkage, and Feature 008 disconnect decisions.

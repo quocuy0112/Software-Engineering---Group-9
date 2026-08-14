@@ -266,21 +266,28 @@ export async function runBusinessVerificationPreparationCleanupCycle(
   now = new Date(),
 ) {
   const deleteAfter = new Date(now.getTime() + 24 * 60 * 60_000);
-  const expiredChallenges = await prisma.companyContactEmailChallenge.updateMany({
-    where: { state: { in: ["PENDING", "VERIFIED"] }, expiresAt: { lte: now } },
-    data: {
-      state: "EXPIRED",
-      normalizedEmail: null,
-      tokenDigest: null,
-      sensitiveInaccessibleAt: now,
-      sensitiveDeleteAfter: deleteAfter,
-    },
-  });
+  const expiredChallenges =
+    await prisma.companyContactEmailChallenge.updateMany({
+      where: {
+        state: { in: ["PENDING", "VERIFIED"] },
+        expiresAt: { lte: now },
+      },
+      data: {
+        state: "EXPIRED",
+        normalizedEmail: null,
+        tokenDigest: null,
+        sensitiveInaccessibleAt: now,
+        sensitiveDeleteAfter: deleteAfter,
+      },
+    });
   const scrubbedChallenges =
     await prisma.companyContactEmailChallenge.updateMany({
       where: {
         sensitiveInaccessibleAt: { not: null },
-        OR: [{ normalizedEmail: { not: null } }, { tokenDigest: { not: null } }],
+        OR: [
+          { normalizedEmail: { not: null } },
+          { tokenDigest: { not: null } },
+        ],
       },
       data: { normalizedEmail: null, tokenDigest: null },
     });
@@ -289,20 +296,31 @@ export async function runBusinessVerificationPreparationCleanupCycle(
       where: { inaccessibleAt: null, expiresAt: { lte: now } },
       data: { inaccessibleAt: now, deleteAfter },
     });
-  const expiredSnapshots = await prisma.businessRegistryLookupSnapshot.updateMany({
-    where: { acceptedRequestId: null, inaccessibleAt: null, expiresAt: { lte: now } },
-    data: { inaccessibleAt: now, deleteAfter },
-  });
-  const deletedChallenges = await prisma.companyContactEmailChallenge.deleteMany({
-    where: { metadataDeleteAfter: { lte: now } },
-  });
+  const expiredSnapshots =
+    await prisma.businessRegistryLookupSnapshot.updateMany({
+      where: {
+        acceptedRequestId: null,
+        inaccessibleAt: null,
+        expiresAt: { lte: now },
+      },
+      data: { inaccessibleAt: now, deleteAfter },
+    });
+  const deletedChallenges =
+    await prisma.companyContactEmailChallenge.deleteMany({
+      where: { metadataDeleteAfter: { lte: now } },
+    });
   const deletedPreparations =
     await prisma.employerVerificationPreparation.deleteMany({
       where: { deleteAfter: { lte: now } },
     });
-  const deletedSnapshots = await prisma.businessRegistryLookupSnapshot.deleteMany({
-    where: { acceptedRequestId: null, deleteAfter: { lte: now }, currentPreparation: null },
-  });
+  const deletedSnapshots =
+    await prisma.businessRegistryLookupSnapshot.deleteMany({
+      where: {
+        acceptedRequestId: null,
+        deleteAfter: { lte: now },
+        currentPreparation: null,
+      },
+    });
   return {
     expiredChallenges: expiredChallenges.count,
     scrubbedChallenges: scrubbedChallenges.count,

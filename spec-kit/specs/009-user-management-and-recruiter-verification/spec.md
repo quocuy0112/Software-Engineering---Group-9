@@ -59,3 +59,9 @@ per functional group.
 
 The existence of all three written speckits does not authorize implementation.
 Planning and implementation remain a separate later task after review.
+
+## Feature 016 Notification Integration
+
+- Recruiter verification receipt, changes-requested, approval, rejection, cancellation, processing-delay, and expiry outcomes create one safe in-app record beside every existing email outcome.
+- The in-app record contains only allow-listed state, company display name when applicable, and an internal verification-workspace destination; business-license evidence and private notes are excluded.
+- Successfully displaying an applicant's own verification history clears only matching request notifications.

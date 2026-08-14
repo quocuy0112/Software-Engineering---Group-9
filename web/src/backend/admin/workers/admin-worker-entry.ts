@@ -13,6 +13,7 @@ import { runRationaleRetentionCycle } from "./rationale-retention-loop";
 import { runSupportLifecycleCycle } from "./support-lifecycle-loop";
 import { runProposalLifecycleCycle } from "@/backend/connections/workers/proposal-lifecycle-loop";
 import { runProposalRetentionCycle } from "@/backend/connections/workers/proposal-retention-loop";
+import { runNotificationRetentionCycle } from "./notification-retention-loop";
 
 export async function startAdminWorker(options: { probe?: boolean } = {}) {
   const runtime = new AdminWorkerRuntime([
@@ -37,6 +38,11 @@ export async function startAdminWorker(options: { probe?: boolean } = {}) {
       name: "verification-notification",
       intervalMs: 30_000,
       run: runVerificationNotificationCycle,
+    },
+    {
+      name: "in-app-notification-retention",
+      intervalMs: 60_000,
+      run: runNotificationRetentionCycle,
     },
     {
       name: "retention",

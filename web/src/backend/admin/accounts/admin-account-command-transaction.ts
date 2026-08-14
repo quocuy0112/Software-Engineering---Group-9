@@ -8,6 +8,7 @@ import {
   securityNotificationIdempotencyKey,
   type AdminSecurityEventKind,
 } from "@/backend/admin/notifications/notification-events";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
 
 export async function recordAccountCommand(
   tx: Prisma.TransactionClient,
@@ -66,12 +67,17 @@ export async function recordAccountCommand(
           ? "ACCOUNT_REINSTATED"
           : input.action === "admin.account_restored"
             ? "ACCOUNT_RESTORED"
-          : "ALL_SESSIONS_REVOKED";
+            : "ALL_SESSIONS_REVOKED";
     const businessEventKey = accountBusinessEventKey(
       input.targetUserId,
       eventKind,
       input.resultingVersion,
     );
+    // The immutable audit action distinguishes ACCOUNT_RESTORED from the
+    // legacy ACCOUNT_REINSTATED label, while the unified notification enum
+    // intentionally keeps one user-facing restoration kind.
+    const inAppKind =
+      eventKind === "ACCOUNT_RESTORED" ? "ACCOUNT_REINSTATED" : eventKind;
     await new PrismaSecurityNotificationRepository(tx).enqueue({
       idempotencyKey: securityNotificationIdempotencyKey(businessEventKey),
       originatingCorrelationId: input.correlationId,
@@ -87,6 +93,16 @@ export async function recordAccountCommand(
       attemptCount: 0,
       nextAttemptAt: input.occurredAt,
       deliveryDeadline: new Date(input.occurredAt.getTime() + 24 * 60 * 60_000),
+    });
+    await createInAppNotification(tx, {
+      recipientUserId: input.targetUserId,
+      kind: inAppKind,
+      deduplicationKey: securityNotificationIdempotencyKey(businessEventKey),
+      correlationId: input.correlationId,
+      occurredAt: input.occurredAt,
+      contextType: "ACCOUNT",
+      contextId: input.targetUserId,
+      variables: { state: input.resultingState },
     });
   }
 }

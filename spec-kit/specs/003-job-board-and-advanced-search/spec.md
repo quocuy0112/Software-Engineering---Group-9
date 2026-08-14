@@ -337,3 +337,9 @@ As an authenticated user, I can privately report a suspected fraudulent, mislead
 - Image upload, OCR, image-search consent/retention, and intent interpretation, which belong to Feature 005; Feature 003 consumes only visible validated criteria.
 - AI-generated job descriptions, autonomous job selection/ranking, autonomous recruitment decisions, and automatic enforcement based solely on a report.
 - Dedicated UC-JOB-04 external sharing controls beyond ordinary canonical URLs.
+
+## Feature 016 Notification Integration
+
+- Successful application submission creates an in-app receipt for the Candidate and one in-app receipt for each active authorized company member; these receipts do not add email.
+- Candidate-visible application stage changes create an in-app outcome beside the existing preference-controlled email without changing that email behavior.
+- Job and related moderation report receipts and terminal outcomes use safe summaries that never expose submitted report detail or protected target content.

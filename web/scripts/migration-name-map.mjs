@@ -16,4 +16,9 @@ export const migrationNameMap = Object.freeze([
     "20260810130000_verification_outbox_event_unique",
     "020_verification_outbox_event_unique",
   ],
+  ["20260813061054_smarthire", "031_smarthire"],
+  [
+    "20260814090000_unified_in_app_notifications",
+    "032_unified_in_app_notifications",
+  ],
 ]);

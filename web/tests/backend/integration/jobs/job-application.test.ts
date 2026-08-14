@@ -27,7 +27,16 @@ describe.skipIf(!databaseAvailable)("transactional job application", () => {
       ).deleteJobBoardDatabaseFixture(fixture);
   });
 
-  it("commits one Applied application, initial history, audit, and notification work", async () => {
+  it("commits one Applied application, history, audit, and unified notifications", async () => {
+    const prisma = (await import("@/backend/database/prisma")).prisma;
+    await prisma.companyMembership.create({
+      data: {
+        companyId: fixture.company.id,
+        userId: fixture.userIds[1]!,
+        role: "RECRUITER",
+        priorApprovedRole: "RECRUITER",
+      },
+    });
     const input = {
       candidateUserId: fixture.userIds[0]!,
       sessionId: "session-1",
@@ -55,7 +64,6 @@ describe.skipIf(!databaseAvailable)("transactional job application", () => {
       created: false,
       application: { applicationId: first.application.applicationId },
     });
-    const prisma = (await import("@/backend/database/prisma")).prisma;
     expect(
       await prisma.jobApplication.count({
         where: {
@@ -68,7 +76,26 @@ describe.skipIf(!databaseAvailable)("transactional job application", () => {
       await prisma.recruitmentNotificationWork.count({
         where: { applicationId: first.application.applicationId },
       }),
-    ).toBe(2);
+    ).toBe(0);
+    expect(
+      await prisma.inAppNotification.count({
+        where: {
+          recipientUserId: fixture.userIds[0]!,
+          kind: "APPLICATION_SUBMITTED",
+          contextType: "APPLICATION",
+          contextId: first.application.applicationId,
+        },
+      }),
+    ).toBe(1);
+    expect(
+      await prisma.inAppNotification.count({
+        where: {
+          kind: "APPLICATION_RECEIVED",
+          contextType: "APPLICATION",
+          contextId: first.application.applicationId,
+        },
+      }),
+    ).toBeGreaterThan(0);
     expect(
       await prisma.applicationStageEvent.findMany({
         where: { applicationId: first.application.applicationId },
