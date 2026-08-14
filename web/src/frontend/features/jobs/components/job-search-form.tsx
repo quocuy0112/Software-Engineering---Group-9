@@ -4,14 +4,29 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 
-type SearchCriteria = Partial<
+export type JobSearchCriteria = Partial<
   Record<string, string | string[] | number | undefined>
 >;
+
+export type JobFilterTrigger = "debounced" | "immediate";
 
 type ActiveFilter = Readonly<{
   id: string;
   label: string;
+  name: string;
+  value?: string;
   href: string;
+}>;
+
+type JobSearchFormProps = Readonly<{
+  criteria: JobSearchCriteria;
+  onCriteriaChange?: (
+    criteria: JobSearchCriteria,
+    trigger: JobFilterTrigger,
+  ) => void;
+  onClear?: () => void;
+  resultCount?: number;
+  isLoading?: boolean;
 }>;
 
 const valueLabels: Record<string, string> = {
@@ -64,13 +79,19 @@ const valueLabelsVi: Record<string, string> = {
   "30": "30 ngày",
 };
 
-const one = (value: SearchCriteria[string]) =>
+const one = (value: JobSearchCriteria[string]) =>
   Array.isArray(value) ? (value[0] ?? "") : (value?.toString() ?? "");
 
-function criteriaParams(criteria: SearchCriteria) {
+export function jobCriteriaParams(criteria: JobSearchCriteria) {
   const params = new URLSearchParams();
   for (const [name, value] of Object.entries(criteria)) {
-    if (value === undefined || name === "cursor" || name === "limit") continue;
+    if (
+      value === undefined ||
+      name === "cursor" ||
+      name === "limit" ||
+      name === "page"
+    )
+      continue;
     for (const item of Array.isArray(value) ? value : [String(value)]) {
       if (item) params.append(name, item);
     }
@@ -79,11 +100,11 @@ function criteriaParams(criteria: SearchCriteria) {
 }
 
 function removeFilterHref(
-  criteria: SearchCriteria,
+  criteria: JobSearchCriteria,
   name: string,
   value?: string,
 ) {
-  const params = criteriaParams(criteria);
+  const params = jobCriteriaParams(criteria);
   const existing = params.getAll(name);
   params.delete(name);
   if (value !== undefined) {
@@ -94,8 +115,25 @@ function removeFilterHref(
   return query ? `/jobs?${query}` : "/jobs";
 }
 
+function removeCriterion(
+  criteria: JobSearchCriteria,
+  name: string,
+  value?: string,
+): JobSearchCriteria {
+  const next = { ...criteria };
+  const current = next[name];
+  if (Array.isArray(current) && value !== undefined) {
+    const remaining = current.filter((item) => item !== value);
+    if (remaining.length) next[name] = remaining;
+    else delete next[name];
+  } else {
+    delete next[name];
+  }
+  return next;
+}
+
 function activeFilters(
-  criteria: SearchCriteria,
+  criteria: JobSearchCriteria,
   locale: "vi" | "en",
 ): ActiveFilter[] {
   const labels =
@@ -106,6 +144,7 @@ function activeFilters(
           employmentType: "Loại việc",
           experienceLevel: "Cấp độ",
           workArrangement: "Hình thức",
+          careerPath: "Lộ trình",
           skills: "Kỹ năng",
           salaryMin: "Lương từ",
           salaryMax: "Lương đến",
@@ -118,6 +157,7 @@ function activeFilters(
           employmentType: "Employment type",
           experienceLevel: "Experience level",
           workArrangement: "Work arrangement",
+          careerPath: "Career path",
           skills: "Skill",
           salaryMin: "Salary from",
           salaryMax: "Salary to",
@@ -135,6 +175,8 @@ function activeFilters(
     output.push({
       id: `${name}:${value}`,
       label: `${labels[name]}: ${visible}`,
+      name,
+      value,
       href: removeFilterHref(criteria, name, value),
     });
   };
@@ -145,6 +187,7 @@ function activeFilters(
     "employmentType",
     "experienceLevel",
     "workArrangement",
+    "careerPath",
     "skills",
     "salaryMin",
     "salaryMax",
@@ -162,7 +205,13 @@ function activeFilters(
   return output;
 }
 
-export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
+export function JobSearchForm({
+  criteria,
+  onCriteriaChange,
+  onClear,
+  resultCount,
+  isLoading = false,
+}: JobSearchFormProps) {
   const locale = useWorkspaceLocale();
   const vi = locale === "vi";
   const copy = vi
@@ -170,10 +219,11 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
         mobile: "Bộ lọc",
         close: "Đóng bộ lọc",
         applied: "Bộ lọc đang áp dụng",
-        clear: "Xóa tất cả",
+        clear: "Xoá bộ lọc",
+        remove: "Xoá bộ lọc",
         refine: "Tinh chỉnh tìm kiếm",
         filters: "Bộ lọc",
-        intro: "Thu hẹp danh sách bằng một hoặc nhiều tiêu chí.",
+        intro: "Danh sách tự cập nhật khi bạn thay đổi tiêu chí.",
         keywords: "Từ khóa",
         keywordPlaceholder: "Chức danh, kỹ năng hoặc công ty",
         location: "Địa điểm",
@@ -187,17 +237,20 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
         sort: "Sắp xếp",
         any: "Tất cả",
         anyTime: "Mọi thời điểm",
-        search: "Tìm việc",
         image: "Tìm bằng hình ảnh",
+        updating: "Đang cập nhật",
+        matching: "việc làm phù hợp",
+        noMatching: "Chưa có việc làm phù hợp",
       }
     : {
         mobile: "Filters",
         close: "Close filters",
         applied: "Applied filters",
-        clear: "Clear all",
+        clear: "Clear filters",
+        remove: "Remove filter",
         refine: "Refine search",
         filters: "Filters",
-        intro: "Narrow the list using one or more criteria.",
+        intro: "The list updates as you change a criterion.",
         keywords: "Keywords",
         keywordPlaceholder: "Title, skill, or company",
         location: "Location",
@@ -211,8 +264,10 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
         sort: "Sort",
         any: "Any",
         anyTime: "Any time",
-        search: "Search jobs",
         image: "Search from an image",
+        updating: "Updating",
+        matching: "matching jobs",
+        noMatching: "No matching jobs yet",
       };
   const filters = useMemo(
     () => activeFilters(criteria, locale),
@@ -222,6 +277,9 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
   const drawer = useRef<HTMLElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const form = useRef<HTMLFormElement>(null);
+  const live = Boolean(onCriteriaChange);
+  const optionLabel = (value: string) =>
+    (vi ? valueLabelsVi : valueLabels)[value] ?? value;
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -287,6 +345,30 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
     return () => filterColumn.removeEventListener("wheel", scrollFilterColumn);
   }, []);
 
+  const valueProps = (name: string) =>
+    live
+      ? { value: one(criteria[name]) }
+      : { defaultValue: one(criteria[name]) };
+
+  const updateCriterion = (
+    name: string,
+    value: string,
+    trigger: JobFilterTrigger,
+  ) => {
+    if (!onCriteriaChange) return;
+    const next = { ...criteria };
+    if (value) next[name] = value;
+    else delete next[name];
+    onCriteriaChange(next, trigger);
+  };
+
+  const countText =
+    resultCount === undefined
+      ? ""
+      : resultCount
+        ? `${new Intl.NumberFormat(vi ? "vi-VN" : "en-US").format(resultCount)} ${copy.matching}`
+        : copy.noMatching;
+
   return (
     <div className="job-filter-shell" data-mobile-open={mobileOpen}>
       <button
@@ -304,19 +386,41 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
       {filters.length ? (
         <div className="job-active-filters" aria-label={copy.applied}>
           <div>
-            {filters.map((filter) => (
-              <Link key={filter.id} href={filter.href}>
-                {filter.label}
-                <span aria-hidden="true">×</span>
-                <span className="sr-only">
-                  {vi ? "Xóa bộ lọc" : "Remove filter"} {filter.label}
-                </span>
-              </Link>
-            ))}
+            {filters.map((filter) =>
+              onCriteriaChange ? (
+                <button
+                  key={filter.id}
+                  className="job-active-filter-chip"
+                  type="button"
+                  onClick={() =>
+                    onCriteriaChange(
+                      removeCriterion(criteria, filter.name, filter.value),
+                      "immediate",
+                    )
+                  }
+                >
+                  {filter.label}
+                  <span aria-hidden="true">×</span>
+                  <span className="sr-only">
+                    {copy.remove} {filter.label}
+                  </span>
+                </button>
+              ) : (
+                <Link key={filter.id} href={filter.href}>
+                  {filter.label}
+                  <span aria-hidden="true">×</span>
+                  <span className="sr-only">
+                    {copy.remove} {filter.label}
+                  </span>
+                </Link>
+              ),
+            )}
           </div>
-          <Link className="job-active-filters-clear" href="/jobs">
-            {vi ? "Đặt lại bộ lọc" : "Reset filters"}
-          </Link>
+          {!onClear ? (
+            <Link className="job-active-filters-clear" href="/jobs">
+              {copy.clear}
+            </Link>
+          ) : null}
         </div>
       ) : null}
 
@@ -344,6 +448,10 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
           role="search"
           aria-label={vi ? "Tìm kiếm việc làm" : "Job search"}
           action="/jobs"
+          onSubmit={(event) => {
+            event.preventDefault();
+            onCriteriaChange?.(criteria, "immediate");
+          }}
         >
           <header className="job-filter-heading">
             <span className="job-filter-icon" aria-hidden="true">
@@ -353,7 +461,20 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
             </span>
             <div>
               <p className="panel-kicker">{copy.refine}</p>
-              <h2>{copy.filters}</h2>
+              <div className="job-filter-title-row">
+                <h2>{copy.filters}</h2>
+                <p
+                  className="job-filter-result-count"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  {countText
+                    ? isLoading
+                      ? `${countText} · ${copy.updating}`
+                      : countText
+                    : null}
+                </p>
+              </div>
             </div>
             <button
               className="job-filter-mobile-close"
@@ -372,8 +493,11 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
                 name="q"
                 type="search"
                 maxLength={200}
-                defaultValue={one(criteria.q)}
                 placeholder={copy.keywordPlaceholder}
+                {...valueProps("q")}
+                onChange={(event) =>
+                  updateCriterion("q", event.currentTarget.value, "debounced")
+                }
               />
             </label>
             <label>
@@ -381,59 +505,77 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
               <input
                 name="location"
                 maxLength={160}
-                defaultValue={one(criteria.location)}
                 placeholder="Ho Chi Minh City"
+                {...valueProps("location")}
+                onChange={(event) =>
+                  updateCriterion(
+                    "location",
+                    event.currentTarget.value,
+                    "debounced",
+                  )
+                }
               />
             </label>
             <label>
               {copy.employment}
               <select
                 name="employmentType"
-                defaultValue={one(criteria.employmentType)}
+                {...valueProps("employmentType")}
+                onChange={(event) =>
+                  updateCriterion(
+                    "employmentType",
+                    event.currentTarget.value,
+                    "immediate",
+                  )
+                }
               >
                 <option value="">{copy.any}</option>
-                <option value="FULL_TIME">
-                  {vi ? "Toàn thời gian" : "Full time"}
-                </option>
-                <option value="PART_TIME">
-                  {vi ? "Bán thời gian" : "Part time"}
-                </option>
-                <option value="CONTRACT">{vi ? "Hợp đồng" : "Contract"}</option>
-                <option value="INTERNSHIP">
-                  {vi ? "Thực tập" : "Internship"}
-                </option>
-                <option value="TEMPORARY">
-                  {vi ? "Tạm thời" : "Temporary"}
-                </option>
+                <option value="FULL_TIME">{optionLabel("FULL_TIME")}</option>
+                <option value="PART_TIME">{optionLabel("PART_TIME")}</option>
+                <option value="CONTRACT">{optionLabel("CONTRACT")}</option>
+                <option value="INTERNSHIP">{optionLabel("INTERNSHIP")}</option>
+                <option value="TEMPORARY">{optionLabel("TEMPORARY")}</option>
               </select>
             </label>
             <label>
               {copy.experience}
               <select
                 name="experienceLevel"
-                defaultValue={one(criteria.experienceLevel)}
+                {...valueProps("experienceLevel")}
+                onChange={(event) =>
+                  updateCriterion(
+                    "experienceLevel",
+                    event.currentTarget.value,
+                    "immediate",
+                  )
+                }
               >
                 <option value="">{copy.any}</option>
-                <option value="ENTRY">{vi ? "Mới bắt đầu" : "Entry"}</option>
+                <option value="ENTRY">{optionLabel("ENTRY")}</option>
                 <option value="JUNIOR">Junior</option>
-                <option value="MID">{vi ? "Trung cấp" : "Mid-level"}</option>
-                <option value="SENIOR">{vi ? "Cao cấp" : "Senior"}</option>
-                <option value="LEAD">{vi ? "Trưởng nhóm" : "Lead"}</option>
-                <option value="MANAGER">{vi ? "Quản lý" : "Manager"}</option>
+                <option value="MID">{optionLabel("MID")}</option>
+                <option value="SENIOR">{optionLabel("SENIOR")}</option>
+                <option value="LEAD">{optionLabel("LEAD")}</option>
+                <option value="MANAGER">{optionLabel("MANAGER")}</option>
               </select>
             </label>
             <label>
               {copy.arrangement}
               <select
                 name="workArrangement"
-                defaultValue={one(criteria.workArrangement)}
+                {...valueProps("workArrangement")}
+                onChange={(event) =>
+                  updateCriterion(
+                    "workArrangement",
+                    event.currentTarget.value,
+                    "immediate",
+                  )
+                }
               >
                 <option value="">{copy.any}</option>
-                <option value="ONSITE">
-                  {vi ? "Tại văn phòng" : "On-site"}
-                </option>
-                <option value="HYBRID">{vi ? "Linh hoạt" : "Hybrid"}</option>
-                <option value="REMOTE">{vi ? "Từ xa" : "Remote"}</option>
+                <option value="ONSITE">{optionLabel("ONSITE")}</option>
+                <option value="HYBRID">{optionLabel("HYBRID")}</option>
+                <option value="REMOTE">{optionLabel("REMOTE")}</option>
               </select>
             </label>
             <label>
@@ -442,7 +584,15 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
                 name="salaryMin"
                 type="number"
                 min="0"
-                defaultValue={one(criteria.salaryMin)}
+                inputMode="numeric"
+                {...valueProps("salaryMin")}
+                onChange={(event) =>
+                  updateCriterion(
+                    "salaryMin",
+                    event.currentTarget.value,
+                    "debounced",
+                  )
+                }
               />
             </label>
             <label>
@@ -451,7 +601,15 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
                 name="salaryMax"
                 type="number"
                 min="0"
-                defaultValue={one(criteria.salaryMax)}
+                inputMode="numeric"
+                {...valueProps("salaryMax")}
+                onChange={(event) =>
+                  updateCriterion(
+                    "salaryMax",
+                    event.currentTarget.value,
+                    "debounced",
+                  )
+                }
               />
             </label>
             <label>
@@ -459,57 +617,87 @@ export function JobSearchForm({ criteria }: { criteria: SearchCriteria }) {
               <input
                 name="skills"
                 maxLength={80}
-                defaultValue={one(criteria.skills)}
                 placeholder="TypeScript"
+                {...valueProps("skills")}
+                onChange={(event) =>
+                  updateCriterion(
+                    "skills",
+                    event.currentTarget.value,
+                    "debounced",
+                  )
+                }
               />
             </label>
             <label>
               {copy.posted}
               <select
                 name="postedWithinDays"
-                defaultValue={one(criteria.postedWithinDays)}
+                {...valueProps("postedWithinDays")}
+                onChange={(event) =>
+                  updateCriterion(
+                    "postedWithinDays",
+                    event.currentTarget.value,
+                    "immediate",
+                  )
+                }
               >
                 <option value="">{copy.anyTime}</option>
-                <option value="1">{vi ? "24 giờ" : "24 hours"}</option>
-                <option value="3">{vi ? "3 ngày" : "3 days"}</option>
-                <option value="7">{vi ? "7 ngày" : "7 days"}</option>
-                <option value="14">{vi ? "14 ngày" : "14 days"}</option>
-                <option value="30">{vi ? "30 ngày" : "30 days"}</option>
+                <option value="1">{optionLabel("1")}</option>
+                <option value="3">{optionLabel("3")}</option>
+                <option value="7">{optionLabel("7")}</option>
+                <option value="14">{optionLabel("14")}</option>
+                <option value="30">{optionLabel("30")}</option>
               </select>
             </label>
             <label>
               {copy.sort}
               <select
                 name="sort"
-                defaultValue={one(criteria.sort) || "RELEVANCE"}
+                value={live ? one(criteria.sort) || "RELEVANCE" : undefined}
+                defaultValue={
+                  live ? undefined : one(criteria.sort) || "RELEVANCE"
+                }
+                onChange={(event) =>
+                  updateCriterion(
+                    "sort",
+                    event.currentTarget.value,
+                    "immediate",
+                  )
+                }
               >
-                <option value="RELEVANCE">
-                  {vi ? "Liên quan nhất" : "Relevance"}
-                </option>
-                <option value="NEWEST">{vi ? "Mới nhất" : "Newest"}</option>
+                <option value="RELEVANCE">{optionLabel("RELEVANCE")}</option>
+                <option value="NEWEST">{optionLabel("NEWEST")}</option>
                 <option value="SALARY_DESC">
-                  {vi ? "Lương cao nhất" : "Highest salary"}
+                  {optionLabel("SALARY_DESC")}
                 </option>
               </select>
             </label>
           </div>
-          <input type="hidden" name="salaryCurrency" value="VND" />
-          <input type="hidden" name="salaryPeriod" value="MONTH" />
           <div className="job-filter-actions">
-            <button className="job-primary-button" type="submit">
-              <svg className="job-filter-action-icon" aria-hidden="true" viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="6" />
-                <path d="m16 16 4 4" />
-              </svg>
-              {copy.search}
-            </button>
-            <Link className="job-secondary-link job-filter-clear" href="/jobs">
-              <svg className="job-filter-action-icon" aria-hidden="true" viewBox="0 0 24 24">
-                <path d="M20 11a8 8 0 1 0 1.6 4.8" />
-                <path d="M20 4v7h-7" />
-              </svg>
-              {copy.clear}
-            </Link>
+            {onClear ? (
+              <button
+                className="job-secondary-link job-filter-clear"
+                type="button"
+                onClick={onClear}
+              >
+                <svg
+                  className="job-filter-action-icon"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M20 11a8 8 0 1 0 1.6 4.8" />
+                  <path d="M20 4v7h-7" />
+                </svg>
+                {copy.clear}
+              </button>
+            ) : (
+              <Link
+                className="job-secondary-link job-filter-clear"
+                href="/jobs"
+              >
+                {copy.clear}
+              </Link>
+            )}
           </div>
         </form>
       </section>

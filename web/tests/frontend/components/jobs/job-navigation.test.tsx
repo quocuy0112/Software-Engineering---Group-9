@@ -89,7 +89,10 @@ describe("job board navigation", () => {
 
   it("lets the results list grow with the page instead of creating a nested scroll region", async () => {
     const source = await readFile(
-      resolve(process.cwd(), "src/app/jobs/page.tsx"),
+      resolve(
+        process.cwd(),
+        "src/frontend/features/jobs/components/live-job-search-experience.tsx",
+      ),
       "utf8",
     );
     const styles = await readFile(
@@ -112,7 +115,10 @@ describe("job board navigation", () => {
 
   it("uses compact numeric pagination for job results", async () => {
     const source = await readFile(
-      resolve(process.cwd(), "src/app/jobs/page.tsx"),
+      resolve(
+        process.cwd(),
+        "src/frontend/features/jobs/components/live-job-search-experience.tsx",
+      ),
       "utf8",
     );
     const styles = await readFile(
@@ -124,13 +130,13 @@ describe("job board navigation", () => {
     expect(source).toContain("currentPage - 1");
     expect(source).toContain("currentPage + 1");
     expect(source).toContain("result.totalPages > 1");
-    expect(source).toContain("pageHref(paginationParams, result.totalPages)");
+    expect(source).toContain("goToPage(result.totalPages)");
     expect(source).toContain('className="job-pagination-progress"');
     expect(styles).toContain(".job-pagination-pages {");
     expect(styles).toContain("overflow-x: auto;");
   });
 
-  it("keeps the Filters sidebar in the page scroll context", async () => {
+  it("keeps the Filters sidebar sticky with its own scroll region", async () => {
     const styles = await readFile(
       resolve(process.cwd(), "src/frontend/features/jobs/styles/job-board.css"),
       "utf8",
@@ -143,9 +149,10 @@ describe("job board navigation", () => {
       "utf8",
     );
 
-    expect(styles).toContain("height: auto;");
-    expect(styles).toContain("max-height: none;");
-    expect(styles).not.toContain(".job-filter-column::-webkit-scrollbar {");
+    expect(styles).toContain("position: sticky;");
+    expect(styles).toContain("max-height: calc(");
+    expect(styles).toContain("overflow-y: auto;");
+    expect(styles).toContain("overscroll-behavior: contain;");
     expect(formSource).toContain('filterColumn.addEventListener("wheel"');
     expect(styles).toContain(".job-filter-mobile-trigger");
     expect(styles).toContain(".job-filter-drawer");

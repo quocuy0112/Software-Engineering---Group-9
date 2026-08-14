@@ -20,6 +20,9 @@ export function WorkspaceNavigation({
       ? {
           dashboard: "Bảng điều khiển",
           jobs: "Việc làm",
+          messages: "Tin nhắn",
+          connections: "Kết nối",
+          support: "Hỗ trợ",
           profile: "Hồ sơ",
           workspace: "Không gian ứng viên",
           openMenu: "Mở menu không gian làm việc",
@@ -34,6 +37,9 @@ export function WorkspaceNavigation({
       : {
           dashboard: "Dashboard",
           jobs: "Jobs",
+          messages: "Messages",
+          connections: "Connections",
+          support: "Support",
           profile: "Profile",
           workspace: "Candidate workspace",
           openMenu: "Open workspace menu",
@@ -48,28 +54,16 @@ export function WorkspaceNavigation({
   const destinations = [
     { href: "/dashboard", label: copy.dashboard, icon: "dashboard" },
     { href: "/jobs", label: copy.jobs, icon: "jobs" },
-    { href: "/messages", label: "Messages", icon: "messages" },
-    { href: "/connections", label: "Connections", icon: "connections" },
-    { href: "/support", label: "Support", icon: "support" },
+    { href: "/messages", label: copy.messages, icon: "messages" },
+    { href: "/connections", label: copy.connections, icon: "connections" },
+    { href: "/support", label: copy.support, icon: "support" },
     { href: "/profile", label: copy.profile, icon: "profile" },
   ] as const;
   const jobsSubnav = [
-    {
-      href: "/jobs/saved",
-      label: copy.savedJobs,
-    },
-    {
-      href: "/jobs/applied",
-      label: copy.appliedJobs,
-    },
-    {
-      href: "/jobs/matches",
-      label: copy.suggestedJobs,
-    },
-    {
-      href: "/jobs/settings",
-      label: copy.recommendationSettings,
-    },
+    { href: "/jobs/saved", label: copy.savedJobs },
+    { href: "/jobs/applied", label: copy.appliedJobs },
+    { href: "/jobs/matches", label: copy.suggestedJobs },
+    { href: "/jobs/settings", label: copy.recommendationSettings },
   ] as const;
   const pathname = usePathname() ?? "/";
   const [menuOpen, setMenuOpen] = useState(false);

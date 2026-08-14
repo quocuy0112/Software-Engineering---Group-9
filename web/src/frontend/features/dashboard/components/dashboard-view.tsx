@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Badge } from "@/frontend/components/ui/badge";
+import { useWorkspaceLocale } from "../client/workspace-locale";
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
 
 export function DashboardView({
@@ -11,56 +12,8 @@ export function DashboardView({
   account: { name: string; hasAvatar: boolean; twoFactorEnabled: boolean };
   profile: CandidateProfileContract;
 }) {
-  const copy = {
-    kicker: "YOUR CAREER WORKSPACE",
-    title: "Dashboard",
-    subtitle: "Your important details and next steps, all in one place.",
-    badge: "Candidate profile",
-    welcome: "WELCOME BACK",
-    heroTitle: (name: string) =>
-      `${name}, keep building a profile that feels like you.`,
-    heroCopy:
-      "SmartHire tracks progress from your real profile and current security settings.",
-    completeProfile: "Complete profile",
-    viewProfile: "View profile",
-    completion: "Profile completion",
-    complete: "complete",
-    profileTitle: "Professional profile",
-    profileCopy: "Manage your introduction, experience, education, and skills.",
-    skills: "skills",
-    experiences: "experiences",
-    jobsTitle: "Job opportunities",
-    jobsCopy: "Search and filter active roles, then save or apply when ready.",
-    browseJobs: "Browse jobs",
-    securityTitle: "Account security",
-    securityCopy:
-      "Control your password, two-factor authentication, and sessions.",
-    protected: "2FA enabled",
-    recommended: "2FA recommended",
-    preferencesTitle: "Personal preferences",
-    preferencesCopy: "Review your timezone and security notification settings.",
-    configured: "Available",
-    nextKicker: "NEXT STEPS",
-    nextTitle: "Make your profile stronger",
-    basics: "Add a headline and summary",
-    avatar: "Add a profile photo",
-    skillsStep: "Add your strongest skills",
-    experienceStep: "Add work experience",
-    educationStep: "Add education",
-    socialStep: "Add a professional link",
-    done: "Complete",
-    pending: "Needs attention",
-    basicsPending: "Use a 20+ character headline and 120+ character summary",
-    skillsPending: "Add at least 3 strong skills",
-    experiencePending: "Add at least one experience",
-    educationPending: "Add at least one education entry",
-    avatarPending: "Upload a clear profile photo",
-    socialPending: "Add at least one profile or website",
-    remaining: (count: number) =>
-      count === 0 ? "Profile ready" : `${count} steps left`,
-    workspaceSections: "Job, profile, and account management areas",
-  };
-
+  const locale = useWorkspaceLocale();
+  const copy = dashboardCopy(locale);
   const headlineLength = profile.basics.headline?.trim().length ?? 0;
   const summaryLength = profile.basics.summary?.trim().length ?? 0;
   const detailedExperience = profile.experience.some(
@@ -264,6 +217,110 @@ export function DashboardView({
       </div>
     </div>
   );
+}
+
+function dashboardCopy(locale: "vi" | "en") {
+  if (locale === "vi") {
+    return {
+      kicker: "KHÔNG GIAN NGHỀ NGHIỆP",
+      title: "Bảng điều khiển",
+      subtitle:
+        "Thông tin quan trọng và bước tiếp theo của bạn, ở cùng một nơi.",
+      badge: "Hồ sơ ứng viên",
+      welcome: "CHÀO MỪNG TRỞ LẠI",
+      heroTitle: (name: string) =>
+        `${name}, hãy tiếp tục hoàn thiện hồ sơ của bạn.`,
+      heroCopy:
+        "SmartHire theo dõi tiến độ từ hồ sơ và cài đặt bảo mật hiện tại của bạn.",
+      completeProfile: "Hoàn thiện hồ sơ",
+      viewProfile: "Xem hồ sơ",
+      completion: "Mức độ hoàn thiện hồ sơ",
+      complete: "hoàn tất",
+      profileTitle: "Hồ sơ chuyên nghiệp",
+      profileCopy: "Quản lý phần giới thiệu, kinh nghiệm, học vấn và kỹ năng.",
+      skills: "kỹ năng",
+      experiences: "kinh nghiệm",
+      jobsTitle: "Cơ hội việc làm",
+      jobsCopy: "Tìm, lọc, lưu hoặc ứng tuyển vào các vị trí đang mở.",
+      browseJobs: "Tìm việc",
+      securityTitle: "Bảo mật tài khoản",
+      securityCopy:
+        "Quản lý mật khẩu, xác thực hai lớp và các phiên đăng nhập.",
+      protected: "Đã bật 2FA",
+      recommended: "Nên bật 2FA",
+      preferencesTitle: "Tùy chọn cá nhân",
+      preferencesCopy: "Xem lại múi giờ và tùy chọn thông báo bảo mật.",
+      configured: "Đã sẵn sàng",
+      nextKicker: "BƯỚC TIẾP THEO",
+      nextTitle: "Làm hồ sơ của bạn nổi bật hơn",
+      basics: "Thêm tiêu đề và phần giới thiệu",
+      avatar: "Thêm ảnh hồ sơ",
+      skillsStep: "Thêm những kỹ năng nổi bật",
+      experienceStep: "Thêm kinh nghiệm làm việc",
+      educationStep: "Thêm học vấn",
+      socialStep: "Thêm liên kết chuyên nghiệp",
+      done: "Hoàn tất",
+      pending: "Cần chú ý",
+      basicsPending: "Dùng tiêu đề từ 20 ký tự và phần giới thiệu từ 120 ký tự",
+      skillsPending: "Thêm ít nhất 3 kỹ năng nổi bật",
+      experiencePending: "Thêm ít nhất một kinh nghiệm",
+      educationPending: "Thêm ít nhất một mục học vấn",
+      avatarPending: "Tải lên ảnh hồ sơ rõ nét",
+      socialPending: "Thêm ít nhất một liên kết hồ sơ hoặc website",
+      remaining: (count: number) =>
+        count === 0 ? "Hồ sơ đã sẵn sàng" : `Còn ${count} bước`,
+      workspaceSections: "Khu vực quản lý việc làm, hồ sơ và tài khoản",
+    };
+  }
+  return {
+    kicker: "YOUR CAREER WORKSPACE",
+    title: "Dashboard",
+    subtitle: "Your important details and next steps, all in one place.",
+    badge: "Candidate profile",
+    welcome: "WELCOME BACK",
+    heroTitle: (name: string) =>
+      `${name}, keep building a profile that feels like you.`,
+    heroCopy:
+      "SmartHire tracks progress from your real profile and current security settings.",
+    completeProfile: "Complete profile",
+    viewProfile: "View profile",
+    completion: "Profile completion",
+    complete: "complete",
+    profileTitle: "Professional profile",
+    profileCopy: "Manage your introduction, experience, education, and skills.",
+    skills: "skills",
+    experiences: "experiences",
+    jobsTitle: "Job opportunities",
+    jobsCopy: "Search and filter active roles, then save or apply when ready.",
+    browseJobs: "Browse jobs",
+    securityTitle: "Account security",
+    securityCopy:
+      "Control your password, two-factor authentication, and sessions.",
+    protected: "2FA enabled",
+    recommended: "2FA recommended",
+    preferencesTitle: "Personal preferences",
+    preferencesCopy: "Review your timezone and security notification settings.",
+    configured: "Available",
+    nextKicker: "NEXT STEPS",
+    nextTitle: "Make your profile stronger",
+    basics: "Add a headline and summary",
+    avatar: "Add a profile photo",
+    skillsStep: "Add your strongest skills",
+    experienceStep: "Add work experience",
+    educationStep: "Add education",
+    socialStep: "Add a professional link",
+    done: "Complete",
+    pending: "Needs attention",
+    basicsPending: "Use a 20+ character headline and 120+ character summary",
+    skillsPending: "Add at least 3 strong skills",
+    experiencePending: "Add at least one experience",
+    educationPending: "Add at least one education entry",
+    avatarPending: "Upload a clear profile photo",
+    socialPending: "Add at least one profile or website",
+    remaining: (count: number) =>
+      count === 0 ? "Profile ready" : `${count} steps left`,
+    workspaceSections: "Job, profile, and account management areas",
+  };
 }
 
 function DashboardIcon({

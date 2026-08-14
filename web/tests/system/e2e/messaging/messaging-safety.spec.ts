@@ -2,7 +2,10 @@ import { expect, test, type Page } from "@playwright/test";
 import { Client } from "pg";
 import { messagingE2eUsers } from "../fixtures/messaging";
 
-test.skip(process.env.MESSAGING_E2E_READY !== "1", "Requires the documented two-user messaging fixture");
+test.skip(
+  process.env.MESSAGING_E2E_READY !== "1",
+  "Requires the documented two-user messaging fixture",
+);
 
 async function signIn(page: Page, email: string, password: string) {
   const response = await page.request.post("/api/identity/login", {
@@ -12,10 +15,14 @@ async function signIn(page: Page, email: string, password: string) {
     },
     data: { email, password, returnTo: "/dashboard" },
   });
-  expect(response.ok(), `Login failed with status ${response.status()}.`).toBe(true);
+  expect(response.ok(), `Login failed with status ${response.status()}.`).toBe(
+    true,
+  );
 }
 
-test("block and report remain safe across two browsers and multiple tabs", async ({ browser }) => {
+test("block and report remain safe across two browsers and multiple tabs", async ({
+  browser,
+}) => {
   test.setTimeout(120_000);
   const candidateContext = await browser.newContext();
   const recruiterContext = await browser.newContext();
@@ -24,54 +31,83 @@ test("block and report remain safe across two browsers and multiple tabs", async
     const candidateSecondTab = await candidateContext.newPage();
     const recruiter = await recruiterContext.newPage();
     await Promise.all([
-      signIn(candidate, messagingE2eUsers.candidate.email, messagingE2eUsers.candidate.password),
-      signIn(recruiter, messagingE2eUsers.recruiter.email, messagingE2eUsers.recruiter.password),
+      signIn(
+        candidate,
+        messagingE2eUsers.candidate.email,
+        messagingE2eUsers.candidate.password,
+      ),
+      signIn(
+        recruiter,
+        messagingE2eUsers.recruiter.email,
+        messagingE2eUsers.recruiter.password,
+      ),
     ]);
-    await Promise.all([candidate.goto("/messages"), candidateSecondTab.goto("/messages"), recruiter.goto("/messages")]);
-    await expect(candidate.getByRole("status").filter({ hasText: "connected" })).toBeVisible();
-    await candidate.getByRole("button", { name: /^Message / }).first().click();
-    await candidate.getByRole("button", { name: "Report" }).click();
-    await candidate.getByRole("button", { name: "Submit report" }).click();
+    await Promise.all([
+      candidate.goto("/messages"),
+      candidateSecondTab.goto("/messages"),
+      recruiter.goto("/messages"),
+    ]);
     await expect(
-      candidate.getByRole("status").filter({ hasText: "Report received." }),
+      candidate
+        .getByRole("status")
+        .filter({ hasText: "Đang kết nối trực tuyến" }),
     ).toBeVisible();
-    await candidate.getByRole("button", { name: "Close" }).click();
-    await candidate.getByRole("button", { name: /^Block / }).click();
-    await candidate.getByRole("button", { name: "Confirm block" }).click();
     await candidate
-      .getByRole("navigation", { name: "Conversations" })
+      .getByRole("button", { name: /^Nhắn tin cho / })
+      .first()
+      .click();
+    await candidate.getByRole("button", { name: "Báo cáo" }).click();
+    await candidate.getByRole("button", { name: "Gửi báo cáo" }).click();
+    await expect(
+      candidate.getByRole("status").filter({ hasText: "Đã nhận báo cáo" }),
+    ).toBeVisible();
+    await candidate.getByRole("button", { name: "Đóng" }).click();
+    await candidate.getByRole("button", { name: /^Chặn / }).click();
+    await candidate.getByRole("button", { name: "Xác nhận chặn" }).click();
+    await candidate
+      .getByRole("navigation", { name: "Cuộc trò chuyện" })
       .getByRole("button")
       .first()
       .click();
-    await expect(candidate.getByText(/Messaging is blocked/)).toBeVisible();
+    await expect(candidate.getByText(/Bạn đã chặn nhắn tin/)).toBeVisible();
     await candidateSecondTab.close();
-    await expect(candidate.getByLabel(/is (online|offline)/)).toBeVisible();
-    await candidate.getByRole("button", { name: /^Unblock / }).click();
-    await candidate.getByRole("button", { name: "Confirm unblock" }).click();
-    await expect(candidate.getByLabel("Message composer")).toBeEnabled();
+    await expect(
+      candidate.getByLabel(/đang (trực tuyến|ngoại tuyến)/),
+    ).toBeVisible();
+    await candidate.getByRole("button", { name: /^Bỏ chặn / }).click();
+    await candidate.getByRole("button", { name: "Xác nhận bỏ chặn" }).click();
+    await expect(candidate.getByLabel("Soạn tin nhắn")).toBeEnabled();
   } finally {
-    await Promise.all([
-      candidateContext.close(),
-      recruiterContext.close(),
-    ]);
+    await Promise.all([candidateContext.close(), recruiterContext.close()]);
   }
 });
 
-test("revoking one session disconnects only sockets owned by that session", async ({ browser }) => {
+test("revoking one session disconnects only sockets owned by that session", async ({
+  browser,
+}) => {
   test.setTimeout(120_000);
   const authorityContext = await browser.newContext();
   const revokedContext = await browser.newContext();
   try {
     const authority = await authorityContext.newPage();
     const revoked = await revokedContext.newPage();
-    await signIn(authority, messagingE2eUsers.candidate.email, messagingE2eUsers.candidate.password);
-    await signIn(revoked, messagingE2eUsers.candidate.email, messagingE2eUsers.candidate.password);
+    await signIn(
+      authority,
+      messagingE2eUsers.candidate.email,
+      messagingE2eUsers.candidate.password,
+    );
+    await signIn(
+      revoked,
+      messagingE2eUsers.candidate.email,
+      messagingE2eUsers.candidate.password,
+    );
     await Promise.all([authority.goto("/messages"), revoked.goto("/messages")]);
 
-    const [authoritySessionsResponse, revokedSessionsResponse] = await Promise.all([
-      authority.request.get("/api/identity/sessions"),
-      revoked.request.get("/api/identity/sessions"),
-    ]);
+    const [authoritySessionsResponse, revokedSessionsResponse] =
+      await Promise.all([
+        authority.request.get("/api/identity/sessions"),
+        revoked.request.get("/api/identity/sessions"),
+      ]);
     expect(authoritySessionsResponse.ok()).toBe(true);
     expect(revokedSessionsResponse.ok()).toBe(true);
     const authoritySessions = (await authoritySessionsResponse.json()) as {
@@ -94,28 +130,47 @@ test("revoking one session disconnects only sockets owned by that session", asyn
       },
     );
     expect(revoke.ok()).toBe(true);
-    await expect(revoked.getByRole("status").filter({ hasText: /reconnecting|offline/ })).toBeVisible({
+    await expect(
+      revoked
+        .getByRole("status")
+        .filter({ hasText: /Đang kết nối lại|Ngoại tuyến/ }),
+    ).toBeVisible({
       timeout: 10_000,
     });
-    await expect.poll(async () =>
-      (await revoked.request.get("/api/messaging/conversations")).status(),
-    ).toBe(401);
-    await expect(authority.getByRole("status").filter({ hasText: "connected" })).toBeVisible();
+    await expect
+      .poll(async () =>
+        (await revoked.request.get("/api/messaging/conversations")).status(),
+      )
+      .toBe(401);
+    await expect(
+      authority
+        .getByRole("status")
+        .filter({ hasText: "Đang kết nối trực tuyến" }),
+    ).toBeVisible();
   } finally {
     await Promise.all([authorityContext.close(), revokedContext.close()]);
   }
 });
 
-test("membership loss removes the recruiter from the affected conversation", async ({ browser }) => {
+test("membership loss removes the recruiter from the affected conversation", async ({
+  browser,
+}) => {
   const recruiterContext = await browser.newContext();
   let membershipId: string | null = null;
   const database = new Client({ connectionString: process.env.DATABASE_URL });
   try {
     await database.connect();
     const recruiter = await recruiterContext.newPage();
-    await signIn(recruiter, messagingE2eUsers.recruiter.email, messagingE2eUsers.recruiter.password);
+    await signIn(
+      recruiter,
+      messagingE2eUsers.recruiter.email,
+      messagingE2eUsers.recruiter.password,
+    );
     await recruiter.goto("/messages");
-    await recruiter.getByRole("button", { name: /^Message / }).first().click();
+    await recruiter
+      .getByRole("button", { name: /^Nhắn tin cho / })
+      .first()
+      .click();
     const membership = await database.query<{ id: string }>(
       `SELECT membership."id"
          FROM "CompanyMembership" membership
@@ -135,10 +190,14 @@ test("membership loss removes the recruiter from the affected conversation", asy
       [membershipId],
     );
     await recruiter.reload();
-    await expect(recruiter.getByText("Select a conversation to read messages.")).toBeVisible({
+    await expect(
+      recruiter.getByText(
+        "Tin nhắn xuất hiện khi bạn ứng tuyển vào một vị trí hoặc kết nối với nhà tuyển dụng.",
+      ),
+    ).toBeVisible({
       timeout: 10_000,
     });
-    await expect(recruiter.getByLabel("Message composer")).toHaveCount(0);
+    await expect(recruiter.getByLabel("Soạn tin nhắn")).toHaveCount(0);
   } finally {
     if (membershipId) {
       await database.query(

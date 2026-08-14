@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type { WorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import type { ConversationDetail } from "@/shared/contracts/messaging/conversations";
 import type { MessagingMessage } from "@/shared/contracts/messaging/messages";
+import { messagingCopy } from "../messaging-copy";
 import { getChatSocket } from "./chat-socket";
 
 export type MessageHistoryPage = {
@@ -15,7 +17,9 @@ export function useMessageHistory(
   conversationId: string | null,
   csrfProof: string,
   onReadCommitted?: (conversationId: string) => void,
+  locale: WorkspaceLocale = "en",
 ) {
+  const copy = messagingCopy(locale);
   const [page, setPage] = useState<MessageHistoryPage | null>(null);
   const [error, setError] = useState<string | null>(null);
   const markReadThrough = useCallback(
@@ -55,6 +59,7 @@ export function useMessageHistory(
     },
     [conversationId, csrfProof, onReadCommitted],
   );
+
   const refresh = useCallback(async () => {
     if (!conversationId) return;
     try {
@@ -79,9 +84,10 @@ export function useMessageHistory(
       }
       setError(null);
     } catch {
-      setError("Messages could not be loaded.");
+      setError(copy.messagesLoadError);
     }
-  }, [conversationId, markReadThrough]);
+  }, [conversationId, copy.messagesLoadError, markReadThrough]);
+
   useEffect(() => {
     let active = true;
     queueMicrotask(() => {
@@ -98,7 +104,10 @@ export function useMessageHistory(
       `/api/messaging/conversations/${encodeURIComponent(conversationId)}/messages?limit=20&cursor=${encodeURIComponent(page.nextCursor)}`,
       { credentials: "same-origin", cache: "no-store" },
     );
-    if (!response.ok) return setError("Older messages could not be loaded.");
+    if (!response.ok) {
+      setError(copy.olderMessagesError);
+      return;
+    }
     const older = (await response.json()) as MessageHistoryPage;
     setPage((current) =>
       current
@@ -108,7 +117,8 @@ export function useMessageHistory(
             items: [
               ...older.items,
               ...current.items.filter(
-                (message) => !older.items.some((candidate) => candidate.id === message.id),
+                (message) =>
+                  !older.items.some((candidate) => candidate.id === message.id),
               ),
             ],
             nextCursor: older.nextCursor,
@@ -120,22 +130,25 @@ export function useMessageHistory(
   const addMessage = useCallback((message: MessagingMessage) => {
     setPage((current) =>
       current && current.conversation.id === message.conversationId
-        ? current.items.some((item) => item.id === message.id || item.sequence === message.sequence)
+        ? current.items.some(
+            (item) =>
+              item.id === message.id || item.sequence === message.sequence,
+          )
           ? current
           : { ...current, items: [...current.items, message] }
         : current,
     );
   }, []);
-  const setPresence = useCallback((userId: string, presence: "ONLINE" | "OFFLINE") => {
-    setPage((current) =>
-      current?.conversation.otherParticipant.id === userId
-        ? {
-            ...current,
-            conversation: { ...current.conversation, presence },
-          }
-        : current,
-    );
-  }, []);
+  const setPresence = useCallback(
+    (userId: string, presence: "ONLINE" | "OFFLINE") => {
+      setPage((current) =>
+        current?.conversation.otherParticipant.id === userId
+          ? { ...current, conversation: { ...current.conversation, presence } }
+          : current,
+      );
+    },
+    [],
+  );
   const visiblePage = page?.conversation.id === conversationId ? page : null;
   return {
     page: visiblePage,
