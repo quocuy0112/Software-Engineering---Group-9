@@ -5474,9 +5474,11 @@
 }
 
 .home-job-spotlight .home-match-score-value {
+  align-self: center;
+  justify-self: center;
   z-index: 2;
   max-width: none;
-  margin: -6px 0 0;
+  margin: -8px 0 0;
   color: var(--home-ink);
   font-family: var(--sh-font-family-label);
   font-size: 32px;
@@ -5487,6 +5489,8 @@
 }
 
 .home-job-spotlight .home-match-score-label {
+  align-self: center;
+  justify-self: center;
   z-index: 2;
   max-width: none;
   margin: 0;
@@ -5780,6 +5784,22 @@
 
 .home-job-spotlight .home-match-ring::after {
   content: none;
+}
+
+/* Keep the score ring on the same vertical axis as its label and breakdown.
+   The shared Smart Match styles set `align-self: start` for larger layouts;
+   that rule must not leak into the compact spotlight column. */
+.home-job-spotlight .home-match-ring {
+  align-self: center;
+  justify-self: center;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.home-job-spotlight .home-match-breakdown-visual {
+  align-self: center;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .home-job-spotlight .home-match-ring--ghost {
@@ -6715,6 +6735,236 @@
 
 @media (prefers-reduced-motion: reduce) {
   .home-company-hiring-card {
+    transition: none;
+  }
+}
+
+/* Workspace-aligned job cards: the same quiet surface language used by
+   Support and Connections, while keeping Smart Match as the one focal point. */
+.home-job-card,
+.home-job-spotlight,
+.home-job-list {
+  border-color: var(--home-body-border);
+  box-shadow: 0 8px 24px rgb(15 23 42 / 4%);
+}
+
+.home-job-card {
+  border-radius: var(--sh-radius-md);
+  box-shadow: none;
+}
+
+.home-job-card:hover,
+.home-job-card:focus-within {
+  box-shadow: 0 12px 28px rgb(15 23 42 / 7%);
+}
+
+.home-job-spotlight {
+  margin-bottom: var(--sh-space-4);
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgb(15 23 42 / 4%);
+}
+
+.home-job-spotlight::before {
+  display: none;
+}
+
+.home-job-spotlight-tag {
+  top: 22px;
+  left: 24px;
+  min-height: 26px;
+  padding: 5px 10px;
+  border: 1px solid color-mix(in srgb, var(--home-primary) 18%, var(--home-border));
+  background: var(--home-soft);
+  color: var(--home-primary);
+  font-size: 10.5px;
+  letter-spacing: 0.025em;
+}
+
+.home-job-spotlight-tag > span {
+  color: var(--home-primary);
+}
+
+.home-job-spotlight-content {
+  grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.9fr);
+}
+
+.home-job-spotlight-main {
+  padding: 68px 32px 30px;
+}
+
+.home-job-company {
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.home-job-company-mark {
+  border: 1px solid rgb(255 255 255 / 38%);
+  box-shadow: 0 5px 12px rgb(15 23 42 / 8%);
+}
+
+.home-job-company p {
+  font-size: var(--sh-font-size-body-sm);
+}
+
+.home-job-spotlight-main > h3 a {
+  font-size: clamp(22px, 2.1vw, 27px);
+  letter-spacing: -0.025em;
+}
+
+.home-job-spotlight-meta {
+  margin: 9px 0 14px;
+  font-size: var(--sh-font-size-body-sm);
+  line-height: 1.55;
+}
+
+.home-job-spotlight-salary,
+.home-job-list-salary {
+  border: 1px solid transparent;
+}
+
+.home-job-spotlight-salary {
+  margin-bottom: 18px;
+  padding: 6px 10px;
+}
+
+.home-job-salary--configured {
+  border-color: color-mix(in srgb, var(--sh-color-success) 18%, transparent);
+}
+
+.home-job-salary--negotiable {
+  border-color: var(--home-body-border);
+}
+
+.home-job-spotlight-skills {
+  gap: 7px;
+  margin-bottom: 22px;
+}
+
+.home-job-spotlight-skills li {
+  min-height: 30px;
+  padding: 5px 10px;
+  border-color: var(--home-body-border);
+  background: var(--sh-color-surface-subtle);
+}
+
+.home-job-spotlight-actions {
+  gap: 10px;
+  padding-top: 18px;
+  border-top: 1px solid var(--home-body-border);
+}
+
+.home-job-spotlight-actions > a {
+  min-height: 44px;
+  padding-inline: 18px;
+  border-radius: 10px;
+}
+
+.home-job-spotlight-actions .home-save-button,
+.home-job-spotlight-actions .home-save-link {
+  width: 44px;
+  min-height: 44px;
+  height: 44px;
+}
+
+.home-job-spotlight-match {
+  min-height: 100%;
+  padding: 34px 32px;
+  border-left-color: var(--home-body-border);
+  background: var(--home-body-muted-surface);
+}
+
+.home-job-spotlight-match > p:first-child {
+  margin-bottom: 16px;
+  font-size: 11px;
+}
+
+.home-job-spotlight .home-match-breakdown-visual {
+  max-width: 240px;
+}
+
+.home-job-list {
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgb(15 23 42 / 4%);
+}
+
+.home-job-list-row {
+  min-height: 72px;
+  gap: 14px;
+  padding: 14px 20px;
+  transition:
+    background var(--home-motion-duration) var(--home-motion-ease),
+    box-shadow var(--home-motion-duration) var(--home-motion-ease);
+}
+
+.home-job-list-row:hover,
+.home-job-list-row:focus-within {
+  background: var(--home-body-muted-surface);
+  box-shadow: inset 3px 0 0 var(--home-primary);
+}
+
+.home-job-list-main h3 {
+  font-family: var(--sh-font-family);
+  font-size: 15px;
+  font-weight: var(--sh-font-weight-bold);
+}
+
+.home-job-list-main p {
+  font-size: 12px;
+}
+
+.home-job-list-salary {
+  min-height: 28px;
+  padding: 5px 9px;
+  border-radius: var(--sh-radius-full);
+}
+
+.home-job-list-match {
+  min-height: 28px;
+  border: 1px solid color-mix(in srgb, var(--home-primary) 14%, var(--home-border));
+  background: var(--home-soft);
+}
+
+.home-job-list-arrow {
+  width: 34px;
+  height: 34px;
+  flex-basis: 34px;
+  border-color: var(--home-body-border);
+}
+
+@media (max-width: 860px) {
+  .home-job-spotlight-content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .home-job-spotlight-match {
+    min-height: 0;
+    padding: 32px 28px 36px;
+    border-top: 1px solid var(--home-body-border);
+    border-left: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .home-job-spotlight-tag {
+    left: 20px;
+  }
+
+  .home-job-spotlight-main {
+    padding: 66px 20px 24px;
+  }
+
+  .home-job-spotlight-match {
+    padding: 28px 20px 32px;
+  }
+
+  .home-job-list-row {
+    min-height: 0;
+    padding: 14px var(--sh-space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-job-list-row {
     transition: none;
   }
 }

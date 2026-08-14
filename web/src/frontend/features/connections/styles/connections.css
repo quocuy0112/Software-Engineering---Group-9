@@ -104,6 +104,7 @@
 
 .connections-flow__step h2 {
   color: var(--sh-color-text-primary);
+  font-family: var(--sh-font-family);
   font-size: var(--sh-font-size-body);
   font-weight: var(--sh-font-weight-semibold);
   line-height: var(--sh-line-height-body);
@@ -170,6 +171,7 @@
 .connections-panel > header h2 {
   margin-top: var(--sh-space-2);
   color: var(--sh-color-text-primary);
+  font-family: var(--sh-font-family);
   font-size: var(--sh-font-size-h3);
   line-height: var(--sh-line-height-h3);
 }
@@ -212,6 +214,7 @@
 
 .connections-mini-empty p {
   margin: 0;
+  font-family: var(--sh-font-family);
   font-size: var(--sh-font-size-body-sm);
   line-height: var(--sh-line-height-body-sm);
 }

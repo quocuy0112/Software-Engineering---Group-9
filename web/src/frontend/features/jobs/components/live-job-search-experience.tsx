@@ -376,6 +376,7 @@ export function LiveJobSearchExperience({
                       type="button"
                       disabled={result.page === 1}
                       aria-label={copy.firstPage}
+                      title={copy.firstPage}
                       onClick={() => goToPage(1)}
                     >
                       <span aria-hidden="true">«</span>
@@ -388,6 +389,7 @@ export function LiveJobSearchExperience({
                       type="button"
                       disabled={result.page === 1}
                       aria-label={copy.previousPage}
+                      title={copy.previousPage}
                       onClick={() => goToPage(result.page - 1)}
                     >
                       <span aria-hidden="true">‹</span>
@@ -401,7 +403,9 @@ export function LiveJobSearchExperience({
                           (number) => (
                             <li key={number}>
                               <button
-                                className={`job-pagination-page${number === result.page ? "is-current" : ""}`}
+                                className={`job-pagination-page${
+                                  number === result.page ? " is-current" : ""
+                                }`}
                                 type="button"
                                 aria-current={
                                   number === result.page ? "page" : undefined
@@ -421,6 +425,7 @@ export function LiveJobSearchExperience({
                       type="button"
                       disabled={result.page === result.totalPages}
                       aria-label={copy.nextPage}
+                      title={copy.nextPage}
                       onClick={() => goToPage(result.page + 1)}
                     >
                       <span className="job-pagination-control-label">
@@ -433,6 +438,7 @@ export function LiveJobSearchExperience({
                       type="button"
                       disabled={result.page === result.totalPages}
                       aria-label={copy.lastPage}
+                      title={copy.lastPage}
                       onClick={() => goToPage(result.totalPages)}
                     >
                       <span className="job-pagination-control-label">

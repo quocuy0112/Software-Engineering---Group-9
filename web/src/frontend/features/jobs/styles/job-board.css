@@ -6857,6 +6857,7 @@
 .job-card-title {
   min-width: 0;
   margin: 0;
+  font-family: var(--sh-font-family);
   font-size: var(--sh-font-size-h3);
   line-height: 1.3;
 }
@@ -8234,5 +8235,852 @@
   .job-card-overflow > div {
     right: auto;
     left: 0;
+  }
+}
+
+/* Pagination aligned with the compact workspace controls used by Support and
+   Connections. The numeric state is intentionally the only filled control. */
+.job-pagination {
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 4px;
+  margin: var(--sh-space-6) auto 0;
+  padding: 6px;
+  overflow: hidden;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: 14px;
+  background: var(--sh-color-surface-card);
+  box-shadow: 0 8px 24px rgb(15 23 42 / 4%);
+}
+
+.job-pagination-control,
+.job-pagination-page {
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  color: var(--sh-color-text-secondary);
+  background: transparent;
+  box-shadow: none;
+  font-family: inherit;
+  font-size: var(--sh-font-size-body-sm);
+  font-weight: var(--sh-font-weight-semibold);
+  transition:
+    color var(--sh-motion-standard) ease,
+    background-color var(--sh-motion-standard) ease,
+    border-color var(--sh-motion-standard) ease,
+    transform var(--sh-motion-standard) ease;
+}
+
+.job-pagination-control:hover:not(:disabled),
+.job-pagination-control:focus-visible:not(:disabled),
+.job-pagination-page:hover,
+.job-pagination-page:focus-visible {
+  border-color: var(--sh-color-brand-primary);
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+  transform: translateY(-1px);
+}
+
+.job-pagination-control:disabled {
+  border-color: transparent;
+  color: var(--sh-color-text-muted);
+  background: var(--sh-color-surface-subtle);
+  cursor: not-allowed;
+}
+
+/* Keep the compact icon controls visually crisp even when legacy copy data
+   contains an encoded arrow. The hidden text remains available to assistive
+   technology through the button's aria-label. */
+.job-pagination-control > span[aria-hidden="true"] {
+  display: inline-grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  overflow: hidden;
+  font-size: 0;
+}
+
+.job-pagination-control > span[aria-hidden="true"]::before {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.job-pagination > button:nth-of-type(1) > span[aria-hidden="true"]::before {
+  content: "\00AB";
+}
+
+.job-pagination > button:nth-of-type(2) > span[aria-hidden="true"]::before {
+  content: "\2039";
+}
+
+.job-pagination > button:nth-of-type(3) > span[aria-hidden="true"]::before {
+  content: "\203A";
+}
+
+.job-pagination > button:nth-of-type(4) > span[aria-hidden="true"]::before {
+  content: "\00BB";
+}
+
+.job-pagination-pages {
+  max-width: min(100%, 32rem);
+  padding-inline: 2px;
+}
+
+.job-pagination-pages ol {
+  gap: 4px;
+}
+
+.job-pagination-page.is-current {
+  border-color: var(--sh-color-brand-primary);
+  color: var(--sh-color-text-inverse);
+  background: var(--sh-color-brand-primary);
+  box-shadow: 0 5px 12px rgb(37 99 235 / 18%);
+}
+
+.job-pagination-page.is-current:hover,
+.job-pagination-page.is-current:focus-visible {
+  border-color: var(--sh-color-brand-primary-hover);
+  color: var(--sh-color-text-inverse);
+  background: var(--sh-color-brand-primary-hover);
+}
+
+.job-pagination-progress {
+  margin-left: 8px;
+  padding-left: 12px;
+  border-left: 1px solid var(--sh-color-border-subtle);
+  color: var(--sh-color-text-secondary);
+  font-size: var(--sh-font-size-body-sm);
+  font-weight: var(--sh-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 720px) {
+  .job-pagination {
+    width: 100%;
+    justify-content: flex-start;
+    margin-top: var(--sh-space-5);
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .job-pagination-pages {
+    flex: 0 0 auto;
+  }
+
+  .job-pagination-progress {
+    margin-left: auto;
+    white-space: nowrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .job-pagination-control,
+  .job-pagination-page {
+    transition: none;
+  }
+}
+
+/* Modern clean job cards: the same calm, workspace-first language used by
+   Support and Connections, with a stronger hierarchy for salary and actions. */
+.job-redesign-card {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--sh-space-5);
+  min-width: 0;
+  padding: 28px;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-lg);
+  background: var(--sh-color-surface-card);
+  box-shadow:
+    0 4px 20px -2px rgb(15 23 42 / 5%),
+    0 2px 6px -1px rgb(15 23 42 / 3%);
+  transition:
+    border-color var(--sh-motion-deliberate) ease,
+    box-shadow var(--sh-motion-deliberate) ease,
+    transform var(--sh-motion-deliberate) ease;
+}
+
+.job-redesign-card:hover {
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-brand-accent) 34%,
+    var(--sh-color-border-subtle)
+  );
+  box-shadow:
+    0 16px 32px -4px rgb(29 78 216 / 8%),
+    0 4px 12px -2px rgb(15 23 42 / 4%);
+  transform: translateY(-4px);
+}
+
+.job-redesign-card-header {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 14px;
+  margin: 0;
+}
+
+.job-redesign-card .job-card-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  border-color: var(--sh-color-focus-ring-bg);
+  box-shadow: 0 2px 4px rgb(29 78 216 / 6%);
+  font-size: var(--sh-font-size-body-sm);
+}
+
+.job-redesign-card .job-card-company-block {
+  min-width: 0;
+  padding-top: 3px;
+}
+
+.job-redesign-card .job-card-company-name {
+  margin: 0;
+  overflow: hidden;
+  color: var(--sh-color-text-primary);
+  font-size: var(--sh-font-size-body-sm);
+  font-weight: var(--sh-font-weight-bold);
+  line-height: var(--sh-line-height-body-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.job-redesign-card .job-card-header-meta {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  width: max-content;
+  max-width: min(100%, 18rem);
+  padding: 8px 14px;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-md);
+  background: var(--sh-color-surface-subtle);
+  text-align: right;
+  transition:
+    border-color var(--sh-motion-standard) ease,
+    background-color var(--sh-motion-standard) ease;
+}
+
+.job-redesign-card:hover .job-card-header-meta {
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-brand-accent) 30%,
+    var(--sh-color-border-subtle)
+  );
+  background: var(--sh-color-brand-soft);
+}
+
+.job-redesign-card .job-card-header-meta .job-salary {
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  color: var(--sh-color-brand-primary);
+  font-size: 15px;
+  font-weight: var(--sh-font-weight-bold);
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.job-redesign-card .job-card-header-meta .job-salary--negotiable {
+  color: var(--sh-color-text-secondary);
+}
+
+.job-redesign-card .job-card-timing {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin: 0;
+  color: var(--sh-color-text-muted);
+  font-size: var(--sh-font-size-caption);
+  font-weight: var(--sh-font-weight-medium);
+  line-height: var(--sh-line-height-caption);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.job-card-timing-icon {
+  display: inline-grid;
+  width: 14px;
+  height: 14px;
+  place-items: center;
+  color: var(--sh-color-text-muted);
+}
+
+.job-card-timing-icon svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.job-redesign-card .job-card-body {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+  padding: 0;
+}
+
+.job-redesign-card .job-card-title {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: var(--sh-color-text-primary);
+  font-size: 1.35rem;
+  font-weight: var(--sh-font-weight-bold);
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.job-redesign-card .job-card-title a {
+  color: inherit;
+}
+
+.job-redesign-card .job-card-title a:hover {
+  color: var(--sh-color-brand-primary);
+}
+
+.job-redesign-card .job-card-location {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  overflow: hidden;
+  color: var(--sh-color-text-secondary);
+  font-size: var(--sh-font-size-body-sm);
+  font-weight: var(--sh-font-weight-medium);
+  line-height: var(--sh-line-height-body-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.job-redesign-card .job-card-location .job-meta-svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  color: var(--sh-color-brand-primary);
+}
+
+.job-redesign-card .job-card-tags {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.job-redesign-card .job-card-tag {
+  display: inline-flex;
+  max-width: 100%;
+  min-height: 32px;
+  align-items: center;
+  padding: 0 12px;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-text-secondary);
+  background: var(--sh-color-surface-subtle);
+  font-size: var(--sh-font-size-caption);
+  font-weight: var(--sh-font-weight-medium);
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition:
+    border-color var(--sh-motion-standard) ease,
+    color var(--sh-motion-standard) ease,
+    background-color var(--sh-motion-standard) ease;
+}
+
+.job-redesign-card .job-card-tag--neutral {
+  color: var(--sh-color-text-secondary);
+  background: var(--sh-color-surface-subtle);
+}
+
+.job-redesign-card .job-card-tag--skill {
+  border-color: transparent;
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+  font-weight: var(--sh-font-weight-semibold);
+}
+
+.job-redesign-card .job-card-tag:hover,
+.job-redesign-card .job-card-tag:focus-visible {
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-brand-accent) 38%,
+    transparent
+  );
+  color: var(--sh-color-brand-primary-hover);
+  background: var(--sh-color-brand-soft);
+}
+
+.job-redesign-card .job-card-overflow summary {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: var(--sh-radius-sm);
+  font-size: var(--sh-font-size-caption);
+}
+
+.job-redesign-card .job-redesign-card-footer {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  margin-top: 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--sh-color-border-subtle);
+}
+
+.job-redesign-card .job-card-row-actions,
+.job-redesign-card .job-card-grid-actions {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.job-redesign-card .job-card-hover-action,
+.job-redesign-card .job-heart-button {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--sh-color-border-subtle);
+  border-radius: 10px;
+  color: var(--sh-color-text-muted);
+  background: var(--sh-color-surface-card);
+  box-shadow: none;
+  transition:
+    border-color var(--sh-motion-standard) ease,
+    color var(--sh-motion-standard) ease,
+    background-color var(--sh-motion-standard) ease,
+    transform var(--sh-motion-standard) ease;
+}
+
+.job-redesign-card .job-card-hover-action:hover,
+.job-redesign-card .job-card-hover-action:focus-visible,
+.job-redesign-card .job-heart-button:hover,
+.job-redesign-card .job-heart-button:focus-visible {
+  border-color: var(--sh-color-brand-accent);
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+  transform: scale(1.05);
+}
+
+.job-redesign-card .job-heart-button[aria-pressed="true"] {
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-error) 34%,
+    var(--sh-color-border-subtle)
+  );
+  color: var(--sh-color-error);
+  background: var(--sh-color-error-bg);
+}
+
+.job-redesign-card .job-card-hover-action svg,
+.job-redesign-card .job-heart-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.job-redesign-card .job-save-control {
+  display: inline-flex;
+  min-width: 40px;
+  align-items: center;
+}
+
+.job-redesign-card .job-card-apply-button,
+.job-redesign-card .job-applied-state,
+.job-redesign-card .job-closed-state {
+  min-height: 40px;
+  margin-left: auto;
+  border-radius: 10px;
+  font-size: var(--sh-font-size-label);
+  font-weight: var(--sh-font-weight-bold);
+}
+
+.job-redesign-card .job-card-apply-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 26px;
+  border: 0;
+  color: var(--sh-color-text-inverse);
+  background: var(--sh-color-brand-primary);
+  box-shadow: 0 4px 12px rgb(29 78 216 / 20%);
+  text-decoration: none;
+  transition:
+    background-color var(--sh-motion-standard) ease,
+    box-shadow var(--sh-motion-standard) ease,
+    transform var(--sh-motion-standard) ease;
+}
+
+.job-redesign-card .job-card-apply-button::after {
+  content: "→";
+  font-size: 14px;
+  transition: transform var(--sh-motion-standard) ease;
+}
+
+.job-redesign-card .job-card-apply-button:hover {
+  color: var(--sh-color-text-inverse);
+  background: var(--sh-color-brand-primary-hover);
+  box-shadow: 0 6px 16px rgb(29 78 216 / 30%);
+  transform: translateY(-1px);
+}
+
+.job-redesign-card .job-card-apply-button:hover::after {
+  transform: translateX(3px);
+}
+
+.job-redesign-card .job-applied-state,
+.job-redesign-card .job-closed-state {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.job-redesign-card .job-applied-state {
+  color: var(--sh-color-success);
+  background: var(--sh-color-success-bg);
+}
+
+.job-redesign-card .job-closed-state {
+  color: var(--sh-color-text-muted);
+  background: var(--sh-color-surface-subtle);
+}
+
+/* Secondary actions stay discoverable without requiring a hover first. */
+.job-redesign-card.group .job-card-hover-action {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+
+/* Quick view: calm blue information action. */
+.job-redesign-card .job-card-row-actions > .job-card-hover-action:first-child,
+.job-redesign-card .job-card-grid-actions > .job-card-hover-action:first-child {
+  color: var(--sh-color-brand-primary);
+}
+
+.job-redesign-card
+  .job-card-row-actions
+  > .job-card-hover-action:first-child:hover,
+.job-redesign-card
+  .job-card-row-actions
+  > .job-card-hover-action:first-child:focus-visible,
+.job-redesign-card
+  .job-card-grid-actions
+  > .job-card-hover-action:first-child:hover,
+.job-redesign-card
+  .job-card-grid-actions
+  > .job-card-hover-action:first-child:focus-visible {
+  border-color: var(--sh-color-brand-accent);
+  color: var(--sh-color-brand-primary);
+  background: var(--sh-color-brand-soft);
+}
+
+/* Hide: amber communicates a reversible, non-destructive secondary action. */
+.job-redesign-card .job-card-row-actions > .job-card-hover-action:nth-child(2),
+.job-redesign-card .job-card-grid-actions > .job-card-hover-action:nth-child(2) {
+  color: var(--sh-color-warning);
+}
+
+.job-redesign-card
+  .job-card-row-actions
+  > .job-card-hover-action:nth-child(2):hover,
+.job-redesign-card
+  .job-card-row-actions
+  > .job-card-hover-action:nth-child(2):focus-visible,
+.job-redesign-card
+  .job-card-grid-actions
+  > .job-card-hover-action:nth-child(2):hover,
+.job-redesign-card
+  .job-card-grid-actions
+  > .job-card-hover-action:nth-child(2):focus-visible {
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-warning) 42%,
+    var(--sh-color-border-subtle)
+  );
+  color: var(--sh-color-warning);
+  background: var(--sh-color-warning-bg);
+}
+
+/* Save: the heart is outlined in red on hover, matching the action's intent. */
+.job-redesign-card .job-card-row-actions > .job-heart-button,
+.job-redesign-card .job-card-row-actions > .job-save-control .job-heart-button,
+.job-redesign-card .job-card-grid-actions > .job-heart-button,
+.job-redesign-card .job-card-grid-actions > .job-save-control .job-heart-button {
+  color: var(--sh-color-text-muted);
+}
+
+.job-redesign-card .job-card-row-actions > .job-heart-button:hover,
+.job-redesign-card
+  .job-card-row-actions
+  > .job-save-control
+  .job-heart-button:hover,
+.job-redesign-card .job-card-grid-actions > .job-heart-button:hover,
+.job-redesign-card
+  .job-card-grid-actions
+  > .job-save-control
+  .job-heart-button:hover,
+.job-redesign-card .job-card-row-actions > .job-heart-button:focus-visible,
+.job-redesign-card
+  .job-card-row-actions
+  > .job-save-control
+  .job-heart-button:focus-visible,
+.job-redesign-card .job-card-grid-actions > .job-heart-button:focus-visible,
+.job-redesign-card
+  .job-card-grid-actions
+  > .job-save-control
+  .job-heart-button:focus-visible {
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-error) 48%,
+    var(--sh-color-border-subtle)
+  );
+  color: var(--sh-color-error);
+  background: var(--sh-color-error-bg);
+}
+
+@media (max-width: 600px) {
+  .job-redesign-card {
+    gap: var(--sh-space-4);
+    padding: var(--sh-space-5);
+    border-radius: var(--sh-radius-md);
+  }
+
+  .job-redesign-card-header {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  .job-redesign-card .job-card-header-meta {
+    grid-column: 1 / -1;
+    justify-self: start;
+    justify-items: start;
+    width: max-content;
+    max-width: 100%;
+    text-align: left;
+  }
+
+  .job-redesign-card .job-card-timing {
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+
+@media (max-width: 520px) {
+  .job-redesign-card .job-card-row-actions,
+  .job-redesign-card .job-card-grid-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 40px) minmax(0, 1fr);
+  }
+
+  .job-redesign-card .job-card-apply-button,
+  .job-redesign-card .job-applied-state,
+  .job-redesign-card .job-closed-state {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-content: center;
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .job-redesign-card,
+  .job-redesign-card .job-card-header-meta,
+  .job-redesign-card .job-card-tag,
+  .job-redesign-card .job-card-hover-action,
+  .job-redesign-card .job-heart-button,
+  .job-redesign-card .job-card-apply-button,
+  .job-redesign-card .job-card-apply-button::after {
+    transition: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * Filter panel polish
+ * Keep the live result summary in the results column; the sidebar stays
+ * focused on making a filter choice and no longer repeats the job count.
+ * -------------------------------------------------------------------------- */
+.job-filter-form {
+  padding: var(--sh-space-5);
+  border-radius: var(--sh-radius-lg);
+}
+
+.job-filter-form .job-filter-result-count {
+  display: none;
+}
+
+.job-filter-heading {
+  gap: var(--sh-space-3);
+  padding-bottom: var(--sh-space-4);
+  border-bottom: 1px solid var(--sh-color-border-subtle);
+}
+
+.job-filter-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-brand-primary) 18%,
+    var(--sh-color-border-subtle)
+  );
+  background: color-mix(
+    in srgb,
+    var(--sh-color-brand-soft) 72%,
+    var(--sh-color-surface-card)
+  );
+  box-shadow: inset 0 0 0 4px
+    color-mix(in srgb, var(--sh-color-brand-soft) 45%, transparent);
+}
+
+.job-filter-icon svg {
+  width: 21px;
+  height: 21px;
+  stroke-width: 1.9;
+}
+
+.job-filter-heading .panel-kicker {
+  margin: 0 0 2px;
+  color: var(--sh-color-brand-primary);
+  font-family: var(--sh-font-family-label);
+  font-size: var(--sh-font-size-caption);
+  font-weight: var(--sh-font-weight-bold);
+  letter-spacing: 0.02em;
+}
+
+.job-filter-heading h2 {
+  margin: 0;
+  color: var(--sh-color-text-primary);
+  font-family: var(--sh-font-family);
+  font-size: var(--sh-font-size-h2);
+  font-weight: var(--sh-font-weight-medium);
+  letter-spacing: -0.02em;
+  line-height: var(--sh-line-height-h2);
+}
+
+.job-filter-title-row {
+  display: block;
+}
+
+.job-filter-copy {
+  margin: var(--sh-space-4) 0 var(--sh-space-5);
+  padding: 0 0 var(--sh-space-4);
+  color: var(--sh-color-text-secondary);
+  font-family: var(--sh-font-family);
+  font-size: var(--sh-font-size-body-sm);
+  line-height: var(--sh-line-height-body-sm);
+}
+
+.job-filter-fields {
+  gap: var(--sh-space-3);
+}
+
+.job-filter-fields label {
+  gap: 6px;
+  color: var(--sh-color-text-secondary);
+  font-family: var(--sh-font-family-label);
+  font-size: var(--sh-font-size-caption);
+  font-weight: var(--sh-font-weight-semibold);
+}
+
+.job-filter-fields input,
+.job-filter-fields select {
+  min-height: 44px;
+  padding: 9px var(--sh-space-3);
+  border-color: var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-sm);
+  background: var(--sh-color-surface-card);
+  box-shadow: none;
+  font-family: var(--sh-font-family);
+  font-size: var(--sh-font-size-body-sm);
+}
+
+.job-filter-fields input::placeholder {
+  color: var(--sh-color-text-muted);
+  opacity: 0.82;
+}
+
+.job-filter-fields input:hover,
+.job-filter-fields select:hover {
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-brand-primary) 28%,
+    var(--sh-color-border-subtle)
+  );
+}
+
+.job-filter-fields input:focus,
+.job-filter-fields select:focus {
+  border-color: var(--sh-color-border-focus);
+  outline: 3px solid var(--sh-color-focus-ring-bg);
+  outline-offset: 0;
+}
+
+.job-filter-actions {
+  margin-top: var(--sh-space-5);
+  padding: var(--sh-space-2);
+  border-color: var(--sh-color-border-subtle);
+  border-radius: var(--sh-radius-md);
+  background: color-mix(
+    in srgb,
+    var(--sh-color-surface-subtle) 78%,
+    var(--sh-color-surface-card)
+  );
+  box-shadow: none;
+}
+
+.job-filter-actions .job-filter-clear {
+  min-height: 40px;
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-color-brand-primary);
+  font-family: var(--sh-font-family-label);
+  font-size: var(--sh-font-size-label);
+  font-weight: var(--sh-font-weight-semibold);
+  transition: background var(--sh-motion-fast) ease, color var(--sh-motion-fast) ease;
+}
+
+.job-filter-actions .job-filter-clear:hover,
+.job-filter-actions .job-filter-clear:focus-visible {
+  color: var(--sh-color-brand-primary-hover);
+  background: var(--sh-color-brand-soft);
+}
+
+@media (max-width: 600px) {
+  .job-filter-form {
+    padding: var(--sh-space-4);
+  }
+
+  .job-filter-heading h2 {
+    font-size: var(--sh-font-size-h3);
+    line-height: var(--sh-line-height-h3);
   }
 }
