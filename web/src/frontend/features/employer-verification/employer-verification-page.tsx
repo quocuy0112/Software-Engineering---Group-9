@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
+import { preparationPatchSchema } from "@/shared/contracts/employer-verification/business-verification";
 import type { EmployerVerificationPreparationResponse } from "@/shared/contracts/employer-verification/business-verification-responses";
 import styles from "./employer-verification-page.module.css";
 
@@ -43,8 +44,28 @@ async function requestJson(url: string, init?: RequestInit) {
       : { "Content-Type": "application/json", ...init?.headers },
   });
   const body = await response.json().catch(() => ({ code: "REQUEST_FAILED" }));
-  if (!response.ok) throw Object.assign(new Error(body.code ?? "REQUEST_FAILED"), { body });
+  if (!response.ok) {
+    throw Object.assign(new Error(body.code ?? "REQUEST_FAILED"), {
+      body,
+      status: response.status,
+    });
+  }
   return body;
+}
+
+function draftFieldError(name: string) {
+  const messages: Record<string, string> = {
+    applicantLegalName: "Legal company name is required and must be at most 240 characters.",
+    applicantRegisteredAddress: "Registered address must contain 5–500 characters.",
+    operatingAddress: "Operating address must contain 5–500 characters.",
+    companyPhone: "Enter a valid Vietnamese phone number such as 0901 234 567.",
+    website: "Enter a public company domain using HTTPS, without a path, query, or fragment.",
+    relationship: "Select a valid relationship to the company.",
+    currentJobTitle: "Current job title must contain 2–120 characters.",
+    authorityExplanation: "Authority explanation must contain 20–500 characters.",
+    mismatchExplanation: "Difference explanation must contain 20–500 characters when provided.",
+  };
+  return messages[name] ?? "This field is invalid. Review it and try again.";
 }
 
 export function EmployerVerificationPage() {
@@ -53,6 +74,8 @@ export function EmployerVerificationPage() {
   const [draft, setDraft] = useState<Record<string, string | boolean | null>>({});
   const [companyEmail, setCompanyEmail] = useState("");
   const [busy, setBusy] = useState<string>();
+  const preparationRef = useRef<Preparation | null>(null);
+  const draftSaveQueueRef = useRef<Promise<void>>(Promise.resolve());
 
   async function loadRequests() {
     const body = await requestJson("/api/employer-verifications");
@@ -63,6 +86,7 @@ export function EmployerVerificationPage() {
     const body = (await requestJson(
       "/api/employer-verifications/preparation",
     )) as EmployerVerificationPreparationResponse;
+    preparationRef.current = body.data;
     setPreparation(body.data);
     setDraft(body.data.draft);
   }
@@ -75,6 +99,7 @@ export function EmployerVerificationPage() {
     ])
       .then(([requests, current]) => {
         if (!active) return;
+        preparationRef.current = current.data;
         setItems(requests.data);
         setPreparation(current.data);
         setDraft(current.data.draft);
@@ -116,6 +141,7 @@ export function EmployerVerificationPage() {
         "/api/employer-verifications/registry-lookups",
         { method: "POST", body: JSON.stringify({ taxIdentifier: value }) },
       )) as EmployerVerificationPreparationResponse;
+      preparationRef.current = body.data;
       setPreparation(body.data);
       setDraft(body.data.draft);
       toast.success(
@@ -133,29 +159,45 @@ export function EmployerVerificationPage() {
     }
   }
 
-  async function saveDraft(name: string, value: string | boolean | null) {
-    if (!preparation?.preparationId) return;
-    const next = { ...draft, [name]: value };
-    setDraft(next);
-    try {
-      const body = (await requestJson(
-        "/api/employer-verifications/preparation",
-        {
-          method: "PATCH",
-          body: JSON.stringify({
-            preparationId: preparation.preparationId,
-            version: preparation.version,
-            changes: { [name]: value },
-          }),
-        },
-      )) as EmployerVerificationPreparationResponse;
-      setPreparation(body.data);
-      setDraft(body.data.draft);
-    } catch {
-      toast.error("This field could not be saved. Refresh and try again.", {
-        id: "verification-draft",
+  function saveDraft(name: string, value: string | boolean | null) {
+    setDraft((current) => ({ ...current, [name]: value }));
+    const run = async () => {
+      const current = preparationRef.current;
+      if (!current?.preparationId) return;
+      const payload = preparationPatchSchema.safeParse({
+        preparationId: current.preparationId,
+        version: current.version,
+        changes: { [name]: value },
       });
-    }
+      if (!payload.success) {
+        toast.error(draftFieldError(name), { id: `verification-draft-${name}` });
+        return;
+      }
+      try {
+        const body = (await requestJson(
+          "/api/employer-verifications/preparation",
+          {
+            method: "PATCH",
+            body: JSON.stringify(payload.data),
+          },
+        )) as EmployerVerificationPreparationResponse;
+        preparationRef.current = body.data;
+        setPreparation(body.data);
+        setDraft(body.data.draft);
+      } catch (error) {
+        const failure = error as Error & { status?: number };
+        if (failure.status === 409) {
+          await loadPreparation();
+          toast.error("The draft changed in another request. Latest values were restored.", {
+            id: "verification-draft-conflict",
+          });
+          return;
+        }
+        toast.error(draftFieldError(name), { id: `verification-draft-${name}` });
+      }
+    };
+    draftSaveQueueRef.current = draftSaveQueueRef.current.then(run, run);
+    return draftSaveQueueRef.current;
   }
 
   async function issueEmail() {
@@ -202,6 +244,7 @@ export function EmployerVerificationPage() {
       });
       toast.success("Verification request received.");
       form.reset();
+      preparationRef.current = null;
       setPreparation(null);
       setDraft({});
       await Promise.all([loadRequests(), loadPreparation()]);
@@ -297,7 +340,7 @@ export function EmployerVerificationPage() {
                 <label className={styles.field}><span>Registered address</span><textarea name="applicantRegisteredAddress" required minLength={5} maxLength={500} value={String(draft.applicantRegisteredAddress ?? "")} onChange={(e) => setDraft({ ...draft, applicantRegisteredAddress: e.target.value })} onBlur={(e) => void saveDraft("applicantRegisteredAddress", e.target.value)} /></label>
                 <label className={styles.checkboxField}><input name="operatingAddressDiffers" type="checkbox" value="true" checked={Boolean(draft.operatingAddressDiffers)} onChange={(e) => void saveDraft("operatingAddressDiffers", e.target.checked)} /><span>Operating location differs from registered address</span></label>
                 {Boolean(draft.operatingAddressDiffers) && <label className={styles.field}><span>Operating address</span><textarea name="operatingAddress" required minLength={5} maxLength={500} value={String(draft.operatingAddress ?? "")} onChange={(e) => setDraft({ ...draft, operatingAddress: e.target.value })} onBlur={(e) => void saveDraft("operatingAddress", e.target.value)} /></label>}
-                <label className={styles.field}><span>Explain differences from registry (if any)</span><textarea name="mismatchExplanation" minLength={20} maxLength={500} value={String(draft.mismatchExplanation ?? "")} onChange={(e) => setDraft({ ...draft, mismatchExplanation: e.target.value })} onBlur={(e) => void saveDraft("mismatchExplanation", e.target.value || null)} /><small>Required when legal name or registered address differs from source facts.</small></label>
+                <label className={styles.field}><span>Explain differences from registry (if any)</span><textarea name="mismatchExplanation" minLength={20} maxLength={500} value={String(draft.mismatchExplanation ?? "")} onChange={(e) => setDraft({ ...draft, mismatchExplanation: e.target.value })} onBlur={(e) => void saveDraft("mismatchExplanation", e.target.value || null)} /><small>Required when legal name or registered address differs from source facts. Use 20–500 characters when provided.</small></label>
               </div>
             </section>
 
@@ -307,7 +350,7 @@ export function EmployerVerificationPage() {
                 <div className={styles.verifiedRow}><span>Email status</span><strong data-verified={emailVerified}>{emailVerified ? `Verified: ${preparation.email.maskedEmail}` : preparation.email.status === "PENDING" ? `Pending: ${preparation.email.maskedEmail}` : "Not verified"}</strong></div>
                 {!emailVerified && <div className={styles.emailForm} role="group" aria-label="Verify company email"><label className={styles.field}><span>Company email</span><input type="email" maxLength={254} required value={companyEmail} onChange={(e) => setCompanyEmail(e.target.value)} /></label><button className={styles.secondaryButton} disabled={busy === "email"} type="button" onClick={() => void issueEmail()}>{busy === "email" ? "Queuing…" : "Send verification link"}</button></div>}
                 <label className={styles.field}><span>Company phone</span><input name="companyPhone" required maxLength={32} placeholder="0901 234 567" value={String(draft.companyPhone ?? "")} onChange={(e) => setDraft({ ...draft, companyPhone: e.target.value })} onBlur={(e) => void saveDraft("companyPhone", e.target.value)} /><small>Stored in +84 format. No OTP is performed; this phone is unverified.</small></label>
-                <label className={styles.field}><span>Company website (optional)</span><input name="website" type="text" maxLength={2048} placeholder="company.vn" value={String(draft.website ?? "")} onChange={(e) => setDraft({ ...draft, website: e.target.value })} onBlur={(e) => void saveDraft("website", e.target.value || null)} /></label>
+                <label className={styles.field}><span>Company website (optional)</span><input name="website" type="text" maxLength={2048} placeholder="company.vn" value={String(draft.website ?? "")} onChange={(e) => setDraft({ ...draft, website: e.target.value })} onBlur={(e) => void saveDraft("website", e.target.value || null)} /><small>Public HTTPS origin only; paths, queries, fragments, localhost, and IP addresses are rejected.</small></label>
               </div>
             </section>
 
@@ -316,7 +359,7 @@ export function EmployerVerificationPage() {
               <div className={styles.form}>
                 <label className={styles.field}><span>Relationship to company</span><select name="relationship" required value={relationship} onChange={(e) => { setDraft({ ...draft, relationship: e.target.value }); void saveDraft("relationship", e.target.value); }}><option value="">Select relationship</option><option value="LEGAL_OWNER">Legal owner</option><option value="AUTHORIZED_EMPLOYEE">Authorized employee</option><option value="INVITED_MEMBER">Invited member</option><option value="EXISTING_OWNER_APPROVAL">Existing owner approval</option><option value="OTHER">Other</option></select></label>
                 <label className={styles.field}><span>Current job title</span><input name="currentJobTitle" required minLength={2} maxLength={120} value={String(draft.currentJobTitle ?? "")} onChange={(e) => setDraft({ ...draft, currentJobTitle: e.target.value })} onBlur={(e) => void saveDraft("currentJobTitle", e.target.value)} /></label>
-                {authorityExplanationRequired && <label className={styles.field}><span>Authority explanation</span><textarea name="authorityExplanation" required minLength={20} maxLength={500} value={String(draft.authorityExplanation ?? "")} onChange={(e) => setDraft({ ...draft, authorityExplanation: e.target.value })} onBlur={(e) => void saveDraft("authorityExplanation", e.target.value)} /></label>}
+                {authorityExplanationRequired && <label className={styles.field}><span>Authority explanation</span><textarea name="authorityExplanation" required minLength={20} maxLength={500} value={String(draft.authorityExplanation ?? "")} onChange={(e) => setDraft({ ...draft, authorityExplanation: e.target.value })} onBlur={(e) => void saveDraft("authorityExplanation", e.target.value)} /><small>Required for authorized employees and Other; use 20–500 characters.</small></label>}
                 <label className={`${styles.field} ${styles.fileField}`}><span>Business license</span><input name="document" type="file" accept="application/pdf,image/png,image/jpeg" required /><small>PDF, PNG, or JPEG · 1 byte to 5,000,000 bytes.</small></label>
                 <label className={styles.checkboxField}><input name="accuracyDeclaration" type="checkbox" value="true" required /><span>I declare that these business and authority details are accurate.</span></label>
                 <label className={styles.checkboxField}><input name="documentProcessingConsent" type="checkbox" value="true" required /><span>I consent to safety checking and human review of this business document.</span></label>
