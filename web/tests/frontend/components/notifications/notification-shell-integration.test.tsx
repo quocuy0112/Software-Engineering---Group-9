@@ -15,8 +15,14 @@ describe("notification shell integration", () => {
       "src/frontend/features/admin/layout/admin-layout.tsx",
       "utf8",
     );
+    const adminApp = readFileSync(
+      "src/frontend/features/admin/app/admin-app.tsx",
+      "utf8",
+    );
     expect(workspace).toContain("<NotificationCenter");
-    expect(adminBar).toContain("<NotificationCenter");
+    expect(adminBar).toContain("<AdminNotificationButton");
     expect(adminLayout).toContain("appBar={AdminAppBar}");
+    expect(adminApp).toContain('name="notifications"');
+    expect(adminApp).toContain("list={AdminNotificationList}");
   });
 });

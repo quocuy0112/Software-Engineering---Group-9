@@ -6,10 +6,9 @@ import {
   TextField,
   Resource,
   memoryStore,
-  CustomRoutes,
 } from "react-admin";
-import { Route } from "react-router-dom";
 import { createTheme, ScopedCssBaseline } from "@mui/material";
+import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import { adminAuthProvider } from "./auth-provider";
 import { adminDataProvider } from "./data-provider";
 import { createAdminQueryClient } from "./query-client";
@@ -30,8 +29,7 @@ import { SupportCaseList } from "../support/support-case-list";
 import { SupportCaseShow } from "../support/support-case-show";
 import { ProfessionalConnectionProposalList } from "../professional-connections/professional-connection-proposal-list";
 import { ProfessionalConnectionProposalShow } from "../professional-connections/professional-connection-proposal-show";
-import { AdminNotificationInbox } from "@/frontend/features/notifications/components/notification-inbox";
-import { currentAdminCsrfToken } from "./auth-provider";
+import { AdminNotificationList } from "../notifications/admin-notification-list";
 
 const theme = createTheme({
   palette: { mode: "light", primary: { main: "#155eef" } },
@@ -90,16 +88,12 @@ export function AdminApp() {
           dashboard={AdminDashboard}
           requireAuth
         >
-          <CustomRoutes>
-            <Route
-              path="/notifications"
-              element={
-                <AdminNotificationInbox
-                  getCsrfProof={currentAdminCsrfToken}
-                />
-              }
-            />
-          </CustomRoutes>
+          <Resource
+            name="notifications"
+            options={{ label: "Notifications" }}
+            icon={NotificationsOutlinedIcon}
+            list={AdminNotificationList}
+          />
           <Resource
             name="accounts"
             list={AccountList}

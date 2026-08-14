@@ -9,7 +9,9 @@ describe("in-app notification architecture", () => {
       /^import "server-only";/u,
     );
     expect(
-      read("src/backend/repositories/notifications/prisma-notification-repository.ts"),
+      read(
+        "src/backend/repositories/notifications/prisma-notification-repository.ts",
+      ),
     ).toMatch(/^import "server-only";/u);
     for (const route of [
       "src/app/api/notifications/route.ts",
@@ -27,5 +29,16 @@ describe("in-app notification architecture", () => {
     );
     expect(connection).not.toContain("socket.io");
     expect(connection).toContain("4_000");
+  });
+
+  it("keeps administrator notification mutations behind the administrator boundary", () => {
+    for (const route of [
+      "src/app/api/admin/notifications/route.ts",
+      "src/app/api/admin/notifications/[notificationId]/read/route.ts",
+      "src/app/api/admin/notifications/read-all/route.ts",
+    ]) {
+      expect(read(route)).toContain("AdminRequestBoundary");
+      expect(read(route)).not.toContain("requireAccountRequest");
+    }
   });
 });
