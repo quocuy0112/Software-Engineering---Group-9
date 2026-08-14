@@ -6,7 +6,9 @@ import {
   TextField,
   Resource,
   memoryStore,
+  CustomRoutes,
 } from "react-admin";
+import { Route } from "react-router-dom";
 import { createTheme, ScopedCssBaseline } from "@mui/material";
 import { adminAuthProvider } from "./auth-provider";
 import { adminDataProvider } from "./data-provider";
@@ -28,6 +30,8 @@ import { SupportCaseList } from "../support/support-case-list";
 import { SupportCaseShow } from "../support/support-case-show";
 import { ProfessionalConnectionProposalList } from "../professional-connections/professional-connection-proposal-list";
 import { ProfessionalConnectionProposalShow } from "../professional-connections/professional-connection-proposal-show";
+import { AdminNotificationInbox } from "@/frontend/features/notifications/components/notification-inbox";
+import { currentAdminCsrfToken } from "./auth-provider";
 
 const theme = createTheme({
   palette: { mode: "light", primary: { main: "#155eef" } },
@@ -86,6 +90,16 @@ export function AdminApp() {
           dashboard={AdminDashboard}
           requireAuth
         >
+          <CustomRoutes>
+            <Route
+              path="/notifications"
+              element={
+                <AdminNotificationInbox
+                  getCsrfProof={currentAdminCsrfToken}
+                />
+              }
+            />
+          </CustomRoutes>
           <Resource
             name="accounts"
             list={AccountList}
