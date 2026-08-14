@@ -12,6 +12,7 @@ const endpoints: Record<string, string> = {
   "support-cases": "/api/admin/support-cases",
   "professional-connection-proposals":
     "/api/admin/professional-connection-proposals",
+  notifications: "/api/admin/notifications",
 };
 
 export function adminApiErrorDetails(body: unknown) {
@@ -74,6 +75,7 @@ export type AdminDataProvider = DataProvider & {
     idempotencyKey: string,
   ): Promise<unknown>;
   dashboard(): Promise<unknown>;
+  markAllNotificationsRead(): Promise<unknown>;
 };
 
 type ListParams = {
@@ -99,6 +101,7 @@ const closedProvider = {
       data: result.data,
       total: result.total,
       meta: {
+        ...(result.meta ?? {}),
         calculatedAt: result.calculatedAt,
         stateDefinitionVersion: result.stateDefinitionVersion,
       },
@@ -133,7 +136,27 @@ const closedProvider = {
     return { data: result.data, total: result.total };
   },
   create: unsupported,
-  update: unsupported,
+  async update(
+    resource: string,
+    params: {
+      id: Identifier;
+      data: Record<string, unknown>;
+      previousData?: Record<string, unknown>;
+    },
+  ) {
+    if (resource !== "notifications") return unsupported();
+    const result = (await api(
+      `${endpoint(resource)}/${encodeURIComponent(String(params.id))}/read`,
+      { method: "PATCH", body: "{}" },
+    )) as { observedAt?: string };
+    return {
+      data: {
+        ...(params.previousData ?? params.data),
+        id: params.id,
+        readAt: result.observedAt ?? new Date().toISOString(),
+      },
+    };
+  },
   updateMany: unsupported,
   delete: unsupported,
   deleteMany: unsupported,
@@ -153,6 +176,11 @@ const closedProvider = {
     });
   },
   dashboard: () => api("/api/admin/dashboard"),
+  markAllNotificationsRead: () =>
+    api("/api/admin/notifications/read-all", {
+      method: "POST",
+      body: "{}",
+    }),
 } as unknown as AdminDataProvider;
 
 export const adminDataProvider = closedProvider;

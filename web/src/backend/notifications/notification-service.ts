@@ -32,7 +32,16 @@ const toItem = (row: {
   lastOccurredAt: Date;
   expiresAt: Date;
 }): NotificationItem => ({
-  ...row,
+  id: row.id,
+  kind: row.kind,
+  category: row.category,
+  severity: row.severity,
+  title: row.title,
+  summary: row.summary,
+  href: row.href,
+  contextType: row.contextType,
+  contextId: row.contextId,
+  occurrenceCount: row.occurrenceCount,
   readAt: row.readAt?.toISOString() ?? null,
   createdAt: row.createdAt.toISOString(),
   lastOccurredAt: row.lastOccurredAt.toISOString(),
