@@ -10,7 +10,7 @@ const root = process.cwd();
 const evidencePath = resolve(root, "web/.local/evidence/ocr-supply-chain.json");
 const requiredNpm = {
   "node_modules/sharp": "0.35.3",
-  "web/node_modules/@napi-rs/canvas": "1.0.2",
+  "node_modules/@napi-rs/canvas": "1.0.3",
   "node_modules/openai": "7.3.0",
 };
 

@@ -35,7 +35,7 @@ describe("OCR supply-chain gate", () => {
     expect(report.npm).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ name: "sharp", version: "0.35.3" }),
-        expect.objectContaining({ name: "@napi-rs/canvas", version: "1.0.2" }),
+        expect.objectContaining({ name: "@napi-rs/canvas", version: "1.0.3" }),
       ]),
     );
   });

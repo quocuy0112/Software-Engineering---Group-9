@@ -101,7 +101,7 @@
     "@mui/icons-material": "7.3.11",
     "@mui/material": "7.3.11",
     "@next/env": "16.3.0",
-    "@napi-rs/canvas": "1.0.2",
+    "@napi-rs/canvas": "1.0.3",
     "@prisma/adapter-pg": "7.9.0",
     "@prisma/client": "7.9.0",
     "@react-email/components": "1.0.1",
