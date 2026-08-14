@@ -62,6 +62,21 @@ describe("in-app notification event policy", () => {
     expect(en.groupable).toBe(true);
   });
 
+  it("uses English operational copy for administrator verification alerts", () => {
+    const notification = buildNotification(
+      {
+        ...base,
+        kind: "VERIFICATION_RECEIVED",
+        variables: { audience: "ADMIN" },
+      },
+      "EN",
+    );
+    expect(notification.title).toBe("Verification received");
+    expect(notification.summary).toBe(
+      "A new business verification request was submitted and is awaiting review.",
+    );
+  });
+
   it("rejects unknown variables and context mismatches", () => {
     expect(() =>
       buildNotification({

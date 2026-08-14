@@ -122,6 +122,76 @@ describe("employer verification submission UI", () => {
     expect(fetcher).toHaveBeenCalledTimes(2);
   });
 
+  it("waits for the latest draft version before submitting", async () => {
+    let releasePatch!: (response: Response) => void;
+    const pendingPatch = new Promise<Response>((resolve) => {
+      releasePatch = resolve;
+    });
+    let submittedBody: FormData | null = null;
+    const latestPreparation = {
+      data: {
+        ...preparation.data,
+        version: 3,
+        draft: { ...preparation.data.draft, applicantLegalName: "Updated Company" },
+      },
+    };
+    const fetcher = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (url.endsWith("/preparation") && init?.method === "PATCH")
+        return pendingPatch;
+      if (url.endsWith("/employer-verifications") && init?.method === "POST") {
+        submittedBody = init.body as FormData;
+        return Promise.resolve(
+          Response.json({ requestId: "request-1", state: "PENDING_CHECKS" }),
+        );
+      }
+      if (url.endsWith("/preparation"))
+        return Promise.resolve(Response.json(preparation));
+      return Promise.resolve(Response.json({ data: [] }));
+    });
+    vi.stubGlobal("fetch", fetcher);
+    render(<EmployerVerificationPage />);
+    const validity = vi
+      .spyOn(HTMLFormElement.prototype, "checkValidity")
+      .mockReturnValue(true);
+
+    const legalName = await screen.findByRole("textbox", {
+      name: "Legal company name",
+    });
+    fireEvent.change(legalName, { target: { value: "Updated Company" } });
+    fireEvent.blur(legalName);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Submit recruiter application" }),
+    );
+
+    await waitFor(() =>
+      expect(
+        fetcher.mock.calls.filter(
+          ([url, request]) =>
+            String(url).endsWith("/preparation") &&
+            request?.method === "PATCH",
+        ),
+      ).toHaveLength(1),
+    );
+    expect(
+      fetcher.mock.calls.some(
+        ([url, request]) =>
+          String(url).endsWith("/employer-verifications") &&
+          request?.method === "POST",
+      ),
+    ).toBe(false);
+
+    await act(async () => {
+      releasePatch(Response.json(latestPreparation));
+    });
+    await waitFor(() => expect(submittedBody).not.toBeNull());
+    const capturedBody = submittedBody as unknown as FormData;
+    expect(capturedBody.get("preparationVersion")).toBe("3");
+    expect(capturedBody.get("preparationId")).toBe("prep-1");
+    expect(toast.error).not.toHaveBeenCalled();
+    validity.mockRestore();
+  });
+
   it("sends replacement evidence only once when the form is submitted twice", async () => {
     let finishResubmit!: (response: Response) => void;
     let resubmitted = false;

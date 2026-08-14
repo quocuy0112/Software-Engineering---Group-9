@@ -101,3 +101,46 @@ export function createVerificationInAppNotification(
     },
   });
 }
+
+/**
+ * The applicant owns the normal verification receipt. Administrators also
+ * need a recipient-owned inbox item so the Admin bell reflects newly submitted
+ * recruiter requests. Fan-out is limited to currently active administrator
+ * grants and each recipient receives a deterministic, English notification.
+ */
+export async function notifyActiveAdministratorsOfVerificationSubmission(
+  db: PrismaClient | Prisma.TransactionClient,
+  input: {
+    requestId: string;
+    submissionVersion: number;
+    occurredAt: Date;
+    correlationId: string;
+  },
+) {
+  const administrators = await db.platformAdministratorGrant.findMany({
+    where: {
+      state: "ACTIVE",
+      OR: [{ expiresAt: null }, { expiresAt: { gt: input.occurredAt } }],
+      user: { state: "ACTIVE", deletedAt: null },
+    },
+    select: { userId: true },
+  });
+  const businessEventKey = verificationBusinessEventKey(
+    input.requestId,
+    "VERIFICATION_RECEIPT",
+    input.submissionVersion,
+  );
+  for (const administrator of administrators) {
+    await createInAppNotification(db, {
+      recipientUserId: administrator.userId,
+      kind: "VERIFICATION_RECEIVED",
+      deduplicationKey: `admin-verification:${businessEventKey}:${administrator.userId}`,
+      correlationId: input.correlationId,
+      occurredAt: input.occurredAt,
+      contextType: "VERIFICATION_REQUEST",
+      contextId: input.requestId,
+      variables: { audience: "ADMIN" },
+      language: "EN",
+    });
+  }
+}

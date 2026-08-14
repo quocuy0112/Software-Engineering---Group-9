@@ -203,7 +203,9 @@ export const verificationDecisionSchema = z.discriminatedUnion("action", [
 export function validateEvidenceFile(file: { size: number; type: string }) {
   if (file.size < 1 || file.size > 5_000_000)
     throw new Error("FILE_SIZE_INVALID");
-  return businessEvidenceMediaTypeSchema.parse(file.type);
+  const mediaType = businessEvidenceMediaTypeSchema.safeParse(file.type);
+  if (!mediaType.success) throw new Error("FILE_TYPE_INVALID");
+  return mediaType.data;
 }
 export const verificationTransitions: Record<string, readonly string[]> = {
   PENDING_CHECKS: ["PENDING_REVIEW", "CANCELLED", "EXPIRED"],

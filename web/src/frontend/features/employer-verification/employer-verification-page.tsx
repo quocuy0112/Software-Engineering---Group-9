@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import {
+  businessFactsDiffer,
   businessTaxIdentifierSchema,
   preparationPatchSchema,
 } from "@/shared/contracts/employer-verification/business-verification";
@@ -96,6 +97,52 @@ function draftFieldError(name: string) {
     mismatchExplanation: "Difference explanation must contain 20–500 characters when provided.",
   };
   return messages[name] ?? "This field is invalid. Review it and try again.";
+}
+
+function submissionFailureMessage(error: unknown) {
+  const failure = error as {
+    body?: {
+      code?: unknown;
+      fieldErrors?: Array<{ field?: unknown; message?: unknown }>;
+    };
+  };
+  const code = typeof failure.body?.code === "string" ? failure.body.code : "";
+  const fieldError = failure.body?.fieldErrors?.find(
+    (item) => typeof item.message === "string" && item.message.length > 0,
+  );
+  if (code === "VALIDATION_FAILED" && fieldError) {
+    const field =
+      typeof fieldError.field === "string" ? fieldError.field : "form";
+    return `${field}: ${fieldError.message}`;
+  }
+  const messages: Record<string, string> = {
+    LOOKUP_REQUIRED:
+      "The business lookup expired or changed. Look up the tax identifier again before submitting.",
+    EMAIL_VERIFICATION_REQUIRED:
+      "Verify the company email again before submitting the recruiter application.",
+    MISMATCH_EXPLANATION_REQUIRED:
+      "Explain the differences between your entries and the registry before submitting.",
+    RELATIONSHIP_REQUIRED:
+      "An active company invitation or owner approval is required for this recruiter application.",
+    DUPLICATE_AUTHORITY:
+      "You already have active authority for this company.",
+    ACTIVE_REQUEST_EXISTS:
+      "An active recruiter application already exists for this tax identifier.",
+    STALE_CONFLICT:
+      "The verification draft changed while you were editing it. Reload the page and try again.",
+    FILE_SIZE_INVALID:
+      "Choose a PDF, PNG, or JPEG file no larger than 5 MB.",
+    FILE_TYPE_INVALID: "Choose a PDF, PNG, or JPEG business license file.",
+    TARGET_UNAVAILABLE:
+      "The selected company relationship is no longer available. Refresh and try again.",
+    UNAUTHORIZED: "Your session has expired. Sign in again and retry.",
+  };
+  return (
+    messages[code] ??
+    (code
+      ? `The recruiter application could not be submitted (${code}).`
+      : "The recruiter application could not be submitted. Try again.")
+  );
 }
 
 function VerificationContextRead({
@@ -337,10 +384,22 @@ export function EmployerVerificationPage({
     }
     setBusy("submit");
     try {
+      await draftSaveQueueRef.current;
+      const latestPreparation = preparationRef.current;
+      if (!latestPreparation?.preparationId || !latestPreparation.lookup) {
+        throw Object.assign(new Error("LOOKUP_REQUIRED"), {
+          body: { code: "LOOKUP_REQUIRED" },
+        });
+      }
+      const payload = new FormData(form);
+      payload.set("preparationId", latestPreparation.preparationId);
+      payload.set("preparationVersion", String(latestPreparation.version));
+      payload.set("lookupSnapshotId", latestPreparation.lookup.snapshotId);
+      payload.set("taxIdentifier", latestPreparation.lookup.taxIdentifier);
       await requestJson("/api/employer-verifications", {
         method: "POST",
         headers: { "Idempotency-Key": crypto.randomUUID() },
-        body: new FormData(form),
+        body: payload,
       });
       toast.success("Verification request received.");
       form.reset();
@@ -348,8 +407,8 @@ export function EmployerVerificationPage({
       setPreparation(null);
       setDraft({});
       await Promise.all([loadRequests(), loadPreparation()]);
-    } catch {
-      toast.error("The request needs attention. Check each field and retry.");
+    } catch (error) {
+      toast.error(submissionFailureMessage(error));
     } finally {
       setBusy(undefined);
     }
@@ -416,6 +475,17 @@ export function EmployerVerificationPage({
   }
 
   const lookupFacts = preparation?.lookup?.facts;
+  const mismatchExplanationRequired = Boolean(
+    lookupFacts &&
+      (businessFactsDiffer(
+        String(draft.applicantLegalName ?? ""),
+        lookupFacts.legalName,
+      ) ||
+        businessFactsDiffer(
+          String(draft.applicantRegisteredAddress ?? ""),
+          lookupFacts.registeredAddress,
+        )),
+  );
   const registryConfirmed = Boolean(
     preparation?.lookup &&
       taxIdentifier === preparation.lookup.taxIdentifier &&
@@ -470,7 +540,7 @@ export function EmployerVerificationPage({
                 <label className={styles.field}><span>Registered address</span><textarea name="applicantRegisteredAddress" required minLength={5} maxLength={500} value={String(draft.applicantRegisteredAddress ?? "")} onChange={(e) => setDraft({ ...draft, applicantRegisteredAddress: e.target.value })} onBlur={(e) => void saveDraft("applicantRegisteredAddress", e.target.value)} /></label>
                 <label className={styles.checkboxField}><input name="operatingAddressDiffers" type="checkbox" value="true" checked={Boolean(draft.operatingAddressDiffers)} onChange={(e) => void saveDraft("operatingAddressDiffers", e.target.checked)} /><span>Operating location differs from registered address</span></label>
                 {Boolean(draft.operatingAddressDiffers) && <label className={styles.field}><span>Operating address</span><textarea name="operatingAddress" required minLength={5} maxLength={500} value={String(draft.operatingAddress ?? "")} onChange={(e) => setDraft({ ...draft, operatingAddress: e.target.value })} onBlur={(e) => void saveDraft("operatingAddress", e.target.value)} /></label>}
-                <label className={styles.field}><span>Explain differences from registry (if any)</span><textarea name="mismatchExplanation" minLength={20} maxLength={500} value={String(draft.mismatchExplanation ?? "")} onChange={(e) => setDraft({ ...draft, mismatchExplanation: e.target.value })} onBlur={(e) => void saveDraft("mismatchExplanation", e.target.value || null)} /><small>Required when legal name or registered address differs from source facts. Use 20–500 characters when provided.</small></label>
+                <label className={styles.field}><span>Explain differences from registry (if any)</span><textarea name="mismatchExplanation" minLength={20} maxLength={500} required={mismatchExplanationRequired} value={String(draft.mismatchExplanation ?? "")} onChange={(e) => setDraft({ ...draft, mismatchExplanation: e.target.value })} onBlur={(e) => void saveDraft("mismatchExplanation", e.target.value || null)} /><small>Required when legal name or registered address differs from source facts. Use 20–500 characters when provided.</small></label>
               </div>
             </section>
 

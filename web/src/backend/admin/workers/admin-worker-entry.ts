@@ -4,6 +4,7 @@ import { runDashboardSnapshotCycle } from "./dashboard-snapshot-loop";
 import {
   runBusinessVerificationPreparationCleanupCycle,
   runEvidenceSafetyCycle,
+  runVerificationAdminNotificationCycle,
   runVerificationDeadlineCycle,
 } from "./verification-lifecycle-loop";
 import { runEvidenceRetentionCycle } from "./evidence-retention-loop";
@@ -23,6 +24,11 @@ export async function startAdminWorker(options: { probe?: boolean } = {}) {
       name: "verification-deadline",
       intervalMs: 60_000,
       run: runVerificationDeadlineCycle,
+    },
+    {
+      name: "verification-admin-notification-reconcile",
+      intervalMs: 30_000,
+      run: runVerificationAdminNotificationCycle,
     },
     {
       name: "business-verification-preparation-cleanup",

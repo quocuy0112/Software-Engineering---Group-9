@@ -11,6 +11,7 @@ import { notificationKindSchema } from "@/shared/contracts/notifications";
 const safeVariablesSchema = z
   .object({
     companyName: z.string().trim().min(1).max(120).optional(),
+    audience: z.enum(["ADMIN"]).optional(),
     stage: z.string().trim().min(1).max(64).optional(),
     state: z.string().trim().min(1).max(64).optional(),
     count: z.number().int().min(1).max(999).optional(),
@@ -26,6 +27,7 @@ export type NotificationEventInput = {
   contextType?: NotificationContextType;
   contextId?: string;
   variables?: z.input<typeof safeVariablesSchema>;
+  language?: "VI" | "EN";
 };
 
 type Policy = {
@@ -184,10 +186,13 @@ const policies = {
     category: "VERIFICATION",
     severity: "MEDIUM",
     title: { vi: "Đã nhận yêu cầu xác minh", en: "Verification received" },
-    summary: generic(
-      "Yêu cầu xác minh doanh nghiệp của bạn đã được ghi nhận.",
-      "Your business verification request was received.",
-    ),
+    summary: (locale, variables) =>
+      variables.audience === "ADMIN"
+        ? "A new business verification request was submitted and is awaiting review."
+        : generic(
+            "Yêu cầu xác minh doanh nghiệp của bạn đã được ghi nhận.",
+            "Your business verification request was received.",
+          )(locale),
   },
   VERIFICATION_CHANGES_REQUESTED: {
     category: "VERIFICATION",

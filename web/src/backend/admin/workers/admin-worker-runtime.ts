@@ -5,6 +5,7 @@ export type AdminWorkerLoop = {
     | "snapshot"
     | "evidence"
     | "verification-deadline"
+    | "verification-admin-notification-reconcile"
     | "business-verification-preparation-cleanup"
     | "notification"
     | "verification-notification"
