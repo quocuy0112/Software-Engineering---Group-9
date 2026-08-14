@@ -131,7 +131,7 @@ Admission uses the existing PostgreSQL `RateLimitBucket`: 10 account lookups per
 
 The Candidate page becomes four responsive sections: registered business, company contact, applicant authority, and evidence/declarations. Tax lookup precedes the remaining sections. Registry values are labelled read-only source facts; fallback and limitations use text plus icons, never color alone. Inline errors use `aria-describedby`; failed validation focuses the first invalid control and emits one Sonner summary toast. Async actions have stable toast IDs, disabled duplicate controls, visible progress, and actionable retry copy.
 
-The administrator detail adds a bounded comparison panel showing source/outcome/age, registry versus applicant values, explicit differences, email verification/domain signals, unverified phone, website, relationship/title/explanations, and consent version/time. No signal changes the existing approve/reject controls or server decision gates.
+The administrator detail adds a bounded comparison panel and non-color checklist showing source/outcome/age, registry versus applicant values, explicit differences, email verification/domain signals, unverified phone, website, relationship/title/explanations, and consent version/time. Current qualified business-license evidence also shows bounded metadata and safety states and supports a normalized preview plus authenticated full-document inline viewing or download. No signal changes the existing approve/reject controls or server decision gates.
 
 ## Project Structure
 

@@ -93,10 +93,11 @@ As a Platform Administrator, I want registry, applicant, contact, relationship, 
 
 **Acceptance Scenarios**:
 
-1. **Given** an authorized administrator opens a request, **When** detail loads, **Then** it separately labels applicant claims, registry facts, source/check time, field differences, email-verification time, email-domain signals, unverified phone, website, relationship, title, explanations, and consent time.
+1. **Given** an authorized administrator opens a request, **When** detail loads, **Then** it separately labels applicant claims, registry facts, source/check time, field differences, email-verification time, email-domain signals, unverified phone, website, relationship, title, explanations, consent time, and a non-color review checklist.
 2. **Given** registry facts are missing, stale, or provider-unavailable, **When** detail loads, **Then** the limitation is visible and no company field is silently presented as registry-confirmed.
 3. **Given** all enriched facts appear credible, **When** the administrator reviews them, **Then** no lookup, email-domain, phone, or website signal can automatically invoke approval, rejection, membership creation, or evidence qualification.
 4. **Given** an existing-company application lacks the exact valid invitation or request-bound OWNER approval, **When** approval is attempted, **Then** the existing Feature 006 relationship prerequisite still blocks approval regardless of enriched facts.
+5. **Given** the current business-license evidence passed every safety check, **When** the administrator reviews it, **Then** the detail shows file metadata and safety states and permits both a normalized preview and an authenticated full-document view or download; inaccessible evidence keeps decisions disabled.
 
 ### Edge Cases
 
@@ -145,7 +146,8 @@ As a Platform Administrator, I want registry, applicant, contact, relationship, 
 - **FR-027**: Candidate UI MUST use field-level errors associated with inputs plus a non-color summary toast for validation failures; lookup, email, upload, and command success/failure MUST use accessible toast announcements without exposing internal codes.
 - **FR-028**: Candidate UI MUST preserve normalized non-file progress across recoverable component or network failure without storing verification tokens, document bytes, or sensitive server responses in localStorage or sessionStorage.
 - **FR-029**: Administrator queue/detail projections MUST expose bounded enriched review fields and difference indicators only after current admin authorization; public and applicant projections MUST not expose provider internals or administrator-only representative information.
-- **FR-030**: Administrator detail MUST show snapshot source and age, applicant versus registry values, mismatch explanation, email verification and domain signals, unverified phone label, website, relationship, title, authority explanation, and consent policy/time.
+- **FR-030**: Administrator detail MUST show snapshot source and age, applicant versus registry values, mismatch explanation, email verification and domain signals, unverified phone label, website, relationship, title, authority explanation, consent policy/time, and an explicit review checklist.
+- **FR-030A**: Administrator detail MUST show current business-license metadata and safety states and, only after current sensitive-admin authorization and successful evidence qualification, provide a normalized preview plus an authenticated full-document inline view or download with private no-store responses.
 - **FR-031**: Decision commands MUST re-evaluate applicant account eligibility, request version/state, evidence qualification/accessibility, existing-company relationship prerequisite, and required enriched facts; stale lookup age MAY warn but MUST NOT silently mutate submitted facts.
 - **FR-032**: Lookup and email events MUST create privacy-safe operational records sufficient to diagnose outcome, provider, latency class, and retry behavior without recording email tokens, raw responses, full evidence, or unnecessary contact data.
 - **FR-033**: Existing applicant receipt, change, approval, rejection, cancellation, delay, and expiry notifications MUST remain idempotent and MUST NOT disclose registry representative, internal lookup failures, evidence locators, admin identity, or private notes.

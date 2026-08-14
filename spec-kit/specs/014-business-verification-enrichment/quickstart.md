@@ -9,10 +9,15 @@
 
 ## Environment
 
-Use one of:
+Local development enables VietQR with:
 
 ```text
 BUSINESS_REGISTRY_PROVIDER=vietqr
+```
+
+To test the deterministic fallback, temporarily use:
+
+```text
 BUSINESS_REGISTRY_PROVIDER=disabled
 ```
 
@@ -51,7 +56,7 @@ http://localhost:3001/dashboard/employer-verification
 Administrator verification resource:
 
 ```text
-http://console.admin.localhost:3001/#/recruiter-verifications
+http://console.admin.localhost:3001/#/verification-requests
 ```
 
 ## Manual Acceptance Flow
@@ -64,8 +69,9 @@ http://console.admin.localhost:3001/#/recruiter-verifications
 6. Open the fragment-based verification link while signed in as the same Candidate; confirm the fragment is removed and the page shows verified status.
 7. Enter phone, optional website, relationship, title, required explanations, declarations, and a supported business-license file.
 8. Submit twice rapidly; confirm one active request, one evidence version, and one receipt exist.
-9. Open admin detail and confirm applicant/registry values, differences, email/domain signals, unverified phone, relationship, and consent are clearly separated.
-10. Confirm no lookup or contact signal automatically approves or rejects the request.
+9. Open admin detail and confirm the checklist, applicant/registry values, differences, email/domain signals, unverified phone, relationship, and consent are clearly separated.
+10. Confirm the current business-license metadata and safety checks are visible, preview the normalized document, then open the authenticated full PDF/image in a separate tab.
+11. Confirm no lookup or contact signal automatically approves or rejects the request.
 
 ## Focused Validation
 

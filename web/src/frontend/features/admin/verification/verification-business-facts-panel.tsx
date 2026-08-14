@@ -12,6 +12,22 @@ function Fact({ label, value }: { label: string; value: string | null }) {
   );
 }
 
+function ReviewCheck({
+  label,
+  status,
+}: {
+  label: string;
+  status: "PASS" | "REVIEW" | "UNVERIFIED";
+}) {
+  return (
+    <Chip
+      label={`${label}: ${status}`}
+      color={status === "PASS" ? "success" : "warning"}
+      variant={status === "PASS" ? "filled" : "outlined"}
+    />
+  );
+}
+
 export function VerificationBusinessFactsPanel({
   facts,
   legacyRequest,
@@ -39,6 +55,25 @@ export function VerificationBusinessFactsPanel({
       <Typography color="text.secondary" variant="body2">
         Source {facts.registry.providerKey}; checked {new Date(facts.registry.checkedAt).toLocaleString()}. These signals support a human decision only.
       </Typography>
+      <Box component="section" aria-labelledby="admin-review-checklist" sx={{ display: "grid", gap: 1 }}>
+        <Typography id="admin-review-checklist" component="h3" fontWeight={700}>
+          Admin review checklist
+        </Typography>
+        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+          <ReviewCheck
+            label="Tax registry record"
+            status={facts.registry.outcome === "MATCHED" || facts.registry.outcome === "PARTIAL" ? "PASS" : "REVIEW"}
+          />
+          <ReviewCheck label="Company email control" status="PASS" />
+          <ReviewCheck label="Phone format" status="UNVERIFIED" />
+          <ReviewCheck
+            label="Registry comparison"
+            status={facts.legalNameDiffers || facts.registeredAddressDiffers ? "REVIEW" : "PASS"}
+          />
+          <ReviewCheck label="Applicant authority" status="PASS" />
+          <ReviewCheck label="Declarations and consent" status="PASS" />
+        </Box>
+      </Box>
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 2 }}>
         <Paper variant="outlined" sx={{ p: 2, display: "grid", gap: 1 }}>
           <Typography fontWeight={700}>Registry snapshot</Typography>

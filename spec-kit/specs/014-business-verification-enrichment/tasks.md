@@ -176,6 +176,8 @@
 - [X] T074 Synchronize implemented API/status details in `spec-kit/specs/006-admin-management/spec.md`, `spec-kit/specs/009-user-management-and-recruiter-verification/spec-group-2-business-verification-approval.md`, and `spec-kit/specs/014-business-verification-enrichment/quickstart.md`
 - [X] T075 Run migration verifier, Prisma validation/generation, focused Feature 014 tests, typecheck, lint, build, and manual disabled-provider quickstart from `spec-kit/specs/014-business-verification-enrichment/quickstart.md`
 - [X] T076 Review generated diffs for secrets, raw provider/token data, unrelated changes, and local-only commit status from repository root `.`
+- [X] T077 [US4] Add an administrator review checklist and current evidence metadata to the verification detail UI
+- [X] T078 [US4] Add sensitive-authorized full-document inline viewing while preserving protected preview and download behavior
 
 ---
 
