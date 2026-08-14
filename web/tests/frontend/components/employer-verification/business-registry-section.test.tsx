@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { EmployerVerificationPage } from "@/frontend/features/employer-verification/employer-verification-page";
 
@@ -73,7 +73,10 @@ describe("business registry section", () => {
     expect(
       screen.getByText(/before continuing to company details/i),
     ).toBeVisible();
-    expect(toast.error).toHaveBeenCalled();
+    expect(toast.error).toHaveBeenCalledWith(
+      "The business registry is currently unavailable. Try again later.",
+      { id: "business-lookup" },
+    );
     expect(screen.getByText(/never auto-approves access/i)).toBeVisible();
   });
 
@@ -138,6 +141,34 @@ describe("business registry section", () => {
     expect(fetcher).toHaveBeenCalledWith(
       "/api/employer-verifications/preparation",
       expect.objectContaining({ method: "DELETE" }),
+    );
+  });
+
+  it("does not describe a registry outage as an invalid tax identifier", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input);
+        if (url.includes("/registry-lookups") && init?.method === "POST") {
+          return Response.json({ code: "INTERNAL_FAILURE" }, { status: 500 });
+        }
+        return Response.json(
+          url.endsWith("/preparation") ? emptyPreparation : { data: [] },
+        );
+      }),
+    );
+    render(<EmployerVerificationPage />);
+    const tax = await screen.findByRole("textbox", {
+      name: /Vietnamese tax identifier/u,
+    });
+    fireEvent.change(tax, { target: { value: "0316794479" } });
+    fireEvent.click(screen.getByRole("button", { name: "Look up business" }));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "The business registry is temporarily unavailable. Try again later.",
+        { id: "business-lookup" },
+      ),
     );
   });
 });

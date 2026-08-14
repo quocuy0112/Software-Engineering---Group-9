@@ -35,6 +35,8 @@ const eventBase = z.object({
 });
 const accountPayload = eventBase.extend({
   resultingState: z.enum(["ACTIVE", "SUSPENDED"]),
+  reasonCategory: z.string().trim().min(1).max(80).default("OTHER"),
+  supportPath: z.literal("/support/account-security").default("/support/account-security"),
 });
 const membershipPayload = eventBase.extend({
   companyDisplayName: z.string().trim().min(1).max(200),
@@ -48,6 +50,8 @@ const verificationPayload = eventBase.extend({
   approvedMembershipRole: z
     .enum(["OWNER", "HR_MANAGER", "RECRUITER", "HIRING_MANAGER"])
     .optional(),
+  rejectionCategory: z.string().min(1).max(80).optional(),
+  applicantComment: z.string().min(1).max(500).optional(),
 });
 const supportCasePayload = z.object({
   caseId: z.string().min(1).max(128),
@@ -114,9 +118,12 @@ export async function renderFeature006Email(input: {
     const payload = accountPayload.parse(input.payloadRef);
     const props = {
       ...payload,
-      eventKind: payload.eventKind as Extract<
-        AdminSecurityEventKind,
-        "ACCOUNT_SUSPENDED" | "ACCOUNT_REINSTATED" | "ALL_SESSIONS_REVOKED"
+        eventKind: payload.eventKind as Extract<
+          AdminSecurityEventKind,
+          | "ACCOUNT_SUSPENDED"
+          | "ACCOUNT_REINSTATED"
+          | "ACCOUNT_RESTORED"
+          | "ALL_SESSIONS_REVOKED"
       >,
       supportUrl: new URL("/support/account-security", input.appUrl).toString(),
     };
@@ -124,7 +131,8 @@ export async function renderFeature006Email(input: {
       subject:
         props.eventKind === "ACCOUNT_SUSPENDED"
           ? "Your SmartHire account was suspended"
-          : props.eventKind === "ACCOUNT_REINSTATED"
+            : props.eventKind === "ACCOUNT_REINSTATED" ||
+                props.eventKind === "ACCOUNT_RESTORED"
             ? "Your SmartHire account is active"
             : "Your SmartHire sessions were revoked",
       html: await render(createElement(AccountSecurityEmail, props)),

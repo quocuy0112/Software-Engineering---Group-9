@@ -375,6 +375,7 @@ export type EmailOutboxWhereInput = {
   professionalConnection?: Prisma.XOR<Prisma.ProfessionalConnectionNullableScalarRelationFilter, Prisma.ProfessionalConnectionWhereInput> | null
   companyEmailChallenge?: Prisma.XOR<Prisma.CompanyContactEmailChallengeNullableScalarRelationFilter, Prisma.CompanyContactEmailChallengeWhereInput> | null
   securityNotificationWork?: Prisma.XOR<Prisma.SecurityNotificationWorkNullableScalarRelationFilter, Prisma.SecurityNotificationWorkWhereInput> | null
+  verificationNotificationEvent?: Prisma.XOR<Prisma.VerificationNotificationEventNullableScalarRelationFilter, Prisma.VerificationNotificationEventWhereInput> | null
 }
 
 export type EmailOutboxOrderByWithRelationInput = {
@@ -413,6 +414,7 @@ export type EmailOutboxOrderByWithRelationInput = {
   professionalConnection?: Prisma.ProfessionalConnectionOrderByWithRelationInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeOrderByWithRelationInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkOrderByWithRelationInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventOrderByWithRelationInput
 }
 
 export type EmailOutboxWhereUniqueInput = Prisma.AtLeast<{
@@ -454,6 +456,7 @@ export type EmailOutboxWhereUniqueInput = Prisma.AtLeast<{
   professionalConnection?: Prisma.XOR<Prisma.ProfessionalConnectionNullableScalarRelationFilter, Prisma.ProfessionalConnectionWhereInput> | null
   companyEmailChallenge?: Prisma.XOR<Prisma.CompanyContactEmailChallengeNullableScalarRelationFilter, Prisma.CompanyContactEmailChallengeWhereInput> | null
   securityNotificationWork?: Prisma.XOR<Prisma.SecurityNotificationWorkNullableScalarRelationFilter, Prisma.SecurityNotificationWorkWhereInput> | null
+  verificationNotificationEvent?: Prisma.XOR<Prisma.VerificationNotificationEventNullableScalarRelationFilter, Prisma.VerificationNotificationEventWhereInput> | null
 }, "id" | "companyEmailChallengeId" | "idempotencyKey">
 
 export type EmailOutboxOrderByWithAggregationInput = {
@@ -547,6 +550,7 @@ export type EmailOutboxCreateInput = {
   professionalConnection?: Prisma.ProfessionalConnectionCreateNestedOneWithoutNotificationOutboxInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeCreateNestedOneWithoutOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxUncheckedCreateInput = {
@@ -578,6 +582,7 @@ export type EmailOutboxUncheckedCreateInput = {
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedCreateNestedOneWithoutOldEmailNoticeOutboxInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedCreateNestedOneWithoutNotificationOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxUpdateInput = {
@@ -609,6 +614,7 @@ export type EmailOutboxUpdateInput = {
   professionalConnection?: Prisma.ProfessionalConnectionUpdateOneWithoutNotificationOutboxNestedInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeUpdateOneWithoutOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateInput = {
@@ -640,6 +646,7 @@ export type EmailOutboxUncheckedUpdateInput = {
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedUpdateOneWithoutOldEmailNoticeOutboxNestedInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedUpdateOneWithoutNotificationOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxCreateManyInput = {
@@ -1000,6 +1007,22 @@ export type EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput 
   deleteMany?: Prisma.EmailOutboxScalarWhereInput | Prisma.EmailOutboxScalarWhereInput[]
 }
 
+export type EmailOutboxCreateNestedOneWithoutVerificationNotificationEventInput = {
+  create?: Prisma.XOR<Prisma.EmailOutboxCreateWithoutVerificationNotificationEventInput, Prisma.EmailOutboxUncheckedCreateWithoutVerificationNotificationEventInput>
+  connectOrCreate?: Prisma.EmailOutboxCreateOrConnectWithoutVerificationNotificationEventInput
+  connect?: Prisma.EmailOutboxWhereUniqueInput
+}
+
+export type EmailOutboxUpdateOneWithoutVerificationNotificationEventNestedInput = {
+  create?: Prisma.XOR<Prisma.EmailOutboxCreateWithoutVerificationNotificationEventInput, Prisma.EmailOutboxUncheckedCreateWithoutVerificationNotificationEventInput>
+  connectOrCreate?: Prisma.EmailOutboxCreateOrConnectWithoutVerificationNotificationEventInput
+  upsert?: Prisma.EmailOutboxUpsertWithoutVerificationNotificationEventInput
+  disconnect?: Prisma.EmailOutboxWhereInput | boolean
+  delete?: Prisma.EmailOutboxWhereInput | boolean
+  connect?: Prisma.EmailOutboxWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EmailOutboxUpdateToOneWithWhereWithoutVerificationNotificationEventInput, Prisma.EmailOutboxUpdateWithoutVerificationNotificationEventInput>, Prisma.EmailOutboxUncheckedUpdateWithoutVerificationNotificationEventInput>
+}
+
 export type EmailOutboxCreateNestedManyWithoutCompanyEmailChallengeInput = {
   create?: Prisma.XOR<Prisma.EmailOutboxCreateWithoutCompanyEmailChallengeInput, Prisma.EmailOutboxUncheckedCreateWithoutCompanyEmailChallengeInput> | Prisma.EmailOutboxCreateWithoutCompanyEmailChallengeInput[] | Prisma.EmailOutboxUncheckedCreateWithoutCompanyEmailChallengeInput[]
   connectOrCreate?: Prisma.EmailOutboxCreateOrConnectWithoutCompanyEmailChallengeInput | Prisma.EmailOutboxCreateOrConnectWithoutCompanyEmailChallengeInput[]
@@ -1212,6 +1235,7 @@ export type EmailOutboxCreateWithoutUserInput = {
   professionalConnection?: Prisma.ProfessionalConnectionCreateNestedOneWithoutNotificationOutboxInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeCreateNestedOneWithoutOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxUncheckedCreateWithoutUserInput = {
@@ -1242,6 +1266,7 @@ export type EmailOutboxUncheckedCreateWithoutUserInput = {
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedCreateNestedOneWithoutOldEmailNoticeOutboxInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedCreateNestedOneWithoutNotificationOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxCreateOrConnectWithoutUserInput = {
@@ -1328,6 +1353,7 @@ export type EmailOutboxCreateWithoutEmailChangeVerificationForInput = {
   professionalConnection?: Prisma.ProfessionalConnectionCreateNestedOneWithoutNotificationOutboxInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeCreateNestedOneWithoutOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxUncheckedCreateWithoutEmailChangeVerificationForInput = {
@@ -1358,6 +1384,7 @@ export type EmailOutboxUncheckedCreateWithoutEmailChangeVerificationForInput = {
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedCreateNestedOneWithoutOldEmailNoticeOutboxInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedCreateNestedOneWithoutNotificationOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxCreateOrConnectWithoutEmailChangeVerificationForInput = {
@@ -1393,6 +1420,7 @@ export type EmailOutboxCreateWithoutEmailChangeOldAddressForInput = {
   professionalConnection?: Prisma.ProfessionalConnectionCreateNestedOneWithoutNotificationOutboxInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeCreateNestedOneWithoutOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxUncheckedCreateWithoutEmailChangeOldAddressForInput = {
@@ -1423,6 +1451,7 @@ export type EmailOutboxUncheckedCreateWithoutEmailChangeOldAddressForInput = {
   emailChangeVerificationFor?: Prisma.EmailChangeRequestUncheckedCreateNestedOneWithoutVerificationOutboxInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedCreateNestedOneWithoutNotificationOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxCreateOrConnectWithoutEmailChangeOldAddressForInput = {
@@ -1469,6 +1498,7 @@ export type EmailOutboxUpdateWithoutEmailChangeVerificationForInput = {
   professionalConnection?: Prisma.ProfessionalConnectionUpdateOneWithoutNotificationOutboxNestedInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeUpdateOneWithoutOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateWithoutEmailChangeVerificationForInput = {
@@ -1499,6 +1529,7 @@ export type EmailOutboxUncheckedUpdateWithoutEmailChangeVerificationForInput = {
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedUpdateOneWithoutOldEmailNoticeOutboxNestedInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedUpdateOneWithoutNotificationOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUpsertWithoutEmailChangeOldAddressForInput = {
@@ -1540,6 +1571,7 @@ export type EmailOutboxUpdateWithoutEmailChangeOldAddressForInput = {
   professionalConnection?: Prisma.ProfessionalConnectionUpdateOneWithoutNotificationOutboxNestedInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeUpdateOneWithoutOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateWithoutEmailChangeOldAddressForInput = {
@@ -1570,6 +1602,7 @@ export type EmailOutboxUncheckedUpdateWithoutEmailChangeOldAddressForInput = {
   emailChangeVerificationFor?: Prisma.EmailChangeRequestUncheckedUpdateOneWithoutVerificationOutboxNestedInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedUpdateOneWithoutNotificationOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxCreateWithoutPasswordChangeNotificationForInput = {
@@ -1600,6 +1633,7 @@ export type EmailOutboxCreateWithoutPasswordChangeNotificationForInput = {
   professionalConnection?: Prisma.ProfessionalConnectionCreateNestedOneWithoutNotificationOutboxInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeCreateNestedOneWithoutOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxUncheckedCreateWithoutPasswordChangeNotificationForInput = {
@@ -1630,6 +1664,7 @@ export type EmailOutboxUncheckedCreateWithoutPasswordChangeNotificationForInput 
   emailChangeVerificationFor?: Prisma.EmailChangeRequestUncheckedCreateNestedOneWithoutVerificationOutboxInput
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedCreateNestedOneWithoutOldEmailNoticeOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxCreateOrConnectWithoutPasswordChangeNotificationForInput = {
@@ -1676,6 +1711,7 @@ export type EmailOutboxUpdateWithoutPasswordChangeNotificationForInput = {
   professionalConnection?: Prisma.ProfessionalConnectionUpdateOneWithoutNotificationOutboxNestedInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeUpdateOneWithoutOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateWithoutPasswordChangeNotificationForInput = {
@@ -1706,6 +1742,7 @@ export type EmailOutboxUncheckedUpdateWithoutPasswordChangeNotificationForInput 
   emailChangeVerificationFor?: Prisma.EmailChangeRequestUncheckedUpdateOneWithoutVerificationOutboxNestedInput
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedUpdateOneWithoutOldEmailNoticeOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxCreateWithoutSecurityTokenInput = {
@@ -1736,6 +1773,7 @@ export type EmailOutboxCreateWithoutSecurityTokenInput = {
   professionalConnection?: Prisma.ProfessionalConnectionCreateNestedOneWithoutNotificationOutboxInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeCreateNestedOneWithoutOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxUncheckedCreateWithoutSecurityTokenInput = {
@@ -1766,6 +1804,7 @@ export type EmailOutboxUncheckedCreateWithoutSecurityTokenInput = {
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedCreateNestedOneWithoutOldEmailNoticeOutboxInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedCreateNestedOneWithoutNotificationOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxCreateOrConnectWithoutSecurityTokenInput = {
@@ -1822,6 +1861,7 @@ export type EmailOutboxCreateWithoutVerificationRequestInput = {
   professionalConnection?: Prisma.ProfessionalConnectionCreateNestedOneWithoutNotificationOutboxInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeCreateNestedOneWithoutOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxUncheckedCreateWithoutVerificationRequestInput = {
@@ -1852,6 +1892,7 @@ export type EmailOutboxUncheckedCreateWithoutVerificationRequestInput = {
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedCreateNestedOneWithoutOldEmailNoticeOutboxInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedCreateNestedOneWithoutNotificationOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxCreateOrConnectWithoutVerificationRequestInput = {
@@ -1878,6 +1919,146 @@ export type EmailOutboxUpdateWithWhereUniqueWithoutVerificationRequestInput = {
 export type EmailOutboxUpdateManyWithWhereWithoutVerificationRequestInput = {
   where: Prisma.EmailOutboxScalarWhereInput
   data: Prisma.XOR<Prisma.EmailOutboxUpdateManyMutationInput, Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestInput>
+}
+
+export type EmailOutboxCreateWithoutVerificationNotificationEventInput = {
+  id?: string
+  kind: $Enums.EmailKind
+  recipientRef: string
+  recipientCiphertext?: string | null
+  recipientPurpose?: string | null
+  templateVersion: string
+  payloadRef: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey: string
+  status?: $Enums.OutboxStatus
+  attempts?: number
+  leaseOwner?: string | null
+  leaseExpiresAt?: Date | string | null
+  nextAttemptAt?: Date | string
+  providerMessageId?: string | null
+  safeErrorCode?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user?: Prisma.UserAccountCreateNestedOneWithoutOutboxInput
+  securityToken?: Prisma.SecurityTokenCreateNestedOneWithoutOutboxInput
+  emailChangeVerificationFor?: Prisma.EmailChangeRequestCreateNestedOneWithoutVerificationOutboxInput
+  emailChangeOldAddressFor?: Prisma.EmailChangeRequestCreateNestedOneWithoutOldEmailNoticeOutboxInput
+  passwordChangeNotificationFor?: Prisma.PasswordChangeOperationCreateNestedOneWithoutNotificationOutboxInput
+  verificationRequest?: Prisma.RecruiterVerificationRequestCreateNestedOneWithoutNotificationsInput
+  supportConversation?: Prisma.SupportConversationCreateNestedOneWithoutNotificationOutboxInput
+  professionalConnectionProposal?: Prisma.ProfessionalConnectionProposalCreateNestedOneWithoutNotificationOutboxInput
+  professionalConnection?: Prisma.ProfessionalConnectionCreateNestedOneWithoutNotificationOutboxInput
+  companyEmailChallenge?: Prisma.CompanyContactEmailChallengeCreateNestedOneWithoutOutboxInput
+  securityNotificationWork?: Prisma.SecurityNotificationWorkCreateNestedOneWithoutEmailOutboxInput
+}
+
+export type EmailOutboxUncheckedCreateWithoutVerificationNotificationEventInput = {
+  id?: string
+  kind: $Enums.EmailKind
+  userId?: string | null
+  securityTokenId?: string | null
+  verificationRequestId?: string | null
+  supportConversationId?: string | null
+  professionalConnectionProposalId?: string | null
+  professionalConnectionId?: string | null
+  companyEmailChallengeId?: string | null
+  recipientRef: string
+  recipientCiphertext?: string | null
+  recipientPurpose?: string | null
+  templateVersion: string
+  payloadRef: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey: string
+  status?: $Enums.OutboxStatus
+  attempts?: number
+  leaseOwner?: string | null
+  leaseExpiresAt?: Date | string | null
+  nextAttemptAt?: Date | string
+  providerMessageId?: string | null
+  safeErrorCode?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  emailChangeVerificationFor?: Prisma.EmailChangeRequestUncheckedCreateNestedOneWithoutVerificationOutboxInput
+  emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedCreateNestedOneWithoutOldEmailNoticeOutboxInput
+  passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedCreateNestedOneWithoutNotificationOutboxInput
+  securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedCreateNestedOneWithoutEmailOutboxInput
+}
+
+export type EmailOutboxCreateOrConnectWithoutVerificationNotificationEventInput = {
+  where: Prisma.EmailOutboxWhereUniqueInput
+  create: Prisma.XOR<Prisma.EmailOutboxCreateWithoutVerificationNotificationEventInput, Prisma.EmailOutboxUncheckedCreateWithoutVerificationNotificationEventInput>
+}
+
+export type EmailOutboxUpsertWithoutVerificationNotificationEventInput = {
+  update: Prisma.XOR<Prisma.EmailOutboxUpdateWithoutVerificationNotificationEventInput, Prisma.EmailOutboxUncheckedUpdateWithoutVerificationNotificationEventInput>
+  create: Prisma.XOR<Prisma.EmailOutboxCreateWithoutVerificationNotificationEventInput, Prisma.EmailOutboxUncheckedCreateWithoutVerificationNotificationEventInput>
+  where?: Prisma.EmailOutboxWhereInput
+}
+
+export type EmailOutboxUpdateToOneWithWhereWithoutVerificationNotificationEventInput = {
+  where?: Prisma.EmailOutboxWhereInput
+  data: Prisma.XOR<Prisma.EmailOutboxUpdateWithoutVerificationNotificationEventInput, Prisma.EmailOutboxUncheckedUpdateWithoutVerificationNotificationEventInput>
+}
+
+export type EmailOutboxUpdateWithoutVerificationNotificationEventInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumEmailKindFieldUpdateOperationsInput | $Enums.EmailKind
+  recipientRef?: Prisma.StringFieldUpdateOperationsInput | string
+  recipientCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recipientPurpose?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  templateVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadRef?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumOutboxStatusFieldUpdateOperationsInput | $Enums.OutboxStatus
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
+  leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  nextAttemptAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safeErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserAccountUpdateOneWithoutOutboxNestedInput
+  securityToken?: Prisma.SecurityTokenUpdateOneWithoutOutboxNestedInput
+  emailChangeVerificationFor?: Prisma.EmailChangeRequestUpdateOneWithoutVerificationOutboxNestedInput
+  emailChangeOldAddressFor?: Prisma.EmailChangeRequestUpdateOneWithoutOldEmailNoticeOutboxNestedInput
+  passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUpdateOneWithoutNotificationOutboxNestedInput
+  verificationRequest?: Prisma.RecruiterVerificationRequestUpdateOneWithoutNotificationsNestedInput
+  supportConversation?: Prisma.SupportConversationUpdateOneWithoutNotificationOutboxNestedInput
+  professionalConnectionProposal?: Prisma.ProfessionalConnectionProposalUpdateOneWithoutNotificationOutboxNestedInput
+  professionalConnection?: Prisma.ProfessionalConnectionUpdateOneWithoutNotificationOutboxNestedInput
+  companyEmailChallenge?: Prisma.CompanyContactEmailChallengeUpdateOneWithoutOutboxNestedInput
+  securityNotificationWork?: Prisma.SecurityNotificationWorkUpdateOneWithoutEmailOutboxNestedInput
+}
+
+export type EmailOutboxUncheckedUpdateWithoutVerificationNotificationEventInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumEmailKindFieldUpdateOperationsInput | $Enums.EmailKind
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  securityTokenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  supportConversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalConnectionProposalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  professionalConnectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyEmailChallengeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recipientRef?: Prisma.StringFieldUpdateOperationsInput | string
+  recipientCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recipientPurpose?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  templateVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadRef?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumOutboxStatusFieldUpdateOperationsInput | $Enums.OutboxStatus
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
+  leaseOwner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  leaseExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  nextAttemptAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  safeErrorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailChangeVerificationFor?: Prisma.EmailChangeRequestUncheckedUpdateOneWithoutVerificationOutboxNestedInput
+  emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedUpdateOneWithoutOldEmailNoticeOutboxNestedInput
+  passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedUpdateOneWithoutNotificationOutboxNestedInput
+  securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxCreateWithoutCompanyEmailChallengeInput = {
@@ -1908,6 +2089,7 @@ export type EmailOutboxCreateWithoutCompanyEmailChallengeInput = {
   professionalConnectionProposal?: Prisma.ProfessionalConnectionProposalCreateNestedOneWithoutNotificationOutboxInput
   professionalConnection?: Prisma.ProfessionalConnectionCreateNestedOneWithoutNotificationOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxUncheckedCreateWithoutCompanyEmailChallengeInput = {
@@ -1938,6 +2120,7 @@ export type EmailOutboxUncheckedCreateWithoutCompanyEmailChallengeInput = {
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedCreateNestedOneWithoutOldEmailNoticeOutboxInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedCreateNestedOneWithoutNotificationOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxCreateOrConnectWithoutCompanyEmailChallengeInput = {
@@ -1994,6 +2177,7 @@ export type EmailOutboxCreateWithoutSecurityNotificationWorkInput = {
   professionalConnectionProposal?: Prisma.ProfessionalConnectionProposalCreateNestedOneWithoutNotificationOutboxInput
   professionalConnection?: Prisma.ProfessionalConnectionCreateNestedOneWithoutNotificationOutboxInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeCreateNestedOneWithoutOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxUncheckedCreateWithoutSecurityNotificationWorkInput = {
@@ -2024,6 +2208,7 @@ export type EmailOutboxUncheckedCreateWithoutSecurityNotificationWorkInput = {
   emailChangeVerificationFor?: Prisma.EmailChangeRequestUncheckedCreateNestedOneWithoutVerificationOutboxInput
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedCreateNestedOneWithoutOldEmailNoticeOutboxInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedCreateNestedOneWithoutNotificationOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxCreateOrConnectWithoutSecurityNotificationWorkInput = {
@@ -2070,6 +2255,7 @@ export type EmailOutboxUpdateWithoutSecurityNotificationWorkInput = {
   professionalConnectionProposal?: Prisma.ProfessionalConnectionProposalUpdateOneWithoutNotificationOutboxNestedInput
   professionalConnection?: Prisma.ProfessionalConnectionUpdateOneWithoutNotificationOutboxNestedInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeUpdateOneWithoutOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateWithoutSecurityNotificationWorkInput = {
@@ -2100,6 +2286,7 @@ export type EmailOutboxUncheckedUpdateWithoutSecurityNotificationWorkInput = {
   emailChangeVerificationFor?: Prisma.EmailChangeRequestUncheckedUpdateOneWithoutVerificationOutboxNestedInput
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedUpdateOneWithoutOldEmailNoticeOutboxNestedInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedUpdateOneWithoutNotificationOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxCreateWithoutProfessionalConnectionInput = {
@@ -2130,6 +2317,7 @@ export type EmailOutboxCreateWithoutProfessionalConnectionInput = {
   professionalConnectionProposal?: Prisma.ProfessionalConnectionProposalCreateNestedOneWithoutNotificationOutboxInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeCreateNestedOneWithoutOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxUncheckedCreateWithoutProfessionalConnectionInput = {
@@ -2160,6 +2348,7 @@ export type EmailOutboxUncheckedCreateWithoutProfessionalConnectionInput = {
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedCreateNestedOneWithoutOldEmailNoticeOutboxInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedCreateNestedOneWithoutNotificationOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxCreateOrConnectWithoutProfessionalConnectionInput = {
@@ -2216,6 +2405,7 @@ export type EmailOutboxCreateWithoutProfessionalConnectionProposalInput = {
   professionalConnection?: Prisma.ProfessionalConnectionCreateNestedOneWithoutNotificationOutboxInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeCreateNestedOneWithoutOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxUncheckedCreateWithoutProfessionalConnectionProposalInput = {
@@ -2246,6 +2436,7 @@ export type EmailOutboxUncheckedCreateWithoutProfessionalConnectionProposalInput
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedCreateNestedOneWithoutOldEmailNoticeOutboxInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedCreateNestedOneWithoutNotificationOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxCreateOrConnectWithoutProfessionalConnectionProposalInput = {
@@ -2302,6 +2493,7 @@ export type EmailOutboxCreateWithoutSupportConversationInput = {
   professionalConnection?: Prisma.ProfessionalConnectionCreateNestedOneWithoutNotificationOutboxInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeCreateNestedOneWithoutOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxUncheckedCreateWithoutSupportConversationInput = {
@@ -2332,6 +2524,7 @@ export type EmailOutboxUncheckedCreateWithoutSupportConversationInput = {
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedCreateNestedOneWithoutOldEmailNoticeOutboxInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedCreateNestedOneWithoutNotificationOutboxInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedCreateNestedOneWithoutEmailOutboxInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedCreateNestedOneWithoutEmailOutboxInput
 }
 
 export type EmailOutboxCreateOrConnectWithoutSupportConversationInput = {
@@ -2414,6 +2607,7 @@ export type EmailOutboxUpdateWithoutUserInput = {
   professionalConnection?: Prisma.ProfessionalConnectionUpdateOneWithoutNotificationOutboxNestedInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeUpdateOneWithoutOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateWithoutUserInput = {
@@ -2444,6 +2638,7 @@ export type EmailOutboxUncheckedUpdateWithoutUserInput = {
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedUpdateOneWithoutOldEmailNoticeOutboxNestedInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedUpdateOneWithoutNotificationOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateManyWithoutUserInput = {
@@ -2526,6 +2721,7 @@ export type EmailOutboxUpdateWithoutSecurityTokenInput = {
   professionalConnection?: Prisma.ProfessionalConnectionUpdateOneWithoutNotificationOutboxNestedInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeUpdateOneWithoutOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateWithoutSecurityTokenInput = {
@@ -2556,6 +2752,7 @@ export type EmailOutboxUncheckedUpdateWithoutSecurityTokenInput = {
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedUpdateOneWithoutOldEmailNoticeOutboxNestedInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedUpdateOneWithoutNotificationOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateManyWithoutSecurityTokenInput = {
@@ -2638,6 +2835,7 @@ export type EmailOutboxUpdateWithoutVerificationRequestInput = {
   professionalConnection?: Prisma.ProfessionalConnectionUpdateOneWithoutNotificationOutboxNestedInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeUpdateOneWithoutOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateWithoutVerificationRequestInput = {
@@ -2668,6 +2866,7 @@ export type EmailOutboxUncheckedUpdateWithoutVerificationRequestInput = {
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedUpdateOneWithoutOldEmailNoticeOutboxNestedInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedUpdateOneWithoutNotificationOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateManyWithoutVerificationRequestInput = {
@@ -2750,6 +2949,7 @@ export type EmailOutboxUpdateWithoutCompanyEmailChallengeInput = {
   professionalConnectionProposal?: Prisma.ProfessionalConnectionProposalUpdateOneWithoutNotificationOutboxNestedInput
   professionalConnection?: Prisma.ProfessionalConnectionUpdateOneWithoutNotificationOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateWithoutCompanyEmailChallengeInput = {
@@ -2780,6 +2980,7 @@ export type EmailOutboxUncheckedUpdateWithoutCompanyEmailChallengeInput = {
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedUpdateOneWithoutOldEmailNoticeOutboxNestedInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedUpdateOneWithoutNotificationOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateManyWithoutCompanyEmailChallengeInput = {
@@ -2862,6 +3063,7 @@ export type EmailOutboxUpdateWithoutProfessionalConnectionInput = {
   professionalConnectionProposal?: Prisma.ProfessionalConnectionProposalUpdateOneWithoutNotificationOutboxNestedInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeUpdateOneWithoutOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateWithoutProfessionalConnectionInput = {
@@ -2892,6 +3094,7 @@ export type EmailOutboxUncheckedUpdateWithoutProfessionalConnectionInput = {
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedUpdateOneWithoutOldEmailNoticeOutboxNestedInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedUpdateOneWithoutNotificationOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateManyWithoutProfessionalConnectionInput = {
@@ -2974,6 +3177,7 @@ export type EmailOutboxUpdateWithoutProfessionalConnectionProposalInput = {
   professionalConnection?: Prisma.ProfessionalConnectionUpdateOneWithoutNotificationOutboxNestedInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeUpdateOneWithoutOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateWithoutProfessionalConnectionProposalInput = {
@@ -3004,6 +3208,7 @@ export type EmailOutboxUncheckedUpdateWithoutProfessionalConnectionProposalInput
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedUpdateOneWithoutOldEmailNoticeOutboxNestedInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedUpdateOneWithoutNotificationOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateManyWithoutProfessionalConnectionProposalInput = {
@@ -3086,6 +3291,7 @@ export type EmailOutboxUpdateWithoutSupportConversationInput = {
   professionalConnection?: Prisma.ProfessionalConnectionUpdateOneWithoutNotificationOutboxNestedInput
   companyEmailChallenge?: Prisma.CompanyContactEmailChallengeUpdateOneWithoutOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateWithoutSupportConversationInput = {
@@ -3116,6 +3322,7 @@ export type EmailOutboxUncheckedUpdateWithoutSupportConversationInput = {
   emailChangeOldAddressFor?: Prisma.EmailChangeRequestUncheckedUpdateOneWithoutOldEmailNoticeOutboxNestedInput
   passwordChangeNotificationFor?: Prisma.PasswordChangeOperationUncheckedUpdateOneWithoutNotificationOutboxNestedInput
   securityNotificationWork?: Prisma.SecurityNotificationWorkUncheckedUpdateOneWithoutEmailOutboxNestedInput
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventUncheckedUpdateOneWithoutEmailOutboxNestedInput
 }
 
 export type EmailOutboxUncheckedUpdateManyWithoutSupportConversationInput = {
@@ -3182,6 +3389,7 @@ export type EmailOutboxSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   professionalConnection?: boolean | Prisma.EmailOutbox$professionalConnectionArgs<ExtArgs>
   companyEmailChallenge?: boolean | Prisma.EmailOutbox$companyEmailChallengeArgs<ExtArgs>
   securityNotificationWork?: boolean | Prisma.EmailOutbox$securityNotificationWorkArgs<ExtArgs>
+  verificationNotificationEvent?: boolean | Prisma.EmailOutbox$verificationNotificationEventArgs<ExtArgs>
 }, ExtArgs["result"]["emailOutbox"]>
 
 export type EmailOutboxSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -3292,6 +3500,7 @@ export type EmailOutboxInclude<ExtArgs extends runtime.Types.Extensions.Internal
   professionalConnection?: boolean | Prisma.EmailOutbox$professionalConnectionArgs<ExtArgs>
   companyEmailChallenge?: boolean | Prisma.EmailOutbox$companyEmailChallengeArgs<ExtArgs>
   securityNotificationWork?: boolean | Prisma.EmailOutbox$securityNotificationWorkArgs<ExtArgs>
+  verificationNotificationEvent?: boolean | Prisma.EmailOutbox$verificationNotificationEventArgs<ExtArgs>
 }
 export type EmailOutboxIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.EmailOutbox$userArgs<ExtArgs>
@@ -3326,6 +3535,7 @@ export type $EmailOutboxPayload<ExtArgs extends runtime.Types.Extensions.Interna
     professionalConnection: Prisma.$ProfessionalConnectionPayload<ExtArgs> | null
     companyEmailChallenge: Prisma.$CompanyContactEmailChallengePayload<ExtArgs> | null
     securityNotificationWork: Prisma.$SecurityNotificationWorkPayload<ExtArgs> | null
+    verificationNotificationEvent: Prisma.$VerificationNotificationEventPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3757,6 +3967,7 @@ export interface Prisma__EmailOutboxClient<T, Null = never, ExtArgs extends runt
   professionalConnection<T extends Prisma.EmailOutbox$professionalConnectionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EmailOutbox$professionalConnectionArgs<ExtArgs>>): Prisma.Prisma__ProfessionalConnectionClient<runtime.Types.Result.GetResult<Prisma.$ProfessionalConnectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   companyEmailChallenge<T extends Prisma.EmailOutbox$companyEmailChallengeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EmailOutbox$companyEmailChallengeArgs<ExtArgs>>): Prisma.Prisma__CompanyContactEmailChallengeClient<runtime.Types.Result.GetResult<Prisma.$CompanyContactEmailChallengePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   securityNotificationWork<T extends Prisma.EmailOutbox$securityNotificationWorkArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EmailOutbox$securityNotificationWorkArgs<ExtArgs>>): Prisma.Prisma__SecurityNotificationWorkClient<runtime.Types.Result.GetResult<Prisma.$SecurityNotificationWorkPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  verificationNotificationEvent<T extends Prisma.EmailOutbox$verificationNotificationEventArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EmailOutbox$verificationNotificationEventArgs<ExtArgs>>): Prisma.Prisma__VerificationNotificationEventClient<runtime.Types.Result.GetResult<Prisma.$VerificationNotificationEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4417,6 +4628,25 @@ export type EmailOutbox$securityNotificationWorkArgs<ExtArgs extends runtime.Typ
    */
   include?: Prisma.SecurityNotificationWorkInclude<ExtArgs> | null
   where?: Prisma.SecurityNotificationWorkWhereInput
+}
+
+/**
+ * EmailOutbox.verificationNotificationEvent
+ */
+export type EmailOutbox$verificationNotificationEventArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VerificationNotificationEvent
+   */
+  select?: Prisma.VerificationNotificationEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VerificationNotificationEvent
+   */
+  omit?: Prisma.VerificationNotificationEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VerificationNotificationEventInclude<ExtArgs> | null
+  where?: Prisma.VerificationNotificationEventWhereInput
 }
 
 /**

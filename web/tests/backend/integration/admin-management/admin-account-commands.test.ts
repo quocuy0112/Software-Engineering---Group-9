@@ -20,6 +20,8 @@ const command = (version: number) => ({
 
 describe("authoritative account commands", () => {
   beforeEach(async () => {
+    await prisma.platformAdministratorGrant.deleteMany({ where: { userId: targetId } });
+    await prisma.userAccount.deleteMany({ where: { id: targetId } });
     await prisma.userAccount.create({
       data: {
         id: targetId,
@@ -67,6 +69,7 @@ describe("authoritative account commands", () => {
     await prisma.adminCommandReceipt.deleteMany({
       where: { targetReference: { startsWith: targetId } },
     });
+    await prisma.platformAdministratorGrant.deleteMany({ where: { userId: targetId } });
     await prisma.candidateIdentity.delete({ where: { userId: targetId } });
     await prisma.userAccount.delete({ where: { id: targetId } });
   });
@@ -100,17 +103,26 @@ describe("authoritative account commands", () => {
     );
   });
   it("blocks self-targeting before changing state", async () => {
+    await prisma.platformAdministratorGrant.create({
+      data: { id: `self-grant-${suffix}`, userId: targetId },
+    });
     await expect(
       new AdminAccountService().suspend(
         { ...authority, userId: targetId },
         targetId,
         command(1),
       ),
-    ).rejects.toThrow("PROTECTED_ADMIN_ACTION");
+    ).rejects.toThrow("ACTION_BLOCKED");
     expect(
       (await prisma.userAccount.findUniqueOrThrow({ where: { id: targetId } }))
         .state,
     ).toBe("ACTIVE");
+    expect(
+      await prisma.auditEvent.findFirstOrThrow({
+        where: { targetId, action: "admin.account_suspended", result: "DENIED" },
+        orderBy: { occurredAt: "desc" },
+      }),
+    ).toMatchObject({ result: "DENIED" });
   });
 
   it("replays one stable admin operation without duplicate audit, work, or email", async () => {

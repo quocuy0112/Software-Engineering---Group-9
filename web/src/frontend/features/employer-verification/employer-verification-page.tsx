@@ -2,7 +2,10 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
-import { preparationPatchSchema } from "@/shared/contracts/employer-verification/business-verification";
+import {
+  businessTaxIdentifierSchema,
+  preparationPatchSchema,
+} from "@/shared/contracts/employer-verification/business-verification";
 import {
   registryLookupConfirmsBusiness,
   type EmployerVerificationPreparationResponse,
@@ -55,6 +58,29 @@ async function requestJson(url: string, init?: RequestInit) {
     });
   }
   return body;
+}
+
+function lookupFailureMessage(error: unknown) {
+  const failure = error as {
+    body?: { code?: unknown; retryAfterSeconds?: unknown };
+  };
+  const code = typeof failure.body?.code === "string" ? failure.body.code : "";
+  if (code === "RATE_LIMITED") {
+    const retryAfter =
+      typeof failure.body?.retryAfterSeconds === "number"
+        ? Math.max(1, Math.ceil(failure.body.retryAfterSeconds / 60))
+        : null;
+    return retryAfter
+      ? `Too many registry lookups. Try again in about ${retryAfter} minute${retryAfter === 1 ? "" : "s"}.`
+      : "Too many registry lookups. Try again later.";
+  }
+  if (code === "UNAUTHORIZED") {
+    return "Your session has expired. Sign in again and retry the lookup.";
+  }
+  if (code === "VALIDATION_FAILED") {
+    return "Enter a valid 10-digit tax identifier and try again.";
+  }
+  return "The business registry is temporarily unavailable. Try again later.";
 }
 
 function draftFieldError(name: string) {
@@ -165,31 +191,46 @@ export function EmployerVerificationPage({
 
   async function lookup(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const normalizedTaxIdentifier = businessTaxIdentifierSchema.safeParse(
+      taxIdentifier,
+    );
+    if (!normalizedTaxIdentifier.success) {
+      toast.error("Enter a valid 10-digit tax identifier and try again.", {
+        id: "business-lookup",
+      });
+      return;
+    }
     setBusy("lookup");
     try {
       const body = (await requestJson(
         "/api/employer-verifications/registry-lookups",
-        { method: "POST", body: JSON.stringify({ taxIdentifier }) },
+        {
+          method: "POST",
+          body: JSON.stringify({ taxIdentifier: normalizedTaxIdentifier.data }),
+        },
       )) as EmployerVerificationPreparationResponse;
       preparationRef.current = body.data;
       setPreparation(body.data);
       setDraft(body.data.draft);
       setCompanyEmail("");
-      setTaxIdentifier(body.data.lookup?.taxIdentifier ?? taxIdentifier);
+      setTaxIdentifier(
+        body.data.lookup?.taxIdentifier ?? normalizedTaxIdentifier.data,
+      );
       if (body.data.lookup && registryLookupConfirmsBusiness(body.data.lookup.outcome)) {
         toast.success("Registered business record found.", { id: "business-lookup" });
       } else {
+        const lookupOutcome = body.data.lookup?.outcome;
         toast.error(
-          body.data.lookup?.outcome === "NOT_FOUND"
+          lookupOutcome === "NOT_FOUND"
             ? "This tax identifier was not found in the business registry."
-            : "The registry could not confirm this tax identifier. Try again later.",
+            : lookupOutcome === "UNAVAILABLE"
+              ? "The business registry is currently unavailable. Try again later."
+              : "The registry could not confirm this tax identifier. Try again later.",
           { id: "business-lookup" },
         );
       }
-    } catch {
-      toast.error("Enter a valid 10-digit tax identifier and try again.", {
-        id: "business-lookup",
-      });
+    } catch (error) {
+      toast.error(lookupFailureMessage(error), { id: "business-lookup" });
     } finally {
       setBusy(undefined);
     }

@@ -63,6 +63,28 @@ function endpoint(resource: string) {
   return value;
 }
 
+function reactAdminRecord(resource: string, value: unknown) {
+  if (!value || typeof value !== "object") return value;
+  const record = value as Record<string, unknown>;
+  if (typeof record.id === "string" || typeof record.id === "number")
+    return value;
+
+  const nestedKey =
+    resource === "accounts"
+      ? "account"
+      : resource === "verification-requests"
+        ? "request"
+        : null;
+  if (!nestedKey) return value;
+
+  const nested = record[nestedKey];
+  if (!nested || typeof nested !== "object") return value;
+  const nestedRecord = nested as Record<string, unknown>;
+  if (typeof nestedRecord.id !== "string" && typeof nestedRecord.id !== "number")
+    return value;
+  return { ...record, id: nestedRecord.id };
+}
+
 const unsupported = async (): Promise<never> => {
   throw new Error("GENERIC_PRIVILEGED_CRUD_DISABLED");
 };
@@ -85,18 +107,54 @@ type ListParams = {
   target?: string;
   id?: Identifier;
   ids?: Identifier[];
+  signal?: AbortSignal;
 };
 
 const closedProvider = {
   async getList(resource: string, params: ListParams) {
+    const page = params.pagination?.page ?? 1;
+    const pageSize = params.pagination?.perPage ?? 25;
+    const filter = params.filter ?? {};
     const query = new URLSearchParams({
-      page: String(params.pagination?.page ?? 1),
-      perPage: String(params.pagination?.perPage ?? 25),
-      sort: params.sort?.field ?? "createdAt",
-      order: params.sort?.order ?? "DESC",
-      filter: JSON.stringify(params.filter ?? {}),
+      page: String(page),
+      pageSize: String(pageSize),
     });
-    const result = await api(`${endpoint(resource)}?${query}`);
+    if (resource === "accounts") {
+      for (const key of [
+        "q",
+        "type",
+        "status",
+        "registeredFrom",
+        "registeredTo",
+      ]) {
+        const value = filter[key];
+        if (typeof value === "string" && value.trim())
+          query.set(key, value.trim());
+      }
+    } else if (resource === "verification-requests") {
+      for (const key of [
+        "state",
+        "applicantEligibility",
+        "company",
+        "taxCode",
+        "submittedFrom",
+        "submittedTo",
+        "applicantId",
+        "assignment",
+      ]) {
+        const value = filter[key];
+        if (typeof value === "string" && value.trim())
+          query.set(key, value.trim());
+      }
+    } else {
+      query.set("perPage", String(pageSize));
+      query.set("sort", params.sort?.field ?? "createdAt");
+      query.set("order", params.sort?.order ?? "DESC");
+      query.set("filter", JSON.stringify(filter));
+    }
+    const result = await api(`${endpoint(resource)}?${query}`, {
+      signal: params.signal,
+    });
     return {
       data: result.data,
       total: result.total,
@@ -108,11 +166,10 @@ const closedProvider = {
     };
   },
   async getOne(resource: string, params: { id: Identifier }) {
-    const suffix = resource === "accounts" ? "/security" : "";
     const result = await api(
-      `${endpoint(resource)}/${encodeURIComponent(String(params.id))}${suffix}`,
+      `${endpoint(resource)}/${encodeURIComponent(String(params.id))}`,
     );
-    return { data: result.data };
+    return { data: reactAdminRecord(resource, result.data ?? result) };
   },
   async getMany(resource: string, params: { ids: Identifier[] }) {
     const result = await api(
@@ -169,7 +226,7 @@ const closedProvider = {
     return api(path, {
       method: "POST",
       headers: {
-        "if-match-version": String(version),
+        "If-Match": `"${version}"`,
         "idempotency-key": idempotencyKey,
       },
       body: JSON.stringify(input),
@@ -191,7 +248,7 @@ export function recordPath(resource: string, id: Identifier) {
 
 export function accountCommandPath(
   accountId: Identifier,
-  action: "suspend" | "reinstate" | "revoke-all" | "revoke-one",
+  action: "suspend" | "restore" | "revoke-all" | "revoke-one",
   sessionReference?: string,
 ) {
   const base = `${endpoint("accounts")}/${encodeURIComponent(String(accountId))}`;

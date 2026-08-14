@@ -429,6 +429,7 @@ export const ModelName = {
   CompanyMembershipHistory: 'CompanyMembershipHistory',
   CompanyAccessPrerequisite: 'CompanyAccessPrerequisite',
   RecruiterVerificationRequest: 'RecruiterVerificationRequest',
+  VerificationNotificationEvent: 'VerificationNotificationEvent',
   EmployerVerificationPreparation: 'EmployerVerificationPreparation',
   BusinessRegistryLookupSnapshot: 'BusinessRegistryLookupSnapshot',
   CompanyContactEmailChallenge: 'CompanyContactEmailChallenge',
@@ -507,7 +508,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "inAppNotification" | "auditEvent" | "company" | "companyMembership" | "platformAdministratorGrant" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence"
+    modelProps: "userAccount" | "authProviderAccount" | "session" | "verification" | "twoFactor" | "candidateIdentity" | "candidateProfile" | "profileExperience" | "profileEducation" | "skill" | "candidateProfileSkill" | "socialLink" | "accountPreferences" | "userJobWorkspaceState" | "emailChangeRequest" | "passwordChangeAttemptWindow" | "passwordChangeOperation" | "securityToken" | "passwordResetOperation" | "fullAccountRecoveryOperation" | "authenticationChallenge" | "rateLimitBucket" | "emailOutbox" | "inAppNotification" | "auditEvent" | "company" | "companyMembership" | "platformAdministratorGrant" | "administratorSessionPolicy" | "companyMembershipHistory" | "companyAccessPrerequisite" | "recruiterVerificationRequest" | "verificationNotificationEvent" | "employerVerificationPreparation" | "businessRegistryLookupSnapshot" | "companyContactEmailChallenge" | "verificationBusinessFacts" | "businessLicenseEvidence" | "verificationSafetyAttempt" | "verificationDecisionHistory" | "verificationPrivateNote" | "privilegedActionRationale" | "adminCommandReceipt" | "securityNotificationWork" | "adminDashboardSnapshot" | "moderationReport" | "moderationReportHistory" | "moderationPrivateNote" | "jobPosting" | "jobPostingSkill" | "applicationQuestion" | "candidateCv" | "savedJob" | "jobReport" | "jobApplication" | "professionalConnection" | "professionalConnectionProposal" | "professionalConnectionDecision" | "professionalConnectionProposalHistory" | "professionalConnectionNotification" | "professionalConnectionCommandReceipt" | "supportConversation" | "supportMessage" | "supportAssignment" | "supportInternalNote" | "supportConversationHistory" | "messagingConversation" | "messagingConversationParticipant" | "messagingMessage" | "userMessagingBlock" | "messagingReport" | "messagingReportReviewEvent" | "messagingReportPrivateNote" | "applicationStageEvent" | "applicationAnswer" | "recruitmentNotificationWork" | "cvAccountQuota" | "cvUpload" | "cvStoredArtifact" | "cvScanAssessment" | "cvExtraction" | "cvParseJob" | "cvRetryRequest" | "cvDraft" | "cvProcessingConsent" | "cvImportConfirmation" | "ocrProcessingAttempt" | "ocrUnitOutcome" | "searchImageQuery" | "searchStoredArtifact" | "searchScanAssessment" | "searchImageDecodeAttempt" | "searchIntentAttempt" | "searchProcessingConsent" | "imageSearchAdmissionEvent" | "imageSearchOperationalEvidence"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2876,6 +2877,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.RecruiterVerificationRequestCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.RecruiterVerificationRequestCountAggregateOutputType> | number
+        }
+      }
+    }
+    VerificationNotificationEvent: {
+      payload: Prisma.$VerificationNotificationEventPayload<ExtArgs>
+      fields: Prisma.VerificationNotificationEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VerificationNotificationEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationNotificationEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VerificationNotificationEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationNotificationEventPayload>
+        }
+        findFirst: {
+          args: Prisma.VerificationNotificationEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationNotificationEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VerificationNotificationEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationNotificationEventPayload>
+        }
+        findMany: {
+          args: Prisma.VerificationNotificationEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationNotificationEventPayload>[]
+        }
+        create: {
+          args: Prisma.VerificationNotificationEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationNotificationEventPayload>
+        }
+        createMany: {
+          args: Prisma.VerificationNotificationEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VerificationNotificationEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationNotificationEventPayload>[]
+        }
+        delete: {
+          args: Prisma.VerificationNotificationEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationNotificationEventPayload>
+        }
+        update: {
+          args: Prisma.VerificationNotificationEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationNotificationEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.VerificationNotificationEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VerificationNotificationEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VerificationNotificationEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationNotificationEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.VerificationNotificationEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VerificationNotificationEventPayload>
+        }
+        aggregate: {
+          args: Prisma.VerificationNotificationEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVerificationNotificationEvent>
+        }
+        groupBy: {
+          args: Prisma.VerificationNotificationEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VerificationNotificationEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VerificationNotificationEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VerificationNotificationEventCountAggregateOutputType> | number
         }
       }
     }
@@ -8163,10 +8238,30 @@ export const RecruiterVerificationRequestScalarFieldEnum = {
   viewerDelayNotifiedAt: 'viewerDelayNotifiedAt',
   version: 'version',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  adminComment: 'adminComment'
 } as const
 
 export type RecruiterVerificationRequestScalarFieldEnum = (typeof RecruiterVerificationRequestScalarFieldEnum)[keyof typeof RecruiterVerificationRequestScalarFieldEnum]
+
+
+export const VerificationNotificationEventScalarFieldEnum = {
+  id: 'id',
+  verificationRequestId: 'verificationRequestId',
+  idempotencyKey: 'idempotencyKey',
+  eventKind: 'eventKind',
+  resultingStatus: 'resultingStatus',
+  eventTime: 'eventTime',
+  payloadRef: 'payloadRef',
+  emailStatus: 'emailStatus',
+  inAppStatus: 'inAppStatus',
+  emailOutboxId: 'emailOutboxId',
+  inAppNotificationRef: 'inAppNotificationRef',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VerificationNotificationEventScalarFieldEnum = (typeof VerificationNotificationEventScalarFieldEnum)[keyof typeof VerificationNotificationEventScalarFieldEnum]
 
 
 export const EmployerVerificationPreparationScalarFieldEnum = {
@@ -9946,6 +10041,34 @@ export type ListEnumRecruiterVerificationStateFieldRefInput<$PrismaModel> = Fiel
 
 
 /**
+ * Reference to a field of type 'VerificationNotificationEventKind'
+ */
+export type EnumVerificationNotificationEventKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VerificationNotificationEventKind'>
+    
+
+
+/**
+ * Reference to a field of type 'VerificationNotificationEventKind[]'
+ */
+export type ListEnumVerificationNotificationEventKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VerificationNotificationEventKind[]'>
+    
+
+
+/**
+ * Reference to a field of type 'VerificationNotificationChannelStatus'
+ */
+export type EnumVerificationNotificationChannelStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VerificationNotificationChannelStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'VerificationNotificationChannelStatus[]'
+ */
+export type ListEnumVerificationNotificationChannelStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VerificationNotificationChannelStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'EmployerApplicantRelationship'
  */
 export type EnumEmployerApplicantRelationshipFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmployerApplicantRelationship'>
@@ -11065,6 +11188,7 @@ export type GlobalOmitConfig = {
   companyMembershipHistory?: Prisma.CompanyMembershipHistoryOmit
   companyAccessPrerequisite?: Prisma.CompanyAccessPrerequisiteOmit
   recruiterVerificationRequest?: Prisma.RecruiterVerificationRequestOmit
+  verificationNotificationEvent?: Prisma.VerificationNotificationEventOmit
   employerVerificationPreparation?: Prisma.EmployerVerificationPreparationOmit
   businessRegistryLookupSnapshot?: Prisma.BusinessRegistryLookupSnapshotOmit
   companyContactEmailChallenge?: Prisma.CompanyContactEmailChallengeOmit

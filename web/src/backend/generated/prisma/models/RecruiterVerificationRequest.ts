@@ -63,6 +63,7 @@ export type RecruiterVerificationRequestMinAggregateOutputType = {
   version: number | null
   createdAt: Date | null
   updatedAt: Date | null
+  adminComment: string | null
 }
 
 export type RecruiterVerificationRequestMaxAggregateOutputType = {
@@ -90,6 +91,7 @@ export type RecruiterVerificationRequestMaxAggregateOutputType = {
   version: number | null
   createdAt: Date | null
   updatedAt: Date | null
+  adminComment: string | null
 }
 
 export type RecruiterVerificationRequestCountAggregateOutputType = {
@@ -117,6 +119,7 @@ export type RecruiterVerificationRequestCountAggregateOutputType = {
   version: number
   createdAt: number
   updatedAt: number
+  adminComment: number
   _all: number
 }
 
@@ -158,6 +161,7 @@ export type RecruiterVerificationRequestMinAggregateInputType = {
   version?: true
   createdAt?: true
   updatedAt?: true
+  adminComment?: true
 }
 
 export type RecruiterVerificationRequestMaxAggregateInputType = {
@@ -185,6 +189,7 @@ export type RecruiterVerificationRequestMaxAggregateInputType = {
   version?: true
   createdAt?: true
   updatedAt?: true
+  adminComment?: true
 }
 
 export type RecruiterVerificationRequestCountAggregateInputType = {
@@ -212,6 +217,7 @@ export type RecruiterVerificationRequestCountAggregateInputType = {
   version?: true
   createdAt?: true
   updatedAt?: true
+  adminComment?: true
   _all?: true
 }
 
@@ -326,6 +332,7 @@ export type RecruiterVerificationRequestGroupByOutputType = {
   version: number
   createdAt: Date
   updatedAt: Date
+  adminComment: string | null
   _count: RecruiterVerificationRequestCountAggregateOutputType | null
   _avg: RecruiterVerificationRequestAvgAggregateOutputType | null
   _sum: RecruiterVerificationRequestSumAggregateOutputType | null
@@ -376,6 +383,7 @@ export type RecruiterVerificationRequestWhereInput = {
   version?: Prisma.IntFilter<"RecruiterVerificationRequest"> | number
   createdAt?: Prisma.DateTimeFilter<"RecruiterVerificationRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"RecruiterVerificationRequest"> | Date | string
+  adminComment?: Prisma.StringNullableFilter<"RecruiterVerificationRequest"> | string | null
   applicant?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   targetCompany?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
   evidence?: Prisma.BusinessLicenseEvidenceListRelationFilter
@@ -383,6 +391,7 @@ export type RecruiterVerificationRequestWhereInput = {
   decisions?: Prisma.VerificationDecisionHistoryListRelationFilter
   notes?: Prisma.VerificationPrivateNoteListRelationFilter
   notifications?: Prisma.EmailOutboxListRelationFilter
+  notificationEvents?: Prisma.VerificationNotificationEventListRelationFilter
   businessFacts?: Prisma.XOR<Prisma.VerificationBusinessFactsNullableScalarRelationFilter, Prisma.VerificationBusinessFactsWhereInput> | null
   acceptedRegistrySnapshot?: Prisma.XOR<Prisma.BusinessRegistryLookupSnapshotNullableScalarRelationFilter, Prisma.BusinessRegistryLookupSnapshotWhereInput> | null
 }
@@ -412,6 +421,7 @@ export type RecruiterVerificationRequestOrderByWithRelationInput = {
   version?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  adminComment?: Prisma.SortOrderInput | Prisma.SortOrder
   applicant?: Prisma.UserAccountOrderByWithRelationInput
   targetCompany?: Prisma.CompanyOrderByWithRelationInput
   evidence?: Prisma.BusinessLicenseEvidenceOrderByRelationAggregateInput
@@ -419,6 +429,7 @@ export type RecruiterVerificationRequestOrderByWithRelationInput = {
   decisions?: Prisma.VerificationDecisionHistoryOrderByRelationAggregateInput
   notes?: Prisma.VerificationPrivateNoteOrderByRelationAggregateInput
   notifications?: Prisma.EmailOutboxOrderByRelationAggregateInput
+  notificationEvents?: Prisma.VerificationNotificationEventOrderByRelationAggregateInput
   businessFacts?: Prisma.VerificationBusinessFactsOrderByWithRelationInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotOrderByWithRelationInput
 }
@@ -451,6 +462,7 @@ export type RecruiterVerificationRequestWhereUniqueInput = Prisma.AtLeast<{
   version?: Prisma.IntFilter<"RecruiterVerificationRequest"> | number
   createdAt?: Prisma.DateTimeFilter<"RecruiterVerificationRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"RecruiterVerificationRequest"> | Date | string
+  adminComment?: Prisma.StringNullableFilter<"RecruiterVerificationRequest"> | string | null
   applicant?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   targetCompany?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
   evidence?: Prisma.BusinessLicenseEvidenceListRelationFilter
@@ -458,6 +470,7 @@ export type RecruiterVerificationRequestWhereUniqueInput = Prisma.AtLeast<{
   decisions?: Prisma.VerificationDecisionHistoryListRelationFilter
   notes?: Prisma.VerificationPrivateNoteListRelationFilter
   notifications?: Prisma.EmailOutboxListRelationFilter
+  notificationEvents?: Prisma.VerificationNotificationEventListRelationFilter
   businessFacts?: Prisma.XOR<Prisma.VerificationBusinessFactsNullableScalarRelationFilter, Prisma.VerificationBusinessFactsWhereInput> | null
   acceptedRegistrySnapshot?: Prisma.XOR<Prisma.BusinessRegistryLookupSnapshotNullableScalarRelationFilter, Prisma.BusinessRegistryLookupSnapshotWhereInput> | null
 }, "id" | "submissionIdempotencyKey">
@@ -487,6 +500,7 @@ export type RecruiterVerificationRequestOrderByWithAggregationInput = {
   version?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  adminComment?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.RecruiterVerificationRequestCountOrderByAggregateInput
   _avg?: Prisma.RecruiterVerificationRequestAvgOrderByAggregateInput
   _max?: Prisma.RecruiterVerificationRequestMaxOrderByAggregateInput
@@ -522,6 +536,7 @@ export type RecruiterVerificationRequestScalarWhereWithAggregatesInput = {
   version?: Prisma.IntWithAggregatesFilter<"RecruiterVerificationRequest"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"RecruiterVerificationRequest"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"RecruiterVerificationRequest"> | Date | string
+  adminComment?: Prisma.StringNullableWithAggregatesFilter<"RecruiterVerificationRequest"> | string | null
 }
 
 export type RecruiterVerificationRequestCreateInput = {
@@ -547,6 +562,7 @@ export type RecruiterVerificationRequestCreateInput = {
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   applicant: Prisma.UserAccountCreateNestedOneWithoutRecruiterVerificationRequestsInput
   targetCompany?: Prisma.CompanyCreateNestedOneWithoutRecruiterVerificationRequestsInput
   evidence?: Prisma.BusinessLicenseEvidenceCreateNestedManyWithoutRequestInput
@@ -554,6 +570,7 @@ export type RecruiterVerificationRequestCreateInput = {
   decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
 }
@@ -583,11 +600,13 @@ export type RecruiterVerificationRequestUncheckedCreateInput = {
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedCreateNestedManyWithoutRequestInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
 }
@@ -615,6 +634,7 @@ export type RecruiterVerificationRequestUpdateInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicant?: Prisma.UserAccountUpdateOneRequiredWithoutRecruiterVerificationRequestsNestedInput
   targetCompany?: Prisma.CompanyUpdateOneWithoutRecruiterVerificationRequestsNestedInput
   evidence?: Prisma.BusinessLicenseEvidenceUpdateManyWithoutRequestNestedInput
@@ -622,6 +642,7 @@ export type RecruiterVerificationRequestUpdateInput = {
   decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
 }
@@ -651,11 +672,13 @@ export type RecruiterVerificationRequestUncheckedUpdateInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedUpdateManyWithoutRequestNestedInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
 }
@@ -685,6 +708,7 @@ export type RecruiterVerificationRequestCreateManyInput = {
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
 }
 
 export type RecruiterVerificationRequestUpdateManyMutationInput = {
@@ -710,6 +734,7 @@ export type RecruiterVerificationRequestUpdateManyMutationInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type RecruiterVerificationRequestUncheckedUpdateManyInput = {
@@ -737,6 +762,7 @@ export type RecruiterVerificationRequestUncheckedUpdateManyInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type RecruiterVerificationRequestListRelationFilter = {
@@ -779,6 +805,7 @@ export type RecruiterVerificationRequestCountOrderByAggregateInput = {
   version?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  adminComment?: Prisma.SortOrder
 }
 
 export type RecruiterVerificationRequestAvgOrderByAggregateInput = {
@@ -812,6 +839,7 @@ export type RecruiterVerificationRequestMaxOrderByAggregateInput = {
   version?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  adminComment?: Prisma.SortOrder
 }
 
 export type RecruiterVerificationRequestMinOrderByAggregateInput = {
@@ -839,6 +867,7 @@ export type RecruiterVerificationRequestMinOrderByAggregateInput = {
   version?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  adminComment?: Prisma.SortOrder
 }
 
 export type RecruiterVerificationRequestSumOrderByAggregateInput = {
@@ -956,6 +985,20 @@ export type EnumRecruiterVerificationStateFieldUpdateOperationsInput = {
   set?: $Enums.RecruiterVerificationState
 }
 
+export type RecruiterVerificationRequestCreateNestedOneWithoutNotificationEventsInput = {
+  create?: Prisma.XOR<Prisma.RecruiterVerificationRequestCreateWithoutNotificationEventsInput, Prisma.RecruiterVerificationRequestUncheckedCreateWithoutNotificationEventsInput>
+  connectOrCreate?: Prisma.RecruiterVerificationRequestCreateOrConnectWithoutNotificationEventsInput
+  connect?: Prisma.RecruiterVerificationRequestWhereUniqueInput
+}
+
+export type RecruiterVerificationRequestUpdateOneRequiredWithoutNotificationEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.RecruiterVerificationRequestCreateWithoutNotificationEventsInput, Prisma.RecruiterVerificationRequestUncheckedCreateWithoutNotificationEventsInput>
+  connectOrCreate?: Prisma.RecruiterVerificationRequestCreateOrConnectWithoutNotificationEventsInput
+  upsert?: Prisma.RecruiterVerificationRequestUpsertWithoutNotificationEventsInput
+  connect?: Prisma.RecruiterVerificationRequestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RecruiterVerificationRequestUpdateToOneWithWhereWithoutNotificationEventsInput, Prisma.RecruiterVerificationRequestUpdateWithoutNotificationEventsInput>, Prisma.RecruiterVerificationRequestUncheckedUpdateWithoutNotificationEventsInput>
+}
+
 export type RecruiterVerificationRequestCreateNestedOneWithoutAcceptedRegistrySnapshotInput = {
   create?: Prisma.XOR<Prisma.RecruiterVerificationRequestCreateWithoutAcceptedRegistrySnapshotInput, Prisma.RecruiterVerificationRequestUncheckedCreateWithoutAcceptedRegistrySnapshotInput>
   connectOrCreate?: Prisma.RecruiterVerificationRequestCreateOrConnectWithoutAcceptedRegistrySnapshotInput
@@ -1065,12 +1108,14 @@ export type RecruiterVerificationRequestCreateWithoutApplicantInput = {
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   targetCompany?: Prisma.CompanyCreateNestedOneWithoutRecruiterVerificationRequestsInput
   evidence?: Prisma.BusinessLicenseEvidenceCreateNestedManyWithoutRequestInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
 }
@@ -1099,11 +1144,13 @@ export type RecruiterVerificationRequestUncheckedCreateWithoutApplicantInput = {
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedCreateNestedManyWithoutRequestInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
 }
@@ -1162,6 +1209,7 @@ export type RecruiterVerificationRequestScalarWhereInput = {
   version?: Prisma.IntFilter<"RecruiterVerificationRequest"> | number
   createdAt?: Prisma.DateTimeFilter<"RecruiterVerificationRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"RecruiterVerificationRequest"> | Date | string
+  adminComment?: Prisma.StringNullableFilter<"RecruiterVerificationRequest"> | string | null
 }
 
 export type RecruiterVerificationRequestCreateWithoutNotificationsInput = {
@@ -1187,12 +1235,14 @@ export type RecruiterVerificationRequestCreateWithoutNotificationsInput = {
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   applicant: Prisma.UserAccountCreateNestedOneWithoutRecruiterVerificationRequestsInput
   targetCompany?: Prisma.CompanyCreateNestedOneWithoutRecruiterVerificationRequestsInput
   evidence?: Prisma.BusinessLicenseEvidenceCreateNestedManyWithoutRequestInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
 }
@@ -1222,10 +1272,12 @@ export type RecruiterVerificationRequestUncheckedCreateWithoutNotificationsInput
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedCreateNestedManyWithoutRequestInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
 }
@@ -1269,12 +1321,14 @@ export type RecruiterVerificationRequestUpdateWithoutNotificationsInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicant?: Prisma.UserAccountUpdateOneRequiredWithoutRecruiterVerificationRequestsNestedInput
   targetCompany?: Prisma.CompanyUpdateOneWithoutRecruiterVerificationRequestsNestedInput
   evidence?: Prisma.BusinessLicenseEvidenceUpdateManyWithoutRequestNestedInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
 }
@@ -1304,10 +1358,12 @@ export type RecruiterVerificationRequestUncheckedUpdateWithoutNotificationsInput
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedUpdateManyWithoutRequestNestedInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
 }
@@ -1335,12 +1391,14 @@ export type RecruiterVerificationRequestCreateWithoutTargetCompanyInput = {
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   applicant: Prisma.UserAccountCreateNestedOneWithoutRecruiterVerificationRequestsInput
   evidence?: Prisma.BusinessLicenseEvidenceCreateNestedManyWithoutRequestInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
 }
@@ -1369,11 +1427,13 @@ export type RecruiterVerificationRequestUncheckedCreateWithoutTargetCompanyInput
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedCreateNestedManyWithoutRequestInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
 }
@@ -1404,6 +1464,162 @@ export type RecruiterVerificationRequestUpdateManyWithWhereWithoutTargetCompanyI
   data: Prisma.XOR<Prisma.RecruiterVerificationRequestUpdateManyMutationInput, Prisma.RecruiterVerificationRequestUncheckedUpdateManyWithoutTargetCompanyInput>
 }
 
+export type RecruiterVerificationRequestCreateWithoutNotificationEventsInput = {
+  id?: string
+  submissionIdempotencyKey?: string | null
+  submittedCompanyName: string
+  normalizedTaxIdentifier: string
+  requestedRole: $Enums.CompanyMembershipRole
+  prerequisiteId?: string | null
+  state?: $Enums.RecruiterVerificationState
+  currentEvidenceId?: string | null
+  currentSubmissionVersion?: number
+  resubmissionCount?: number
+  assignedAdminUserId?: string | null
+  changesRequestedAt?: Date | string | null
+  delayedAt?: Date | string | null
+  expiredAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  decidedAt?: Date | string | null
+  viewerUnavailableSince?: Date | string | null
+  viewerEscalatedAt?: Date | string | null
+  viewerDelayNotifiedAt?: Date | string | null
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  adminComment?: string | null
+  applicant: Prisma.UserAccountCreateNestedOneWithoutRecruiterVerificationRequestsInput
+  targetCompany?: Prisma.CompanyCreateNestedOneWithoutRecruiterVerificationRequestsInput
+  evidence?: Prisma.BusinessLicenseEvidenceCreateNestedManyWithoutRequestInput
+  safetyAttempts?: Prisma.VerificationSafetyAttemptCreateNestedManyWithoutRequestInput
+  decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
+  notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
+  notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
+}
+
+export type RecruiterVerificationRequestUncheckedCreateWithoutNotificationEventsInput = {
+  id?: string
+  submissionIdempotencyKey?: string | null
+  applicantUserId: string
+  submittedCompanyName: string
+  normalizedTaxIdentifier: string
+  targetCompanyId?: string | null
+  requestedRole: $Enums.CompanyMembershipRole
+  prerequisiteId?: string | null
+  state?: $Enums.RecruiterVerificationState
+  currentEvidenceId?: string | null
+  currentSubmissionVersion?: number
+  resubmissionCount?: number
+  assignedAdminUserId?: string | null
+  changesRequestedAt?: Date | string | null
+  delayedAt?: Date | string | null
+  expiredAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  decidedAt?: Date | string | null
+  viewerUnavailableSince?: Date | string | null
+  viewerEscalatedAt?: Date | string | null
+  viewerDelayNotifiedAt?: Date | string | null
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  adminComment?: string | null
+  evidence?: Prisma.BusinessLicenseEvidenceUncheckedCreateNestedManyWithoutRequestInput
+  safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedCreateNestedManyWithoutRequestInput
+  decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
+  notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
+  notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
+}
+
+export type RecruiterVerificationRequestCreateOrConnectWithoutNotificationEventsInput = {
+  where: Prisma.RecruiterVerificationRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.RecruiterVerificationRequestCreateWithoutNotificationEventsInput, Prisma.RecruiterVerificationRequestUncheckedCreateWithoutNotificationEventsInput>
+}
+
+export type RecruiterVerificationRequestUpsertWithoutNotificationEventsInput = {
+  update: Prisma.XOR<Prisma.RecruiterVerificationRequestUpdateWithoutNotificationEventsInput, Prisma.RecruiterVerificationRequestUncheckedUpdateWithoutNotificationEventsInput>
+  create: Prisma.XOR<Prisma.RecruiterVerificationRequestCreateWithoutNotificationEventsInput, Prisma.RecruiterVerificationRequestUncheckedCreateWithoutNotificationEventsInput>
+  where?: Prisma.RecruiterVerificationRequestWhereInput
+}
+
+export type RecruiterVerificationRequestUpdateToOneWithWhereWithoutNotificationEventsInput = {
+  where?: Prisma.RecruiterVerificationRequestWhereInput
+  data: Prisma.XOR<Prisma.RecruiterVerificationRequestUpdateWithoutNotificationEventsInput, Prisma.RecruiterVerificationRequestUncheckedUpdateWithoutNotificationEventsInput>
+}
+
+export type RecruiterVerificationRequestUpdateWithoutNotificationEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
+  prerequisiteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumRecruiterVerificationStateFieldUpdateOperationsInput | $Enums.RecruiterVerificationState
+  currentEvidenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentSubmissionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  resubmissionCount?: Prisma.IntFieldUpdateOperationsInput | number
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changesRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  delayedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerUnavailableSince?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerEscalatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerDelayNotifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicant?: Prisma.UserAccountUpdateOneRequiredWithoutRecruiterVerificationRequestsNestedInput
+  targetCompany?: Prisma.CompanyUpdateOneWithoutRecruiterVerificationRequestsNestedInput
+  evidence?: Prisma.BusinessLicenseEvidenceUpdateManyWithoutRequestNestedInput
+  safetyAttempts?: Prisma.VerificationSafetyAttemptUpdateManyWithoutRequestNestedInput
+  decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
+  notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
+  notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
+}
+
+export type RecruiterVerificationRequestUncheckedUpdateWithoutNotificationEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionIdempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicantUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedTaxIdentifier?: Prisma.StringFieldUpdateOperationsInput | string
+  targetCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestedRole?: Prisma.EnumCompanyMembershipRoleFieldUpdateOperationsInput | $Enums.CompanyMembershipRole
+  prerequisiteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.EnumRecruiterVerificationStateFieldUpdateOperationsInput | $Enums.RecruiterVerificationState
+  currentEvidenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentSubmissionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  resubmissionCount?: Prisma.IntFieldUpdateOperationsInput | number
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changesRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  delayedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerUnavailableSince?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerEscalatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  viewerDelayNotifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidence?: Prisma.BusinessLicenseEvidenceUncheckedUpdateManyWithoutRequestNestedInput
+  safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedUpdateManyWithoutRequestNestedInput
+  decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
+  notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
+  notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
+  acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
+}
+
 export type RecruiterVerificationRequestCreateWithoutAcceptedRegistrySnapshotInput = {
   id?: string
   submissionIdempotencyKey?: string | null
@@ -1427,6 +1643,7 @@ export type RecruiterVerificationRequestCreateWithoutAcceptedRegistrySnapshotInp
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   applicant: Prisma.UserAccountCreateNestedOneWithoutRecruiterVerificationRequestsInput
   targetCompany?: Prisma.CompanyCreateNestedOneWithoutRecruiterVerificationRequestsInput
   evidence?: Prisma.BusinessLicenseEvidenceCreateNestedManyWithoutRequestInput
@@ -1434,6 +1651,7 @@ export type RecruiterVerificationRequestCreateWithoutAcceptedRegistrySnapshotInp
   decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
 }
 
@@ -1462,11 +1680,13 @@ export type RecruiterVerificationRequestUncheckedCreateWithoutAcceptedRegistrySn
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedCreateNestedManyWithoutRequestInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
 }
 
@@ -1509,6 +1729,7 @@ export type RecruiterVerificationRequestUpdateWithoutAcceptedRegistrySnapshotInp
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicant?: Prisma.UserAccountUpdateOneRequiredWithoutRecruiterVerificationRequestsNestedInput
   targetCompany?: Prisma.CompanyUpdateOneWithoutRecruiterVerificationRequestsNestedInput
   evidence?: Prisma.BusinessLicenseEvidenceUpdateManyWithoutRequestNestedInput
@@ -1516,6 +1737,7 @@ export type RecruiterVerificationRequestUpdateWithoutAcceptedRegistrySnapshotInp
   decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
 }
 
@@ -1544,11 +1766,13 @@ export type RecruiterVerificationRequestUncheckedUpdateWithoutAcceptedRegistrySn
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedUpdateManyWithoutRequestNestedInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
 }
 
@@ -1575,6 +1799,7 @@ export type RecruiterVerificationRequestCreateWithoutBusinessFactsInput = {
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   applicant: Prisma.UserAccountCreateNestedOneWithoutRecruiterVerificationRequestsInput
   targetCompany?: Prisma.CompanyCreateNestedOneWithoutRecruiterVerificationRequestsInput
   evidence?: Prisma.BusinessLicenseEvidenceCreateNestedManyWithoutRequestInput
@@ -1582,6 +1807,7 @@ export type RecruiterVerificationRequestCreateWithoutBusinessFactsInput = {
   decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventCreateNestedManyWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
 }
 
@@ -1610,11 +1836,13 @@ export type RecruiterVerificationRequestUncheckedCreateWithoutBusinessFactsInput
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedCreateNestedManyWithoutRequestInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedCreateNestedManyWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
 }
 
@@ -1657,6 +1885,7 @@ export type RecruiterVerificationRequestUpdateWithoutBusinessFactsInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicant?: Prisma.UserAccountUpdateOneRequiredWithoutRecruiterVerificationRequestsNestedInput
   targetCompany?: Prisma.CompanyUpdateOneWithoutRecruiterVerificationRequestsNestedInput
   evidence?: Prisma.BusinessLicenseEvidenceUpdateManyWithoutRequestNestedInput
@@ -1664,6 +1893,7 @@ export type RecruiterVerificationRequestUpdateWithoutBusinessFactsInput = {
   decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUpdateManyWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
 }
 
@@ -1692,11 +1922,13 @@ export type RecruiterVerificationRequestUncheckedUpdateWithoutBusinessFactsInput
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedUpdateManyWithoutRequestNestedInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedUpdateManyWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
 }
 
@@ -1723,12 +1955,14 @@ export type RecruiterVerificationRequestCreateWithoutEvidenceInput = {
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   applicant: Prisma.UserAccountCreateNestedOneWithoutRecruiterVerificationRequestsInput
   targetCompany?: Prisma.CompanyCreateNestedOneWithoutRecruiterVerificationRequestsInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
 }
@@ -1758,10 +1992,12 @@ export type RecruiterVerificationRequestUncheckedCreateWithoutEvidenceInput = {
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
 }
@@ -1805,12 +2041,14 @@ export type RecruiterVerificationRequestUpdateWithoutEvidenceInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicant?: Prisma.UserAccountUpdateOneRequiredWithoutRecruiterVerificationRequestsNestedInput
   targetCompany?: Prisma.CompanyUpdateOneWithoutRecruiterVerificationRequestsNestedInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
 }
@@ -1840,10 +2078,12 @@ export type RecruiterVerificationRequestUncheckedUpdateWithoutEvidenceInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
 }
@@ -1871,12 +2111,14 @@ export type RecruiterVerificationRequestCreateWithoutSafetyAttemptsInput = {
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   applicant: Prisma.UserAccountCreateNestedOneWithoutRecruiterVerificationRequestsInput
   targetCompany?: Prisma.CompanyCreateNestedOneWithoutRecruiterVerificationRequestsInput
   evidence?: Prisma.BusinessLicenseEvidenceCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
 }
@@ -1906,10 +2148,12 @@ export type RecruiterVerificationRequestUncheckedCreateWithoutSafetyAttemptsInpu
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
 }
@@ -1953,12 +2197,14 @@ export type RecruiterVerificationRequestUpdateWithoutSafetyAttemptsInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicant?: Prisma.UserAccountUpdateOneRequiredWithoutRecruiterVerificationRequestsNestedInput
   targetCompany?: Prisma.CompanyUpdateOneWithoutRecruiterVerificationRequestsNestedInput
   evidence?: Prisma.BusinessLicenseEvidenceUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
 }
@@ -1988,10 +2234,12 @@ export type RecruiterVerificationRequestUncheckedUpdateWithoutSafetyAttemptsInpu
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
 }
@@ -2019,12 +2267,14 @@ export type RecruiterVerificationRequestCreateWithoutDecisionsInput = {
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   applicant: Prisma.UserAccountCreateNestedOneWithoutRecruiterVerificationRequestsInput
   targetCompany?: Prisma.CompanyCreateNestedOneWithoutRecruiterVerificationRequestsInput
   evidence?: Prisma.BusinessLicenseEvidenceCreateNestedManyWithoutRequestInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
 }
@@ -2054,10 +2304,12 @@ export type RecruiterVerificationRequestUncheckedCreateWithoutDecisionsInput = {
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedCreateNestedManyWithoutRequestInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedCreateNestedManyWithoutRequestInput
   notes?: Prisma.VerificationPrivateNoteUncheckedCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
 }
@@ -2101,12 +2353,14 @@ export type RecruiterVerificationRequestUpdateWithoutDecisionsInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicant?: Prisma.UserAccountUpdateOneRequiredWithoutRecruiterVerificationRequestsNestedInput
   targetCompany?: Prisma.CompanyUpdateOneWithoutRecruiterVerificationRequestsNestedInput
   evidence?: Prisma.BusinessLicenseEvidenceUpdateManyWithoutRequestNestedInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
 }
@@ -2136,10 +2390,12 @@ export type RecruiterVerificationRequestUncheckedUpdateWithoutDecisionsInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedUpdateManyWithoutRequestNestedInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
 }
@@ -2167,12 +2423,14 @@ export type RecruiterVerificationRequestCreateWithoutNotesInput = {
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   applicant: Prisma.UserAccountCreateNestedOneWithoutRecruiterVerificationRequestsInput
   targetCompany?: Prisma.CompanyCreateNestedOneWithoutRecruiterVerificationRequestsInput
   evidence?: Prisma.BusinessLicenseEvidenceCreateNestedManyWithoutRequestInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsCreateNestedOneWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotCreateNestedOneWithoutAcceptedRequestInput
 }
@@ -2202,10 +2460,12 @@ export type RecruiterVerificationRequestUncheckedCreateWithoutNotesInput = {
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedCreateNestedManyWithoutRequestInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedCreateNestedManyWithoutRequestInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedCreateNestedManyWithoutRequestInput
   notifications?: Prisma.EmailOutboxUncheckedCreateNestedManyWithoutVerificationRequestInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedCreateNestedManyWithoutRequestInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedCreateNestedOneWithoutRequestInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedCreateNestedOneWithoutAcceptedRequestInput
 }
@@ -2249,12 +2509,14 @@ export type RecruiterVerificationRequestUpdateWithoutNotesInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicant?: Prisma.UserAccountUpdateOneRequiredWithoutRecruiterVerificationRequestsNestedInput
   targetCompany?: Prisma.CompanyUpdateOneWithoutRecruiterVerificationRequestsNestedInput
   evidence?: Prisma.BusinessLicenseEvidenceUpdateManyWithoutRequestNestedInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
 }
@@ -2284,10 +2546,12 @@ export type RecruiterVerificationRequestUncheckedUpdateWithoutNotesInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedUpdateManyWithoutRequestNestedInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
 }
@@ -2316,6 +2580,7 @@ export type RecruiterVerificationRequestCreateManyApplicantInput = {
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
 }
 
 export type RecruiterVerificationRequestUpdateWithoutApplicantInput = {
@@ -2341,12 +2606,14 @@ export type RecruiterVerificationRequestUpdateWithoutApplicantInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetCompany?: Prisma.CompanyUpdateOneWithoutRecruiterVerificationRequestsNestedInput
   evidence?: Prisma.BusinessLicenseEvidenceUpdateManyWithoutRequestNestedInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
 }
@@ -2375,11 +2642,13 @@ export type RecruiterVerificationRequestUncheckedUpdateWithoutApplicantInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedUpdateManyWithoutRequestNestedInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
 }
@@ -2408,6 +2677,7 @@ export type RecruiterVerificationRequestUncheckedUpdateManyWithoutApplicantInput
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type RecruiterVerificationRequestCreateManyTargetCompanyInput = {
@@ -2434,6 +2704,7 @@ export type RecruiterVerificationRequestCreateManyTargetCompanyInput = {
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  adminComment?: string | null
 }
 
 export type RecruiterVerificationRequestUpdateWithoutTargetCompanyInput = {
@@ -2459,12 +2730,14 @@ export type RecruiterVerificationRequestUpdateWithoutTargetCompanyInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   applicant?: Prisma.UserAccountUpdateOneRequiredWithoutRecruiterVerificationRequestsNestedInput
   evidence?: Prisma.BusinessLicenseEvidenceUpdateManyWithoutRequestNestedInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUpdateOneWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUpdateOneWithoutAcceptedRequestNestedInput
 }
@@ -2493,11 +2766,13 @@ export type RecruiterVerificationRequestUncheckedUpdateWithoutTargetCompanyInput
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   evidence?: Prisma.BusinessLicenseEvidenceUncheckedUpdateManyWithoutRequestNestedInput
   safetyAttempts?: Prisma.VerificationSafetyAttemptUncheckedUpdateManyWithoutRequestNestedInput
   decisions?: Prisma.VerificationDecisionHistoryUncheckedUpdateManyWithoutRequestNestedInput
   notes?: Prisma.VerificationPrivateNoteUncheckedUpdateManyWithoutRequestNestedInput
   notifications?: Prisma.EmailOutboxUncheckedUpdateManyWithoutVerificationRequestNestedInput
+  notificationEvents?: Prisma.VerificationNotificationEventUncheckedUpdateManyWithoutRequestNestedInput
   businessFacts?: Prisma.VerificationBusinessFactsUncheckedUpdateOneWithoutRequestNestedInput
   acceptedRegistrySnapshot?: Prisma.BusinessRegistryLookupSnapshotUncheckedUpdateOneWithoutAcceptedRequestNestedInput
 }
@@ -2526,6 +2801,7 @@ export type RecruiterVerificationRequestUncheckedUpdateManyWithoutTargetCompanyI
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -2539,6 +2815,7 @@ export type RecruiterVerificationRequestCountOutputType = {
   decisions: number
   notes: number
   notifications: number
+  notificationEvents: number
 }
 
 export type RecruiterVerificationRequestCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2547,6 +2824,7 @@ export type RecruiterVerificationRequestCountOutputTypeSelect<ExtArgs extends ru
   decisions?: boolean | RecruiterVerificationRequestCountOutputTypeCountDecisionsArgs
   notes?: boolean | RecruiterVerificationRequestCountOutputTypeCountNotesArgs
   notifications?: boolean | RecruiterVerificationRequestCountOutputTypeCountNotificationsArgs
+  notificationEvents?: boolean | RecruiterVerificationRequestCountOutputTypeCountNotificationEventsArgs
 }
 
 /**
@@ -2594,6 +2872,13 @@ export type RecruiterVerificationRequestCountOutputTypeCountNotificationsArgs<Ex
   where?: Prisma.EmailOutboxWhereInput
 }
 
+/**
+ * RecruiterVerificationRequestCountOutputType without action
+ */
+export type RecruiterVerificationRequestCountOutputTypeCountNotificationEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VerificationNotificationEventWhereInput
+}
+
 
 export type RecruiterVerificationRequestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2620,6 +2905,7 @@ export type RecruiterVerificationRequestSelect<ExtArgs extends runtime.Types.Ext
   version?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  adminComment?: boolean
   applicant?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   targetCompany?: boolean | Prisma.RecruiterVerificationRequest$targetCompanyArgs<ExtArgs>
   evidence?: boolean | Prisma.RecruiterVerificationRequest$evidenceArgs<ExtArgs>
@@ -2627,6 +2913,7 @@ export type RecruiterVerificationRequestSelect<ExtArgs extends runtime.Types.Ext
   decisions?: boolean | Prisma.RecruiterVerificationRequest$decisionsArgs<ExtArgs>
   notes?: boolean | Prisma.RecruiterVerificationRequest$notesArgs<ExtArgs>
   notifications?: boolean | Prisma.RecruiterVerificationRequest$notificationsArgs<ExtArgs>
+  notificationEvents?: boolean | Prisma.RecruiterVerificationRequest$notificationEventsArgs<ExtArgs>
   businessFacts?: boolean | Prisma.RecruiterVerificationRequest$businessFactsArgs<ExtArgs>
   acceptedRegistrySnapshot?: boolean | Prisma.RecruiterVerificationRequest$acceptedRegistrySnapshotArgs<ExtArgs>
   _count?: boolean | Prisma.RecruiterVerificationRequestCountOutputTypeDefaultArgs<ExtArgs>
@@ -2657,6 +2944,7 @@ export type RecruiterVerificationRequestSelectCreateManyAndReturn<ExtArgs extend
   version?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  adminComment?: boolean
   applicant?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   targetCompany?: boolean | Prisma.RecruiterVerificationRequest$targetCompanyArgs<ExtArgs>
 }, ExtArgs["result"]["recruiterVerificationRequest"]>
@@ -2686,6 +2974,7 @@ export type RecruiterVerificationRequestSelectUpdateManyAndReturn<ExtArgs extend
   version?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  adminComment?: boolean
   applicant?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   targetCompany?: boolean | Prisma.RecruiterVerificationRequest$targetCompanyArgs<ExtArgs>
 }, ExtArgs["result"]["recruiterVerificationRequest"]>
@@ -2715,9 +3004,10 @@ export type RecruiterVerificationRequestSelectScalar = {
   version?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  adminComment?: boolean
 }
 
-export type RecruiterVerificationRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "submissionIdempotencyKey" | "applicantUserId" | "submittedCompanyName" | "normalizedTaxIdentifier" | "targetCompanyId" | "requestedRole" | "prerequisiteId" | "state" | "currentEvidenceId" | "currentSubmissionVersion" | "resubmissionCount" | "assignedAdminUserId" | "changesRequestedAt" | "delayedAt" | "expiredAt" | "cancelledAt" | "decidedAt" | "viewerUnavailableSince" | "viewerEscalatedAt" | "viewerDelayNotifiedAt" | "version" | "createdAt" | "updatedAt", ExtArgs["result"]["recruiterVerificationRequest"]>
+export type RecruiterVerificationRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "submissionIdempotencyKey" | "applicantUserId" | "submittedCompanyName" | "normalizedTaxIdentifier" | "targetCompanyId" | "requestedRole" | "prerequisiteId" | "state" | "currentEvidenceId" | "currentSubmissionVersion" | "resubmissionCount" | "assignedAdminUserId" | "changesRequestedAt" | "delayedAt" | "expiredAt" | "cancelledAt" | "decidedAt" | "viewerUnavailableSince" | "viewerEscalatedAt" | "viewerDelayNotifiedAt" | "version" | "createdAt" | "updatedAt" | "adminComment", ExtArgs["result"]["recruiterVerificationRequest"]>
 export type RecruiterVerificationRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   applicant?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   targetCompany?: boolean | Prisma.RecruiterVerificationRequest$targetCompanyArgs<ExtArgs>
@@ -2726,6 +3016,7 @@ export type RecruiterVerificationRequestInclude<ExtArgs extends runtime.Types.Ex
   decisions?: boolean | Prisma.RecruiterVerificationRequest$decisionsArgs<ExtArgs>
   notes?: boolean | Prisma.RecruiterVerificationRequest$notesArgs<ExtArgs>
   notifications?: boolean | Prisma.RecruiterVerificationRequest$notificationsArgs<ExtArgs>
+  notificationEvents?: boolean | Prisma.RecruiterVerificationRequest$notificationEventsArgs<ExtArgs>
   businessFacts?: boolean | Prisma.RecruiterVerificationRequest$businessFactsArgs<ExtArgs>
   acceptedRegistrySnapshot?: boolean | Prisma.RecruiterVerificationRequest$acceptedRegistrySnapshotArgs<ExtArgs>
   _count?: boolean | Prisma.RecruiterVerificationRequestCountOutputTypeDefaultArgs<ExtArgs>
@@ -2749,6 +3040,7 @@ export type $RecruiterVerificationRequestPayload<ExtArgs extends runtime.Types.E
     decisions: Prisma.$VerificationDecisionHistoryPayload<ExtArgs>[]
     notes: Prisma.$VerificationPrivateNotePayload<ExtArgs>[]
     notifications: Prisma.$EmailOutboxPayload<ExtArgs>[]
+    notificationEvents: Prisma.$VerificationNotificationEventPayload<ExtArgs>[]
     businessFacts: Prisma.$VerificationBusinessFactsPayload<ExtArgs> | null
     acceptedRegistrySnapshot: Prisma.$BusinessRegistryLookupSnapshotPayload<ExtArgs> | null
   }
@@ -2777,6 +3069,7 @@ export type $RecruiterVerificationRequestPayload<ExtArgs extends runtime.Types.E
     version: number
     createdAt: Date
     updatedAt: Date
+    adminComment: string | null
   }, ExtArgs["result"]["recruiterVerificationRequest"]>
   composites: {}
 }
@@ -3178,6 +3471,7 @@ export interface Prisma__RecruiterVerificationRequestClient<T, Null = never, Ext
   decisions<T extends Prisma.RecruiterVerificationRequest$decisionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RecruiterVerificationRequest$decisionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VerificationDecisionHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notes<T extends Prisma.RecruiterVerificationRequest$notesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RecruiterVerificationRequest$notesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VerificationPrivateNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.RecruiterVerificationRequest$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RecruiterVerificationRequest$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailOutboxPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notificationEvents<T extends Prisma.RecruiterVerificationRequest$notificationEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RecruiterVerificationRequest$notificationEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VerificationNotificationEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   businessFacts<T extends Prisma.RecruiterVerificationRequest$businessFactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RecruiterVerificationRequest$businessFactsArgs<ExtArgs>>): Prisma.Prisma__VerificationBusinessFactsClient<runtime.Types.Result.GetResult<Prisma.$VerificationBusinessFactsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   acceptedRegistrySnapshot<T extends Prisma.RecruiterVerificationRequest$acceptedRegistrySnapshotArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RecruiterVerificationRequest$acceptedRegistrySnapshotArgs<ExtArgs>>): Prisma.Prisma__BusinessRegistryLookupSnapshotClient<runtime.Types.Result.GetResult<Prisma.$BusinessRegistryLookupSnapshotPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
@@ -3233,6 +3527,7 @@ export interface RecruiterVerificationRequestFieldRefs {
   readonly version: Prisma.FieldRef<"RecruiterVerificationRequest", 'Int'>
   readonly createdAt: Prisma.FieldRef<"RecruiterVerificationRequest", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"RecruiterVerificationRequest", 'DateTime'>
+  readonly adminComment: Prisma.FieldRef<"RecruiterVerificationRequest", 'String'>
 }
     
 
@@ -3770,6 +4065,30 @@ export type RecruiterVerificationRequest$notificationsArgs<ExtArgs extends runti
   take?: number
   skip?: number
   distinct?: Prisma.EmailOutboxScalarFieldEnum | Prisma.EmailOutboxScalarFieldEnum[]
+}
+
+/**
+ * RecruiterVerificationRequest.notificationEvents
+ */
+export type RecruiterVerificationRequest$notificationEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VerificationNotificationEvent
+   */
+  select?: Prisma.VerificationNotificationEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VerificationNotificationEvent
+   */
+  omit?: Prisma.VerificationNotificationEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VerificationNotificationEventInclude<ExtArgs> | null
+  where?: Prisma.VerificationNotificationEventWhereInput
+  orderBy?: Prisma.VerificationNotificationEventOrderByWithRelationInput | Prisma.VerificationNotificationEventOrderByWithRelationInput[]
+  cursor?: Prisma.VerificationNotificationEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VerificationNotificationEventScalarFieldEnum | Prisma.VerificationNotificationEventScalarFieldEnum[]
 }
 
 /**

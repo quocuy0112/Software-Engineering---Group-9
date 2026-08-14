@@ -22,6 +22,12 @@ export class AdminCommandConflict extends Error {
   }
 }
 
+export class AdminCommandDenied extends Error {
+  constructor(public readonly payload: Record<string, unknown>) {
+    super("ACTION_BLOCKED");
+  }
+}
+
 function digest(value: unknown) {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
@@ -70,7 +76,15 @@ export class PrismaAdminCommandRepository {
         } as T & { correlationId: string; replayed: true };
       }
       const correlationId = crypto.randomUUID();
-      const result = await operation(tx, correlationId);
+      let result: T;
+      let resultCode: "SUCCESS" | "DENIED" = "SUCCESS";
+      try {
+        result = await operation(tx, correlationId);
+      } catch (error) {
+        if (!(error instanceof AdminCommandDenied)) throw error;
+        result = error.payload as T;
+        resultCode = "DENIED";
+      }
       await tx.adminCommandReceipt.create({
         data: {
           actorSubjectDigest,
@@ -78,7 +92,7 @@ export class PrismaAdminCommandRepository {
           targetReference: identity.targetReference,
           idempotencyKey: identity.idempotencyKey,
           normalizedBodyDigest,
-          resultCode: "SUCCESS",
+          resultCode,
           resultingVersion: result.version ?? null,
           resultPayload: JSON.parse(JSON.stringify(result)) as Prisma.InputJsonValue,
           correlationId,

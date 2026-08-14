@@ -8,7 +8,9 @@ describe("OCR/image-worker failure isolation", () => {
       resolve(process.cwd(), "../scripts/run-local-development.mjs"),
       "utf8",
     );
-    expect(script).toContain('"building worker images"');
+    expect(script).toContain("function workerImageIsMissing");
+    expect(script).toContain("worker images are cached; skipping build");
+    expect(script).toContain('"--build-workers"');
     for (const service of [
       "cv-worker",
       "ocr-engine",
@@ -20,22 +22,28 @@ describe("OCR/image-worker failure isolation", () => {
     expect(script).toContain('"postgres"');
     expect(script).toContain('"clamav"');
     expect(script).toContain(
-      '["compose", "up", "-d", "--no-build", ...infrastructureServices]',
+      '["compose", "up", "-d", "--wait", "--no-build", "postgres"]',
     );
+    expect(script).toContain('"--parallel"');
+    expect(script).toContain('"1"');
+    expect(script).toContain('["compose", "up", "-d", "--no-build", "clamav"]');
     expect(script).toContain(
-      '["compose", "up", "-d", "--no-build", "--no-deps", ...workerServices]',
+      '["compose", "up", "-d", "--no-build", "--no-deps", ...builtServices]',
     );
     expect(script).not.toContain('"compose",\n        "stop"');
     expect(script).toContain('stdio: "inherit"');
+    expect(script).toContain("detached: true");
+    expect(script).toContain('spawn("taskkill.exe"');
+    expect(script).toContain("const shutdownChildren");
+    expect(script).not.toContain("latestModifiedAt");
+    expect(script).not.toContain("missing or changed worker images");
     expect(script).toContain('child.once("error", (error) =>');
     expect(script).toContain('child.once("exit", (code, signal) =>');
     expect(script).toContain(
       "Compose infrastructure and workers remain running",
     );
     expect(
-      script.indexOf(
-        'void runCommand(\n    "starting restartable worker services',
-      ),
+      script.indexOf("const workerBuildResult = await workerBuild"),
     ).toBeLessThan(script.indexOf('start("web", "dev:web")'));
     expect(script).toContain("web startup does not wait for ClamAV health");
   });

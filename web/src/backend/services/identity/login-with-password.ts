@@ -92,10 +92,16 @@ export class LoginWithPasswordService {
         account.id,
         "account_inactive",
       );
-      return Response.json(
-        { message: GENERIC_LOGIN_ERROR },
-        { status: 401, headers: noStoreHeaders },
-      );
+      if (account.state === "SUSPENDED")
+        return Response.json(
+          {
+            code: "ACCOUNT_SUSPENDED",
+            message: "This account is suspended.",
+            supportPath: "/support/account-security",
+          },
+          { status: 423, headers: noStoreHeaders },
+        );
+      return Response.json({ message: GENERIC_LOGIN_ERROR }, { status: 401, headers: noStoreHeaders });
     }
     const [hasIncompleteReset, hasBlockingRecovery] = await Promise.all([
       this.resetOperations.hasIncompleteForUser(account.id).catch(() => true),

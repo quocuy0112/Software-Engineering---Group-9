@@ -27,11 +27,24 @@ describe("custom server runtime boundaries", () => {
     }
   });
 
-  it("supports backend server-only markers without changing React exports", () => {
-    const loaderSource = readFileSync(
-      "scripts/server-only-loader.mjs",
-      "utf8",
+  it("preloads tsx without Windows user lookup failures", () => {
+    const packageSource = JSON.parse(readFileSync("package.json", "utf8"));
+    const tsxRuntime = readFileSync("scripts/register-tsx-runtime.mjs", "utf8");
+
+    for (const scriptName of ["dev", "dev:web", "start"]) {
+      expect(packageSource.scripts[scriptName]).toContain(
+        "--import ./scripts/register-tsx-runtime.mjs",
+      );
+    }
+    expect(packageSource.scripts["email:worker"]).toContain(
+      "./scripts/register-tsx-runtime.mjs",
     );
+    expect(tsxRuntime).toContain("process.geteuid");
+    expect(tsxRuntime).toContain('await import("tsx")');
+  });
+
+  it("supports backend server-only markers without changing React exports", () => {
+    const loaderSource = readFileSync("scripts/server-only-loader.mjs", "utf8");
     expect(loaderSource).toContain('specifier === "server-only"');
     expect(loaderSource).not.toMatch(/react(?:-dom)?/u);
 
@@ -73,9 +86,7 @@ describe("custom server runtime boundaries", () => {
     const buildSource = readFileSync("scripts/run-next-build.mjs", "utf8");
 
     expect(packageSource.scripts).not.toHaveProperty("prebuild");
-    expect(packageSource.scripts.build).toBe(
-      "node scripts/run-next-build.mjs",
-    );
+    expect(packageSource.scripts.build).toBe("node scripts/run-next-build.mjs");
     expect(buildSource).toContain('acquireNextOutputLock("next-build")');
     expect(buildSource.indexOf("spawn(")).toBeLessThan(
       buildSource.indexOf("releaseNextOutputLock()"),

@@ -17,9 +17,10 @@ export async function GET(
     );
     const inline =
       new URL(request.url).searchParams.get("disposition") === "inline";
-    return new Response(result.bytes, {
+    return new Response(Uint8Array.from(result.bytes), {
       headers: adminNoStoreHeaders({
         "content-type": inline ? result.mediaType : "application/octet-stream",
+        "content-length": String(result.bytes.byteLength),
         "content-disposition": `${inline ? "inline" : "attachment"}; filename="${result.filename}"`,
         ...(inline
           ? {

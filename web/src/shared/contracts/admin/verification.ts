@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   membershipRoleSchema,
   normalizedText,
+  adminTimestampSchema,
   verificationRejectionCategorySchema,
   verificationStateSchema,
 } from "./common";
@@ -64,6 +65,118 @@ export const verificationListFilterSchema = z
     taxIdentifier: normalizedTaxIdentifierSchema.optional(),
     applicantId: z.string().optional(),
     assignment: z.enum(["UNASSIGNED", "MINE", "ANY"]).optional(),
+  })
+  .strict();
+
+export const verificationQueueFilterSchema = z
+  .object({
+    state: verificationStateSchema.default("PENDING_REVIEW"),
+    applicantEligibility: z
+      .enum(["ACTIVE_ONLY", "SUSPENDED_ONLY", "ANY"])
+      .default("ACTIVE_ONLY"),
+    company: z.string().trim().max(160).optional(),
+    taxCode: z
+      .string()
+      .trim()
+      .regex(/^\d{10}$/u)
+      .optional(),
+    submittedFrom: z.string().date().optional(),
+    submittedTo: z.string().date().optional(),
+    page: z.coerce.number().int().min(1).default(1),
+    pageSize: z.union([z.literal(25), z.literal(50), z.literal(100)]).default(25),
+    // Legacy React Admin aliases remain accepted at the adapter boundary while
+    // the Feature 009 HTTP projection uses the exact contract names above.
+    taxIdentifier: z.string().trim().optional(),
+    applicantId: z.string().trim().optional(),
+    assignment: z.enum(["UNASSIGNED", "MINE", "ANY"]).optional(),
+  })
+  .superRefine((value, context) => {
+    if (value.submittedFrom && value.submittedTo && value.submittedFrom > value.submittedTo) {
+      context.addIssue({
+        code: "custom",
+        path: ["submittedFrom"],
+        message: "submittedFrom must be on or before submittedTo",
+      });
+    }
+    if (value.taxIdentifier && !/^\d{10}$/u.test(value.taxIdentifier)) {
+      context.addIssue({
+        code: "custom",
+        path: ["taxIdentifier"],
+        message: "taxIdentifier must contain exactly 10 digits",
+      });
+    }
+  });
+
+export const verificationQueueItemSchema = z
+  .object({
+    id: z.string().min(1),
+    applicantId: z.string().min(1),
+    companyName: z.string().max(240),
+    taxCode: z.string().regex(/^\d{10}$/u),
+    state: verificationStateSchema,
+    applicantEligibility: z.enum(["ACTIVE", "SUSPENDED"]),
+    submittedAt: adminTimestampSchema,
+    resubmissionCount: z.number().int().nonnegative(),
+    assignedAdminRef: z.string().min(1).nullable(),
+    version: z.number().int().positive(),
+  })
+  .strict();
+
+export const verificationQueuePageSchema = z
+  .object({
+    data: z.array(verificationQueueItemSchema),
+    page: z.number().int().positive(),
+    pageSize: z.union([z.literal(25), z.literal(50), z.literal(100)]),
+    total: z.number().int().nonnegative(),
+    calculatedAt: adminTimestampSchema,
+  })
+  .strict();
+
+export const verificationDecisionHistoryItemSchema = z
+  .object({
+    id: z.string().min(1),
+    decision: z.enum(["APPROVED", "REJECTED", "CHANGES_REQUESTED"]),
+    category: z.string().nullable(),
+    applicantComment: z.string().nullable(),
+    decidedAt: adminTimestampSchema,
+    reviewerRef: z.string().min(1),
+  })
+  .strict();
+
+export const evidenceMetadataSchema = z
+  .object({
+    id: z.string().min(1),
+    version: z.number().int().positive(),
+    fileName: z.string().min(1).max(240),
+    mediaType: businessEvidenceMediaTypeSchema,
+    byteSize: z.number().int().positive(),
+    safetyState: z.enum(["PENDING", "PASS", "FAIL", "ERROR"]),
+    accessibility: z.enum(["AVAILABLE", "INACCESSIBLE", "DELETED"]),
+  })
+  .strict();
+
+export const verificationReviewDetailSchema = z
+  .object({
+    request: verificationQueueItemSchema,
+    company: z.object({
+      name: z.string(),
+      taxCode: z.string().regex(/^\d{10}$/u),
+      targetKind: z.enum(["NEW_COMPANY", "EXISTING_COMPANY"]),
+      prerequisiteState: z.string(),
+    }),
+    evidence: evidenceMetadataSchema.nullable(),
+    versions: z.array(evidenceMetadataSchema),
+    decisions: z.array(verificationDecisionHistoryItemSchema),
+    notes: z.array(z.object({
+      id: z.string(),
+      reviewerRef: z.string(),
+      text: z.string(),
+      createdAt: adminTimestampSchema,
+    })),
+    applicantComment: z.string().nullable(),
+    canDecide: z.boolean(),
+    blockReason: z.string().nullable(),
+    calculatedAt: adminTimestampSchema,
   })
   .strict();
 export const verificationDecisionSchema = z.discriminatedUnion("action", [

@@ -1,49 +1,62 @@
 "use client";
 import {
-  BooleanInput,
   Datagrid,
   DateField,
+  FunctionField,
   List,
   Pagination,
   SelectInput,
   TextField,
   TextInput,
 } from "react-admin";
-import { CurrentListSnapshotDifference } from "../dashboard/snapshot-difference-notice";
-import { AccessRolesField, AccessRolesLegend } from "./access-roles-field";
 
 const filters = [
   <TextInput
     key="q"
     source="q"
-    label="Account reference, name, or exact email"
+    label="Account reference, name, or email"
     alwaysOn
   />,
   <SelectInput
-    key="state"
-    source="state"
-    choices={["ACTIVE", "SUSPENDED", "PENDING_VERIFICATION", "DELETED"].map(
-      (id) => ({ id, name: id }),
-    )}
-  />,
-  <BooleanInput
-    key="recruiterEnabled"
-    source="recruiterEnabled"
-    label="Recruiter enabled"
+    key="type"
+    source="type"
+    label="Account type"
+    choices={[
+      { id: "ALL", name: "All accounts" },
+      { id: "CANDIDATE", name: "Candidates" },
+      { id: "RECRUITER", name: "Recruiters" },
+    ]}
   />,
   <SelectInput
-    key="membershipRole"
-    source="membershipRole"
-    choices={["OWNER", "HR_MANAGER", "RECRUITER", "HIRING_MANAGER"].map(
-      (id) => ({ id, name: id }),
-    )}
+    key="status"
+    source="status"
+    label="Account status"
+    choices={[
+      { id: "ALL", name: "All statuses" },
+      { id: "ACTIVE", name: "Active" },
+      { id: "SUSPENDED", name: "Suspended" },
+    ]}
   />,
-  <SelectInput
-    key="membershipState"
-    source="membershipState"
-    choices={["ACTIVE", "SUSPENDED", "REMOVED"].map((id) => ({ id, name: id }))}
+  <TextInput
+    key="registeredFrom"
+    source="registeredFrom"
+    label="Registered from (YYYY-MM-DD)"
+  />,
+  <TextInput
+    key="registeredTo"
+    source="registeredTo"
+    label="Registered to (YYYY-MM-DD)"
   />,
 ];
+
+function counts(record: Record<string, unknown>) {
+  const value = record.counts as Record<string, unknown> | undefined;
+  if (!value) return "Unavailable";
+  if (value.unavailable === true) return "Unavailable";
+  if (value.kind === "CANDIDATE")
+    return `CVs ${value.cvCount}; applications ${value.applicationCount}`;
+  return `Active ${value.active}; pending ${value.pendingReview}; rejected ${value.rejected}; draft ${value.draft}; closed ${value.closed}`;
+}
 
 export function AccountList() {
   return (
@@ -51,17 +64,16 @@ export function AccountList() {
       filters={filters}
       perPage={25}
       pagination={<Pagination rowsPerPageOptions={[25, 50, 100]} />}
-      sort={{ field: "createdAt", order: "DESC" }}
+      sort={{ field: "registeredAt", order: "DESC" }}
     >
-      <CurrentListSnapshotDifference />
-      <AccessRolesLegend />
       <Datagrid bulkActionButtons={false} rowClick="show">
-        <TextField source="id" label="Account reference" />
+        <TextField source="accountReference" label="Account reference" />
         <TextField source="displayName" />
         <TextField source="maskedEmail" />
-        <TextField source="state" />
-        <DateField source="createdAt" showTime />
-        <AccessRolesField label="Access roles" />
+        <TextField source="type" label="Account type" />
+        <TextField source="status" label="Status" />
+        <DateField source="registeredAt" showTime />
+        <FunctionField label="Activity" render={counts} />
       </Datagrid>
     </List>
   );

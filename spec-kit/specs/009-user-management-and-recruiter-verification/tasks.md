@@ -8,15 +8,41 @@
 
 **Implementation order**: Complete Group 1 and its gate before Group 2; complete Group 2 and its gate before Group 3. No group-specific task directory is created.
 
+## Implementation audit — 2026-08-14
+
+The initial checklist was stale. Feature 006 already supplied the Candidate
+submission flow, legacy verification approval/Request Changes compatibility,
+admin authentication/session boundaries, evidence storage routes, and the
+security-notification worker. Feature 009 work in this pass added the reviewed
+migration, account directory/detail projections, current Approve/Reject
+surface, shared decision eligibility, dual-channel verification outcome, exact
+Restore route, and account moderation transaction changes.
+
+Checkboxes below are checked only for work that exists and has a focused
+verification result. Unchecked tasks remain genuinely partial or unstarted;
+in particular, the full database-backed fixture, accessibility/E2E suites,
+failure-injection matrix, PostgreSQL EXPLAIN/P95 evidence, rationale UI, and
+cross-module release suite are not represented as complete. Legacy
+`CHANGES_REQUESTED`/`RESUBMITTED` data and compatibility tests remain readable,
+but are not current Admin commands.
+
+Phase status: Setup and the reviewed persistence/contract foundation are
+implemented and locally checked. Group 1 read backend/UI, Group 2 queue,
+decision, retention, and protected-viewer backend/UI, and Group 3 core
+Suspend/Restore backend/routes are implemented. Group 1 has only a synthetic
+performance smoke result; Group 2/3 release gates, database-backed fixture
+coverage, full accessibility/E2E/failure-injection coverage, and the remaining
+moderation-history/rationale UI are still pending.
+
 ## Phase 1: Setup (Shared Infrastructure)
 
 **Purpose**: Prepare the existing Feature 006 admin surface, task tooling, and test boundaries for Feature 009.
 
-- [ ] T001 Confirm the `009-user-management-and-recruiter-verification` branch, feature directory, and reviewed inputs in `spec-kit/specs/009-user-management-and-recruiter-verification/plan.md`
-- [ ] T002 [P] Add root and `web/package.json` scripts for contract validation, focused tests, E2E tests, performance, usability, and migration verification from `spec-kit/specs/009-user-management-and-recruiter-verification/quickstart.md`
-- [ ] T003 [P] Create planned source and test directories under `web/src/backend/admin/accounts`, `web/src/backend/admin/verification`, `web/src/frontend/features/admin`, `web/tests/fixtures/admin-user-verification`, `web/tests/backend/{unit,contract,integration}/admin-user-verification`, `web/tests/frontend/{components,accessibility}/admin-user-verification`, `web/tests/{architecture,security,performance,usability}`, and `web/tests/system/e2e/admin-user-verification/` without adding a group folder under `spec-kit/specs/009-user-management-and-recruiter-verification/`
-- [ ] T004 [P] Add deterministic fixture factories and synthetic evidence fixtures in `web/tests/fixtures/admin-user-verification/index.ts` and `web/tests/fixtures/admin-user-verification/documents/`
-- [ ] T005 Add the Feature 009 contract-validation entry point for `spec-kit/specs/009-user-management-and-recruiter-verification/contracts/admin-user-verification.openapi.yaml` and `admin-console-contract.md` in `web/scripts/validate-admin-user-verification-contracts.mjs`
+- [x] T001 Confirm the `009-user-management-and-recruiter-verification` branch, feature directory, and reviewed inputs in `spec-kit/specs/009-user-management-and-recruiter-verification/plan.md`
+- [x] T002 [P] Add root and `web/package.json` scripts for contract validation, focused tests, E2E tests, performance, usability, and migration verification from `spec-kit/specs/009-user-management-and-recruiter-verification/quickstart.md`
+- [x] T003 [P] Create planned source and test directories under `web/src/backend/admin/accounts`, `web/src/backend/admin/verification`, `web/src/frontend/features/admin`, `web/tests/fixtures/admin-user-verification`, `web/tests/backend/{unit,contract,integration}/admin-user-verification`, `web/tests/frontend/{components,accessibility}/admin-user-verification`, `web/tests/{architecture,security,performance,usability}`, and `web/tests/system/e2e/admin-user-verification/` without adding a group folder under `spec-kit/specs/009-user-management-and-recruiter-verification/`
+- [x] T004 [P] Add deterministic fixture factories and synthetic evidence fixtures in `web/tests/fixtures/admin-user-verification/index.ts` and `web/tests/fixtures/admin-user-verification/documents/`
+- [x] T005 Add the Feature 009 contract-validation entry point for `spec-kit/specs/009-user-management-and-recruiter-verification/contracts/admin-user-verification.openapi.yaml` and `admin-console-contract.md` in `web/scripts/validate-admin-user-verification-contracts.mjs`
 
 ---
 
@@ -26,15 +52,15 @@
 
 **Checkpoint**: Foundation passes migration, boundary, and contract checks before Group 1 work begins.
 
-- [ ] T006 Create migration `web/prisma/migrations/022_admin_user_management_refinement/migration.sql` and update `web/prisma/schema.prisma` with nullable `RecruiterVerificationRequest.adminComment`, `VerificationNotificationEvent` dual-channel persistence/idempotency, reviewed directory indexes, and safe legacy-row handling
-- [ ] T007 [P] Define shared Zod/domain types for masked account identity, account status/type, version/freshness, error envelopes, and correlation in `web/src/shared/contracts/admin/resources.ts`
+- [x] T006 Create migration `web/prisma/migrations/022_admin_user_management_refinement/migration.sql` and update `web/prisma/schema.prisma` with nullable `RecruiterVerificationRequest.adminComment`, `VerificationNotificationEvent` dual-channel persistence/idempotency, reviewed directory indexes, and safe legacy-row handling
+- [x] T007 [P] Define shared Zod/domain types for masked account identity, account status/type, version/freshness, error envelopes, and correlation in `web/src/shared/contracts/admin/resources.ts`
 - [ ] T008 [P] Extend the Admin-origin, Better Auth session, Platform Administrator grant, CSRF, and 15-minute step-up boundary for Feature 009 reads and commands in `web/src/backend/admin/admin-request-boundary.ts`
 - [ ] T009 [P] Extend shared idempotency, `If-Match`, pessimistic mutation, audit correlation, and safe failure primitives in `web/src/backend/admin/admin-command-boundary.ts`
 - [ ] T010 [P] Define private evidence capability, no-store byte-stream, protected rationale, and retention ports in `web/src/backend/admin/admin-protected-data-ports.ts`
 - [ ] T011 [P] Add fixed-clock, transaction-failure, concurrency, session-revocation, and email-capture helpers in `web/tests/fixtures/admin-user-verification/test-harness.ts`
 - [ ] T012 [P] Add architecture tests enforcing route-handler/service/repository/provider separation, one browser-session owner, no protected client persistence, and no Prisma imports in services in `web/tests/architecture/admin-user-verification-boundaries.test.ts`
-- [ ] T013 Add shared OpenAPI/Zod response and command schemas, removed-route metadata for `reinstate` and `request-changes`, and generated exports in `web/src/shared/contracts/admin/commands.ts` and `web/src/shared/contracts/admin/index.ts`
-- [ ] T014 Verify migration counts, legacy rejected rows, audit/history rows, and index plans without changing authoritative data in `web/scripts/verify-admin-user-management-migration.mjs`
+- [x] T013 Add shared OpenAPI/Zod response and command schemas, removed-route metadata for `reinstate` and `request-changes`, and generated exports in `web/src/shared/contracts/admin/commands.ts` and `web/src/shared/contracts/admin/index.ts`
+- [x] T014 Verify migration counts, legacy rejected rows, audit/history rows, and index plans without changing authoritative data in `web/scripts/verify-admin-user-management-migration.mjs`
 
 ---
 
@@ -48,12 +74,12 @@
 
 - [ ] T015 [P] [US1] Write failing contract tests for `GET /api/admin/accounts` filters, pagination, stable ordering, freshness, masked fields, and safe errors in `web/tests/contract/admin-user-verification/account-directory.contract.test.ts`
 - [ ] T016 [P] [US1] Write failing repository/integration tests for Candidate-only, Recruiter-only, combined, account-reference/display-name/email keyword, inclusive date-range, lifecycle-status, and `registeredAt DESC, id ASC` queries in `web/tests/backend/integration/admin-user-verification/account-directory-query.test.ts`
-- [ ] T017 [P] [US1] Implement bounded account page query and active verified-membership classifier in `web/src/backend/repositories/admin/prisma-account-directory-repository.ts`
-- [ ] T018 [US1] Implement `AccountDirectoryItem` projection, filter normalization, page bounds, unavailable-result handling, and `calculatedAt` in `web/src/backend/admin/accounts/account-directory-service.ts`
-- [ ] T019 [US1] Add typed query/response schemas for account directory filters and rows in `web/src/shared/contracts/admin/resources.ts`
-- [ ] T020 [US1] Implement authenticated `GET /api/admin/accounts` in `web/src/app/api/admin/accounts/route.ts`
-- [ ] T021 [US1] Implement React Admin `accounts.getList` with memory-only filters, no-store reads, abort propagation, and authority-loss cache purge in `web/src/frontend/features/admin/app/data-provider.tsx`
-- [ ] T022 [US1] Build account table, filter bar, loading/empty/error/authority-lost states, masked identity, status labels, and responsive rows in `web/src/frontend/features/admin/accounts/account-list.tsx`
+- [x] T017 [P] [US1] Implement bounded account page query and active verified-membership classifier in `web/src/backend/repositories/admin/prisma-account-directory-repository.ts`
+- [x] T018 [US1] Implement `AccountDirectoryItem` projection, filter normalization, page bounds, unavailable-result handling, and `calculatedAt` in `web/src/backend/admin/accounts/account-directory-service.ts`
+- [x] T019 [US1] Add typed query/response schemas for account directory filters and rows in `web/src/shared/contracts/admin/resources.ts`
+- [x] T020 [US1] Implement authenticated `GET /api/admin/accounts` in `web/src/app/api/admin/accounts/route.ts`
+- [x] T021 [US1] Implement React Admin `accounts.getList` with memory-only filters, no-store reads, abort propagation, and authority-loss cache purge in `web/src/frontend/features/admin/app/data-provider.tsx`
+- [x] T022 [US1] Build account table, filter bar, loading/empty/error/authority-lost states, masked identity, status labels, and responsive rows in `web/src/frontend/features/admin/accounts/account-list.tsx`
 
 **Checkpoint**: US1 is demonstrable through the directory route and React Admin list without account or business-state mutation.
 
@@ -65,11 +91,11 @@
 
 - [ ] T023 [P] [US2] Write failing aggregate tests for all Candidate CV rows and submitted JobApplication rows, including zero, unavailable, and Suspended cases, in `web/tests/backend/integration/admin-user-verification/candidate-activity-aggregate.test.ts`
 - [ ] T024 [P] [US2] Write failing contract/privacy tests for `GET /api/admin/accounts/{accountId}` Candidate detail and forbidden protected fields in `web/tests/contract/admin-user-verification/account-detail.contract.test.ts`
-- [ ] T025 [P] [US2] Add page-bounded Candidate CV/application aggregate queries in `web/src/backend/repositories/admin/prisma-account-directory-repository.ts`
-- [ ] T026 [US2] Implement Candidate-aware account detail composition and exact count semantics in `web/src/backend/admin/accounts/account-detail-service.ts`
-- [ ] T027 [US2] Add account detail route and safe not-found/authority/version responses in `web/src/app/api/admin/accounts/[accountId]/route.ts`
-- [ ] T028 [US2] Add typed account detail schemas and Candidate count variants in `web/src/shared/contracts/admin/resources.ts`
-- [ ] T029 [US2] Build Candidate detail rendering, freshness/unavailable states, protected-field exclusions, and keyboard navigation in `web/src/frontend/features/admin/accounts/account-detail-show.tsx`
+- [x] T025 [P] [US2] Add page-bounded Candidate CV/application aggregate queries in `web/src/backend/repositories/admin/prisma-account-directory-repository.ts`
+- [x] T026 [US2] Implement Candidate-aware account detail composition and exact count semantics in `web/src/backend/admin/accounts/account-detail-service.ts`
+- [x] T027 [US2] Add account detail route and safe not-found/authority/version responses in `web/src/app/api/admin/accounts/[accountId]/route.ts`
+- [x] T028 [US2] Add typed account detail schemas and Candidate count variants in `web/src/shared/contracts/admin/resources.ts`
+- [x] T029 [US2] Build Candidate detail rendering, freshness/unavailable states, protected-field exclusions, and keyboard navigation in `web/src/frontend/features/admin/accounts/account-detail-show.tsx`
 
 **Checkpoint**: US2 is independently testable by opening a Candidate detail from a seeded directory page and comparing counts with authoritative records.
 
@@ -81,10 +107,10 @@
 
 - [ ] T030 [P] [US3] Write failing repository tests for distinct active verified company membership, five displayed job statuses, and excluded EXPIRED/REMOVED postings in `web/tests/backend/integration/admin-user-verification/recruiter-job-aggregate.test.ts`
 - [ ] T031 [P] [US3] Write failing contract/component tests for Recruiter detail authority rows and type-specific counts in `web/tests/frontend/components/admin-user-verification/recruiter-account-detail.test.tsx`
-- [ ] T032 [P] [US3] Add bounded Recruiter job-status aggregate and per-company authority queries in `web/src/backend/repositories/admin/prisma-account-directory-repository.ts`
-- [ ] T033 [US3] Extend account detail service with Recruiter counts, authority state, duplicate-company protection, and explicit unavailable results in `web/src/backend/admin/accounts/account-detail-service.ts`
-- [ ] T034 [US3] Add Recruiter count and company-authority contract variants in `web/src/shared/contracts/admin/resources.ts`
-- [ ] T035 [US3] Render Recruiter counts, company authority entries, status labels, and excluded-status semantics in `web/src/frontend/features/admin/accounts/account-detail-show.tsx`
+- [x] T032 [P] [US3] Add bounded Recruiter job-status aggregate and per-company authority queries in `web/src/backend/repositories/admin/prisma-account-directory-repository.ts`
+- [x] T033 [US3] Extend account detail service with Recruiter counts, authority state, duplicate-company protection, and explicit unavailable results in `web/src/backend/admin/accounts/account-detail-service.ts`
+- [x] T034 [US3] Add Recruiter count and company-authority contract variants in `web/src/shared/contracts/admin/resources.ts`
+- [x] T035 [US3] Render Recruiter counts, company authority entries, status labels, and excluded-status semantics in `web/src/frontend/features/admin/accounts/account-detail-show.tsx`
 - [ ] T036 [US3] Add 10,000-account/200-sample directory performance instrumentation and N+1 query assertions in `web/tests/performance/admin-user-verification/account-directory.perf.test.ts`
 
 **Checkpoint**: US3 is demonstrable with exact Recruiter aggregates and company authority data while preserving tenant boundaries.
@@ -116,11 +142,11 @@
 
 - [ ] T043 [P] [US5] Write failing queue contract tests for `/api/admin/verification-requests`, default Active Pending Review scope, applicant eligibility filters, exact tax-code/company/date filters, assignment metadata, and stable ordering in `web/tests/contract/admin-user-verification/verification-queue.contract.test.ts`
 - [ ] T044 [P] [US5] Write failing repository tests for request-state, applicant-state, evidence qualification, pagination, and no-locator queue projections in `web/tests/backend/integration/admin-user-verification/verification-queue-query.test.ts`
-- [ ] T045 [P] [US5] Implement queue filters, oldest-first order, bounded page query, applicant eligibility overlay, and safe queue fields in `web/src/backend/repositories/admin/prisma-verification-repository.ts`
-- [ ] T046 [US5] Implement `VerificationQueueItem` projection and operational suspended-applicant filtering in `web/src/backend/admin/verification/verification-review-service.ts`
-- [ ] T047 [US5] Implement `GET /api/admin/verification-requests` with validated filters and no evidence capability in `web/src/app/api/admin/verification-requests/route.ts`
-- [ ] T048 [US5] Add queue schemas, exact `^[0-9]{10}$` tax-code validation, and React Admin `verification-requests.getList` mapping in `web/src/shared/contracts/admin/verification.ts` and `web/src/frontend/features/admin/app/data-provider.tsx`
-- [ ] T049 [US5] Build verification queue table, filters, empty/loading/error states, applicant eligibility badges, pagination, and calculated-at display in `web/src/frontend/features/admin/verification/verification-request-list.tsx`
+- [x] T045 [P] [US5] Implement queue filters, oldest-first order, bounded page query, applicant eligibility overlay, and safe queue fields in `web/src/backend/repositories/admin/prisma-verification-repository.ts`
+- [x] T046 [US5] Implement `VerificationQueueItem` projection and operational suspended-applicant filtering in `web/src/backend/admin/verification/verification-review-service.ts`
+- [x] T047 [US5] Implement `GET /api/admin/verification-requests` with validated filters and no evidence capability in `web/src/app/api/admin/verification-requests/route.ts`
+- [x] T048 [US5] Add queue schemas, exact `^[0-9]{10}$` tax-code validation, and React Admin `verification-requests.getList` mapping in `web/src/shared/contracts/admin/verification.ts` and `web/src/frontend/features/admin/app/data-provider.tsx`
+- [x] T049 [US5] Build verification queue table, filters, empty/loading/error states, applicant eligibility badges, pagination, and calculated-at display in `web/src/frontend/features/admin/verification/verification-request-list.tsx`
 
 **Checkpoint**: US5 is demonstrable as a read-only review queue with Active-only default behavior and suspended operational visibility.
 
@@ -132,11 +158,11 @@
 
 - [ ] T050 [P] [US6] Write failing review-detail contract tests for applicant/company/prerequisite/evidence metadata, histories, notes, `canDecide`, and safe block reasons in `web/tests/contract/admin-user-verification/verification-review.contract.test.ts`
 - [ ] T051 [P] [US6] Write failing evidence capability/privacy tests for preview/download media types, no-store headers, expired capability, deleted evidence, and raw-byte exclusion in `web/tests/security/admin-user-verification/verification-evidence-privacy.test.ts`
-- [ ] T052 [P] [US6] Implement review-detail joins, evidence version metadata, decision history, protected-note projection, and applicant eligibility in `web/src/backend/repositories/admin/prisma-verification-repository.ts`
-- [ ] T053 [US6] Implement `GET /api/admin/verification-requests/{requestId}` and protected evidence preview/download route handlers in `web/src/app/api/admin/verification-requests/[requestId]/route.ts` and `web/src/app/api/admin/verification-requests/[requestId]/evidence/[evidenceId]/{preview,download}/route.ts`
-- [ ] T054 [US6] Add review-detail/evidence metadata schemas and capability response validation in `web/src/shared/contracts/admin/verification.ts`
+- [x] T052 [P] [US6] Implement review-detail joins, evidence version metadata, decision history, protected-note projection, and applicant eligibility in `web/src/backend/repositories/admin/prisma-verification-repository.ts`
+- [x] T053 [US6] Implement `GET /api/admin/verification-requests/{requestId}` and protected evidence preview/download route handlers in `web/src/app/api/admin/verification-requests/[requestId]/route.ts` and `web/src/app/api/admin/verification-requests/[requestId]/evidence/[evidenceId]/{preview,download}/route.ts`
+- [x] T054 [US6] Add review-detail/evidence metadata schemas and capability response validation in `web/src/shared/contracts/admin/verification.ts`
 - [ ] T055 [US6] Build review detail with company facts, tax code, histories, notes, decision availability, and safe recovery states in `web/src/frontend/features/admin/verification/verification-review-show.tsx`
-- [ ] T056 [US6] Build protected image/PDF viewer controls, zoom/page keyboard behavior, no-store download, and inaccessible/deleted/unsupported states in `web/src/frontend/features/admin/verification/protected-evidence-viewer.tsx`
+- [x] T056 [US6] Build protected image/PDF viewer controls, zoom/page keyboard behavior, no-store download, and inaccessible/deleted/unsupported states in `web/src/frontend/features/admin/verification/protected-evidence-viewer.tsx`
 
 **Checkpoint**: US6 is independently testable with review detail and protected evidence viewing without exposing locators or internal scanner responses.
 
@@ -148,11 +174,11 @@
 
 - [ ] T057 [P] [US7] Write failing eligibility tests for request/version, applicant Active, four evidence PASS checks, prerequisite, authority, fresh proof, and duplicate-membership gates in `web/tests/backend/unit/admin-user-verification/verification-decision-eligibility.test.ts`
 - [ ] T058 [P] [US7] Write failing transaction tests for exactly-once approval, company creation/reuse, membership grant, Candidate identity preservation, decision history, audit, and one dual-channel notification outcome in `web/tests/backend/integration/admin-user-verification/verification-approval-transaction.test.ts`
-- [ ] T059 [US7] Implement shared transaction-local approval/rejection eligibility loader in `web/src/backend/admin/verification/verification-decision-eligibility.ts`
-- [ ] T060 [US7] Implement atomic approval transaction with row locks, version checks, company prerequisite validation, membership uniqueness, decision/audit/outbox writes, and idempotency in `web/src/backend/admin/verification/verification-approval-transaction.ts`
-- [ ] T061 [US7] Add approval command schema/result and shared verification command types in `web/src/shared/contracts/admin/commands.ts`
-- [ ] T062 [US7] Implement `POST /api/admin/verification-requests/{requestId}/approve` with CSRF, step-up, If-Match, and idempotency handling in `web/src/app/api/admin/verification-requests/[requestId]/approve/route.ts`
-- [ ] T063 [US7] Add Approve confirmation, pending/conflict/success/error states, per-channel email/in-app queued delivery status, and authoritative refetch to `web/src/frontend/features/admin/verification/verification-decision-panel.tsx`
+- [x] T059 [US7] Implement shared transaction-local approval/rejection eligibility loader in `web/src/backend/admin/verification/verification-decision-eligibility.ts`
+- [x] T060 [US7] Implement atomic approval transaction with row locks, version checks, company prerequisite validation, membership uniqueness, decision/audit/outbox writes, and idempotency in `web/src/backend/admin/verification/verification-approval-transaction.ts`
+- [x] T061 [US7] Add approval command schema/result and shared verification command types in `web/src/shared/contracts/admin/commands.ts`
+- [x] T062 [US7] Implement `POST /api/admin/verification-requests/{requestId}/approve` with CSRF, step-up, If-Match, and idempotency handling in `web/src/app/api/admin/verification-requests/[requestId]/approve/route.ts`
+- [x] T063 [US7] Add Approve confirmation, pending/conflict/success/error states, per-channel email/in-app queued delivery status, and authoritative refetch to `web/src/frontend/features/admin/verification/verification-decision-panel.tsx`
 - [ ] T064 [US7] Add concurrency, replay, prerequisite-expiry, duplicate-authority, audit, dual-channel notification-outbox, and delivery-idempotency E2E coverage in `web/tests/system/e2e/admin-user-verification/verification-approval.spec.ts`
 
 **Checkpoint**: US7 is demonstrable and approved membership appears in Group 1 on the next confirmed read.
@@ -165,10 +191,10 @@
 
 - [ ] T065 [P] [US8] Write failing rejection validation and legacy-row tests for category, normalized 10-500-character reason, protected note separation, and unavailable legacy reason in `web/tests/backend/unit/admin-user-verification/verification-rejection-validation.test.ts`
 - [ ] T066 [P] [US8] Write failing integration tests for rejection evidence inaccessibility, 24-hour deletion scheduling, decision/audit/outbox, and Candidate-side reapplication fields/statuses in `web/tests/backend/integration/admin-user-verification/verification-rejection-reapply.test.ts`
-- [ ] T067 [US8] Implement rejection transaction, `adminComment` persistence, evidence retention transition, decision/audit writes, and exactly-once `VerificationNotificationEvent` with one email outbox child plus one in-app work item in `web/src/backend/admin/verification/verification-approval-transaction.ts`
-- [ ] T068 [US8] Implement `POST /api/admin/verification-requests/{requestId}/reject` and remove current Request Changes command exposure in `web/src/app/api/admin/verification-requests/[requestId]/reject/route.ts`
-- [ ] T069 [US8] Add Reject command schemas with the seven allowlisted reason categories, applicant-visible/protected-note separation, dual-channel notification result, and removed-route metadata in `web/src/shared/contracts/admin/commands.ts` and `web/src/shared/contracts/admin/generated/index.ts`
-- [ ] T070 [US8] Build Reject dialog, field validation, protected-note labeling, email-safe preview, and authoritative result/refetch states in `web/src/frontend/features/admin/verification/verification-decision-panel.tsx`
+- [x] T067 [US8] Implement rejection transaction, `adminComment` persistence, evidence retention transition, decision/audit writes, and exactly-once `VerificationNotificationEvent` with one email outbox child plus one in-app work item in `web/src/backend/admin/verification/verification-review-service.ts`
+- [x] T068 [US8] Implement `POST /api/admin/verification-requests/{requestId}/reject` and remove current Request Changes command exposure in `web/src/app/api/admin/verification-requests/[requestId]/reject/route.ts`
+- [x] T069 [US8] Add Reject command schemas with the seven allowlisted reason categories, applicant-visible/protected-note separation, dual-channel notification result, and removed-route metadata in `web/src/shared/contracts/admin/commands.ts` and `web/src/shared/contracts/admin/generated/index.ts`
+- [x] T070 [US8] Build Reject dialog, field validation, protected-note labeling, email-safe preview, and authoritative result/refetch states in `web/src/frontend/features/admin/verification/verification-decision-panel.tsx`
 - [ ] T071 [US8] Update Candidate verification state/reapply compatibility and map one idempotent verification outcome to both email and in-app applicant channels; implement retryable channel delivery in `web/src/backend/candidate/recruiter-verification/verification-application-service.ts` and `web/src/backend/admin/workers/verification-notification-loop.ts`
 - [ ] T072 [US8] Add rejection privacy, dual-channel notification payload/delivery-idempotency, reapply, retention, and no-Request-Changes E2E coverage in `web/tests/system/e2e/admin-user-verification/verification-rejection.spec.ts`
 
@@ -182,8 +208,8 @@
 
 - [ ] T073 [P] [US9] Write failing stale/suspended/outage/concurrency tests for decision endpoints and queue refetch behavior in `web/tests/backend/integration/admin-user-verification/verification-recovery.test.ts`
 - [ ] T074 [P] [US9] Write failing fake-clock worker tests for evidence deletion deadlines, verification lifecycle reconciliation, retry idempotency, and no-authority mutation in `web/tests/backend/integration/admin-user-verification/verification-retention-worker.test.ts`
-- [ ] T075 [US9] Implement suspended-applicant eligibility overlay, safe 423/block responses, stale refetch contract, and no-deadline-reset behavior in `web/src/backend/admin/verification/verification-review-service.ts` and `web/src/backend/admin/verification/verification-decision-eligibility.ts`
-- [ ] T076 [US9] Complete evidence retention and verification lifecycle reconciliation for rejected/cancelled/expired/superseded/approved records in `web/src/backend/admin/workers/evidence-retention-loop.ts` and `web/src/backend/admin/workers/verification-lifecycle-loop.ts`
+- [x] T075 [US9] Implement suspended-applicant eligibility overlay, safe 423/block responses, stale refetch contract, and no-deadline-reset behavior in `web/src/backend/admin/verification/verification-review-service.ts` and `web/src/backend/admin/verification/verification-decision-eligibility.ts`
+- [x] T076 [US9] Complete evidence retention and verification lifecycle reconciliation for rejected/cancelled/expired/superseded/approved records in `web/src/backend/admin/workers/evidence-retention-loop.ts` and `web/src/backend/admin/workers/verification-lifecycle-loop.ts`
 - [ ] T077 [US9] Add suspended-applicant, stale, worker-delay, storage-error, and retry UI states with explicit retry/refetch behavior in `web/src/frontend/features/admin/verification/verification-review-show.tsx`
 - [ ] T078 [US9] Record Group 2 qualification, privacy, accessibility, P95, concurrency, and usability evidence from `spec-kit/specs/009-user-management-and-recruiter-verification/quickstart.md` in `web/tests/usability/admin-user-verification/group-2-release-evidence.test.ts`
 
@@ -201,11 +227,11 @@
 
 - [ ] T079 [P] [US10] Write failing suspend command tests for category/reason/confirmation, Active-state/version, authorization, session/challenge revocation, audit, rationale, email work, and exactly-once effects in `web/tests/backend/integration/admin-user-verification/account-suspend-command.test.ts`
 - [ ] T080 [P] [US10] Write failing contract tests for `POST /api/admin/accounts/{accountId}/suspend`, error codes, If-Match, CSRF, idempotency, and safe protected-target behavior in `web/tests/contract/admin-user-verification/account-moderation.contract.test.ts`
-- [ ] T081 [US10] Tighten suspend transaction with current Platform Administrator target block, row lock, version check, account state update, all-session/challenge revocation, audit, encrypted rationale, and notification outbox in `web/src/backend/admin/accounts/admin-account-command-transaction.ts`
-- [ ] T082 [US10] Implement suspend command validation, account eligibility, and moderation history projection in `web/src/backend/admin/accounts/admin-account-service.ts`
-- [ ] T083 [US10] Implement `POST /api/admin/accounts/{accountId}/suspend` with fresh proof, CSRF, If-Match, idempotency, and safe errors in `web/src/app/api/admin/accounts/[accountId]/suspend/route.ts`
-- [ ] T084 [US10] Add moderation command schemas/results with the seven allowlisted categories and canonical `ACCOUNT_SUSPENDED` security event payload in `web/src/shared/contracts/admin/commands.ts` and `web/src/backend/admin/notifications/notification-events.ts`
-- [ ] T085 [US10] Build Suspend dialog with reason/category validation, explicit confirmation, focus containment, pending/result/error states, and authoritative refetch in `web/src/frontend/features/admin/accounts/account-state-dialog.tsx`
+- [x] T081 [US10] Tighten suspend transaction with current Platform Administrator target block, row lock, version check, account state update, all-session/challenge revocation, audit, encrypted rationale, and notification outbox in `web/src/backend/admin/accounts/admin-account-command-transaction.ts`
+- [x] T082 [US10] Implement suspend command validation, account eligibility, and moderation history projection in `web/src/backend/admin/accounts/admin-account-service.ts`
+- [x] T083 [US10] Implement `POST /api/admin/accounts/{accountId}/suspend` with fresh proof, CSRF, If-Match, idempotency, and safe errors in `web/src/app/api/admin/accounts/[accountId]/suspend/route.ts`
+- [x] T084 [US10] Add moderation command schemas/results with the seven allowlisted categories and canonical `ACCOUNT_SUSPENDED` security event payload in `web/src/shared/contracts/admin/commands.ts` and `web/src/backend/admin/notifications/notification-events.ts`
+- [x] T085 [US10] Build Suspend dialog with reason/category validation, explicit confirmation, focus containment, pending/result/error states, and authoritative refetch in `web/src/frontend/features/admin/accounts/account-state-dialog.tsx`
 - [ ] T086 [US10] Add suspend command E2E, failure-injection, session-revocation, protected-rationale, and mandatory-email assertions in `web/tests/system/e2e/admin-user-verification/account-suspend.spec.ts`
 
 **Checkpoint**: US10 is demonstrable with atomic suspension and no mutation to jobs, applications, memberships, verification, CVs, or scores.
@@ -232,9 +258,9 @@
 **Independent test**: Restore Candidate-only and recruiter-enabled Suspended fixtures and verify Active state/version, new-login behavior, old-session invalidity, no membership/content revival, audit/rationale/email, and verification revalidation.
 
 - [ ] T093 [P] [US12] Write failing restore transaction and contract tests for Suspended-state/version, protected-admin block, no-session-creation, canonical event, rationale, email, and idempotent replay in `web/tests/backend/integration/admin-user-verification/account-restore-command.test.ts`
-- [ ] T094 [US12] Implement Restore branch and `ACCOUNT_RESTORED` mapping while keeping historical `ACCOUNT_REINSTATED` rows immutable in `web/src/backend/admin/accounts/admin-account-command-transaction.ts`
-- [ ] T095 [US12] Implement `POST /api/admin/accounts/{accountId}/restore` and remove current `reinstate` command exposure in `web/src/app/api/admin/accounts/[accountId]/restore/route.ts`
-- [ ] T096 [US12] Add Restore command schema/result, historical event presentation mapper, and canonical notification template payload in `web/src/shared/contracts/admin/commands.ts` and `web/src/backend/admin/notifications/account-security-templates.tsx`
+- [x] T094 [US12] Implement Restore branch and `ACCOUNT_RESTORED` mapping while keeping historical `ACCOUNT_REINSTATED` rows immutable in `web/src/backend/admin/accounts/admin-account-command-transaction.ts`
+- [x] T095 [US12] Implement `POST /api/admin/accounts/{accountId}/restore` and remove current `reinstate` command exposure in `web/src/app/api/admin/accounts/[accountId]/restore/route.ts`
+- [x] T096 [US12] Add Restore command schema/result, historical event presentation mapper, and canonical notification template payload in `web/src/shared/contracts/admin/commands.ts` and `web/src/backend/admin/notifications/account-security-templates.tsx`
 - [ ] T097 [US12] Add Restore action, confirmation, no-session messaging, stale/refetch states, and verification-request revalidation link in `web/src/frontend/features/admin/accounts/account-state-dialog.tsx`
 - [ ] T098 [US12] Add restore/login/session-preservation and post-restore verification eligibility E2E coverage in `web/tests/system/e2e/admin-user-verification/account-restore.spec.ts`
 - [ ] T099 [US12] Add Group 3 restore acceptance evidence for state, session, domain-record preservation, email, and P95 navigation in `web/tests/usability/admin-user-verification/group-3-restore-evidence.test.ts`
@@ -249,7 +275,7 @@
 
 - [ ] T100 [P] [US13] Write failing protected-administrator and denied-audit tests for acting/non-acting current administrators, audit failure, no rationale/email, and safe `ACTION_BLOCKED` output in `web/tests/security/admin-user-verification/protected-admin-target.test.ts`
 - [ ] T101 [P] [US13] Write failing concurrency/idempotency/failure-injection tests across account, session, challenge, audit, rationale, notification, and outbox writes in `web/tests/backend/integration/admin-user-verification/account-moderation-integrity.test.ts`
-- [ ] T102 [US13] Implement stable denied command receipt/audit branch and all row-lock/version/idempotency conflict handling in `web/src/backend/admin/accounts/admin-account-command-transaction.ts`
+- [x] T102 [US13] Implement stable denied command receipt/audit branch and all row-lock/version/idempotency conflict handling in `web/src/backend/admin/accounts/admin-account-command-transaction.ts`
 - [ ] T103 [US13] Implement cache purge, authoritative detail refetch, stale-page handling, and authority-loss navigation for moderation commands in `web/src/frontend/features/admin/app/data-provider.tsx`
 - [ ] T104 [US13] Add browser history/in-flight request protection and shared session invalidation canaries in `web/src/backend/auth/session-revocation-service.ts`
 - [ ] T105 [US13] Add safe moderation error-envelope and removed-route contract parity assertions in `web/tests/contract/admin-user-verification/account-moderation.contract.test.ts`
@@ -280,7 +306,7 @@
 
 **Purpose**: Complete release-quality verification across all three groups and preserve existing SmartHire workflows.
 
-- [ ] T115 [P] Run full OpenAPI/Zod/provider parity and removed-route validation for `spec-kit/specs/009-user-management-and-recruiter-verification/contracts/` in `web/scripts/validate-admin-user-verification-contracts.mjs`
+- [x] T115 [P] Run full OpenAPI/Zod/provider parity and removed-route validation for `spec-kit/specs/009-user-management-and-recruiter-verification/contracts/` in `web/scripts/validate-admin-user-verification-contracts.mjs`
 - [ ] T116 [P] Run full Feature 009 unit/integration/contract/accessibility/security suites and publish sanitized evidence in `web/tests/system/e2e/admin-user-verification/release-suite.spec.ts`
 - [ ] T117 [P] Run all three 10,000-account/1,000-request performance protocols with 200 measured samples, 10 concurrent admins, P95/error reporting, and dataset metadata in `web/tests/performance/admin-user-verification/release-performance.test.ts`
 - [ ] T118 [P] Run 20-participant usability protocols for directory, verification review, and moderation dialogs with keyboard/focus observations in `web/tests/usability/admin-user-verification/release-usability.test.ts`

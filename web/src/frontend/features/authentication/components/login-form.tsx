@@ -68,6 +68,8 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
   const router = useRouter();
   const { status, setStatus } = useReplayableStatus("");
   const [isLocked, setIsLocked] = useState(false);
+  const [suspended, setSuspended] = useState(false);
+  const [suspendedSupportPath, setSuspendedSupportPath] = useState("/support/account-security");
   const [isNavigating, startNavigation] = useTransition();
   const {
     register,
@@ -94,6 +96,8 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
     });
     const body = (await response.json().catch(() => null)) as {
       message?: string;
+      code?: string;
+      supportPath?: string;
       requiresTwoFactor?: boolean;
       fields?: Record<string, string[]>;
     } | null;
@@ -102,6 +106,13 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
         ? GENERIC_LOGIN_ERROR
         : (body?.message ?? "Something went wrong. Please try again.");
     if (!response.ok) {
+      if (response.status === 423 && body?.code === "ACCOUNT_SUSPENDED") {
+        setSuspended(true);
+        setSuspendedSupportPath(body.supportPath ?? "/support/account-security");
+        setStatus(body.message ?? "This account is suspended.");
+        return;
+      }
+      setSuspended(false);
       for (const [field, messages] of Object.entries(body?.fields ?? {}))
         setError(field as keyof LoginInput, { message: messages[0] });
 
@@ -166,6 +177,13 @@ export function LoginForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
         {isSubmitting || isNavigating ? "Signing in…" : "Sign in"}
       </button>
       <FormFeedback status={status} />
+      {suspended && (
+        <p role="status">
+          <a href={suspendedSupportPath}>
+            Contact support or submit a dispute
+          </a>
+        </p>
+      )}
     </form>
   );
 }

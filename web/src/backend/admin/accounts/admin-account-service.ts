@@ -1,20 +1,39 @@
 import "server-only";
+import { Prisma } from "@/backend/generated/prisma/client";
 import type { AdminAuthority } from "@/backend/security/admin-request-boundary";
+import { AuditWriter } from "@/backend/admin/audit/audit-writer";
 import {
   PrismaAdminCommandRepository,
   AdminCommandConflict,
+  AdminCommandDenied,
 } from "@/backend/repositories/admin/prisma-admin-command-repository";
 import { PrismaAdminAccountRepository } from "@/backend/repositories/admin/prisma-admin-account-repository";
 import { recordAccountCommand } from "./admin-account-command-transaction";
-import { enforceMessagingUserRevocation } from "@/backend/messaging/realtime/messaging-authority-enforcement";
-import { ProposalAuthorityInvalidationService } from "@/backend/connections/services/proposal-authority-invalidation-service";
+import {
+  normalizeAdminPlainText,
+  privilegedReasonCategorySchema,
+} from "@/shared/contracts/admin/common";
 
 type Command = {
   expectedVersion: number;
   idempotencyKey: string;
-  reasonCategory: string;
-  explanation: string;
+  reasonCategory?: string;
+  explanation?: string;
+  category?: string;
+  reason?: string;
 };
+
+function normalizeCommand(command: Command) {
+  const reasonCategory = privilegedReasonCategorySchema.parse(
+    command.reasonCategory ?? command.category,
+  );
+  const explanation = normalizeAdminPlainText(
+    command.explanation ?? command.reason ?? "",
+  );
+  if (Array.from(explanation).length < 10 || Array.from(explanation).length > 500)
+    throw new Error("RATIONALE_LENGTH_INVALID");
+  return { ...command, reasonCategory, explanation };
+}
 export class AdminAccountService {
   security(accountId: string) {
     return new PrismaAdminAccountRepository().security(accountId);
@@ -22,12 +41,18 @@ export class AdminAccountService {
   private async run(
     authority: AdminAuthority,
     targetUserId: string,
-    kind: "suspend" | "reinstate" | "revoke-all" | "revoke-one",
+    kind: "suspend" | "restore" | "reinstate" | "revoke-all" | "revoke-one",
     command: Command,
     sessionReference?: string,
   ) {
-    if (authority.userId === targetUserId)
+    if (
+      authority.userId === targetUserId &&
+      kind !== "suspend" &&
+      kind !== "restore" &&
+      kind !== "reinstate"
+    )
       throw new Error("PROTECTED_ADMIN_ACTION");
+    const normalizedCommand = normalizeCommand(command);
     const now = new Date();
     const outcome = await new PrismaAdminCommandRepository().execute(
       {
@@ -39,10 +64,15 @@ export class AdminAccountService {
           ? `${targetUserId}:${sessionReference}`
           : targetUserId,
         idempotencyKey: command.idempotencyKey,
-        normalizedBody: command,
+        normalizedBody: normalizedCommand,
       },
       async (tx, correlationId) => {
         await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('feature006:usable-administrators'))`;
+        if (kind === "suspend" || kind === "restore" || kind === "reinstate") {
+          await tx.$queryRaw(
+            Prisma.sql`SELECT "id" FROM "user" WHERE "id" = ${targetUserId} FOR UPDATE`,
+          );
+        }
         const account = await tx.userAccount.findUnique({
           where: { id: targetUserId },
           include: {
@@ -55,11 +85,40 @@ export class AdminAccountService {
           },
         });
         if (!account) throw new Error("TARGET_UNAVAILABLE");
+        if (
+          (kind === "suspend" || kind === "restore" || kind === "reinstate") &&
+          account.platformAdministratorGrants.length > 0
+        ) {
+          await new AuditWriter(tx).append({
+            occurredAt: now,
+            actorType: "user",
+            actorUserId: authority.userId,
+            actorSessionId: authority.sessionId,
+            action:
+              kind === "suspend"
+                ? "admin.account_suspended"
+                : "admin.account_restored",
+            targetType: "user_account",
+            targetId: targetUserId,
+            result: "DENIED",
+            correlationId,
+            context: {
+              reasonCategory: normalizedCommand.reasonCategory,
+              priorState: account.state,
+              resultingState: account.state,
+            },
+          });
+          throw new AdminCommandDenied({
+            accountId: targetUserId,
+            status: "ACTION_BLOCKED",
+            version: account.version,
+          });
+        }
         if (account.version !== command.expectedVersion)
           throw new AdminCommandConflict("STALE_CONFLICT", account.version);
         if (
           account.platformAdministratorGrants.length > 0 &&
-          (kind === "suspend" || kind === "revoke-all")
+          (kind === "revoke-all")
         ) {
           const alternatives = await tx.platformAdministratorGrant.count({
             where: {
@@ -74,6 +133,7 @@ export class AdminAccountService {
         let action:
           | "admin.account_suspended"
           | "admin.account_reinstated"
+          | "admin.account_restored"
           | "admin.session_revoked"
           | "admin.sessions_revoked_all";
         const priorState = account.state;
@@ -114,7 +174,7 @@ export class AdminAccountService {
           action = "admin.account_suspended";
           resultingState = "SUSPENDED";
           notify = true;
-        } else if (kind === "reinstate") {
+        } else if (kind === "restore" || kind === "reinstate") {
           if (account.state !== "SUSPENDED") throw new Error("INVALID_STATE");
           const claimed = await tx.userAccount.updateMany({
             where: {
@@ -133,7 +193,7 @@ export class AdminAccountService {
               "STALE_CONFLICT",
               command.expectedVersion + 1,
             );
-          action = "admin.account_reinstated";
+          action = kind === "restore" ? "admin.account_restored" : "admin.account_reinstated";
           resultingState = "ACTIVE";
           notify = true;
         } else if (kind === "revoke-all") {
@@ -190,28 +250,24 @@ export class AdminAccountService {
           actorSessionId: authority.sessionId,
           targetUserId,
           action,
-          reasonCategory: command.reasonCategory,
-          explanation: command.explanation,
+          reasonCategory: normalizedCommand.reasonCategory,
+          explanation: normalizedCommand.explanation,
           priorState,
           resultingState,
           resultingVersion: account.version + 1,
           occurredAt: now,
           notify,
         });
-        return { version: account.version + 1, state: resultingState };
+        return {
+          accountId: targetUserId,
+          status: resultingState,
+          version: account.version + 1,
+          emailStatus: notify ? ("QUEUED" as const) : ("NONE" as const),
+        };
       },
     );
-    if (kind === "suspend" || kind === "revoke-all" || kind === "revoke-one") {
-      await enforceMessagingUserRevocation({
-        userId: targetUserId,
-        cause: kind === "suspend" ? "ACCOUNT" : "SESSION",
-      }).catch(() => undefined);
-      if (kind === "suspend") {
-        await new ProposalAuthorityInvalidationService()
-          .account(targetUserId)
-          .catch(() => undefined);
-      }
-    }
+    if ((outcome as { status?: string }).status === "ACTION_BLOCKED")
+      throw new Error("ACTION_BLOCKED");
     return outcome;
   }
   suspend(a: AdminAuthority, id: string, c: Command) {
@@ -219,6 +275,9 @@ export class AdminAccountService {
   }
   reinstate(a: AdminAuthority, id: string, c: Command) {
     return this.run(a, id, "reinstate", c);
+  }
+  restore(a: AdminAuthority, id: string, c: Command) {
+    return this.run(a, id, "restore", c);
   }
   revokeAll(a: AdminAuthority, id: string, c: Command) {
     return this.run(a, id, "revoke-all", c);

@@ -29,6 +29,8 @@ export type VerificationNotificationInput = {
   nextAction: string;
   companyDisplayName?: string;
   approvedMembershipRole?: CompanyMembershipRole;
+  rejectionCategory?: string;
+  applicantComment?: string;
 };
 
 export function buildVerificationOutbox(
@@ -56,6 +58,12 @@ export function buildVerificationOutbox(
         : {}),
       ...(input.approvedMembershipRole
         ? { approvedMembershipRole: input.approvedMembershipRole }
+        : {}),
+      ...(input.rejectionCategory
+        ? { rejectionCategory: input.rejectionCategory }
+        : {}),
+      ...(input.applicantComment
+        ? { applicantComment: input.applicantComment }
         : {}),
     },
     idempotencyKey: emailDeliveryIdempotencyKey(businessEventKey),

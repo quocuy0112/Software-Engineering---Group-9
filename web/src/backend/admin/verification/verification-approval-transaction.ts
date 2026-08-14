@@ -4,30 +4,34 @@ import {
   PrismaAdminCommandRepository,
   AdminCommandConflict,
 } from "@/backend/repositories/admin/prisma-admin-command-repository";
-import { CompanyRelationshipPrerequisiteGateway } from "./company-relationship-prerequisite-gateway";
 import { AuditWriter } from "@/backend/admin/audit/audit-writer";
-import {
-  buildVerificationOutbox,
-  createVerificationInAppNotification,
-} from "@/backend/admin/notifications/verification-outbox";
-type Command = {
+import { createVerificationDecisionNotification } from "@/backend/admin/notifications/verification-notification-event";
+import { loadVerificationDecisionEligibility } from "./verification-decision-eligibility";
+
+export type ApprovalCommand = {
   expectedVersion: number;
   idempotencyKey: string;
-  role: "OWNER" | "HR_MANAGER" | "RECRUITER" | "HIRING_MANAGER";
+  role?: "OWNER" | "HR_MANAGER" | "RECRUITER" | "HIRING_MANAGER";
   privateNote?: string;
 };
+
 function slug(name: string, suffix: string) {
-  return `${
-    name
-      .normalize("NFKD")
-      .replace(/[^a-zA-Z0-9]+/gu, "-")
-      .replace(/^-|-$/gu, "")
-      .toLowerCase()
-      .slice(0, 48) || "company"
-  }-${suffix.slice(0, 8)}`;
+  const base = name
+    .normalize("NFKD")
+    .replace(/[^a-zA-Z0-9]+/gu, "-")
+    .replace(/^-|-$/gu, "")
+    .toLowerCase()
+    .slice(0, 48)
+    .replace(/^-|-$/gu, "");
+  return `${base || "company"}-${suffix.slice(0, 8)}`;
 }
+
 export class VerificationApprovalTransaction {
-  execute(authority: AdminAuthority, requestId: string, command: Command) {
+  execute(
+    authority: AdminAuthority,
+    requestId: string,
+    command: ApprovalCommand,
+  ) {
     const now = new Date();
     return new PrismaAdminCommandRepository().execute(
       {
@@ -40,38 +44,14 @@ export class VerificationApprovalTransaction {
         normalizedBody: command,
       },
       async (tx, correlationId) => {
-        const row = await tx.recruiterVerificationRequest.findUnique({
-          where: { id: requestId },
-          include: {
-            targetCompany: { select: { displayName: true } },
-            businessFacts: true,
-            applicant: { select: { state: true, deletedAt: true } },
-          },
+        const eligible = await loadVerificationDecisionEligibility(tx, {
+          authority,
+          requestId,
+          expectedVersion: command.expectedVersion,
+          decision: "APPROVE",
+          now,
         });
-        if (!row) throw new Error("TARGET_UNAVAILABLE");
-        if (row.version !== command.expectedVersion)
-          throw new AdminCommandConflict("STALE_CONFLICT", row.version);
-        if (row.state !== "PENDING_REVIEW") throw new Error("INVALID_STATE");
-        if (row.applicant.state !== "ACTIVE" || row.applicant.deletedAt) {
-          throw new Error("TARGET_UNAVAILABLE");
-        }
-        if (row.submissionIdempotencyKey && !row.businessFacts) {
-          throw new Error("ENRICHED_FACTS_REQUIRED");
-        }
-        const evidence = await tx.businessLicenseEvidence.findUnique({
-          where: { id: row.currentEvidenceId ?? "" },
-        });
-        if (
-          !evidence ||
-          [
-            evidence.malwareStatus,
-            evidence.typeStatus,
-            evidence.structureStatus,
-            evidence.previewStatus,
-          ].some((value) => value !== "PASS") ||
-          evidence.contentInaccessibleAt
-        )
-          throw new Error("EVIDENCE_UNAVAILABLE");
+        const row = eligible.request;
         const version = row.version + 1;
         const claimed = await tx.recruiterVerificationRequest.updateMany({
           where: {
@@ -83,21 +63,12 @@ export class VerificationApprovalTransaction {
         });
         if (claimed.count !== 1)
           throw new AdminCommandConflict("STALE_CONFLICT", version);
+
         let companyId = row.targetCompanyId;
         let companyDisplayName = row.targetCompany?.displayName;
-        let role = command.role;
-        let prerequisiteId: string | undefined;
+        let role = command.role ?? row.requestedRole;
         if (companyId) {
-          const prerequisite =
-            await new CompanyRelationshipPrerequisiteGateway().require(tx, {
-              prerequisiteId: row.prerequisiteId ?? undefined,
-              applicantUserId: row.applicantUserId,
-              companyId,
-              requestedRole: command.role,
-              requestId: row.id,
-              now,
-            });
-          prerequisiteId = prerequisite.id;
+          if (!eligible.prerequisite) throw new Error("RELATIONSHIP_REQUIRED");
         } else {
           role = "OWNER";
           const company = await tx.company.create({
@@ -113,10 +84,13 @@ export class VerificationApprovalTransaction {
           companyId = company.id;
           companyDisplayName = company.displayName;
         }
+
+        if (!companyId) throw new Error("TARGET_UNAVAILABLE");
         const existingMembership = await tx.companyMembership.findUnique({
           where: {
             companyId_userId: { companyId, userId: row.applicantUserId },
           },
+          select: { id: true, status: true },
         });
         if (existingMembership?.status === "ACTIVE")
           throw new Error("DUPLICATE_AUTHORITY");
@@ -141,9 +115,14 @@ export class VerificationApprovalTransaction {
             version: { increment: 1 },
           },
         });
-        if (prerequisiteId)
-          await tx.companyAccessPrerequisite.update({
-            where: { id: prerequisiteId },
+        if (eligible.prerequisite) {
+          const consumed = await tx.companyAccessPrerequisite.updateMany({
+            where: {
+              id: eligible.prerequisite.id,
+              state: "AVAILABLE",
+              applicantUserId: row.applicantUserId,
+              companyId,
+            },
             data: {
               state: "USED",
               usedAt: now,
@@ -151,6 +130,8 @@ export class VerificationApprovalTransaction {
               version: { increment: 1 },
             },
           });
+          if (consumed.count !== 1) throw new Error("RELATIONSHIP_REQUIRED");
+        }
         await tx.recruiterVerificationRequest.update({
           where: { id: row.id },
           data: {
@@ -199,26 +180,28 @@ export class VerificationApprovalTransaction {
             companyReference: companyId,
           },
         });
-        const notification = {
-            requestId: row.id,
-            userId: row.applicantUserId,
-            eventKind: "VERIFICATION_APPROVED",
-            resultingState: "APPROVED",
-            resultingVersion: version,
-            occurredAt: now,
-            nextAction: "OPEN_RECRUITER_WORKSPACE",
-            companyDisplayName: companyDisplayName!,
-            approvedMembershipRole: role,
-          } as const;
-        await tx.emailOutbox.create({
-          data: buildVerificationOutbox(notification),
+        const notification = await createVerificationDecisionNotification(tx, {
+          requestId: row.id,
+          userId: row.applicantUserId,
+          eventKind: "VERIFICATION_APPROVED",
+          resultingState: "APPROVED",
+          resultingVersion: version,
+          occurredAt: now,
+          nextAction: "OPEN_RECRUITER_WORKSPACE",
+          companyDisplayName: companyDisplayName ?? row.submittedCompanyName,
+          approvedMembershipRole: role,
         });
-        await createVerificationInAppNotification(
-          tx,
-          notification,
-          correlationId,
-        );
-        return { version, state: "APPROVED", companyId, role };
+        return {
+          requestId: row.id,
+          version,
+          state: "APPROVED" as const,
+          companyId,
+          role,
+          notification: {
+            email: notification.emailStatus,
+            inApp: notification.inAppStatus,
+          },
+        };
       },
     );
   }

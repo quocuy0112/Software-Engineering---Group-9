@@ -3,20 +3,20 @@ import { describe, expect, it } from "vitest";
 
 describe("Feature 006 approval gates remain authoritative", () => {
   const source = readFileSync(
-    "src/backend/admin/verification/verification-approval-transaction.ts",
+    "src/backend/admin/verification/verification-decision-eligibility.ts",
     "utf8",
   );
 
   it("requires review state, safe evidence, active applicant, and enriched facts", () => {
     for (const gate of [
       'row.state !== "PENDING_REVIEW"',
-      'row.applicant.state !== "ACTIVE"',
-      "evidence.malwareStatus",
-      "evidence.typeStatus",
-      "evidence.structureStatus",
-      "evidence.previewStatus",
-      '.some((value) => value !== "PASS")',
-      "row.submissionIdempotencyKey && !row.businessFacts",
+      'applicant.state !== "ACTIVE"',
+      'evidence.malwareStatus !== "PASS"',
+      'evidence.typeStatus !== "PASS"',
+      'evidence.structureStatus !== "PASS"',
+      'evidence.previewStatus !== "PASS"',
+      'input.decision === "APPROVE" && row.submissionIdempotencyKey',
+      "if (!row.businessFacts)",
     ]) {
       expect(source).toContain(gate);
     }

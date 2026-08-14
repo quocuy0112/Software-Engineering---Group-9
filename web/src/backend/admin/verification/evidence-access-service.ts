@@ -18,6 +18,13 @@ export class EvidenceAccessService {
         request: {
           state: { in: ["PENDING_REVIEW", "APPROVED"] },
           currentEvidenceId: evidenceId,
+          OR: [
+            { state: "PENDING_REVIEW" },
+            {
+              state: "APPROVED",
+              targetCompany: { verificationState: "ACTIVE" },
+            },
+          ],
         },
       },
     });

@@ -438,6 +438,19 @@ enum VerificationDecisionKind {
   REJECT
 }
 
+enum VerificationNotificationEventKind {
+  VERIFICATION_APPROVED
+  VERIFICATION_REJECTED
+  VERIFICATION_DELAYED
+  VERIFICATION_EXPIRED
+}
+
+enum VerificationNotificationChannelStatus {
+  QUEUED
+  DELIVERED
+  FAILED
+}
+
 enum CompanyAccessPrerequisiteKind {
   INVITATION
   OWNER_APPROVAL
@@ -825,7 +838,9 @@ model UserAccount {
   supportInternalNotes           SupportInternalNote[]
 
   @@index([state, id])
+  @@index([state, createdAt(sort: Desc), id])
   @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "user_name_trgm_idx")
+  @@index([normalizedEmail(ops: raw("gin_trgm_ops"))], type: Gin, map: "user_normalizedEmail_trgm_idx")
   @@map("user")
 }
 
@@ -1266,6 +1281,7 @@ model EmailOutbox {
   professionalConnection           ProfessionalConnection?         @relation(fields: [professionalConnectionId], references: [id], onDelete: SetNull)
   companyEmailChallenge            CompanyContactEmailChallenge?    @relation("CompanyEmailChallengeOutbox", fields: [companyEmailChallengeId], references: [id], onDelete: SetNull)
   securityNotificationWork         SecurityNotificationWork?
+  verificationNotificationEvent    VerificationNotificationEvent?
 
   @@index([status, nextAttemptAt])
   @@index([leaseExpiresAt])
@@ -1299,7 +1315,7 @@ model InAppNotification {
 
   @@index([recipientUserId, lastOccurredAt(sort: Desc), id(sort: Desc)])
   @@index([recipientUserId, readAt, expiresAt])
-  @@index([recipientUserId, contextType, contextId, readAt])
+  @@index([recipientUserId, contextType, contextId, readAt], map: "InAppNotification_recipientUserId_contextType_contextId_readAt_")
   @@index([expiresAt, id])
 }
 
@@ -1473,13 +1489,36 @@ model RecruiterVerificationRequest {
   decisions                VerificationDecisionHistory[]
   notes                    VerificationPrivateNote[]
   notifications            EmailOutbox[]
+  notificationEvents       VerificationNotificationEvent[]
   businessFacts            VerificationBusinessFacts?
   acceptedRegistrySnapshot BusinessRegistryLookupSnapshot? @relation("AcceptedRegistrySnapshot")
+  adminComment             String?
 
   @@index([state, createdAt, id])
   @@index([normalizedTaxIdentifier, state])
   @@index([applicantUserId, normalizedTaxIdentifier, state])
   @@index([assignedAdminUserId, state])
+}
+
+model VerificationNotificationEvent {
+  id                    String                                @id @default(cuid())
+  verificationRequestId String
+  idempotencyKey        String                                @unique
+  eventKind             VerificationNotificationEventKind
+  resultingStatus       RecruiterVerificationState
+  eventTime             DateTime
+  payloadRef            Json
+  emailStatus           VerificationNotificationChannelStatus @default(QUEUED)
+  inAppStatus           VerificationNotificationChannelStatus @default(QUEUED)
+  emailOutboxId         String?                               @unique
+  inAppNotificationRef  String?                               @unique
+  createdAt             DateTime                              @default(now())
+  updatedAt             DateTime                              @updatedAt
+  request               RecruiterVerificationRequest           @relation(fields: [verificationRequestId], references: [id], onDelete: Cascade)
+  emailOutbox           EmailOutbox?                          @relation(fields: [emailOutboxId], references: [id], onDelete: SetNull)
+
+  @@index([verificationRequestId, eventKind])
+  @@index([emailStatus, inAppStatus, updatedAt])
 }
 
 model EmployerVerificationPreparation {

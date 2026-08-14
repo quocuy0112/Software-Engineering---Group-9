@@ -4,7 +4,10 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { config as loadEnvironment } from "dotenv";
 import pg from "pg";
-import { migrationNameMap } from "./migration-name-map.mjs";
+import {
+  migrationChecksumAliases,
+  migrationNameMap,
+} from "./migration-name-map.mjs";
 
 const webRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 loadEnvironment({ path: resolve(webRoot, ".env.local"), quiet: true });
@@ -62,12 +65,42 @@ try {
       });
       continue;
     }
-    if (applied.checksum !== sourceChecksum) {
+    const checksumAliasAccepted = [
+      ...(migrationChecksumAliases[applied.migration_name] ?? []),
+      ...(!current ? (migrationChecksumAliases[legacyName] ?? []) : []),
+    ].includes(applied.checksum);
+    if (applied.checksum !== sourceChecksum && !checksumAliasAccepted) {
       throw new Error(
         `Checksum mismatch for ${applied.migration_name}; refusing history reconciliation`,
       );
     }
     if (current) {
+      if (applied.checksum !== sourceChecksum) {
+        if (!apply) {
+          results.push({
+            legacyName,
+            currentName,
+            status: "CHECKSUM_NORMALIZATION_REQUIRED",
+          });
+          continue;
+        }
+        await client.query(
+          `UPDATE "_prisma_migrations"
+              SET checksum = $1
+            WHERE migration_name = $2
+              AND checksum = $3
+              AND finished_at IS NOT NULL
+              AND rolled_back_at IS NULL`,
+          [sourceChecksum, currentName, applied.checksum],
+        );
+        results.push({
+          legacyName,
+          currentName,
+          status: "CHECKSUM_NORMALIZED",
+          previousChecksum: applied.checksum,
+        });
+        continue;
+      }
       results.push({
         legacyName,
         currentName,
@@ -82,9 +115,10 @@ try {
     }
     await client.query(
       `UPDATE "_prisma_migrations"
-          SET migration_name = $1
-        WHERE migration_name = $2`,
-      [currentName, legacyName],
+          SET migration_name = $1,
+              checksum = $2
+        WHERE migration_name = $3`,
+      [currentName, sourceChecksum, legacyName],
     );
     results.push({
       legacyName,
@@ -102,7 +136,16 @@ try {
   await client.end();
 }
 
-console.log(JSON.stringify({ mode: apply ? "apply" : "check", results }, null, 2));
-if (!apply && results.some((entry) => entry.status === "RENAME_REQUIRED")) {
+console.log(
+  JSON.stringify({ mode: apply ? "apply" : "check", results }, null, 2),
+);
+if (
+  !apply &&
+  results.some((entry) =>
+    ["RENAME_REQUIRED", "CHECKSUM_NORMALIZATION_REQUIRED"].includes(
+      entry.status,
+    ),
+  )
+) {
   process.exitCode = 2;
 }

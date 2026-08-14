@@ -35,4 +35,3 @@ COPY --chown=node:node web/src ./src
 
 USER node
 CMD ["node", "--conditions=react-server", "--import", "tsx", "scripts/run-image-search-worker.mjs"]
-

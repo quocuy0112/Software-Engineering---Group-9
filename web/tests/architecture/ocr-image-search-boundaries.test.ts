@@ -78,9 +78,9 @@ describe("Feature 005 architecture boundaries", () => {
     );
     expect(resetScript).not.toContain('["compose", "down", "-v"]');
     expect(resetScript).toContain(
-      '"db:migrate",\n  "--workspace",\n  "@smarthire/web"',
+      'runNpm(["run", "db:deploy", "--workspace", "@smarthire/web"]);',
     );
-    expect(resetScript).not.toContain('runNpm(["run", "db:deploy"]);');
+    expect(resetScript).not.toContain('"db:migrate"');
     expect(JSON.parse(rootPackage).scripts["db:reset:empty"]).toBe(
       "node scripts/reset-local-database.mjs --empty",
     );

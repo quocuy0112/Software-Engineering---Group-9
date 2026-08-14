@@ -596,6 +596,25 @@ export const VerificationDecisionKind = {
 export type VerificationDecisionKind = (typeof VerificationDecisionKind)[keyof typeof VerificationDecisionKind]
 
 
+export const VerificationNotificationEventKind = {
+  VERIFICATION_APPROVED: 'VERIFICATION_APPROVED',
+  VERIFICATION_REJECTED: 'VERIFICATION_REJECTED',
+  VERIFICATION_DELAYED: 'VERIFICATION_DELAYED',
+  VERIFICATION_EXPIRED: 'VERIFICATION_EXPIRED'
+} as const
+
+export type VerificationNotificationEventKind = (typeof VerificationNotificationEventKind)[keyof typeof VerificationNotificationEventKind]
+
+
+export const VerificationNotificationChannelStatus = {
+  QUEUED: 'QUEUED',
+  DELIVERED: 'DELIVERED',
+  FAILED: 'FAILED'
+} as const
+
+export type VerificationNotificationChannelStatus = (typeof VerificationNotificationChannelStatus)[keyof typeof VerificationNotificationChannelStatus]
+
+
 export const CompanyAccessPrerequisiteKind = {
   INVITATION: 'INVITATION',
   OWNER_APPROVAL: 'OWNER_APPROVAL'

@@ -10,46 +10,51 @@ import {
   AdminHttpError,
   parseAdminJson,
 } from "@/backend/admin/http/admin-route";
-const changes = z
-  .object({
-    confirmation: z.literal(true),
-    guidance: normalizedText(10, 500),
-    privateNote: normalizedText(0, 2000).optional(),
-  })
-  .strict();
 const reject = z
   .object({
-    confirmation: z.literal(true),
     category: verificationRejectionCategorySchema,
-    reason: normalizedText(10, 500),
-    privateNote: normalizedText(0, 2000).optional(),
+    applicantComment: normalizedText(10, 500),
+    protectedNote: normalizedText(0, 2000).optional(),
   })
   .strict();
 const approve = z
   .object({
-    confirmation: z.literal(true),
-    role: membershipRoleSchema,
-    privateNote: normalizedText(0, 2000).optional(),
+    role: membershipRoleSchema.optional(),
+    protectedNote: normalizedText(0, 2000).optional(),
   })
   .strict();
 export async function readVerificationCommand(
   request: Request,
-  action: "request-changes" | "reject" | "approve",
+  action: "reject" | "approve",
 ) {
   const schema: z.ZodType<Record<string, unknown>> = (
-    action === "request-changes"
-      ? changes
-      : action === "reject"
-        ? reject
-        : approve
+    action === "reject" ? reject : approve
   ) as z.ZodType<Record<string, unknown>>;
   const body = await parseAdminJson(request, schema);
-  const headers = commandHeaders(request);
+  const headers = commandHeaders(request, { strictIfMatch: true });
   if (
-    !headers.idempotencyKey ||
+    headers.idempotencyKey.length < 16 ||
+    headers.idempotencyKey.length > 128 ||
     !Number.isInteger(headers.expectedVersion) ||
     headers.expectedVersion < 1
   )
     throw new AdminHttpError(400, "VALIDATION_FAILED");
-  return { ...body, ...headers };
+  if (action === "reject") {
+    const rejection = body as {
+      applicantComment?: string;
+      protectedNote?: string;
+    };
+    return {
+      ...body,
+      reason: rejection.applicantComment,
+      privateNote: rejection.protectedNote,
+      ...headers,
+    };
+  }
+  const approval = body as { protectedNote?: string };
+  return {
+    ...body,
+    privateNote: approval.protectedNote,
+    ...headers,
+  };
 }

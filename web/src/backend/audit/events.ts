@@ -93,6 +93,7 @@ export const authenticationAuditAction = z.enum([
   "admin.step_up_completed",
   "admin.account_suspended",
   "admin.account_reinstated",
+  "admin.account_restored",
   "admin.session_revoked",
   "admin.sessions_revoked_all",
   "admin.membership_suspended",

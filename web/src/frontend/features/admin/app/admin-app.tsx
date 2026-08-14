@@ -15,7 +15,7 @@ import { createAdminQueryClient } from "./query-client";
 import { AdminLayout } from "../layout/admin-layout";
 import { AdminDashboard } from "../dashboard/admin-dashboard";
 import { AccountList } from "../accounts/account-list";
-import { AccountSecurityShow } from "../accounts/account-security-show";
+import { AccountDetailShow } from "../accounts/account-detail-show";
 import { AdminLoginPage } from "../auth/admin-login-page";
 import { CompanyMembershipList } from "../memberships/company-membership-list";
 import { MembershipLifecyclePanel } from "../memberships/membership-lifecycle-panel";
@@ -97,7 +97,7 @@ export function AdminApp() {
           <Resource
             name="accounts"
             list={AccountList}
-            show={AccountSecurityShow}
+            show={AccountDetailShow}
           />
           <Resource name="companies" list={SafeList} />
           <Resource

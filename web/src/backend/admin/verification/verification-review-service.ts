@@ -10,12 +10,29 @@ import {
   buildVerificationOutbox,
   createVerificationInAppNotification,
 } from "@/backend/admin/notifications/verification-outbox";
+import { createVerificationDecisionNotification } from "@/backend/admin/notifications/verification-notification-event";
+import { loadVerificationDecisionEligibility } from "./verification-decision-eligibility";
+import {
+  normalizeAdminPlainText,
+  verificationRejectionCategorySchema,
+} from "@/shared/contracts/admin/common";
 type Base = {
   expectedVersion: number;
   idempotencyKey: string;
   privateNote?: string;
 };
 export class VerificationReviewService {
+  listQueue(input: {
+    page: number;
+    pageSize: number;
+    filter: Record<string, unknown>;
+    adminUserId: string;
+  }) {
+    return new PrismaVerificationRepository().listQueue(input);
+  }
+  reviewDetail(requestId: string) {
+    return new PrismaVerificationRepository().reviewDetail(requestId);
+  }
   list(input: {
     page: number;
     perPage: number;
@@ -122,20 +139,18 @@ export class VerificationReviewService {
           },
         });
         const notification = {
-            requestId: row.id,
-            userId: row.applicantUserId,
-            eventKind:
-              action === "changes"
-                ? "VERIFICATION_CHANGES_REQUESTED"
-                : "VERIFICATION_REJECTED",
-            resultingState,
-            resultingVersion: version,
-            occurredAt: now,
-            nextAction:
-              action === "changes"
-                ? "RESUBMIT_OR_CANCEL"
-                : "SUBMIT_NEW_REQUEST",
-          } as const;
+          requestId: row.id,
+          userId: row.applicantUserId,
+          eventKind:
+            action === "changes"
+              ? "VERIFICATION_CHANGES_REQUESTED"
+              : "VERIFICATION_REJECTED",
+          resultingState,
+          resultingVersion: version,
+          occurredAt: now,
+          nextAction:
+            action === "changes" ? "RESUBMIT_OR_CANCEL" : "SUBMIT_NEW_REQUEST",
+        } as const;
         await tx.emailOutbox.create({
           data: buildVerificationOutbox(notification),
         });
@@ -160,6 +175,121 @@ export class VerificationReviewService {
     id: string,
     c: Base & { category: string; reason: string },
   ) {
-    return this.run(a, id, "reject", c);
+    const category = verificationRejectionCategorySchema.parse(c.category);
+    const reason = normalizeAdminPlainText(c.reason);
+    if (Array.from(reason).length < 10 || Array.from(reason).length > 500)
+      throw new Error("REJECTION_REASON_INVALID");
+    const normalized = {
+      ...c,
+      category,
+      reason,
+      ...(c.privateNote
+        ? { privateNote: normalizeAdminPlainText(c.privateNote) }
+        : {}),
+    };
+    const now = new Date();
+    return new PrismaAdminCommandRepository().execute(
+      {
+        actorUserId: a.userId,
+        actorSessionId: a.sessionId,
+        grantId: a.grantId,
+        commandKind: "verification.reject",
+        targetReference: id,
+        idempotencyKey: c.idempotencyKey,
+        normalizedBody: normalized,
+      },
+      async (tx, correlationId) => {
+        const eligible = await loadVerificationDecisionEligibility(tx, {
+          authority: a,
+          requestId: id,
+          expectedVersion: c.expectedVersion,
+          decision: "REJECT",
+          now,
+        });
+        const row = eligible.request;
+        const version = row.version + 1;
+        const claimed = await tx.recruiterVerificationRequest.updateMany({
+          where: {
+            id: row.id,
+            version: c.expectedVersion,
+            state: "PENDING_REVIEW",
+          },
+          data: {
+            state: "REJECTED",
+            decidedAt: now,
+            adminComment: reason,
+            version,
+          },
+        });
+        if (claimed.count !== 1)
+          throw new AdminCommandConflict("STALE_CONFLICT", version);
+
+        await tx.businessLicenseEvidence.updateMany({
+          where: { requestId: row.id, deletedAt: null },
+          data: {
+            contentInaccessibleAt: now,
+            deleteAfter: new Date(now.getTime() + 24 * 60 * 60_000),
+          },
+        });
+        await tx.verificationDecisionHistory.create({
+          data: {
+            requestId: row.id,
+            submissionVersion: row.currentSubmissionVersion,
+            actorAdminUserId: a.userId,
+            priorState: row.state,
+            resultingState: "REJECTED",
+            decisionKind: "REJECT",
+            rejectionCategory: category,
+            result: "SUCCESS",
+            correlationId,
+            decidedAt: now,
+          },
+        });
+        if (normalized.privateNote)
+          await tx.verificationPrivateNote.create({
+            data: {
+              requestId: row.id,
+              authorAdminUserId: a.userId,
+              normalizedText: normalized.privateNote,
+            },
+          });
+        await new AuditWriter(tx).append({
+          occurredAt: now,
+          actorType: "user",
+          actorUserId: a.userId,
+          actorSessionId: a.sessionId,
+          action: "admin.verification_rejected",
+          targetType: "recruiter_verification",
+          targetId: row.id,
+          result: "SUCCESS",
+          correlationId,
+          context: {
+            priorState: row.state,
+            resultingState: "REJECTED",
+            targetVersion: version,
+          },
+        });
+        const notification = await createVerificationDecisionNotification(tx, {
+          requestId: row.id,
+          userId: row.applicantUserId,
+          eventKind: "VERIFICATION_REJECTED",
+          resultingState: "REJECTED",
+          resultingVersion: version,
+          occurredAt: now,
+          nextAction: "SUBMIT_NEW_REQUEST",
+          category,
+          applicantComment: reason,
+        });
+        return {
+          requestId: row.id,
+          version,
+          state: "REJECTED" as const,
+          notification: {
+            email: notification.emailStatus,
+            inApp: notification.inAppStatus,
+          },
+        };
+      },
+    );
   }
 }

@@ -6,69 +6,7 @@ import { S3PrivateBusinessEvidenceStorage } from "@/backend/storage/business-evi
 import type { Prisma } from "@/backend/generated/prisma/client";
 import type { PrivateBusinessEvidenceStorage } from "@/backend/storage/business-evidence/private-business-evidence-storage";
 import { randomUUID } from "node:crypto";
-import {
-  buildVerificationOutbox,
-  createVerificationInAppNotification,
-} from "@/backend/admin/notifications/verification-outbox";
-
-function outbox(
-  requestId: string,
-  userId: string,
-  eventKind: "VERIFICATION_DELAYED" | "VERIFICATION_EXPIRED",
-  resultingVersion: number,
-  now: Date,
-) {
-  return buildVerificationOutbox({
-    requestId,
-    userId,
-    eventKind,
-    resultingState:
-      eventKind === "VERIFICATION_EXPIRED" ? "EXPIRED" : "PROCESSING_DELAYED",
-    resultingVersion,
-    occurredAt: now,
-    nextAction:
-      eventKind === "VERIFICATION_EXPIRED" ? "SUBMIT_NEW_REQUEST" : "WAIT",
-  });
-}
-
-async function enqueueLifecycleNotification(
-  tx: Prisma.TransactionClient,
-  requestId: string,
-  userId: string,
-  eventKind: "VERIFICATION_DELAYED" | "VERIFICATION_EXPIRED",
-  resultingVersion: number,
-  now: Date,
-) {
-  const email = outbox(
-    requestId,
-    userId,
-    eventKind,
-    resultingVersion,
-    now,
-  );
-  await tx.emailOutbox.upsert({
-    where: { idempotencyKey: email.idempotencyKey },
-    update: {},
-    create: email,
-  });
-  await createVerificationInAppNotification(
-    tx,
-    {
-      requestId,
-      userId,
-      eventKind,
-      resultingState:
-        eventKind === "VERIFICATION_EXPIRED"
-          ? "EXPIRED"
-          : "PROCESSING_DELAYED",
-      resultingVersion,
-      occurredAt: now,
-      nextAction:
-        eventKind === "VERIFICATION_EXPIRED" ? "SUBMIT_NEW_REQUEST" : "WAIT",
-    },
-    `${requestId}:${eventKind}:${resultingVersion}`,
-  );
-}
+import { createVerificationNotificationEvent } from "@/backend/admin/notifications/verification-notification-event";
 
 async function makeEvidenceInaccessible(
   tx: Prisma.TransactionClient,
@@ -200,14 +138,15 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
         });
         if (update.count) {
           await makeEvidenceInaccessible(tx, row.id, now);
-          await enqueueLifecycleNotification(
-            tx,
-            row.id,
-            row.applicantUserId,
-            "VERIFICATION_EXPIRED",
-            row.version + 1,
-            now,
-          );
+          await createVerificationNotificationEvent(tx, {
+            requestId: row.id,
+            userId: row.applicantUserId,
+            eventKind: "VERIFICATION_EXPIRED",
+            resultingState: "EXPIRED",
+            resultingVersion: row.version + 1,
+            occurredAt: now,
+            nextAction: "SUBMIT_NEW_REQUEST",
+          });
         }
       });
       changed += 1;
@@ -223,14 +162,15 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
           where: { id: row.id, state: "PENDING_CHECKS", delayedAt: null },
           data: { delayedAt: now },
         });
-        await enqueueLifecycleNotification(
-          tx,
-          row.id,
-          row.applicantUserId,
-          "VERIFICATION_DELAYED",
-          row.version,
-          now,
-        );
+        await createVerificationNotificationEvent(tx, {
+          requestId: row.id,
+          userId: row.applicantUserId,
+          eventKind: "VERIFICATION_DELAYED",
+          resultingState: "PENDING_CHECKS",
+          resultingVersion: row.version,
+          occurredAt: now,
+          nextAction: "WAIT",
+        });
       });
       changed += 1;
     }
@@ -252,14 +192,15 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
           });
           if (update.count) {
             await makeEvidenceInaccessible(tx, row.id, now);
-            await enqueueLifecycleNotification(
-              tx,
-              row.id,
-              row.applicantUserId,
-              "VERIFICATION_EXPIRED",
-              row.version + 1,
-              now,
-            );
+            await createVerificationNotificationEvent(tx, {
+              requestId: row.id,
+              userId: row.applicantUserId,
+              eventKind: "VERIFICATION_EXPIRED",
+              resultingState: "EXPIRED",
+              resultingVersion: row.version + 1,
+              occurredAt: now,
+              nextAction: "SUBMIT_NEW_REQUEST",
+            });
           }
         });
         changed += 1;
@@ -269,14 +210,15 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
             where: { id: row.id },
             data: { viewerDelayNotifiedAt: now },
           });
-          await enqueueLifecycleNotification(
-            tx,
-            row.id,
-            row.applicantUserId,
-            "VERIFICATION_DELAYED",
-            row.version,
-            now,
-          );
+          await createVerificationNotificationEvent(tx, {
+            requestId: row.id,
+            userId: row.applicantUserId,
+            eventKind: "VERIFICATION_DELAYED",
+            resultingState: "PENDING_CHECKS",
+            resultingVersion: row.version,
+            occurredAt: now,
+            nextAction: "WAIT",
+          });
         });
         changed += 1;
       } else if (outage >= 15 * 60_000 && !row.viewerEscalatedAt) {
@@ -303,14 +245,15 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
         });
         if (update.count) {
           await makeEvidenceInaccessible(tx, row.id, now);
-          await enqueueLifecycleNotification(
-            tx,
-            row.id,
-            row.applicantUserId,
-            "VERIFICATION_EXPIRED",
-            row.version + 1,
-            now,
-          );
+          await createVerificationNotificationEvent(tx, {
+            requestId: row.id,
+            userId: row.applicantUserId,
+            eventKind: "VERIFICATION_EXPIRED",
+            resultingState: "EXPIRED",
+            resultingVersion: row.version + 1,
+            occurredAt: now,
+            nextAction: "SUBMIT_NEW_REQUEST",
+          });
         }
       });
       changed += 1;
@@ -323,21 +266,28 @@ export async function runBusinessVerificationPreparationCleanupCycle(
   now = new Date(),
 ) {
   const deleteAfter = new Date(now.getTime() + 24 * 60 * 60_000);
-  const expiredChallenges = await prisma.companyContactEmailChallenge.updateMany({
-    where: { state: { in: ["PENDING", "VERIFIED"] }, expiresAt: { lte: now } },
-    data: {
-      state: "EXPIRED",
-      normalizedEmail: null,
-      tokenDigest: null,
-      sensitiveInaccessibleAt: now,
-      sensitiveDeleteAfter: deleteAfter,
-    },
-  });
+  const expiredChallenges =
+    await prisma.companyContactEmailChallenge.updateMany({
+      where: {
+        state: { in: ["PENDING", "VERIFIED"] },
+        expiresAt: { lte: now },
+      },
+      data: {
+        state: "EXPIRED",
+        normalizedEmail: null,
+        tokenDigest: null,
+        sensitiveInaccessibleAt: now,
+        sensitiveDeleteAfter: deleteAfter,
+      },
+    });
   const scrubbedChallenges =
     await prisma.companyContactEmailChallenge.updateMany({
       where: {
         sensitiveInaccessibleAt: { not: null },
-        OR: [{ normalizedEmail: { not: null } }, { tokenDigest: { not: null } }],
+        OR: [
+          { normalizedEmail: { not: null } },
+          { tokenDigest: { not: null } },
+        ],
       },
       data: { normalizedEmail: null, tokenDigest: null },
     });
@@ -346,20 +296,31 @@ export async function runBusinessVerificationPreparationCleanupCycle(
       where: { inaccessibleAt: null, expiresAt: { lte: now } },
       data: { inaccessibleAt: now, deleteAfter },
     });
-  const expiredSnapshots = await prisma.businessRegistryLookupSnapshot.updateMany({
-    where: { acceptedRequestId: null, inaccessibleAt: null, expiresAt: { lte: now } },
-    data: { inaccessibleAt: now, deleteAfter },
-  });
-  const deletedChallenges = await prisma.companyContactEmailChallenge.deleteMany({
-    where: { metadataDeleteAfter: { lte: now } },
-  });
+  const expiredSnapshots =
+    await prisma.businessRegistryLookupSnapshot.updateMany({
+      where: {
+        acceptedRequestId: null,
+        inaccessibleAt: null,
+        expiresAt: { lte: now },
+      },
+      data: { inaccessibleAt: now, deleteAfter },
+    });
+  const deletedChallenges =
+    await prisma.companyContactEmailChallenge.deleteMany({
+      where: { metadataDeleteAfter: { lte: now } },
+    });
   const deletedPreparations =
     await prisma.employerVerificationPreparation.deleteMany({
       where: { deleteAfter: { lte: now } },
     });
-  const deletedSnapshots = await prisma.businessRegistryLookupSnapshot.deleteMany({
-    where: { acceptedRequestId: null, deleteAfter: { lte: now }, currentPreparation: null },
-  });
+  const deletedSnapshots =
+    await prisma.businessRegistryLookupSnapshot.deleteMany({
+      where: {
+        acceptedRequestId: null,
+        deleteAfter: { lte: now },
+        currentPreparation: null,
+      },
+    });
   return {
     expiredChallenges: expiredChallenges.count,
     scrubbedChallenges: scrubbedChallenges.count,

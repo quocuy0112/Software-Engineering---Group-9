@@ -1,7 +1,7 @@
 import { AdminRequestBoundary } from "@/backend/security/admin-request-boundary";
 import { adminJson, adminRouteError } from "@/backend/admin/http/admin-route";
 import { AdminAccountService } from "@/backend/admin/accounts/admin-account-service";
-import { readAccountCommand } from "@/backend/admin/accounts/account-command-http";
+import { readAccountModerationCommand } from "@/backend/admin/accounts/account-command-http";
 export async function POST(
   request: Request,
   context: { params: Promise<{ accountId: string }> },
@@ -14,7 +14,7 @@ export async function POST(
       await new AdminAccountService().suspend(
         authority,
         (await context.params).accountId,
-        await readAccountCommand(request),
+        await readAccountModerationCommand(request),
       ),
     );
   } catch (error) {

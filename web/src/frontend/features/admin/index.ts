@@ -4,6 +4,8 @@ export { adminAuthProvider } from "./app/auth-provider";
 export { adminDataProvider } from "./app/data-provider";
 export { AdminDashboard } from "./dashboard/admin-dashboard";
 export { AccountList } from "./accounts/account-list";
+export { AccountDetailShow } from "./accounts/account-detail-show";
+export { AccountModerationPanel } from "./accounts/account-moderation-panel";
 export { AccountSecurityShow } from "./accounts/account-security-show";
 export { CompanyMembershipList } from "./memberships/company-membership-list";
 export { ModerationReportList } from "./moderation/moderation-report-list";

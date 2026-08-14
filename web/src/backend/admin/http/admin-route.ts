@@ -109,6 +109,11 @@ export function adminRouteError(error: unknown) {
       POLICY_VERSION_INVALID: 409,
       MISMATCH_EXPLANATION_REQUIRED: 400,
       ENRICHED_FACTS_REQUIRED: 409,
+      REJECTION_REASON_INVALID: 400,
+      APPLICANT_SUSPENDED: 423,
+      ADMIN_AUTHORITY_STALE: 403,
+      VALIDATION_FAILED: 400,
+      ACTION_BLOCKED: 423,
     };
     if (known[error.message])
       return adminJson(
@@ -146,10 +151,19 @@ export function adminRouteError(error: unknown) {
   return adminJson({ code: "INTERNAL_FAILURE" }, { status: 500 });
 }
 
-export function commandHeaders(request: Request) {
+export function commandHeaders(
+  request: Request,
+  options: { strictIfMatch?: boolean } = {},
+) {
+  const ifMatch = options.strictIfMatch
+    ? request.headers.get("If-Match")
+    : request.headers.get("If-Match") ?? request.headers.get("if-match-version");
+  const parsed = options.strictIfMatch
+    ? ifMatch?.match(/^"(\d+)"$/u)
+    : ifMatch?.match(/^"?(\d+)"?$/u);
   return {
     idempotencyKey: request.headers.get("idempotency-key") ?? "",
-    expectedVersion: Number(request.headers.get("if-match-version") ?? NaN),
+    expectedVersion: parsed ? Number(parsed[1]) : Number.NaN,
   };
 }
 

@@ -7936,11 +7936,11 @@
     "id": "job-000074",
     "slug": "merchandising-manager-dong-nai-000074",
     "companyId": "comp-0002-unity-trading-co",
-    "title": "Merchandising Manager",
-    "shortPitch": "Grow your career as Merchandising Manager in brand / trade / product marketing.",
     "industry": "Marketing / PR / Advertising / Communications",
     "industryCode": "r02",
     "subIndustry": "Brand / Trade / Product Marketing",
+    "title": "Merchandising Manager",
+    "shortPitch": "Grow your career as Merchandising Manager in brand / trade / product marketing.",
     "categoryIds": [
       "r02-brand-trade-product-marketing"
     ],
@@ -7973,7 +7973,8 @@
     "education": "Bachelor's degree or above",
     "age": "38-43",
     "numberOfHires": 3,
-    "status": "open",
+    "status": "active",
+    "approvalComment": null,
     "isUrgent": false,
     "isVerified": true,
     "postedAt": "2026-08-05T00:00:00.000Z",
@@ -8037,9 +8038,8 @@
     },
     "stats": {
       "viewCount": 3020,
-      "applicantCount": 137
-    },
-    "approvalComment": null
+      "applicantCount": 138
+    }
   },
   {
     "id": "job-000075",

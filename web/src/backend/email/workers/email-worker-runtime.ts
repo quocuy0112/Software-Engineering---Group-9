@@ -2,19 +2,37 @@ import "server-only";
 import { prisma } from "@/backend/database/prisma";
 import { DueOutboxProcessor } from "./due-outbox-processor";
 const processor = new DueOutboxProcessor();
-let closing = false;
-async function shutdown() {
-  if (closing) return;
-  closing = true;
-  processor.stop();
-  await prisma.$disconnect();
+let shutdownPromise: Promise<void> | null = null;
+function shutdown(exitCode = 0) {
+  if (shutdownPromise) return shutdownPromise;
+  shutdownPromise = (async () => {
+    processor.stop();
+    try {
+      await prisma.$disconnect();
+    } finally {
+      process.exitCode = exitCode;
+    }
+  })();
+  return shutdownPromise;
 }
-process.once("SIGINT", () => void shutdown());
-process.once("SIGTERM", () => void shutdown());
+
+function requestShutdown(exitCode: number) {
+  void shutdown(exitCode).then(
+    () => process.exit(process.exitCode ?? exitCode),
+    () => process.exit(1),
+  );
+}
+
+process.once("SIGINT", () => requestShutdown(0));
+process.once("SIGTERM", () => requestShutdown(0));
+if (process.platform === "win32") {
+  process.once("SIGBREAK", () => requestShutdown(0));
+}
+
 processor
   .run()
-  .then(shutdown)
+  .then(() => shutdown())
   .catch(async () => {
-    await shutdown();
-    process.exitCode = 1;
+    await shutdown(1);
+    process.exit(1);
   });

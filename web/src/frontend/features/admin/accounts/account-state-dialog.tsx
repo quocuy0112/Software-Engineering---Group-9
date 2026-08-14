@@ -62,7 +62,10 @@ export function AccountStateDialog(props: {
       <DialogContent sx={{ display: "grid", gap: 2, pt: "12px !important" }}>
         <Alert severity="warning">
           Target: {props.targetLabel}. This action is immediate and cannot be
-          undone by closing this dialog.
+          undone by closing this dialog. Existing applications, jobs,
+          memberships, verification records, CV records, and scores are not
+          deleted. Suspension revokes sessions; Restore does not create a new
+          session.
         </Alert>
         <FormControl required>
           <InputLabel id="reason-category-label">Reason category</InputLabel>
@@ -122,7 +125,7 @@ export function SuspendAccountDialog(
     />
   );
 }
-export function ReinstateAccountDialog(
+export function RestoreAccountDialog(
   props: Omit<
     Parameters<typeof AccountStateDialog>[0],
     "title" | "actionLabel"
@@ -131,8 +134,8 @@ export function ReinstateAccountDialog(
   return (
     <AccountStateDialog
       {...props}
-      title="Reinstate account"
-      actionLabel="Reinstate account"
+      title="Restore account"
+      actionLabel="Restore account"
     />
   );
 }
