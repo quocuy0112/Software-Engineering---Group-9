@@ -57,6 +57,9 @@ async function linked(now: Date) {
 }
 
 afterEach(async () => {
+  await prisma.platformAdministratorGrant.deleteMany({
+    where: { userId: { in: userIds } },
+  });
   await prisma.securityNotificationWork.deleteMany({
     where: { idempotencyKey: { contains: prefix } },
   });
@@ -172,6 +175,10 @@ describe("security notification provider-truth status", () => {
   it("moves a permanent provider failure directly to DEAD", async () => {
     const now = new Date("2026-08-10T00:00:00.000Z");
     const { outbox, work } = await linked(now);
+    const adminId = await user();
+    await prisma.platformAdministratorGrant.create({
+      data: { userId: adminId },
+    });
     const repository = new PrismaOutboxRepository();
     const owner = "provider-permanent";
     const claimed = await repository.claimOne(outbox.id, owner, now);
@@ -202,6 +209,18 @@ describe("security notification provider-truth status", () => {
       }),
     ).toEqual({ status: "MANUAL_INTERVENTION_REQUIRED" });
     expect(sendAlert).toHaveBeenCalledOnce();
+    const inAppAlerts = await prisma.inAppNotification.findMany({
+      where: {
+        recipientUserId: adminId,
+        kind: "DELIVERY_MANUAL_INTERVENTION_REQUIRED" as never,
+        contextType: "ACCOUNT",
+        contextId: work.targetUserId,
+      },
+    });
+    expect(inAppAlerts).toHaveLength(1);
+    expect(JSON.stringify(inAppAlerts)).not.toContain(
+      `${work.targetUserId}@example.test`,
+    );
     expect(sendAlert.mock.calls[0]?.[0]).toEqual({
       alertKey: `account-security-dead:${work.id}`,
       workReference: work.id,

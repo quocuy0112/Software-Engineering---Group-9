@@ -6,6 +6,7 @@ const base = {
   kind: "MESSAGE_RECEIVED" as const,
   category: "MESSAGING" as const,
   severity: "MEDIUM" as const,
+  audience: "USER" as const,
   title: "New message",
   summary: "You have unread messages.",
   href: "/messages?conversation=conversation-1",
@@ -73,6 +74,7 @@ describe("PrismaNotificationRepository", () => {
     await repository.markRead("recipient-1", "notification-1", now);
     expect(updateMany).toHaveBeenCalledWith({
       where: {
+        audience: "USER",
         id: "notification-1",
         recipientUserId: "recipient-1",
         readAt: null,

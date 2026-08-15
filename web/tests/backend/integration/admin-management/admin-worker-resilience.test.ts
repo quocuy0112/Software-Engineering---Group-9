@@ -1,7 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AdminWorkerRuntime } from "@/backend/admin/workers/admin-worker-runtime";
 import { prisma } from "@/backend/database/prisma";
-import { runEvidenceSafetyCycle } from "@/backend/admin/workers/verification-lifecycle-loop";
+import {
+  runEvidenceSafetyCycle,
+  runVerificationDeadlineCycle,
+} from "@/backend/admin/workers/verification-lifecycle-loop";
 import { runRationaleRetentionCycle } from "@/backend/admin/workers/rationale-retention-loop";
 
 describe("admin worker loop isolation", () => {
@@ -13,12 +16,78 @@ describe("admin worker loop isolation", () => {
     await prisma.recruiterVerificationRequest.deleteMany({
       where: { id: { startsWith: "worker-resilience:" } },
     });
+    await prisma.platformAdministratorGrant.deleteMany({
+      where: { userId: { startsWith: "worker-resilience:" } },
+    });
     await prisma.userAccount.deleteMany({
       where: { id: { startsWith: "worker-resilience:" } },
     });
     await prisma.privilegedActionRationale.deleteMany({
       where: { correlationId: { startsWith: "worker-resilience:" } },
     });
+  });
+
+  it("notifies active administrators once when evidence unavailability reaches escalation", async () => {
+    const suffix = crypto.randomUUID();
+    const applicantId = `worker-resilience:applicant:${suffix}`;
+    const adminId = `worker-resilience:admin:${suffix}`;
+    const requestId = `worker-resilience:overdue:${suffix}`;
+    const now = new Date("2026-08-15T00:15:00.000Z");
+    await prisma.userAccount.createMany({
+      data: [
+        {
+          id: applicantId,
+          name: "Verification Applicant",
+          email: `${applicantId}@example.test`,
+          normalizedEmail: `${applicantId}@example.test`,
+          emailVerified: true,
+          state: "ACTIVE",
+        },
+        {
+          id: adminId,
+          name: "Verification Administrator",
+          email: `${adminId}@example.test`,
+          normalizedEmail: `${adminId}@example.test`,
+          emailVerified: true,
+          state: "ACTIVE",
+        },
+      ],
+    });
+    await prisma.platformAdministratorGrant.create({
+      data: { userId: adminId },
+    });
+    await prisma.recruiterVerificationRequest.create({
+      data: {
+        id: requestId,
+        applicantUserId: applicantId,
+        submittedCompanyName: "Verification Attention Co",
+        normalizedTaxIdentifier: "0312345678",
+        requestedRole: "RECRUITER",
+        state: "PENDING_REVIEW",
+        viewerUnavailableSince: new Date(now.getTime() - 15 * 60_000),
+      },
+    });
+
+    await runVerificationDeadlineCycle(now);
+    await runVerificationDeadlineCycle(new Date(now.getTime() + 60_000));
+
+    expect(
+      await prisma.recruiterVerificationRequest.findUniqueOrThrow({
+        where: { id: requestId },
+        select: { viewerEscalatedAt: true },
+      }),
+    ).toEqual({ viewerEscalatedAt: now });
+    const notifications = await prisma.inAppNotification.findMany({
+      where: {
+        recipientUserId: adminId,
+        kind: "VERIFICATION_REVIEW_OVERDUE",
+        contextId: requestId,
+      },
+    });
+    expect(notifications).toHaveLength(1);
+    expect(JSON.stringify(notifications)).not.toContain(
+      "Verification Attention Co",
+    );
   });
 
   it("reports each loop independently during a partial provider outage", async () => {
@@ -171,7 +240,12 @@ describe("admin worker loop isolation", () => {
     await expect(
       prisma.privilegedActionRationale.findUniqueOrThrow({
         where: { id: row.id },
-        select: { ciphertext: true, iv: true, authenticationTag: true, deletedAt: true },
+        select: {
+          ciphertext: true,
+          iv: true,
+          authenticationTag: true,
+          deletedAt: true,
+        },
       }),
     ).resolves.toMatchObject({
       ciphertext: "",

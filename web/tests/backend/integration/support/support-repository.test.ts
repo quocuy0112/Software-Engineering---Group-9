@@ -69,7 +69,7 @@ afterEach(async () => {
 
 describe("PrismaSupportRepository", () => {
   it("creates one idempotent case and redacts administrator identity", async () => {
-    const { requesterId } = await fixture();
+    const { requesterId, adminAId, adminBId } = await fixture();
     const repository = new PrismaSupportRepository();
     const operationId = randomUUID();
     const create = () =>
@@ -95,6 +95,24 @@ describe("PrismaSupportRepository", () => {
         where: { requesterUserId: requesterId },
       }),
     ).toBe(1);
+    const adminNotifications = await prisma.inAppNotification.findMany({
+      where: {
+        recipientUserId: { in: [adminAId, adminBId] },
+        kind: "SUPPORT_CASE_RECEIVED" as never,
+        contextId: first.detail.id,
+      },
+      orderBy: { recipientUserId: "asc" },
+    });
+    expect(adminNotifications).toHaveLength(2);
+    expect(
+      adminNotifications.map((item) => item.recipientUserId).sort(),
+    ).toEqual([adminAId, adminBId].sort());
+    expect(JSON.stringify(adminNotifications)).not.toContain(
+      "Please help with messaging.",
+    );
+    expect(JSON.stringify(adminNotifications)).not.toContain(
+      "Cannot send messages",
+    );
   });
 
   it("permits one race winner, replies, resolves, and reopens", async () => {
@@ -173,10 +191,80 @@ describe("PrismaSupportRepository", () => {
     );
     expect(reopened.detail.state).toBe("WAITING_FOR_SUPPORT");
     expect(
+      await prisma.inAppNotification.findMany({
+        where: {
+          kind: "SUPPORT_CASE_REOPENED" as never,
+          contextId: current.id,
+        },
+        select: { recipientUserId: true },
+      }),
+    ).toEqual([{ recipientUserId: assignee }]);
+    expect(
       await prisma.supportAssignment.count({
         where: { conversationId: current.id, endedAt: null },
       }),
     ).toBe(1);
+  });
+
+  it("routes a requester reply only to the active assigned administrator", async () => {
+    const { requesterId, adminAId, adminBId } = await fixture();
+    const repository = new PrismaSupportRepository();
+    const created = await repository.runTransaction((tx) =>
+      tx.createRequesterCase({
+        userId: requesterId,
+        category: "PROFILE",
+        subject: "Profile assistance",
+        message: "Please review my profile issue.",
+        clientOperationId: randomUUID(),
+        now: new Date("2026-08-13T00:00:00.000Z"),
+      }),
+    );
+    await repository.runTransaction((tx) =>
+      tx.claim({
+        caseId: created.detail.id,
+        adminUserId: adminAId,
+        expectedVersion: 1,
+        now: new Date("2026-08-13T00:01:00.000Z"),
+      }),
+    );
+    await repository.runTransaction((tx) =>
+      tx.reply({
+        caseId: created.detail.id,
+        adminUserId: adminAId,
+        content: "Please provide another safe detail.",
+        clientOperationId: randomUUID(),
+        expectedVersion: 2,
+        now: new Date("2026-08-13T00:02:00.000Z"),
+      }),
+    );
+    await repository.runTransaction((tx) =>
+      tx.sendRequesterMessage({
+        caseId: created.detail.id,
+        userId: requesterId,
+        content: "Here is the additional private detail.",
+        clientOperationId: randomUUID(),
+        expectedVersion: 3,
+        now: new Date("2026-08-13T00:03:00.000Z"),
+      }),
+    );
+    const recipients = await prisma.inAppNotification.findMany({
+      where: {
+        kind: "SUPPORT_REQUESTER_REPLIED" as never,
+        contextId: created.detail.id,
+      },
+      select: {
+        recipientUserId: true,
+        title: true,
+        summary: true,
+        variables: true,
+      },
+    });
+    expect(recipients).toHaveLength(1);
+    expect(recipients[0]?.recipientUserId).toBe(adminAId);
+    expect(recipients[0]?.recipientUserId).not.toBe(adminBId);
+    expect(JSON.stringify(recipients)).not.toContain(
+      "additional private detail",
+    );
   });
 
   it("auto-closes and deletes content atomically after retention", async () => {

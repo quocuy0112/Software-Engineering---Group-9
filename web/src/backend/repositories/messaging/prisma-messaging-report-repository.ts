@@ -2,9 +2,13 @@ import "server-only";
 import { createHash } from "node:crypto";
 import { Prisma } from "@/backend/generated/prisma/client";
 import { prisma } from "@/backend/database/prisma";
-import { MessagingError, unavailableConversation } from "@/backend/messaging/messaging-errors";
+import {
+  MessagingError,
+  unavailableConversation,
+} from "@/backend/messaging/messaging-errors";
 import type { MessagingReportInput } from "@/shared/contracts/messaging/safety";
 import { createInAppNotification } from "@/backend/notifications/notification-service";
+import { notifyActionableAdministrators } from "@/backend/notifications/admin-notification-fanout";
 
 const REPORT_WINDOW_MS = 24 * 60 * 60 * 1_000;
 const REPORT_QUOTA = 10;
@@ -32,7 +36,9 @@ function reportKey(input: {
 export class PrismaMessagingReportRepository {
   constructor(private readonly db: typeof prisma = prisma) {}
 
-  async submit(input: MessagingReportInput & { reporterUserId: string; now: Date }) {
+  async submit(
+    input: MessagingReportInput & { reporterUserId: string; now: Date },
+  ) {
     const threshold = new Date(input.now.getTime() - REPORT_WINDOW_MS);
     const unresolvedKey = reportKey(input);
     try {
@@ -50,7 +56,8 @@ export class PrismaMessagingReportRepository {
             conversation.participantLowId === input.reporterUserId
               ? conversation.participantHighId
               : conversation.participantLowId;
-          if (expectedTarget !== input.targetUserId) throw unavailableConversation();
+          if (expectedTarget !== input.targetUserId)
+            throw unavailableConversation();
 
           if (input.evidenceMessageId) {
             const evidence = await tx.messagingMessage.findFirst({
@@ -114,12 +121,24 @@ export class PrismaMessagingReportRepository {
             contextType: "MESSAGING_REPORT",
             contextId: report.id,
           });
+          await notifyActionableAdministrators(tx, {
+            kind: "MESSAGE_REPORT_RECEIVED_ADMIN",
+            eventKey: `${report.id}:received`,
+            correlationId: report.id,
+            occurredAt: input.now,
+            contextType: "MESSAGING_REPORT",
+            contextId: report.id,
+            state: "PENDING_REVIEW",
+          });
           return { reportId: report.id, deduplicated: false };
         },
         { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
       );
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
         const existing = await this.db.messagingReport.findUnique({
           where: { unresolvedKey },
           select: { id: true },
