@@ -12,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import { loadProtectedPdf } from "@/client-vendors/protected-pdf-viewer";
+import { StepUpDialog } from "../auth/step-up-dialog";
 
 function formatBytes(byteSize: number) {
   if (byteSize < 1_000) return `${byteSize} B`;
@@ -52,12 +53,46 @@ export function ProtectedEvidenceViewer(props: {
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
   const [failureMessage, setFailureMessage] = useState("");
+  const [stepUpRequired, setStepUpRequired] = useState(false);
+  const [retryAction, setRetryAction] = useState<
+    "load" | "inline" | "attachment"
+  >();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const popupRef = useRef<Window | null>(null);
   const headingId = `business-license-evidence-${props.evidenceId}`;
 
   const evidenceUrl = `/api/admin/verification-requests/${encodeURIComponent(props.requestId)}/evidence/${encodeURIComponent(props.evidenceId)}`;
 
+  async function readProtected(path: string) {
+    const response = await fetch(path, {
+      cache: "no-store",
+      credentials: "same-origin",
+    });
+    if (response.ok) return response;
+    const body = (await response.json().catch(() => ({}))) as {
+      code?: string;
+    };
+    if (body.code === "STEP_UP_REQUIRED") {
+      setStepUpRequired(true);
+      throw new Error(
+        "Fresh two-factor proof is required to view this evidence.",
+      );
+    }
+    if (body.code === "EVIDENCE_UNAVAILABLE") {
+      throw new Error("This evidence is no longer available for review.");
+    }
+    if (response.status === 410) {
+      throw new Error("Evidence was deleted or is no longer available.");
+    }
+    throw new Error(
+      props.mediaType === "application/pdf"
+        ? "Protected PDF is unavailable."
+        : "Protected image is unavailable.",
+    );
+  }
+
   async function load() {
+    setRetryAction("load");
     setLoading(true);
     setFailed(false);
     setFailureMessage("");
@@ -66,19 +101,9 @@ export function ProtectedEvidenceViewer(props: {
     setPdfPage(1);
     try {
       if (props.mediaType === "application/pdf") {
-        const response = await fetch(
+        const response = await readProtected(
           `${evidenceUrl}/download?disposition=inline`,
-          {
-            cache: "no-store",
-            credentials: "same-origin",
-          },
         );
-        if (!response.ok)
-          throw new Error(
-            response.status === 410
-              ? "Evidence was deleted or is no longer available."
-              : "Protected PDF is unavailable.",
-          );
         const document = (await loadProtectedPdf(
           await response.arrayBuffer(),
         )) as PdfDocument;
@@ -87,16 +112,7 @@ export function ProtectedEvidenceViewer(props: {
         props.mediaType === "image/png" ||
         props.mediaType === "image/jpeg"
       ) {
-        const response = await fetch(`${evidenceUrl}/preview`, {
-          cache: "no-store",
-          credentials: "same-origin",
-        });
-        if (!response.ok)
-          throw new Error(
-            response.status === 410
-              ? "Evidence was deleted or is no longer available."
-              : "Protected image is unavailable.",
-          );
+        const response = await readProtected(`${evidenceUrl}/preview`);
         const blob = await response.blob();
         if (blob.type !== "image/png")
           throw new Error("The protected preview format is unavailable.");
@@ -118,11 +134,74 @@ export function ProtectedEvidenceViewer(props: {
     }
   }
 
+  async function downloadEvidence(disposition: "inline" | "attachment") {
+    setRetryAction(disposition);
+    setLoading(true);
+    setFailed(false);
+    setFailureMessage("");
+    let popup: Window | null = null;
+    try {
+      if (disposition === "inline") {
+        popup =
+          popupRef.current && !popupRef.current.closed
+            ? popupRef.current
+            : window.open("about:blank", "_blank");
+        if (!popup) {
+          throw new Error("Allow pop-ups to open the protected document.");
+        }
+        popupRef.current = popup;
+        popup.opener = null;
+      }
+      const response = await readProtected(
+        `${evidenceUrl}/download${disposition === "inline" ? "?disposition=inline" : ""}`,
+      );
+      const url = URL.createObjectURL(await response.blob());
+      if (disposition === "inline") {
+        popup!.location.href = url;
+        popupRef.current = null;
+        window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      } else {
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `business-license-${props.submissionVersion}.${props.mediaType === "application/pdf" ? "pdf" : props.mediaType === "image/png" ? "png" : "jpg"}`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 0);
+      }
+    } catch (error) {
+      const awaitingStepUp =
+        error instanceof Error &&
+        error.message ===
+          "Fresh two-factor proof is required to view this evidence.";
+      if (!awaitingStepUp) {
+        popup?.close();
+        if (popupRef.current === popup) popupRef.current = null;
+      }
+      setFailed(true);
+      setFailureMessage(
+        error instanceof Error
+          ? error.message
+          : "Protected evidence is unavailable.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(
     () => () => {
       if (imageUrl) URL.revokeObjectURL(imageUrl);
     },
     [imageUrl],
+  );
+
+  useEffect(
+    () => () => {
+      popupRef.current?.close();
+      popupRef.current = null;
+    },
+    [],
   );
 
   useEffect(() => {
@@ -234,10 +313,23 @@ export function ProtectedEvidenceViewer(props: {
             href={`${evidenceUrl}/download?disposition=inline`}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(event) => {
+              event.preventDefault();
+              void downloadEvidence("inline");
+            }}
+            disabled={loading}
           >
             Open full document
           </Button>
-          <Button component="a" href={`${evidenceUrl}/download`}>
+          <Button
+            component="a"
+            href={`${evidenceUrl}/download`}
+            onClick={(event) => {
+              event.preventDefault();
+              void downloadEvidence("attachment");
+            }}
+            disabled={loading}
+          >
             Download authenticated copy
           </Button>
         </Box>
@@ -359,6 +451,24 @@ export function ProtectedEvidenceViewer(props: {
           </Box>
         </Box>
       )}
+      <StepUpDialog
+        open={stepUpRequired}
+        id={`evidence-${props.evidenceId}`}
+        onCancel={() => {
+          popupRef.current?.close();
+          popupRef.current = null;
+          setStepUpRequired(false);
+          setRetryAction(undefined);
+        }}
+        onVerified={() => {
+          const action = retryAction;
+          setStepUpRequired(false);
+          setRetryAction(undefined);
+          if (action === "inline" || action === "attachment")
+            void downloadEvidence(action);
+          else void load();
+        }}
+      />
     </Paper>
   );
 }

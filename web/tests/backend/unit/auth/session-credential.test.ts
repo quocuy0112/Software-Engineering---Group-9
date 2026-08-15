@@ -121,4 +121,10 @@ describe("exclusive browser-session credential", () => {
     expect(source.match(/modelName:\s*"Session"/g)).toHaveLength(1);
     expect(source).toContain("cookieCache: { enabled: false }");
   });
+
+  it("keeps the seven-day absolute ceiling by disabling sliding refresh", async () => {
+    const source = await readFile("src/backend/auth/cookies/config.ts", "utf8");
+    expect(source).toContain("disableSessionRefresh: true");
+    expect(source).not.toMatch(/\bupdateAge\s*:/);
+  });
 });

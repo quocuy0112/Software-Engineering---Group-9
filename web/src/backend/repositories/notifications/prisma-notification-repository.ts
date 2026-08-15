@@ -46,6 +46,7 @@ export class PrismaNotificationRepository {
           severity: input.severity,
           title: input.title,
           summary: input.summary,
+          variables: input.variables ?? {},
           href: input.href,
           contextType: input.contextType,
           contextId: input.contextId,
@@ -70,6 +71,7 @@ export class PrismaNotificationRepository {
           severity: input.severity,
           title: input.title,
           summary: input.summary,
+          variables: input.variables ?? {},
           href: input.href,
           contextType: input.contextType,
           contextId: input.contextId,
@@ -88,6 +90,9 @@ export class PrismaNotificationRepository {
           readAt: null,
           occurrenceCount: 1,
           correlationId: input.correlationId,
+          title: input.title,
+          summary: input.summary,
+          variables: input.variables ?? {},
           lastOccurredAt: input.occurredAt,
           expiresAt,
         },
@@ -97,10 +102,19 @@ export class PrismaNotificationRepository {
       where: { id: existing.id },
       data: {
         occurrenceCount: { increment: 1 },
+        variables: input.variables ?? {},
         summary: input.summary,
         lastOccurredAt: input.occurredAt,
       },
     });
+  }
+
+  async language(recipientUserId: string) {
+    const preferences = await this.db.accountPreferences.findUnique({
+      where: { userId: recipientUserId },
+      select: { language: true },
+    });
+    return preferences?.language ?? null;
   }
 
   async list(input: {

@@ -3,6 +3,7 @@ import type { Prisma, PrismaClient } from "@/backend/generated/prisma/client";
 import { prisma } from "@/backend/database/prisma";
 import {
   buildNotification,
+  renderNotificationCopy,
   type NotificationEventInput,
 } from "@/backend/notifications/event-policy";
 import { NotificationError } from "@/backend/notifications/notification-errors";
@@ -16,37 +17,46 @@ import { emitNotificationOperation } from "@/backend/notifications/notification-
 
 type NotificationDb = PrismaClient | Prisma.TransactionClient;
 
-const toItem = (row: {
-  id: string;
-  kind: NotificationItem["kind"];
-  category: NotificationItem["category"];
-  severity: NotificationItem["severity"];
-  title: string;
-  summary: string;
-  href: string | null;
-  contextType: NotificationItem["contextType"];
-  contextId: string | null;
-  occurrenceCount: number;
-  readAt: Date | null;
-  createdAt: Date;
-  lastOccurredAt: Date;
-  expiresAt: Date;
-}): NotificationItem => ({
-  id: row.id,
-  kind: row.kind,
-  category: row.category,
-  severity: row.severity,
-  title: row.title,
-  summary: row.summary,
-  href: row.href,
-  contextType: row.contextType,
-  contextId: row.contextId,
-  occurrenceCount: row.occurrenceCount,
-  readAt: row.readAt?.toISOString() ?? null,
-  createdAt: row.createdAt.toISOString(),
-  lastOccurredAt: row.lastOccurredAt.toISOString(),
-  expiresAt: row.expiresAt.toISOString(),
-});
+const toItem = (
+  row: {
+    id: string;
+    kind: NotificationItem["kind"];
+    category: NotificationItem["category"];
+    severity: NotificationItem["severity"];
+    title: string;
+    summary: string;
+    variables?: unknown;
+    href: string | null;
+    contextType: NotificationItem["contextType"];
+    contextId: string | null;
+    occurrenceCount: number;
+    readAt: Date | null;
+    createdAt: Date;
+    lastOccurredAt: Date;
+    expiresAt: Date;
+  },
+  language?: "VI" | "EN",
+): NotificationItem => {
+  const localized = language
+    ? renderNotificationCopy(row.kind, row.variables, language)
+    : null;
+  return {
+    id: row.id,
+    kind: row.kind,
+    category: row.category,
+    severity: row.severity,
+    title: localized?.title ?? row.title,
+    summary: localized?.summary ?? row.summary,
+    href: row.href,
+    contextType: row.contextType,
+    contextId: row.contextId,
+    occurrenceCount: row.occurrenceCount,
+    readAt: row.readAt?.toISOString() ?? null,
+    createdAt: row.createdAt.toISOString(),
+    lastOccurredAt: row.lastOccurredAt.toISOString(),
+    expiresAt: row.expiresAt.toISOString(),
+  };
+};
 
 export async function createInAppNotification(
   db: NotificationDb,
@@ -60,7 +70,7 @@ export async function createInAppNotification(
     });
     const built = buildNotification(
       input,
-      input.language ?? preferences?.language ?? "VI",
+      input.language ?? preferences?.language ?? "EN",
     );
     const result = await new PrismaNotificationRepository(db).create({
       ...built,
@@ -105,12 +115,15 @@ export class NotificationService {
     },
   ) {
     const observedAt = this.now();
-    const [page, unreadCount] = await Promise.all([
+    const [page, unreadCount, language] = await Promise.all([
       this.repository.list({ recipientUserId, ...input, now: observedAt }),
       this.repository.unreadCount(recipientUserId, observedAt),
+      typeof this.repository.language === "function"
+        ? this.repository.language(recipientUserId)
+        : Promise.resolve(null),
     ]);
     return {
-      items: page.items.map(toItem),
+      items: page.items.map((item) => toItem(item, language ?? "EN")),
       nextCursor: page.nextCursor,
       unreadCount,
       observedAt: observedAt.toISOString(),
@@ -188,12 +201,7 @@ export class NotificationService {
         }
         const changed = await new PrismaNotificationRepository(
           tx,
-        ).markContextRead(
-          recipientUserId,
-          contextType,
-          contextId,
-          observedAt,
-        );
+        ).markContextRead(recipientUserId, contextType, contextId, observedAt);
         return changed.count;
       });
       return this.readResult(recipientUserId, changedCount, observedAt);

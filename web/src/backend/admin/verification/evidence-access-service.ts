@@ -1,4 +1,5 @@
 import "server-only";
+import { createHash } from "node:crypto";
 import { prisma } from "@/backend/database/prisma";
 import { FilesystemPrivateBusinessEvidenceStorage } from "@/backend/storage/business-evidence/filesystem";
 import { S3PrivateBusinessEvidenceStorage } from "@/backend/storage/business-evidence/s3";
@@ -33,7 +34,16 @@ export class EvidenceAccessService {
       evidence.storageAdapter === "s3"
         ? new S3PrivateBusinessEvidenceStorage()
         : new FilesystemPrivateBusinessEvidenceStorage();
-    const bytes = await adapter.read(evidence.storageLocator, evidence);
+    let bytes: Buffer;
+    try {
+      bytes = await adapter.read(evidence.storageLocator, evidence);
+    } catch {
+      throw new Error("EVIDENCE_UNAVAILABLE");
+    }
+    if (
+      createHash("sha256").update(bytes).digest("hex") !== evidence.sourceSha256
+    )
+      throw new Error("EVIDENCE_UNAVAILABLE");
     return {
       bytes,
       mediaType: evidence.detectedMediaType ?? evidence.declaredMediaType,

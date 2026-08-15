@@ -9426,6 +9426,7 @@ export const InAppNotificationScalarFieldEnum = {
   severity: 'severity',
   title: 'title',
   summary: 'summary',
+  variables: 'variables',
   href: 'href',
   contextType: 'contextType',
   contextId: 'contextId',

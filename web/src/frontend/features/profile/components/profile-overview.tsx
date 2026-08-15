@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
 import { Badge } from "@/frontend/components/ui/badge";
 import { useProfileEditor } from "../client/use-profile-editor";
@@ -12,6 +13,7 @@ import { ProfileEducationForm } from "./profile-education-form";
 import { ProfileSocialLinksForm } from "./profile-social-links-form";
 import { ProfileAvatarEditor } from "./profile-avatar-editor";
 import { AccountIdRow } from "./account-id-row";
+import { ProfileCompletionHeader } from "./profile-completion-header";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 
 type ProfileOverviewProps = {
@@ -45,6 +47,7 @@ export function ProfileOverview({
             "Quản lý tài khoản và cập nhật thông tin nghề nghiệp của bạn.",
           enabled2fa: "Đã bật 2FA",
           recommended2fa: "Nên bật 2FA",
+          enable2fa: "Bật xác thực 2 bước",
           account: "CHI TIẾT TÀI KHOẢN",
           accountId: "ID tài khoản",
           copyAccountId: "Sao chép ID tài khoản",
@@ -80,6 +83,7 @@ export function ProfileOverview({
             "Manage your account and keep your professional information current.",
           enabled2fa: "2FA enabled",
           recommended2fa: "2FA recommended",
+          enable2fa: "Enable two-factor authentication",
           account: "ACCOUNT DETAILS",
           accountId: "Account ID",
           copyAccountId: "Copy account ID",
@@ -106,6 +110,7 @@ export function ProfileOverview({
           overviewLabel: "Profile overview",
         };
   const editor = useProfileEditor(initialProfile, csrfProof);
+  const [avatar, setAvatar] = useState(account.image ?? null);
 
   if (editor.loading) {
     return (
@@ -139,13 +144,28 @@ export function ProfileOverview({
           <p className="page-heading-copy">{copy.subtitle}</p>
         </div>
 
-        <Badge
-          className="page-heading-badge"
-          tone={account.twoFactorEnabled ? "success" : "warning"}
-        >
-          {account.twoFactorEnabled ? copy.enabled2fa : copy.recommended2fa}
-        </Badge>
+        {account.twoFactorEnabled ? (
+          <Badge className="page-heading-badge" tone="success">
+            {copy.enabled2fa}
+          </Badge>
+        ) : (
+          <Link
+            className="profile-security-status-action"
+            href="/profile/security#totp-title"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M12 3 2.8 20h18.4L12 3Zm0 6v5m0 3h.01" />
+            </svg>
+            {copy.enable2fa}
+          </Link>
+        )}
       </header>
+
+      <ProfileCompletionHeader
+        profile={profile}
+        avatar={avatar}
+        locale={locale}
+      />
 
       <ProfileNavigation active="overview" />
 
@@ -153,6 +173,7 @@ export function ProfileOverview({
         accountName={account.name}
         initialAvatar={account.image}
         csrfProof={csrfProof}
+        onAvatarChanged={setAvatar}
       />
 
       <section

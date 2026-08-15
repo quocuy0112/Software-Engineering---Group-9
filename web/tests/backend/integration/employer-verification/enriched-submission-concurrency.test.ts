@@ -16,7 +16,10 @@ describe("enriched submission concurrency guards", () => {
     expect(service).toContain(
       'throw new Error("ACTIVE_REQUEST_EXISTS", { cause: error })',
     );
-    expect(service).toContain("await storage().delete(stored.storageLocator)");
+    expect(service).toContain("const evidenceStorage = storage()");
+    expect(service).toContain(
+      "await evidenceStorage.delete(stored.storageLocator)",
+    );
     expect(migration).toContain("RecruiterVerificationRequest_active_applicant_tax_key");
   });
 });

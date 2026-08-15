@@ -13,6 +13,7 @@ import {
   useSetWorkspaceLocale,
   useWorkspaceLocale,
 } from "../../dashboard/client/workspace-locale";
+import { NOTIFICATION_CHANGED_EVENT } from "../../notifications/client/use-notification-context-read";
 
 export type AccountPreferencesFeedback = {
   kind: "success" | "error";
@@ -79,6 +80,7 @@ export function useAccountPreferences(
       setPreferences(saved);
       setSavedPreferences(saved);
       setWorkspaceLocale(saved.language);
+      window.dispatchEvent(new Event(NOTIFICATION_CHANGED_EVENT));
       const message = localizeAccountMessage(
         saved.language,
         parsed.data.message,

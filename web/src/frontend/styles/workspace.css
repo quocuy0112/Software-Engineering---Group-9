@@ -496,6 +496,15 @@
   padding-bottom: var(--sh-space-16);
 }
 
+/*
+ * Reading typography for workspace surfaces.
+ * Be Vietnam Pro carries Vietnamese headings and card titles; compact UI
+ * labels intentionally keep the Manrope label token in their own selectors.
+ */
+.workspace-content :where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--sh-font-family);
+}
+
 .dashboard-page,
 .profile-page,
 .sessions-page {

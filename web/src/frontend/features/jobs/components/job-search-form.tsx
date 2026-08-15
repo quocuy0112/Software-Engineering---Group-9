@@ -456,7 +456,7 @@ export function JobSearchForm({
           <header className="job-filter-heading">
             <span className="job-filter-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24">
-                <path d="M4 6h16M7 12h10M10 18h4" />
+                <path d="M4 5.5h16l-6.25 7.1v5.1l-3.5 1.8v-6.9L4 5.5Z" />
               </svg>
             </span>
             <div>

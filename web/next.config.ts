@@ -3,8 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   // Native canvas is used only by the server-side protected-document preview
-  // pipeline. Keep its platform binary out of Turbopack's ESM chunks.
-  serverExternalPackages: ["@napi-rs/canvas", "pdfjs-dist"],
+  // pipeline. Keep its platform binary out of Turbopack's ESM chunks. PDF.js
+  // itself is ESM and must remain bundled, including its browser worker.
+  serverExternalPackages: ["@napi-rs/canvas"],
   async headers() {
     const scripts =
       process.env.NODE_ENV === "development"

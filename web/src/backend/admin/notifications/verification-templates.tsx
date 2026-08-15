@@ -5,7 +5,7 @@ import {
   Html,
   Link,
   Text,
-} from "@react-email/components";
+} from "react-email";
 import type {
   CompanyMembershipRole,
   VerificationEventKind,
