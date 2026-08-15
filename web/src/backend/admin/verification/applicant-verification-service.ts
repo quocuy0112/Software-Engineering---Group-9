@@ -2,9 +2,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { prisma } from "@/backend/database/prisma";
 import { requireSession } from "@/backend/auth/session/require-session";
-import {
-  validateEvidenceFile,
-} from "@/shared/contracts/admin/verification";
+import { validateEvidenceFile } from "@/shared/contracts/admin/verification";
 import {
   businessFactsDiffer,
   enrichedVerificationSubmissionSchema,
@@ -48,32 +46,34 @@ export class ApplicantVerificationService {
   async list(request: Request) {
     const session = await requireSession(request.headers, new Date());
     if (!session) throw new Error("UNAUTHORIZED");
-    return prisma.recruiterVerificationRequest.findMany({
-      where: { applicantUserId: session.userId },
-      select: {
-        id: true,
-        submittedCompanyName: true,
-        normalizedTaxIdentifier: true,
-        requestedRole: true,
-        state: true,
-        currentSubmissionVersion: true,
-        resubmissionCount: true,
-        createdAt: true,
-        updatedAt: true,
-        businessFacts: {
-          select: {
-            lookupSnapshot: { select: { outcome: true } },
+    return prisma.recruiterVerificationRequest
+      .findMany({
+        where: { applicantUserId: session.userId },
+        select: {
+          id: true,
+          submittedCompanyName: true,
+          normalizedTaxIdentifier: true,
+          requestedRole: true,
+          state: true,
+          currentSubmissionVersion: true,
+          resubmissionCount: true,
+          createdAt: true,
+          updatedAt: true,
+          businessFacts: {
+            select: {
+              lookupSnapshot: { select: { outcome: true } },
+            },
           },
         },
-      },
-      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-    }).then((rows) =>
-      rows.map(({ businessFacts, ...row }) => ({
-        ...row,
-        legacyRequest: !businessFacts,
-        registryOutcome: businessFacts?.lookupSnapshot.outcome ?? null,
-      })),
-    );
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      })
+      .then((rows) =>
+        rows.map(({ businessFacts, ...row }) => ({
+          ...row,
+          legacyRequest: !businessFacts,
+          registryOutcome: businessFacts?.lookupSnapshot.outcome ?? null,
+        })),
+      );
   }
   async submit(
     request: Request,
@@ -98,10 +98,14 @@ export class ApplicantVerificationService {
       if (replay.applicantUserId !== session.userId) {
         throw new Error("IDEMPOTENCY_CONFLICT");
       }
-      return { requestId: replay.id, state: replay.state, version: replay.version };
+      return {
+        requestId: replay.id,
+        state: replay.state,
+        version: replay.version,
+      };
     }
-    const mediaType = validateEvidenceFile(file);
     const bytes = Buffer.from(await file.arrayBuffer());
+    const mediaType = validateEvidenceFile(file, bytes);
     const requestId = randomUUID();
     const preparation = await prisma.employerVerificationPreparation.findFirst({
       where: {
@@ -162,10 +166,7 @@ export class ApplicantVerificationService {
     ) {
       throw new Error("MISMATCH_EXPLANATION_REQUIRED");
     }
-    const emailSignals = companyEmailSignals(
-      companyEmail,
-      input.website,
-    );
+    const emailSignals = companyEmailSignals(companyEmail, input.website);
     const existing = await prisma.company.findUnique({
       where: { normalizedTaxIdentifier: input.taxIdentifier },
     });
@@ -190,7 +191,8 @@ export class ApplicantVerificationService {
       });
       if (membership) throw new Error("DUPLICATE_AUTHORITY");
     }
-    const stored = await storage().write(`${requestId}:1`, bytes);
+    const evidenceStorage = storage();
+    const stored = await evidenceStorage.write(`${requestId}:1`, bytes);
     try {
       return await prisma.$transaction(async (tx) => {
         const row = await tx.recruiterVerificationRequest.create({
@@ -282,13 +284,13 @@ export class ApplicantVerificationService {
           },
         });
         const receipt = receiptData(
-            requestId,
-            session.userId,
-            "PENDING_CHECKS",
-            "VERIFICATION_RECEIPT",
-            row.version,
-            now,
-          );
+          requestId,
+          session.userId,
+          "PENDING_CHECKS",
+          "VERIFICATION_RECEIPT",
+          row.version,
+          now,
+        );
         await tx.emailOutbox.create({ data: receipt });
         await createVerificationInAppNotification(
           tx,
@@ -312,16 +314,18 @@ export class ApplicantVerificationService {
         return { requestId: row.id, state: row.state, version: row.version };
       });
     } catch (error) {
-      await storage().delete(stored.storageLocator);
+      await evidenceStorage.delete(stored.storageLocator);
       if (
         error &&
         typeof error === "object" &&
         "code" in error &&
         error.code === "P2002"
       ) {
-        const idempotent = await prisma.recruiterVerificationRequest.findUnique({
-          where: { submissionIdempotencyKey: idempotencyKey },
-        });
+        const idempotent = await prisma.recruiterVerificationRequest.findUnique(
+          {
+            where: { submissionIdempotencyKey: idempotencyKey },
+          },
+        );
         if (idempotent?.applicantUserId === session.userId) {
           return {
             requestId: idempotent.id,
@@ -385,13 +389,13 @@ export class ApplicantVerificationService {
         },
       });
       const receipt = receiptData(
-          row.id,
-          session.userId,
-          "CANCELLED",
-          "VERIFICATION_CANCELLED",
-          updated.version,
-          now,
-        );
+        row.id,
+        session.userId,
+        "CANCELLED",
+        "VERIFICATION_CANCELLED",
+        updated.version,
+        now,
+      );
       await tx.emailOutbox.create({ data: receipt });
       await createVerificationInAppNotification(
         tx,
@@ -417,7 +421,6 @@ export class ApplicantVerificationService {
     const now = new Date();
     const session = await requireSession(request.headers, now);
     if (!session) throw new Error("UNAUTHORIZED");
-    const mediaType = validateEvidenceFile(file);
     const current = await prisma.recruiterVerificationRequest.findFirst({
       where: {
         id: requestId,
@@ -428,9 +431,12 @@ export class ApplicantVerificationService {
     });
     if (!current) throw new Error("TARGET_UNAVAILABLE");
     const version = current.currentSubmissionVersion + 1;
-    const stored = await storage().write(
+    const bytes = Buffer.from(await file.arrayBuffer());
+    const mediaType = validateEvidenceFile(file, bytes);
+    const evidenceStorage = storage();
+    const stored = await evidenceStorage.write(
       `${requestId}:${version}`,
-      Buffer.from(await file.arrayBuffer()),
+      bytes,
     );
     try {
       return await prisma.$transaction(async (tx) => {
@@ -479,13 +485,13 @@ export class ApplicantVerificationService {
           },
         });
         const receipt = receiptData(
-            requestId,
-            session.userId,
-            "PENDING_CHECKS",
-            "VERIFICATION_RECEIPT",
-            result.version,
-            now,
-          );
+          requestId,
+          session.userId,
+          "PENDING_CHECKS",
+          "VERIFICATION_RECEIPT",
+          result.version,
+          now,
+        );
         await tx.emailOutbox.create({ data: receipt });
         await createVerificationInAppNotification(
           tx,
@@ -509,7 +515,7 @@ export class ApplicantVerificationService {
         return { requestId, state: result.state, version: result.version };
       });
     } catch (error) {
-      await storage().delete(stored.storageLocator);
+      await evidenceStorage.delete(stored.storageLocator);
       throw error;
     }
   }

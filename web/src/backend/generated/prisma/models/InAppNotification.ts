@@ -84,6 +84,7 @@ export type InAppNotificationCountAggregateOutputType = {
   severity: number
   title: number
   summary: number
+  variables: number
   href: number
   contextType: number
   contextId: number
@@ -157,6 +158,7 @@ export type InAppNotificationCountAggregateInputType = {
   severity?: true
   title?: true
   summary?: true
+  variables?: true
   href?: true
   contextType?: true
   contextId?: true
@@ -265,6 +267,7 @@ export type InAppNotificationGroupByOutputType = {
   severity: $Enums.InAppNotificationSeverity
   title: string
   summary: string
+  variables: runtime.JsonValue | null
   href: string | null
   contextType: $Enums.InAppNotificationContextType | null
   contextId: string | null
@@ -309,6 +312,7 @@ export type InAppNotificationWhereInput = {
   severity?: Prisma.EnumInAppNotificationSeverityFilter<"InAppNotification"> | $Enums.InAppNotificationSeverity
   title?: Prisma.StringFilter<"InAppNotification"> | string
   summary?: Prisma.StringFilter<"InAppNotification"> | string
+  variables?: Prisma.JsonNullableFilter<"InAppNotification">
   href?: Prisma.StringNullableFilter<"InAppNotification"> | string | null
   contextType?: Prisma.EnumInAppNotificationContextTypeNullableFilter<"InAppNotification"> | $Enums.InAppNotificationContextType | null
   contextId?: Prisma.StringNullableFilter<"InAppNotification"> | string | null
@@ -331,6 +335,7 @@ export type InAppNotificationOrderByWithRelationInput = {
   severity?: Prisma.SortOrder
   title?: Prisma.SortOrder
   summary?: Prisma.SortOrder
+  variables?: Prisma.SortOrderInput | Prisma.SortOrder
   href?: Prisma.SortOrderInput | Prisma.SortOrder
   contextType?: Prisma.SortOrderInput | Prisma.SortOrder
   contextId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -357,6 +362,7 @@ export type InAppNotificationWhereUniqueInput = Prisma.AtLeast<{
   severity?: Prisma.EnumInAppNotificationSeverityFilter<"InAppNotification"> | $Enums.InAppNotificationSeverity
   title?: Prisma.StringFilter<"InAppNotification"> | string
   summary?: Prisma.StringFilter<"InAppNotification"> | string
+  variables?: Prisma.JsonNullableFilter<"InAppNotification">
   href?: Prisma.StringNullableFilter<"InAppNotification"> | string | null
   contextType?: Prisma.EnumInAppNotificationContextTypeNullableFilter<"InAppNotification"> | $Enums.InAppNotificationContextType | null
   contextId?: Prisma.StringNullableFilter<"InAppNotification"> | string | null
@@ -378,6 +384,7 @@ export type InAppNotificationOrderByWithAggregationInput = {
   severity?: Prisma.SortOrder
   title?: Prisma.SortOrder
   summary?: Prisma.SortOrder
+  variables?: Prisma.SortOrderInput | Prisma.SortOrder
   href?: Prisma.SortOrderInput | Prisma.SortOrder
   contextType?: Prisma.SortOrderInput | Prisma.SortOrder
   contextId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -407,6 +414,7 @@ export type InAppNotificationScalarWhereWithAggregatesInput = {
   severity?: Prisma.EnumInAppNotificationSeverityWithAggregatesFilter<"InAppNotification"> | $Enums.InAppNotificationSeverity
   title?: Prisma.StringWithAggregatesFilter<"InAppNotification"> | string
   summary?: Prisma.StringWithAggregatesFilter<"InAppNotification"> | string
+  variables?: Prisma.JsonNullableWithAggregatesFilter<"InAppNotification">
   href?: Prisma.StringNullableWithAggregatesFilter<"InAppNotification"> | string | null
   contextType?: Prisma.EnumInAppNotificationContextTypeNullableWithAggregatesFilter<"InAppNotification"> | $Enums.InAppNotificationContextType | null
   contextId?: Prisma.StringNullableWithAggregatesFilter<"InAppNotification"> | string | null
@@ -427,6 +435,7 @@ export type InAppNotificationCreateInput = {
   severity: $Enums.InAppNotificationSeverity
   title: string
   summary: string
+  variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   href?: string | null
   contextType?: $Enums.InAppNotificationContextType | null
   contextId?: string | null
@@ -449,6 +458,7 @@ export type InAppNotificationUncheckedCreateInput = {
   severity: $Enums.InAppNotificationSeverity
   title: string
   summary: string
+  variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   href?: string | null
   contextType?: $Enums.InAppNotificationContextType | null
   contextId?: string | null
@@ -469,6 +479,7 @@ export type InAppNotificationUpdateInput = {
   severity?: Prisma.EnumInAppNotificationSeverityFieldUpdateOperationsInput | $Enums.InAppNotificationSeverity
   title?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
+  variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   href?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contextType?: Prisma.NullableEnumInAppNotificationContextTypeFieldUpdateOperationsInput | $Enums.InAppNotificationContextType | null
   contextId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -491,6 +502,7 @@ export type InAppNotificationUncheckedUpdateInput = {
   severity?: Prisma.EnumInAppNotificationSeverityFieldUpdateOperationsInput | $Enums.InAppNotificationSeverity
   title?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
+  variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   href?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contextType?: Prisma.NullableEnumInAppNotificationContextTypeFieldUpdateOperationsInput | $Enums.InAppNotificationContextType | null
   contextId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -512,6 +524,7 @@ export type InAppNotificationCreateManyInput = {
   severity: $Enums.InAppNotificationSeverity
   title: string
   summary: string
+  variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   href?: string | null
   contextType?: $Enums.InAppNotificationContextType | null
   contextId?: string | null
@@ -532,6 +545,7 @@ export type InAppNotificationUpdateManyMutationInput = {
   severity?: Prisma.EnumInAppNotificationSeverityFieldUpdateOperationsInput | $Enums.InAppNotificationSeverity
   title?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
+  variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   href?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contextType?: Prisma.NullableEnumInAppNotificationContextTypeFieldUpdateOperationsInput | $Enums.InAppNotificationContextType | null
   contextId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -553,6 +567,7 @@ export type InAppNotificationUncheckedUpdateManyInput = {
   severity?: Prisma.EnumInAppNotificationSeverityFieldUpdateOperationsInput | $Enums.InAppNotificationSeverity
   title?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
+  variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   href?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contextType?: Prisma.NullableEnumInAppNotificationContextTypeFieldUpdateOperationsInput | $Enums.InAppNotificationContextType | null
   contextId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -584,6 +599,7 @@ export type InAppNotificationCountOrderByAggregateInput = {
   severity?: Prisma.SortOrder
   title?: Prisma.SortOrder
   summary?: Prisma.SortOrder
+  variables?: Prisma.SortOrder
   href?: Prisma.SortOrder
   contextType?: Prisma.SortOrder
   contextId?: Prisma.SortOrder
@@ -712,6 +728,7 @@ export type InAppNotificationCreateWithoutRecipientInput = {
   severity: $Enums.InAppNotificationSeverity
   title: string
   summary: string
+  variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   href?: string | null
   contextType?: $Enums.InAppNotificationContextType | null
   contextId?: string | null
@@ -732,6 +749,7 @@ export type InAppNotificationUncheckedCreateWithoutRecipientInput = {
   severity: $Enums.InAppNotificationSeverity
   title: string
   summary: string
+  variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   href?: string | null
   contextType?: $Enums.InAppNotificationContextType | null
   contextId?: string | null
@@ -782,6 +800,7 @@ export type InAppNotificationScalarWhereInput = {
   severity?: Prisma.EnumInAppNotificationSeverityFilter<"InAppNotification"> | $Enums.InAppNotificationSeverity
   title?: Prisma.StringFilter<"InAppNotification"> | string
   summary?: Prisma.StringFilter<"InAppNotification"> | string
+  variables?: Prisma.JsonNullableFilter<"InAppNotification">
   href?: Prisma.StringNullableFilter<"InAppNotification"> | string | null
   contextType?: Prisma.EnumInAppNotificationContextTypeNullableFilter<"InAppNotification"> | $Enums.InAppNotificationContextType | null
   contextId?: Prisma.StringNullableFilter<"InAppNotification"> | string | null
@@ -802,6 +821,7 @@ export type InAppNotificationCreateManyRecipientInput = {
   severity: $Enums.InAppNotificationSeverity
   title: string
   summary: string
+  variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   href?: string | null
   contextType?: $Enums.InAppNotificationContextType | null
   contextId?: string | null
@@ -822,6 +842,7 @@ export type InAppNotificationUpdateWithoutRecipientInput = {
   severity?: Prisma.EnumInAppNotificationSeverityFieldUpdateOperationsInput | $Enums.InAppNotificationSeverity
   title?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
+  variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   href?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contextType?: Prisma.NullableEnumInAppNotificationContextTypeFieldUpdateOperationsInput | $Enums.InAppNotificationContextType | null
   contextId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -842,6 +863,7 @@ export type InAppNotificationUncheckedUpdateWithoutRecipientInput = {
   severity?: Prisma.EnumInAppNotificationSeverityFieldUpdateOperationsInput | $Enums.InAppNotificationSeverity
   title?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
+  variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   href?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contextType?: Prisma.NullableEnumInAppNotificationContextTypeFieldUpdateOperationsInput | $Enums.InAppNotificationContextType | null
   contextId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -862,6 +884,7 @@ export type InAppNotificationUncheckedUpdateManyWithoutRecipientInput = {
   severity?: Prisma.EnumInAppNotificationSeverityFieldUpdateOperationsInput | $Enums.InAppNotificationSeverity
   title?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
+  variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   href?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contextType?: Prisma.NullableEnumInAppNotificationContextTypeFieldUpdateOperationsInput | $Enums.InAppNotificationContextType | null
   contextId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -885,6 +908,7 @@ export type InAppNotificationSelect<ExtArgs extends runtime.Types.Extensions.Int
   severity?: boolean
   title?: boolean
   summary?: boolean
+  variables?: boolean
   href?: boolean
   contextType?: boolean
   contextId?: boolean
@@ -907,6 +931,7 @@ export type InAppNotificationSelectCreateManyAndReturn<ExtArgs extends runtime.T
   severity?: boolean
   title?: boolean
   summary?: boolean
+  variables?: boolean
   href?: boolean
   contextType?: boolean
   contextId?: boolean
@@ -929,6 +954,7 @@ export type InAppNotificationSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   severity?: boolean
   title?: boolean
   summary?: boolean
+  variables?: boolean
   href?: boolean
   contextType?: boolean
   contextId?: boolean
@@ -951,6 +977,7 @@ export type InAppNotificationSelectScalar = {
   severity?: boolean
   title?: boolean
   summary?: boolean
+  variables?: boolean
   href?: boolean
   contextType?: boolean
   contextId?: boolean
@@ -964,7 +991,7 @@ export type InAppNotificationSelectScalar = {
   updatedAt?: boolean
 }
 
-export type InAppNotificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "recipientUserId" | "kind" | "category" | "severity" | "title" | "summary" | "href" | "contextType" | "contextId" | "deduplicationKey" | "correlationId" | "occurrenceCount" | "readAt" | "expiresAt" | "createdAt" | "lastOccurredAt" | "updatedAt", ExtArgs["result"]["inAppNotification"]>
+export type InAppNotificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "recipientUserId" | "kind" | "category" | "severity" | "title" | "summary" | "variables" | "href" | "contextType" | "contextId" | "deduplicationKey" | "correlationId" | "occurrenceCount" | "readAt" | "expiresAt" | "createdAt" | "lastOccurredAt" | "updatedAt", ExtArgs["result"]["inAppNotification"]>
 export type InAppNotificationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recipient?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
 }
@@ -988,6 +1015,7 @@ export type $InAppNotificationPayload<ExtArgs extends runtime.Types.Extensions.I
     severity: $Enums.InAppNotificationSeverity
     title: string
     summary: string
+    variables: runtime.JsonValue | null
     href: string | null
     contextType: $Enums.InAppNotificationContextType | null
     contextId: string | null
@@ -1430,6 +1458,7 @@ export interface InAppNotificationFieldRefs {
   readonly severity: Prisma.FieldRef<"InAppNotification", 'InAppNotificationSeverity'>
   readonly title: Prisma.FieldRef<"InAppNotification", 'String'>
   readonly summary: Prisma.FieldRef<"InAppNotification", 'String'>
+  readonly variables: Prisma.FieldRef<"InAppNotification", 'Json'>
   readonly href: Prisma.FieldRef<"InAppNotification", 'String'>
   readonly contextType: Prisma.FieldRef<"InAppNotification", 'InAppNotificationContextType'>
   readonly contextId: Prisma.FieldRef<"InAppNotification", 'String'>

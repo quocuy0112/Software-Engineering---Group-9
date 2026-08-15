@@ -1300,6 +1300,7 @@ model InAppNotification {
   severity           InAppNotificationSeverity
   title              String                       @db.VarChar(120)
   summary            String                       @db.VarChar(500)
+  variables          Json?
   href               String?                      @db.VarChar(500)
   contextType        InAppNotificationContextType?
   contextId          String?                      @db.VarChar(128)

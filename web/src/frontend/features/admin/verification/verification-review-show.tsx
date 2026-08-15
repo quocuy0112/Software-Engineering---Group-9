@@ -42,7 +42,12 @@ type VerificationReview = {
     decidedAt: string;
     reviewerRef: string;
   }>;
-  notes: Array<{ id: string; reviewerRef: string; text: string; createdAt: string }>;
+  notes: Array<{
+    id: string;
+    reviewerRef: string;
+    text: string;
+    createdAt: string;
+  }>;
   applicantComment: string | null;
   canDecide: boolean;
   blockReason: string | null;
@@ -61,16 +66,21 @@ function Review() {
       </Typography>
       <Typography>Applicant reference: {current.applicantId}</Typography>
       <Typography>
-        Company: {record.company.name}; tax code: {record.company.taxCode}; target: {record.company.targetKind}
+        Company: {record.company.name}; tax code: {record.company.taxCode};
+        target: {record.company.targetKind}
       </Typography>
       <Typography>
-        Applicant account: {current.applicantEligibility}; lifecycle: {current.state}; version: {current.version}
+        Applicant account: {current.applicantEligibility}; lifecycle:{" "}
+        {current.state}; version: {current.version}
       </Typography>
       <Typography variant="body2" color="text.secondary">
-        Submitted {new Date(current.submittedAt).toLocaleString()}; resubmissions: {current.resubmissionCount}; calculated {new Date(record.calculatedAt).toLocaleString()}.
+        Submitted {new Date(current.submittedAt).toLocaleString()};
+        resubmissions: {current.resubmissionCount}; calculated{" "}
+        {new Date(record.calculatedAt).toLocaleString()}.
       </Typography>
       {record.evidence ? (
         <ProtectedEvidenceViewer
+          key={`${current.id}:${record.evidence.id}`}
           requestId={current.id}
           evidenceId={record.evidence.id}
           mediaType={record.evidence.mediaType}
@@ -84,17 +94,30 @@ function Review() {
           accessible={record.evidence.accessibility === "AVAILABLE"}
         />
       ) : (
-        <Alert severity="warning">No current qualified evidence is available.</Alert>
+        <Alert severity="warning">
+          No current qualified evidence is available.
+        </Alert>
       )}
       {record.applicantComment !== null ? (
-        <Alert severity="info">Recorded applicant-visible outcome: {record.applicantComment}</Alert>
-      ) : record.decisions.some((decision) => decision.decision === "REJECTED") ? (
-        <Alert severity="info">Applicant-visible rejection reason: unavailable for this legacy record.</Alert>
+        <Alert severity="info">
+          Recorded applicant-visible outcome: {record.applicantComment}
+        </Alert>
+      ) : record.decisions.some(
+          (decision) => decision.decision === "REJECTED",
+        ) ? (
+        <Alert severity="info">
+          Applicant-visible rejection reason: unavailable for this legacy
+          record.
+        </Alert>
       ) : null}
       {record.notes.length > 0 && (
         <Box component="section" aria-labelledby="protected-notes-heading">
-          <Typography id="protected-notes-heading" component="h2" variant="h6">Protected administrator notes</Typography>
-          {record.notes.map((note) => <Typography key={note.id}>{note.text}</Typography>)}
+          <Typography id="protected-notes-heading" component="h2" variant="h6">
+            Protected administrator notes
+          </Typography>
+          {record.notes.map((note) => (
+            <Typography key={note.id}>{note.text}</Typography>
+          ))}
         </Box>
       )}
       <VerificationDecisionPanel

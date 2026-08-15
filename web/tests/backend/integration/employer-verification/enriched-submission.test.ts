@@ -8,7 +8,10 @@ const fixture = vi.hoisted(() => ({
 }));
 
 vi.mock("@/backend/auth/session/require-session", () => ({
-  requireSession: async () => ({ userId: fixture.userId, sessionId: "session-014" }),
+  requireSession: async () => ({
+    userId: fixture.userId,
+    sessionId: "session-014",
+  }),
 }));
 vi.mock("@/backend/storage/business-evidence/filesystem", () => ({
   FilesystemPrivateBusinessEvidenceStorage: class {
@@ -123,10 +126,18 @@ describe("enriched employer verification submission transaction", () => {
       where: { recipientUserId: fixture.adminId },
     });
     await prisma.emailOutbox.deleteMany({ where: { userId: fixture.userId } });
-    await prisma.recruiterVerificationRequest.deleteMany({ where: { applicantUserId: fixture.userId } });
-    await prisma.companyContactEmailChallenge.deleteMany({ where: { applicantUserId: fixture.userId } });
-    await prisma.employerVerificationPreparation.deleteMany({ where: { applicantUserId: fixture.userId } });
-    await prisma.businessRegistryLookupSnapshot.deleteMany({ where: { applicantUserId: fixture.userId } });
+    await prisma.recruiterVerificationRequest.deleteMany({
+      where: { applicantUserId: fixture.userId },
+    });
+    await prisma.companyContactEmailChallenge.deleteMany({
+      where: { applicantUserId: fixture.userId },
+    });
+    await prisma.employerVerificationPreparation.deleteMany({
+      where: { applicantUserId: fixture.userId },
+    });
+    await prisma.businessRegistryLookupSnapshot.deleteMany({
+      where: { applicantUserId: fixture.userId },
+    });
     await prisma.platformAdministratorGrant.deleteMany({
       where: { id: adminGrantId },
     });
@@ -140,10 +151,9 @@ describe("enriched employer verification submission transaction", () => {
       data: { outcome: "UNAVAILABLE" },
     });
     const file = {
-      size: 16,
+      size: 8,
       type: "application/pdf",
-      arrayBuffer: async () =>
-        new TextEncoder().encode("business-license").buffer,
+      arrayBuffer: async () => new TextEncoder().encode("%PDF-1.7\n").buffer,
     } as File;
     await expect(
       new ApplicantVerificationService().submit(
@@ -163,9 +173,9 @@ describe("enriched employer verification submission transaction", () => {
     const idempotencyKey = `submission:${crypto.randomUUID()}`;
     const file = () =>
       ({
-        size: 16,
+        size: 8,
         type: "application/pdf",
-        arrayBuffer: async () => new TextEncoder().encode("business-license").buffer,
+        arrayBuffer: async () => new TextEncoder().encode("%PDF-1.7\n").buffer,
       }) as File;
     const service = new ApplicantVerificationService();
     const [result, replay] = await Promise.all([
@@ -183,18 +193,30 @@ describe("enriched employer verification submission transaction", () => {
       ),
     ]);
     expect(replay.requestId).toBe(result.requestId);
-    const request = await prisma.recruiterVerificationRequest.findUniqueOrThrow({
-      where: { id: result.requestId },
-      include: { businessFacts: true, evidence: true },
-    });
+    const request = await prisma.recruiterVerificationRequest.findUniqueOrThrow(
+      {
+        where: { id: result.requestId },
+        include: { businessFacts: true, evidence: true },
+      },
+    );
     expect(request.businessFacts).toMatchObject({
       companyEmail: "hr@example.vn",
       companyPhoneE164: "+84901234567",
       companyPhoneVerified: false,
     });
     expect(request.evidence).toHaveLength(1);
-    expect((await prisma.companyContactEmailChallenge.findUniqueOrThrow({ where: { id: challengeId } })).state).toBe("CONSUMED");
-    expect(await prisma.emailOutbox.count({ where: { verificationRequestId: result.requestId } })).toBe(1);
+    expect(
+      (
+        await prisma.companyContactEmailChallenge.findUniqueOrThrow({
+          where: { id: challengeId },
+        })
+      ).state,
+    ).toBe("CONSUMED");
+    expect(
+      await prisma.emailOutbox.count({
+        where: { verificationRequestId: result.requestId },
+      }),
+    ).toBe(1);
     await expect(
       prisma.inAppNotification.findMany({
         where: {

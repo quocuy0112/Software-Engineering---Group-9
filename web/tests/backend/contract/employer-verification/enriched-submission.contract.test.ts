@@ -25,7 +25,10 @@ describe("enriched multipart submission contract", () => {
 
   it("keeps file compensation and safe stale/idempotent handling", () => {
     expect(service).toContain("submissionIdempotencyKey");
-    expect(service).toContain("await storage().delete(stored.storageLocator)");
+    expect(service).toContain("const evidenceStorage = storage()");
+    expect(service).toContain(
+      "await evidenceStorage.delete(stored.storageLocator)",
+    );
     expect(service).toContain("STALE_CONFLICT");
     expect(service).not.toMatch(/console\.(?:log|info|warn).*companyEmail/gu);
   });

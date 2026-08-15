@@ -15,6 +15,7 @@ export function StepUpDialog(props: {
   open: boolean;
   onCancel: () => void;
   onVerified: () => void;
+  id?: string;
 }) {
   const [code, setCode] = useState("");
   const [failed, setFailed] = useState(false);
@@ -41,9 +42,11 @@ export function StepUpDialog(props: {
     <Dialog
       open={props.open}
       onClose={props.onCancel}
-      aria-labelledby="step-up-title"
+      aria-labelledby={`step-up-title-${props.id ?? "default"}`}
     >
-      <DialogTitle id="step-up-title">Confirm sensitive action</DialogTitle>
+      <DialogTitle id={`step-up-title-${props.id ?? "default"}`}>
+        Confirm sensitive action
+      </DialogTitle>
       <DialogContent>
         {failed && (
           <Alert severity="error" sx={{ mb: 2 }}>

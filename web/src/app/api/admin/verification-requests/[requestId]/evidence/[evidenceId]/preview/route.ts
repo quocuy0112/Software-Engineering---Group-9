@@ -4,6 +4,10 @@ import {
   adminRouteError,
 } from "@/backend/admin/http/admin-route";
 import { EvidenceAccessService } from "@/backend/admin/verification/evidence-access-service";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export async function GET(
   request: Request,
   context: { params: Promise<{ requestId: string; evidenceId: string }> },

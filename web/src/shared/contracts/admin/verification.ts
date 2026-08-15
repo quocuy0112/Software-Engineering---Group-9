@@ -49,6 +49,32 @@ export const businessEvidenceMediaTypeSchema = z.enum([
   "image/png",
   "image/jpeg",
 ]);
+
+export function detectBusinessEvidenceMediaType(bytes: Uint8Array) {
+  if (
+    bytes.length >= 5 &&
+    String.fromCharCode(...bytes.subarray(0, 5)) === "%PDF-"
+  )
+    return "application/pdf" as const;
+  if (
+    bytes.length >= 8 &&
+    bytes
+      .subarray(0, 8)
+      .every(
+        (value, index) => value === [137, 80, 78, 71, 13, 10, 26, 10][index],
+      )
+  )
+    return "image/png" as const;
+  if (
+    bytes.length >= 4 &&
+    bytes[0] === 0xff &&
+    bytes[1] === 0xd8 &&
+    bytes.at(-2) === 0xff &&
+    bytes.at(-1) === 0xd9
+  )
+    return "image/jpeg" as const;
+  return null;
+}
 export const verificationSubmissionSchema = z
   .object({
     companyName: normalizedText(1, 240),
@@ -83,7 +109,9 @@ export const verificationQueueFilterSchema = z
     submittedFrom: z.string().date().optional(),
     submittedTo: z.string().date().optional(),
     page: z.coerce.number().int().min(1).default(1),
-    pageSize: z.union([z.literal(25), z.literal(50), z.literal(100)]).default(25),
+    pageSize: z
+      .union([z.literal(25), z.literal(50), z.literal(100)])
+      .default(25),
     // Legacy React Admin aliases remain accepted at the adapter boundary while
     // the Feature 009 HTTP projection uses the exact contract names above.
     taxIdentifier: z.string().trim().optional(),
@@ -91,7 +119,11 @@ export const verificationQueueFilterSchema = z
     assignment: z.enum(["UNASSIGNED", "MINE", "ANY"]).optional(),
   })
   .superRefine((value, context) => {
-    if (value.submittedFrom && value.submittedTo && value.submittedFrom > value.submittedTo) {
+    if (
+      value.submittedFrom &&
+      value.submittedTo &&
+      value.submittedFrom > value.submittedTo
+    ) {
       context.addIssue({
         code: "custom",
         path: ["submittedFrom"],
@@ -167,12 +199,14 @@ export const verificationReviewDetailSchema = z
     evidence: evidenceMetadataSchema.nullable(),
     versions: z.array(evidenceMetadataSchema),
     decisions: z.array(verificationDecisionHistoryItemSchema),
-    notes: z.array(z.object({
-      id: z.string(),
-      reviewerRef: z.string(),
-      text: z.string(),
-      createdAt: adminTimestampSchema,
-    })),
+    notes: z.array(
+      z.object({
+        id: z.string(),
+        reviewerRef: z.string(),
+        text: z.string(),
+        createdAt: adminTimestampSchema,
+      }),
+    ),
     applicantComment: z.string().nullable(),
     canDecide: z.boolean(),
     blockReason: z.string().nullable(),
@@ -200,10 +234,21 @@ export const verificationDecisionSchema = z.discriminatedUnion("action", [
     privateNote: normalizedText(0, 2000).optional(),
   }),
 ]);
-export function validateEvidenceFile(file: { size: number; type: string }) {
+export function validateEvidenceFile(
+  file: { size: number; type: string },
+  bytes?: Uint8Array,
+): z.infer<typeof businessEvidenceMediaTypeSchema> {
   if (file.size < 1 || file.size > 5_000_000)
     throw new Error("FILE_SIZE_INVALID");
-  const mediaType = businessEvidenceMediaTypeSchema.safeParse(file.type);
+  const declared = file.type.trim().toLowerCase();
+  const mediaType = businessEvidenceMediaTypeSchema.safeParse(declared);
+  if (bytes) {
+    const detected = detectBusinessEvidenceMediaType(bytes);
+    if (!detected) throw new Error("FILE_TYPE_INVALID");
+    if (mediaType.success && mediaType.data !== detected)
+      throw new Error("FILE_TYPE_INVALID");
+    return detected;
+  }
   if (!mediaType.success) throw new Error("FILE_TYPE_INVALID");
   return mediaType.data;
 }
