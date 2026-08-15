@@ -3,6 +3,7 @@ import "server-only";
 import type { Prisma } from "@/backend/generated/prisma/client";
 import { prisma } from "@/backend/database/prisma";
 import { NotificationService } from "@/backend/notifications/notification-service";
+import { renderNotificationCopy } from "@/backend/notifications/event-policy";
 import {
   notificationItemSchema,
   type NotificationCategory,
@@ -16,6 +17,7 @@ const notificationSelect = {
   severity: true,
   title: true,
   summary: true,
+  variables: true,
   href: true,
   contextType: true,
   contextId: true,
@@ -30,14 +32,17 @@ type NotificationRow = Prisma.InAppNotificationGetPayload<{
   select: typeof notificationSelect;
 }>;
 
-const toItem = (row: NotificationRow): NotificationItem =>
-  notificationItemSchema.parse({
-    ...row,
+const toItem = (row: NotificationRow): NotificationItem => {
+  const { variables, ...publicRow } = row;
+  return notificationItemSchema.parse({
+    ...publicRow,
+    ...renderNotificationCopy(row.kind, variables, "EN"),
     readAt: row.readAt?.toISOString() ?? null,
     createdAt: row.createdAt.toISOString(),
     lastOccurredAt: row.lastOccurredAt.toISOString(),
     expiresAt: row.expiresAt.toISOString(),
   });
+};
 
 export class AdminNotificationService {
   constructor(

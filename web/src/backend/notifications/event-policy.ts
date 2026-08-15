@@ -8,7 +8,7 @@ import type {
 } from "@/shared/contracts/notifications";
 import { notificationKindSchema } from "@/shared/contracts/notifications";
 
-const safeVariablesSchema = z
+export const notificationVariablesSchema = z
   .object({
     companyName: z.string().trim().min(1).max(120).optional(),
     audience: z.enum(["ADMIN"]).optional(),
@@ -18,6 +18,10 @@ const safeVariablesSchema = z
   })
   .strict();
 
+export type NotificationVariables = z.output<
+  typeof notificationVariablesSchema
+>;
+
 export type NotificationEventInput = {
   recipientUserId: string;
   kind: NotificationKind;
@@ -26,7 +30,7 @@ export type NotificationEventInput = {
   occurredAt: Date;
   contextType?: NotificationContextType;
   contextId?: string;
-  variables?: z.input<typeof safeVariablesSchema>;
+  variables?: z.input<typeof notificationVariablesSchema>;
   language?: "VI" | "EN";
 };
 
@@ -38,10 +42,10 @@ type Policy = {
   summary: (locale: "vi" | "en", variables: SafeVariables) => string;
 };
 
-type SafeVariables = z.output<typeof safeVariablesSchema>;
+type SafeVariables = NotificationVariables;
 
-const generic = (vi: string, en: string) =>
-  (locale: "vi" | "en") => (locale === "vi" ? vi : en);
+const generic = (vi: string, en: string) => (locale: "vi" | "en") =>
+  locale === "vi" ? vi : en;
 const stateSummary = (
   vi: string,
   en: string,
@@ -74,7 +78,10 @@ const policies = {
   RECOVERY_PENDING: {
     category: "SECURITY",
     severity: "CRITICAL",
-    title: { vi: "Khôi phục tài khoản đang chờ", en: "Account recovery pending" },
+    title: {
+      vi: "Khôi phục tài khoản đang chờ",
+      en: "Account recovery pending",
+    },
     summary: generic(
       "Yêu cầu khôi phục tài khoản đang trong thời gian bảo vệ.",
       "Your account recovery is in its security hold.",
@@ -83,7 +90,10 @@ const policies = {
   RECOVERY_CANCELLED: {
     category: "SECURITY",
     severity: "HIGH",
-    title: { vi: "Đã hủy khôi phục tài khoản", en: "Account recovery cancelled" },
+    title: {
+      vi: "Đã hủy khôi phục tài khoản",
+      en: "Account recovery cancelled",
+    },
     summary: generic(
       "Yêu cầu khôi phục tài khoản đã được hủy.",
       "Your account recovery request was cancelled.",
@@ -92,7 +102,10 @@ const policies = {
   RECOVERY_COMPLETED: {
     category: "SECURITY",
     severity: "CRITICAL",
-    title: { vi: "Khôi phục tài khoản hoàn tất", en: "Account recovery completed" },
+    title: {
+      vi: "Khôi phục tài khoản hoàn tất",
+      en: "Account recovery completed",
+    },
     summary: generic(
       "Khôi phục tài khoản đã hoàn tất. Hãy đăng nhập lại an toàn.",
       "Account recovery completed. Sign in again securely.",
@@ -173,7 +186,10 @@ const policies = {
   APPLICATION_STAGE_CHANGED: {
     category: "APPLICATION",
     severity: "MEDIUM",
-    title: { vi: "Trạng thái ứng tuyển thay đổi", en: "Application status changed" },
+    title: {
+      vi: "Trạng thái ứng tuyển thay đổi",
+      en: "Application status changed",
+    },
     summary: (locale, variables) =>
       stateSummary(
         "Trạng thái hồ sơ ứng tuyển của bạn đã thay đổi.",
@@ -278,7 +294,10 @@ const policies = {
   CONNECTION_PROPOSAL_UPDATED: {
     category: "CONNECTION",
     severity: "MEDIUM",
-    title: { vi: "Đề xuất kết nối cập nhật", en: "Connection proposal updated" },
+    title: {
+      vi: "Đề xuất kết nối cập nhật",
+      en: "Connection proposal updated",
+    },
     summary: generic(
       "Một đề xuất kết nối nghề nghiệp đã thay đổi.",
       "A professional connection proposal changed.",
@@ -287,7 +306,10 @@ const policies = {
   CONNECTION_PROPOSAL_INACTIVE: {
     category: "CONNECTION",
     severity: "LOW",
-    title: { vi: "Đề xuất không còn hoạt động", en: "Connection proposal inactive" },
+    title: {
+      vi: "Đề xuất không còn hoạt động",
+      en: "Connection proposal inactive",
+    },
     summary: generic(
       "Một đề xuất kết nối không còn hoạt động.",
       "A connection proposal is no longer active.",
@@ -412,16 +434,32 @@ export type BuiltNotification = {
   correlationId: string;
   occurredAt: Date;
   groupable: boolean;
+  /** Safe, non-sensitive values needed to render the notification in another locale. */
+  variables?: NotificationVariables;
 };
+
+export function renderNotificationCopy(
+  kind: NotificationKind,
+  rawVariables: unknown,
+  language: "VI" | "EN",
+) {
+  const parsed = notificationVariablesSchema.safeParse(rawVariables ?? {});
+  const variables: SafeVariables = parsed.success ? parsed.data : {};
+  const policy: Policy = policies[notificationKindSchema.parse(kind)];
+  const locale = language === "EN" ? "en" : "vi";
+  return {
+    title: policy.title[locale].slice(0, 120),
+    summary: policy.summary(locale, variables).slice(0, 500),
+  };
+}
 
 export function buildNotification(
   input: NotificationEventInput,
   language: "VI" | "EN" = "VI",
 ): BuiltNotification {
   const kind = notificationKindSchema.parse(input.kind);
-  const variables = safeVariablesSchema.parse(input.variables ?? {});
+  const variables = notificationVariablesSchema.parse(input.variables ?? {});
   const policy: Policy = policies[kind];
-  const locale = language === "EN" ? "en" : "vi";
   const contextType = input.contextType ?? null;
   const contextId = input.contextId?.trim() || null;
   if ((contextType === null) !== (contextId === null))
@@ -436,8 +474,7 @@ export function buildNotification(
     Number.isNaN(input.occurredAt.getTime())
   )
     throw new Error("NOTIFICATION_EVENT_INVALID");
-  const title = policy.title[locale].slice(0, 120);
-  const summary = policy.summary(locale, variables).slice(0, 500);
+  const { title, summary } = renderNotificationCopy(kind, variables, language);
   return {
     kind,
     category: policy.category,
@@ -455,6 +492,7 @@ export function buildNotification(
     correlationId: input.correlationId,
     occurredAt: input.occurredAt,
     groupable: policy.groupable === true,
+    variables,
   };
 }
 
