@@ -294,6 +294,9 @@ export async function deleteJobBoardDatabaseFixture(
   await prisma.jobPostingSkill.deleteMany({
     where: { jobPostingId: { in: jobIds } },
   });
+  await prisma.applicationArtifactPromotion.deleteMany({
+    where: { jobPostingId: { in: jobIds } },
+  });
   await prisma.jobPosting.deleteMany({ where: { id: { in: jobIds } } });
   await prisma.company.deleteMany({ where: { id: fixture.company.id } });
   await prisma.candidateIdentity.deleteMany({

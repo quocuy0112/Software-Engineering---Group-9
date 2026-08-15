@@ -106,6 +106,10 @@ export const ModelName = {
   SavedJob: 'SavedJob',
   JobReport: 'JobReport',
   JobApplication: 'JobApplication',
+  ApplicationDocument: 'ApplicationDocument',
+  ApplicationCoverLetterText: 'ApplicationCoverLetterText',
+  ApplicationArtifactPromotion: 'ApplicationArtifactPromotion',
+  ApplicationDocumentLegalHold: 'ApplicationDocumentLegalHold',
   ProfessionalConnection: 'ProfessionalConnection',
   ProfessionalConnectionProposal: 'ProfessionalConnectionProposal',
   ProfessionalConnectionDecision: 'ProfessionalConnectionDecision',
@@ -146,7 +150,21 @@ export const ModelName = {
   SearchIntentAttempt: 'SearchIntentAttempt',
   SearchProcessingConsent: 'SearchProcessingConsent',
   ImageSearchAdmissionEvent: 'ImageSearchAdmissionEvent',
-  ImageSearchOperationalEvidence: 'ImageSearchOperationalEvidence'
+  ImageSearchOperationalEvidence: 'ImageSearchOperationalEvidence',
+  AutomaticMatchResult: 'AutomaticMatchResult',
+  DocumentParseResult: 'DocumentParseResult',
+  SkillEvidenceExtraction: 'SkillEvidenceExtraction',
+  CvEvidenceExcerpt: 'CvEvidenceExcerpt',
+  AiAssessment: 'AiAssessment',
+  AiAssessmentFinding: 'AiAssessmentFinding',
+  AiSuggestedInterviewQuestion: 'AiSuggestedInterviewQuestion',
+  ScoringOperation: 'ScoringOperation',
+  ScoringWorkItem: 'ScoringWorkItem',
+  AiAssessmentAttempt: 'AiAssessmentAttempt',
+  ApplicationScoringResult: 'ApplicationScoringResult',
+  ManualApplicationPriority: 'ManualApplicationPriority',
+  RankingSnapshot: 'RankingSnapshot',
+  RankingSnapshotRow: 'RankingSnapshotRow'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1223,11 +1241,92 @@ export const JobApplicationScalarFieldEnum = {
   idempotencyKey: 'idempotencyKey',
   submissionBindingDigest: 'submissionBindingDigest',
   submittedAt: 'submittedAt',
+  documentRetentionDueAt: 'documentRetentionDueAt',
+  documentAccessDeniedAt: 'documentAccessDeniedAt',
+  documentDeletionDueAt: 'documentDeletionDueAt',
+  documentDeletedAt: 'documentDeletedAt',
+  legacyDocumentState: 'legacyDocumentState',
+  currentScoringResultId: 'currentScoringResultId',
+  scoringGeneration: 'scoringGeneration',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type JobApplicationScalarFieldEnum = (typeof JobApplicationScalarFieldEnum)[keyof typeof JobApplicationScalarFieldEnum]
+
+
+export const ApplicationDocumentScalarFieldEnum = {
+  id: 'id',
+  jobApplicationId: 'jobApplicationId',
+  kind: 'kind',
+  storagePurposeVersion: 'storagePurposeVersion',
+  storageKeyEncrypted: 'storageKeyEncrypted',
+  originalFilenameEncrypted: 'originalFilenameEncrypted',
+  mediaType: 'mediaType',
+  byteLength: 'byteLength',
+  contentDigestHmac: 'contentDigestHmac',
+  sourceCandidateCvId: 'sourceCandidateCvId',
+  sourceCandidateCvVersion: 'sourceCandidateCvVersion',
+  safetyAssessmentId: 'safetyAssessmentId',
+  committedAt: 'committedAt',
+  ordinaryAccessDeniedAt: 'ordinaryAccessDeniedAt',
+  deleteAfter: 'deleteAfter',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ApplicationDocumentScalarFieldEnum = (typeof ApplicationDocumentScalarFieldEnum)[keyof typeof ApplicationDocumentScalarFieldEnum]
+
+
+export const ApplicationCoverLetterTextScalarFieldEnum = {
+  jobApplicationId: 'jobApplicationId',
+  textEncrypted: 'textEncrypted',
+  characterCount: 'characterCount',
+  ordinaryAccessDeniedAt: 'ordinaryAccessDeniedAt',
+  deleteAfter: 'deleteAfter',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ApplicationCoverLetterTextScalarFieldEnum = (typeof ApplicationCoverLetterTextScalarFieldEnum)[keyof typeof ApplicationCoverLetterTextScalarFieldEnum]
+
+
+export const ApplicationArtifactPromotionScalarFieldEnum = {
+  id: 'id',
+  candidateUserId: 'candidateUserId',
+  jobPostingId: 'jobPostingId',
+  jobApplicationId: 'jobApplicationId',
+  kind: 'kind',
+  storagePurposeVersion: 'storagePurposeVersion',
+  storageKeyEncrypted: 'storageKeyEncrypted',
+  state: 'state',
+  orphanDeleteAfter: 'orphanDeleteAfter',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  attemptCount: 'attemptCount',
+  lastSafeFailureCode: 'lastSafeFailureCode',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type ApplicationArtifactPromotionScalarFieldEnum = (typeof ApplicationArtifactPromotionScalarFieldEnum)[keyof typeof ApplicationArtifactPromotionScalarFieldEnum]
+
+
+export const ApplicationDocumentLegalHoldScalarFieldEnum = {
+  id: 'id',
+  jobApplicationId: 'jobApplicationId',
+  purposeCode: 'purposeCode',
+  policyVersion: 'policyVersion',
+  issuedByAdminUserId: 'issuedByAdminUserId',
+  startsAt: 'startsAt',
+  reviewAt: 'reviewAt',
+  endsAt: 'endsAt',
+  releasedAt: 'releasedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ApplicationDocumentLegalHoldScalarFieldEnum = (typeof ApplicationDocumentLegalHoldScalarFieldEnum)[keyof typeof ApplicationDocumentLegalHoldScalarFieldEnum]
 
 
 export const ProfessionalConnectionScalarFieldEnum = {
@@ -1520,7 +1619,13 @@ export const ApplicationStageEventScalarFieldEnum = {
   candidateVisible: 'candidateVisible',
   occurredAt: 'occurredAt',
   applicationVersion: 'applicationVersion',
-  metadata: 'metadata'
+  metadata: 'metadata',
+  decisionKind: 'decisionKind',
+  reasonLabelSnapshot: 'reasonLabelSnapshot',
+  internalNoteEncrypted: 'internalNoteEncrypted',
+  notificationRequired: 'notificationRequired',
+  notificationStatus: 'notificationStatus',
+  idempotencyKey: 'idempotencyKey'
 } as const
 
 export type ApplicationStageEventScalarFieldEnum = (typeof ApplicationStageEventScalarFieldEnum)[keyof typeof ApplicationStageEventScalarFieldEnum]
@@ -2056,6 +2161,285 @@ export const ImageSearchOperationalEvidenceScalarFieldEnum = {
 } as const
 
 export type ImageSearchOperationalEvidenceScalarFieldEnum = (typeof ImageSearchOperationalEvidenceScalarFieldEnum)[keyof typeof ImageSearchOperationalEvidenceScalarFieldEnum]
+
+
+export const AutomaticMatchResultScalarFieldEnum = {
+  id: 'id',
+  jobApplicationId: 'jobApplicationId',
+  jobDescriptionVersionId: 'jobDescriptionVersionId',
+  cvSnapshotVersionId: 'cvSnapshotVersionId',
+  scoringConfigVersionId: 'scoringConfigVersionId',
+  parserBundleVersion: 'parserBundleVersion',
+  score: 'score',
+  requiredSkillPoints: 'requiredSkillPoints',
+  experiencePoints: 'experiencePoints',
+  preferredSkillBonus: 'preferredSkillBonus',
+  minimumExperienceYears: 'minimumExperienceYears',
+  detectedExperienceYears: 'detectedExperienceYears',
+  experienceInterpretationCode: 'experienceInterpretationCode',
+  experienceInterpretationLabel: 'experienceInterpretationLabel',
+  mayBeIncomplete: 'mayBeIncomplete',
+  incompletenessLabel: 'incompletenessLabel',
+  computedAt: 'computedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type AutomaticMatchResultScalarFieldEnum = (typeof AutomaticMatchResultScalarFieldEnum)[keyof typeof AutomaticMatchResultScalarFieldEnum]
+
+
+export const DocumentParseResultScalarFieldEnum = {
+  id: 'id',
+  automaticMatchResultId: 'automaticMatchResultId',
+  documentKind: 'documentKind',
+  applicationDocumentId: 'applicationDocumentId',
+  jobDescriptionVersionId: 'jobDescriptionVersionId',
+  snapshotVersion: 'snapshotVersion',
+  parserName: 'parserName',
+  parserVersion: 'parserVersion',
+  schemaVersion: 'schemaVersion',
+  status: 'status',
+  processingMilliseconds: 'processingMilliseconds',
+  safeIssueCodes: 'safeIssueCodes',
+  parsedAt: 'parsedAt'
+} as const
+
+export type DocumentParseResultScalarFieldEnum = (typeof DocumentParseResultScalarFieldEnum)[keyof typeof DocumentParseResultScalarFieldEnum]
+
+
+export const SkillEvidenceExtractionScalarFieldEnum = {
+  id: 'id',
+  automaticMatchResultId: 'automaticMatchResultId',
+  skillCanonicalId: 'skillCanonicalId',
+  skillLabel: 'skillLabel',
+  requirementKind: 'requirementKind',
+  matchState: 'matchState',
+  normalizationVersion: 'normalizationVersion',
+  createdAt: 'createdAt'
+} as const
+
+export type SkillEvidenceExtractionScalarFieldEnum = (typeof SkillEvidenceExtractionScalarFieldEnum)[keyof typeof SkillEvidenceExtractionScalarFieldEnum]
+
+
+export const CvEvidenceExcerptScalarFieldEnum = {
+  id: 'id',
+  skillEvidenceExtractionId: 'skillEvidenceExtractionId',
+  excerptEncrypted: 'excerptEncrypted',
+  pageNumber: 'pageNumber',
+  sectionLabel: 'sectionLabel',
+  sourceStart: 'sourceStart',
+  sourceEnd: 'sourceEnd',
+  cvSnapshotVersionId: 'cvSnapshotVersionId',
+  parserVersion: 'parserVersion',
+  accessDeniedAt: 'accessDeniedAt',
+  deleteAfter: 'deleteAfter',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type CvEvidenceExcerptScalarFieldEnum = (typeof CvEvidenceExcerptScalarFieldEnum)[keyof typeof CvEvidenceExcerptScalarFieldEnum]
+
+
+export const AiAssessmentScalarFieldEnum = {
+  id: 'id',
+  jobApplicationId: 'jobApplicationId',
+  automaticMatchResultId: 'automaticMatchResultId',
+  score: 'score',
+  confidencePercent: 'confidencePercent',
+  confidenceLevel: 'confidenceLevel',
+  confidenceLabel: 'confidenceLabel',
+  humanReviewGuidance: 'humanReviewGuidance',
+  providerAdapterVersion: 'providerAdapterVersion',
+  providerModel: 'providerModel',
+  modelVersion: 'modelVersion',
+  promptVersion: 'promptVersion',
+  assessmentSchemaVersion: 'assessmentSchemaVersion',
+  sensitiveAttributePolicyVersion: 'sensitiveAttributePolicyVersion',
+  overallSummaryEncrypted: 'overallSummaryEncrypted',
+  technicalAbilitySummaryEncrypted: 'technicalAbilitySummaryEncrypted',
+  roleFitSummaryEncrypted: 'roleFitSummaryEncrypted',
+  deductionSummaryEncrypted: 'deductionSummaryEncrypted',
+  complianceStatementCode: 'complianceStatementCode',
+  complianceStatementLabel: 'complianceStatementLabel',
+  questionState: 'questionState',
+  questionFallbackLabel: 'questionFallbackLabel',
+  accessDeniedAt: 'accessDeniedAt',
+  deleteAfter: 'deleteAfter',
+  deletedAt: 'deletedAt',
+  computedAt: 'computedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type AiAssessmentScalarFieldEnum = (typeof AiAssessmentScalarFieldEnum)[keyof typeof AiAssessmentScalarFieldEnum]
+
+
+export const AiAssessmentFindingScalarFieldEnum = {
+  id: 'id',
+  aiAssessmentId: 'aiAssessmentId',
+  kind: 'kind',
+  titleEncrypted: 'titleEncrypted',
+  evidenceEncrypted: 'evidenceEncrypted',
+  ordinal: 'ordinal'
+} as const
+
+export type AiAssessmentFindingScalarFieldEnum = (typeof AiAssessmentFindingScalarFieldEnum)[keyof typeof AiAssessmentFindingScalarFieldEnum]
+
+
+export const AiSuggestedInterviewQuestionScalarFieldEnum = {
+  id: 'id',
+  aiAssessmentId: 'aiAssessmentId',
+  pointToVerifyFindingId: 'pointToVerifyFindingId',
+  questionEncrypted: 'questionEncrypted',
+  ordinal: 'ordinal'
+} as const
+
+export type AiSuggestedInterviewQuestionScalarFieldEnum = (typeof AiSuggestedInterviewQuestionScalarFieldEnum)[keyof typeof AiSuggestedInterviewQuestionScalarFieldEnum]
+
+
+export const ScoringOperationScalarFieldEnum = {
+  id: 'id',
+  kind: 'kind',
+  jobPostingId: 'jobPostingId',
+  jobApplicationId: 'jobApplicationId',
+  requestedByUserId: 'requestedByUserId',
+  requestedAt: 'requestedAt',
+  confirmationIntent: 'confirmationIntent',
+  idempotencyKey: 'idempotencyKey',
+  targetJobDescriptionVersionId: 'targetJobDescriptionVersionId',
+  targetScoringConfigVersionId: 'targetScoringConfigVersionId',
+  reusedAutomaticMatchResultId: 'reusedAutomaticMatchResultId',
+  state: 'state',
+  totalCount: 'totalCount',
+  succeededCount: 'succeededCount',
+  deterministicOnlyCount: 'deterministicOnlyCount',
+  failedCount: 'failedCount',
+  supersededCount: 'supersededCount',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ScoringOperationScalarFieldEnum = (typeof ScoringOperationScalarFieldEnum)[keyof typeof ScoringOperationScalarFieldEnum]
+
+
+export const ScoringWorkItemScalarFieldEnum = {
+  id: 'id',
+  operationId: 'operationId',
+  jobApplicationId: 'jobApplicationId',
+  state: 'state',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  attemptCount: 'attemptCount',
+  consecutiveAiFailureCount: 'consecutiveAiFailureCount',
+  lastSafeFailureCode: 'lastSafeFailureCode',
+  nextAttemptAt: 'nextAttemptAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ScoringWorkItemScalarFieldEnum = (typeof ScoringWorkItemScalarFieldEnum)[keyof typeof ScoringWorkItemScalarFieldEnum]
+
+
+export const AiAssessmentAttemptScalarFieldEnum = {
+  id: 'id',
+  operationId: 'operationId',
+  workItemId: 'workItemId',
+  jobApplicationId: 'jobApplicationId',
+  automaticMatchResultId: 'automaticMatchResultId',
+  assessmentId: 'assessmentId',
+  providerAdapterVersion: 'providerAdapterVersion',
+  providerModel: 'providerModel',
+  promptVersion: 'promptVersion',
+  deadlineAt: 'deadlineAt',
+  safeOutcome: 'safeOutcome',
+  safeFailureCode: 'safeFailureCode',
+  attemptNumber: 'attemptNumber',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type AiAssessmentAttemptScalarFieldEnum = (typeof AiAssessmentAttemptScalarFieldEnum)[keyof typeof AiAssessmentAttemptScalarFieldEnum]
+
+
+export const ApplicationScoringResultScalarFieldEnum = {
+  id: 'id',
+  jobApplicationId: 'jobApplicationId',
+  generation: 'generation',
+  operationId: 'operationId',
+  automaticMatchResultId: 'automaticMatchResultId',
+  aiAssessmentId: 'aiAssessmentId',
+  automaticScore: 'automaticScore',
+  aiScore: 'aiScore',
+  finalScore: 'finalScore',
+  state: 'state',
+  formulaVersion: 'formulaVersion',
+  automaticWeight: 'automaticWeight',
+  aiWeight: 'aiWeight',
+  highThreshold: 'highThreshold',
+  mediumThreshold: 'mediumThreshold',
+  roundingRule: 'roundingRule',
+  jobDescriptionVersionId: 'jobDescriptionVersionId',
+  cvSnapshotVersionId: 'cvSnapshotVersionId',
+  scoringConfigVersionId: 'scoringConfigVersionId',
+  parserBundleVersion: 'parserBundleVersion',
+  mayBeIncomplete: 'mayBeIncomplete',
+  incompletenessLabel: 'incompletenessLabel',
+  computedAt: 'computedAt',
+  publishedAt: 'publishedAt',
+  supersededAt: 'supersededAt'
+} as const
+
+export type ApplicationScoringResultScalarFieldEnum = (typeof ApplicationScoringResultScalarFieldEnum)[keyof typeof ApplicationScoringResultScalarFieldEnum]
+
+
+export const ManualApplicationPriorityScalarFieldEnum = {
+  id: 'id',
+  jobApplicationId: 'jobApplicationId',
+  value: 'value',
+  reasonEncrypted: 'reasonEncrypted',
+  setByUserId: 'setByUserId',
+  setAt: 'setAt',
+  version: 'version',
+  active: 'active',
+  removedByUserId: 'removedByUserId',
+  removedAt: 'removedAt',
+  removalReasonEncrypted: 'removalReasonEncrypted',
+  createdAt: 'createdAt'
+} as const
+
+export type ManualApplicationPriorityScalarFieldEnum = (typeof ManualApplicationPriorityScalarFieldEnum)[keyof typeof ManualApplicationPriorityScalarFieldEnum]
+
+
+export const RankingSnapshotScalarFieldEnum = {
+  id: 'id',
+  jobPostingId: 'jobPostingId',
+  generation: 'generation',
+  filterHash: 'filterHash',
+  filters: 'filters',
+  sort: 'sort',
+  pageSize: 'pageSize',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type RankingSnapshotScalarFieldEnum = (typeof RankingSnapshotScalarFieldEnum)[keyof typeof RankingSnapshotScalarFieldEnum]
+
+
+export const RankingSnapshotRowScalarFieldEnum = {
+  id: 'id',
+  rankingSnapshotId: 'rankingSnapshotId',
+  applicationId: 'applicationId',
+  rankPosition: 'rankPosition',
+  scoreState: 'scoreState',
+  finalScore: 'finalScore',
+  submittedAt: 'submittedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type RankingSnapshotRowScalarFieldEnum = (typeof RankingSnapshotRowScalarFieldEnum)[keyof typeof RankingSnapshotRowScalarFieldEnum]
 
 
 export const SortOrder = {

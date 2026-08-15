@@ -10,6 +10,7 @@ import {
 } from "@/frontend/features/dashboard/components/workspace-navigation-icons";
 import { CompanyAvatar } from "@/frontend/features/jobs/components/company-avatar";
 import { JobPostingEditor } from "./job-posting-editor";
+import { CandidateRankingList } from "@/frontend/features/recruiter-applications/candidate-ranking-list";
 import {
   createEmptyJobPosting,
   recruiterJobStatusMeta,
@@ -587,24 +588,11 @@ export function RecruiterJobPostingManagement({
     );
   if (view === "applicants" && applicantJob)
     return (
-      <section className="recruiter-applicants recruiter-surface-card">
-        <button
-          type="button"
-          className="recruiter-back-button"
-          onClick={() => setView("dashboard")}
-        >
-          Back to job postings
-        </button>
-        <p className="recruiter-eyebrow">Candidate list</p>
-        <h1>{applicantJob.title}</h1>
-        <p>
-          {applicantJob.stats.applicantCount
-            ? String(applicantJob.stats.applicantCount) +
-              " candidates have applied to this posting."
-            : "No applicants yet."}
-        </p>
-        <StatusPill status={applicantJob.status} />
-      </section>
+      <CandidateRankingList
+        jobId={applicantJob.id}
+        jobTitle={applicantJob.title}
+        onBack={() => setView("dashboard")}
+      />
     );
 
   if (!loading && current.companyProfileComplete === false) {
@@ -844,7 +832,12 @@ export function RecruiterWorkspaceNavigation({
       active:
         pathname === "/recruiter" || pathname.startsWith("/recruiter/jobs"),
     },
-    { label: "Candidates", icon: "connections", active: false },
+    {
+      label: "Candidates",
+      icon: "candidates",
+      href: "/recruiter/candidates",
+      active: pathname === "/recruiter/candidates",
+    },
     {
       label: "Company settings",
       icon: "settings",

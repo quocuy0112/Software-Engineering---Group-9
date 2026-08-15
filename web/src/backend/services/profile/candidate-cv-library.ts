@@ -16,6 +16,14 @@ function initialDisplayName(originalName: string | null, fallback: string) {
   return value.slice(0, 200);
 }
 
+function isMaterializedStorageLocator(value: string | undefined): boolean {
+  return Boolean(
+    value &&
+      !value.startsWith("candidate-cv-") &&
+      /^[A-Za-z0-9_-]{32,128}$/u.test(value),
+  );
+}
+
 type ConfirmedCvImport = Readonly<{
   id: string;
   declaredMediaType: string;
@@ -115,20 +123,21 @@ export async function ensureCandidateCvLibrary(
 ) {
   const imports = await confirmedCvImports(userId, db);
 
+  const desiredIds = imports.map((upload) => "candidate-cv-" + upload.id);
+  const desiredStorageKeys = [...desiredIds];
   const legacyRows = imports.length
     ? await db.candidateCv.findMany({
         where: {
-          candidateUserId: userId,
-          storageKey: {
-            in: imports.map((upload) => "candidate-cv-" + upload.id),
-          },
+          OR: [
+            { id: { in: desiredIds } },
+            { storageKey: { in: desiredStorageKeys } },
+          ],
         },
-        select: { storageKey: true, displayName: true },
+        select: { id: true, candidateUserId: true, storageKey: true, displayName: true },
       })
     : [];
-  const existingByStorageKey = new Map(
-    legacyRows.map((row) => [row.storageKey, row.displayName]),
-  );
+  const existingByStorageKey = new Map(legacyRows.map((row) => [row.storageKey, row]));
+  const existingById = new Map(legacyRows.map((row) => [row.id, row]));
 
   await Promise.all(
     imports.map(async (upload) => {
@@ -141,6 +150,7 @@ export async function ensureCandidateCvLibrary(
       const extension =
         upload.declaredMediaType === "application/pdf" ? "pdf" : "docx";
       const storageKey = "candidate-cv-" + upload.id;
+      const desiredId = storageKey;
       const fileName = "imported-cv-" + upload.id + "." + extension;
       const originalName = initialDisplayName(
         safeFilename(upload.displayFilenameCiphertext, {
@@ -150,11 +160,13 @@ export async function ensureCandidateCvLibrary(
         fileName,
       );
       const checksumSha256 = Buffer.from(upload.sourceSha256).toString("hex");
-      const legacyDisplayName = existingByStorageKey.get(storageKey);
+      const existing = existingByStorageKey.get(storageKey) ?? existingById.get(desiredId);
+      if (existing && existing.candidateUserId !== userId) return;
+      const stableId = existing?.id ?? desiredId;
       await db.candidateCv.upsert({
-        where: { storageKey },
+        where: { id: stableId },
         create: {
-          id: "candidate-cv-" + upload.id,
+          id: desiredId,
           candidateUserId: userId,
           displayName: originalName,
           fileName,
@@ -166,9 +178,19 @@ export async function ensureCandidateCvLibrary(
           confirmedAt: upload.confirmedAt,
         },
         update: {
-          ...(legacyDisplayName === "Imported CV"
+          ...(existing?.displayName === "Imported CV"
             ? { displayName: originalName }
             : {}),
+          // A confirmed import is first projected with the stable
+          // `candidate-cv-<uploadId>` bridge key.  The confirmation flow then
+          // materializes a plaintext copy and replaces that bridge with a
+          // private-storage locator.  Do not overwrite the materialized
+          // locator every time the library is listed (the old behavior made
+          // profile CVs and subsequent application promotions unreadable).
+          storageKey:
+            existing && isMaterializedStorageLocator(existing.storageKey)
+              ? existing.storageKey
+              : storageKey,
           fileName,
           mimeType: upload.declaredMediaType,
           byteSize: upload.actualBytes,

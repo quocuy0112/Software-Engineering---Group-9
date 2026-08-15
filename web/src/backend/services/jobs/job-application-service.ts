@@ -13,14 +13,17 @@ import {
 } from "@/shared/contracts/jobs/actions";
 import { JobServiceError, type CandidateActor } from "./job-types";
 import { recordApplication } from "./recruiter-job-posting-data";
+import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
 import type {
   DirectApplicationCvSource,
   PreparedDirectApplicationCv,
 } from "./prepare-direct-application-cv";
+import { z } from "zod";
 
 function binding(
   command: ApplicationSubmission,
   directCv?: PreparedDirectApplicationCv,
+  directCoverLetter?: PreparedDirectApplicationCv,
 ) {
   const stable = {
     ...command,
@@ -30,6 +33,14 @@ function binding(
           mimeType: directCv.mimeType,
           byteSize: directCv.byteSize,
           checksumSha256: directCv.checksumSha256,
+        }
+      : null,
+    directCoverLetter: directCoverLetter
+      ? {
+          fileName: directCoverLetter.fileName,
+          mimeType: directCoverLetter.mimeType,
+          byteSize: directCoverLetter.byteSize,
+          checksumSha256: directCoverLetter.checksumSha256,
         }
       : null,
     answers: [...command.answers].sort((a, b) =>
@@ -57,6 +68,8 @@ function applicationFailureMessage(code: string) {
       return "Accept the application consent before applying.";
     case "APPLICATION_TEXT_TOO_LONG":
       return "Shorten the application text before applying.";
+    case "APPLICATION_COVER_LETTER_INELIGIBLE":
+      return "Use a supported cover letter format before applying.";
     default:
       return "Complete the required profile, CV, answers, and consent before applying.";
   }
@@ -68,6 +81,7 @@ export class JobApplicationService {
     private readonly csrfTokenFactory?: (
       sessionId: string,
     ) => string | Promise<string>,
+    private readonly audit?: Pick<PrismaAuditRepository, "append">,
   ) {}
 
   private async repo() {
@@ -127,11 +141,14 @@ export class JobApplicationService {
     raw: unknown,
     now = new Date(),
     directCvSource?: DirectApplicationCvSource,
+    directCoverLetterSource?: DirectApplicationCvSource,
   ) {
-    const command = applicationSubmissionSchema.parse(raw);
-    const key = idempotencyKeySchema.parse(idempotencyKey);
+    const correlationId = randomUUID();
     let directCv: PreparedDirectApplicationCv | undefined;
+    let directCoverLetter: PreparedDirectApplicationCv | undefined;
     try {
+      const command = applicationSubmissionSchema.parse(raw);
+      const key = idempotencyKeySchema.parse(idempotencyKey);
       if (directCvSource) {
         if (command.cvId !== DIRECT_APPLICATION_CV_ID) {
           throw new JobServiceError(400, {
@@ -150,6 +167,45 @@ export class JobApplicationService {
           });
         }
       }
+      if (
+        directCoverLetterSource &&
+        (!command.coverLetter ||
+          typeof command.coverLetter === "string" ||
+          command.coverLetter.kind !== "FILE")
+      ) {
+        throw new JobServiceError(400, {
+          code: "APPLICATION_COVER_LETTER_INELIGIBLE",
+          message: applicationFailureMessage(
+            "APPLICATION_COVER_LETTER_INELIGIBLE",
+          ),
+        });
+      }
+      if (
+        command.coverLetter &&
+        typeof command.coverLetter !== "string" &&
+        command.coverLetter.kind === "FILE"
+      ) {
+        if (!directCoverLetterSource) {
+          throw new JobServiceError(400, {
+            code: "APPLICATION_COVER_LETTER_INELIGIBLE",
+            message: applicationFailureMessage(
+              "APPLICATION_COVER_LETTER_INELIGIBLE",
+            ),
+          });
+        }
+        try {
+          directCoverLetter = await (
+            await import("./prepare-direct-application-cv")
+          ).prepareDirectApplicationCv(directCoverLetterSource);
+        } catch {
+          throw new JobServiceError(400, {
+            code: "APPLICATION_COVER_LETTER_INELIGIBLE",
+            message: applicationFailureMessage(
+              "APPLICATION_COVER_LETTER_INELIGIBLE",
+            ),
+          });
+        }
+      }
       const result = await (
         await this.repo()
       ).submit({
@@ -157,30 +213,75 @@ export class JobApplicationService {
         sessionId: actor.sessionId,
         jobId,
         idempotencyKey: key,
-        submissionBindingDigest: binding(command, directCv),
+        submissionBindingDigest: binding(command, directCv, directCoverLetter),
         command,
         directCv,
+        directCoverLetter,
         activeConsentVersion: ACTIVE_APPLICATION_CONSENT_VERSION,
         occurredAt: now,
-        correlationId: randomUUID(),
+        correlationId,
       });
       if (!result.created) await directCv?.cleanup();
+      if (!result.created) await directCoverLetter?.cleanup();
       if (result.created) {
         await recordApplication(actor.userId, jobId).catch(() => undefined);
       }
       return { ...result.application, created: result.created };
     } catch (error) {
       if (directCv) await directCv.cleanup().catch(() => undefined);
+      if (directCoverLetter)
+        await directCoverLetter.cleanup().catch(() => undefined);
+      await (this.audit ?? new PrismaAuditRepository())
+        .append({
+          occurredAt: now,
+          actorType: "user",
+          actorUserId: actor.userId,
+          actorSessionId: actor.sessionId,
+          action: "job.application.failed",
+          targetType: "job_application",
+          targetId: null,
+          result: "FAILURE",
+          correlationId,
+          context: {
+            failureCode:
+              error instanceof JobServiceError
+                ? error.body.code
+                : error instanceof ApplicationRepositoryError
+                  ? error.code
+                  : "APPLICATION_SUBMISSION_FAILED",
+          },
+        })
+        .catch(() => undefined);
       if (error instanceof ApplicationRepositoryError) {
         const conflict = [
           "IDEMPOTENCY_KEY_REUSED",
           "JOB_NO_LONGER_ACCEPTING_APPLICATIONS",
         ].includes(error.code);
-        throw new JobServiceError(conflict ? 409 : 403, {
-          code: error.code,
-          message: conflict
-            ? "The application could not be submitted in its current state."
-            : applicationFailureMessage(error.code),
+        const invalidApplication = [
+          "APPLICATION_PROFILE_INCOMPLETE",
+          "APPLICATION_CV_INELIGIBLE",
+          "APPLICATION_ANSWER_REQUIRED",
+          "APPLICATION_ANSWER_INVALID",
+          "APPLICATION_ANSWER_UNKNOWN",
+          "APPLICATION_ANSWER_DUPLICATE",
+          "APPLICATION_CONSENT_STALE",
+          "APPLICATION_TEXT_TOO_LONG",
+          "APPLICATION_COVER_LETTER_INELIGIBLE",
+        ].includes(error.code);
+        throw new JobServiceError(
+          conflict ? 409 : invalidApplication ? 400 : 403,
+          {
+            code: error.code,
+            message: conflict
+              ? "The application could not be submitted in its current state."
+              : applicationFailureMessage(error.code),
+          },
+        );
+      }
+      if (error instanceof z.ZodError) {
+        throw new JobServiceError(400, {
+          code: "APPLICATION_SUBMISSION_INVALID",
+          message: "Review the application fields and try again.",
         });
       }
       throw error;

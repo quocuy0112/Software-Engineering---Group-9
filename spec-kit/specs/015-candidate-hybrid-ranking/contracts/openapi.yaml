@@ -247,7 +247,7 @@ components:
     AiAssessment:
       type: object
       additionalProperties: false
-      required: [assessmentId, score, confidencePercent, confidenceLevel, confidenceLabel, provider, modelVersion, promptVersion, policyVersion, overallSummary, breakdown, findings, compliance, questions]
+      required: [assessmentId, score, confidencePercent, confidenceLevel, confidenceLabel, requiresHumanReview, provider, modelVersion, promptVersion, policyVersion, overallSummary, breakdown, findings, compliance, questions]
       properties:
         assessmentId: { type: string }
         score: { type: number, minimum: 0, maximum: 100 }
@@ -255,6 +255,7 @@ components:
         confidenceLevel: { type: string, enum: [LOW, STANDARD] }
         confidenceLabel: { type: string }
         humanReviewGuidance: { type: [string, 'null'] }
+        requiresHumanReview: { type: boolean }
         provider: { type: string }
         modelVersion: { type: string }
         promptVersion: { type: string }

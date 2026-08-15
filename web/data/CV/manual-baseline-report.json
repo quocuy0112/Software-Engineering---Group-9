@@ -1,0 +1,724 @@
+{
+  "generated_at": "2026-08-15T10:17:29.859Z",
+  "method": "manual-deterministic-auto-match-v3",
+  "description": "Offline baseline matching the production automatic matcher: controlled normalized/semantic skill aliases (75 points) plus detected experience (25 points). No AI provider was called.",
+  "rubric": {
+    "required_skills": 75,
+    "experience": 25
+  },
+  "dataset": {
+    "records": 25,
+    "pdf_directory": "data\\CV\\pdfs"
+  },
+  "metrics": {
+    "mean_absolute_error": 14.96,
+    "max_absolute_error": 36,
+    "within_10_points": 11,
+    "flagged_over_10_points_or_boundary": 14,
+    "match_level_mismatches": 9
+  },
+  "flagged_records": [
+    {
+      "cv_id": "cv-02",
+      "cv_pdf_file": "cv-02_LE_THI_HOA.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 2,
+      "found_required_skills": [
+        "Customer Focus",
+        "Teamwork"
+      ],
+      "minimum_experience_years": 1,
+      "detected_experience_years": 1,
+      "automatic_score": 75,
+      "ground_truth_score": 62,
+      "absolute_delta": 13,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "medium",
+      "match_level_mismatch": true
+    },
+    {
+      "cv_id": "cv-03",
+      "cv_pdf_file": "cv-03_PHAM_VAN_NAM.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 2,
+      "found_required_skills": [
+        "Time Management",
+        "Customer Focus"
+      ],
+      "minimum_experience_years": 3,
+      "detected_experience_years": 1,
+      "automatic_score": 58.3,
+      "ground_truth_score": 27,
+      "absolute_delta": 31.3,
+      "automatic_match_level": "medium",
+      "ground_truth_match_level": "low",
+      "match_level_mismatch": true
+    },
+    {
+      "cv_id": "cv-05",
+      "cv_pdf_file": "cv-05_VO_THI_MAI.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 2,
+      "found_required_skills": [
+        "Time Management",
+        "Reporting"
+      ],
+      "minimum_experience_years": 1,
+      "detected_experience_years": 1,
+      "automatic_score": 75,
+      "ground_truth_score": 62,
+      "absolute_delta": 13,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "medium",
+      "match_level_mismatch": true
+    },
+    {
+      "cv_id": "cv-06",
+      "cv_pdf_file": "cv-06_HOANG_VAN_TUAN.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 0,
+      "found_required_skills": [],
+      "minimum_experience_years": 3,
+      "detected_experience_years": 1,
+      "automatic_score": 8.3,
+      "ground_truth_score": 27,
+      "absolute_delta": 18.7,
+      "automatic_match_level": "low",
+      "ground_truth_match_level": "low",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-08",
+      "cv_pdf_file": "cv-08_BUI_THI_NGOC.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Customer Focus",
+        "Reporting",
+        "MS Office"
+      ],
+      "minimum_experience_years": 1,
+      "detected_experience_years": 1,
+      "automatic_score": 100,
+      "ground_truth_score": 65,
+      "absolute_delta": 35,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "medium",
+      "match_level_mismatch": true
+    },
+    {
+      "cv_id": "cv-09",
+      "cv_pdf_file": "cv-09_NGO_VAN_PHUC.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 2,
+      "found_required_skills": [
+        "Architecture & Interior Design",
+        "MS Office"
+      ],
+      "minimum_experience_years": 3,
+      "detected_experience_years": 1,
+      "automatic_score": 58.3,
+      "ground_truth_score": 27,
+      "absolute_delta": 31.3,
+      "automatic_match_level": "medium",
+      "ground_truth_match_level": "low",
+      "match_level_mismatch": true
+    },
+    {
+      "cv_id": "cv-11",
+      "cv_pdf_file": "cv-11_LY_VAN_HUNG.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Attention to Detail",
+        "Teamwork",
+        "Time Management"
+      ],
+      "minimum_experience_years": 3,
+      "detected_experience_years": 2,
+      "automatic_score": 91.7,
+      "ground_truth_score": 63,
+      "absolute_delta": 28.7,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "medium",
+      "match_level_mismatch": true
+    },
+    {
+      "cv_id": "cv-14",
+      "cv_pdf_file": "cv-14_PHAN_THI_DIEM.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Time Management",
+        "Negotiation",
+        "Customer Focus"
+      ],
+      "minimum_experience_years": 3,
+      "detected_experience_years": 1.5,
+      "automatic_score": 87.5,
+      "ground_truth_score": 59,
+      "absolute_delta": 28.5,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "medium",
+      "match_level_mismatch": true
+    },
+    {
+      "cv_id": "cv-16",
+      "cv_pdf_file": "cv-16_DINH_THI_THAO.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Reporting",
+        "Leadership",
+        "Customer Focus"
+      ],
+      "minimum_experience_years": 1,
+      "detected_experience_years": 2,
+      "automatic_score": 100,
+      "ground_truth_score": 89,
+      "absolute_delta": 11,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "high",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-18",
+      "cv_pdf_file": "cv-18_TA_THI_HUONG.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 0,
+      "found_required_skills": [],
+      "minimum_experience_years": 1,
+      "detected_experience_years": null,
+      "automatic_score": 0,
+      "ground_truth_score": 17,
+      "absolute_delta": 17,
+      "automatic_match_level": "low",
+      "ground_truth_match_level": "low",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-19",
+      "cv_pdf_file": "cv-19_LE_VAN_THANH.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Time Management",
+        "Customer Focus",
+        "Data Analysis"
+      ],
+      "minimum_experience_years": 1,
+      "detected_experience_years": 1.5,
+      "automatic_score": 100,
+      "ground_truth_score": 87,
+      "absolute_delta": 13,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "high",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-20",
+      "cv_pdf_file": "cv-20_NGUYEN_THI_HONG_NHUNG.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "English Proficiency",
+        "Leadership",
+        "Process Improvement"
+      ],
+      "minimum_experience_years": 1,
+      "detected_experience_years": 1,
+      "automatic_score": 100,
+      "ground_truth_score": 64,
+      "absolute_delta": 36,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "medium",
+      "match_level_mismatch": true
+    },
+    {
+      "cv_id": "cv-21",
+      "cv_pdf_file": "cv-21_CAO_THI_YEN.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 0,
+      "found_required_skills": [],
+      "minimum_experience_years": 1,
+      "detected_experience_years": null,
+      "automatic_score": 0,
+      "ground_truth_score": 12,
+      "absolute_delta": 12,
+      "automatic_match_level": "low",
+      "ground_truth_match_level": "low",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-23",
+      "cv_pdf_file": "cv-23_TRAN_VAN_BAO.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Leadership",
+        "English Proficiency",
+        "Teamwork"
+      ],
+      "minimum_experience_years": 6,
+      "detected_experience_years": 4,
+      "automatic_score": 91.7,
+      "ground_truth_score": 66,
+      "absolute_delta": 25.7,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "medium",
+      "match_level_mismatch": true
+    }
+  ],
+  "records": [
+    {
+      "cv_id": "cv-01",
+      "cv_pdf_file": "cv-01_TRAN_MINH_DUC.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Data Analysis",
+        "Process Improvement",
+        "Problem Solving"
+      ],
+      "minimum_experience_years": 1,
+      "detected_experience_years": 2,
+      "automatic_score": 100,
+      "ground_truth_score": 91,
+      "absolute_delta": 9,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "high",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-02",
+      "cv_pdf_file": "cv-02_LE_THI_HOA.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 2,
+      "found_required_skills": [
+        "Customer Focus",
+        "Teamwork"
+      ],
+      "minimum_experience_years": 1,
+      "detected_experience_years": 1,
+      "automatic_score": 75,
+      "ground_truth_score": 62,
+      "absolute_delta": 13,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "medium",
+      "match_level_mismatch": true
+    },
+    {
+      "cv_id": "cv-03",
+      "cv_pdf_file": "cv-03_PHAM_VAN_NAM.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 2,
+      "found_required_skills": [
+        "Time Management",
+        "Customer Focus"
+      ],
+      "minimum_experience_years": 3,
+      "detected_experience_years": 1,
+      "automatic_score": 58.3,
+      "ground_truth_score": 27,
+      "absolute_delta": 31.3,
+      "automatic_match_level": "medium",
+      "ground_truth_match_level": "low",
+      "match_level_mismatch": true
+    },
+    {
+      "cv_id": "cv-04",
+      "cv_pdf_file": "cv-04_NGUYEN_THI_LAN.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Attention to Detail",
+        "Process Improvement",
+        "Project Management"
+      ],
+      "minimum_experience_years": 1,
+      "detected_experience_years": 2,
+      "automatic_score": 100,
+      "ground_truth_score": 90,
+      "absolute_delta": 10,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "high",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-05",
+      "cv_pdf_file": "cv-05_VO_THI_MAI.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 2,
+      "found_required_skills": [
+        "Time Management",
+        "Reporting"
+      ],
+      "minimum_experience_years": 1,
+      "detected_experience_years": 1,
+      "automatic_score": 75,
+      "ground_truth_score": 62,
+      "absolute_delta": 13,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "medium",
+      "match_level_mismatch": true
+    },
+    {
+      "cv_id": "cv-06",
+      "cv_pdf_file": "cv-06_HOANG_VAN_TUAN.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 0,
+      "found_required_skills": [],
+      "minimum_experience_years": 3,
+      "detected_experience_years": 1,
+      "automatic_score": 8.3,
+      "ground_truth_score": 27,
+      "absolute_delta": 18.7,
+      "automatic_match_level": "low",
+      "ground_truth_match_level": "low",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-07",
+      "cv_pdf_file": "cv-07_DANG_THI_THU.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Leadership",
+        "Communication",
+        "Planning"
+      ],
+      "minimum_experience_years": 6,
+      "detected_experience_years": 7,
+      "automatic_score": 100,
+      "ground_truth_score": 99,
+      "absolute_delta": 1,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "high",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-08",
+      "cv_pdf_file": "cv-08_BUI_THI_NGOC.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Customer Focus",
+        "Reporting",
+        "MS Office"
+      ],
+      "minimum_experience_years": 1,
+      "detected_experience_years": 1,
+      "automatic_score": 100,
+      "ground_truth_score": 65,
+      "absolute_delta": 35,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "medium",
+      "match_level_mismatch": true
+    },
+    {
+      "cv_id": "cv-09",
+      "cv_pdf_file": "cv-09_NGO_VAN_PHUC.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 2,
+      "found_required_skills": [
+        "Architecture & Interior Design",
+        "MS Office"
+      ],
+      "minimum_experience_years": 3,
+      "detected_experience_years": 1,
+      "automatic_score": 58.3,
+      "ground_truth_score": 27,
+      "absolute_delta": 31.3,
+      "automatic_match_level": "medium",
+      "ground_truth_match_level": "low",
+      "match_level_mismatch": true
+    },
+    {
+      "cv_id": "cv-10",
+      "cv_pdf_file": "cv-10_DO_THI_KIM_ANH.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "MS Office",
+        "Problem Solving",
+        "Planning"
+      ],
+      "minimum_experience_years": 6,
+      "detected_experience_years": 8,
+      "automatic_score": 100,
+      "ground_truth_score": 99,
+      "absolute_delta": 1,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "high",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-11",
+      "cv_pdf_file": "cv-11_LY_VAN_HUNG.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Attention to Detail",
+        "Teamwork",
+        "Time Management"
+      ],
+      "minimum_experience_years": 3,
+      "detected_experience_years": 2,
+      "automatic_score": 91.7,
+      "ground_truth_score": 63,
+      "absolute_delta": 28.7,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "medium",
+      "match_level_mismatch": true
+    },
+    {
+      "cv_id": "cv-12",
+      "cv_pdf_file": "cv-12_TRUONG_VAN_DUY.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 1,
+      "found_required_skills": [
+        "Transport & Warehousing"
+      ],
+      "minimum_experience_years": 3,
+      "detected_experience_years": null,
+      "automatic_score": 25,
+      "ground_truth_score": 22,
+      "absolute_delta": 3,
+      "automatic_match_level": "low",
+      "ground_truth_match_level": "low",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-13",
+      "cv_pdf_file": "cv-13_NGUYEN_THI_BICH.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Planning",
+        "Time Management",
+        "Process Improvement"
+      ],
+      "minimum_experience_years": 1,
+      "detected_experience_years": 2,
+      "automatic_score": 100,
+      "ground_truth_score": 91,
+      "absolute_delta": 9,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "high",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-14",
+      "cv_pdf_file": "cv-14_PHAN_THI_DIEM.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Time Management",
+        "Negotiation",
+        "Customer Focus"
+      ],
+      "minimum_experience_years": 3,
+      "detected_experience_years": 1.5,
+      "automatic_score": 87.5,
+      "ground_truth_score": 59,
+      "absolute_delta": 28.5,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "medium",
+      "match_level_mismatch": true
+    },
+    {
+      "cv_id": "cv-15",
+      "cv_pdf_file": "cv-15_VU_VAN_KHOA.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 0,
+      "found_required_skills": [],
+      "minimum_experience_years": 1,
+      "detected_experience_years": 1,
+      "automatic_score": 25,
+      "ground_truth_score": 23,
+      "absolute_delta": 2,
+      "automatic_match_level": "low",
+      "ground_truth_match_level": "low",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-16",
+      "cv_pdf_file": "cv-16_DINH_THI_THAO.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Reporting",
+        "Leadership",
+        "Customer Focus"
+      ],
+      "minimum_experience_years": 1,
+      "detected_experience_years": 2,
+      "automatic_score": 100,
+      "ground_truth_score": 89,
+      "absolute_delta": 11,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "high",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-17",
+      "cv_pdf_file": "cv-17_NGUYEN_VAN_SON.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 2,
+      "found_required_skills": [
+        "Planning",
+        "Communication"
+      ],
+      "minimum_experience_years": 6,
+      "detected_experience_years": 4,
+      "automatic_score": 66.7,
+      "ground_truth_score": 61,
+      "absolute_delta": 5.7,
+      "automatic_match_level": "medium",
+      "ground_truth_match_level": "medium",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-18",
+      "cv_pdf_file": "cv-18_TA_THI_HUONG.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 0,
+      "found_required_skills": [],
+      "minimum_experience_years": 1,
+      "detected_experience_years": null,
+      "automatic_score": 0,
+      "ground_truth_score": 17,
+      "absolute_delta": 17,
+      "automatic_match_level": "low",
+      "ground_truth_match_level": "low",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-19",
+      "cv_pdf_file": "cv-19_LE_VAN_THANH.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Time Management",
+        "Customer Focus",
+        "Data Analysis"
+      ],
+      "minimum_experience_years": 1,
+      "detected_experience_years": 1.5,
+      "automatic_score": 100,
+      "ground_truth_score": 87,
+      "absolute_delta": 13,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "high",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-20",
+      "cv_pdf_file": "cv-20_NGUYEN_THI_HONG_NHUNG.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "English Proficiency",
+        "Leadership",
+        "Process Improvement"
+      ],
+      "minimum_experience_years": 1,
+      "detected_experience_years": 1,
+      "automatic_score": 100,
+      "ground_truth_score": 64,
+      "absolute_delta": 36,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "medium",
+      "match_level_mismatch": true
+    },
+    {
+      "cv_id": "cv-21",
+      "cv_pdf_file": "cv-21_CAO_THI_YEN.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 0,
+      "found_required_skills": [],
+      "minimum_experience_years": 1,
+      "detected_experience_years": null,
+      "automatic_score": 0,
+      "ground_truth_score": 12,
+      "absolute_delta": 12,
+      "automatic_match_level": "low",
+      "ground_truth_match_level": "low",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-22",
+      "cv_pdf_file": "cv-22_PHAM_THI_KIM_NGAN.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Time Management",
+        "Project Management",
+        "Customer Focus"
+      ],
+      "minimum_experience_years": 3,
+      "detected_experience_years": 3,
+      "automatic_score": 100,
+      "ground_truth_score": 92,
+      "absolute_delta": 8,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "high",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-23",
+      "cv_pdf_file": "cv-23_TRAN_VAN_BAO.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Leadership",
+        "English Proficiency",
+        "Teamwork"
+      ],
+      "minimum_experience_years": 6,
+      "detected_experience_years": 4,
+      "automatic_score": 91.7,
+      "ground_truth_score": 66,
+      "absolute_delta": 25.7,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "medium",
+      "match_level_mismatch": true
+    },
+    {
+      "cv_id": "cv-24",
+      "cv_pdf_file": "cv-24_NGUYEN_VAN_LOC.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 1,
+      "found_required_skills": [
+        "Agriculture & Science"
+      ],
+      "minimum_experience_years": 1,
+      "detected_experience_years": null,
+      "automatic_score": 25,
+      "ground_truth_score": 20,
+      "absolute_delta": 5,
+      "automatic_match_level": "low",
+      "ground_truth_match_level": "low",
+      "match_level_mismatch": false
+    },
+    {
+      "cv_id": "cv-25",
+      "cv_pdf_file": "cv-25_HOANG_THI_YEN_NHI.pdf",
+      "required_skill_count": 3,
+      "found_required_skill_count": 3,
+      "found_required_skills": [
+        "Translation",
+        "Negotiation",
+        "Problem Solving"
+      ],
+      "minimum_experience_years": 1,
+      "detected_experience_years": 1.5,
+      "automatic_score": 100,
+      "ground_truth_score": 94,
+      "absolute_delta": 6,
+      "automatic_match_level": "high",
+      "ground_truth_match_level": "high",
+      "match_level_mismatch": false
+    }
+  ]
+}

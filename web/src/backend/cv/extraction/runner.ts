@@ -50,12 +50,13 @@ export async function runExtractionChild(
         childEntry,
       ],
       {
-        stdio: ["pipe", "pipe", "ignore"],
+        stdio: ["pipe", "pipe", "pipe"],
         windowsHide: true,
         detached: process.platform !== "win32",
       },
     );
     const output: Buffer[] = [];
+    const diagnostics: Buffer[] = [];
     let outputBytes = 0;
     let settled = false;
     const finish = (error?: Error, value?: ExtractionChildResult) => {
@@ -74,6 +75,15 @@ export async function runExtractionChild(
     child.once("error", () =>
       finish(new DocumentExtractionError("EXTRACTION_FAILED")),
     );
+    // On Windows a short-lived extraction child can close its stdin while the
+    // parent is still flushing the request.  Node otherwise emits an
+    // unhandled `write EOF`/`EPIPE` error and takes down the scoring worker.
+    // The exit handler below remains the source of truth for the child result.
+    child.stdin?.on("error", (error: NodeJS.ErrnoException) => {
+      if (error.code !== "EOF" && error.code !== "EPIPE" && !settled) {
+        finish(new DocumentExtractionError("EXTRACTION_FAILED"));
+      }
+    });
     child.stdout?.on("data", (chunk: Buffer) => {
       outputBytes += chunk.byteLength;
       if (outputBytes > request.limits.maximumOutputBytes * 4) {
@@ -81,6 +91,7 @@ export async function runExtractionChild(
         finish(new DocumentExtractionError("OUTPUT_LIMIT"));
       } else output.push(Buffer.from(chunk));
     });
+    child.stderr?.on("data", (chunk: Buffer) => diagnostics.push(Buffer.from(chunk)));
     child.once("exit", (code) => {
       if (settled) return;
       try {
@@ -95,15 +106,22 @@ export async function runExtractionChild(
           );
         else finish(undefined, message.value);
       } catch {
+        if (process.env.CV_EXTRACTION_DEBUG === "1") {
+          console.warn(`[cv-extraction] child exited code=${String(code)} stderr=${Buffer.concat(diagnostics).toString("utf8").slice(0, 500)}`);
+        }
         finish(new DocumentExtractionError("EXTRACTION_FAILED"));
       }
     });
-    child.stdin?.end(
-      JSON.stringify({
-        kind: request.kind,
-        source: Buffer.from(request.source).toString("base64"),
-        limits: request.limits,
-      }),
-    );
+    try {
+      child.stdin?.end(
+        JSON.stringify({
+          kind: request.kind,
+          source: Buffer.from(request.source).toString("base64"),
+          limits: request.limits,
+        }),
+      );
+    } catch {
+      // The child exit event reports the actual extraction outcome.
+    }
   });
 }

@@ -70,6 +70,11 @@ export async function start() {
       return handle(request, response);
     });
     const chat = attachSocketIoChatGateway(server);
+    const { ScoringWorkerRuntime } = await import(
+      "./src/backend/scoring/workers/scoring-worker-runtime"
+    );
+    const scoring = new ScoringWorkerRuntime();
+    scoring.start();
     server.on("error", (error) => {
       console.error("SmartHire HTTP server failed", error);
       process.exitCode = 1;
@@ -81,6 +86,7 @@ export async function start() {
     let closing: Promise<void> | null = null;
     const close = () => {
       if (closing) return closing;
+      scoring.stop();
       closing = new Promise<void>((resolveClose, rejectClose) =>
         chat.close((error) => {
           if (error) rejectClose(error);
