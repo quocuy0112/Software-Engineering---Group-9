@@ -13,6 +13,7 @@ const endpoints: Record<string, string> = {
   "professional-connection-proposals":
     "/api/admin/professional-connection-proposals",
   notifications: "/api/admin/notifications",
+  "job-post-reviews": "/api/admin/job-post-reviews",
 };
 
 export function adminApiErrorDetails(body: unknown) {
@@ -80,7 +81,10 @@ function reactAdminRecord(resource: string, value: unknown) {
   const nested = record[nestedKey];
   if (!nested || typeof nested !== "object") return value;
   const nestedRecord = nested as Record<string, unknown>;
-  if (typeof nestedRecord.id !== "string" && typeof nestedRecord.id !== "number")
+  if (
+    typeof nestedRecord.id !== "string" &&
+    typeof nestedRecord.id !== "number"
+  )
     return value;
   return { ...record, id: nestedRecord.id };
 }

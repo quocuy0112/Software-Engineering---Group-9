@@ -51,6 +51,26 @@ export const jobPostReviewQueueItemSchema = z
   })
   .strict();
 
+export const jobPostReviewQueuePageSchema = z
+  .object({
+    data: z.array(jobPostReviewQueueItemSchema),
+    total: z.number().int().nonnegative(),
+    calculatedAt: z.string().datetime(),
+  })
+  .strict();
+
+export const jobPostReviewListQuerySchema = z
+  .object({
+    page: z.number().int().min(1).max(1_000_000),
+    perPage: z.number().int().min(1).max(100),
+    state: jobPostReviewStateSchema.optional(),
+    assignment: z.enum(["ANY", "UNASSIGNED", "MINE"]).optional(),
+    companyId: z.string().min(1).max(128).optional(),
+    minimumAgeHours: z.number().int().min(0).max(8_760).optional(),
+    sequence: z.number().int().positive().optional(),
+  })
+  .strict();
+
 const reviewDecisionSchema = z
   .object({
     adminUserId: z.string().min(1).max(128).nullable(),

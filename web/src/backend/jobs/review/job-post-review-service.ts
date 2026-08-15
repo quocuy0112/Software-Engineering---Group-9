@@ -3,6 +3,19 @@ import { PrismaJobPostReviewRepository } from "@/backend/repositories/jobs/prism
 import { prisma } from "@/backend/database/prisma";
 import { randomUUID } from "node:crypto";
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
+import {
+  AdminCommandConflict,
+  PrismaAdminCommandRepository,
+} from "@/backend/repositories/admin/prisma-admin-command-repository";
+import type { AdminAuthority } from "@/backend/security/admin-request-boundary";
+import {
+  adminReviewCommandResultSchema,
+  jobPostReviewDetailSchema,
+  jobPostReviewListQuerySchema,
+  jobPostReviewQueuePageSchema,
+  type AdminReviewCommand,
+} from "@/shared/contracts/admin/job-post-review";
+import { jobReviewSnapshotSchema } from "@/shared/contracts/recruiter-job-posting";
 
 /**
  * Application boundary for the review lifecycle. User-story orchestration is
@@ -12,6 +25,308 @@ export class JobPostReviewService {
   constructor(
     readonly reviews: PrismaJobPostReviewRepository = new PrismaJobPostReviewRepository(),
   ) {}
+
+  private async assertCurrentGrant(
+    authority: AdminAuthority,
+    now = new Date(),
+  ) {
+    const grant = await prisma.platformAdministratorGrant.findFirst({
+      where: {
+        id: authority.grantId,
+        userId: authority.userId,
+        state: "ACTIVE",
+        OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+      },
+      select: { id: true },
+    });
+    if (!grant) throw new Error("TARGET_UNAVAILABLE");
+  }
+
+  async list(authority: AdminAuthority, query: unknown) {
+    const input = jobPostReviewListQuerySchema.parse(query);
+    const calculatedAt = new Date();
+    await this.assertCurrentGrant(authority, calculatedAt);
+    const result = await this.reviews.listReviewQueue({
+      page: input.page,
+      perPage: input.perPage,
+      state: input.state,
+      companyId: input.companyId,
+      assignedAdminUserId:
+        input.assignment === "UNASSIGNED"
+          ? null
+          : input.assignment === "MINE"
+            ? authority.userId
+            : undefined,
+      submittedBefore:
+        input.minimumAgeHours === undefined
+          ? undefined
+          : new Date(
+              calculatedAt.getTime() - input.minimumAgeHours * 60 * 60_000,
+            ),
+      sequence: input.sequence,
+    });
+    return jobPostReviewQueuePageSchema.parse({
+      total: result.total,
+      calculatedAt: calculatedAt.toISOString(),
+      data: result.rows.map((row) => {
+        const snapshot = jobReviewSnapshotSchema.safeParse(row.snapshot);
+        return {
+          id: row.id,
+          jobId: row.aggregate.jobId,
+          jobTitle: snapshot.success
+            ? snapshot.data.title
+            : "Unavailable job content",
+          companyId: row.aggregate.company.id,
+          companyDisplayName: row.aggregate.company.displayName,
+          sequence: row.sequence,
+          state: row.state,
+          assignment: row.assignedAdminUserId,
+          submittedAt: row.submittedAt.toISOString(),
+          ageSeconds: Math.max(
+            0,
+            Math.floor(
+              (calculatedAt.getTime() - row.submittedAt.getTime()) / 1_000,
+            ),
+          ),
+          version: row.aggregate.version,
+          integrityState: snapshot.success ? "VALID" : "BLOCKED",
+        };
+      }),
+    });
+  }
+
+  async detail(authority: AdminAuthority, reviewId: string) {
+    await this.assertCurrentGrant(authority);
+    const row = await this.reviews.findReviewDetail(reviewId);
+    if (!row) throw new Error("TARGET_UNAVAILABLE");
+    const snapshot = jobReviewSnapshotSchema.safeParse(row.snapshot);
+    if (!snapshot.success) throw new Error("TARGET_UNAVAILABLE");
+    const membershipActive = row.submittedMembership?.status === "ACTIVE";
+    const accountActive = row.submittedBy?.state === "ACTIVE";
+    const companyActive =
+      row.aggregate.company.verificationState === "ACTIVE" &&
+      row.aggregate.company.verificationInactiveAt === null;
+    return jobPostReviewDetailSchema.parse({
+      id: row.id,
+      jobId: row.aggregate.jobId,
+      companyId: row.aggregate.companyId,
+      sequence: row.sequence,
+      state: row.state,
+      assignment: row.assignedAdminUserId,
+      submittedAt: row.submittedAt.toISOString(),
+      ageSeconds: Math.max(
+        0,
+        Math.floor((Date.now() - row.submittedAt.getTime()) / 1_000),
+      ),
+      version: row.aggregate.version,
+      integrityState: "VALID",
+      snapshot: snapshot.data,
+      snapshotSchemaVersion: row.snapshotSchemaVersion,
+      snapshotSha256: row.snapshotSha256,
+      company: {
+        id: row.aggregate.company.id,
+        displayName: row.aggregate.company.displayName,
+        verificationState: row.aggregate.company.verificationState,
+        active: companyActive,
+        protectedVerificationHref: `/admin/verification-requests?company=${encodeURIComponent(row.aggregate.company.id)}`,
+      },
+      submitter: {
+        accountId: row.submittedBy?.id ?? "imported-baseline",
+        displayName: row.submittedBy?.name ?? "Imported baseline",
+        membershipState: row.submittedMembership?.status ?? "IMPORTED",
+        currentlyEligible: membershipActive && accountActive && companyActive,
+      },
+      priorApprovedSnapshot:
+        row.aggregate.approvedVersion?.id === row.id
+          ? null
+          : (row.aggregate.approvedVersion?.snapshot ?? null),
+      decision: row.decidedAt
+        ? {
+            adminUserId: row.decidedByAdminUserId,
+            decidedAt: row.decidedAt.toISOString(),
+            publishedAt: row.publishedAt?.toISOString() ?? null,
+            reasonCode: row.reasonCode,
+            publicExplanation: row.publicExplanation,
+          }
+        : null,
+      history: row.history.map((item) => ({
+        id: item.id,
+        action: item.action,
+        resultingState: item.resultingState,
+        resultingVersion: item.resultingAggregateVersion,
+        occurredAt: item.occurredAt.toISOString(),
+      })),
+      privateNotes: row.privateNotes.map((note) => ({
+        id: note.id,
+        authorAdminUserId: note.authorAdminUserId,
+        normalizedText: note.normalizedText,
+        createdAt: note.createdAt.toISOString(),
+      })),
+    });
+  }
+
+  async assign(input: {
+    authority: AdminAuthority;
+    reviewId: string;
+    command: Extract<AdminReviewCommand, { command: "CLAIM" | "REASSIGN" }>;
+    expectedVersion: number;
+    idempotencyKey: string;
+    now?: Date;
+  }) {
+    const now = input.now ?? new Date();
+    await this.assertCurrentGrant(input.authority, now);
+    return new PrismaAdminCommandRepository().execute(
+      {
+        actorUserId: input.authority.userId,
+        actorSessionId: input.authority.sessionId,
+        grantId: input.authority.grantId,
+        commandKind: `JOB_POST_REVIEW_${input.command.command}`,
+        targetReference: input.reviewId,
+        idempotencyKey: input.idempotencyKey,
+        normalizedBody: {
+          reviewId: input.reviewId,
+          expectedVersion: input.expectedVersion,
+          ...input.command,
+        },
+      },
+      async (transaction, correlationId) => {
+        const currentGrant =
+          await transaction.platformAdministratorGrant.findFirst({
+            where: {
+              id: input.authority.grantId,
+              userId: input.authority.userId,
+              state: "ACTIVE",
+              OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+              user: { state: "ACTIVE", deletedAt: null },
+              sessionPolicy: {
+                is: { designatedSessionId: input.authority.sessionId },
+              },
+            },
+            select: { id: true },
+          });
+        if (!currentGrant) throw new Error("TARGET_UNAVAILABLE");
+        const row = await transaction.jobPostReviewVersion.findUnique({
+          where: { id: input.reviewId },
+          include: { aggregate: true },
+        });
+        if (!row || row.state !== "PENDING_REVIEW")
+          throw new Error("TARGET_UNAVAILABLE");
+        if (row.aggregate.version !== input.expectedVersion)
+          throw new AdminCommandConflict(
+            "STALE_CONFLICT",
+            row.aggregate.version,
+          );
+        let targetAdminUserId = input.authority.userId;
+        if (input.command.command === "REASSIGN")
+          targetAdminUserId = input.command.targetAdminUserId;
+        const target = await transaction.platformAdministratorGrant.findFirst({
+          where: {
+            userId: targetAdminUserId,
+            state: "ACTIVE",
+            OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+            user: { state: "ACTIVE", deletedAt: null },
+          },
+          select: { userId: true },
+        });
+        if (!target) throw new Error("TARGET_UNAVAILABLE");
+        if (
+          row.assignedAdminUserId &&
+          row.assignedAdminUserId !== input.authority.userId
+        ) {
+          const incumbent =
+            await transaction.platformAdministratorGrant.findFirst({
+              where: {
+                userId: row.assignedAdminUserId,
+                state: "ACTIVE",
+                OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+                user: { state: "ACTIVE", deletedAt: null },
+              },
+              select: { id: true },
+            });
+          if (incumbent) throw new Error("ACTION_BLOCKED");
+        }
+        if (
+          input.command.command === "CLAIM" &&
+          row.assignedAdminUserId === input.authority.userId
+        )
+          throw new Error("ACTION_BLOCKED");
+        if (
+          input.command.command === "REASSIGN" &&
+          row.assignedAdminUserId !== input.authority.userId &&
+          row.assignedAdminUserId === null
+        )
+          throw new Error("ACTION_BLOCKED");
+        const updatedAggregate =
+          await transaction.jobPostReviewAggregate.updateMany({
+            where: {
+              id: row.aggregate.id,
+              version: input.expectedVersion,
+              pendingVersionId: row.id,
+            },
+            data: { version: { increment: 1 } },
+          });
+        if (updatedAggregate.count !== 1)
+          throw new AdminCommandConflict("STALE_CONFLICT");
+        await transaction.jobPostReviewVersion.update({
+          where: { id: row.id },
+          data: { assignedAdminUserId: targetAdminUserId, assignedAt: now },
+        });
+        const resultingVersion = input.expectedVersion + 1;
+        const action =
+          input.command.command === "CLAIM" ? "CLAIMED" : "REASSIGNED";
+        await transaction.jobPostReviewHistory.create({
+          data: {
+            reviewVersionId: row.id,
+            action,
+            actorUserId: input.authority.userId,
+            priorState: row.state,
+            resultingState: row.state,
+            priorAssigneeUserId: row.assignedAdminUserId,
+            resultingAssigneeUserId: targetAdminUserId,
+            resultingAggregateVersion: resultingVersion,
+            correlationId,
+            occurredAt: now,
+          },
+        });
+        if (input.command.command === "REASSIGN" && input.command.privateNote) {
+          await transaction.jobPostReviewPrivateNote.create({
+            data: {
+              reviewVersionId: row.id,
+              authorAdminUserId: input.authority.userId,
+              normalizedText: input.command.privateNote,
+              createdAt: now,
+            },
+          });
+        }
+        await new PrismaAuditRepository(transaction).append({
+          occurredAt: now,
+          actorType: "user",
+          actorUserId: input.authority.userId,
+          actorSessionId: input.authority.sessionId,
+          action:
+            input.command.command === "CLAIM"
+              ? "job_post_review.claimed"
+              : "job_post_review.reassigned",
+          targetType: "job_post_review",
+          targetId: row.id,
+          result: "SUCCESS",
+          correlationId,
+          context: {
+            priorState: row.state,
+            resultingState: row.state,
+            targetVersion: resultingVersion,
+          },
+        });
+        return adminReviewCommandResultSchema.parse({
+          reviewId: row.id,
+          state: row.state,
+          assignedAdminUserId: targetAdminUserId,
+          version: resultingVersion,
+          correlationId,
+        });
+      },
+    );
+  }
 }
 
 export async function closeManagedJobPost(input: {

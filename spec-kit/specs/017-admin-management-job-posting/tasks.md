@@ -105,28 +105,28 @@
 
 ### Tests for User Story 2
 
-- [ ] T045 [P] [US2] Add list/detail pagination, filters, ordering, response bounds, authority, no-store, and neutral-error contract tests in `web/tests/backend/contract/job-post-reviews/admin-review-query.contract.test.ts` (FR-011, FR-012, FR-015, FR-016, FR-027)
-- [ ] T046 [P] [US2] Add claim/reassign path/body match, command discriminator, CSRF, actor-scoped `AdminCommandReceipt` replay/binding, expected-version, current-grant, and safe-conflict contract tests in `web/tests/backend/contract/job-post-reviews/admin-review-command.contract.test.ts` (FR-013, FR-014, FR-020, FR-027, FR-028)
-- [ ] T047 [P] [US2] Add active/inactive Administrator fan-out, per-recipient dedupe/read state, five-second availability, and exact navigation integration tests in `web/tests/backend/integration/job-post-reviews/admin-review-notification.test.ts` (FR-009, FR-010, FR-011, SC-002)
-- [ ] T048 [P] [US2] Add deterministic queue order, bounded title/company summary, age/company/state/assignment filters, safe company/submitter detail context without contact data, complete detail, and current eligibility integration tests in `web/tests/backend/integration/job-post-reviews/admin-review-query.test.ts` (FR-012, FR-015, FR-016)
-- [ ] T049 [P] [US2] Add concurrent/stale claim, current-assignee reassignment, non-assignee takeover denial, inactive target, recovery from an inactive assignee, and immutable history/audit tests in `web/tests/backend/integration/job-post-reviews/admin-review-assignment.test.ts` (FR-013, FR-014, FR-020, FR-021, SC-004)
-- [ ] T050 [P] [US2] Add cross-recipient notification, revoked grant, direct enumeration, snapshot/note/evidence, and ordinary-log privacy tests in `web/tests/security/job-post-reviews/admin-review-isolation.test.ts` (FR-016, FR-027, FR-030, SC-006)
-- [ ] T051 [P] [US2] Add queue/detail/claim/reassign/loading/empty/error/stale component tests in `web/tests/frontend/components/admin-management/job-post-review-discovery.test.tsx` (FR-012, FR-013, FR-014, FR-029)
-- [ ] T052 [P] [US2] Add queue keyboard navigation, filter labels, focus restoration, live claim status, non-color assignment cues, and axe tests in `web/tests/frontend/accessibility/admin-management/job-post-review-discovery.accessibility.test.tsx` (FR-029, SC-008)
+- [X] T045 [P] [US2] Add list/detail pagination, filters, ordering, response bounds, authority, no-store, and neutral-error contract tests in `web/tests/backend/contract/job-post-reviews/admin-review-query.contract.test.ts` (FR-011, FR-012, FR-015, FR-016, FR-027)
+- [X] T046 [P] [US2] Add claim/reassign path/body match, command discriminator, CSRF, actor-scoped `AdminCommandReceipt` replay/binding, expected-version, current-grant, and safe-conflict contract tests in `web/tests/backend/contract/job-post-reviews/admin-review-command.contract.test.ts` (FR-013, FR-014, FR-020, FR-027, FR-028)
+- [X] T047 [P] [US2] Add active/inactive Administrator fan-out, per-recipient dedupe/read state, five-second availability, and exact navigation integration tests in `web/tests/backend/integration/job-post-reviews/admin-review-notification.test.ts` (FR-009, FR-010, FR-011, SC-002)
+- [X] T048 [P] [US2] Add deterministic queue order, bounded title/company summary, age/company/state/assignment filters, safe company/submitter detail context without contact data, complete detail, and current eligibility integration tests in `web/tests/backend/integration/job-post-reviews/admin-review-query.test.ts` (FR-012, FR-015, FR-016)
+- [X] T049 [P] [US2] Add concurrent/stale claim, current-assignee reassignment, non-assignee takeover denial, inactive target, recovery from an inactive assignee, and immutable history/audit tests in `web/tests/backend/integration/job-post-reviews/admin-review-assignment.test.ts` (FR-013, FR-014, FR-020, FR-021, SC-004)
+- [X] T050 [P] [US2] Add cross-recipient notification, revoked grant, direct enumeration, snapshot/note/evidence, and ordinary-log privacy tests in `web/tests/security/job-post-reviews/admin-review-isolation.test.ts` (FR-016, FR-027, FR-030, SC-006)
+- [X] T051 [P] [US2] Add queue/detail/claim/reassign/loading/empty/error/stale component tests in `web/tests/frontend/components/admin-management/job-post-review-discovery.test.tsx` (FR-012, FR-013, FR-014, FR-029)
+- [X] T052 [P] [US2] Add queue keyboard navigation, filter labels, focus restoration, live claim status, non-color assignment cues, and axe tests in `web/tests/frontend/accessibility/admin-management/job-post-review-discovery.accessibility.test.tsx` (FR-029, SC-008)
 
 ### Implementation for User Story 2
 
-- [ ] T053 [US2] Implement deterministic paginated queue and complete safe detail projections in `web/src/backend/repositories/jobs/prisma-job-post-review-repository.ts` (FR-012, FR-015, FR-016)
-- [ ] T054 [US2] Implement current-grant list/detail authorization, first-writer claim, current-assignee reassignment, inactive-assignee recovery, expected versions, existing `AdminCommandReceipt` binding/replay, history, and audit in `web/src/backend/jobs/review/job-post-review-service.ts` (FR-012-FR-016, FR-020, FR-021, FR-027)
-- [ ] T055 [US2] Implement protected Administrator queue transport in `web/src/app/api/admin/job-post-reviews/route.ts` (FR-012, FR-027, FR-028)
-- [ ] T056 [US2] Implement protected complete detail transport in `web/src/app/api/admin/job-post-reviews/[reviewId]/route.ts` (FR-015, FR-016, FR-027, FR-028)
-- [ ] T057 [US2] Implement claim/reassign action dispatch, exact command/path matching with mutation-free mismatch rejection, CSRF, expected-version, idempotency, and safe conflict responses in `web/src/app/api/admin/job-post-reviews/[reviewId]/[action]/route.ts` (FR-013, FR-014, FR-020, FR-027, FR-028)
-- [ ] T058 [US2] Add `job-post-reviews` list/detail/command mappings to `web/src/frontend/features/admin/app/data-provider.ts` (FR-012, FR-013, FR-014)
-- [ ] T059 [US2] Add the protected job-review resource and navigation entry to `web/src/frontend/features/admin/app/admin-app.tsx` (FR-012, FR-029)
-- [ ] T060 [P] [US2] Implement filtered deterministic queue presentation with bounded job title/company labels in `web/src/frontend/features/admin/job-post-reviews/job-post-review-list.tsx` (FR-012, FR-029)
-- [ ] T061 [P] [US2] Implement complete snapshot, eligibility, prior-approved diff, assignment, history, private-note, and protected-evidence-link detail in `web/src/frontend/features/admin/job-post-reviews/job-post-review-show.tsx` (FR-015, FR-016, FR-029)
-- [ ] T062 [US2] Implement claim/reassign confirmation and stale-conflict recovery in `web/src/frontend/features/admin/job-post-reviews/job-post-review-action-panel.tsx` (FR-013, FR-014, FR-020, FR-029)
-- [ ] T063 [US2] Validate User Story 2 and record focused results in `spec-kit/specs/017-admin-management-job-posting/quickstart.md` (SC-002, SC-003, SC-004, SC-006, SC-008)
+- [X] T053 [US2] Implement deterministic paginated queue and complete safe detail projections in `web/src/backend/repositories/jobs/prisma-job-post-review-repository.ts` (FR-012, FR-015, FR-016)
+- [X] T054 [US2] Implement current-grant list/detail authorization, first-writer claim, current-assignee reassignment, inactive-assignee recovery, expected versions, existing `AdminCommandReceipt` binding/replay, history, and audit in `web/src/backend/jobs/review/job-post-review-service.ts` (FR-012-FR-016, FR-020, FR-021, FR-027)
+- [X] T055 [US2] Implement protected Administrator queue transport in `web/src/app/api/admin/job-post-reviews/route.ts` (FR-012, FR-027, FR-028)
+- [X] T056 [US2] Implement protected complete detail transport in `web/src/app/api/admin/job-post-reviews/[reviewId]/route.ts` (FR-015, FR-016, FR-027, FR-028)
+- [X] T057 [US2] Implement claim/reassign action dispatch, exact command/path matching with mutation-free mismatch rejection, CSRF, expected-version, idempotency, and safe conflict responses in `web/src/app/api/admin/job-post-reviews/[reviewId]/[action]/route.ts` (FR-013, FR-014, FR-020, FR-027, FR-028)
+- [X] T058 [US2] Add `job-post-reviews` list/detail/command mappings to `web/src/frontend/features/admin/app/data-provider.ts` (FR-012, FR-013, FR-014)
+- [X] T059 [US2] Add the protected job-review resource and navigation entry to `web/src/frontend/features/admin/app/admin-app.tsx` (FR-012, FR-029)
+- [X] T060 [P] [US2] Implement filtered deterministic queue presentation with bounded job title/company labels in `web/src/frontend/features/admin/job-post-reviews/job-post-review-list.tsx` (FR-012, FR-029)
+- [X] T061 [P] [US2] Implement complete snapshot, eligibility, prior-approved diff, assignment, history, private-note, and protected-evidence-link detail in `web/src/frontend/features/admin/job-post-reviews/job-post-review-show.tsx` (FR-015, FR-016, FR-029)
+- [X] T062 [US2] Implement claim/reassign confirmation and stale-conflict recovery in `web/src/frontend/features/admin/job-post-reviews/job-post-review-action-panel.tsx` (FR-013, FR-014, FR-020, FR-029)
+- [X] T063 [US2] Validate User Story 2 and record focused results in `spec-kit/specs/017-admin-management-job-posting/quickstart.md` (SC-002, SC-003, SC-004, SC-006, SC-008)
 
 **Checkpoint**: Administrator discovery, protected full detail, and single-owner assignment work independently; terminal decisions remain the next required slice.
 

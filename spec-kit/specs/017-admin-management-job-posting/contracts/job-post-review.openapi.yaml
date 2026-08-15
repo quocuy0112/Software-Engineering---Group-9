@@ -50,6 +50,7 @@ paths:
         - { name: assignment, in: query, schema: { type: string, enum: [ANY, UNASSIGNED, MINE] } }
         - { name: companyId, in: query, schema: { type: string, maxLength: 128 } }
         - { name: minimumAgeHours, in: query, schema: { type: integer, minimum: 0, maximum: 8760 } }
+        - { name: sequence, in: query, schema: { type: integer, minimum: 1 } }
       responses:
         '200':
           description: Paginated review rows.

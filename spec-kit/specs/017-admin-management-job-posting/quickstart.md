@@ -73,6 +73,15 @@ Expected:
 - Focused Vitest command for submission contract, isolation, concurrency/failure boundaries, notification producer, Recruiter persistence/UI/accessibility, and architecture: 10 files passed, 22 tests passed.
 - Database-connected migration, writer preflight, and end-to-end checks remain release gates and were not represented as locally passed by these isolated tests.
 
+### Recorded User Story 2 evidence (2026-08-15)
+
+- `npm.cmd run typecheck`: passed.
+- Focused ESLint for the protected queue/detail/command routes, review service and repository, Administrator UI, shared contracts, and US2 tests: passed.
+- US2 Vitest command for query/command contracts, notification/query/assignment integration boundaries, isolation, UI, and accessibility: 8 files passed, 8 tests passed.
+- Expanded job-review regression command covering the foundation, Recruiter submission, Administrator discovery, notification producer/privacy, accessibility, and architecture boundaries: 21 files passed, 36 tests passed.
+- The final review also added strict bounded queue parsing, contract-aligned state/assignment/company/age/submission-version filters, a common `calculatedAt`, transaction-time grant/session revalidation, inactive-account assignment recovery, reassignment private-note persistence, and the complete eligibility/diff/evidence UI projection.
+- Database-connected concurrency, five-second notification freshness, browser end-to-end, and performance checks remain release gates and are not represented as locally passed by these isolated suites.
+
 1. Open each active Administrator console and wait at most five seconds.
 2. Confirm the unread count and generic alert contain no title, company name, submitter identity, reason, evidence, or note.
 3. Open the alert and confirm it reaches the exact protected review.

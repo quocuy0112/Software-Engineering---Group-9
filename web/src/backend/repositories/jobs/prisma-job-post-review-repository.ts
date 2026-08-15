@@ -91,6 +91,47 @@ export class PrismaJobPostReviewRepository {
     });
   }
 
+  async listReviewQueue(input: {
+    page: number;
+    perPage: number;
+    state?: "PENDING_REVIEW" | "APPROVED" | "REJECTED";
+    companyId?: string;
+    assignedAdminUserId?: string | null;
+    submittedBefore?: Date;
+    sequence?: number;
+  }) {
+    const where: Prisma.JobPostReviewVersionWhereInput = {
+      state: input.state ?? "PENDING_REVIEW",
+      ...(input.companyId ? { aggregate: { companyId: input.companyId } } : {}),
+      ...(input.assignedAdminUserId !== undefined
+        ? { assignedAdminUserId: input.assignedAdminUserId }
+        : {}),
+      ...(input.submittedBefore
+        ? { submittedAt: { lte: input.submittedBefore } }
+        : {}),
+      ...(input.sequence ? { sequence: input.sequence } : {}),
+    };
+    const [rows, total] = await Promise.all([
+      this.db.jobPostReviewVersion.findMany({
+        where,
+        include: {
+          aggregate: {
+            include: { company: { select: { id: true, displayName: true } } },
+          },
+        },
+        orderBy: [
+          { assignedAdminUserId: { sort: "asc", nulls: "first" } },
+          { submittedAt: "asc" },
+          { id: "asc" },
+        ],
+        skip: (input.page - 1) * input.perPage,
+        take: input.perPage,
+      }),
+      this.db.jobPostReviewVersion.count({ where }),
+    ]);
+    return { rows, total };
+  }
+
   async createPendingVersion(input: {
     aggregateId: string;
     expectedAggregateVersion: number;
