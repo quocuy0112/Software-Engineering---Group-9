@@ -1,6 +1,6 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
-import { render } from "@react-email/render";
+import { render } from "react-email";
 import { createElement } from "react";
 import { serverEnvironment } from "@/backend/env/runtime";
 import { safeErrorCode } from "@/backend/security/redaction";
