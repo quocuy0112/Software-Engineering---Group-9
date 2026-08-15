@@ -8,6 +8,16 @@
 
 **Input**: User description: "Preserve the existing job-post content persistence mechanism and add a complete workflow in which a recruiter submits a job for review, active Platform Administrators receive an in-app notification, an Administrator reviews the complete submitted posting, and explicitly approves or rejects it. Follow Spec Kit in English, resolve every analysis severity before implementation, and stop before implementation for review."
 
+## Clarifications
+
+### Session 2026-08-15
+
+- Q: How should unassigned job-review work be distributed and assigned? → A: Notify every currently eligible Platform Administrator, let the first successful claim become the sole assignee, and require explicit audited reassignment.
+- Q: What should happen when a Recruiter materially edits an active approved posting? → A: Create a distinct pending review version and keep the latest approved version public until the replacement version is approved.
+- Q: What feedback is required when an Administrator rejects a posting? → A: Require one stable Recruiter-visible reason code and a bounded safe explanation, while storing any private Administrator note separately and excluding it from all Recruiter notifications and views.
+- Q: Who receives the approval or rejection outcome when the original submitter loses company access? → A: Notify the submitter only while that person retains qualifying membership; otherwise send no direct detail and expose the outcome only to currently authorized company members in the protected workspace.
+- Q: Which company information belongs in the full job-review detail? → A: Show the complete submitted job snapshot and a safe current company/submitter eligibility summary; link to the existing protected verification viewer when separately authorized, but never copy protected evidence into the review or notification.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Submit a Job for Review (Priority: P1)
@@ -102,21 +112,21 @@ As the submitting Recruiter, I receive the decision, can understand a rejection,
 - **FR-005**: Repeated and concurrent submissions of the same job version MUST be idempotent and MUST NOT create duplicate pending reviews or notifications.
 - **FR-006**: Pending and rejected versions MUST remain unavailable through all public job discovery and detail paths.
 - **FR-007**: A submitted version MUST be locked against in-place Recruiter edits; revisions MUST use a distinct version.
-- **FR-008**: A material edit to an active posting MUST require review, and the last approved version MUST remain the only public version until the edit is approved.
+- **FR-008**: A material edit to an active posting MUST create a distinct immutable review version, and the last approved version MUST remain the only public version until the edited version is approved; closure and expiry MAY still remove public availability without approving unpublished edits.
 - **FR-009**: Submission MUST create one generic in-app review notification for each currently eligible Platform Administrator without including job content, company-private data, contact data, evidence, or internal notes.
 - **FR-010**: Administrator review notifications MUST be deduplicated per recipient and submitted version.
 - **FR-011**: Selecting a review notification MUST lead an authorized Administrator to the exact protected review and mark only that recipient's notification as read.
 - **FR-012**: The Administrator console MUST provide a paginated review queue with state, assignment, age, company, and submission-version filters and deterministic ordering.
-- **FR-013**: Eligible Administrators MUST be able to claim unassigned pending reviews, and concurrent claims MUST select exactly one current assignee.
-- **FR-014**: Only an eligible current assignee MUST be able to approve or reject a pending review; reassignment, if supported, MUST be explicit and auditable.
-- **FR-015**: The review detail MUST show the complete submitted job content, safe company and submitter context, current eligibility, prior-approved comparison, review version, assignment, and immutable decision history.
-- **FR-016**: Review detail and notifications MUST NOT copy or disclose protected business evidence, unrestricted notes, private contact information, or unrelated company, application, candidate, or account data.
+- **FR-013**: Every currently eligible Administrator MUST be able to discover and claim unassigned pending reviews, and concurrent claims MUST select exactly one current assignee without withdrawing the historical alert from other recipients.
+- **FR-014**: Only an eligible current assignee MUST be able to approve or reject a pending review; reassignment MUST be explicit, authorized, version-checked, and auditable.
+- **FR-015**: The review detail MUST show the complete immutable submitted job snapshot, safe current company and submitter eligibility context, prior-approved comparison, review version, assignment, and immutable decision history; separately authorized Administrators MAY follow a link to the existing protected verification viewer.
+- **FR-016**: Review detail and notifications MUST NOT copy or disclose protected business evidence, unrestricted notes, private contact information, or unrelated company, application, candidate, or account data, and losing access to the protected verification viewer MUST NOT reveal evidence through cached review data.
 - **FR-017**: Approval MUST revalidate the exact pending version, current company eligibility, current assignment, deadline viability, and expected review version before making the submitted version active.
 - **FR-018**: Approval MUST make exactly one reviewed version public and MUST set its approval/publication facts consistently.
-- **FR-019**: Rejection MUST require a normalized Recruiter-visible reason code and bounded explanation; any private Administrator note MUST remain separately protected.
+- **FR-019**: Rejection MUST require one allow-listed Recruiter-visible reason code and a normalized bounded explanation that identifies an actionable correction; any optional private Administrator note MUST remain separately protected and MUST NOT be copied into notifications, public history, or Recruiter views.
 - **FR-020**: Approval and rejection commands MUST be idempotent and reject stale, conflicting, unassigned, unauthorized, or already-terminal decisions without overwriting the authoritative state.
 - **FR-021**: Every submission, claim, reassignment, approval, rejection, blocked decision, and resubmission MUST produce an audit record identifying actor, action, target, result, version, and timestamp without unnecessary personal data.
-- **FR-022**: A committed decision MUST create exactly one safe in-app outcome notification for the submitting Recruiter, with tenant-safe fallback discovery when that submitter no longer has access.
+- **FR-022**: A committed decision MUST create exactly one safe in-app outcome notification for the submitting Recruiter only when that person still has qualifying company membership; otherwise it MUST send no direct outcome detail and MUST expose the state only through tenant-scoped discovery by currently authorized company members.
 - **FR-023**: Recruiter notifications and views MUST expose no private Administrator note, other Administrator identity, or cross-company review data.
 - **FR-024**: A rejected job MUST be revisable and resubmittable by a currently authorized Recruiter as a distinct version while preserving all prior review history.
 - **FR-025**: Failure to create required review state, audit evidence, or in-app notifications MUST NOT leave a posting publicly active without its matching approved decision.
