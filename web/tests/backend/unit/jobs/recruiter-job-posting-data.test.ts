@@ -88,6 +88,7 @@ describe("recruiter JSON job persistence", () => {
         size: null,
         industry: null,
         address: null,
+        entityType: null,
         normalizedTaxIdentifier: "1234567890",
         memberships: [{ userId: "recruiter-1", role: "OWNER" }],
       },
@@ -109,6 +110,41 @@ describe("recruiter JSON job persistence", () => {
     });
   });
 
+  it("keeps a registry entity type out of the company display name", async () => {
+    prismaMocks.company.findMany.mockResolvedValue([
+      {
+        id: "db-company-2",
+        slug: "vnpt",
+        legalName:
+          "TẬP ĐOÀN BƯU CHÍNH VIỄN THÔNG VIỆT NAM (LOẠI HÌNH DOANH NGHIỆP: CÔNG TY TNHH)",
+        displayName:
+          "TẬP ĐOÀN BƯU CHÍNH VIỄN THÔNG VIỆT NAM (LOẠI HÌNH DOANH NGHIỆP: CÔNG TY TNHH)",
+        logoUrl: null,
+        websiteUrl: null,
+        publicDescription: null,
+        publicLocation: null,
+        size: null,
+        industry: null,
+        address: null,
+        entityType: null,
+        normalizedTaxIdentifier: "0100684378",
+        memberships: [{ userId: "recruiter-1", role: "OWNER" }],
+      },
+    ]);
+    fsMocks.readFile.mockImplementation(async (path: string) => {
+      if (path.endsWith("jobs.json")) return "[]";
+      if (path.endsWith("companies.json")) return "[]";
+      throw new Error("Unexpected mock path: " + path);
+    });
+
+    await expect(
+      readRecruiterCompanySettings("recruiter-1"),
+    ).resolves.toMatchObject({
+      name: "TẬP ĐOÀN BƯU CHÍNH VIỄN THÔNG VIỆT NAM",
+      entityType: "CÔNG TY TNHH",
+    });
+  });
+
   it("allows an approved database member to open job posting management", async () => {
     prismaMocks.company.findMany.mockResolvedValue([
       {
@@ -123,6 +159,7 @@ describe("recruiter JSON job persistence", () => {
         size: "51-200 employees",
         industry: "Technology",
         address: "Ho Chi Minh City",
+        entityType: null,
         normalizedTaxIdentifier: "1234567890",
         memberships: [{ userId: "recruiter-1", role: "OWNER" }],
       },
@@ -154,6 +191,7 @@ describe("recruiter JSON job persistence", () => {
         size: "1-50 employees",
         industry: "Game Development",
         address: "Ho Chi Minh, District 8",
+        entityType: null,
         normalizedTaxIdentifier: "2000000000",
         memberships: [{ userId: "recruiter-1", role: "OWNER" }],
       },

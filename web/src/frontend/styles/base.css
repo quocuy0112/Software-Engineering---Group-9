@@ -259,6 +259,10 @@ textarea {
   padding: 0;
 }
 
+.sh-button--full {
+  width: 100%;
+}
+
 .sh-input,
 .auth-form input,
 .security-panel input {

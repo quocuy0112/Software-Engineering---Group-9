@@ -2,8 +2,19 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import {
+  Bell,
+  CalendarDays,
+  CircleCheck,
+  KeyRound,
+  LockKeyhole,
+  Mail,
+} from "lucide-react";
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
 import { Badge } from "@/frontend/components/ui/badge";
+import { Panel, StatusPill } from "@/frontend/components/ui/design-system";
+import { InfoRow } from "@/frontend/components/ui/info-row";
+import { PageHeader } from "@/frontend/components/layout/page-header";
 import { useProfileEditor } from "../client/use-profile-editor";
 import { ProfileNavigation } from "./profile-navigation";
 import { ProfileBasicsForm } from "./profile-basics-form";
@@ -13,7 +24,7 @@ import { ProfileEducationForm } from "./profile-education-form";
 import { ProfileSocialLinksForm } from "./profile-social-links-form";
 import { ProfileAvatarEditor } from "./profile-avatar-editor";
 import { AccountIdRow } from "./account-id-row";
-import { ProfileCompletionHeader } from "./profile-completion-header";
+import { ProfileIdentityHeader } from "./profile-identity-header";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 
 type ProfileOverviewProps = {
@@ -38,31 +49,36 @@ export function ProfileOverview({
   const copy =
     locale === "vi"
       ? {
-          loading: "Đang tải hồ sơ nghề nghiệp…",
-          loadError: "Không thể tải hồ sơ nghề nghiệp của bạn.",
+          accountTitle: "Thông tin tài khoản",
+          password: "Mật khẩu",
+          passwordProtected: "Đã bảo vệ",
+          autoSave:
+            "Hồ sơ được lưu tự động và mã hoá. Thay đổi gần nhất sẽ hiển thị tại đây.",
+          loading: "Đang tải hồ sơ chuyên môn…",
+          loadError: "Không thể tải hồ sơ chuyên môn của bạn.",
           retry: "Thử lại",
-          kicker: "TÀI KHOẢN SMARTHIRE CỦA BẠN",
-          title: "Hồ sơ",
+          kicker: "Hồ sơ của bạn",
+          title: "Hồ sơ chuyên môn",
           subtitle:
-            "Quản lý tài khoản và cập nhật thông tin nghề nghiệp của bạn.",
-          enabled2fa: "Đã bật 2FA",
-          recommended2fa: "Nên bật 2FA",
+            "Hoàn thiện các mục bên dưới để nhà tuyển dụng SME dễ tìm thấy và đánh giá đúng năng lực của bạn.",
+          enabled2fa: "Xác thực 2 lớp đã bật",
+          recommended2fa: "Nên bật xác thực 2 lớp",
           enable2fa: "Bật xác thực 2 bước",
-          account: "CHI TIẾT TÀI KHOẢN",
+          account: "TÀI KHOẢN",
           accountId: "ID tài khoản",
           copyAccountId: "Sao chép ID tài khoản",
           copiedAccountId: "Đã sao chép ID tài khoản",
           copyAccountIdFailed: "Không thể sao chép ID tài khoản",
-          email: "Địa chỉ email",
-          status: "Trạng thái tài khoản",
+          email: "Email",
+          status: "Trạng thái",
           active: "Đang hoạt động",
-          memberSince: "Thành viên từ",
+          memberSince: "Tham gia",
           manage: "Quản lý tài khoản",
           security: "BẢO MẬT",
-          securityTitle: "Giữ tài khoản của bạn an toàn",
+          securityTitle: "Bảo vệ tài khoản",
           securityCopy:
             "Quản lý mật khẩu, ứng dụng xác thực, mã dự phòng và các phiên đăng nhập.",
-          securityAction: "Mở cài đặt bảo mật",
+          securityAction: "Quản lý bảo mật",
           story: "CÂU CHUYỆN NGHỀ NGHIỆP",
           professional: "Hồ sơ nghề nghiệp",
           updated: "Đã cập nhật",
@@ -77,30 +93,35 @@ export function ProfileOverview({
           loading: "Loading professional profile…",
           loadError: "Unable to load your professional profile.",
           retry: "Try again",
-          kicker: "YOUR SMARTHIRE ACCOUNT",
-          title: "Profile",
+          kicker: "YOUR PROFILE",
+          title: "Professional profile",
           subtitle:
-            "Manage your account and keep your professional information current.",
+            "Complete the sections below so employers can quickly understand your strengths and experience.",
           enabled2fa: "2FA enabled",
           recommended2fa: "2FA recommended",
           enable2fa: "Enable two-factor authentication",
-          account: "ACCOUNT DETAILS",
+          account: "ACCOUNT",
+          accountTitle: "Account information",
           accountId: "Account ID",
           copyAccountId: "Copy account ID",
           copiedAccountId: "Account ID copied",
           copyAccountIdFailed: "Account ID could not be copied",
-          email: "Email address",
-          status: "Account status",
+          email: "Email",
+          status: "Status",
           active: "Active",
           memberSince: "Member since",
           manage: "Manage account",
           security: "SECURITY",
-          securityTitle: "Keep your account protected",
+          securityTitle: "Account protection",
           securityCopy:
             "Manage your password, authenticator, backup codes, and active sessions from one secure place.",
-          securityAction: "Open security settings",
-          story: "YOUR PROFESSIONAL STORY",
-          professional: "Professional profile",
+          securityAction: "Manage security",
+          password: "Password",
+          passwordProtected: "Protected",
+          autoSave:
+            "Your profile is saved automatically and encrypted. Latest changes will appear here.",
+          story: "PROFESSIONAL STORY",
+          professional: "Your professional story",
           updated: "Updated",
           ready: "READY WHEN YOU ARE",
           emptyTitle: "Your professional profile is not filled yet",
@@ -111,10 +132,11 @@ export function ProfileOverview({
         };
   const editor = useProfileEditor(initialProfile, csrfProof);
   const [avatar, setAvatar] = useState(account.image ?? null);
+  const [avatarEditorOpen, setAvatarEditorOpen] = useState(false);
 
   if (editor.loading) {
     return (
-      <div className="profile-page professional-profile-page">
+      <div className="candidate-profile-page">
         <p role="status" aria-label={copy.loading}>
           {copy.loading}
         </p>
@@ -124,7 +146,7 @@ export function ProfileOverview({
 
   if (editor.loadError || !editor.profile) {
     return (
-      <div className="profile-page professional-profile-page">
+      <div className="candidate-profile-page">
         <p role="alert">{copy.loadError}</p>
         <button type="button" onClick={editor.reload}>
           {copy.retry}
@@ -136,103 +158,132 @@ export function ProfileOverview({
   const profile = editor.profile;
 
   return (
-    <div className="profile-page professional-profile-page">
-      <header className="page-heading profile-heading">
-        <div>
-          <p className="workspace-kicker">{copy.kicker}</p>
-          <h1 id="workspace-page-title">{copy.title}</h1>
-          <p className="page-heading-copy">{copy.subtitle}</p>
-        </div>
+    <div className="candidate-profile-page">
+      <ProfileNavigation active="overview" accountName={account.name} />
 
-        {account.twoFactorEnabled ? (
-          <Badge className="page-heading-badge" tone="success">
-            {copy.enabled2fa}
-          </Badge>
-        ) : (
-          <Link
-            className="profile-security-status-action"
-            href="/profile/security#totp-title"
-          >
-            <svg aria-hidden="true" viewBox="0 0 24 24">
-              <path d="M12 3 2.8 20h18.4L12 3Zm0 6v5m0 3h.01" />
-            </svg>
-            {copy.enable2fa}
-          </Link>
-        )}
-      </header>
+      <PageHeader
+        className="candidate-profile-page__header"
+        eyebrow={copy.kicker}
+        title={copy.title}
+        titleId="workspace-page-title"
+        subtitle={copy.subtitle}
+        status={{
+          label: locale === "vi" ? "Tự động lưu" : "Auto-save",
+          tone: "success",
+          pulsing: true,
+        }}
+      />
 
-      <ProfileCompletionHeader
+      <ProfileIdentityHeader
         profile={profile}
         avatar={avatar}
         locale={locale}
+        accountName={account.name}
+        onEditAvatar={() => setAvatarEditorOpen(true)}
       />
-
-      <ProfileNavigation active="overview" />
 
       <ProfileAvatarEditor
         accountName={account.name}
         initialAvatar={account.image}
         csrfProof={csrfProof}
+        compact
+        open={avatarEditorOpen}
+        onOpenChange={setAvatarEditorOpen}
         onAvatarChanged={setAvatar}
       />
 
       <section
-        className="profile-overview-grid"
+        className="candidate-profile-page__overview"
         aria-label={copy.overviewLabel}
       >
-        <article className="profile-account-card profile-card">
-          <p className="panel-kicker">{copy.account}</p>
-          <h2>{account.name}</h2>
-
+        <Panel
+          as="article"
+          className="candidate-profile-page__account-card"
+          eyebrow={copy.account}
+          title={copy.accountTitle}
+          titleId="profile-account-title"
+        >
           <dl className="profile-account-details">
+            <InfoRow
+              asDefinition
+              icon={<Badge tone="blue" icon={<Mail />} aria-hidden="true" />}
+              label={copy.email}
+              value={account.email}
+            />
+            <InfoRow
+              asDefinition
+              icon={
+                <Badge tone="blue" icon={<CalendarDays />} aria-hidden="true" />
+              }
+              label={copy.memberSince}
+              value={account.memberSince}
+            />
+            <InfoRow
+              asDefinition
+              icon={
+                <Badge tone="blue" icon={<CircleCheck />} aria-hidden="true" />
+              }
+              label={copy.status}
+              value={copy.active}
+              valueTone="success"
+            />
             <AccountIdRow
               accountId={account.id}
               label={copy.accountId}
               copyLabel={copy.copyAccountId}
               copiedLabel={copy.copiedAccountId}
               failedLabel={copy.copyAccountIdFailed}
+              icon={
+                <Badge tone="blue" icon={<KeyRound />} aria-hidden="true" />
+              }
             />
-            <div>
-              <dt>{copy.email}</dt>
-              <dd>{account.email}</dd>
-            </div>
-            <div>
-              <dt>{copy.status}</dt>
-              <dd>{copy.active}</dd>
-            </div>
-            <div>
-              <dt>{copy.memberSince}</dt>
-              <dd>{account.memberSince}</dd>
-            </div>
           </dl>
 
           <div className="profile-account-actions">
-            <Badge
-              className="profile-status-pill"
-              tone={account.twoFactorEnabled ? "success" : "warning"}
-            >
-              {account.twoFactorEnabled ? copy.enabled2fa : copy.recommended2fa}
-            </Badge>
-
-            <Link href="/profile/account">{copy.manage}</Link>
+            <Link className="btn-ghost" href="/profile/account">
+              {copy.manage}
+            </Link>
           </div>
-        </article>
+        </Panel>
 
-        <article className="profile-card profile-security-card">
-          <p className="panel-kicker">{copy.security}</p>
-          <h2>{copy.securityTitle}</h2>
-          <p>{copy.securityCopy}</p>
-          <Link className="profile-card-link" href="/profile/security">
+        <Panel
+          as="article"
+          className="candidate-profile-page__security-card"
+          eyebrow={copy.security}
+          title={copy.securityTitle}
+          titleId="profile-security-title"
+        >
+          <StatusPill
+            className="profile-security-status"
+            label={
+              account.twoFactorEnabled ? copy.enabled2fa : copy.recommended2fa
+            }
+            tone={account.twoFactorEnabled ? "success" : "warning"}
+          />
+          <InfoRow
+            icon={
+              <Badge tone="blue" icon={<LockKeyhole />} aria-hidden="true" />
+            }
+            label={copy.password}
+            value={<strong>{copy.passwordProtected}</strong>}
+          />
+          <Link
+            className="btn-ghost candidate-profile-page__security-action"
+            href="/profile/security"
+          >
             {copy.securityAction}
           </Link>
-        </article>
+        </Panel>
       </section>
 
       <section
-        className="profile-professional-section"
-        aria-labelledby="professional-profile-title"
+        className="candidate-profile-page__professional"
+        aria-label={copy.professional}
       >
-        <div className="profile-section-heading">
+        <div
+          className="candidate-profile-page__legacy-heading"
+          aria-hidden="true"
+        >
           <div>
             <p className="workspace-kicker">{copy.story}</p>
             <h2 id="professional-profile-title">{copy.professional}</h2>
@@ -245,10 +296,10 @@ export function ProfileOverview({
 
         {profile.empty ? (
           <section
-            className="professional-profile-empty"
+            className="candidate-profile-page__empty"
             aria-labelledby="empty-title"
           >
-            <p className="panel-kicker">{copy.ready}</p>
+            <p className="candidate-profile-page__empty-kicker">{copy.ready}</p>
             <h2 id="empty-title">{copy.emptyTitle}</h2>
             <p>{copy.emptyCopy}</p>
             <button
@@ -262,7 +313,7 @@ export function ProfileOverview({
           </section>
         ) : null}
 
-        <div className="professional-profile-sections">
+        <div className="candidate-profile-page__sections">
           <ProfileBasicsForm
             profile={profile}
             saving={editor.savingSection === "basics"}
@@ -307,6 +358,16 @@ export function ProfileOverview({
           />
         </div>
       </section>
+
+      <div className="candidate-profile-page__notice" role="note">
+        <Badge
+          tone="amber"
+          className="candidate-profile-page__notice-icon"
+          icon={<Bell />}
+          aria-hidden="true"
+        />
+        <p>{copy.autoSave}</p>
+      </div>
     </div>
   );
 }

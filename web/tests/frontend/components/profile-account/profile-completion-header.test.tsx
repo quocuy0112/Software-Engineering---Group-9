@@ -21,18 +21,26 @@ describe("profile completion header", () => {
       {
         ...emptyProfile,
         basics: {
-          headline: "Platform engineer",
-          summary: "Builds reliable systems.",
+          headline: "Platform reliability engineer",
+          summary:
+            "Builds reliable systems for teams that need accessible, resilient, and maintainable products with clearly communicated technical decisions. ".repeat(
+              2,
+            ),
           phone: null,
           location: null,
         },
-        skills: [{ id: "skill-1", label: "TypeScript" }],
+        skills: [
+          { id: "skill-1", label: "TypeScript" },
+          { id: "skill-2", label: "Accessibility" },
+          { id: "skill-3", label: "Product design" },
+        ],
         experience: [
           {
             id: "experience-1",
             title: "Engineer",
             company: "Smart Hire",
-            description: null,
+            description:
+              "Delivered accessible product experiences while improving reliability, documenting decisions, and helping cross-functional teams ship maintainable workflows.",
             startDate: "2024-01-01",
             endDate: null,
             current: true,

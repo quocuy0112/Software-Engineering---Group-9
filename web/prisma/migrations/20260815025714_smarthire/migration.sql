@@ -1,0 +1,14 @@
+-- RenameIndex
+ALTER INDEX "BusinessRegistryLookupSnapshot_applicant_tax_expiry_idx" RENAME TO "BusinessRegistryLookupSnapshot_applicantUserId_normalizedTa_idx";
+
+-- RenameIndex
+ALTER INDEX "BusinessRegistryLookupSnapshot_expiry_acceptance_idx" RENAME TO "BusinessRegistryLookupSnapshot_expiresAt_acceptedRequestId__idx";
+
+-- RenameIndex
+ALTER INDEX "CompanyContactEmailChallenge_binding_state_idx" RENAME TO "CompanyContactEmailChallenge_applicantUserId_lookupSnapshot_idx";
+
+-- RenameIndex
+ALTER INDEX "VerificationNotificationEvent_emailStatus_inAppStatus_updatedAt" RENAME TO "VerificationNotificationEvent_emailStatus_inAppStatus_updat_idx";
+
+-- RenameIndex
+ALTER INDEX "VerificationNotificationEvent_verificationRequestId_eventKind_i" RENAME TO "VerificationNotificationEvent_verificationRequestId_eventKi_idx";

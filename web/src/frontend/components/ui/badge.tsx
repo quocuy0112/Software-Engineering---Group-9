@@ -1,6 +1,14 @@
 import type { HTMLAttributes, ReactNode } from "react";
 
-export type BadgeTone = "neutral" | "info" | "success" | "warning" | "error";
+export type BadgeTone =
+  | "neutral"
+  | "info"
+  | "success"
+  | "warning"
+  | "error"
+  | "blue"
+  | "teal"
+  | "amber";
 
 const toneIcons: Record<BadgeTone, string> = {
   neutral: "•",
@@ -8,17 +16,36 @@ const toneIcons: Record<BadgeTone, string> = {
   success: "✓",
   warning: "!",
   error: "!",
+  blue: "",
+  teal: "✓",
+  amber: "!",
 };
 
 export function Badge({
   tone = "neutral",
   children,
   className = "",
+  icon,
   ...props
 }: HTMLAttributes<HTMLSpanElement> & {
   tone?: BadgeTone;
-  children: ReactNode;
+  children?: ReactNode;
+  icon?: ReactNode;
 }) {
+  if (icon) {
+    const iconTone =
+      tone === "blue" || tone === "teal" || tone === "amber" ? tone : "neutral";
+    return (
+      <span
+        className={["sh-icon-badge", className].filter(Boolean).join(" ")}
+        data-tone={iconTone}
+        {...props}
+      >
+        {icon}
+      </span>
+    );
+  }
+
   return (
     <span
       className={["sh-badge", className].filter(Boolean).join(" ")}

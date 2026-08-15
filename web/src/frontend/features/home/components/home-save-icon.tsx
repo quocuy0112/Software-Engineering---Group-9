@@ -1,7 +1,9 @@
 export function HomeSaveIcon({ saved = false }: { saved?: boolean }) {
   return (
     <svg
-      className={`home-save-icon${saved ? "home-save-icon--saved" : ""}`}
+      className={["home-save-icon", saved && "home-save-icon--saved"]
+        .filter(Boolean)
+        .join(" ")}
       aria-hidden="true"
       viewBox="0 0 24 24"
     >

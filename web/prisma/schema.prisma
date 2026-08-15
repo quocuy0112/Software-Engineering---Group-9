@@ -1347,6 +1347,7 @@ model Company {
   slug                          String                         @unique
   legalName                     String
   displayName                   String
+  entityType                    String?
   logoUrl                       String?
   websiteUrl                    String?
   publicDescription             String?

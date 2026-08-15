@@ -13,6 +13,7 @@ import {
   companyEmailConfirmationSchema,
   preparationPatchSchema,
   registryLookupSchema,
+  splitCompanyIdentity,
 } from "@/shared/contracts/employer-verification/business-verification";
 import type { EmployerVerificationPreparationResponse } from "@/shared/contracts/employer-verification/business-verification-responses";
 import { businessVerificationConfig } from "./business-verification-config";
@@ -281,6 +282,18 @@ export class EmployerVerificationPreparationService {
         )
       : null;
     const snapshot = preparation.lookupSnapshot;
+    const registryIdentity = snapshot
+      ? splitCompanyIdentity(
+          snapshot.registryLegalName ?? "",
+          snapshot.registryEntityType,
+        )
+      : null;
+    const draftIdentity = preparation.applicantLegalName
+      ? splitCompanyIdentity(
+          preparation.applicantLegalName,
+          registryIdentity?.entityType,
+        )
+      : null;
     return {
       data: {
         preparationId: preparation.id,
@@ -297,13 +310,13 @@ export class EmployerVerificationPreparationService {
               checkedAt: snapshot.checkedAt.toISOString(),
               expiresAt: snapshot.expiresAt.toISOString(),
               facts: {
-                legalName: snapshot.registryLegalName,
+                legalName: registryIdentity?.name || snapshot.registryLegalName,
                 registeredAddress: snapshot.registryRegisteredAddress,
                 establishmentDate:
                   snapshot.registryEstablishedAt?.toISOString().slice(0, 10) ??
                   null,
                 legalStatus: snapshot.registryLegalStatus,
-                entityType: snapshot.registryEntityType,
+                entityType: registryIdentity?.entityType ?? null,
               },
             }
           : null,
@@ -321,7 +334,8 @@ export class EmployerVerificationPreparationService {
             }
           : { status: "NONE" },
         draft: {
-          applicantLegalName: preparation.applicantLegalName,
+          applicantLegalName:
+            draftIdentity?.name ?? preparation.applicantLegalName,
           applicantRegisteredAddress: preparation.applicantRegisteredAddress,
           operatingAddressDiffers: preparation.operatingAddressDiffers,
           operatingAddress: preparation.operatingAddress,

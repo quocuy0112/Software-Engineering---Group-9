@@ -2,6 +2,16 @@
 
 import Link from "next/link";
 import { useCallback, useState } from "react";
+import {
+  ArrowRight,
+  Bell,
+  CircleHelp,
+  MessageSquareLock,
+  ShieldCheck,
+  UserRoundPlus,
+} from "lucide-react";
+import { Badge } from "@/frontend/components/ui/badge";
+import { Panel } from "@/frontend/components/ui/design-system";
 import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { WorkspacePageHeader } from "@/frontend/features/dashboard/components/page-header";
 import type {
@@ -335,13 +345,13 @@ export function ConnectionsWorkspace({
         {copy.flow.map((step, index) => (
           <div className="connections-flow__group" key={step.title}>
             <article className="connections-flow__step">
-              <span
+              <Badge
+                tone={index === 2 ? "teal" : "blue"}
                 className="connections-flow__icon"
                 data-step={index + 1}
                 aria-hidden="true"
-              >
-                <ConsentFlowIcon step={index + 1} />
-              </span>
+                icon={<ConsentFlowIcon step={index + 1} />}
+              />
               <div>
                 <h2>{step.title}</h2>
                 <p>{step.description}</p>
@@ -356,16 +366,17 @@ export function ConnectionsWorkspace({
         ))}
       </section>
       <section className="connections-grid">
-        <article className="connections-panel connections-panel--mini">
-          <header>
-            <div>
-              <p>{copy.consent}</p>
-              <h2>{copy.proposals}</h2>
-            </div>
-            <span>
+        <Panel
+          as="article"
+          className="connections-panel connections-panel--mini"
+          eyebrow={copy.consent}
+          title={copy.proposals}
+          rightSlot={
+            <span className="count-pill">
               {activeProposals.length} {copy.pending}
             </span>
-          </header>
+          }
+        >
           {proposals.length === 0 ? (
             <CompactEmpty
               title={copy.noProposals}
@@ -437,18 +448,19 @@ export function ConnectionsWorkspace({
               })}
             </div>
           )}
-        </article>
-        <article className="connections-panel connections-panel--mini">
-          <header>
-            <div>
-              <p>{copy.messagingAccess}</p>
-              <h2>{copy.connections}</h2>
-            </div>
-            <span>
+        </Panel>
+        <Panel
+          as="article"
+          className="connections-panel connections-panel--mini"
+          eyebrow={copy.messagingAccess}
+          title={copy.connections}
+          rightSlot={
+            <span className="count-pill">
               {connections.filter((item) => item.state === "ACCEPTED").length}{" "}
               {copy.active}
             </span>
-          </header>
+          }
+        >
           {connections.length === 0 ? (
             <CompactEmpty
               title={copy.noConnections}
@@ -501,7 +513,7 @@ export function ConnectionsWorkspace({
               ))}
             </div>
           )}
-        </article>
+        </Panel>
         <aside
           className="connections-notification-strip"
           data-populated={notifications.length > 0}
@@ -561,50 +573,19 @@ function CompactEmpty({
 }
 
 function ConsentFlowIcon({ step }: { step: number }) {
-  if (step === 1)
-    return (
-      <svg viewBox="0 0 24 24">
-        <circle cx="9" cy="7" r="3" />
-        <path d="M3.5 20.5a5.5 5.5 0 0 1 11 0M18 7v6m-3-3h6" />
-      </svg>
-    );
-  if (step === 2)
-    return (
-      <svg viewBox="0 0 24 24">
-        <path d="m5 12 4.2 4.2L19 6.5" />
-        <path d="M21 12a9 9 0 1 1-3-6.7" />
-      </svg>
-    );
-  return (
-    <svg viewBox="0 0 24 24">
-      <path d="M19.5 11.5A4.5 4.5 0 0 1 15 16h-5l-4.5 3v-7.5A4.5 4.5 0 0 1 10 7h2" />
-      <rect x="14" y="6.5" width="6" height="5.5" rx="1" />
-      <path d="M15.5 6.5V5a1.5 1.5 0 0 1 3 0v1.5" />
-    </svg>
-  );
+  const Icon =
+    step === 1 ? UserRoundPlus : step === 2 ? ShieldCheck : MessageSquareLock;
+  return <Icon aria-hidden="true" />;
 }
 
 function ArrowIcon() {
-  return (
-    <svg viewBox="0 0 24 24">
-      <path d="M4 12h15m-5-5 5 5-5 5" />
-    </svg>
-  );
+  return <ArrowRight aria-hidden="true" />;
 }
 
 function EmptyStateIcon() {
-  return (
-    <svg viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="7" />
-      <path d="M12 8v4m0 3h.01" />
-    </svg>
-  );
+  return <CircleHelp aria-hidden="true" />;
 }
 
 function NotificationIcon() {
-  return (
-    <svg viewBox="0 0 24 24">
-      <path d="M18 10a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
-    </svg>
-  );
+  return <Bell aria-hidden="true" />;
 }

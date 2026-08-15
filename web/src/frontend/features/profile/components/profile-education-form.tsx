@@ -1,6 +1,7 @@
 "use client";
 
 import { useFieldArray, useForm } from "react-hook-form";
+import { useState } from "react";
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
 import type {
   ProfileEditorFeedback,
@@ -12,7 +13,11 @@ import {
   useUnsavedChangesGuard,
 } from "../client/unsaved-changes";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { ProfileCompactSection } from "./profile-compact-section";
 import { ProfileSaveFeedback } from "./profile-save-feedback";
+import { formatProfileDateRange } from "./profile-display";
+import { CirclePlus, GraduationCap } from "lucide-react";
+import { Badge } from "@/frontend/components/ui/badge";
 
 type EducationValues = {
   education: Array<{
@@ -49,8 +54,9 @@ export function ProfileEducationForm({
   const copy =
     locale === "vi"
       ? {
-          kicker: "HỌC VẤN",
-          title: "Học vấn",
+          kicker: "Học vấn",
+          title: "Quá trình học tập",
+          count: (count: number) => `${count} mục`,
           saving: "Đang lưu học vấn…",
           save: "Lưu học vấn",
           empty: "Bạn chưa thêm thông tin học vấn.",
@@ -64,11 +70,14 @@ export function ProfileEducationForm({
           up: "Di chuyển lên",
           down: "Di chuyển xuống",
           remove: "Xóa",
-          add: "Thêm học vấn",
+          add: "+ Thêm học vấn",
+          addOther: "Thêm bằng cấp hoặc chứng chỉ",
         }
       : {
-          kicker: "LEARNING",
-          title: "Education",
+          kicker: "Education",
+          title: "Academic background",
+          count: (count: number) =>
+            `${count} ${count === 1 ? "item" : "items"}`,
           saving: "Saving education…",
           save: "Save education",
           empty: "No education added yet.",
@@ -82,8 +91,11 @@ export function ProfileEducationForm({
           up: "Move up",
           down: "Move down",
           remove: "Remove",
-          add: "Add education",
+          add: "+ Add education",
+          addOther: "Add degree or certification",
         };
+  const editLabel = locale === "vi" ? "Chỉnh sửa học vấn" : "Edit education";
+  const cancelLabel = locale === "vi" ? "Hủy" : "Cancel";
   const {
     control,
     register,
@@ -96,19 +108,103 @@ export function ProfileEducationForm({
     name: "education",
     keyName: "fieldKey",
   });
+  const hasEducation = profile.education.length > 0;
+  const [isEditing, setIsEditing] = useState(!hasEducation);
 
   useServerFormReconciliation(valuesFrom(profile), reset);
-  useUnsavedChangesGuard(isDirty);
+  useUnsavedChangesGuard(isDirty && isEditing);
 
   const fieldError = (path: string) => feedback?.fieldErrors?.[path]?.[0];
+
+  if (!isEditing) {
+    return (
+      <ProfileCompactSection
+        sectionId="profile-education-section"
+        titleId="profile-education-title"
+        kicker={copy.kicker}
+        title={copy.title}
+        mark="ED"
+        count={copy.count(profile.education.length)}
+        feedback={<ProfileSaveFeedback feedback={feedback} />}
+        content={
+          hasEducation ? (
+            <>
+              <div
+                className="edu-row sh-education-grid"
+                aria-label="Saved education"
+              >
+                {profile.education.map((entry, idx) => (
+                  <div className="edu-card" key={entry.id || idx}>
+                    <Badge
+                      tone="blue"
+                      icon={<GraduationCap />}
+                      aria-hidden="true"
+                    />
+                    <div>
+                      <p className="edu-title">{entry.degree}</p>
+                      <p className="edu-sub">
+                        {entry.institution}
+                        {entry.field ? ` · ${entry.field}` : ""} ·{" "}
+                        {formatProfileDateRange(
+                          entry.startDate,
+                          entry.endDate,
+                          entry.current,
+                          locale,
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  className="edu-card candidate-add-card"
+                  onClick={() => setIsEditing(true)}
+                >
+                  <CirclePlus aria-hidden="true" />
+                  <span className="candidate-add-card__copy">
+                    <strong>{copy.addOther}</strong>
+                  </span>
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="profile-compact-empty-text">
+              <strong>{copy.empty}</strong>
+              <span>
+                {locale === "vi"
+                  ? "Bổ sung quá trình học tập và chuyên ngành của bạn."
+                  : "Add your academic background and field of study."}
+              </span>
+            </div>
+          )
+        }
+        action={
+          <button
+            className={
+              hasEducation
+                ? "profile-section-edit-button btn-ghost"
+                : "profile-section-secondary-button"
+            }
+            style={
+              hasEducation ? { width: "auto", padding: "6px 14px" } : undefined
+            }
+            type="button"
+            onClick={() => setIsEditing(true)}
+          >
+            {hasEducation ? editLabel : copy.add}
+          </button>
+        }
+      />
+    );
+  }
 
   return (
     <form
       id="profile-education-section"
-      className="professional-profile-section"
+      className="candidate-section candidate-section--editing"
       aria-labelledby="profile-education-title"
       onSubmit={handleSubmit(async ({ education }) => {
-        await onSave({
+        const saved = await onSave({
           section: "education",
           education: education.map(({ id, ...entry }) => ({
             ...(id ? { id } : {}),
@@ -117,6 +213,7 @@ export function ProfileEducationForm({
             endDate: entry.endDate || null,
           })),
         });
+        if (saved) setIsEditing(false);
       })}
     >
       <div className="professional-profile-section-heading">
@@ -125,9 +222,23 @@ export function ProfileEducationForm({
           <h2 id="profile-education-title">{copy.title}</h2>
           <UnsavedChangesIndicator dirty={isDirty} />
         </div>
-        <button type="submit" disabled={saving}>
-          {saving ? copy.saving : copy.save}
-        </button>
+        <div className="profile-section-action-group">
+          <button type="submit" disabled={saving}>
+            {saving ? copy.saving : copy.save}
+          </button>
+          {hasEducation ? (
+            <button
+              className="profile-section-secondary-button"
+              type="button"
+              onClick={() => {
+                reset(valuesFrom(profile));
+                setIsEditing(false);
+              }}
+            >
+              {cancelLabel}
+            </button>
+          ) : null}
+        </div>
       </div>
       <ProfileSaveFeedback feedback={feedback} />
       {fields.length === 0 ? <p>{copy.empty}</p> : null}
@@ -250,6 +361,7 @@ export function ProfileEducationForm({
       <div className="professional-profile-add-row">
         <button
           type="button"
+          aria-label={locale === "vi" ? "Thêm học vấn" : "Add education"}
           disabled={fields.length >= 50}
           onClick={() =>
             append({

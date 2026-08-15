@@ -627,6 +627,7 @@ export const CompanyScalarFieldEnum = {
   slug: 'slug',
   legalName: 'legalName',
   displayName: 'displayName',
+  entityType: 'entityType',
   logoUrl: 'logoUrl',
   websiteUrl: 'websiteUrl',
   publicDescription: 'publicDescription',

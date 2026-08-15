@@ -8697,6 +8697,35 @@
   background: var(--sh-color-error-bg);
 }
 
+/* Keep the saved state above the later action-color overrides and fill the full heart. */
+.job-redesign-card
+  .job-card-row-actions
+  > .job-heart-button[aria-pressed="true"],
+.job-redesign-card
+  .job-card-row-actions
+  > .job-save-control
+  .job-heart-button[aria-pressed="true"],
+.job-redesign-card
+  .job-card-grid-actions
+  > .job-heart-button[aria-pressed="true"],
+.job-redesign-card
+  .job-card-grid-actions
+  > .job-save-control
+  .job-heart-button[aria-pressed="true"] {
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-error) 48%,
+    var(--sh-color-border-subtle)
+  );
+  color: var(--sh-color-error);
+  background: var(--sh-color-error-bg);
+}
+
+.job-redesign-card .job-heart-button[aria-pressed="true"] svg {
+  fill: currentColor;
+  stroke: currentColor;
+}
+
 .job-redesign-card .job-card-hover-action svg,
 .job-redesign-card .job-heart-button svg {
   width: 18px;
@@ -8807,7 +8836,9 @@
 
 /* Hide: amber communicates a reversible, non-destructive secondary action. */
 .job-redesign-card .job-card-row-actions > .job-card-hover-action:nth-child(2),
-.job-redesign-card .job-card-grid-actions > .job-card-hover-action:nth-child(2) {
+.job-redesign-card
+  .job-card-grid-actions
+  > .job-card-hover-action:nth-child(2) {
   color: var(--sh-color-warning);
 }
 
@@ -8833,10 +8864,20 @@
 }
 
 /* Save: the heart is outlined in red on hover, matching the action's intent. */
-.job-redesign-card .job-card-row-actions > .job-heart-button,
-.job-redesign-card .job-card-row-actions > .job-save-control .job-heart-button,
-.job-redesign-card .job-card-grid-actions > .job-heart-button,
-.job-redesign-card .job-card-grid-actions > .job-save-control .job-heart-button {
+.job-redesign-card
+  .job-card-row-actions
+  > .job-heart-button:not([aria-pressed="true"]),
+.job-redesign-card
+  .job-card-row-actions
+  > .job-save-control
+  .job-heart-button:not([aria-pressed="true"]),
+.job-redesign-card
+  .job-card-grid-actions
+  > .job-heart-button:not([aria-pressed="true"]),
+.job-redesign-card
+  .job-card-grid-actions
+  > .job-save-control
+  .job-heart-button:not([aria-pressed="true"]) {
   color: var(--sh-color-text-muted);
 }
 
@@ -9065,7 +9106,9 @@
   font-family: var(--sh-font-family-label);
   font-size: var(--sh-font-size-label);
   font-weight: var(--sh-font-weight-semibold);
-  transition: background var(--sh-motion-fast) ease, color var(--sh-motion-fast) ease;
+  transition:
+    background var(--sh-motion-fast) ease,
+    color var(--sh-motion-fast) ease;
 }
 
 .job-filter-actions .job-filter-clear:hover,
