@@ -1,5 +1,5 @@
 import "server-only";
-import { render } from "@react-email/render";
+import { render } from "react-email";
 import { createElement } from "react";
 import { z } from "zod";
 import {

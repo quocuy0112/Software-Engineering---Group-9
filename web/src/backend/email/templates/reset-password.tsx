@@ -7,7 +7,7 @@ import {
   Html,
   Preview,
   Text,
-} from "@react-email/components";
+} from "react-email";
 
 export function ResetPasswordTemplate({ resetUrl }: { resetUrl: string }) {
   return (
