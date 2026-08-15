@@ -5,6 +5,7 @@ import {
   type JobReviewSnapshot,
 } from "@/shared/contracts/recruiter-job-posting";
 import type { JobPostReviewState } from "@/shared/contracts/admin/job-post-review";
+import type { JobCatalogItem } from "@/shared/contracts/jobs/catalog";
 
 export const JOB_REVIEW_SNAPSHOT_SCHEMA_VERSION = "1";
 
@@ -33,6 +34,26 @@ function canonicalJson(value: unknown): string {
 
 export function normalizeJobReviewSnapshot(value: unknown): JobReviewSnapshot {
   return jobReviewSnapshotSchema.parse(normalizeValue(value));
+}
+
+export function jobReviewSnapshotFromCatalog(
+  value: JobCatalogItem,
+  authoritativeCompanyId: string,
+) {
+  const candidate = {
+    ...value,
+    companyId: authoritativeCompanyId,
+  } as Record<string, unknown>;
+  for (const field of [
+    "status",
+    "approvalComment",
+    "isVerified",
+    "postedAt",
+    "updatedAt",
+    "stats",
+  ])
+    delete candidate[field];
+  return normalizeJobReviewSnapshot(candidate);
 }
 
 export function jobReviewSnapshotSha256(value: unknown): string {

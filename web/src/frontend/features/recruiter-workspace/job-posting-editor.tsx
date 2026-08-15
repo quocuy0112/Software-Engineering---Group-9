@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Badge } from "@/frontend/components/ui/badge";
 import {
   formatVndInput,
@@ -145,6 +145,7 @@ export function JobPostingEditor({
 }) {
   const [job, setJob] = useState(initialJob);
   const [saving, setSaving] = useState(false);
+  const submissionKey = useRef<string | null>(null);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<RecruiterJobFieldErrors>({});
   const [openSections, setOpenSections] = useState<boolean[]>(
@@ -337,14 +338,21 @@ export function JobPostingEditor({
     setSaving(true);
     setError("");
     try {
+      if (
+        targetStatus === "pending_approval" &&
+        !window.confirm(
+          "Submit this exact version for Administrator review? You cannot edit it while the review is pending.",
+        )
+      )
+        return;
       const method = prepared.id === "new-job" ? "POST" : "PATCH";
       const response = await fetch("/api/recruiter/job-postings", {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
           method === "POST"
-            ? { job: prepared, status: targetStatus }
-            : { ...prepared, status: targetStatus },
+            ? { job: prepared, status: "draft" }
+            : { ...prepared, status: "draft" },
         ),
       });
       const payload = (await response.json().catch(() => null)) as
@@ -360,6 +368,40 @@ export function JobPostingEditor({
       }
       if (!payload) {
         setError("The server returned an invalid response.");
+        return;
+      }
+      if (targetStatus === "pending_approval") {
+        submissionKey.current ??= crypto.randomUUID();
+        const submissionResponse = await fetch(
+          `/api/recruiter/job-postings/${encodeURIComponent(payload.id)}/submit-review`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "idempotency-key": submissionKey.current,
+            },
+            body: JSON.stringify({
+              expectedWorkingUpdatedAt: payload.updatedAt,
+            }),
+          },
+        );
+        const review = (await submissionResponse.json().catch(() => null)) as
+          | RecruiterJob["review"]
+          | { message?: string; fieldErrors?: RecruiterJobFieldErrors }
+          | null;
+        if (!submissionResponse.ok || !review || !("reviewId" in review)) {
+          setFieldErrors(
+            review && "fieldErrors" in review ? (review.fieldErrors ?? {}) : {},
+          );
+          setError(
+            review && "message" in review
+              ? (review.message ?? "Unable to submit this posting for review.")
+              : "Unable to submit this posting for review.",
+          );
+          return;
+        }
+        submissionKey.current = null;
+        onSaved({ ...payload, status: "pending_approval", review });
         return;
       }
       onSaved(payload);

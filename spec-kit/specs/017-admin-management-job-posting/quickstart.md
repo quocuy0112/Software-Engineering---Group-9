@@ -65,6 +65,14 @@ Expected:
 
 ## Administrator Discovery and Claim
 
+### Recorded User Story 1 evidence (2026-08-15)
+
+- Foundation commit: `1cf616d feat: add job post review foundation`.
+- `npm.cmd run typecheck`: passed.
+- Focused ESLint for the submission route, review services, Recruiter UI, and tests: passed.
+- Focused Vitest command for submission contract, isolation, concurrency/failure boundaries, notification producer, Recruiter persistence/UI/accessibility, and architecture: 10 files passed, 22 tests passed.
+- Database-connected migration, writer preflight, and end-to-end checks remain release gates and were not represented as locally passed by these isolated tests.
+
 1. Open each active Administrator console and wait at most five seconds.
 2. Confirm the unread count and generic alert contain no title, company name, submitter identity, reason, evidence, or note.
 3. Open the alert and confirm it reaches the exact protected review.

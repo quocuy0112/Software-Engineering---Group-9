@@ -1562,3 +1562,31 @@
     grid-template-columns: 1fr;
   }
 }
+.recruiter-review-state {
+  margin: 0.75rem 0;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid currentColor;
+  border-radius: 0.75rem;
+  line-height: 1.45;
+}
+
+.recruiter-review-state--pending_review {
+  color: #854d0e;
+  background: #fefce8;
+}
+
+.recruiter-review-state--rejected {
+  color: #991b1b;
+  background: #fef2f2;
+}
+
+.recruiter-review-state--approved {
+  color: #166534;
+  background: #f0fdf4;
+}
+
+@media (max-width: 640px) {
+  .recruiter-review-state {
+    font-size: 0.875rem;
+  }
+}

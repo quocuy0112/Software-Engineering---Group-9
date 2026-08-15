@@ -7,6 +7,7 @@ import {
   type JobPostingStatus,
 } from "./jobs/catalog";
 import { z } from "zod";
+import type { RecruiterReviewProjection } from "./admin/job-post-review";
 
 export { companyCatalogSchema, jobCatalogSchema, jobPostingStatusSchema };
 export type { CompanyCatalogItem, JobCatalogItem, JobPostingStatus };
@@ -85,6 +86,7 @@ export type RecruiterCompanyView = Omit<
   >;
 export type RecruiterJob = JobCatalogItem & {
   company: RecruiterCompanyView;
+  review?: RecruiterReviewProjection;
 };
 
 export type RecruiterJobManagementData = {

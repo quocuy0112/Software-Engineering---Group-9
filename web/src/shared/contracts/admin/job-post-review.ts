@@ -159,3 +159,6 @@ export type JobPostReviewReasonCode = z.infer<
   typeof jobPostReviewReasonCodeSchema
 >;
 export type AdminReviewCommand = z.infer<typeof adminReviewCommandSchema>;
+export type RecruiterReviewProjection = z.infer<
+  typeof recruiterReviewProjectionSchema
+>;

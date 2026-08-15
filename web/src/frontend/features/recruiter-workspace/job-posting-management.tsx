@@ -204,6 +204,20 @@ function JobPostingCard({
           <span aria-hidden="true">|</span>
           {arrangementLabel(job)}
         </p>
+        {job.review ? (
+          <p
+            className={`recruiter-review-state recruiter-review-state--${job.review.state.toLowerCase()}`}
+            role="status"
+          >
+            <strong>
+              Review version {job.review.sequence}:{" "}
+              {job.review.state.replace("_", " ")}
+            </strong>
+            {job.review.readOnly
+              ? " — This submitted version is locked while an Administrator reviews it."
+              : null}
+          </p>
+        ) : null}
         <div className="recruiter-job-card__chips" aria-label="Skills">
           {job.skillTags.slice(0, 6).map((skill) => (
             <span className="recruiter-skill-chip" key={skill}>
@@ -350,7 +364,7 @@ function CompanyProfileRequiredState({
 }: {
   missingFields: Array<"name" | "industry" | "size" | "address" | "logo">;
 }) {
-  const labels: Record<typeof missingFields[number], string> = {
+  const labels: Record<(typeof missingFields)[number], string> = {
     name: "Company name",
     industry: "Industry",
     size: "Company size",
@@ -364,12 +378,19 @@ function CompanyProfileRequiredState({
       </span>
       <div>
         <h2>Complete company profile before posting</h2>
-        <p>Create job posting is locked until the following fields are complete.</p>
+        <p>
+          Create job posting is locked until the following fields are complete.
+        </p>
         <ul className="recruiter-company-required__list">
-          {missingFields.map((field) => <li key={field}>{labels[field]}</li>)}
+          {missingFields.map((field) => (
+            <li key={field}>{labels[field]}</li>
+          ))}
         </ul>
       </div>
-      <Link className="recruiter-primary-button" href="/recruiter/company-settings?required=profile">
+      <Link
+        className="recruiter-primary-button"
+        href="/recruiter/company-settings?required=profile"
+      >
         Open company settings
       </Link>
     </section>
@@ -378,7 +399,10 @@ function CompanyProfileRequiredState({
 export function RecruiterJobPostingManagement({
   initialData,
   onNavigate,
-}: { initialData?: RecruiterJobManagementData | null; onNavigate?: (href: string) => void } = {}) {
+}: {
+  initialData?: RecruiterJobManagementData | null;
+  onNavigate?: (href: string) => void;
+} = {}) {
   const [data, setData] = useState<RecruiterJobManagementData | null>(
     initialData ?? null,
   );
@@ -487,7 +511,7 @@ export function RecruiterJobPostingManagement({
       return;
     }
     if (onNavigate) {
-      onNavigate('/recruiter/jobs/create');
+      onNavigate("/recruiter/jobs/create");
       return;
     }
     setEditorJob(createEmptyJobPosting(current.companyId));
@@ -602,12 +626,26 @@ export function RecruiterJobPostingManagement({
             <h1>Job postings</h1>
             <p>Complete the company identity before opening a new role.</p>
           </div>
-          <button type="button" className="recruiter-primary-button" onClick={openCreate}>
+          <button
+            type="button"
+            className="recruiter-primary-button"
+            onClick={openCreate}
+          >
             <Icon name="plus" />
             Create job posting
           </button>
         </header>
-        <CompanyProfileRequiredState missingFields={current.missingCompanyProfileFields ?? ["name", "industry", "size", "address", "logo"]} />
+        <CompanyProfileRequiredState
+          missingFields={
+            current.missingCompanyProfileFields ?? [
+              "name",
+              "industry",
+              "size",
+              "address",
+              "logo",
+            ]
+          }
+        />
       </div>
     );
   }
@@ -779,7 +817,7 @@ export function RecruiterJobPostingManagement({
             aria-label="Dismiss message"
             onClick={() => setMessage("")}
           >
-          <Icon name="close" />
+            <Icon name="close" />
           </button>
         </div>
       ) : null}
@@ -787,7 +825,12 @@ export function RecruiterJobPostingManagement({
   );
 }
 
-type RecruiterNavIconName = "overview" | "jobs" | "candidates" | "settings" | "signout";
+type RecruiterNavIconName =
+  | "overview"
+  | "jobs"
+  | "candidates"
+  | "settings"
+  | "signout";
 
 function RecruiterNavIcon({ name }: { name: RecruiterNavIconName }) {
   const paths = {
@@ -826,7 +869,11 @@ function RecruiterNavIcon({ name }: { name: RecruiterNavIconName }) {
     ),
   } as const;
   return (
-    <svg className="nav-icon recruiter-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <svg
+      className="nav-icon recruiter-nav-icon"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
       {paths[name]}
     </svg>
   );
@@ -853,7 +900,8 @@ export function RecruiterWorkspaceNavigation({
       label: "Job postings",
       icon: "jobs",
       href: "/recruiter",
-      active: pathname === "/recruiter" || pathname.startsWith("/recruiter/jobs"),
+      active:
+        pathname === "/recruiter" || pathname.startsWith("/recruiter/jobs"),
     },
     { label: "Candidates", icon: "candidates", active: false },
     {
@@ -881,7 +929,9 @@ export function RecruiterWorkspaceNavigation({
             <>
               <RecruiterNavIcon name={item.icon} />
               <span className="workspace-navigation-label">{item.label}</span>
-              {!item.href ? <span className="recruiter-nav-soon">Soon</span> : null}
+              {!item.href ? (
+                <span className="recruiter-nav-soon">Soon</span>
+              ) : null}
             </>
           );
           return item.href ? (
