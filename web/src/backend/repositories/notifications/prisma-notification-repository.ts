@@ -31,7 +31,14 @@ const decodeCursor = (value?: string): Cursor | null => {
 };
 
 export class PrismaNotificationRepository {
-  constructor(private readonly db: NotificationDb = prisma) {}
+  constructor(
+    private readonly db: NotificationDb = prisma,
+    private readonly audienceScope: "USER" | "ALL" = "USER",
+  ) {}
+
+  private audienceWhere(): Prisma.InAppNotificationWhereInput {
+    return this.audienceScope === "ALL" ? {} : { audience: "USER" };
+  }
 
   async create(input: BuiltNotification & { recipientUserId: string }) {
     const expiresAt = new Date(input.occurredAt.getTime() + retentionMs);
@@ -44,6 +51,7 @@ export class PrismaNotificationRepository {
           kind: input.kind,
           category: input.category,
           severity: input.severity,
+          audience: input.audience,
           title: input.title,
           summary: input.summary,
           variables: input.variables ?? {},
@@ -69,6 +77,7 @@ export class PrismaNotificationRepository {
           kind: input.kind,
           category: input.category,
           severity: input.severity,
+          audience: input.audience,
           title: input.title,
           summary: input.summary,
           variables: input.variables ?? {},
@@ -127,6 +136,7 @@ export class PrismaNotificationRepository {
   }) {
     const cursor = decodeCursor(input.cursor);
     const where: Prisma.InAppNotificationWhereInput = {
+      ...this.audienceWhere(),
       recipientUserId: input.recipientUserId,
       expiresAt: { gt: input.now },
       ...(input.category ? { category: input.category } : {}),
@@ -166,13 +176,19 @@ export class PrismaNotificationRepository {
 
   unreadCount(recipientUserId: string, now: Date) {
     return this.db.inAppNotification.count({
-      where: { recipientUserId, readAt: null, expiresAt: { gt: now } },
+      where: {
+        ...this.audienceWhere(),
+        recipientUserId,
+        readAt: null,
+        expiresAt: { gt: now },
+      },
     });
   }
 
   markRead(recipientUserId: string, notificationId: string, now: Date) {
     return this.db.inAppNotification.updateMany({
       where: {
+        ...this.audienceWhere(),
         id: notificationId,
         recipientUserId,
         readAt: null,
@@ -185,6 +201,7 @@ export class PrismaNotificationRepository {
   hasAvailable(recipientUserId: string, notificationId: string, now: Date) {
     return this.db.inAppNotification.findFirst({
       where: {
+        ...this.audienceWhere(),
         id: notificationId,
         recipientUserId,
         expiresAt: { gt: now },
@@ -195,7 +212,12 @@ export class PrismaNotificationRepository {
 
   markAllRead(recipientUserId: string, now: Date) {
     return this.db.inAppNotification.updateMany({
-      where: { recipientUserId, readAt: null, expiresAt: { gt: now } },
+      where: {
+        ...this.audienceWhere(),
+        recipientUserId,
+        readAt: null,
+        expiresAt: { gt: now },
+      },
       data: { readAt: now },
     });
   }
@@ -208,6 +230,7 @@ export class PrismaNotificationRepository {
   ) {
     return this.db.inAppNotification.updateMany({
       where: {
+        ...this.audienceWhere(),
         recipientUserId,
         contextType,
         contextId,

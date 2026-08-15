@@ -8,6 +8,8 @@ import {
   type FormEvent,
 } from "react";
 
+import { Button } from "@/frontend/components/ui/button";
+import { SelectableCard } from "@/frontend/components/ui/cv-import-primitives";
 import type { CvParserClass } from "@/shared/contracts/cv-import/common";
 import { CV_SOURCE_MAX_BYTES } from "@/shared/contracts/cv-import/common";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
@@ -31,10 +33,7 @@ export function CvUploadForm({
   parserAvailability = { deterministic: true, external: true },
 }: {
   csrfProof: string;
-  parserAvailability?: Readonly<{
-    deterministic: boolean;
-    external: boolean;
-  }>;
+  parserAvailability?: Readonly<{ deterministic: boolean; external: boolean }>;
   onUpload(
     file: File,
     parserClass: CvParserClass,
@@ -69,12 +68,12 @@ export function CvUploadForm({
     else errorRef.current?.focus();
   }, [error]);
 
-  const showError = (value: string, focusFile = false) => {
+  function showError(value: string, focusFile = false) {
     focusFileAfterError.current = focusFile;
     setError(value);
-  };
+  }
 
-  const choose = (candidate: File | null) => {
+  function choose(candidate: File | null) {
     setError(null);
     if (!candidate) return setFile(null);
     const extension = accepted.get(candidate.type);
@@ -102,9 +101,22 @@ export function CvUploadForm({
         ? `${candidate.name} sẵn sàng để tải lên.`
         : `${candidate.name} is ready to upload.`,
     );
-  };
+  }
 
-  const submit = async (event: FormEvent) => {
+  function selectParser(nextParser: CvParserClass) {
+    setParserClass(nextParser);
+    setMessage(
+      nextParser === "EXTERNAL_OPENAI"
+        ? locale === "vi"
+          ? "Đã chọn OpenAI. Bạn sẽ cấp quyền sau khi trích xuất văn bản an toàn."
+          : "OpenAI selected. You will grant consent after secure text extraction."
+        : locale === "vi"
+          ? "Đã chọn bộ phân tích SmartHire cho CV này."
+          : "SmartHire parser selected for this CV.",
+    );
+  }
+
+  async function submit(event: FormEvent) {
     event.preventDefault();
     if (!file)
       return showError(
@@ -118,6 +130,7 @@ export function CvUploadForm({
           ? "Hiện không có bộ phân tích CV khả dụng."
           : "No CV parser is currently available.",
       );
+
     setBusy(true);
     setError(null);
     setMessage(locale === "vi" ? "Đang tải CV…" : "Uploading CV…");
@@ -130,13 +143,15 @@ export function CvUploadForm({
       );
     } catch (cause) {
       showError(
-        cause instanceof Error && cause.message.includes("not available")
-          ? locale === "vi"
-            ? "Bộ phân tích đã chọn hiện không khả dụng. Hãy kiểm tra cấu hình rồi thử lại."
-            : cause.message
-          : locale === "vi"
-            ? "Tải CV không thành công. Hãy thử lại hoặc nhập hồ sơ thủ công."
-            : "The CV upload failed. Try again or enter your profile manually.",
+        cause instanceof Error && !cause.message.startsWith("CV_")
+          ? cause.message
+          : cause instanceof Error && cause.message.includes("not available")
+            ? locale === "vi"
+              ? "Bộ phân tích đã chọn hiện không khả dụng. Hãy kiểm tra cấu hình rồi thử lại."
+              : cause.message
+            : locale === "vi"
+              ? "Tải CV không thành công. Hãy thử lại hoặc nhập hồ sơ thủ công."
+              : "The CV upload failed. Try again or enter your profile manually.",
       );
       setMessage(
         locale === "vi" ? "Tải lên không thành công." : "Upload failed.",
@@ -144,7 +159,7 @@ export function CvUploadForm({
     } finally {
       setBusy(false);
     }
-  };
+  }
 
   return (
     <form
@@ -177,78 +192,50 @@ export function CvUploadForm({
         <legend>{copy.upload.chooseParser}</legend>
         <p className={styles.parserGuidance}>{copy.upload.parserGuidance}</p>
         <div className={styles.parserOptions}>
-          <label
-            className={styles.parserOption}
-            data-selected={parserClass === "DETERMINISTIC_INTERNAL"}
-            data-disabled={!parserAvailability.deterministic}
-          >
-            <input
-              type="radio"
-              name="cv-upload-parser"
-              value="DETERMINISTIC_INTERNAL"
-              checked={parserClass === "DETERMINISTIC_INTERNAL"}
-              onChange={() => {
-                setParserClass("DETERMINISTIC_INTERNAL");
-                setMessage(
-                  locale === "vi"
-                    ? "Đã chọn bộ phân tích SmartHire cho CV này."
-                    : "SmartHire parser selected for this CV.",
-                );
-              }}
-              disabled={busy || !hydrated || !parserAvailability.deterministic}
-            />
-            <span className={styles.parserMark} aria-hidden="true">
-              SH
-            </span>
-            <span className={styles.parserCopy}>
-              <strong>{copy.upload.deterministic}</strong>
-              <small>{copy.upload.deterministicHint}</small>
-            </span>
-            <span className={styles.parserBadge}>
-              {parserAvailability.deterministic
+          <SelectableCard
+            avatarLabel="SH"
+            title={copy.upload.deterministic}
+            description={copy.upload.deterministicHint}
+            statusLabel={
+              parserAvailability.deterministic
                 ? copy.upload.local
-                : copy.upload.unavailable}
-            </span>
-          </label>
-          <label
-            className={styles.parserOption}
-            data-selected={parserClass === "EXTERNAL_OPENAI"}
-            data-disabled={!parserAvailability.external}
-          >
-            <input
-              type="radio"
-              name="cv-upload-parser"
-              value="EXTERNAL_OPENAI"
-              checked={parserClass === "EXTERNAL_OPENAI"}
-              onChange={() => {
-                setParserClass("EXTERNAL_OPENAI");
-                setMessage(
-                  locale === "vi"
-                    ? "Đã chọn OpenAI. Bạn sẽ cấp quyền sau khi trích xuất văn bản an toàn."
-                    : "OpenAI selected. You will grant consent after secure text extraction.",
-                );
-              }}
-              disabled={busy || !hydrated || !parserAvailability.external}
-            />
-            <span className={styles.parserMark} aria-hidden="true">
-              AI
-            </span>
-            <span className={styles.parserCopy}>
-              <strong>{copy.upload.external}</strong>
-              <small>{copy.upload.externalHint}</small>
-            </span>
-            <span className={styles.parserBadge}>
-              {parserAvailability.external
+                : copy.upload.unavailable
+            }
+            selected={parserClass === "DETERMINISTIC_INTERNAL"}
+            inputProps={{
+              type: "radio",
+              name: "cv-upload-parser",
+              value: "DETERMINISTIC_INTERNAL",
+              checked: parserClass === "DETERMINISTIC_INTERNAL",
+              onChange: () => selectParser("DETERMINISTIC_INTERNAL"),
+              disabled: busy || !hydrated || !parserAvailability.deterministic,
+            }}
+          />
+          <SelectableCard
+            avatarLabel="AI"
+            title={copy.upload.external}
+            description={copy.upload.externalHint}
+            statusLabel={
+              parserAvailability.external
                 ? copy.upload.aiReady
-                : copy.upload.notConfigured}
-            </span>
-          </label>
+                : copy.upload.notConfigured
+            }
+            selected={parserClass === "EXTERNAL_OPENAI"}
+            inputProps={{
+              type: "radio",
+              name: "cv-upload-parser",
+              value: "EXTERNAL_OPENAI",
+              checked: parserClass === "EXTERNAL_OPENAI",
+              onChange: () => selectParser("EXTERNAL_OPENAI"),
+              disabled: busy || !hydrated || !parserAvailability.external,
+            }}
+          />
         </div>
       </fieldset>
       <div className={styles.actions}>
-        <button type="submit" disabled={!hydrated || busy || !parserClass}>
+        <Button type="submit" disabled={!hydrated || busy || !parserClass}>
           {busy ? copy.upload.uploading : copy.upload.upload}
-        </button>
+        </Button>
         <a href="/profile">{copy.upload.manual}</a>
       </div>
       <p className={styles.status} role="status" aria-live="polite">

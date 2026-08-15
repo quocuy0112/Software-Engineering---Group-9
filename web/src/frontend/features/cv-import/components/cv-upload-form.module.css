@@ -9,6 +9,7 @@
 .field {
   display: grid;
   min-width: 0;
+  grid-column: 1 / -1;
   align-content: start;
   gap: var(--sh-space-2);
   color: var(--sh-color-text-primary);

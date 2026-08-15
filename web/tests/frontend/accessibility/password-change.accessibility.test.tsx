@@ -26,6 +26,22 @@ afterEach(() => {
 });
 
 describe("password-change accessibility", () => {
+  it("shows a saved security state until the user chooses to edit", () => {
+    render(
+      <PasswordChangeForm csrfProof="csrf-proof" initiallyEditing={false} />,
+    );
+    expect(screen.getByText("Password protected")).toBeVisible();
+    expect(screen.queryByLabelText("Current password")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Change password" }));
+    expect(screen.getByLabelText("Current password")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Cancel" })).toBeVisible();
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.getByText("Password protected")).toBeVisible();
+    expect(screen.queryByLabelText("Current password")).not.toBeInTheDocument();
+  });
+
   it("labels all fields, permits paste, exposes autocomplete, and toggles each field's visibility", () => {
     render(<PasswordChangeForm csrfProof="csrf-proof" />);
     const current = screen.getByLabelText("Current password");

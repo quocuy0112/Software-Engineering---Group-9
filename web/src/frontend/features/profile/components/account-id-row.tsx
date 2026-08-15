@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Check, Copy } from "lucide-react";
+import type { ReactNode } from "react";
+import { InfoRow } from "@/frontend/components/ui/info-row";
 
 type CopyState = "idle" | "copied" | "failed";
 
@@ -10,12 +13,14 @@ export function AccountIdRow({
   copyLabel,
   copiedLabel,
   failedLabel,
+  icon,
 }: {
   accountId: string;
   label: string;
   copyLabel: string;
   copiedLabel: string;
   failedLabel: string;
+  icon?: ReactNode;
 }) {
   const [copyState, setCopyState] = useState<CopyState>("idle");
   const resetTimer = useRef<number | null>(null);
@@ -72,33 +77,33 @@ export function AccountIdRow({
         : "";
 
   return (
-    <div>
-      <dt>{label}</dt>
-      <dd className="profile-account-id-value">
-        <code>{accountId}</code>
-        <button
-          type="button"
-          aria-label={copyState === "copied" ? copiedLabel : copyLabel}
-          data-state={copyState}
-          onClick={() => void copyAccountId()}
-        >
-          {copyState === "copied" ? (
-            <svg aria-hidden="true" viewBox="0 0 24 24">
-              <path d="m5 12 4 4L19 6" />
-            </svg>
-          ) : (
-            <svg aria-hidden="true" viewBox="0 0 24 24">
-              <rect x="9" y="9" width="10" height="10" rx="2" />
-              <path d="M15 9V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
-            </svg>
-          )}
-        </button>
-        {feedback ? (
-          <span className="sr-only" role="status" aria-live="polite">
-            {feedback}
-          </span>
-        ) : null}
-      </dd>
-    </div>
+    <InfoRow
+      asDefinition
+      className="sh-info-row--account-id"
+      icon={icon}
+      label={label}
+      value={
+        <span className="profile-account-id-value">
+          <code>{accountId}</code>
+          <button
+            type="button"
+            aria-label={copyState === "copied" ? copiedLabel : copyLabel}
+            data-state={copyState}
+            onClick={() => void copyAccountId()}
+          >
+            {copyState === "copied" ? (
+              <Check aria-hidden="true" size={18} />
+            ) : (
+              <Copy aria-hidden="true" size={18} />
+            )}
+          </button>
+          {feedback ? (
+            <span className="sr-only" role="status" aria-live="polite">
+              {feedback}
+            </span>
+          ) : null}
+        </span>
+      }
+    />
   );
 }

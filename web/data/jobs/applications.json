@@ -47,5 +47,12 @@
     "userId": "f41f1f3e-48a1-4a1c-85ac-53e65fa70a51",
     "appliedAt": "2026-08-15T14:10:01.360Z",
     "status": "applied"
+  },
+  {
+    "id": "application-72725fce-c8d4-41f7-b1ee-8821506d8542",
+    "jobId": "job-004515",
+    "userId": "f0056930-6a7d-4880-8ec7-bd78afc162cb",
+    "appliedAt": "2026-08-15T16:16:35.304Z",
+    "status": "applied"
   }
 ]

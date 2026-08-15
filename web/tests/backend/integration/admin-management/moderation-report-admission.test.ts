@@ -1,18 +1,43 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { prisma } from "@/backend/database/prisma";
 import { ModerationSubmissionService } from "@/backend/admin/moderation/moderation-submission-service";
 import {
   createJobBoardDatabaseFixture,
   deleteJobBoardDatabaseFixture,
   type JobBoardDatabaseFixture,
 } from "../../../helpers/job-board-database-fixture";
+import { cleanupAdministratorNotificationsForContexts } from "../../../helpers/notifications/admin-notification-cleanup";
 
 describe("moderation admission", () => {
   let fixture: JobBoardDatabaseFixture;
+  const adminId = `moderation-notification-admin-${crypto.randomUUID()}`;
   beforeAll(async () => {
     fixture = await createJobBoardDatabaseFixture();
+    await prisma.userAccount.create({
+      data: {
+        id: adminId,
+        name: "Moderation Notification Admin",
+        email: `${adminId}@example.test`,
+        normalizedEmail: `${adminId}@example.test`,
+        emailVerified: true,
+        state: "ACTIVE",
+        platformAdministratorGrants: { create: {} },
+      },
+    });
   });
   afterAll(async () => {
+    const reportIds = (
+      await prisma.moderationReport.findMany({
+        where: { reporterUserId: { in: fixture.userIds } },
+        select: { id: true },
+      })
+    ).map(({ id }) => id);
+    await cleanupAdministratorNotificationsForContexts(reportIds);
     await deleteJobBoardDatabaseFixture(fixture);
+    await prisma.platformAdministratorGrant.deleteMany({
+      where: { userId: adminId },
+    });
+    await prisma.userAccount.deleteMany({ where: { id: adminId } });
   });
   it("deduplicates a reporter/target/category during the rolling day with a neutral receipt", async () => {
     const actor = { userId: fixture.userIds[0]!, sessionId: "session-a" };
@@ -37,6 +62,15 @@ describe("moderation admission", () => {
       duplicate: true,
       message: "Thanks. Your concern was received for review.",
     });
+    expect(
+      await prisma.inAppNotification.findMany({
+        where: {
+          recipientUserId: adminId,
+          kind: "MODERATION_REPORT_RECEIVED_ADMIN" as never,
+          contextId: first.reportId,
+        },
+      }),
+    ).toHaveLength(1);
   });
   it("returns the same unavailable outcome for an unknown public target", async () => {
     await expect(

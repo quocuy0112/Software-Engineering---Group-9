@@ -540,6 +540,8 @@ export function cvKnownError(locale: CvLocale, message: string, code?: string) {
     CSRF_REJECTED: "Phiên bảo mật đã hết hạn. Hãy tải lại trang và thử lại.",
     CV_PROCESSING_UNAVAILABLE: "Xử lý CV hiện không khả dụng. Hãy thử lại sau.",
     CV_QUOTA_EXCEEDED: "Bạn đã đạt giới hạn số lần nhập CV.",
+    UPLOAD_RATE_LIMITED:
+      "Bạn đã đạt giới hạn 5 lượt tải CV trong một giờ. Hãy thử lại sau.",
     CONSENT_REQUIRED:
       "Cần cấp quyền đồng ý trước khi tiếp tục xử lý bên ngoài.",
     RETRY_LIMIT_REACHED: "Đã hết số lượt thử lại cho lần nhập này.",

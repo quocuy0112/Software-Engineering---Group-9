@@ -59,17 +59,9 @@
     var(--sh-color-brand-soft)
   );
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 82%),
+    inset 0 1px 0 color-mix(in srgb, var(--sh-profile-surface) 82%, transparent),
     0 8px 18px
       color-mix(in srgb, var(--sh-color-brand-primary) 13%, transparent);
-}
-
-.connections-flow__icon[data-step="2"] {
-  color: #7c3aed;
-  background: linear-gradient(135deg, #faf6ff, #f0e8fd);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 82%),
-    0 8px 18px rgb(124 58 237 / 12%);
 }
 
 .connections-flow__icon[data-step="3"] {
@@ -80,7 +72,7 @@
     var(--sh-color-success-bg)
   );
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 82%),
+    inset 0 1px 0 color-mix(in srgb, var(--sh-profile-surface) 82%, transparent),
     0 8px 18px color-mix(in srgb, var(--sh-color-success) 12%, transparent);
 }
 
@@ -104,9 +96,9 @@
 
 .connections-flow__step h2 {
   color: var(--sh-color-text-primary);
-  font-family: var(--sh-font-family);
+  font-family: var(--sh-profile-font-body);
   font-size: var(--sh-font-size-body);
-  font-weight: var(--sh-font-weight-semibold);
+  font-weight: 700;
   line-height: var(--sh-line-height-body);
 }
 
@@ -161,19 +153,22 @@
 
 .connections-panel > header p {
   color: var(--sh-color-brand-primary);
-  font-family: var(--sh-font-family-label);
-  font-size: 10px;
-  font-weight: var(--sh-font-weight-bold);
-  line-height: var(--sh-line-height-caption);
-  letter-spacing: 0.1em;
+  font-family: var(--sh-profile-font-label);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .connections-panel > header h2 {
-  margin-top: var(--sh-space-2);
-  color: var(--sh-color-text-primary);
-  font-family: var(--sh-font-family);
-  font-size: var(--sh-font-size-h3);
-  line-height: var(--sh-line-height-h3);
+  margin-top: 6px;
+  color: var(--sh-profile-text);
+  font-family: var(--sh-profile-font-body);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0;
 }
 
 .connections-panel > header > span {
@@ -258,7 +253,11 @@
   place-items: center;
   border-radius: var(--sh-radius-sm);
   color: var(--sh-color-brand-primary);
-  background: linear-gradient(135deg, var(--sh-color-brand-soft), #f2ecfc);
+  background: linear-gradient(
+    135deg,
+    var(--sh-profile-primary-light),
+    var(--sh-profile-surface-alt)
+  );
   font-weight: var(--sh-font-weight-bold);
 }
 

@@ -16,7 +16,6 @@ import {
   canonicalParserOutputBytes,
   cvParserAnyOutputSchema,
   cvParserOutputSchema,
-  cvParserOutputV2Schema,
   validateParserEvidenceMembership,
 } from "@/shared/contracts/cv-import/parser-output";
 import { CV_EXTRACTED_TEXT_MAX_BYTES } from "@/shared/contracts/cv-import/common";
@@ -40,7 +39,12 @@ type ResponsesCreate = (
     maxRetries?: number;
     signal?: AbortSignal;
   }>,
-) => Promise<Pick<Response, "id" | "output_text">>;
+) => Promise<
+  Pick<Response, "id" | "output_text"> &
+    Partial<
+      Pick<Response, "status" | "incomplete_details" | "error" | "output">
+    >
+>;
 
 type OpenAiParserClient = Readonly<{
   responses: Readonly<{ create: ResponsesCreate }>;
@@ -112,6 +116,94 @@ function serializedSegments(input: CvParserInput): string {
   return value;
 }
 
+type ParsedProviderOutput = Readonly<{
+  output: ReturnType<typeof cvParserAnyOutputSchema.parse>;
+  inputVersion: ReturnType<typeof cvParserInputVersion>;
+}>;
+
+function responseContainsRefusal(
+  response: Awaited<ReturnType<ResponsesCreate>>,
+): boolean {
+  return Boolean(
+    response.output?.some(
+      (item) =>
+        item.type === "message" &&
+        item.content.some((content) => content.type === "refusal"),
+    ),
+  );
+}
+
+function assertResponseCanBeParsed(
+  response: Awaited<ReturnType<ResponsesCreate>>,
+): void {
+  if (response.status === "incomplete") {
+    if (response.incomplete_details?.reason === "max_output_tokens")
+      safeError("PARSER_OUTPUT_LIMIT_EXCEEDED");
+    safeError("PARSER_UNAVAILABLE");
+  }
+  if (response.status === "failed" || response.error)
+    safeError("PARSER_UNAVAILABLE");
+  if (responseContainsRefusal(response)) safeError("PARSER_UNAVAILABLE");
+}
+
+function parseProviderOutput(
+  response: Awaited<ReturnType<ResponsesCreate>>,
+  input: CvParserInput,
+): ParsedProviderOutput {
+  assertResponseCanBeParsed(response);
+  if (
+    typeof response.output_text !== "string" ||
+    new TextEncoder().encode(response.output_text).byteLength >
+      CV_DRAFT_MAX_BYTES
+  ) {
+    safeError("PARSER_OUTPUT_LIMIT_EXCEEDED");
+  }
+  let value: unknown;
+  try {
+    value = JSON.parse(response.output_text);
+  } catch {
+    safeError("PARSER_OUTPUT_INVALID");
+  }
+  const parsedV1 = cvParserOutputSchema.safeParse(value);
+  if (!parsedV1.success) safeError("PARSER_OUTPUT_INVALID");
+  const inputVersion = cvParserInputVersion(input);
+  const candidate =
+    inputVersion === "cv-segments-v2"
+      ? {
+          ...parsedV1.data,
+          schemaVersion: "cv-draft-v2" as const,
+          segmentEvidence: input.segments.flatMap((segment) => {
+            if (!("source" in segment) || !("confidence" in segment)) return [];
+            return [
+              {
+                segmentId: segment.id,
+                sourceMethod: segment.source.method,
+                sourceLocation:
+                  segment.source.unitKind === "PDF_PAGE"
+                    ? `PDF page ${segment.source.pageNumber}`
+                    : `DOCX body ${segment.source.bodyOrdinal}, image ${(segment.source.imageOrdinal ?? 0) + 1}`,
+                confidenceLevel: segment.confidence.level,
+                warnings: segment.warnings,
+              },
+            ];
+          }),
+        }
+      : parsedV1.data;
+  const parsed = cvParserAnyOutputSchema.safeParse(candidate);
+  if (!parsed.success) safeError("PARSER_OUTPUT_INVALID");
+  if (canonicalParserOutputBytes(parsed.data) > CV_DRAFT_MAX_BYTES)
+    safeError("PARSER_OUTPUT_LIMIT_EXCEEDED");
+  if (
+    !validateParserEvidenceMembership(
+      parsed.data,
+      new Set(input.segments.map((segment) => segment.id)),
+    )
+  ) {
+    safeError("PARSER_OUTPUT_INVALID");
+  }
+  return Object.freeze({ output: parsed.data, inputVersion });
+}
+
 export class OpenAiCvParser implements CvParser {
   readonly parserClass = "EXTERNAL_OPENAI" as const;
   private readonly client: OpenAiParserClient;
@@ -153,97 +245,65 @@ export class OpenAiCvParser implements CvParser {
     const abort = () => controller.abort();
     input.signal?.addEventListener("abort", abort, { once: true });
     try {
-      const response = await this.client.responses.create(
-        {
-          model: CV_APPROVED_OPENAI_MODEL,
-          background: false,
-          store: false,
-          stream: false,
-          reasoning: { effort: "none" },
-          instructions: INSTRUCTIONS,
-          input: [
-            {
-              role: "user",
-              content: [{ type: "input_text", text: segments }],
-            },
-          ],
-          text: {
-            format: zodTextFormat(cvParserOutputSchema, "cv_draft_v1"),
-            verbosity: "low",
+      const body: ResponseCreateParamsNonStreaming = {
+        model: CV_APPROVED_OPENAI_MODEL,
+        background: false,
+        store: false,
+        stream: false,
+        reasoning: { effort: "none" },
+        instructions: INSTRUCTIONS,
+        input: [
+          {
+            role: "user",
+            content: [{ type: "input_text", text: segments }],
           },
-          max_output_tokens: CV_OPENAI_MAX_OUTPUT_TOKENS,
-          safety_identifier: safetyIdentifier,
-          truncation: "disabled",
+        ],
+        text: {
+          format: zodTextFormat(cvParserOutputSchema, "cv_draft_v1"),
+          verbosity: "low",
         },
-        { timeout, maxRetries: 0, signal: controller.signal },
-      );
-      if (
-        typeof response.output_text !== "string" ||
-        new TextEncoder().encode(response.output_text).byteLength >
-          CV_DRAFT_MAX_BYTES
-      ) {
-        safeError("PARSER_OUTPUT_LIMIT_EXCEEDED");
-      }
-      let value: unknown;
+        max_output_tokens: CV_OPENAI_MAX_OUTPUT_TOKENS,
+        safety_identifier: safetyIdentifier,
+        truncation: "disabled",
+      };
+      const request = (requestTimeout: number) =>
+        this.client.responses.create(body, {
+          timeout: requestTimeout,
+          maxRetries: 0,
+          signal: controller.signal,
+        });
+      let response = await request(timeout);
+      let parsed: ParsedProviderOutput;
       try {
-        value = JSON.parse(response.output_text);
-      } catch {
-        safeError("PARSER_OUTPUT_INVALID");
-      }
-      const parsedV1 = cvParserOutputSchema.safeParse(value);
-      if (!parsedV1.success) safeError("PARSER_OUTPUT_INVALID");
-      const inputVersion = cvParserInputVersion(input);
-      const output =
-        inputVersion === "cv-segments-v2"
-          ? cvParserOutputV2Schema.parse({
-              ...parsedV1.data,
-              schemaVersion: "cv-draft-v2",
-              segmentEvidence: input.segments.flatMap((segment) => {
-                if (!("source" in segment) || !("confidence" in segment))
-                  return [];
-                return [
-                  {
-                    segmentId: segment.id,
-                    sourceMethod: segment.source.method,
-                    sourceLocation:
-                      segment.source.unitKind === "PDF_PAGE"
-                        ? `PDF page ${segment.source.pageNumber}`
-                        : `DOCX body ${segment.source.bodyOrdinal}, image ${
-                            (segment.source.imageOrdinal ?? 0) + 1
-                          }`,
-                    confidenceLevel: segment.confidence.level,
-                    warnings: segment.warnings,
-                  },
-                ];
-              }),
-            })
-          : parsedV1.data;
-      if (!cvParserAnyOutputSchema.safeParse(output).success)
-        safeError("PARSER_OUTPUT_INVALID");
-      if (canonicalParserOutputBytes(output) > CV_DRAFT_MAX_BYTES)
-        safeError("PARSER_OUTPUT_LIMIT_EXCEEDED");
-      if (
-        !validateParserEvidenceMembership(
-          output,
-          new Set(input.segments.map((segment) => segment.id)),
+        parsed = parseProviderOutput(response, input);
+      } catch (error) {
+        if (
+          !(error instanceof CvOpenAiParserError) ||
+          error.code !== "PARSER_OUTPUT_INVALID"
         )
-      ) {
-        safeError("PARSER_OUTPUT_INVALID");
+          throw error;
+        const remaining = Math.min(
+          CV_OPENAI_ADAPTER_TIMEOUT_MS,
+          deadlineMs - this.now().getTime(),
+        );
+        if (remaining <= 0) throw error;
+        response = await request(remaining);
+        parsed = parseProviderOutput(response, input);
       }
       return Object.freeze({
-        output,
+        output: parsed.output,
         providerRequestId: response.id,
         dispatch: Object.freeze({
           parserClass: this.parserClass,
           provider: "openai",
           model: CV_APPROVED_OPENAI_MODEL,
-          inputVersion,
+          inputVersion: parsed.inputVersion,
           instructionVersion:
-            inputVersion === "cv-segments-v2"
+            parsed.inputVersion === "cv-segments-v2"
               ? ("cv-extract-v2" as const)
               : ("cv-extract-v1" as const),
           schemaVersion:
-            inputVersion === "cv-segments-v2"
+            parsed.inputVersion === "cv-segments-v2"
               ? ("cv-draft-v2" as const)
               : ("cv-draft-v1" as const),
         }),

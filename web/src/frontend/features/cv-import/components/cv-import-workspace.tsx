@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 
-import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
-import { useCvImport } from "../client/use-cv-import";
+import { Panel } from "@/frontend/components/ui/design-system";
+import { StatusStrip } from "@/frontend/components/ui/cv-import-primitives";
 import type { CandidateCvSummary } from "@/shared/contracts/cv-import/candidate-cv";
 import type { CvImportSummary } from "@/shared/contracts/cv-import/upload";
+import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { useCvImport } from "../client/use-cv-import";
 import { cvCopy } from "../i18n/cv-import-copy";
 import { CandidateCvLibrary } from "./candidate-cv-library";
 import { CvImportList } from "./cv-import-list";
@@ -21,95 +23,75 @@ export function CvImportWorkspace({
   csrfProof: string;
   initialItems: readonly CvImportSummary[];
   initialCandidateCvs?: readonly CandidateCvSummary[];
-  parserAvailability: Readonly<{
-    deterministic: boolean;
-    external: boolean;
-  }>;
+  parserAvailability: Readonly<{ deterministic: boolean; external: boolean }>;
 }) {
   const locale = useWorkspaceLocale();
   const copy = cvCopy(locale);
   const importer = useCvImport({ csrfProof });
+  const savedLabel = locale === "vi" ? `${initialCandidateCvs.length} đã lưu` : `${initialCandidateCvs.length} saved`;
+  const retainedLabel = locale === "vi" ? `${initialItems.length} được lưu giữ` : `${initialItems.length} retained`;
+
   return (
     <div className={styles.root}>
-      <section
-        className={styles.uploadPanel}
-        aria-labelledby="cv-upload-heading"
-      >
-        <header className={styles.sectionHeading}>
-          <div>
-            <p>{locale === "vi" ? "NHẬP MỚI" : "NEW IMPORT"}</p>
-            <h2 id="cv-upload-heading">
-              {locale === "vi" ? "Tải CV của bạn lên" : "Upload your CV"}
-            </h2>
-          </div>
-          <span>
-            {locale === "vi"
-              ? "Lưu trữ tạm thời được mã hóa"
-              : "Encrypted temporary storage"}
+      <Panel
+        eyebrow={locale === "vi" ? "Nhập mới" : "New import"}
+        title={locale === "vi" ? "Tải CV của bạn lên" : "Upload your CV"}
+        rightSlot={
+          <span className="sh-count-pill">
+            {locale === "vi" ? "Lưu trữ tạm thời được mã hóa" : "Encrypted temporary storage"}
           </span>
-        </header>
+        }
+        className={styles.panel}
+        titleId="cv-upload-heading"
+      >
         <CvUploadForm
           csrfProof={csrfProof}
           parserAvailability={parserAvailability}
           onUpload={(file, parserClass) => importer.upload(file, parserClass)}
         />
-      </section>
+      </Panel>
 
-      <div
-        className={styles.workflowProgress}
-        data-state={importer.progress.state}
-        data-parser={importer.progress.parserClass ?? "NONE"}
-      >
-        <span className={styles.progressIcon} aria-hidden="true" />
-        <p className={styles.workflowStatus} role="status" aria-live="polite">
-          <strong>{importer.progress.title}</strong>
-          <span>{importer.progress.message}</span>
-        </p>
-        <div
-          className={styles.progressTrack}
-          role="progressbar"
-          aria-label={
-            locale === "vi" ? "Tiến trình nhập CV" : "CV import progress"
-          }
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={importer.progress.percentage}
-        >
-          <span style={{ width: `${importer.progress.percentage}%` }} />
-        </div>
-        {importer.progress.uploadId ? (
-          <Link
-            className={styles.statusLink}
-            href={`/profile/cv-imports/${importer.progress.uploadId}`}
-          >
-            {locale === "vi" ? "Mở trạng thái nhập" : "Open import status"}{" "}
-            <span aria-hidden="true">→</span>
-          </Link>
-        ) : null}
-      </div>
-
-      <CandidateCvLibrary
-        csrfProof={csrfProof}
-        initialItems={initialCandidateCvs}
+      <StatusStrip
+        title={importer.progress.title}
+        description={importer.progress.message}
+        progressPercent={importer.progress.percentage}
+        state={importer.progress.state}
+        action={
+          importer.progress.uploadId ? (
+            <Link
+              className={styles.statusLink}
+              href={`/profile/cv-imports/${importer.progress.uploadId}`}
+            >
+              {locale === "vi" ? "Mở trạng thái nhập" : "Open import status"}
+              <span aria-hidden="true">→</span>
+            </Link>
+          ) : null
+        }
       />
 
-      <section
-        className={styles.historyPanel}
-        aria-labelledby="cv-import-history-heading"
+      <Panel
+        eyebrow={locale === "vi" ? "CV ứng tuyển" : "Application CVs"}
+        title={locale === "vi" ? "CV đã lưu" : "Saved CVs"}
+        rightSlot={<span className="sh-count-pill">{savedLabel}</span>}
+        className={styles.panel}
+        titleId="candidate-cv-library-heading"
       >
-        <header className={styles.sectionHeading}>
-          <div>
-            <p>{locale === "vi" ? "HOẠT ĐỘNG GẦN ĐÂY" : "RECENT ACTIVITY"}</p>
-            <h2 id="cv-import-history-heading">{copy.common.importHistory}</h2>
-          </div>
-          <span>
-            {locale === "vi"
-              ? `${initialItems.length} được lưu giữ`
-              : `${initialItems.length} retained`}
-          </span>
-        </header>
+        <CandidateCvLibrary
+          csrfProof={csrfProof}
+          initialItems={initialCandidateCvs}
+          embedded
+        />
+      </Panel>
+
+      <Panel
+        eyebrow={locale === "vi" ? "Hoạt động gần đây" : "Recent activity"}
+        title={copy.common.importHistory}
+        rightSlot={<span className="sh-count-pill">{retainedLabel}</span>}
+        className={styles.panel}
+        titleId="cv-import-history-heading"
+      >
         <CvImportList items={initialItems} />
-      </section>
+      </Panel>
     </div>
   );
 }

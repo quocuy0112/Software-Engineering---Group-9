@@ -1,6 +1,7 @@
 "use client";
 
 import type { FormEvent } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
@@ -13,6 +14,7 @@ import type {
   ProfileEditorFeedback,
   ProfileSectionDraft,
 } from "../client/use-profile-editor";
+import { ProfileCompactSection } from "./profile-compact-section";
 import { ProfileSaveFeedback } from "./profile-save-feedback";
 
 type BasicsValues = {
@@ -75,6 +77,8 @@ export function ProfileBasicsForm({
             "Use 7–15 digits with optional spaces, periods, hyphens, parentheses, or one leading plus.",
           location: "Location",
         };
+  const editLabel = locale === "vi" ? "Chỉnh sửa thông tin" : "Edit basics";
+  const cancelLabel = locale === "vi" ? "Hủy" : "Cancel";
   const {
     register,
     handleSubmit,
@@ -83,19 +87,68 @@ export function ProfileBasicsForm({
   } = useForm<BasicsValues>({
     defaultValues: valuesFrom(profile.basics),
   });
+  const hasBasics = Object.values(profile.basics).some((value) =>
+    Boolean(value?.trim()),
+  );
+  const [isEditing, setIsEditing] = useState(!hasBasics);
 
   useServerFormReconciliation(valuesFrom(profile.basics), reset);
-  useUnsavedChangesGuard(isDirty);
+  useUnsavedChangesGuard(isDirty && isEditing);
 
   const fieldError = (path: string) => feedback?.fieldErrors?.[path]?.[0];
+
+  if (!isEditing) {
+    return (
+      <ProfileCompactSection
+        sectionId="profile-basics-section"
+        titleId="profile-basics-title"
+        kicker={copy.kicker}
+        title={copy.title}
+        mark="ID"
+        feedback={<ProfileSaveFeedback feedback={feedback} />}
+        content={
+          hasBasics ? (
+            <>
+              <strong className="profile-compact-primary">
+                {profile.basics.summary || "Professional profile details"}
+              </strong>
+              <span className="profile-compact-secondary">
+                {[profile.basics.location, profile.basics.phone]
+                  .filter(Boolean)
+                  .join(" · ") || "Contact details added"}
+              </span>
+            </>
+          ) : (
+            <div className="profile-compact-empty-text">
+              <strong>Your professional basics are not added yet.</strong>
+              <span>Add a headline, summary, phone, or location.</span>
+            </div>
+          )
+        }
+        action={
+          <button
+            className={
+              hasBasics
+                ? "profile-section-edit-button"
+                : "profile-section-secondary-button"
+            }
+            type="button"
+            onClick={() => setIsEditing(true)}
+          >
+            {editLabel}
+          </button>
+        }
+      />
+    );
+  }
 
   return (
     <form
       id="profile-basics-section"
-      className="professional-profile-section"
+      className="candidate-section candidate-section--editing"
       aria-labelledby="profile-basics-title"
       onSubmit={handleSubmit(async (values) => {
-        await onSave({
+        const saved = await onSave({
           section: "basics",
           basics: {
             headline: values.headline || null,
@@ -104,6 +157,7 @@ export function ProfileBasicsForm({
             location: values.location || null,
           },
         });
+        if (saved) setIsEditing(false);
       })}
     >
       <div className="professional-profile-section-heading">
@@ -112,9 +166,23 @@ export function ProfileBasicsForm({
           <h2 id="profile-basics-title">{copy.title}</h2>
           <UnsavedChangesIndicator dirty={isDirty} />
         </div>
-        <button type="submit" disabled={saving}>
-          {saving ? copy.saving : copy.save}
-        </button>
+        <div className="profile-section-action-group">
+          <button type="submit" disabled={saving}>
+            {saving ? copy.saving : copy.save}
+          </button>
+          {hasBasics ? (
+            <button
+              className="profile-section-secondary-button"
+              type="button"
+              onClick={() => {
+                reset(valuesFrom(profile.basics));
+                setIsEditing(false);
+              }}
+            >
+              {cancelLabel}
+            </button>
+          ) : null}
+        </div>
       </div>
       <ProfileSaveFeedback feedback={feedback} />
       <div className="professional-profile-fields">

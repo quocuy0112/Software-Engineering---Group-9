@@ -9424,6 +9424,7 @@ export const InAppNotificationScalarFieldEnum = {
   kind: 'kind',
   category: 'category',
   severity: 'severity',
+  audience: 'audience',
   title: 'title',
   summary: 'summary',
   variables: 'variables',
@@ -9467,6 +9468,7 @@ export const CompanyScalarFieldEnum = {
   slug: 'slug',
   legalName: 'legalName',
   displayName: 'displayName',
+  entityType: 'entityType',
   logoUrl: 'logoUrl',
   websiteUrl: 'websiteUrl',
   publicDescription: 'publicDescription',
@@ -11628,6 +11630,20 @@ export type EnumInAppNotificationSeverityFieldRefInput<$PrismaModel> = FieldRefI
  * Reference to a field of type 'InAppNotificationSeverity[]'
  */
 export type ListEnumInAppNotificationSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InAppNotificationSeverity[]'>
+    
+
+
+/**
+ * Reference to a field of type 'InAppNotificationAudience'
+ */
+export type EnumInAppNotificationAudienceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InAppNotificationAudience'>
+    
+
+
+/**
+ * Reference to a field of type 'InAppNotificationAudience[]'
+ */
+export type ListEnumInAppNotificationAudienceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InAppNotificationAudience[]'>
     
 
 

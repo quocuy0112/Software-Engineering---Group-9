@@ -489582,7 +489582,7 @@
     },
     "stats": {
       "viewCount": 1394,
-      "applicantCount": 120
+      "applicantCount": 121
     }
   },
   {
@@ -542247,5 +542247,81 @@
       "applicantCount": 0
     },
     "approvalComment": null
+  },
+  {
+    "id": "job-a254d754-d9d0-4b90-a0c7-105b56b15b32",
+    "slug": "thanh-ne-ho-chi-minh-city-56b15b32",
+    "companyId": "cmsttfkx1000o3kf0a240bvxd",
+    "industry": "thành",
+    "industryCode": "thanh",
+    "subIndustry": "thành",
+    "title": "thành nè",
+    "shortPitch": "thành",
+    "categoryIds": [
+      "thànhcon"
+    ],
+    "categoryFamily": "thành",
+    "skillTags": [
+      "gsfsgf"
+    ],
+    "location": {
+      "city": "Ho Chi Minh City",
+      "district": "thành",
+      "isNationwideRemote": false
+    },
+    "salary": {
+      "min": 111,
+      "max": 1111,
+      "currency": "VND",
+      "period": "month",
+      "isNegotiable": true
+    },
+    "experience": {
+      "minYears": 3,
+      "label": "3+ years"
+    },
+    "level": "team_lead",
+    "employmentType": "part_time",
+    "workArrangement": "remote",
+    "workOnSaturday": false,
+    "education": "College degree or above",
+    "age": "30",
+    "numberOfHires": 3,
+    "status": "pending_approval",
+    "approvalComment": null,
+    "isUrgent": false,
+    "isVerified": false,
+    "postedAt": "2026-08-15T04:38:00.101Z",
+    "updatedAt": "2026-08-15T04:39:57.153Z",
+    "applyDeadline": "2026-08-27T23:59:59.000Z",
+    "description": {
+      "overview": "agadgadgda",
+      "topReasonsToJoin": [
+        "gadgadg",
+        "dgadadga"
+      ],
+      "responsibilities": [
+        "agagadd"
+      ],
+      "requirements": [
+        "gàgsfgs"
+      ],
+      "benefits": [
+        {
+          "icon": "book-open",
+          "label": "Training budget and certification sponsorship"
+        }
+      ],
+      "generalInfo": {
+        "reportsTo": null,
+        "department": "thành",
+        "workingHours": null,
+        "workAddress": null
+      }
+    },
+    "stats": {
+      "viewCount": 0,
+      "applicantCount": 0
+    }
   }
 ]

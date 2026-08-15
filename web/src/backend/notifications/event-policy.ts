@@ -282,6 +282,33 @@ const policies = {
       "Your support case was resolved.",
     ),
   },
+  SUPPORT_CASE_RECEIVED: {
+    category: "SUPPORT",
+    severity: "MEDIUM",
+    title: { vi: "Yêu cầu hỗ trợ mới", en: "New support case" },
+    summary: generic(
+      "Một yêu cầu hỗ trợ mới đang chờ quản trị viên xem xét.",
+      "A new support case is awaiting administrator review.",
+    ),
+  },
+  SUPPORT_REQUESTER_REPLIED: {
+    category: "SUPPORT",
+    severity: "HIGH",
+    title: { vi: "Người yêu cầu đã phản hồi", en: "Support requester replied" },
+    summary: generic(
+      "Người yêu cầu đã phản hồi một trường hợp hỗ trợ được phân công.",
+      "A requester replied to an assigned support case.",
+    ),
+  },
+  SUPPORT_CASE_REOPENED: {
+    category: "SUPPORT",
+    severity: "HIGH",
+    title: { vi: "Yêu cầu hỗ trợ được mở lại", en: "Support case reopened" },
+    summary: generic(
+      "Một yêu cầu hỗ trợ đã giải quyết vừa được người yêu cầu mở lại.",
+      "A resolved support case was reopened by its requester.",
+    ),
+  },
   CONNECTION_PROPOSAL_CREATED: {
     category: "CONNECTION",
     severity: "MEDIUM",
@@ -370,6 +397,15 @@ const policies = {
       "Your message report was reviewed and closed.",
     ),
   },
+  MESSAGE_REPORT_RECEIVED_ADMIN: {
+    category: "MODERATION",
+    severity: "HIGH",
+    title: { vi: "Báo cáo tin nhắn mới", en: "New message report" },
+    summary: generic(
+      "Một báo cáo tin nhắn mới đang chờ xem xét được bảo vệ.",
+      "A new message report is awaiting protected review.",
+    ),
+  },
   MODERATION_REPORT_RECEIVED: {
     category: "MODERATION",
     severity: "LOW",
@@ -395,6 +431,36 @@ const policies = {
     summary: generic(
       "Báo cáo của bạn đã được xem xét và đóng.",
       "Your report was reviewed and closed.",
+    ),
+  },
+  MODERATION_REPORT_RECEIVED_ADMIN: {
+    category: "MODERATION",
+    severity: "HIGH",
+    title: { vi: "Báo cáo kiểm duyệt mới", en: "New moderation report" },
+    summary: generic(
+      "Một báo cáo kiểm duyệt mới đang chờ xem xét.",
+      "A new moderation report is awaiting review.",
+    ),
+  },
+  VERIFICATION_REVIEW_OVERDUE: {
+    category: "VERIFICATION",
+    severity: "HIGH",
+    title: { vi: "Xác minh cần chú ý", en: "Verification requires attention" },
+    summary: generic(
+      "Bằng chứng xác minh không thể xem trong thời hạn leo thang và cần được kiểm tra.",
+      "Verification evidence has remained unavailable through the escalation threshold.",
+    ),
+  },
+  DELIVERY_MANUAL_INTERVENTION_REQUIRED: {
+    category: "SYSTEM",
+    severity: "CRITICAL",
+    title: {
+      vi: "Gửi thông báo cần can thiệp",
+      en: "Notification delivery needs intervention",
+    },
+    summary: generic(
+      "Một thông báo bảo mật không thể gửi và cần quản trị viên can thiệp.",
+      "A security notification could not be delivered and requires administrator intervention.",
     ),
   },
 } satisfies Record<NotificationKind, Policy>;
@@ -425,6 +491,7 @@ export type BuiltNotification = {
   kind: NotificationKind;
   category: NotificationCategory;
   severity: NotificationSeverity;
+  audience: "USER" | "ADMIN";
   title: string;
   summary: string;
   href: string | null;
@@ -479,6 +546,7 @@ export function buildNotification(
     kind,
     category: policy.category,
     severity: policy.severity,
+    audience: variables.audience === "ADMIN" ? "ADMIN" : "USER",
     title,
     summary,
     href: hrefForContext(

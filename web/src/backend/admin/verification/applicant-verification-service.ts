@@ -6,6 +6,7 @@ import { validateEvidenceFile } from "@/shared/contracts/admin/verification";
 import {
   businessFactsDiffer,
   enrichedVerificationSubmissionSchema,
+  splitCompanyIdentity,
 } from "@/shared/contracts/employer-verification/business-verification";
 import { FilesystemPrivateBusinessEvidenceStorage } from "@/backend/storage/business-evidence/filesystem";
 import { S3PrivateBusinessEvidenceStorage } from "@/backend/storage/business-evidence/s3";
@@ -152,9 +153,13 @@ export class ApplicantVerificationService {
     }
     const companyEmail = challenge.normalizedEmail;
     const companyEmailVerifiedAt = challenge.verifiedAt;
+    const registryIdentity = splitCompanyIdentity(
+      lookupSnapshot.registryLegalName ?? "",
+      lookupSnapshot.registryEntityType,
+    );
     const legalNameDiffers = businessFactsDiffer(
       input.applicantLegalName,
-      lookupSnapshot.registryLegalName,
+      registryIdentity.name || lookupSnapshot.registryLegalName,
     );
     const registeredAddressDiffers = businessFactsDiffer(
       input.applicantRegisteredAddress,

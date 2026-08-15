@@ -133,6 +133,87 @@ describe("OpenAI CV parser SDK compatibility", () => {
     },
   );
 
+  it("retries one structurally invalid response within the pipeline deadline", async () => {
+    const validOutput = buildCvFixtureParserOutput();
+    const create = vi
+      .fn()
+      .mockResolvedValueOnce({
+        id: "resp_invalid_1234",
+        output_text: "not-json",
+      })
+      .mockResolvedValueOnce({
+        id: "resp_valid_1234",
+        output_text: JSON.stringify(validOutput),
+      });
+    const parser = new OpenAiCvParser({
+      apiKey: "synthetic-key",
+      client: { responses: { create } },
+      now: () => new Date("2026-08-02T00:00:00.000Z"),
+    });
+
+    const result = await parser.parse({
+      segments,
+      safetyIdentifier,
+      deadline: new Date("2026-08-02T00:01:00.000Z"),
+    });
+
+    expect(result.providerRequestId).toBe("resp_valid_1234");
+    expect(create).toHaveBeenCalledTimes(2);
+  });
+
+  it("classifies incomplete output caused by the token limit separately", async () => {
+    const create = vi.fn(async () => ({
+      id: "resp_incomplete_1234",
+      output_text: "",
+      status: "incomplete" as const,
+      incomplete_details: { reason: "max_output_tokens" as const },
+    }));
+    const parser = new OpenAiCvParser({
+      apiKey: "synthetic-key",
+      client: { responses: { create } },
+    });
+
+    await expect(
+      parser.parse({ segments, safetyIdentifier }),
+    ).rejects.toMatchObject({
+      code: "PARSER_OUTPUT_LIMIT_EXCEEDED",
+    });
+    expect(create).toHaveBeenCalledOnce();
+  });
+
+  it("classifies a structured-output refusal as provider unavailable", async () => {
+    const create = vi.fn(async () => ({
+      id: "resp_refusal_1234",
+      output_text: "",
+      status: "completed" as const,
+      output: [
+        {
+          id: "msg_refusal_1234",
+          role: "assistant" as const,
+          status: "completed" as const,
+          type: "message" as const,
+          content: [
+            {
+              type: "refusal" as const,
+              refusal: "Unable to process this request.",
+            },
+          ],
+        },
+      ],
+    }));
+    const parser = new OpenAiCvParser({
+      apiKey: "synthetic-key",
+      client: { responses: { create } },
+    });
+
+    await expect(
+      parser.parse({ segments, safetyIdentifier }),
+    ).rejects.toMatchObject({
+      code: "PARSER_UNAVAILABLE",
+    });
+    expect(create).toHaveBeenCalledOnce();
+  });
+
   it("sanitizes provider failures and never logs provider payloads", async () => {
     const raw = "raw-provider-secret synthetic-person@example.invalid";
     const create = vi.fn(async () => {

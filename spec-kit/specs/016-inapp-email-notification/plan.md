@@ -1,6 +1,6 @@
 # Implementation Plan: In-App Notification Center
 
-**Branch**: `015-inapp-email-notification` | **Date**: 2026-08-14 | **Spec**: [spec.md](./spec.md)
+**Branch**: `016-inapp-email-notification` | **Date**: 2026-08-15 | **Spec**: [spec.md](./spec.md)
 
 **Input**: Feature specification from `spec-kit/specs/016-inapp-email-notification/spec.md`
 
@@ -30,17 +30,17 @@ Build one PostgreSQL-backed notification inbox for candidates, recruiters, and p
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research and was re-checked after Phase 1 design.*
+_GATE: Must pass before Phase 0 research and was re-checked after Phase 1 design._
 
-| Gate | Status | Evidence |
-|---|---|---|
-| Human-controlled recruitment | PASS | Notifications communicate events only; they do not score, rank, reject, hire, or advance candidates. |
-| Security, privacy, tenant isolation | PASS | Server-owned session authorization, recipient-only queries, allow-listed safe payloads, internal links, no tokens/proofs/evidence, and company recipient rules are explicit. |
-| Deterministic core | PASS | Event policy and deduplication are deterministic; no AI or external provider is introduced. |
-| State, audit, data integrity | PASS | PostgreSQL is authoritative; unique deduplication keys, transactional producer integration, idempotent reads, migration verification, and originating audit retention are planned. |
-| Scope discipline and complete workflows | PASS | Scope is limited to delivery and read state for existing events plus specified in-app-only events. Email templates and unrelated workflows are not redesigned. |
-| Measurable quality and accessibility | PASS | Four-second refresh supports the five-second P95 target; keyboard, focus, live status, contrast, non-color state, security, and performance tests are included. |
-| Maintainable/provider-independent architecture | PASS | Shared Zod contracts, service/repository boundaries, Route Handlers, existing session owner, and PostgreSQL are retained. Socket transport remains untouched. |
+| Gate                                           | Status | Evidence                                                                                                                                                                           |
+| ---------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Human-controlled recruitment                   | PASS   | Notifications communicate events only; they do not score, rank, reject, hire, or advance candidates.                                                                               |
+| Security, privacy, tenant isolation            | PASS   | Server-owned session authorization, recipient-only queries, allow-listed safe payloads, internal links, no tokens/proofs/evidence, and company recipient rules are explicit.       |
+| Deterministic core                             | PASS   | Event policy and deduplication are deterministic; no AI or external provider is introduced.                                                                                        |
+| State, audit, data integrity                   | PASS   | PostgreSQL is authoritative; unique deduplication keys, transactional producer integration, idempotent reads, migration verification, and originating audit retention are planned. |
+| Scope discipline and complete workflows        | PASS   | Scope is limited to delivery and read state for existing events plus specified in-app-only events. Email templates and unrelated workflows are not redesigned.                     |
+| Measurable quality and accessibility           | PASS   | Four-second refresh supports the five-second P95 target; keyboard, focus, live status, contrast, non-color state, security, and performance tests are included.                    |
+| Maintainable/provider-independent architecture | PASS   | Shared Zod contracts, service/repository boundaries, Route Handlers, existing session owner, and PostgreSQL are retained. Socket transport remains untouched.                      |
 
 **Exclusive browser-session owner**: The existing Better Auth server session stored in secure HttpOnly cookies remains the only browser session mechanism. Unified notification routes resolve that session server-side. Platform-administrator access is additionally checked through the existing active administrator grant/context boundary; no notification token is stored client-side.
 
@@ -156,6 +156,15 @@ Existing event producers in identity/account, admin security, recruiter verifica
 6. Frontend component and accessibility tests for bell, panel, page, errors, and read state.
 7. Architecture and security tests for route ownership, server-only boundaries, CSRF, unsafe payload rejection, and cross-user enumeration resistance.
 8. Performance measurement on documented seeded data, followed by targeted feature tests, typecheck, lint, migration checks, full test suite, and production build.
+
+## Actionable Administrator Extension
+
+- Add explicit notification kinds for support creation/reply/reopen, administrator messaging/general-report receipts, verification review attention, and manual delivery intervention.
+- Resolve recipients through one transaction-compatible policy: all currently active administrator grants for unassigned queue work, or the active assigned administrator for assigned support follow-up with safe fan-out fallback.
+- Produce each notification in the authoritative business transaction where possible. The existing security-delivery operations alert claims its administrator notifications atomically before invoking the external webhook/log adapter.
+- Keep copy policy-generated and generic. Persist only the resource context identifier and bounded state/audience variables; never copy subject, message, report detail/evidence, contact data, business evidence, notes, or rationale.
+- Use the existing administrator navigation mapping for `SUPPORT_CASE`, `MESSAGING_REPORT`, `MODERATION_REPORT`, `VERIFICATION_REQUEST`, and `ACCOUNT`; every destination re-applies the current administrator boundary.
+- Keep the existing four-second administrator inbox polling, reporter/requester receipts, support realtime invalidation, email behavior, and external operations alert behavior unchanged.
 
 ## Complexity Tracking
 

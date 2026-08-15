@@ -16,7 +16,9 @@ import {
   useUnsavedChangesGuard,
 } from "../client/unsaved-changes";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
+import { ProfileCompactSection } from "./profile-compact-section";
 import { ProfileSaveFeedback } from "./profile-save-feedback";
+import { Chip } from "@/frontend/components/ui/design-system";
 
 type SkillValues = {
   skills: Array<{ id?: string; label: string }>;
@@ -37,22 +39,25 @@ export function ProfileSkillsForm({
   const copy =
     locale === "vi"
       ? {
-          kicker: "THẾ MẠNH CÓ THỂ TÌM KIẾM",
-          title: "Kỹ năng",
+          kicker: "Kỹ năng",
+          title: "Kỹ năng nổi bật",
+          count: (count: number) => `${count} kỹ năng`,
           saving: "Đang lưu kỹ năng…",
           save: "Lưu kỹ năng",
           empty: "Bạn chưa thêm kỹ năng nào.",
           skill: "Kỹ năng",
           up: "Di chuyển lên",
           down: "Di chuyển xuống",
-          remove: "Xóa",
+          remove: "Xoá",
           suggestion: "Dùng gợi ý",
-          add: "Thêm kỹ năng",
+          add: "+ Thêm kỹ năng",
           suggestions: "Gợi ý kỹ năng",
         }
       : {
-          kicker: "SEARCHABLE STRENGTHS",
-          title: "Skills",
+          kicker: "Skills",
+          title: "Featured skills",
+          count: (count: number) =>
+            `${count} ${count === 1 ? "skill" : "skills"}`,
           saving: "Saving skills…",
           save: "Save skills",
           empty: "No skills added yet.",
@@ -61,9 +66,11 @@ export function ProfileSkillsForm({
           down: "Move down",
           remove: "Remove",
           suggestion: "Use suggestion",
-          add: "Add skill",
+          add: "+ Add skill",
           suggestions: "Skill suggestions",
         };
+  const editLabel = locale === "vi" ? "Chỉnh sửa kỹ năng" : "Edit skills";
+  const cancelLabel = locale === "vi" ? "Hủy" : "Cancel";
   const {
     control,
     register,
@@ -74,6 +81,8 @@ export function ProfileSkillsForm({
   } = useForm<SkillValues>({
     defaultValues: { skills: profile.skills },
   });
+  const hasSkills = profile.skills.length > 0;
+  const [isEditing, setIsEditing] = useState(!hasSkills);
   const { fields, append, remove, move } = useFieldArray({
     control,
     name: "skills",
@@ -90,7 +99,7 @@ export function ProfileSkillsForm({
     suggestionResult.query === normalizedQuery ? suggestionResult.items : [];
 
   useServerFormReconciliation({ skills: profile.skills }, reset);
-  useUnsavedChangesGuard(isDirty);
+  useUnsavedChangesGuard(isDirty && isEditing);
 
   const fieldError = (path: string) => feedback?.fieldErrors?.[path]?.[0];
 
@@ -124,18 +133,84 @@ export function ProfileSkillsForm({
     };
   }, [normalizedQuery]);
 
+  if (!isEditing) {
+    return (
+      <ProfileCompactSection
+        sectionId="profile-skills-section"
+        titleId="profile-skills-title"
+        kicker={copy.kicker}
+        title={copy.title}
+        mark="SK"
+        count={copy.count(profile.skills.length)}
+        feedback={<ProfileSaveFeedback feedback={feedback} />}
+        content={
+          hasSkills ? (
+            <>
+              <div className="sh-chips" aria-label="Saved skills">
+                {profile.skills.map((skill) => (
+                  <Chip label={skill.label} key={skill.id} />
+                ))}
+                <button
+                  type="button"
+                  className="chip-add"
+                  aria-label={locale === "vi" ? "Thêm kỹ năng" : "Add skill"}
+                  onClick={() => setIsEditing(true)}
+                >
+                  {copy.add}
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="profile-compact-empty-text">
+              <strong>{copy.empty}</strong>
+              <span>
+                {locale === "vi"
+                  ? "Bổ sung các thế mạnh để nhà tuyển dụng dễ tìm thấy bạn."
+                  : "Add the strengths employers should discover."}
+              </span>
+            </div>
+          )
+        }
+        action={
+          <button
+            className={
+              hasSkills
+                ? "profile-section-edit-button btn-ghost"
+                : "profile-section-secondary-button"
+            }
+            style={
+              hasSkills ? { width: "auto", padding: "6px 14px" } : undefined
+            }
+            type="button"
+            aria-label={
+              hasSkills
+                ? editLabel
+                : locale === "vi"
+                  ? "Thêm kỹ năng"
+                  : "Add skill"
+            }
+            onClick={() => setIsEditing(true)}
+          >
+            {hasSkills ? editLabel : copy.add}
+          </button>
+        }
+      />
+    );
+  }
+
   return (
     <form
       id="profile-skills-section"
-      className="professional-profile-section"
+      className="candidate-section candidate-section--editing"
       aria-labelledby="profile-skills-title"
       onSubmit={handleSubmit(async ({ skills }) => {
-        await onSave({
+        const saved = await onSave({
           section: "skills",
           skills: skills.map(({ id, label }) =>
             id ? { id, label } : { label },
           ),
         });
+        if (saved) setIsEditing(false);
       })}
     >
       <div className="professional-profile-section-heading">
@@ -144,9 +219,24 @@ export function ProfileSkillsForm({
           <h2 id="profile-skills-title">{copy.title}</h2>
           <UnsavedChangesIndicator dirty={isDirty} />
         </div>
-        <button type="submit" disabled={saving}>
-          {saving ? copy.saving : copy.save}
-        </button>
+        <div className="profile-section-action-group">
+          <button type="submit" disabled={saving}>
+            {saving ? copy.saving : copy.save}
+          </button>
+          {hasSkills ? (
+            <button
+              className="profile-section-secondary-button"
+              type="button"
+              onClick={() => {
+                reset({ skills: profile.skills });
+                setQuery("");
+                setIsEditing(false);
+              }}
+            >
+              {cancelLabel}
+            </button>
+          ) : null}
+        </div>
       </div>
       <ProfileSaveFeedback feedback={feedback} />
       {fields.length === 0 ? <p>{copy.empty}</p> : null}
@@ -245,6 +335,7 @@ export function ProfileSkillsForm({
       <div className="professional-profile-add-row">
         <button
           type="button"
+          aria-label={locale === "vi" ? "Thêm kỹ năng" : "Add skill"}
           disabled={fields.length >= 50}
           onClick={() => append({ label: "" })}
         >
