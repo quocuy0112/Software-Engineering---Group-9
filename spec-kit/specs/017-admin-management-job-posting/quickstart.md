@@ -8,6 +8,7 @@ This guide is a pre-implementation validation contract. Run it after the tasks i
 
 - Node.js 24.18.x
 - PostgreSQL reachable through the existing SmartHire environment configuration
+- Exactly one designated catalogue-writer host with one durable working-catalogue path; every other host configured read-only for Recruiter job mutations
 - Dependencies installed in `web/`
 - One active verified company with two active hiring-authority Recruiters
 - Three users with active Platform Administrator grants and one revoked/expired control
@@ -23,12 +24,14 @@ npm.cmd run db:generate
 npm.cmd run db:migrations:check
 npm.cmd run typecheck
 npm.cmd run lint
+node --conditions=react-server --import tsx scripts/check-json-job-catalogue-writer.mjs
 ```
 
 Expected:
 
 - Review tables, enum values, unique identities, indexes, and notification context validate.
 - No new Pages Router endpoint, second session mechanism, or direct JSON file access outside the catalogue repository exists.
+- Catalogue preflight proves this host has the sole writer designation, the configured path is durable/writable, lease acquisition is exclusive across local processes, and checksum continuity holds; a read-only or invalid host rejects mutations.
 
 ## Migration and Legacy Adoption
 
@@ -42,6 +45,7 @@ Expected:
 - Dry run reports pending/rejected candidates without writing.
 - Rerunning adoption creates no duplicate aggregate/version/notification.
 - Unresolved company or submitter mappings are reported and never guessed.
+- Existing relational projections are linked only when stable slug, company, exact mapped baseline content, and unowned identity all match; collisions are reported and never overwritten.
 - Existing unmanaged active jobs retain their legacy public behavior.
 
 ## Recruiter Submission
@@ -66,12 +70,14 @@ Expected:
 3. Open the alert and confirm it reaches the exact protected review.
 4. Race claims from two Administrators.
 5. Attempt a claim/read with the revoked Administrator.
+6. Send a body command discriminator that does not match the path action.
 
 Expected:
 
 - One assignee wins; the loser receives current state/version.
 - The opened recipient's notification is read without changing another recipient's row.
 - Revoked authority receives a neutral denial.
+- Action/body mismatch returns validation failure with no claim, assignment, history, or audit-success mutation.
 
 ## Complete Review and Decision
 
@@ -85,20 +91,23 @@ Expected:
 
 - Only one valid decision occurs.
 - Blocked attempts are audited and never publish content.
-- Approval exposes exactly the reviewed snapshot.
+- Approval atomically creates or replaces one aggregate-linked `JobPosting`/skill projection, and canonical `/jobs` search plus direct detail expose exactly the reviewed snapshot with server-owned publication facts.
+- Pending/rejected versions create no public projection; a pending replacement leaves the last approved projection and public detail unchanged.
 - Rejection stays non-public; Recruiter feedback excludes the private note.
 
 ## Active Edit and Resubmission
 
-1. Materially edit an active legacy job.
-2. Confirm the original active content is captured as an imported approved baseline and remains public.
+1. Materially edit an active legacy job and confirm the pre-edit content is captured as an imported approved baseline with an exact linked/created public projection before the JSON working record changes.
+2. Simulate failure of that first JSON edit and confirm the imported baseline remains unchanged and public; retry the edit successfully.
 3. Submit the edit, approve it, and confirm the public content changes atomically to the new snapshot.
 4. Revise and resubmit a rejected job.
+5. While another replacement is pending, close the managed job and confirm both canonical search and direct detail stop exposing it; approve that pending version and confirm content/history update but the job remains closed.
 
 Expected:
 
 - Each submit creates a new sequence; prior snapshots and decisions remain immutable.
 - No unreviewed edit appears publicly.
+- Reapproval reuses the same aggregate-linked public identity instead of creating a duplicate job.
 - Imported baseline history is clearly distinguished from an Administrator decision.
 
 ## Failure and Integrity Recovery
@@ -106,6 +115,7 @@ Expected:
 Exercise:
 
 - JSON write failure before submission transaction;
+- missing/duplicate writer designation, unwritable/non-durable catalogue path, or competing PostgreSQL writer lease;
 - database/notification failure during submission;
 - malformed or missing JSON after snapshot creation;
 - JSON status tampering after approval;
@@ -123,7 +133,7 @@ Expected:
 ## Focused Automated Suites
 
 ```powershell
-npx.cmd vitest run tests/backend/unit/job-post-reviews tests/backend/contract/job-post-reviews tests/backend/integration/job-post-reviews tests/frontend/components/job-post-reviews tests/frontend/accessibility/job-post-reviews tests/security/job-post-reviews tests/architecture/job-post-review-boundaries.test.ts tests/performance/job-post-reviews --passWithNoTests
+npx.cmd vitest run tests/backend/unit/job-post-reviews tests/backend/contract/job-post-reviews tests/backend/integration/job-post-reviews tests/backend/integration/notifications/notification-event-producers.test.ts tests/frontend/components/recruiter-workspace/job-post-review-submission.test.tsx tests/frontend/components/recruiter-workspace/job-post-review-outcome.test.tsx tests/frontend/components/admin-management/job-post-review-discovery.test.tsx tests/frontend/components/admin-management/job-post-review-decision.test.tsx tests/frontend/accessibility/job-post-reviews tests/frontend/accessibility/admin-management tests/security/job-post-reviews tests/security/notifications/job-post-review-notification-privacy.test.ts tests/architecture/job-post-review-boundaries.test.ts tests/performance/job-post-reviews --passWithNoTests
 npx.cmd playwright test tests/system/e2e/job-post-reviews
 ```
 

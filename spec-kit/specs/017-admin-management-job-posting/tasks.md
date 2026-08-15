@@ -18,7 +18,7 @@
 
 **Purpose**: Register the feature's commands and reusable deterministic fixtures before foundational tests.
 
-- [ ] T001 Add `test:job-post-reviews`, `job-post-reviews:migrate`, `job-post-reviews:migration:verify`, and `perf:job-post-reviews` scripts in `web/package.json`
+- [ ] T001 Add `test:job-post-reviews`, `job-post-reviews:migrate`, `job-post-reviews:migration:verify`, `job-catalogue:preflight`, and `perf:job-post-reviews` scripts in `web/package.json` and document designated-writer/read-only-host plus durable catalogue path configuration in `web/.env.example`
 - [ ] T002 [P] Create deterministic job/review/company/Administrator fixture builders in `web/tests/helpers/job-post-reviews/job-post-review-fixtures.ts`
 - [ ] T003 [P] Create recipient-safe notification cleanup helpers for review contexts in `web/tests/helpers/notifications/job-post-review-notification-cleanup.ts`
 
@@ -33,31 +33,31 @@
 ### Tests for Foundational Authority
 
 - [ ] T004 [P] Add strict schema, reason-code, command-discriminator, and server-owned-field rejection tests in `web/tests/shared/unit/contracts/job-post-reviews/job-post-review-contracts.test.ts` (FR-003, FR-004, FR-019, FR-028)
-- [ ] T005 [P] Add canonical snapshot normalization, material-field identity, SHA-256 determinism, and lifecycle transition tests in `web/tests/backend/unit/job-post-reviews/job-post-review-policy.test.ts` (FR-003, FR-004, FR-007, FR-008)
-- [ ] T006 [P] Add additive table, constraint, index, imported-baseline, notification-enum, and rollback-safety migration tests in `web/tests/backend/integration/job-post-reviews/job-post-review-migration.test.ts` (FR-004, FR-005, FR-021, FR-025)
-- [ ] T007 [P] Add cross-process lease, stale-lease recovery, checksum conflict, temporary-file cleanup, atomic-replace, malformed-file, and crash-recovery tests in `web/tests/backend/unit/job-post-reviews/json-job-catalogue-repository.test.ts` (FR-025, FR-026, SC-009)
+- [ ] T005 [P] Add canonical snapshot normalization, material-field identity, SHA-256 determinism, allow-listed relational-enum/search-field mapping, and lifecycle transition tests in `web/tests/backend/unit/job-post-reviews/job-post-review-policy.test.ts` (FR-002-FR-004, FR-007, FR-008, FR-018)
+- [ ] T006 [P] Add additive table, one-pending constraint, actor-scoped submission-idempotency binding, unique aggregate-to-`JobPosting` projection ownership, writer-lease, imported-baseline, notification-enum, index, and rollback-safety migration tests in `web/tests/backend/integration/job-post-reviews/job-post-review-migration.test.ts` (FR-004, FR-005, FR-018, FR-021, FR-025)
+- [ ] T007 [P] Add designated-writer/read-only-host admission, PostgreSQL writer-lease contention/renewal, monotonically fenced scoped read-through-transaction ownership, expiry-at-commit/replacement rejection, stale recovery, unwritable/non-durable path preflight, checksum conflict, temporary-file cleanup, atomic-replace, malformed-file, and crash-recovery tests in `web/tests/backend/integration/job-post-reviews/json-job-catalogue-repository.test.ts` (FR-007, FR-008, FR-025, FR-026, SC-009)
 - [ ] T008 [P] Add safe-copy, locale, href, severity, allow-listed-variable, and challenge-secret exclusion tests in `web/tests/backend/unit/notifications/job-post-review-notification-policy.test.ts` (FR-009, FR-010, FR-016, FR-022, FR-023)
 - [ ] T009 [P] Add layer, single-Route-Handler, sole JSON-importer, server-only, exclusive-session, and no-direct-file-access canaries in `web/tests/architecture/job-post-review-boundaries.test.ts` (FR-026, FR-027, FR-031)
-- [ ] T010 [P] Add OpenAPI/runtime Zod parity tests for every review path, command discriminator, response, and error in `web/tests/backend/contract/job-post-reviews/job-post-review-openapi-parity.test.ts` (FR-012, FR-013, FR-014, FR-017, FR-019, FR-028)
+- [ ] T010 [P] Add OpenAPI/runtime Zod parity tests for the complete strict job snapshot, bounded safe company/submitter context, every review path, action/body match, command discriminator, response, and error in `web/tests/backend/contract/job-post-reviews/job-post-review-openapi-parity.test.ts` (FR-012-FR-017, FR-019, FR-020, FR-028)
 
 ### Implementation for Foundational Authority
 
 - [ ] T011 Define review state, reason, queue/detail, Recruiter projection, and discriminated command schemas in `web/src/shared/contracts/admin/job-post-review.ts` (FR-004, FR-012, FR-015, FR-019, FR-028)
-- [ ] T012 Define a Recruiter-authored job-content input that excludes id, company ownership, slug, status, approval feedback, statistics, review facts, and server timestamps in `web/src/shared/contracts/recruiter-job-posting.ts` (FR-002, FR-027, FR-028)
+- [ ] T012 Define Recruiter-authored input and immutable review-snapshot schemas with deterministic public-enum inputs while excluding client ownership, status, approval feedback, verification display, statistics, review facts, and lifecycle/publication timestamps in `web/src/shared/contracts/recruiter-job-posting.ts` (FR-002, FR-003, FR-018, FR-027, FR-028)
 - [ ] T013 Add review notification kinds and `JOB_POST_REVIEW` context to `web/src/shared/contracts/notifications/index.ts` and `web/prisma/schema.prisma` (FR-009, FR-010, FR-022)
-- [ ] T014 Add review aggregate/version/history/private-note models, enums, relations, invariants, and indexes to `web/prisma/schema.prisma` (FR-003, FR-004, FR-005, FR-013, FR-019, FR-021)
-- [ ] T015 Create the additive review-authority and notification-enum migration in `web/prisma/migrations/036_job_post_review_authority/migration.sql` (FR-003, FR-004, FR-005, FR-021, FR-025)
+- [ ] T014 Add review aggregate/version/history/private-note and catalogue-writer-lease models, authoritative aggregate closure actor/time, the unique aggregate-to-existing-`JobPosting` projection relation, actor-scoped submission-idempotency binding, enums, invariants, and indexes to `web/prisma/schema.prisma` (FR-003-FR-005, FR-008, FR-013, FR-018, FR-019, FR-021, FR-025)
+- [ ] T015 Create the additive review-authority, aggregate-to-`JobPosting` projection-link, and notification-enum migration in `web/prisma/migrations/036_job_post_review_authority/migration.sql` (FR-003-FR-005, FR-018, FR-021, FR-025)
 - [ ] T016 Regenerate the Prisma client models for the new review authority in `web/src/backend/generated/prisma/` (FR-003, FR-004, FR-021)
-- [ ] T017 Implement canonical content normalization, schema versioning, material-field selection, content hashing, transition policy, reason-code policy, and safe public projection rules in `web/src/backend/jobs/review/job-post-review-policy.ts` (FR-002, FR-003, FR-004, FR-006, FR-008, FR-019)
+- [ ] T017 Implement canonical content normalization, server-field exclusion, schema versioning, material-field selection, content hashing, transition/reason policy in `web/src/backend/jobs/review/job-post-review-policy.ts` and the pure deterministic snapshot-to-`JobPosting`/normalized-skill mapper in `web/src/backend/jobs/review/job-post-publication-projector.ts` (FR-002-FR-004, FR-006, FR-008, FR-018, FR-019)
 - [ ] T018 Define neutral validation, authorization, conflict, integrity, assignment, and unavailable errors in `web/src/backend/jobs/review/job-post-review-errors.ts` (FR-020, FR-027, FR-028)
-- [ ] T019 Implement validated reads, process queueing, cross-process lease, checksum compare, temporary write/flush/atomic replace, stale recovery, and explicit working-record updates in `web/src/backend/repositories/jobs/json-job-catalogue-repository.ts` (FR-025, FR-026, SC-009)
+- [ ] T019 Implement PostgreSQL-coordinated writer claims/renewal/monotonic fencing/stale recovery and transaction-time ownership validation in `web/src/backend/repositories/jobs/prisma-job-catalogue-write-lease-repository.ts`, then inject a scoped owner/fencing/checksum callback across validated read, external review transaction, process queueing, shared-path preflight, final compare, temporary write/flush/atomic replace, and explicit updates in `web/src/backend/repositories/jobs/json-job-catalogue-repository.ts` (FR-007, FR-008, FR-025, FR-026, SC-009)
 - [ ] T020 Refactor direct `jobs.json` access to use the sole JSON repository without changing current management behavior in `web/src/backend/services/jobs/recruiter-job-posting-data.ts` (FR-026, FR-031)
-- [ ] T021 Implement core aggregate/version queries, unique retry identity, optimistic claims, projection selects, and transaction-compatible writes in `web/src/backend/repositories/jobs/prisma-job-post-review-repository.ts` (FR-003, FR-004, FR-005, FR-013, FR-020)
+- [ ] T021 Implement core aggregate/version queries, one-pending enforcement, actor-scoped submission-key/request-hash replay validation, optimistic claims, projection selects, and transaction-compatible writes in `web/src/backend/repositories/jobs/prisma-job-post-review-repository.ts` (FR-003, FR-004, FR-005, FR-013, FR-020)
 - [ ] T022 Add review-request and outcome copy, severity, safe variable, and destination policy in `web/src/backend/notifications/event-policy.ts` (FR-009, FR-016, FR-022, FR-023)
 - [ ] T023 Extend active-Administrator fan-out with the generic job-review request kind in `web/src/backend/notifications/admin-notification-fanout.ts` (FR-009, FR-010)
 - [ ] T024 Add `JOB_POST_REVIEW` destinations for Administrator and Recruiter notification projections in `web/src/frontend/features/admin/notifications/admin-notification-navigation.ts` and `web/src/frontend/features/notifications/notification-copy.ts` (FR-011, FR-022, FR-023)
 - [ ] T025 Create rerunnable legacy pending/rejected adoption with dry-run and unresolved-authority reporting in `web/scripts/migrate-json-job-reviews.mjs` (FR-024, FR-026, SC-009)
-- [ ] T026 Create read-only aggregate/hash/state/recipient/unresolved-row verification in `web/scripts/verify-job-post-review-migration.mjs` (FR-005, FR-010, FR-021, FR-026)
+- [ ] T026 Create read-only aggregate/hash/state/recipient/unresolved-row verification in `web/scripts/verify-job-post-review-migration.mjs` and fail-closed shared-path/lease/checksum preflight in `web/scripts/check-json-job-catalogue-writer.mjs` (FR-005, FR-010, FR-021, FR-025, FR-026)
 
 **Checkpoint**: Shared contracts, schema, JSON safety, review policy, notification policy, and migration controls are ready; all foundational tests fail before implementation and pass afterward.
 
@@ -73,25 +73,25 @@
 
 - [ ] T027 [P] [US1] Add submit-review success, idempotent replay, strict body/header, stale working timestamp, neutral errors, and no-store contract tests in `web/tests/backend/contract/job-post-reviews/recruiter-submit-review.contract.test.ts` (FR-001, FR-002, FR-005, FR-027, FR-028)
 - [ ] T028 [P] [US1] Add verified-company membership, cross-company, inactive account/company/membership, and legacy-company denial tests in `web/tests/security/job-post-reviews/recruiter-submission-isolation.test.ts` (FR-001, FR-027, SC-006)
-- [ ] T029 [P] [US1] Add exact snapshot/hash, one pending version, sequence, audit, and active-baseline adoption integration tests in `web/tests/backend/integration/job-post-reviews/recruiter-submission.test.ts` (FR-003, FR-004, FR-007, FR-008, FR-021)
-- [ ] T030 [P] [US1] Add repeated/concurrent submission and changed-idempotency-binding tests in `web/tests/backend/integration/job-post-reviews/recruiter-submission-concurrency.test.ts` (FR-005, FR-020, SC-004)
-- [ ] T031 [P] [US1] Add JSON-before-transaction, database, audit, notification, compatibility-status, and lost-response failure-isolation tests in `web/tests/backend/integration/job-post-reviews/recruiter-submission-failure.test.ts` (FR-025, SC-009)
+- [ ] T029 [P] [US1] Add exact snapshot/hash, deterministic relational mapping acceptance/rejection, cross-company/aggregate stable-slug collision, one pending version, zero pending public change, sequence, audit, and pre-edit active-baseline bind/create with relational-or-adoption publication time before JSON integration tests in `web/tests/backend/integration/job-post-reviews/recruiter-submission.test.ts` (FR-002-FR-004, FR-007, FR-008, FR-018, FR-021)
+- [ ] T030 [P] [US1] Add repeated/concurrent submission, submit-versus-edit lease races, post-commit pending-lock rejection, actor-scoped key replay, and changed job/working-version/content binding tests in `web/tests/backend/integration/job-post-reviews/recruiter-submission-concurrency.test.ts` (FR-005, FR-007, FR-020, SC-004)
+- [ ] T031 [P] [US1] Add draft JSON-before-submission-transaction, writer-lease/checksum-scoped active baseline-before-JSON-edit, failed/crashed/concurrent active-edit JSON write, database, audit, notification, compatibility-status, and lost-response failure-isolation tests in `web/tests/backend/integration/job-post-reviews/recruiter-submission-failure.test.ts` (FR-008, FR-025, SC-009)
 - [ ] T032 [P] [US1] Add draft validation, submit confirmation, pending lock, active-edit pending version, visible errors, and retry component tests in `web/tests/frontend/components/recruiter-workspace/job-post-review-submission.test.tsx` (FR-002, FR-007, FR-008, FR-029)
 - [ ] T033 [P] [US1] Add keyboard focus recovery, live pending status, confirmation labeling, non-color lock cues, and narrow-screen tests in `web/tests/frontend/accessibility/job-post-reviews/recruiter-submission.accessibility.test.tsx` (FR-029, SC-008)
 
 ### Implementation for User Story 1
 
-- [ ] T034 [US1] Implement membership/company authorization, working-content validation, snapshot/hash creation, retry binding, imported active baseline, transactional version/audit/notification creation, and safe failure isolation in `web/src/backend/jobs/review/job-post-submission-service.ts` (FR-001-FR-010, FR-021, FR-025)
+- [ ] T034 [US1] Implement membership/company authorization, working-content and deterministic public-mapping validation, pre-edit imported-active-baseline/projection preparation, snapshot/hash creation, actor-scoped submission-key/request-hash binding, transactional pending-version/audit/notification creation, and safe failure isolation in `web/src/backend/jobs/review/job-post-submission-service.ts` (FR-001-FR-010, FR-018, FR-021, FR-025)
 - [ ] T035 [US1] Compose the submission service with JSON, Prisma, audit, and notification dependencies in `web/src/backend/jobs/review/job-post-review-service-factory.ts` (FR-025, FR-026, FR-031)
 - [ ] T036 [US1] Implement exact Recruiter-origin, session, strict input, idempotency, no-store, and safe error handling in `web/src/app/api/recruiter/job-postings/[jobId]/submit-review/route.ts` (FR-001, FR-002, FR-005, FR-027, FR-028)
-- [ ] T037 [US1] Restrict general create/update routes to draft content and prevent client-authored lifecycle/approval fields in `web/src/app/api/recruiter/job-postings/route.ts` (FR-002, FR-007, FR-027, FR-028)
+- [ ] T037 [US1] Restrict general create/update routes to draft content, enforce the review-owned pending write lock, prevent client-authored lifecycle/approval fields, require writer-lease/checksum-scoped baseline preparation before a first active material JSON write, and dispatch managed-job `DELETE` closure through review authority in `web/src/app/api/recruiter/job-postings/route.ts` (FR-002, FR-007, FR-008, FR-027, FR-028)
 - [ ] T038 [US1] Overlay authorized PostgreSQL review state/reason/read-only/version data onto JSON working jobs in `web/src/backend/services/jobs/recruiter-job-posting-data.ts` (FR-006, FR-007, FR-008, FR-023, FR-026)
 - [ ] T039 [US1] Add save-draft-then-submit behavior, idempotency keys, stale retry, confirmation, and active-edit submission in `web/src/frontend/features/recruiter-workspace/job-posting-editor.tsx` (FR-002, FR-005, FR-007, FR-008, FR-029)
 - [ ] T040 [US1] Add pending state, immutable version, integrity block, and safe retry presentation in `web/src/frontend/features/recruiter-workspace/job-posting-management.tsx` (FR-007, FR-008, FR-029)
 - [ ] T041 [P] [US1] Add responsive, focus, pending-lock, integrity, and non-color review styles in `web/src/frontend/styles/recruiter-workspace-full.css` (FR-029, SC-008)
 - [ ] T042 [US1] Add submission events, context cleanup, and producer coverage to `web/tests/backend/integration/notifications/notification-event-producers.test.ts` (FR-009, FR-010, FR-025)
 - [ ] T043 [US1] Validate User Story 1 with the focused commands and record exact results in `spec-kit/specs/017-admin-management-job-posting/quickstart.md` (SC-001, SC-004, SC-005, SC-009)
-- [ ] T044 [US1] Commit the completed User Story 1 logical group with an English message and record the hash in `spec-kit/specs/017-admin-management-job-posting/quickstart.md`
+- [ ] T044 [US1] Commit the completed User Story 1 logical group with an English message; use Git history as the commit-hash evidence referenced by `spec-kit/specs/017-admin-management-job-posting/quickstart.md`
 
 **Checkpoint**: Recruiter submission is independently demonstrable and safe, but the feature is not releasable until Administrator discovery, decisions, outcomes, and final gates are complete.
 
@@ -106,10 +106,10 @@
 ### Tests for User Story 2
 
 - [ ] T045 [P] [US2] Add list/detail pagination, filters, ordering, response bounds, authority, no-store, and neutral-error contract tests in `web/tests/backend/contract/job-post-reviews/admin-review-query.contract.test.ts` (FR-011, FR-012, FR-015, FR-016, FR-027)
-- [ ] T046 [P] [US2] Add claim/reassign command discriminator, CSRF, idempotency, expected-version, current-grant, and safe-conflict contract tests in `web/tests/backend/contract/job-post-reviews/admin-review-command.contract.test.ts` (FR-013, FR-014, FR-020, FR-027, FR-028)
+- [ ] T046 [P] [US2] Add claim/reassign path/body match, command discriminator, CSRF, actor-scoped `AdminCommandReceipt` replay/binding, expected-version, current-grant, and safe-conflict contract tests in `web/tests/backend/contract/job-post-reviews/admin-review-command.contract.test.ts` (FR-013, FR-014, FR-020, FR-027, FR-028)
 - [ ] T047 [P] [US2] Add active/inactive Administrator fan-out, per-recipient dedupe/read state, five-second availability, and exact navigation integration tests in `web/tests/backend/integration/job-post-reviews/admin-review-notification.test.ts` (FR-009, FR-010, FR-011, SC-002)
-- [ ] T048 [P] [US2] Add deterministic queue order, age/company/state/assignment filters, bounded detail, and current eligibility integration tests in `web/tests/backend/integration/job-post-reviews/admin-review-query.test.ts` (FR-012, FR-015, FR-016)
-- [ ] T049 [P] [US2] Add concurrent claim, stale claim, explicit reassignment, inactive target, lost assignee grant, and immutable history/audit tests in `web/tests/backend/integration/job-post-reviews/admin-review-assignment.test.ts` (FR-013, FR-014, FR-020, FR-021, SC-004)
+- [ ] T048 [P] [US2] Add deterministic queue order, bounded title/company summary, age/company/state/assignment filters, safe company/submitter detail context without contact data, complete detail, and current eligibility integration tests in `web/tests/backend/integration/job-post-reviews/admin-review-query.test.ts` (FR-012, FR-015, FR-016)
+- [ ] T049 [P] [US2] Add concurrent/stale claim, current-assignee reassignment, non-assignee takeover denial, inactive target, recovery from an inactive assignee, and immutable history/audit tests in `web/tests/backend/integration/job-post-reviews/admin-review-assignment.test.ts` (FR-013, FR-014, FR-020, FR-021, SC-004)
 - [ ] T050 [P] [US2] Add cross-recipient notification, revoked grant, direct enumeration, snapshot/note/evidence, and ordinary-log privacy tests in `web/tests/security/job-post-reviews/admin-review-isolation.test.ts` (FR-016, FR-027, FR-030, SC-006)
 - [ ] T051 [P] [US2] Add queue/detail/claim/reassign/loading/empty/error/stale component tests in `web/tests/frontend/components/admin-management/job-post-review-discovery.test.tsx` (FR-012, FR-013, FR-014, FR-029)
 - [ ] T052 [P] [US2] Add queue keyboard navigation, filter labels, focus restoration, live claim status, non-color assignment cues, and axe tests in `web/tests/frontend/accessibility/admin-management/job-post-review-discovery.accessibility.test.tsx` (FR-029, SC-008)
@@ -117,13 +117,13 @@
 ### Implementation for User Story 2
 
 - [ ] T053 [US2] Implement deterministic paginated queue and complete safe detail projections in `web/src/backend/repositories/jobs/prisma-job-post-review-repository.ts` (FR-012, FR-015, FR-016)
-- [ ] T054 [US2] Implement current-grant list/detail authorization, first-writer claim, explicit reassignment, expected versions, idempotency, history, and audit in `web/src/backend/jobs/review/job-post-review-service.ts` (FR-012-FR-016, FR-020, FR-021, FR-027)
+- [ ] T054 [US2] Implement current-grant list/detail authorization, first-writer claim, current-assignee reassignment, inactive-assignee recovery, expected versions, existing `AdminCommandReceipt` binding/replay, history, and audit in `web/src/backend/jobs/review/job-post-review-service.ts` (FR-012-FR-016, FR-020, FR-021, FR-027)
 - [ ] T055 [US2] Implement protected Administrator queue transport in `web/src/app/api/admin/job-post-reviews/route.ts` (FR-012, FR-027, FR-028)
 - [ ] T056 [US2] Implement protected complete detail transport in `web/src/app/api/admin/job-post-reviews/[reviewId]/route.ts` (FR-015, FR-016, FR-027, FR-028)
-- [ ] T057 [US2] Implement claim/reassign action dispatch, command/path matching, CSRF, expected-version, idempotency, and safe conflict responses in `web/src/app/api/admin/job-post-reviews/[reviewId]/[action]/route.ts` (FR-013, FR-014, FR-020, FR-027, FR-028)
+- [ ] T057 [US2] Implement claim/reassign action dispatch, exact command/path matching with mutation-free mismatch rejection, CSRF, expected-version, idempotency, and safe conflict responses in `web/src/app/api/admin/job-post-reviews/[reviewId]/[action]/route.ts` (FR-013, FR-014, FR-020, FR-027, FR-028)
 - [ ] T058 [US2] Add `job-post-reviews` list/detail/command mappings to `web/src/frontend/features/admin/app/data-provider.ts` (FR-012, FR-013, FR-014)
 - [ ] T059 [US2] Add the protected job-review resource and navigation entry to `web/src/frontend/features/admin/app/admin-app.tsx` (FR-012, FR-029)
-- [ ] T060 [P] [US2] Implement filtered deterministic queue presentation in `web/src/frontend/features/admin/job-post-reviews/job-post-review-list.tsx` (FR-012, FR-029)
+- [ ] T060 [P] [US2] Implement filtered deterministic queue presentation with bounded job title/company labels in `web/src/frontend/features/admin/job-post-reviews/job-post-review-list.tsx` (FR-012, FR-029)
 - [ ] T061 [P] [US2] Implement complete snapshot, eligibility, prior-approved diff, assignment, history, private-note, and protected-evidence-link detail in `web/src/frontend/features/admin/job-post-reviews/job-post-review-show.tsx` (FR-015, FR-016, FR-029)
 - [ ] T062 [US2] Implement claim/reassign confirmation and stale-conflict recovery in `web/src/frontend/features/admin/job-post-reviews/job-post-review-action-panel.tsx` (FR-013, FR-014, FR-020, FR-029)
 - [ ] T063 [US2] Validate User Story 2 and record focused results in `spec-kit/specs/017-admin-management-job-posting/quickstart.md` (SC-002, SC-003, SC-004, SC-006, SC-008)
@@ -141,11 +141,11 @@
 ### Tests for User Story 3
 
 - [ ] T064 [P] [US3] Add approval/rejection eligibility, deadline, assignment, expected-version, content-integrity, public reason, private-note, and transition policy tests in `web/tests/backend/unit/job-post-reviews/job-post-decision-policy.test.ts` (FR-017-FR-020)
-- [ ] T065 [P] [US3] Add approve/reject strict command/path, reason bounds, idempotency, stale conflict, terminal replay, and safe error contract tests in `web/tests/backend/contract/job-post-reviews/admin-review-decision.contract.test.ts` (FR-017-FR-020, FR-028)
-- [ ] T066 [P] [US3] Add exact approval, one public snapshot, publication facts, history, audit, outcome notification, and replay integration tests in `web/tests/backend/integration/job-post-reviews/admin-review-approval.test.ts` (FR-017, FR-018, FR-020-FR-022, SC-005)
+- [ ] T065 [P] [US3] Add approve/reject strict command/path, reason bounds, actor-scoped `AdminCommandReceipt` exact replay and changed-binding conflict, stale conflict, terminal replay, and safe error contract tests in `web/tests/backend/contract/job-post-reviews/admin-review-decision.contract.test.ts` (FR-017-FR-020, FR-028)
+- [ ] T066 [P] [US3] Add exact approval, atomic `JobPosting`/normalized-skill upsert, unused-slug creation, collision blocking, stable aggregate projection identity across reapproval, one public snapshot, server-owned approval/publication/public-update facts, history, audit, outcome notification, and replay integration tests in `web/tests/backend/integration/job-post-reviews/admin-review-approval.test.ts` (FR-017, FR-018, FR-020-FR-022, SC-005)
 - [ ] T067 [P] [US3] Add required reason, safe explanation, separate private note, non-public result, history, audit, and replay integration tests in `web/tests/backend/integration/job-post-reviews/admin-review-rejection.test.ts` (FR-019-FR-023, SC-006)
 - [ ] T068 [P] [US3] Add simultaneous approve/reject, stale assignment, revoked grant, inactive company/membership, expired deadline, changed hash, and lost-response tests in `web/tests/backend/integration/job-post-reviews/admin-review-decision-concurrency.test.ts` (FR-017, FR-020, FR-025, SC-004, SC-009)
-- [ ] T069 [P] [US3] Add approved-snapshot-only, pending-replacement, rejected, closed, expired, removed, malformed JSON, missing JSON, and JSON-status-tamper public tests in `web/tests/backend/integration/job-post-reviews/job-post-public-projection.test.ts` (FR-006, FR-008, FR-018, FR-025, SC-001)
+- [ ] T069 [P] [US3] Add canonical `/jobs` search/detail, exact `JobPosting`/skill projection, approved-snapshot enrichment, pending-replacement, rejected, managed closure with pending then later approval remaining closed, expired, removed, malformed/missing JSON, JSON-status-tamper, and unmanaged-legacy compatibility tests in `web/tests/backend/integration/job-post-reviews/job-post-public-projection.test.ts` (FR-006, FR-008, FR-018, FR-025, FR-031, SC-001)
 - [ ] T070 [P] [US3] Add snapshot allow-list, evidence/contact/application exclusion, private-note isolation, neutral public errors, cross-tenant reads, and log-redaction tests in `web/tests/security/job-post-reviews/job-post-review-privacy.test.ts` (FR-016, FR-023, FR-027, FR-030, SC-006)
 - [ ] T071 [P] [US3] Add full review, approve/reject confirmation, reason validation, eligibility block, stale recovery, and decision-result component tests in `web/tests/frontend/components/admin-management/job-post-review-decision.test.tsx` (FR-015, FR-017-FR-020, FR-029)
 - [ ] T072 [P] [US3] Add focus trap/return, destructive-action labeling, keyboard decision, live result, diff semantics, non-color outcomes, and axe tests in `web/tests/frontend/accessibility/admin-management/job-post-review-decision.accessibility.test.tsx` (FR-029, SC-008)
@@ -153,17 +153,17 @@
 ### Implementation for User Story 3
 
 - [ ] T073 [US3] Implement approval/rejection revalidation for assignee grant, company verification, membership context, deadline, expected version, and content integrity in `web/src/backend/jobs/review/job-post-review-policy.ts` (FR-017, FR-019, FR-020, FR-027)
-- [ ] T074 [US3] Implement transaction-compatible approve/reject claims, aggregate pointers, decision fields, private notes, history, audit, and eligible outcome notifications in `web/src/backend/repositories/jobs/prisma-job-post-review-repository.ts` (FR-017-FR-025)
-- [ ] T075 [US3] Implement idempotent assigned-human approval/rejection orchestration and blocked-attempt auditing in `web/src/backend/jobs/review/job-post-review-service.ts` (FR-014, FR-017-FR-025, FR-027)
+- [ ] T074 [US3] Implement transaction-compatible approve/reject claims, aggregate pointers/closure actor-time, deterministic existing-`JobPosting`/skill projection writes with closed-state preservation, decision fields, private notes, history, audit, and eligible outcome notifications in `web/src/backend/repositories/jobs/prisma-job-post-review-repository.ts` (FR-008, FR-017-FR-025)
+- [ ] T075 [US3] Implement idempotent assigned-human approval/rejection orchestration, authorized managed-job closure across review lifecycle and public projection, and blocked-attempt auditing in `web/src/backend/jobs/review/job-post-review-service.ts` (FR-008, FR-014, FR-017-FR-025, FR-027)
 - [ ] T076 [US3] Complete approve/reject dispatch and strict discriminated validation in `web/src/app/api/admin/job-post-reviews/[reviewId]/[action]/route.ts` (FR-017-FR-020, FR-027, FR-028)
-- [ ] T077 [US3] Implement managed-job approved-snapshot selection and neutral unavailable behavior in `web/src/backend/services/jobs/job-workspace-data.ts` (FR-006, FR-008, FR-018, FR-025)
-- [ ] T078 [US3] Apply the same review-managed visibility policy to canonical public job retrieval in `web/src/backend/services/jobs/job-discovery-service.ts` and `web/src/backend/repositories/jobs/prisma-public-job-repository.ts` without changing unmanaged legacy behavior (FR-006, FR-018, FR-031)
+- [ ] T077 [US3] Implement managed-job approved-content selection, server-derived public status/verification/statistics/timestamps, and neutral unavailable behavior in `web/src/backend/services/jobs/job-workspace-data.ts` (FR-006, FR-008, FR-018, FR-025)
+- [ ] T078 [US3] Integrate the deterministic projector from T017 with aggregate-linked canonical search and approved-snapshot detail enrichment in `web/src/backend/services/jobs/job-discovery-service.ts` and `web/src/backend/repositories/jobs/prisma-public-job-repository.ts` without changing unmanaged legacy behavior (FR-006, FR-018, FR-031)
 - [ ] T079 [US3] Add safe protected verification-viewer destination resolution without evidence copying in `web/src/backend/jobs/review/job-post-review-service.ts` (FR-015, FR-016)
 - [ ] T080 [US3] Extend the Administrator action panel with approve/reject forms, public/private separation, eligibility blocks, confirmation, and stale recovery in `web/src/frontend/features/admin/job-post-reviews/job-post-review-action-panel.tsx` (FR-017-FR-020, FR-029)
 - [ ] T081 [US3] Add current decision, public reason, private notes, approved diff, integrity state, and immutable history rendering in `web/src/frontend/features/admin/job-post-reviews/job-post-review-show.tsx` (FR-015, FR-016, FR-019, FR-021, FR-029)
 - [ ] T082 [US3] Add integrity-block, decision failure, stale conflict, and queue-age operational metrics in `web/src/backend/jobs/review/job-post-review-operations.ts` (FR-030, SC-009)
 - [ ] T083 [US3] Validate User Story 3 and record focused results in `spec-kit/specs/017-admin-management-job-posting/quickstart.md` (SC-001, SC-003-SC-006, SC-008, SC-009)
-- [ ] T084 [US3] Commit the completed Administrator discovery/decision logical group with an English message and record the hash in `spec-kit/specs/017-admin-management-job-posting/quickstart.md`
+- [ ] T084 [US3] Commit the completed Administrator discovery/decision logical group with an English message; use Git history as the commit-hash evidence referenced by `spec-kit/specs/017-admin-management-job-posting/quickstart.md`
 
 **Checkpoint**: Exact human approval/rejection and approved-only public projection are independently demonstrable; Recruiter outcome/resubmission completes the workflow.
 
@@ -193,7 +193,7 @@
 - [ ] T095 [US4] Implement rejected-version editing, public reason display, and new-version submit behavior in `web/src/frontend/features/recruiter-workspace/job-posting-editor.tsx` (FR-019, FR-024, FR-029)
 - [ ] T096 [P] [US4] Add outcome, reason, resubmit, and pending-replacement styles to `web/src/frontend/styles/recruiter-workspace-full.css` (FR-029, SC-008)
 - [ ] T097 [US4] Validate User Story 4 and record focused results in `spec-kit/specs/017-admin-management-job-posting/quickstart.md` (SC-004, SC-006-SC-009)
-- [ ] T098 [US4] Commit the completed Recruiter outcome/resubmission logical group with an English message and record the hash in `spec-kit/specs/017-admin-management-job-posting/quickstart.md`
+- [ ] T098 [US4] Commit the completed Recruiter outcome/resubmission logical group with an English message; use Git history as the commit-hash evidence referenced by `spec-kit/specs/017-admin-management-job-posting/quickstart.md`
 
 **Checkpoint**: All four P1 user stories form one complete human-controlled P0 review workflow.
 
@@ -203,10 +203,10 @@
 
 **Purpose**: Prove migration safety, security, privacy, accessibility, performance, usability, architecture, and regressions across the complete workflow.
 
-- [ ] T099 [P] Add migration adoption/replay/unresolved mapping and verification-script integration tests in `web/tests/backend/integration/job-post-reviews/job-post-review-adoption.test.ts` (FR-024, FR-026, SC-009)
+- [ ] T099 [P] Add migration adoption/replay, exact legacy `JobPosting` identity/content binding, slug/owner mismatch blocking, unresolved mapping, and verification-script integration tests in `web/tests/backend/integration/job-post-reviews/job-post-review-adoption.test.ts` (FR-018, FR-024, FR-026, SC-009)
 - [ ] T100 [P] Add notification payload privacy, recipient isolation, log redaction, and no snapshot/reason/note canaries in `web/tests/security/notifications/job-post-review-notification-privacy.test.ts` (FR-009, FR-016, FR-022, FR-023)
-- [ ] T101 [P] Add CSRF, exact-origin, session expiry/revocation, account state, company/membership state, Administrator grant, enumeration, and command replay matrix tests in `web/tests/security/job-post-reviews/job-post-review-authorization-matrix.test.ts` (FR-001, FR-014, FR-027, FR-028)
-- [ ] T102 [P] Add architecture canaries for PostgreSQL review authority, managed public snapshot gating, one JSON repository, no second session, and no automated decision path in `web/tests/architecture/job-post-review-boundaries.test.ts` (FR-006, FR-025-FR-027, FR-031)
+- [ ] T101 [P] Add CSRF, exact-origin, session expiry/revocation, account state, company/membership state, managed closure, Administrator grant, enumeration, and command replay matrix tests in `web/tests/security/job-post-reviews/job-post-review-authorization-matrix.test.ts` (FR-001, FR-008, FR-014, FR-027, FR-028)
+- [ ] T102 [P] Add architecture canaries for PostgreSQL review authority, aggregate-linked `JobPosting` as derivative search projection, approved-snapshot detail gating, one JSON repository, no second session, and no automated decision path in `web/tests/architecture/job-post-review-boundaries.test.ts` (FR-006, FR-018, FR-025-FR-027, FR-031)
 - [ ] T103 Create the documented dataset, concurrency, warm-up, nearest-rank percentile, max, error-rate, and integrity-aware measurement harness in `web/scripts/measure-job-post-review-performance.mjs` (FR-030, SC-002, SC-003)
 - [ ] T104 [P] Add release thresholds for five-second notification P95, two-second interaction P95, exact sample metadata, and 100% integrity/privacy correctness in `web/tests/performance/job-post-reviews/job-post-review-performance.test.ts` (SC-001-SC-006, SC-009)
 - [ ] T105 [P] Add responsive Administrator/Recruiter submit-alert-claim-approve/reject-resubmit Playwright coverage in `web/tests/system/e2e/job-post-reviews/job-post-review-workflow.spec.ts` (SC-007, SC-008)
@@ -219,7 +219,7 @@
 - [ ] T112 Run the performance harness and record environment, dataset, samples, concurrency, P50/P95/P99/max, error rate, and threshold results in `spec-kit/specs/017-admin-management-job-posting/quickstart.md` (SC-002, SC-003)
 - [ ] T113 Run keyboard, axe, responsive, and focused Playwright validation and record zero serious/critical findings in `spec-kit/specs/017-admin-management-job-posting/quickstart.md` (SC-007, SC-008)
 - [ ] T114 Audit final diffs for zero client-authored lifecycle fields, private-note leakage, unmanaged direct JSON writes, automated decisions, second sessions, hidden analysis findings, or unrelated feature scope and record the result in `spec-kit/specs/017-admin-management-job-posting/quickstart.md` (FR-016, FR-023, FR-026-FR-031)
-- [ ] T115 Commit final validation evidence with an English message and record the release commit hash in `spec-kit/specs/017-admin-management-job-posting/quickstart.md`
+- [ ] T115 Commit final validation evidence with an English message and use Git history as the release commit-hash evidence referenced by `spec-kit/specs/017-admin-management-job-posting/quickstart.md`
 
 ---
 

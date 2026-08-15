@@ -18,7 +18,7 @@ All planning unknowns are resolved. No external provider or AI capability is req
 
 ## Decision 2: Store Full Immutable Review Snapshots
 
-**Decision**: Store the normalized allow-listed job content as a JSON snapshot with schema version and canonical SHA-256 identity for every submitted version.
+**Decision**: Store the normalized allow-listed Recruiter-visible content as a JSON snapshot with schema version and canonical SHA-256 identity for every submitted version. Exclude status, approval feedback, verification display, statistics, and lifecycle/publication timestamps; derive those from current authority and the decision.
 
 **Rationale**: Administrators must decide the exact content they inspected, active edits must preserve the prior approved content, and later JSON changes must not rewrite history.
 
@@ -29,7 +29,7 @@ All planning unknowns are resolved. No external provider or AI capability is req
 
 ## Decision 3: Adopt Legacy Jobs Incrementally
 
-**Decision**: Leave unmanaged legacy jobs unchanged. Adopt a job when it is submitted or materially edited. Capture an imported approved baseline for an active legacy job before reviewing its replacement. Provide a rerunnable command for existing pending/rejected JSON rows.
+**Decision**: Leave unmanaged legacy jobs unchanged. Adopt a job when it is submitted or materially edited. Before the first material JSON write to an active legacy job, capture the pre-edit record as an imported approved baseline and bind or create its exact relational public projection; only after that PostgreSQL transaction commits may the edited working draft replace the JSON record. A failed JSON write leaves the imported baseline safely public and retryable. Provide a rerunnable command for existing pending/rejected JSON rows.
 
 **Rationale**: Incremental adoption avoids a risky bulk migration across thousands of legacy rows while ensuring every new decision has exact authority.
 
@@ -40,18 +40,20 @@ All planning unknowns are resolved. No external provider or AI capability is req
 
 ## Decision 4: Isolate JSON File Safety Behind One Repository
 
-**Decision**: Replace direct `readFile`/`writeFile` use in job services with one JSON repository using a process queue, cross-process lease, checksum comparison, validated parse, temporary file, flush, and atomic replace.
+**Decision**: Designate exactly one long-lived application host as the JSON catalogue writer and make every other host reject catalogue mutations. On the writer host, replace direct `readFile`/`writeFile` use with one JSON repository using a process queue, a PostgreSQL-backed writer lease keyed by the configured catalogue identity, checksum comparison, validated parse, temporary file, flush, and atomic replace.
 
 **Rationale**: Multiple routes and process restarts must not corrupt the catalogue, and all compatibility writes need one deterministic recovery boundary.
 
 **Alternatives considered**:
 
 - Keep the current in-memory write queue only: rejected because it does not coordinate multiple processes.
+- Allow several writer hosts against copied or independently mounted files: rejected because no lock can make different JSON copies one catalogue authority.
+- Use only a filesystem lock on the designated host: rejected because separate local processes and stale owners need one durable compare-and-swap lease.
 - Introduce a second document database: rejected because it violates scope and architecture constraints.
 
 ## Decision 5: Use Explicit Submit and Administrator Command Endpoints
 
-**Decision**: Preserve draft create/update routes and add a dedicated submit-review command. Add protected Administrator list/detail and claim/reassign/approve/reject commands with expected versions and idempotency keys.
+**Decision**: Preserve draft create/update routes and add a dedicated submit-review command. Add protected Administrator list/detail and claim/reassign/approve/reject commands with expected versions, idempotency keys, and a body discriminator that must equal the path action. Store the Recruiter submission key with a request-binding hash so changed reuse is rejected.
 
 **Rationale**: Draft persistence and review submission have different validation, authorization, atomicity, and retry semantics. Explicit commands prevent clients from forging status transitions.
 
@@ -73,7 +75,7 @@ All planning unknowns are resolved. No external provider or AI capability is req
 
 ## Decision 7: Keep Notifications Free of Job Content
 
-**Decision**: Add `JOB_POST_REVIEW_REQUESTED_ADMIN`, `JOB_POST_APPROVED`, and `JOB_POST_REJECTED` with a `JOB_POST_REVIEW` context. Payloads contain only audience/state variables and an opaque review context ID.
+**Decision**: Add `JOB_POST_REVIEW_REQUESTED_ADMIN`, `JOB_POST_APPROVED`, and `JOB_POST_REJECTED` with a `JOB_POST_REVIEW` context. Classify all three as `MODERATION`; use `MEDIUM` severity for request/rejection and `LOW` for approval. Payloads contain only audience/state variables and the opaque Job Review Version ID used consistently by Administrator and Recruiter destinations; aggregate IDs remain internal.
 
 **Rationale**: The destination reauthorizes and loads current data; notification rows do not need company names, job titles, reasons, evidence, or notes.
 
@@ -145,3 +147,15 @@ All planning unknowns are resolved. No external provider or AI capability is req
 **Alternatives considered**:
 
 - One combined performance success rate: rejected because it could conceal critical correctness failures.
+
+## Decision 14: Project Approved JSON Snapshots into the Canonical Job Board
+
+**Decision**: On approval, deterministically upsert the existing PostgreSQL `JobPosting` and normalized skill relations as a searchable publication projection of the approved snapshot. The aggregate's unique `publicJobPostingId` is the primary projection identity. Initial adoption may bind an existing row only when stable slug, company, mapped content, and unowned identity all match; a collision is blocked for reconciliation. New approval creates one row only for an unused stable slug, and reapproval updates the linked row. Skills reuse the existing normalized-name identity. Keep the snapshot as content authority and join it for canonical detail fields not represented by the projection. Pending/rejected versions never update this projection.
+
+**Rationale**: Canonical `/jobs` search/detail already reads `JobPosting`; without a projection, an approved JSON-origin job would remain undiscoverable. The projection is transactional with approval and is not a catalogue-wide source migration.
+
+**Alternatives considered**:
+
+- Query JSON directly from canonical search: rejected because it bypasses existing deterministic indexes, filters, pagination, and authorization rules.
+- Union raw JSONB snapshots into every search query: rejected because it duplicates query policy and lacks the existing structured indexes.
+- Bulk migrate the working catalogue: rejected by the explicit feature scope.

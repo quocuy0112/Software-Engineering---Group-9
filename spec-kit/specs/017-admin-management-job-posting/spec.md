@@ -92,6 +92,7 @@ As the submitting Recruiter, I receive the decision, can understand a rejection,
 - A posting is submitted while its company verification or membership changes concurrently.
 - Two Administrators claim or decide the same review at nearly the same time.
 - A submitted job-content record is missing, malformed, duplicated, or changes unexpectedly after the review snapshot is accepted.
+- The designated working-catalogue writer is unavailable, the configured path is not durable, or another host is incorrectly configured to accept catalogue mutations.
 - Notification creation fails before the submission or decision transaction completes.
 - The notification is replayed, the Administrator refreshes during a command, or a client retries after losing the response.
 - A posting deadline passes while review is pending or immediately before approval.
@@ -106,10 +107,10 @@ As the submitting Recruiter, I receive the decision, can understand a rejection,
 ### Functional Requirements
 
 - **FR-001**: The system MUST permit review submission only for an authenticated Recruiter with an active qualifying membership in the posting's active verified company.
-- **FR-002**: The system MUST validate all required job fields and current company eligibility at submission time and MUST create no review work for an invalid submission.
+- **FR-002**: The system MUST validate all required job fields, deterministic public/search field mappings, and current company eligibility at submission time and MUST create no review work for an invalid or unpublishable submission.
 - **FR-003**: A successful submission MUST identify one exact, immutable review version of the complete submitted job content.
 - **FR-004**: The canonical review lifecycle MUST be `Pending Review` followed by exactly one terminal decision of `Approved` or `Rejected`; a rejected revision MUST create a new lifecycle version.
-- **FR-005**: Repeated and concurrent submissions of the same job version MUST be idempotent and MUST NOT create duplicate pending reviews or notifications.
+- **FR-005**: Repeated and concurrent submissions of the same job version MUST be idempotent and MUST NOT create duplicate pending reviews or notifications; reusing one submission idempotency key with a different job, expected working version, or content identity MUST fail without mutation.
 - **FR-006**: Pending and rejected versions MUST remain unavailable through all public job discovery and detail paths.
 - **FR-007**: A submitted version MUST be locked against in-place Recruiter edits; revisions MUST use a distinct version.
 - **FR-008**: A material edit to an active posting MUST create a distinct immutable review version, and the last approved version MUST remain the only public version until the edited version is approved; closure and expiry MAY still remove public availability without approving unpublished edits.
@@ -118,19 +119,19 @@ As the submitting Recruiter, I receive the decision, can understand a rejection,
 - **FR-011**: Selecting a review notification MUST lead an authorized Administrator to the exact protected review and mark only that recipient's notification as read.
 - **FR-012**: The Administrator console MUST provide a paginated review queue with state, assignment, age, company, and submission-version filters and deterministic ordering.
 - **FR-013**: Every currently eligible Administrator MUST be able to discover and claim unassigned pending reviews, and concurrent claims MUST select exactly one current assignee without withdrawing the historical alert from other recipients.
-- **FR-014**: Only an eligible current assignee MUST be able to approve or reject a pending review; reassignment MUST be explicit, authorized, version-checked, and auditable.
+- **FR-014**: Only an eligible current assignee MUST be able to approve or reject a pending review. The current eligible assignee MAY explicitly reassign it to another eligible Administrator; any eligible Administrator MAY recover work from an assignee whose grant is no longer active. Every reassignment MUST be version-checked and auditable.
 - **FR-015**: The review detail MUST show the complete immutable submitted job snapshot, safe current company and submitter eligibility context, prior-approved comparison, review version, assignment, and immutable decision history; separately authorized Administrators MAY follow a link to the existing protected verification viewer.
 - **FR-016**: Review detail and notifications MUST NOT copy or disclose protected business evidence, unrestricted notes, private contact information, or unrelated company, application, candidate, or account data, and losing access to the protected verification viewer MUST NOT reveal evidence through cached review data.
 - **FR-017**: Approval MUST revalidate the exact pending version, current company eligibility, current assignment, deadline viability, and expected review version before making the submitted version active.
-- **FR-018**: Approval MUST make exactly one reviewed version public and MUST set its approval/publication facts consistently.
+- **FR-018**: Approval MUST atomically create or replace exactly one canonical public/search projection from the reviewed version and MUST set server-owned approval, publication, and public-update times consistently; ordinary visibility gates, including managed closure, determine whether that projection is currently discoverable, and Recruiter-authored or legacy working timestamps MUST NOT control those facts.
 - **FR-019**: Rejection MUST require one allow-listed Recruiter-visible reason code and a normalized bounded explanation that identifies an actionable correction; any optional private Administrator note MUST remain separately protected and MUST NOT be copied into notifications, public history, or Recruiter views.
-- **FR-020**: Approval and rejection commands MUST be idempotent and reject stale, conflicting, unassigned, unauthorized, or already-terminal decisions without overwriting the authoritative state.
+- **FR-020**: Administrator commands MUST require the path action and body command discriminator to match, MUST be idempotent, and MUST reject stale, conflicting, unassigned, unauthorized, or already-terminal decisions without overwriting the authoritative state.
 - **FR-021**: Every submission, claim, reassignment, approval, rejection, blocked decision, and resubmission MUST produce an audit record identifying actor, action, target, result, version, and timestamp without unnecessary personal data.
 - **FR-022**: A committed decision MUST create exactly one safe in-app outcome notification for the submitting Recruiter only when that person still has qualifying company membership; otherwise it MUST send no direct outcome detail and MUST expose the state only through tenant-scoped discovery by currently authorized company members.
 - **FR-023**: Recruiter notifications and views MUST expose no private Administrator note, other Administrator identity, or cross-company review data.
 - **FR-024**: A rejected job MUST be revisable and resubmittable by a currently authorized Recruiter as a distinct version while preserving all prior review history.
 - **FR-025**: Failure to create required review state, audit evidence, or in-app notifications MUST NOT leave a posting publicly active without its matching approved decision.
-- **FR-026**: The workflow MUST preserve the existing job-content persistence and existing job identifiers; migrating job content to a replacement authority is outside this feature.
+- **FR-026**: The workflow MUST preserve the existing JSON working catalogue and stable job identifiers without a catalogue-wide migration. On adoption, the system MUST copy exact submitted/approved snapshots into review authority and MAY maintain a derivative searchable public projection; for that managed job, mutable JSON lifecycle fields MUST no longer control review state or public visibility.
 - **FR-027**: Server-side authorization MUST precede every protected review read or mutation and MUST combine current Platform Administrator authority or current verified-company membership with tenant ownership.
 - **FR-028**: All write operations MUST enforce same-origin request protections, strict input validation, bounded text, and safe error responses.
 - **FR-029**: Review lists and details MUST provide meaningful loading, empty, success, stale-conflict, and retry states and MUST be operable with keyboard navigation, assistive technology, and non-color state cues.
@@ -140,10 +141,11 @@ As the submitting Recruiter, I receive the decision, can understand a rejection,
 ### Key Entities
 
 - **Job Posting**: The existing company-owned job content and stable identifier, including its draft, public, rejected, and closed representations.
-- **Job Review Version**: An immutable identity for one exact submitted content version, including its job, company, submitter, submission time, content integrity identity, lifecycle state, and version number.
+- **Job Review Aggregate**: The internal adoption record that groups every submitted version of one stable job identifier, points to its current pending and approved versions, and owns managed closure state; it is not exposed as an Administrator review resource identifier.
+- **Job Review Version**: The externally addressable review resource for one exact immutable submitted content version, including its aggregate, job, company, submitter, submission time, content integrity identity, lifecycle state, and sequence number. Every API `reviewId` and review notification context identifies this entity.
 - **Job Review Assignment**: The current eligible Platform Administrator responsible for a pending review, including claim and reassignment history.
 - **Job Review Decision**: The terminal human approval or rejection of one exact review version, including reason, public explanation, protected note reference, actor, time, and idempotency identity.
-- **Approved Job Version**: The single review version whose content is authorized for public visibility until superseded, closed, expired, or removed.
+- **Approved Job Version**: The single review version whose content is authorized for public visibility until superseded, closed, expired, or removed, and from which the searchable public projection is deterministically derived.
 - **In-App Notification**: A recipient-scoped, deduplicated review alert or outcome that carries only safe display data and an authorized context reference.
 - **Audit Event**: Immutable operational evidence for a review command or failed attempt with bounded non-sensitive context.
 
@@ -165,6 +167,7 @@ As the submitting Recruiter, I receive the decision, can understand a rejection,
 ## Assumptions
 
 - The existing job-content persistence, identifiers, and Recruiter editing contract remain in place; this feature adds a protected review authority and does not migrate the content catalogue.
+- Exactly one designated application host accepts working-catalogue mutations on one durable path; its local processes share one coordinated writer lease. Other hosts are read-only for this catalogue. If writer designation, durability, writability, checksum continuity, or lease exclusivity cannot be established, job-content mutations fail closed while approved review snapshots remain readable.
 - Better Auth remains the exclusive browser-session owner, and current Platform Administrator grants and verified-company memberships remain the authorization authorities.
 - The existing unified in-app notification center is extended; no new email delivery or realtime transport is required.
 - Material edits include every field that can change the public meaning, eligibility, searchability, application requirements, compensation, location, deadline, or company presentation of a posting.
