@@ -25,7 +25,9 @@ describe("notification event producer coverage", () => {
     ]) {
       expect(recovery).toContain(`kind: "${kind}"`);
     }
-    expect(recovery).toContain('templateVersion: "account-recovery-pending.v1"');
+    expect(recovery).toContain(
+      'templateVersion: "account-recovery-pending.v1"',
+    );
   });
 
   it("covers workflow and terminal report outcomes", () => {
@@ -38,7 +40,9 @@ describe("notification event producer coverage", () => {
       "src/backend/admin/messaging-reports/admin-messaging-report-review-service.ts",
       "src/backend/admin/moderation/moderation-submission-service.ts",
       "src/backend/admin/moderation/moderation-review-service.ts",
-    ].map(read).join("\n");
+    ]
+      .map(read)
+      .join("\n");
     for (const kind of [
       "APPLICATION_STAGE_CHANGED",
       "APPLICATION_SUBMITTED",
@@ -68,6 +72,37 @@ describe("notification event producer coverage", () => {
     );
     expect(outbox).toContain('language: "EN"');
     expect(outbox).toContain('state: "ACTIVE"');
+  });
+
+  it("covers actionable administrator support, report, verification, and delivery producers", () => {
+    const files = [
+      "src/backend/repositories/support/prisma-support-repository.ts",
+      "src/backend/repositories/messaging/prisma-messaging-report-repository.ts",
+      "src/backend/admin/moderation/moderation-submission-service.ts",
+      "src/backend/admin/workers/verification-lifecycle-loop.ts",
+      "src/backend/admin/notifications/security-notification-ops-alert.ts",
+    ]
+      .map(read)
+      .join("\n");
+    for (const kind of [
+      "SUPPORT_CASE_RECEIVED",
+      "SUPPORT_REQUESTER_REPLIED",
+      "SUPPORT_CASE_REOPENED",
+      "MESSAGE_REPORT_RECEIVED_ADMIN",
+      "MODERATION_REPORT_RECEIVED_ADMIN",
+      "VERIFICATION_REVIEW_OVERDUE",
+      "DELIVERY_MANUAL_INTERVENTION_REQUIRED",
+    ]) {
+      expect(files).toContain(kind);
+    }
+    for (const forbidden of [
+      "subject: row.subject",
+      "message: input.content",
+      "detail: command.detail",
+      "evidence: input.evidenceMessageId",
+    ]) {
+      expect(files).not.toContain(forbidden);
+    }
   });
 
   it("keeps application, message, and report receipts in-app-only", () => {

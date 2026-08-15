@@ -8,6 +8,7 @@ import type { PrivateBusinessEvidenceStorage } from "@/backend/storage/business-
 import { randomUUID } from "node:crypto";
 import { createVerificationNotificationEvent } from "@/backend/admin/notifications/verification-notification-event";
 import { notifyActiveAdministratorsOfVerificationSubmission } from "@/backend/admin/notifications/verification-outbox";
+import { notifyActionableAdministrators } from "@/backend/notifications/admin-notification-fanout";
 
 async function makeEvidenceInaccessible(
   tx: Prisma.TransactionClient,
@@ -176,7 +177,8 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
       changed += 1;
     }
     if (row.state === "PENDING_REVIEW" && row.viewerUnavailableSince) {
-      const outage = now.getTime() - row.viewerUnavailableSince.getTime();
+      const viewerUnavailableSince = row.viewerUnavailableSince;
+      const outage = now.getTime() - viewerUnavailableSince.getTime();
       if (outage >= 72 * 60 * 60_000) {
         await prisma.$transaction(async (tx) => {
           const update = await tx.recruiterVerificationRequest.updateMany({
@@ -223,11 +225,31 @@ export async function runVerificationDeadlineCycle(now = new Date()) {
         });
         changed += 1;
       } else if (outage >= 15 * 60_000 && !row.viewerEscalatedAt) {
-        await prisma.recruiterVerificationRequest.update({
-          where: { id: row.id },
-          data: { viewerEscalatedAt: now },
+        const didEscalate = await prisma.$transaction(async (tx) => {
+          const escalated = await tx.recruiterVerificationRequest.updateMany({
+            where: {
+              id: row.id,
+              state: "PENDING_REVIEW",
+              viewerUnavailableSince,
+              viewerEscalatedAt: null,
+            },
+            data: { viewerEscalatedAt: now },
+          });
+          if (escalated.count === 1) {
+            await notifyActionableAdministrators(tx, {
+              kind: "VERIFICATION_REVIEW_OVERDUE",
+              eventKey: `${row.id}:viewer-unavailable:${viewerUnavailableSince.toISOString()}`,
+              correlationId: `verification-escalation:${row.id}`,
+              occurredAt: now,
+              contextType: "VERIFICATION_REQUEST",
+              contextId: row.id,
+              state: "EVIDENCE_UNAVAILABLE",
+            });
+            return true;
+          }
+          return false;
         });
-        changed += 1;
+        if (didEscalate) changed += 1;
       }
     }
     if (
