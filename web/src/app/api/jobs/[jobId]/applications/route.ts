@@ -71,6 +71,7 @@ export async function POST(
       request.headers.get("content-type")?.toLowerCase() ?? "";
     let command: unknown;
     let directCv: DirectApplicationCvSource | undefined;
+    let directCoverLetter: DirectApplicationCvSource | undefined;
     if (contentType.startsWith("multipart/form-data")) {
       const formData = await request.formData();
       const application = formData.get("application");
@@ -89,6 +90,9 @@ export async function POST(
         });
       }
       directCv = directCvSource(formData.get("cvFile"));
+      if (formData.get("coverLetterFile") instanceof File) {
+        directCoverLetter = directCvSource(formData.get("coverLetterFile"));
+      }
     } else {
       command = await parseBoundedJson(
         request,
@@ -103,6 +107,7 @@ export async function POST(
       command,
       new Date(),
       directCv,
+      directCoverLetter,
     );
     return jobJson(result, { status: result.created ? 201 : 200 });
   } catch (error) {

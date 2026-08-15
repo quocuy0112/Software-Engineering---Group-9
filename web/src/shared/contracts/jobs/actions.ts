@@ -128,13 +128,29 @@ export const applicationAnswerInputSchema = z
 
 export const DIRECT_APPLICATION_CV_ID = "application-upload";
 
+export const applicationCoverLetterInputSchema = z.union([
+  z.string().trim().max(5_000),
+  z
+    .object({ kind: z.literal("NONE") })
+    .strict(),
+  z
+    .object({ kind: z.literal("TEXT"), text: z.string().trim().min(1).max(10_000) })
+    .strict(),
+  z
+    .object({
+      kind: z.literal("FILE"),
+      validatedDocumentId: z.string().min(1).max(128),
+    })
+    .strict(),
+]);
+
 export const applicationSubmissionSchema = z
   .object({
     cvId: z.string().min(1).max(128),
     cvFileRef: z.string().min(1).max(256).nullable().optional(),
     contactSnapshot: applicationContactSnapshotSchema.optional(),
     answers: z.array(applicationAnswerInputSchema).max(20),
-    coverLetter: z.string().trim().max(5000).nullable(),
+    coverLetter: applicationCoverLetterInputSchema.nullable(),
     consentVersion: z.string().min(1).max(64),
     consentAccepted: z.literal(true),
     aiAnalysisConsent: z.boolean().optional(),
@@ -156,6 +172,7 @@ export const applicationOutcomeSchema = z
     applicationId: z.string().min(1).max(128),
     jobId: z.string().min(1).max(128),
     stage: z.literal("APPLIED"),
+    stageVersion: z.number().int().positive().optional(),
     submittedAt: z.string().datetime(),
     created: z.boolean(),
     message: z.string().min(1).max(300),

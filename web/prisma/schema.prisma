@@ -284,6 +284,102 @@ enum ApplicationScoringStatus {
   FAILED
 }
 
+enum ApplicationDocumentKind {
+  CV
+  COVER_LETTER
+}
+
+enum ApplicationArtifactPromotionState {
+  PROMOTED
+  COMMITTED
+  DELETE_PENDING
+  DELETING
+  DELETED
+  DELETE_FAILED
+}
+
+enum ApplicationLegacyDocumentState {
+  CURRENT
+  BACKFILLABLE
+  UNAVAILABLE
+}
+
+enum ScoringResultState {
+  DETERMINISTIC_ONLY
+  SCORED
+}
+
+enum ScoringParseStatus {
+  PARSED_SUCCESSFULLY
+  PARSED_WITH_ERRORS
+  FAILED
+}
+
+enum ScoringSkillRequirementKind {
+  REQUIRED
+  PREFERRED
+}
+
+enum ScoringSkillMatchState {
+  FOUND
+  MISSING
+  NEUTRAL_PREFERRED
+}
+
+enum ScoringAiConfidenceLevel {
+  LOW
+  STANDARD
+}
+
+enum ScoringAiQuestionState {
+  GENERATED
+  INSUFFICIENT_DATA
+}
+
+enum ScoringOperationKind {
+  INITIAL
+  JOB_RESCORE
+  AI_RETRY
+}
+
+enum ScoringOperationState {
+  QUEUED
+  RUNNING
+  COMPLETED
+  COMPLETED_WITH_FAILURES
+  FAILED
+}
+
+enum ScoringWorkItemState {
+  QUEUED
+  LEASED
+  AUTOMATIC_READY
+  AI_PENDING
+  PUBLISHED
+  DETERMINISTIC_ONLY
+  FAILED
+  SUPERSEDED
+}
+
+enum ManualPriorityValue {
+  HIGH
+  NORMAL
+  LOW
+  HOLD
+}
+
+enum ScoringDecisionKind {
+  MOVE_TO_INTERVIEW
+  REJECT
+}
+
+enum ScoringNotificationStatus {
+  NOT_REQUIRED
+  PENDING
+  SENT
+  FAILED_RETRYING
+}
+
 enum RecruitmentNotificationAudience {
   CANDIDATE
   COMPANY
@@ -817,6 +913,10 @@ model UserAccount {
   connectionProposalHistory      ProfessionalConnectionProposalHistory[] @relation("ConnectionProposalHistoryActor")
   connectionNotifications        ProfessionalConnectionNotification[]    @relation("ConnectionNotificationRecipient")
   inAppNotifications             InAppNotification[]                     @relation("InAppNotificationRecipient")
+  applicationArtifactPromotions  ApplicationArtifactPromotion[]            @relation("ApplicationArtifactPromotionCandidate")
+  applicationLegalHoldsIssued    ApplicationDocumentLegalHold[]            @relation("ApplicationLegalHoldIssuer")
+  scoringOperationsRequested     ScoringOperation[]                         @relation("ScoringOperationRequester")
+  manualPrioritiesSet            ManualApplicationPriority[]                @relation("ManualPriorityActor")
   connectionCommandReceipts      ProfessionalConnectionCommandReceipt[]  @relation("ConnectionCommandActor")
   messagingConversationsLow      MessagingConversation[]                 @relation("MessagingConversationLow")
   messagingConversationsHigh     MessagingConversation[]                 @relation("MessagingConversationHigh")
@@ -1892,6 +1992,9 @@ model JobPosting {
   savedBy                  SavedJob[]
   reports                  JobReport[]
   applications             JobApplication[]
+  applicationArtifactPromotions ApplicationArtifactPromotion[]
+  scoringOperations        ScoringOperation[]
+  rankingSnapshots         RankingSnapshot[]
 
   @@index([status, publishedAt(sort: Desc), id])
   @@index([status, applicationDeadline, id])
@@ -1954,6 +2057,7 @@ model CandidateCv {
   updatedAt       DateTime          @updatedAt
   candidate       CandidateIdentity @relation(fields: [candidateUserId], references: [userId], onDelete: Restrict)
   applications    JobApplication[]
+  applicationDocuments ApplicationDocument[] @relation("ApplicationDocumentSourceCv")
 
   @@index([candidateUserId, confirmedAt, archivedAt])
 }
@@ -2011,6 +2115,13 @@ model JobApplication {
   idempotencyKey          String
   submissionBindingDigest String
   submittedAt             DateTime                      @default(now())
+  documentRetentionDueAt  DateTime?
+  documentAccessDeniedAt  DateTime?
+  documentDeletionDueAt   DateTime?
+  documentDeletedAt       DateTime?
+  legacyDocumentState     ApplicationLegacyDocumentState @default(CURRENT)
+  currentScoringResultId  String?                       @unique
+  scoringGeneration       Int                           @default(0)
   createdAt               DateTime                      @default(now())
   updatedAt               DateTime                      @updatedAt
   candidate               CandidateIdentity             @relation(fields: [candidateUserId], references: [userId], onDelete: Restrict)
@@ -2020,12 +2131,110 @@ model JobApplication {
   notificationWork        RecruitmentNotificationWork[]
   stageEvents             ApplicationStageEvent[]
   messagingConversations  MessagingConversation[]
+  applicationDocuments    ApplicationDocument[]
+  coverLetterText         ApplicationCoverLetterText?
+  artifactPromotions      ApplicationArtifactPromotion[]
+  legalHolds              ApplicationDocumentLegalHold[]
+  currentScoringResult    ApplicationScoringResult?      @relation("CurrentScoringResult", fields: [currentScoringResultId], references: [id], onDelete: SetNull)
+  scoringResults          ApplicationScoringResult[]      @relation("ApplicationScoringResults")
+  scoringOperations       ScoringOperation[]
+  manualPriorities        ManualApplicationPriority[]
+  rankingRows             RankingSnapshotRow[]
+  aiAssessments           AiAssessment[]
+  scoringWorkItems        ScoringWorkItem[]
+  aiAssessmentAttempts    AiAssessmentAttempt[]
 
   @@unique([candidateUserId, jobPostingId])
   @@unique([candidateUserId, idempotencyKey])
   @@index([jobPostingId, stage, submittedAt])
   @@index([candidateUserId, submittedAt(sort: Desc)])
   @@index([candidateUserId, aiAnalysisConsent])
+  @@index([jobPostingId, submittedAt(sort: Desc), id(sort: Desc)])
+  @@index([documentDeletedAt, documentDeletionDueAt])
+  @@index([jobPostingId, currentScoringResultId, submittedAt(sort: Desc), id(sort: Desc)])
+}
+
+model ApplicationDocument {
+  id                         String                  @id @default(cuid())
+  jobApplicationId           String
+  kind                       ApplicationDocumentKind
+  storagePurposeVersion      String                  @default("application-document-v1")
+  storageKeyEncrypted        String
+  originalFilenameEncrypted  String
+  mediaType                  String
+  byteLength                 Int
+  contentDigestHmac          String
+  sourceCandidateCvId        String?
+  sourceCandidateCvVersion   Int?
+  safetyAssessmentId         String
+  committedAt                DateTime?
+  ordinaryAccessDeniedAt     DateTime?
+  deleteAfter                DateTime?
+  deletedAt                  DateTime?
+  createdAt                  DateTime                @default(now())
+  application                JobApplication         @relation(fields: [jobApplicationId], references: [id], onDelete: Cascade)
+  sourceCandidateCv          CandidateCv?            @relation("ApplicationDocumentSourceCv", fields: [sourceCandidateCvId], references: [id], onDelete: SetNull)
+
+  @@unique([jobApplicationId, kind])
+  @@index([ordinaryAccessDeniedAt, deletedAt])
+  @@index([deleteAfter, deletedAt])
+}
+
+model ApplicationCoverLetterText {
+  jobApplicationId       String          @id
+  textEncrypted          String          @db.Text
+  characterCount         Int
+  ordinaryAccessDeniedAt DateTime?
+  deleteAfter             DateTime?
+  deletedAt               DateTime?
+  createdAt               DateTime        @default(now())
+  application             JobApplication @relation(fields: [jobApplicationId], references: [id], onDelete: Cascade)
+
+  @@index([deleteAfter, deletedAt])
+}
+
+model ApplicationArtifactPromotion {
+  id                    String                             @id @default(cuid())
+  candidateUserId       String
+  jobPostingId          String
+  jobApplicationId      String?
+  kind                  ApplicationDocumentKind
+  storagePurposeVersion String                             @default("application-document-v1")
+  storageKeyEncrypted   String
+  state                 ApplicationArtifactPromotionState @default(PROMOTED)
+  orphanDeleteAfter     DateTime
+  leaseOwner            String?
+  leaseExpiresAt        DateTime?
+  attemptCount          Int                                @default(0)
+  lastSafeFailureCode   String?
+  createdAt             DateTime                            @default(now())
+  updatedAt             DateTime                            @updatedAt
+  deletedAt             DateTime?
+  candidate             UserAccount                         @relation("ApplicationArtifactPromotionCandidate", fields: [candidateUserId], references: [id], onDelete: Restrict)
+  jobPosting            JobPosting                          @relation(fields: [jobPostingId], references: [id], onDelete: Restrict)
+  application           JobApplication?                     @relation(fields: [jobApplicationId], references: [id], onDelete: SetNull)
+
+  @@index([state, orphanDeleteAfter])
+  @@index([jobApplicationId, kind])
+  @@index([leaseExpiresAt])
+}
+
+model ApplicationDocumentLegalHold {
+  id                  String          @id @default(cuid())
+  jobApplicationId    String
+  purposeCode         String          @db.VarChar(80)
+  policyVersion       String          @db.VarChar(40)
+  issuedByAdminUserId String
+  startsAt            DateTime
+  reviewAt            DateTime?
+  endsAt              DateTime?
+  releasedAt          DateTime?
+  createdAt           DateTime        @default(now())
+  application         JobApplication @relation(fields: [jobApplicationId], references: [id], onDelete: Cascade)
+  issuedByAdmin       UserAccount     @relation("ApplicationLegalHoldIssuer", fields: [issuedByAdminUserId], references: [id], onDelete: Restrict)
+
+  @@index([jobApplicationId, endsAt, releasedAt])
+  @@index([issuedByAdminUserId, createdAt])
 }
 
 model ProfessionalConnection {
@@ -2399,11 +2608,18 @@ model ApplicationStageEvent {
   occurredAt             DateTime                  @default(now())
   applicationVersion     Int
   metadata               Json?
+  decisionKind           ScoringDecisionKind?
+  reasonLabelSnapshot    String?
+  internalNoteEncrypted  String?
+  notificationRequired   Boolean                   @default(false)
+  notificationStatus     ScoringNotificationStatus @default(NOT_REQUIRED)
+  idempotencyKey         String?
   application            JobApplication            @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 
   @@unique([applicationId, applicationVersion])
   @@index([applicationId, occurredAt, id])
   @@index([actorUserId, occurredAt])
+  @@unique([applicationId, idempotencyKey])
 }
 
 model ApplicationAnswer {
@@ -3049,4 +3265,332 @@ model ImageSearchOperationalEvidence {
   updatedAt       DateTime @updatedAt
 
   @@index([validUntil])
+}
+
+model AutomaticMatchResult {
+  id                    String                    @id @default(cuid())
+  jobApplicationId      String
+  jobDescriptionVersionId String
+  cvSnapshotVersionId   String
+  scoringConfigVersionId String
+  parserBundleVersion   String
+  score                 Decimal                   @db.Decimal(5, 2)
+  requiredSkillPoints   Decimal                   @db.Decimal(5, 2)
+  experiencePoints      Decimal                   @db.Decimal(5, 2)
+  preferredSkillBonus   Decimal                   @db.Decimal(5, 2) @default(0)
+  minimumExperienceYears Decimal?                 @db.Decimal(5, 2)
+  detectedExperienceYears Decimal?                @db.Decimal(5, 2)
+  experienceInterpretationCode String
+  experienceInterpretationLabel String
+  mayBeIncomplete       Boolean                   @default(false)
+  incompletenessLabel   String?
+  computedAt            DateTime
+  createdAt             DateTime                  @default(now())
+  scoringResults        ApplicationScoringResult[] @relation("AutomaticScoringResults")
+  aiAssessments         AiAssessment[]
+  aiAssessmentAttempts  AiAssessmentAttempt[]
+  parseResults          DocumentParseResult[]
+  skillEvidence         SkillEvidenceExtraction[]
+
+  @@index([jobApplicationId, computedAt])
+  @@index([cvSnapshotVersionId, jobDescriptionVersionId])
+}
+
+model DocumentParseResult {
+  id                    String                @id @default(cuid())
+  automaticMatchResultId String
+  documentKind          String
+  applicationDocumentId String?
+  jobDescriptionVersionId String?
+  snapshotVersion       String
+  parserName            String
+  parserVersion         String
+  schemaVersion         String
+  status                ScoringParseStatus
+  processingMilliseconds Int
+  safeIssueCodes        String[]
+  parsedAt              DateTime
+  automaticMatchResult  AutomaticMatchResult @relation(fields: [automaticMatchResultId], references: [id], onDelete: Cascade)
+
+  @@index([automaticMatchResultId, documentKind])
+  @@index([status, parsedAt])
+}
+
+model SkillEvidenceExtraction {
+  id                    String                @id @default(cuid())
+  automaticMatchResultId String
+  skillCanonicalId      String
+  skillLabel            String
+  requirementKind       ScoringSkillRequirementKind
+  matchState            ScoringSkillMatchState
+  normalizationVersion  String
+  createdAt             DateTime              @default(now())
+  automaticMatchResult  AutomaticMatchResult @relation(fields: [automaticMatchResultId], references: [id], onDelete: Cascade)
+  excerpts              CvEvidenceExcerpt[]
+
+  @@unique([automaticMatchResultId, skillCanonicalId, requirementKind])
+  @@index([skillCanonicalId, matchState])
+}
+
+model CvEvidenceExcerpt {
+  id                       String                  @id @default(cuid())
+  skillEvidenceExtractionId String
+  excerptEncrypted         String                  @db.Text
+  pageNumber               Int?
+  sectionLabel             String?
+  sourceStart              Int?
+  sourceEnd                Int?
+  cvSnapshotVersionId      String
+  parserVersion            String
+  accessDeniedAt           DateTime?
+  deleteAfter              DateTime?
+  deletedAt                DateTime?
+  createdAt                DateTime                @default(now())
+  skillEvidenceExtraction  SkillEvidenceExtraction @relation(fields: [skillEvidenceExtractionId], references: [id], onDelete: Cascade)
+
+  @@index([accessDeniedAt, deletedAt])
+  @@index([deleteAfter, deletedAt])
+}
+
+model AiAssessment {
+  id                       String                    @id @default(cuid())
+  jobApplicationId        String
+  automaticMatchResultId  String
+  score                    Decimal                   @db.Decimal(5, 2)
+  confidencePercent       Int
+  confidenceLevel         ScoringAiConfidenceLevel
+  confidenceLabel         String
+  humanReviewGuidance     String?
+  providerAdapterVersion  String
+  providerModel           String
+  modelVersion             String
+  promptVersion           String
+  assessmentSchemaVersion String
+  sensitiveAttributePolicyVersion String
+  overallSummaryEncrypted String                    @db.Text
+  technicalAbilitySummaryEncrypted String           @db.Text
+  roleFitSummaryEncrypted String                    @db.Text
+  deductionSummaryEncrypted String                  @db.Text
+  complianceStatementCode String
+  complianceStatementLabel String
+  questionState           ScoringAiQuestionState
+  questionFallbackLabel  String?
+  accessDeniedAt          DateTime?
+  deleteAfter             DateTime?
+  deletedAt               DateTime?
+  computedAt              DateTime
+  createdAt               DateTime                  @default(now())
+  application             JobApplication            @relation(fields: [jobApplicationId], references: [id], onDelete: Cascade)
+  automaticMatchResult    AutomaticMatchResult      @relation(fields: [automaticMatchResultId], references: [id], onDelete: Restrict)
+  scoringResults          ApplicationScoringResult[] @relation("AiScoringResults")
+  findings                AiAssessmentFinding[]
+  questions               AiSuggestedInterviewQuestion[]
+  attempts                AiAssessmentAttempt[]
+
+  @@index([jobApplicationId, computedAt])
+  @@index([accessDeniedAt, deletedAt])
+}
+
+model AiAssessmentFinding {
+  id              String       @id @default(cuid())
+  aiAssessmentId  String
+  kind            String
+  titleEncrypted  String       @db.Text
+  evidenceEncrypted String     @db.Text
+  ordinal         Int
+  aiAssessment    AiAssessment @relation(fields: [aiAssessmentId], references: [id], onDelete: Cascade)
+  questions       AiSuggestedInterviewQuestion[]
+
+  @@index([aiAssessmentId, ordinal])
+}
+
+model AiSuggestedInterviewQuestion {
+  id                    String              @id @default(cuid())
+  aiAssessmentId        String
+  pointToVerifyFindingId String
+  questionEncrypted     String              @db.Text
+  ordinal               Int
+  aiAssessment          AiAssessment        @relation(fields: [aiAssessmentId], references: [id], onDelete: Cascade)
+  pointToVerifyFinding  AiAssessmentFinding @relation(fields: [pointToVerifyFindingId], references: [id], onDelete: Restrict)
+
+  @@index([aiAssessmentId, ordinal])
+  @@index([pointToVerifyFindingId])
+}
+
+model ScoringOperation {
+  id                         String                 @id @default(cuid())
+  kind                       ScoringOperationKind
+  jobPostingId               String
+  jobApplicationId          String?
+  requestedByUserId          String
+  requestedAt                DateTime
+  confirmationIntent         Boolean
+  idempotencyKey             String
+  targetJobDescriptionVersionId String
+  targetScoringConfigVersionId String
+  reusedAutomaticMatchResultId String?
+  state                      ScoringOperationState @default(QUEUED)
+  totalCount                 Int                    @default(0)
+  succeededCount             Int                    @default(0)
+  deterministicOnlyCount    Int                    @default(0)
+  failedCount                Int                    @default(0)
+  supersededCount            Int                    @default(0)
+  startedAt                  DateTime?
+  completedAt                DateTime?
+  createdAt                  DateTime               @default(now())
+  updatedAt                  DateTime               @updatedAt
+  jobPosting                 JobPosting             @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
+  application                JobApplication?        @relation(fields: [jobApplicationId], references: [id], onDelete: Cascade)
+  requestedBy                UserAccount            @relation("ScoringOperationRequester", fields: [requestedByUserId], references: [id], onDelete: Restrict)
+  results                    ApplicationScoringResult[]
+  workItems                  ScoringWorkItem[]
+  aiAttempts                 AiAssessmentAttempt[]
+
+  @@unique([requestedByUserId, idempotencyKey])
+  @@index([jobPostingId, state, createdAt])
+  @@index([jobApplicationId, kind, state])
+}
+
+model ScoringWorkItem {
+  id                       String                @id @default(cuid())
+  operationId              String
+  jobApplicationId         String
+  state                    ScoringWorkItemState  @default(QUEUED)
+  leaseOwner               String?
+  leaseExpiresAt           DateTime?
+  attemptCount             Int                   @default(0)
+  consecutiveAiFailureCount Int                  @default(0)
+  lastSafeFailureCode      String?
+  nextAttemptAt            DateTime              @default(now())
+  startedAt                DateTime?
+  completedAt              DateTime?
+  createdAt                DateTime              @default(now())
+  updatedAt                DateTime              @updatedAt
+  operation                ScoringOperation      @relation(fields: [operationId], references: [id], onDelete: Cascade)
+  application              JobApplication        @relation(fields: [jobApplicationId], references: [id], onDelete: Cascade)
+  aiAttempts               AiAssessmentAttempt[]
+
+  @@unique([operationId, jobApplicationId])
+  @@index([state, nextAttemptAt])
+  @@index([leaseExpiresAt])
+}
+
+model AiAssessmentAttempt {
+  id                      String                @id @default(cuid())
+  operationId             String
+  workItemId              String?
+  jobApplicationId        String
+  automaticMatchResultId  String
+  assessmentId            String?
+  providerAdapterVersion  String
+  providerModel           String
+  promptVersion           String
+  deadlineAt              DateTime
+  safeOutcome              String
+  safeFailureCode         String?
+  attemptNumber           Int
+  startedAt               DateTime
+  completedAt             DateTime?
+  createdAt               DateTime              @default(now())
+  operation               ScoringOperation      @relation(fields: [operationId], references: [id], onDelete: Cascade)
+  workItem                ScoringWorkItem?      @relation(fields: [workItemId], references: [id], onDelete: SetNull)
+  application             JobApplication        @relation(fields: [jobApplicationId], references: [id], onDelete: Cascade)
+  automaticMatchResult    AutomaticMatchResult  @relation(fields: [automaticMatchResultId], references: [id], onDelete: Restrict)
+  assessment              AiAssessment?         @relation(fields: [assessmentId], references: [id], onDelete: SetNull)
+
+  @@index([jobApplicationId, createdAt])
+  @@index([operationId, attemptNumber])
+}
+
+model ApplicationScoringResult {
+  id                       String                @id @default(cuid())
+  jobApplicationId        String
+  generation               Int
+  operationId              String
+  automaticMatchResultId  String
+  aiAssessmentId           String?
+  automaticScore           Decimal               @db.Decimal(5, 2)
+  aiScore                  Decimal?              @db.Decimal(5, 2)
+  finalScore               Decimal?              @db.Decimal(5, 2)
+  state                    ScoringResultState
+  formulaVersion           String
+  automaticWeight          Decimal               @db.Decimal(3, 2)
+  aiWeight                 Decimal               @db.Decimal(3, 2)
+  highThreshold            Decimal               @db.Decimal(5, 2)
+  mediumThreshold          Decimal               @db.Decimal(5, 2)
+  roundingRule             String
+  jobDescriptionVersionId  String
+  cvSnapshotVersionId      String
+  scoringConfigVersionId  String
+  parserBundleVersion     String
+  mayBeIncomplete          Boolean               @default(false)
+  incompletenessLabel      String?
+  computedAt               DateTime
+  publishedAt              DateTime
+  supersededAt             DateTime?
+  application              JobApplication        @relation("ApplicationScoringResults", fields: [jobApplicationId], references: [id], onDelete: Cascade)
+  currentForApplication    JobApplication?       @relation("CurrentScoringResult")
+  operation                ScoringOperation      @relation(fields: [operationId], references: [id], onDelete: Restrict)
+  automaticMatch           AutomaticMatchResult  @relation("AutomaticScoringResults", fields: [automaticMatchResultId], references: [id], onDelete: Restrict)
+  aiAssessment             AiAssessment?         @relation("AiScoringResults", fields: [aiAssessmentId], references: [id], onDelete: Restrict)
+
+  @@unique([jobApplicationId, generation])
+  @@index([jobApplicationId, publishedAt])
+  @@index([finalScore, publishedAt])
+  @@index([jobDescriptionVersionId, scoringConfigVersionId])
+}
+
+model ManualApplicationPriority {
+  id                   String              @id @default(cuid())
+  jobApplicationId     String
+  value                ManualPriorityValue
+  reasonEncrypted      String              @db.Text
+  setByUserId          String
+  setAt                DateTime
+  version              Int
+  active               Boolean             @default(true)
+  removedByUserId      String?
+  removedAt            DateTime?
+  removalReasonEncrypted String?           @db.Text
+  createdAt            DateTime            @default(now())
+  application          JobApplication     @relation(fields: [jobApplicationId], references: [id], onDelete: Cascade)
+  setBy                 UserAccount        @relation("ManualPriorityActor", fields: [setByUserId], references: [id], onDelete: Restrict)
+
+  @@unique([jobApplicationId, version])
+  @@index([jobApplicationId, active])
+  @@index([setByUserId, setAt])
+}
+
+model RankingSnapshot {
+  id                    String              @id @default(cuid())
+  jobPostingId          String
+  generation            Int
+  filterHash            String
+  filters               Json
+  sort                  String
+  pageSize              Int
+  createdAt             DateTime            @default(now())
+  expiresAt             DateTime
+  jobPosting            JobPosting          @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
+  rows                  RankingSnapshotRow[]
+
+  @@unique([jobPostingId, generation])
+  @@index([jobPostingId, expiresAt])
+}
+
+model RankingSnapshotRow {
+  id                 String             @id @default(cuid())
+  rankingSnapshotId  String
+  applicationId      String
+  rankPosition       Int
+  scoreState         String
+  finalScore         Decimal?           @db.Decimal(5, 2)
+  submittedAt        DateTime
+  createdAt          DateTime           @default(now())
+  rankingSnapshot    RankingSnapshot    @relation(fields: [rankingSnapshotId], references: [id], onDelete: Cascade)
+  application        JobApplication     @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@unique([rankingSnapshotId, applicationId])
+  @@unique([rankingSnapshotId, rankPosition])
+  @@index([applicationId, rankingSnapshotId])
 }

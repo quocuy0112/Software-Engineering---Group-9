@@ -96,6 +96,14 @@ function plainText(value: string | null, maximum: number, required = false) {
   return normalized || null;
 }
 
+function coverLetterText(value: ApplicationSubmission["coverLetter"]): string | null {
+  if (value === null) return null;
+  if (typeof value === "string") return value;
+  if (value.kind === "NONE") return null;
+  if (value.kind === "TEXT") return value.text;
+  throw new ApplicationRepositoryError("APPLICATION_COVER_LETTER_INELIGIBLE");
+}
+
 const iso = (value: Date | string | null) =>
   value === null ? null : new Date(value).toISOString().slice(0, 10);
 
@@ -189,7 +197,7 @@ export function prepareApplicationSubmission(
   });
 
   return {
-    coverLetter: plainText(command.coverLetter, 5000),
+    coverLetter: plainText(coverLetterText(command.coverLetter), 10_000),
     profileSnapshot: {
       v: 1,
       candidateName: context.candidate.name,

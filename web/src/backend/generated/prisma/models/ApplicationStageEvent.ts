@@ -46,6 +46,12 @@ export type ApplicationStageEventMinAggregateOutputType = {
   candidateVisible: boolean | null
   occurredAt: Date | null
   applicationVersion: number | null
+  decisionKind: $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot: string | null
+  internalNoteEncrypted: string | null
+  notificationRequired: boolean | null
+  notificationStatus: $Enums.ScoringNotificationStatus | null
+  idempotencyKey: string | null
 }
 
 export type ApplicationStageEventMaxAggregateOutputType = {
@@ -60,6 +66,12 @@ export type ApplicationStageEventMaxAggregateOutputType = {
   candidateVisible: boolean | null
   occurredAt: Date | null
   applicationVersion: number | null
+  decisionKind: $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot: string | null
+  internalNoteEncrypted: string | null
+  notificationRequired: boolean | null
+  notificationStatus: $Enums.ScoringNotificationStatus | null
+  idempotencyKey: string | null
 }
 
 export type ApplicationStageEventCountAggregateOutputType = {
@@ -75,6 +87,12 @@ export type ApplicationStageEventCountAggregateOutputType = {
   occurredAt: number
   applicationVersion: number
   metadata: number
+  decisionKind: number
+  reasonLabelSnapshot: number
+  internalNoteEncrypted: number
+  notificationRequired: number
+  notificationStatus: number
+  idempotencyKey: number
   _all: number
 }
 
@@ -99,6 +117,12 @@ export type ApplicationStageEventMinAggregateInputType = {
   candidateVisible?: true
   occurredAt?: true
   applicationVersion?: true
+  decisionKind?: true
+  reasonLabelSnapshot?: true
+  internalNoteEncrypted?: true
+  notificationRequired?: true
+  notificationStatus?: true
+  idempotencyKey?: true
 }
 
 export type ApplicationStageEventMaxAggregateInputType = {
@@ -113,6 +137,12 @@ export type ApplicationStageEventMaxAggregateInputType = {
   candidateVisible?: true
   occurredAt?: true
   applicationVersion?: true
+  decisionKind?: true
+  reasonLabelSnapshot?: true
+  internalNoteEncrypted?: true
+  notificationRequired?: true
+  notificationStatus?: true
+  idempotencyKey?: true
 }
 
 export type ApplicationStageEventCountAggregateInputType = {
@@ -128,6 +158,12 @@ export type ApplicationStageEventCountAggregateInputType = {
   occurredAt?: true
   applicationVersion?: true
   metadata?: true
+  decisionKind?: true
+  reasonLabelSnapshot?: true
+  internalNoteEncrypted?: true
+  notificationRequired?: true
+  notificationStatus?: true
+  idempotencyKey?: true
   _all?: true
 }
 
@@ -230,6 +266,12 @@ export type ApplicationStageEventGroupByOutputType = {
   occurredAt: Date
   applicationVersion: number
   metadata: runtime.JsonValue | null
+  decisionKind: $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot: string | null
+  internalNoteEncrypted: string | null
+  notificationRequired: boolean
+  notificationStatus: $Enums.ScoringNotificationStatus
+  idempotencyKey: string | null
   _count: ApplicationStageEventCountAggregateOutputType | null
   _avg: ApplicationStageEventAvgAggregateOutputType | null
   _sum: ApplicationStageEventSumAggregateOutputType | null
@@ -268,6 +310,12 @@ export type ApplicationStageEventWhereInput = {
   occurredAt?: Prisma.DateTimeFilter<"ApplicationStageEvent"> | Date | string
   applicationVersion?: Prisma.IntFilter<"ApplicationStageEvent"> | number
   metadata?: Prisma.JsonNullableFilter<"ApplicationStageEvent">
+  decisionKind?: Prisma.EnumScoringDecisionKindNullableFilter<"ApplicationStageEvent"> | $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot?: Prisma.StringNullableFilter<"ApplicationStageEvent"> | string | null
+  internalNoteEncrypted?: Prisma.StringNullableFilter<"ApplicationStageEvent"> | string | null
+  notificationRequired?: Prisma.BoolFilter<"ApplicationStageEvent"> | boolean
+  notificationStatus?: Prisma.EnumScoringNotificationStatusFilter<"ApplicationStageEvent"> | $Enums.ScoringNotificationStatus
+  idempotencyKey?: Prisma.StringNullableFilter<"ApplicationStageEvent"> | string | null
   application?: Prisma.XOR<Prisma.JobApplicationScalarRelationFilter, Prisma.JobApplicationWhereInput>
 }
 
@@ -284,12 +332,19 @@ export type ApplicationStageEventOrderByWithRelationInput = {
   occurredAt?: Prisma.SortOrder
   applicationVersion?: Prisma.SortOrder
   metadata?: Prisma.SortOrderInput | Prisma.SortOrder
+  decisionKind?: Prisma.SortOrderInput | Prisma.SortOrder
+  reasonLabelSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
+  internalNoteEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
+  notificationRequired?: Prisma.SortOrder
+  notificationStatus?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrderInput | Prisma.SortOrder
   application?: Prisma.JobApplicationOrderByWithRelationInput
 }
 
 export type ApplicationStageEventWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   applicationId_applicationVersion?: Prisma.ApplicationStageEventApplicationIdApplicationVersionCompoundUniqueInput
+  applicationId_idempotencyKey?: Prisma.ApplicationStageEventApplicationIdIdempotencyKeyCompoundUniqueInput
   AND?: Prisma.ApplicationStageEventWhereInput | Prisma.ApplicationStageEventWhereInput[]
   OR?: Prisma.ApplicationStageEventWhereInput[]
   NOT?: Prisma.ApplicationStageEventWhereInput | Prisma.ApplicationStageEventWhereInput[]
@@ -304,8 +359,14 @@ export type ApplicationStageEventWhereUniqueInput = Prisma.AtLeast<{
   occurredAt?: Prisma.DateTimeFilter<"ApplicationStageEvent"> | Date | string
   applicationVersion?: Prisma.IntFilter<"ApplicationStageEvent"> | number
   metadata?: Prisma.JsonNullableFilter<"ApplicationStageEvent">
+  decisionKind?: Prisma.EnumScoringDecisionKindNullableFilter<"ApplicationStageEvent"> | $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot?: Prisma.StringNullableFilter<"ApplicationStageEvent"> | string | null
+  internalNoteEncrypted?: Prisma.StringNullableFilter<"ApplicationStageEvent"> | string | null
+  notificationRequired?: Prisma.BoolFilter<"ApplicationStageEvent"> | boolean
+  notificationStatus?: Prisma.EnumScoringNotificationStatusFilter<"ApplicationStageEvent"> | $Enums.ScoringNotificationStatus
+  idempotencyKey?: Prisma.StringNullableFilter<"ApplicationStageEvent"> | string | null
   application?: Prisma.XOR<Prisma.JobApplicationScalarRelationFilter, Prisma.JobApplicationWhereInput>
-}, "id" | "applicationId_applicationVersion">
+}, "id" | "applicationId_applicationVersion" | "applicationId_idempotencyKey">
 
 export type ApplicationStageEventOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -320,6 +381,12 @@ export type ApplicationStageEventOrderByWithAggregationInput = {
   occurredAt?: Prisma.SortOrder
   applicationVersion?: Prisma.SortOrder
   metadata?: Prisma.SortOrderInput | Prisma.SortOrder
+  decisionKind?: Prisma.SortOrderInput | Prisma.SortOrder
+  reasonLabelSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
+  internalNoteEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
+  notificationRequired?: Prisma.SortOrder
+  notificationStatus?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ApplicationStageEventCountOrderByAggregateInput
   _avg?: Prisma.ApplicationStageEventAvgOrderByAggregateInput
   _max?: Prisma.ApplicationStageEventMaxOrderByAggregateInput
@@ -343,6 +410,12 @@ export type ApplicationStageEventScalarWhereWithAggregatesInput = {
   occurredAt?: Prisma.DateTimeWithAggregatesFilter<"ApplicationStageEvent"> | Date | string
   applicationVersion?: Prisma.IntWithAggregatesFilter<"ApplicationStageEvent"> | number
   metadata?: Prisma.JsonNullableWithAggregatesFilter<"ApplicationStageEvent">
+  decisionKind?: Prisma.EnumScoringDecisionKindNullableWithAggregatesFilter<"ApplicationStageEvent"> | $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot?: Prisma.StringNullableWithAggregatesFilter<"ApplicationStageEvent"> | string | null
+  internalNoteEncrypted?: Prisma.StringNullableWithAggregatesFilter<"ApplicationStageEvent"> | string | null
+  notificationRequired?: Prisma.BoolWithAggregatesFilter<"ApplicationStageEvent"> | boolean
+  notificationStatus?: Prisma.EnumScoringNotificationStatusWithAggregatesFilter<"ApplicationStageEvent"> | $Enums.ScoringNotificationStatus
+  idempotencyKey?: Prisma.StringNullableWithAggregatesFilter<"ApplicationStageEvent"> | string | null
 }
 
 export type ApplicationStageEventCreateInput = {
@@ -357,6 +430,12 @@ export type ApplicationStageEventCreateInput = {
   occurredAt?: Date | string
   applicationVersion: number
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  decisionKind?: $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot?: string | null
+  internalNoteEncrypted?: string | null
+  notificationRequired?: boolean
+  notificationStatus?: $Enums.ScoringNotificationStatus
+  idempotencyKey?: string | null
   application: Prisma.JobApplicationCreateNestedOneWithoutStageEventsInput
 }
 
@@ -373,6 +452,12 @@ export type ApplicationStageEventUncheckedCreateInput = {
   occurredAt?: Date | string
   applicationVersion: number
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  decisionKind?: $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot?: string | null
+  internalNoteEncrypted?: string | null
+  notificationRequired?: boolean
+  notificationStatus?: $Enums.ScoringNotificationStatus
+  idempotencyKey?: string | null
 }
 
 export type ApplicationStageEventUpdateInput = {
@@ -387,6 +472,12 @@ export type ApplicationStageEventUpdateInput = {
   occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   applicationVersion?: Prisma.IntFieldUpdateOperationsInput | number
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  decisionKind?: Prisma.NullableEnumScoringDecisionKindFieldUpdateOperationsInput | $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalNoteEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notificationStatus?: Prisma.EnumScoringNotificationStatusFieldUpdateOperationsInput | $Enums.ScoringNotificationStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   application?: Prisma.JobApplicationUpdateOneRequiredWithoutStageEventsNestedInput
 }
 
@@ -403,6 +494,12 @@ export type ApplicationStageEventUncheckedUpdateInput = {
   occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   applicationVersion?: Prisma.IntFieldUpdateOperationsInput | number
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  decisionKind?: Prisma.NullableEnumScoringDecisionKindFieldUpdateOperationsInput | $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalNoteEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notificationStatus?: Prisma.EnumScoringNotificationStatusFieldUpdateOperationsInput | $Enums.ScoringNotificationStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ApplicationStageEventCreateManyInput = {
@@ -418,6 +515,12 @@ export type ApplicationStageEventCreateManyInput = {
   occurredAt?: Date | string
   applicationVersion: number
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  decisionKind?: $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot?: string | null
+  internalNoteEncrypted?: string | null
+  notificationRequired?: boolean
+  notificationStatus?: $Enums.ScoringNotificationStatus
+  idempotencyKey?: string | null
 }
 
 export type ApplicationStageEventUpdateManyMutationInput = {
@@ -432,6 +535,12 @@ export type ApplicationStageEventUpdateManyMutationInput = {
   occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   applicationVersion?: Prisma.IntFieldUpdateOperationsInput | number
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  decisionKind?: Prisma.NullableEnumScoringDecisionKindFieldUpdateOperationsInput | $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalNoteEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notificationStatus?: Prisma.EnumScoringNotificationStatusFieldUpdateOperationsInput | $Enums.ScoringNotificationStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ApplicationStageEventUncheckedUpdateManyInput = {
@@ -447,6 +556,12 @@ export type ApplicationStageEventUncheckedUpdateManyInput = {
   occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   applicationVersion?: Prisma.IntFieldUpdateOperationsInput | number
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  decisionKind?: Prisma.NullableEnumScoringDecisionKindFieldUpdateOperationsInput | $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalNoteEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notificationStatus?: Prisma.EnumScoringNotificationStatusFieldUpdateOperationsInput | $Enums.ScoringNotificationStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ApplicationStageEventListRelationFilter = {
@@ -464,6 +579,11 @@ export type ApplicationStageEventApplicationIdApplicationVersionCompoundUniqueIn
   applicationVersion: number
 }
 
+export type ApplicationStageEventApplicationIdIdempotencyKeyCompoundUniqueInput = {
+  applicationId: string
+  idempotencyKey: string
+}
+
 export type ApplicationStageEventCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   applicationId?: Prisma.SortOrder
@@ -477,6 +597,12 @@ export type ApplicationStageEventCountOrderByAggregateInput = {
   occurredAt?: Prisma.SortOrder
   applicationVersion?: Prisma.SortOrder
   metadata?: Prisma.SortOrder
+  decisionKind?: Prisma.SortOrder
+  reasonLabelSnapshot?: Prisma.SortOrder
+  internalNoteEncrypted?: Prisma.SortOrder
+  notificationRequired?: Prisma.SortOrder
+  notificationStatus?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrder
 }
 
 export type ApplicationStageEventAvgOrderByAggregateInput = {
@@ -495,6 +621,12 @@ export type ApplicationStageEventMaxOrderByAggregateInput = {
   candidateVisible?: Prisma.SortOrder
   occurredAt?: Prisma.SortOrder
   applicationVersion?: Prisma.SortOrder
+  decisionKind?: Prisma.SortOrder
+  reasonLabelSnapshot?: Prisma.SortOrder
+  internalNoteEncrypted?: Prisma.SortOrder
+  notificationRequired?: Prisma.SortOrder
+  notificationStatus?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrder
 }
 
 export type ApplicationStageEventMinOrderByAggregateInput = {
@@ -509,6 +641,12 @@ export type ApplicationStageEventMinOrderByAggregateInput = {
   candidateVisible?: Prisma.SortOrder
   occurredAt?: Prisma.SortOrder
   applicationVersion?: Prisma.SortOrder
+  decisionKind?: Prisma.SortOrder
+  reasonLabelSnapshot?: Prisma.SortOrder
+  internalNoteEncrypted?: Prisma.SortOrder
+  notificationRequired?: Prisma.SortOrder
+  notificationStatus?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrder
 }
 
 export type ApplicationStageEventSumOrderByAggregateInput = {
@@ -565,6 +703,14 @@ export type EnumApplicationStageActorTypeFieldUpdateOperationsInput = {
   set?: $Enums.ApplicationStageActorType
 }
 
+export type NullableEnumScoringDecisionKindFieldUpdateOperationsInput = {
+  set?: $Enums.ScoringDecisionKind | null
+}
+
+export type EnumScoringNotificationStatusFieldUpdateOperationsInput = {
+  set?: $Enums.ScoringNotificationStatus
+}
+
 export type ApplicationStageEventCreateWithoutApplicationInput = {
   id?: string
   fromStage?: $Enums.ApplicationStage | null
@@ -577,6 +723,12 @@ export type ApplicationStageEventCreateWithoutApplicationInput = {
   occurredAt?: Date | string
   applicationVersion: number
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  decisionKind?: $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot?: string | null
+  internalNoteEncrypted?: string | null
+  notificationRequired?: boolean
+  notificationStatus?: $Enums.ScoringNotificationStatus
+  idempotencyKey?: string | null
 }
 
 export type ApplicationStageEventUncheckedCreateWithoutApplicationInput = {
@@ -591,6 +743,12 @@ export type ApplicationStageEventUncheckedCreateWithoutApplicationInput = {
   occurredAt?: Date | string
   applicationVersion: number
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  decisionKind?: $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot?: string | null
+  internalNoteEncrypted?: string | null
+  notificationRequired?: boolean
+  notificationStatus?: $Enums.ScoringNotificationStatus
+  idempotencyKey?: string | null
 }
 
 export type ApplicationStageEventCreateOrConnectWithoutApplicationInput = {
@@ -635,6 +793,12 @@ export type ApplicationStageEventScalarWhereInput = {
   occurredAt?: Prisma.DateTimeFilter<"ApplicationStageEvent"> | Date | string
   applicationVersion?: Prisma.IntFilter<"ApplicationStageEvent"> | number
   metadata?: Prisma.JsonNullableFilter<"ApplicationStageEvent">
+  decisionKind?: Prisma.EnumScoringDecisionKindNullableFilter<"ApplicationStageEvent"> | $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot?: Prisma.StringNullableFilter<"ApplicationStageEvent"> | string | null
+  internalNoteEncrypted?: Prisma.StringNullableFilter<"ApplicationStageEvent"> | string | null
+  notificationRequired?: Prisma.BoolFilter<"ApplicationStageEvent"> | boolean
+  notificationStatus?: Prisma.EnumScoringNotificationStatusFilter<"ApplicationStageEvent"> | $Enums.ScoringNotificationStatus
+  idempotencyKey?: Prisma.StringNullableFilter<"ApplicationStageEvent"> | string | null
 }
 
 export type ApplicationStageEventCreateManyApplicationInput = {
@@ -649,6 +813,12 @@ export type ApplicationStageEventCreateManyApplicationInput = {
   occurredAt?: Date | string
   applicationVersion: number
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  decisionKind?: $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot?: string | null
+  internalNoteEncrypted?: string | null
+  notificationRequired?: boolean
+  notificationStatus?: $Enums.ScoringNotificationStatus
+  idempotencyKey?: string | null
 }
 
 export type ApplicationStageEventUpdateWithoutApplicationInput = {
@@ -663,6 +833,12 @@ export type ApplicationStageEventUpdateWithoutApplicationInput = {
   occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   applicationVersion?: Prisma.IntFieldUpdateOperationsInput | number
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  decisionKind?: Prisma.NullableEnumScoringDecisionKindFieldUpdateOperationsInput | $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalNoteEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notificationStatus?: Prisma.EnumScoringNotificationStatusFieldUpdateOperationsInput | $Enums.ScoringNotificationStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ApplicationStageEventUncheckedUpdateWithoutApplicationInput = {
@@ -677,6 +853,12 @@ export type ApplicationStageEventUncheckedUpdateWithoutApplicationInput = {
   occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   applicationVersion?: Prisma.IntFieldUpdateOperationsInput | number
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  decisionKind?: Prisma.NullableEnumScoringDecisionKindFieldUpdateOperationsInput | $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalNoteEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notificationStatus?: Prisma.EnumScoringNotificationStatusFieldUpdateOperationsInput | $Enums.ScoringNotificationStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ApplicationStageEventUncheckedUpdateManyWithoutApplicationInput = {
@@ -691,6 +873,12 @@ export type ApplicationStageEventUncheckedUpdateManyWithoutApplicationInput = {
   occurredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   applicationVersion?: Prisma.IntFieldUpdateOperationsInput | number
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  decisionKind?: Prisma.NullableEnumScoringDecisionKindFieldUpdateOperationsInput | $Enums.ScoringDecisionKind | null
+  reasonLabelSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalNoteEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  notificationStatus?: Prisma.EnumScoringNotificationStatusFieldUpdateOperationsInput | $Enums.ScoringNotificationStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -708,6 +896,12 @@ export type ApplicationStageEventSelect<ExtArgs extends runtime.Types.Extensions
   occurredAt?: boolean
   applicationVersion?: boolean
   metadata?: boolean
+  decisionKind?: boolean
+  reasonLabelSnapshot?: boolean
+  internalNoteEncrypted?: boolean
+  notificationRequired?: boolean
+  notificationStatus?: boolean
+  idempotencyKey?: boolean
   application?: boolean | Prisma.JobApplicationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["applicationStageEvent"]>
 
@@ -724,6 +918,12 @@ export type ApplicationStageEventSelectCreateManyAndReturn<ExtArgs extends runti
   occurredAt?: boolean
   applicationVersion?: boolean
   metadata?: boolean
+  decisionKind?: boolean
+  reasonLabelSnapshot?: boolean
+  internalNoteEncrypted?: boolean
+  notificationRequired?: boolean
+  notificationStatus?: boolean
+  idempotencyKey?: boolean
   application?: boolean | Prisma.JobApplicationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["applicationStageEvent"]>
 
@@ -740,6 +940,12 @@ export type ApplicationStageEventSelectUpdateManyAndReturn<ExtArgs extends runti
   occurredAt?: boolean
   applicationVersion?: boolean
   metadata?: boolean
+  decisionKind?: boolean
+  reasonLabelSnapshot?: boolean
+  internalNoteEncrypted?: boolean
+  notificationRequired?: boolean
+  notificationStatus?: boolean
+  idempotencyKey?: boolean
   application?: boolean | Prisma.JobApplicationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["applicationStageEvent"]>
 
@@ -756,9 +962,15 @@ export type ApplicationStageEventSelectScalar = {
   occurredAt?: boolean
   applicationVersion?: boolean
   metadata?: boolean
+  decisionKind?: boolean
+  reasonLabelSnapshot?: boolean
+  internalNoteEncrypted?: boolean
+  notificationRequired?: boolean
+  notificationStatus?: boolean
+  idempotencyKey?: boolean
 }
 
-export type ApplicationStageEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationId" | "fromStage" | "toStage" | "actorUserId" | "actorType" | "reasonCode" | "candidateVisibleReason" | "candidateVisible" | "occurredAt" | "applicationVersion" | "metadata", ExtArgs["result"]["applicationStageEvent"]>
+export type ApplicationStageEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationId" | "fromStage" | "toStage" | "actorUserId" | "actorType" | "reasonCode" | "candidateVisibleReason" | "candidateVisible" | "occurredAt" | "applicationVersion" | "metadata" | "decisionKind" | "reasonLabelSnapshot" | "internalNoteEncrypted" | "notificationRequired" | "notificationStatus" | "idempotencyKey", ExtArgs["result"]["applicationStageEvent"]>
 export type ApplicationStageEventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   application?: boolean | Prisma.JobApplicationDefaultArgs<ExtArgs>
 }
@@ -787,6 +999,12 @@ export type $ApplicationStageEventPayload<ExtArgs extends runtime.Types.Extensio
     occurredAt: Date
     applicationVersion: number
     metadata: runtime.JsonValue | null
+    decisionKind: $Enums.ScoringDecisionKind | null
+    reasonLabelSnapshot: string | null
+    internalNoteEncrypted: string | null
+    notificationRequired: boolean
+    notificationStatus: $Enums.ScoringNotificationStatus
+    idempotencyKey: string | null
   }, ExtArgs["result"]["applicationStageEvent"]>
   composites: {}
 }
@@ -1223,6 +1441,12 @@ export interface ApplicationStageEventFieldRefs {
   readonly occurredAt: Prisma.FieldRef<"ApplicationStageEvent", 'DateTime'>
   readonly applicationVersion: Prisma.FieldRef<"ApplicationStageEvent", 'Int'>
   readonly metadata: Prisma.FieldRef<"ApplicationStageEvent", 'Json'>
+  readonly decisionKind: Prisma.FieldRef<"ApplicationStageEvent", 'ScoringDecisionKind'>
+  readonly reasonLabelSnapshot: Prisma.FieldRef<"ApplicationStageEvent", 'String'>
+  readonly internalNoteEncrypted: Prisma.FieldRef<"ApplicationStageEvent", 'String'>
+  readonly notificationRequired: Prisma.FieldRef<"ApplicationStageEvent", 'Boolean'>
+  readonly notificationStatus: Prisma.FieldRef<"ApplicationStageEvent", 'ScoringNotificationStatus'>
+  readonly idempotencyKey: Prisma.FieldRef<"ApplicationStageEvent", 'String'>
 }
     
 

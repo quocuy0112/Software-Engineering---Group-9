@@ -1,5 +1,10 @@
 import "server-only";
+import { randomUUID } from "node:crypto";
 import { Prisma } from "@/backend/generated/prisma/client";
+import {
+  ApplicationArtifactPromotionState,
+  ApplicationDocumentKind,
+} from "@/backend/generated/prisma/enums";
 import { prisma } from "@/backend/database/prisma";
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
 import {
@@ -16,6 +21,8 @@ import type {
 } from "@/shared/contracts/jobs/actions";
 import { createInAppNotification } from "@/backend/notifications/notification-service";
 import { NotificationRecipientPolicy } from "@/backend/notifications/notification-recipient-policy";
+import { createApplicationDocumentStorage } from "@/backend/applications/storage/factory";
+import type { ApplicationDocumentStoragePort } from "@/backend/applications/storage/application-document-storage";
 
 type CandidateApplicationForm = {
   job: {
@@ -50,6 +57,7 @@ export type ApplicationRepositoryPort = {
     submissionBindingDigest: string;
     command: ApplicationSubmission;
     directCv?: DirectApplicationCv;
+    directCoverLetter?: DirectApplicationCv;
     activeConsentVersion: string;
     occurredAt: Date;
     correlationId: string;
@@ -62,6 +70,7 @@ const outcome = (
     jobPostingId: string;
     stage: string;
     submittedAt: Date;
+    stageVersion?: number;
     aiAnalysisConsent?: boolean;
     aiMatchScore?: number | null;
   },
@@ -70,6 +79,7 @@ const outcome = (
   applicationId: row.id,
   jobId: row.jobPostingId,
   stage: "APPLIED",
+  stageVersion: row.stageVersion ?? 1,
   submittedAt: row.submittedAt.toISOString(),
   created,
   message: created
@@ -80,7 +90,14 @@ const outcome = (
 });
 
 export class PrismaJobApplicationRepository implements ApplicationRepositoryPort {
-  constructor(private readonly db: typeof prisma = prisma) {}
+  constructor(
+    private readonly db: typeof prisma = prisma,
+    private readonly applicationStorage?: ApplicationDocumentStoragePort,
+  ) {}
+
+  private documentStorage() {
+    return this.applicationStorage ?? createApplicationDocumentStorage();
+  }
 
   async getCandidateForm(userId: string, jobId: string, now: Date) {
     await ensureCandidateCvLibrary(userId, this.db);
@@ -220,8 +237,114 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
   }
 
   async submit(input: Parameters<ApplicationRepositoryPort["submit"]>[0]) {
+    let promotedStorage: ApplicationDocumentStoragePort | null = null;
+    let promotedApplicationDocument:
+      | {
+          promotionId: string;
+          storageKey: string;
+          fileName: string;
+          mediaType: string;
+          byteLength: number;
+          checksumSha256: string;
+          sourceCvId: string;
+          sourceCvVersion: number;
+        }
+      | undefined;
+    let promotedCoverLetterDocument:
+      | {
+          promotionId: string;
+          storageKey: string;
+          fileName: string;
+          mediaType: string;
+          byteLength: number;
+          checksumSha256: string;
+        }
+      | undefined;
     try {
-      return await this.db.$transaction(
+      const existingByKey = await this.db.jobApplication.findUnique({
+        where: {
+          candidateUserId_idempotencyKey: {
+            candidateUserId: input.candidateUserId,
+            idempotencyKey: input.idempotencyKey,
+          },
+        },
+      });
+      if (existingByKey) {
+        if (existingByKey.submissionBindingDigest !== input.submissionBindingDigest) {
+          throw new ApplicationRepositoryError("IDEMPOTENCY_KEY_REUSED");
+        }
+        return { application: outcome(existingByKey, false), created: false };
+      }
+      const existingDuplicate = await this.db.jobApplication.findUnique({
+        where: {
+          candidateUserId_jobPostingId: {
+            candidateUserId: input.candidateUserId,
+            jobPostingId: input.jobId,
+          },
+        },
+      });
+      if (existingDuplicate) {
+        return { application: outcome(existingDuplicate, false), created: false };
+      }
+      const sourceCv = input.directCv
+        ? null
+        : await this.db.candidateCv.findUnique({
+            where: { id: input.command.cvId },
+            select: {
+              id: true,
+              candidateUserId: true,
+              fileName: true,
+              mimeType: true,
+              byteSize: true,
+              storageKey: true,
+              checksumSha256: true,
+              version: true,
+              confirmedAt: true,
+              archivedAt: true,
+            },
+          });
+      if (!input.directCv && sourceCv?.candidateUserId === input.candidateUserId) {
+        promotedStorage = this.documentStorage();
+        const sourceStorage = (await import("@/backend/cv/workers/cv-worker-resources")).createCvWorkerStorage();
+        await promotedStorage.assertReady();
+        await sourceStorage.assertReady();
+        const stored = await promotedStorage.put({
+          expectedBytes: sourceCv.byteSize,
+          source: sourceStorage.open(sourceCv.storageKey, sourceCv.byteSize),
+        });
+        promotedApplicationDocument = {
+          promotionId: randomUUID(),
+          storageKey: stored.locator,
+          fileName: sourceCv.fileName,
+          mediaType: sourceCv.mimeType,
+          byteLength: stored.bytes,
+          checksumSha256: sourceCv.checksumSha256,
+          sourceCvId: sourceCv.id,
+          sourceCvVersion: sourceCv.version,
+        };
+      } else if (input.directCv) {
+        promotedApplicationDocument = {
+          promotionId: randomUUID(),
+          storageKey: input.directCv.storageKey,
+          fileName: input.directCv.fileName,
+          mediaType: input.directCv.mimeType,
+          byteLength: input.directCv.byteSize,
+          checksumSha256: input.directCv.checksumSha256,
+          sourceCvId: input.directCv.id,
+          sourceCvVersion: 1,
+        };
+      }
+      if (input.directCoverLetter) {
+        promotedCoverLetterDocument = {
+          promotionId: randomUUID(),
+          storageKey: input.directCoverLetter.storageKey,
+          fileName: input.directCoverLetter.fileName,
+          mediaType: input.directCoverLetter.mimeType,
+          byteLength: input.directCoverLetter.byteSize,
+          checksumSha256: input.directCoverLetter.checksumSha256,
+        };
+      }
+      const result = await this.db.$transaction(
         async (tx) => {
           const sameKey = await tx.jobApplication.findUnique({
             where: {
@@ -289,6 +412,9 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
             : await tx.candidateCv.findUnique({
                 where: { id: input.command.cvId },
               });
+          if (!cv || cv.candidateUserId !== input.candidateUserId) {
+            throw new ApplicationRepositoryError("APPLICATION_CV_INELIGIBLE");
+          }
           const job = await tx.jobPosting.findFirst({
             where: {
               id: input.jobId,
@@ -372,7 +498,9 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
                 version: question.version,
               })),
             },
-            input.command,
+            input.directCoverLetter
+              ? { ...input.command, coverLetter: null }
+              : input.command,
             input.activeConsentVersion,
             input.occurredAt,
           );
@@ -391,9 +519,11 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
                 ? (input.command.contactSnapshot as Prisma.InputJsonValue)
                 : undefined,
               aiAnalysisConsent: input.command.aiAnalysisConsent ?? false,
-              aiMatchScore: input.command.aiAnalysisConsent ? 82 : null,
+              // Group 1 does not calculate or infer a score. Later scoring
+              // groups own the versioned evaluation records.
+              aiMatchScore: null,
               scoringStatus: input.command.aiAnalysisConsent
-                ? "COMPLETED"
+                ? "PENDING"
                 : "NOT_REQUESTED",
               stage: "APPLIED",
               coverLetter: prepared.coverLetter,
@@ -408,6 +538,97 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
               submittedAt: input.occurredAt,
               stageVersion: 1,
               lastStageChangedAt: input.occurredAt,
+              legacyDocumentState: "CURRENT",
+              applicationDocuments: {
+                create: [
+                  {
+                    kind: ApplicationDocumentKind.CV,
+                    storagePurposeVersion: "application-document-v1",
+                    storageKeyEncrypted:
+                      promotedApplicationDocument?.storageKey ??
+                      prepared.cvSnapshot.storageKey,
+                    originalFilenameEncrypted:
+                      promotedApplicationDocument?.fileName ??
+                      prepared.cvSnapshot.fileName,
+                    mediaType:
+                      promotedApplicationDocument?.mediaType ??
+                      prepared.cvSnapshot.mimeType,
+                    byteLength:
+                      promotedApplicationDocument?.byteLength ??
+                      prepared.cvSnapshot.byteSize,
+                    contentDigestHmac:
+                      promotedApplicationDocument?.checksumSha256 ??
+                      prepared.cvSnapshot.checksumSha256,
+                    sourceCandidateCvId:
+                      promotedApplicationDocument?.sourceCvId ?? cv.id,
+                    sourceCandidateCvVersion:
+                      promotedApplicationDocument?.sourceCvVersion ?? cv.version,
+                    safetyAssessmentId: `application-safety-${cv.id}`,
+                    committedAt: input.occurredAt,
+                  },
+                  ...(promotedCoverLetterDocument
+                    ? [
+                        {
+                          kind: ApplicationDocumentKind.COVER_LETTER,
+                          storagePurposeVersion: "application-document-v1",
+                          storageKeyEncrypted: promotedCoverLetterDocument.storageKey,
+                          originalFilenameEncrypted: promotedCoverLetterDocument.fileName,
+                          mediaType: promotedCoverLetterDocument.mediaType,
+                          byteLength: promotedCoverLetterDocument.byteLength,
+                          contentDigestHmac: promotedCoverLetterDocument.checksumSha256,
+                          safetyAssessmentId: `application-safety-${promotedCoverLetterDocument.promotionId}`,
+                          committedAt: input.occurredAt,
+                        },
+                      ]
+                    : []),
+                ],
+              },
+              ...(prepared.coverLetter
+                ? {
+                    coverLetterText: {
+                      create: {
+                        textEncrypted: prepared.coverLetter,
+                        characterCount: Array.from(prepared.coverLetter).length,
+                      },
+                    },
+                  }
+                : {}),
+              ...(promotedApplicationDocument
+                ? {
+                    artifactPromotions: {
+                      create: [
+                        {
+                        id: promotedApplicationDocument.promotionId,
+                        candidate: { connect: { id: input.candidateUserId } },
+                        jobPosting: { connect: { id: input.jobId } },
+                        kind: ApplicationDocumentKind.CV,
+                        storagePurposeVersion: "application-document-v1",
+                        storageKeyEncrypted: promotedApplicationDocument.storageKey,
+                        state: ApplicationArtifactPromotionState.COMMITTED,
+                        orphanDeleteAfter: new Date(
+                          input.occurredAt.getTime() + 24 * 60 * 60 * 1000,
+                        ),
+                        },
+                        ...(promotedCoverLetterDocument
+                          ? [
+                              {
+                                id: promotedCoverLetterDocument.promotionId,
+                                candidate: { connect: { id: input.candidateUserId } },
+                                jobPosting: { connect: { id: input.jobId } },
+                                kind: ApplicationDocumentKind.COVER_LETTER,
+                                storagePurposeVersion: "application-document-v1",
+                                storageKeyEncrypted: promotedCoverLetterDocument.storageKey,
+                                state: ApplicationArtifactPromotionState.COMMITTED,
+                                orphanDeleteAfter: new Date(
+                                  input.occurredAt.getTime() + 24 * 60 * 60 * 1000,
+                                ),
+                              },
+                            ]
+                          : []),
+                      ],
+                    },
+                  }
+                : {}),
               answers: {
                 create: prepared.answers.map((answer) => ({
                   questionId: answer.questionId,
@@ -479,7 +700,28 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
         },
         { isolationLevel: "Serializable" },
       );
+      if (!result.created && promotedApplicationDocument && promotedStorage) {
+        await promotedStorage
+          .delete(promotedApplicationDocument.storageKey)
+          .catch(() => undefined);
+      }
+      if (!result.created && promotedCoverLetterDocument && promotedStorage) {
+        await promotedStorage
+          .delete(promotedCoverLetterDocument.storageKey)
+          .catch(() => undefined);
+      }
+      return result;
     } catch (error) {
+      if (promotedApplicationDocument && promotedStorage) {
+        await promotedStorage
+          .delete(promotedApplicationDocument.storageKey)
+          .catch(() => undefined);
+      }
+      if (promotedCoverLetterDocument && promotedStorage) {
+        await promotedStorage
+          .delete(promotedCoverLetterDocument.storageKey)
+          .catch(() => undefined);
+      }
       if (error instanceof ApplicationRepositoryError) throw error;
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
