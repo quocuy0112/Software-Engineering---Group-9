@@ -1,4 +1,4 @@
-import { Body, Container, Heading, Html, Text } from "@react-email/components";
+import { Body, Container, Heading, Html, Text } from "react-email";
 import type { AdminSecurityEventKind } from "./notification-events";
 
 export type MembershipSecurityNotice = {
