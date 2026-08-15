@@ -9,8 +9,10 @@ import {
   cleanupMessagingFixture,
   seedMessagingFixture,
 } from "../messaging/fixtures";
+import { cleanupAdministratorNotificationsForContexts } from "../../../helpers/notifications/admin-notification-cleanup";
 
 const prefixes: string[] = [];
+const notificationContextIds: string[] = [];
 
 async function admin(
   prefix: string,
@@ -33,6 +35,9 @@ async function admin(
 }
 
 afterEach(async () => {
+  await cleanupAdministratorNotificationsForContexts(
+    notificationContextIds.splice(0),
+  );
   for (const prefix of prefixes.splice(0)) {
     await prisma.platformAdministratorGrant.deleteMany({
       where: { userId: { startsWith: prefix } },
@@ -51,6 +56,11 @@ describe("actionable administrator notification fan-out", () => {
     const activeB = await admin(prefix, "b");
     const suspended = await admin(prefix, "suspended", "SUSPENDED");
     const now = new Date("2026-08-15T00:00:00.000Z");
+    notificationContextIds.push(
+      `${prefix}-case-all`,
+      `${prefix}-case-preferred`,
+      `${prefix}-case-fallback`,
+    );
     const expectedActiveRecipients = (
       await prisma.platformAdministratorGrant.findMany({
         where: {
@@ -187,6 +197,7 @@ describe("actionable administrator notification fan-out", () => {
       now: new Date("2026-08-15T00:01:00.000Z"),
     };
     const first = await repository.submit(input);
+    notificationContextIds.push(first.reportId);
     const replay = await repository.submit(input);
     expect(replay).toEqual({ reportId: first.reportId, deduplicated: true });
     const notifications = await prisma.inAppNotification.findMany({

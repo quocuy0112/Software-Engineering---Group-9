@@ -5,6 +5,7 @@ import { PrismaOutboxRepository } from "@/backend/repositories/email/outbox-repo
 import { deliverClaimedOutbox } from "@/backend/email/workers/email-outbox";
 import { EmailDeliveryError } from "@/backend/email/email-service";
 import { alertSecurityNotificationDead } from "@/backend/admin/notifications/security-notification-ops-alert";
+import { cleanupAdministratorNotificationsForContexts } from "../../../helpers/notifications/admin-notification-cleanup";
 
 const prefix = "feature006-provider-truth:";
 const userIds: string[] = [];
@@ -57,6 +58,7 @@ async function linked(now: Date) {
 }
 
 afterEach(async () => {
+  await cleanupAdministratorNotificationsForContexts(userIds);
   await prisma.platformAdministratorGrant.deleteMany({
     where: { userId: { in: userIds } },
   });

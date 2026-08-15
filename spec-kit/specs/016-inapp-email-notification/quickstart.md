@@ -92,6 +92,7 @@ Validated on 2026-08-14 against local PostgreSQL and the production Next.js buil
 - The complete Feature 016 suite passed 21 files and 49 tests; the complete support suite passed 12 files and 29 tests; the complete administrator-management suite passed 68 files and 183 tests.
 - Prisma format/validation/generation, 36-migration sequence, deployment/status, fresh migration/drift verification, TypeScript, full ESLint, and the optimized Next.js production build passed.
 - The broader messaging suite passed 28 of 29 files and 67 of 68 tests. Its unchanged `conversation-start.accessibility.test.tsx` still renders an empty container under jsdom and fails to find its searchbox; messaging backend/report tests and all files changed by this extension pass.
+- Administrator-notification fixture cleanup now removes fan-out rows for every generated context before deleting the corresponding support, messaging-report, moderation-report, verification-request, or account fixture. The five affected suites passed 17 tests; rerunning the former leaking suite left zero orphaned actionable administrator notifications.
 
 Manual administrator checks:
 

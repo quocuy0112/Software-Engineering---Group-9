@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { afterEach, describe, expect, it } from "vitest";
 import { prisma } from "@/backend/database/prisma";
 import { PrismaSupportRepository } from "@/backend/repositories/support/prisma-support-repository";
+import { cleanupAdministratorNotificationsForContexts } from "../../../helpers/notifications/admin-notification-cleanup";
 
 const prefixes: string[] = [];
 
@@ -52,6 +53,7 @@ afterEach(async () => {
       select: { id: true },
     });
     const caseIds = cases.map((item) => item.id);
+    await cleanupAdministratorNotificationsForContexts(caseIds);
     await prisma.emailOutbox.deleteMany({
       where: { supportConversationId: { in: caseIds } },
     });

@@ -6,6 +6,7 @@ import {
   deleteJobBoardDatabaseFixture,
   type JobBoardDatabaseFixture,
 } from "../../../helpers/job-board-database-fixture";
+import { cleanupAdministratorNotificationsForContexts } from "../../../helpers/notifications/admin-notification-cleanup";
 
 describe("moderation admission", () => {
   let fixture: JobBoardDatabaseFixture;
@@ -25,6 +26,13 @@ describe("moderation admission", () => {
     });
   });
   afterAll(async () => {
+    const reportIds = (
+      await prisma.moderationReport.findMany({
+        where: { reporterUserId: { in: fixture.userIds } },
+        select: { id: true },
+      })
+    ).map(({ id }) => id);
+    await cleanupAdministratorNotificationsForContexts(reportIds);
     await deleteJobBoardDatabaseFixture(fixture);
     await prisma.platformAdministratorGrant.deleteMany({
       where: { userId: adminId },

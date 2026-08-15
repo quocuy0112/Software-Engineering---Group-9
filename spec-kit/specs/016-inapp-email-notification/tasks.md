@@ -246,6 +246,7 @@
 - [x] T095 [US7] Add verification evidence escalation administrator notification in `web/src/backend/admin/workers/verification-lifecycle-loop.ts`
 - [x] T096 [US7] Add manual-intervention administrator notification while preserving external operations alerts in `web/src/backend/admin/notifications/security-notification-ops-alert.ts`
 - [x] T097 [US7] Run Prisma gates, focused/affected tests, typecheck, lint, migration checks, production build, update `quickstart.md`, and complete the security/diff review
+- [x] T098 [US7] Prevent administrator notification integration tests from leaving orphaned notifications in a shared development database, remove verified stale test artifacts, and run focused regression validation
 
 ---
 

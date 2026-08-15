@@ -6,10 +6,18 @@ import {
   runVerificationDeadlineCycle,
 } from "@/backend/admin/workers/verification-lifecycle-loop";
 import { runRationaleRetentionCycle } from "@/backend/admin/workers/rationale-retention-loop";
+import { cleanupAdministratorNotificationsForContexts } from "../../../helpers/notifications/admin-notification-cleanup";
 
 describe("admin worker loop isolation", () => {
   afterEach(async () => {
     vi.useRealTimers();
+    const requestIds = (
+      await prisma.recruiterVerificationRequest.findMany({
+        where: { id: { startsWith: "worker-resilience:" } },
+        select: { id: true },
+      })
+    ).map(({ id }) => id);
+    await cleanupAdministratorNotificationsForContexts(requestIds);
     await prisma.businessLicenseEvidence.deleteMany({
       where: { requestId: { startsWith: "worker-resilience:" } },
     });
