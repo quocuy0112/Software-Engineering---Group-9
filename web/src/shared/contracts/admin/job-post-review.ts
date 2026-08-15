@@ -137,11 +137,27 @@ const normalizedPrivateNoteSchema = z
   .max(2_000)
   .refine(
     (value) =>
+      !/[<>]/u.test(value) &&
       !Array.from(value).some((character) => {
         const code = character.codePointAt(0) ?? 0;
         return code < 32 || code === 127;
       }),
-    { message: "Control characters are not allowed." },
+    { message: "Markup and control characters are not allowed." },
+  );
+
+const normalizedPublicExplanationSchema = z
+  .string()
+  .trim()
+  .min(20)
+  .max(1_000)
+  .refine(
+    (value) =>
+      !/[<>]/u.test(value) &&
+      !Array.from(value).some((character) => {
+        const code = character.codePointAt(0) ?? 0;
+        return code < 32 || code === 127;
+      }),
+    { message: "Markup and control characters are not allowed." },
   );
 
 export const adminReviewCommandSchema = z.discriminatedUnion("command", [
@@ -158,7 +174,7 @@ export const adminReviewCommandSchema = z.discriminatedUnion("command", [
     .object({
       command: z.literal("REJECT"),
       reasonCode: jobPostReviewReasonCodeSchema,
-      publicExplanation: z.string().trim().min(20).max(1_000),
+      publicExplanation: normalizedPublicExplanationSchema,
       privateNote: normalizedPrivateNoteSchema.optional(),
     })
     .strict(),
@@ -171,6 +187,9 @@ export const adminReviewCommandResultSchema = z
     assignedAdminUserId: z.string().min(1).max(128).nullable(),
     version: z.number().int().positive(),
     correlationId: z.string().min(1).max(128),
+    status: z.enum(["SUCCESS", "ACTION_BLOCKED"]).optional(),
+    code: z.string().min(1).max(64).optional(),
+    replayed: z.boolean().optional(),
   })
   .strict();
 

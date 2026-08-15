@@ -53,9 +53,11 @@ export function projectJobReviewSnapshot(value: unknown) {
       }),
     ).values(),
   );
-  const location = [snapshot.location.district, snapshot.location.city]
-    .filter(Boolean)
-    .join(", ");
+  const location = snapshot.location.isNationwideRemote
+    ? `Remote · ${snapshot.location.city}`
+    : [snapshot.location.district, snapshot.location.city]
+        .filter(Boolean)
+        .join(", ");
   const searchDocumentNormalized = normalizedSearch(
     [
       snapshot.title,

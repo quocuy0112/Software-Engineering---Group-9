@@ -4,6 +4,7 @@ import { prisma } from "@/backend/database/prisma";
 import { randomUUID } from "node:crypto";
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
 import {
+  AdminCommandDenied,
   AdminCommandConflict,
   PrismaAdminCommandRepository,
 } from "@/backend/repositories/admin/prisma-admin-command-repository";
@@ -16,6 +17,12 @@ import {
   type AdminReviewCommand,
 } from "@/shared/contracts/admin/job-post-review";
 import { jobReviewSnapshotSchema } from "@/shared/contracts/recruiter-job-posting";
+import {
+  JobPostDecisionPolicyError,
+  validateJobPostDecision,
+} from "./job-post-review-policy";
+import { projectJobReviewSnapshot } from "./job-post-publication-projector";
+import { emitJobPostReviewOperation } from "./job-post-review-operations";
 
 /**
  * Application boundary for the review lifecycle. User-story orchestration is
@@ -43,6 +50,7 @@ export class JobPostReviewService {
   }
 
   async list(authority: AdminAuthority, query: unknown) {
+    const startedAt = performance.now();
     const input = jobPostReviewListQuerySchema.parse(query);
     const calculatedAt = new Date();
     await this.assertCurrentGrant(authority, calculatedAt);
@@ -64,6 +72,25 @@ export class JobPostReviewService {
               calculatedAt.getTime() - input.minimumAgeHours * 60 * 60_000,
             ),
       sequence: input.sequence,
+    });
+    emitJobPostReviewOperation({
+      operation: "queue_read",
+      outcome: "success",
+      correlationId: randomUUID(),
+      durationMs: performance.now() - startedAt,
+      queueAgeSeconds: result.rows.reduce(
+        (maximum, row) =>
+          Math.max(
+            maximum,
+            Math.max(
+              0,
+              Math.floor(
+                (calculatedAt.getTime() - row.submittedAt.getTime()) / 1_000,
+              ),
+            ),
+          ),
+        0,
+      ),
     });
     return jobPostReviewQueuePageSchema.parse({
       total: result.total,
@@ -100,11 +127,22 @@ export class JobPostReviewService {
     const row = await this.reviews.findReviewDetail(reviewId);
     if (!row) throw new Error("TARGET_UNAVAILABLE");
     const snapshot = jobReviewSnapshotSchema.safeParse(row.snapshot);
-    if (!snapshot.success) throw new Error("TARGET_UNAVAILABLE");
+    if (!snapshot.success) {
+      emitJobPostReviewOperation({
+        operation: "integrity_block",
+        outcome: "denied",
+        correlationId: randomUUID(),
+        durationMs: 0,
+        code: "CONTENT_INTEGRITY_BLOCKED",
+        version: row.aggregate.version,
+      });
+      throw new Error("TARGET_UNAVAILABLE");
+    }
     const membershipActive = row.submittedMembership?.status === "ACTIVE";
     const accountActive = row.submittedBy?.state === "ACTIVE";
     const companyActive =
       row.aggregate.company.verificationState === "ACTIVE" &&
+      row.aggregate.company.verifiedAt !== null &&
       row.aggregate.company.verificationInactiveAt === null;
     return jobPostReviewDetailSchema.parse({
       id: row.id,
@@ -326,6 +364,163 @@ export class JobPostReviewService {
         });
       },
     );
+  }
+
+  async decide(input: {
+    authority: AdminAuthority;
+    reviewId: string;
+    command: Extract<AdminReviewCommand, { command: "APPROVE" | "REJECT" }>;
+    expectedVersion: number;
+    idempotencyKey: string;
+    now?: Date;
+  }) {
+    const now = input.now ?? new Date();
+    const startedAt = performance.now();
+    const result = await new PrismaAdminCommandRepository().execute(
+      {
+        actorUserId: input.authority.userId,
+        actorSessionId: input.authority.sessionId,
+        grantId: input.authority.grantId,
+        commandKind: `JOB_POST_REVIEW_${input.command.command}`,
+        targetReference: input.reviewId,
+        idempotencyKey: input.idempotencyKey,
+        normalizedBody: {
+          reviewId: input.reviewId,
+          expectedVersion: input.expectedVersion,
+          ...input.command,
+        },
+      },
+      async (transaction, correlationId) => {
+        const [currentGrant, row] = await Promise.all([
+          transaction.platformAdministratorGrant.findFirst({
+            where: {
+              id: input.authority.grantId,
+              userId: input.authority.userId,
+              state: "ACTIVE",
+              OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+              user: { state: "ACTIVE", deletedAt: null },
+              sessionPolicy: {
+                is: { designatedSessionId: input.authority.sessionId },
+              },
+            },
+            select: { id: true },
+          }),
+          transaction.jobPostReviewVersion.findUnique({
+            where: { id: input.reviewId },
+            include: {
+              aggregate: { include: { company: true } },
+              submittedBy: {
+                select: { id: true, state: true, deletedAt: true },
+              },
+              submittedMembership: true,
+            },
+          }),
+        ]);
+        if (!row) throw new Error("TARGET_UNAVAILABLE");
+        const companyEligible =
+          row.aggregate.company.verificationState === "ACTIVE" &&
+          row.aggregate.company.verifiedAt !== null &&
+          row.aggregate.company.verificationInactiveAt === null;
+        const submitterEligible = Boolean(
+          row.submittedBy &&
+          row.submittedBy.state === "ACTIVE" &&
+          row.submittedBy.deletedAt === null &&
+          row.submittedMembership &&
+          row.submittedMembership.status === "ACTIVE" &&
+          row.submittedMembership.companyId === row.aggregate.companyId &&
+          row.submittedMembership.userId === row.submittedBy.id,
+        );
+        let snapshot;
+        try {
+          snapshot = validateJobPostDecision({
+            decision: input.command.command,
+            reviewState: row.state,
+            assignedAdminUserId: row.assignedAdminUserId,
+            actorUserId: input.authority.userId,
+            administratorEligible: Boolean(currentGrant),
+            companyEligible,
+            submitterEligible,
+            currentAggregateVersion: row.aggregate.version,
+            expectedAggregateVersion: input.expectedVersion,
+            snapshot: row.snapshot,
+            storedSnapshotSha256: row.snapshotSha256,
+            now,
+          }).snapshot;
+          if (input.command.command === "APPROVE")
+            projectJobReviewSnapshot(snapshot);
+        } catch (error) {
+          const code =
+            error instanceof JobPostDecisionPolicyError
+              ? error.code
+              : "CONTENT_INTEGRITY_BLOCKED";
+          await new PrismaAuditRepository(transaction).append({
+            occurredAt: now,
+            actorType: "user",
+            actorUserId: input.authority.userId,
+            actorSessionId: input.authority.sessionId,
+            action: "job_post_review.approval_blocked",
+            targetType: "job_post_review",
+            targetId: row.id,
+            result: "DENIED",
+            correlationId,
+            context: {
+              priorState: row.state,
+              resultingState: row.state,
+              targetVersion: row.aggregate.version,
+              failureCode: code,
+            },
+          });
+          emitJobPostReviewOperation({
+            operation:
+              code === "STALE_CONFLICT"
+                ? "stale_conflict"
+                : code === "CONTENT_INTEGRITY_BLOCKED"
+                  ? "integrity_block"
+                  : "decision",
+            outcome: "denied",
+            correlationId,
+            durationMs: performance.now() - startedAt,
+            code,
+            version: row.aggregate.version,
+          });
+          throw new AdminCommandDenied({
+            reviewId: row.id,
+            state: row.state,
+            assignedAdminUserId: row.assignedAdminUserId,
+            version: row.aggregate.version,
+            correlationId,
+            status: "ACTION_BLOCKED",
+            code,
+          });
+        }
+        const decided = await new PrismaJobPostReviewRepository(
+          transaction,
+        ).decidePending({
+          reviewId: row.id,
+          aggregateId: row.aggregate.id,
+          expectedAggregateVersion: input.expectedVersion,
+          existingPublicJobPostingId: row.aggregate.publicJobPostingId,
+          closedAt: row.aggregate.closedAt,
+          snapshot,
+          command: input.command,
+          actorUserId: input.authority.userId,
+          actorSessionId: input.authority.sessionId,
+          submittedByUserId: row.submittedByUserId,
+          notifySubmitter: submitterEligible,
+          correlationId,
+          now,
+        });
+        emitJobPostReviewOperation({
+          operation: "decision",
+          outcome: "success",
+          correlationId,
+          durationMs: performance.now() - startedAt,
+          version: decided.version,
+        });
+        return adminReviewCommandResultSchema.parse(decided);
+      },
+    );
+    return adminReviewCommandResultSchema.parse(result);
   }
 }
 

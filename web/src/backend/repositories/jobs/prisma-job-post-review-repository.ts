@@ -2,6 +2,11 @@ import "server-only";
 import { Prisma } from "@/backend/generated/prisma/client";
 import { prisma } from "@/backend/database/prisma";
 import type { JobPostReviewState } from "@/shared/contracts/admin/job-post-review";
+import type { AdminReviewCommand } from "@/shared/contracts/admin/job-post-review";
+import type { JobReviewSnapshot } from "@/shared/contracts/recruiter-job-posting";
+import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
+import { projectJobReviewSnapshot } from "@/backend/jobs/review/job-post-publication-projector";
 
 type ReviewDb = typeof prisma | Prisma.TransactionClient;
 
@@ -13,6 +18,7 @@ const reviewDetailInclude = {
           id: true,
           displayName: true,
           verificationState: true,
+          verifiedAt: true,
           verificationInactiveAt: true,
         },
       },
@@ -189,6 +195,200 @@ export class PrismaJobPostReviewRepository {
       },
     });
     return version;
+  }
+
+  async decidePending(input: {
+    reviewId: string;
+    aggregateId: string;
+    expectedAggregateVersion: number;
+    existingPublicJobPostingId: string | null;
+    closedAt: Date | null;
+    snapshot: JobReviewSnapshot;
+    command: Extract<AdminReviewCommand, { command: "APPROVE" | "REJECT" }>;
+    actorUserId: string;
+    actorSessionId: string;
+    submittedByUserId: string | null;
+    notifySubmitter: boolean;
+    correlationId: string;
+    now: Date;
+  }) {
+    const decisionState =
+      input.command.command === "APPROVE" ? "APPROVED" : "REJECTED";
+    let publicJobPostingId = input.existingPublicJobPostingId;
+    let publishedAt: Date | null = null;
+
+    if (input.command.command === "APPROVE") {
+      const projected = projectJobReviewSnapshot(input.snapshot);
+      const { skills, ...jobData } = projected;
+      const slugOwner = await this.db.jobPosting.findUnique({
+        where: { slug: projected.slug },
+        select: {
+          id: true,
+          companyId: true,
+          reviewAggregate: { select: { id: true } },
+        },
+      });
+      if (
+        (publicJobPostingId && slugOwner?.id !== publicJobPostingId) ||
+        (!publicJobPostingId && slugOwner)
+      )
+        throw new Error("JOB_POST_PROJECTION_COLLISION");
+      if (
+        slugOwner &&
+        (slugOwner.companyId !== projected.companyId ||
+          slugOwner.reviewAggregate?.id !== input.aggregateId)
+      )
+        throw new Error("JOB_POST_PROJECTION_COLLISION");
+
+      const publicJob = await this.db.jobPosting.upsert({
+        where: { slug: projected.slug },
+        create: {
+          ...jobData,
+          status: input.closedAt ? "CLOSED" : "ACTIVE",
+          approvedAt: input.now,
+          publishedAt: input.now,
+          closedAt: input.closedAt,
+        },
+        update: {
+          ...jobData,
+          status: input.closedAt ? "CLOSED" : "ACTIVE",
+          approvedAt: input.now,
+          publishedAt: input.now,
+          closedAt: input.closedAt,
+          version: { increment: 1 },
+        },
+      });
+      publicJobPostingId = publicJob.id;
+      publishedAt = input.now;
+      await this.db.jobPostingSkill.deleteMany({
+        where: { jobPostingId: publicJob.id },
+      });
+      for (const skill of skills) {
+        const stored = await this.db.skill.upsert({
+          where: { normalizedName: skill.normalizedName },
+          create: {
+            name: skill.displayName,
+            normalizedName: skill.normalizedName,
+          },
+          update: {},
+        });
+        await this.db.jobPostingSkill.create({
+          data: {
+            jobPostingId: publicJob.id,
+            skillId: stored.id,
+            displayName: skill.displayName,
+            position: skill.position,
+          },
+        });
+      }
+    }
+
+    const aggregate = await this.db.jobPostReviewAggregate.updateMany({
+      where: {
+        id: input.aggregateId,
+        version: input.expectedAggregateVersion,
+        pendingVersionId: input.reviewId,
+      },
+      data: {
+        pendingVersionId: null,
+        ...(decisionState === "APPROVED"
+          ? { approvedVersionId: input.reviewId, publicJobPostingId }
+          : {}),
+        version: { increment: 1 },
+      },
+    });
+    if (aggregate.count !== 1) throw new Error("STALE_CONFLICT");
+    const decided = await this.db.jobPostReviewVersion.updateMany({
+      where: {
+        id: input.reviewId,
+        state: "PENDING_REVIEW",
+        assignedAdminUserId: input.actorUserId,
+      },
+      data: {
+        state: decisionState,
+        decidedByAdminUserId: input.actorUserId,
+        decidedAt: input.now,
+        publishedAt,
+        decisionCorrelationId: input.correlationId,
+        reasonCode:
+          input.command.command === "REJECT" ? input.command.reasonCode : null,
+        publicExplanation:
+          input.command.command === "REJECT"
+            ? input.command.publicExplanation
+            : null,
+      },
+    });
+    if (decided.count !== 1) throw new Error("STALE_CONFLICT");
+    if (input.command.command === "REJECT" && input.command.privateNote) {
+      await this.db.jobPostReviewPrivateNote.create({
+        data: {
+          reviewVersionId: input.reviewId,
+          authorAdminUserId: input.actorUserId,
+          normalizedText: input.command.privateNote,
+          createdAt: input.now,
+        },
+      });
+    }
+    const resultingVersion = input.expectedAggregateVersion + 1;
+    await this.db.jobPostReviewHistory.create({
+      data: {
+        reviewVersionId: input.reviewId,
+        action: decisionState,
+        actorUserId: input.actorUserId,
+        priorState: "PENDING_REVIEW",
+        resultingState: decisionState,
+        priorAssigneeUserId: input.actorUserId,
+        resultingAssigneeUserId: input.actorUserId,
+        resultingAggregateVersion: resultingVersion,
+        correlationId: input.correlationId,
+        occurredAt: input.now,
+      },
+    });
+    await new PrismaAuditRepository(this.db).append({
+      occurredAt: input.now,
+      actorType: "user",
+      actorUserId: input.actorUserId,
+      actorSessionId: input.actorSessionId,
+      action:
+        decisionState === "APPROVED"
+          ? "job_post_review.approved"
+          : "job_post_review.rejected",
+      targetType: "job_post_review",
+      targetId: input.reviewId,
+      result: "SUCCESS",
+      correlationId: input.correlationId,
+      context: {
+        priorState: "PENDING_REVIEW",
+        resultingState: decisionState,
+        targetVersion: resultingVersion,
+        ...(input.command.command === "REJECT"
+          ? { reasonCategory: input.command.reasonCode }
+          : {}),
+      },
+    });
+    if (input.notifySubmitter && input.submittedByUserId) {
+      await createInAppNotification(this.db, {
+        recipientUserId: input.submittedByUserId,
+        kind:
+          decisionState === "APPROVED"
+            ? "JOB_POST_APPROVED"
+            : "JOB_POST_REJECTED",
+        deduplicationKey: `job-post-outcome:${input.reviewId}:${decisionState}`,
+        correlationId: input.correlationId,
+        occurredAt: input.now,
+        contextType: "JOB_POST_REVIEW",
+        contextId: input.reviewId,
+        variables: { audience: "USER", state: decisionState },
+      });
+    }
+    return {
+      reviewId: input.reviewId,
+      state: decisionState,
+      assignedAdminUserId: input.actorUserId,
+      version: resultingVersion,
+      correlationId: input.correlationId,
+      status: "SUCCESS" as const,
+    };
   }
 
   async assignPending(input: {

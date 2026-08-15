@@ -98,6 +98,17 @@ Expected:
 
 ## Complete Review and Decision
 
+### Recorded User Story 3 evidence (2026-08-15)
+
+- `npm.cmd run typecheck`: passed.
+- Full-project `npm.cmd run lint -- --no-cache` and focused US3 ESLint: passed.
+- `npm.cmd run test:job-post-reviews`: 30 files passed, 43 tests passed.
+- Canonical job detail/search contract plus job-board/review architecture regression: 4 files passed, 13 tests passed.
+- Migration sequence validation passed with 37 migrations and `036_job_post_review_authority` as the latest numbered migration.
+- TDD evidence: the nine new US3 files initially failed 10/10 tests before decision policy, transaction, public authority, observability, and UI implementation; the same scope later passed 9 files and 10 tests.
+- PostgreSQL-backed job integration tests, browser end-to-end, and decision concurrency/performance probes remain release gates: the configured database at `localhost:55432` was unavailable (`P1001`) during this run.
+- Commit evidence is the English `feat: add administrator job post decisions` entry in Git history.
+
 1. Open the assigned review and inspect every submitted field, company eligibility summary, submitter membership summary, prior-approved diff, and history.
 2. Confirm protected evidence is linked through the existing viewer and not copied into review data.
 3. Attempt approve without assignment, with a stale expected version, after company deactivation, after deadline expiry, and as a revoked Administrator.

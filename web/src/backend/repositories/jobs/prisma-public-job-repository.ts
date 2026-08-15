@@ -41,11 +41,23 @@ const publicInclude = (actorUserId: string | null) =>
           select: { id: true, stage: true },
           take: 0,
         },
+    reviewAggregate: {
+      select: {
+        approvedVersionId: true,
+        closedAt: true,
+        approvedVersion: { select: { snapshot: true, snapshotSha256: true } },
+      },
+    },
   }) as const;
 
-export type PublicJobRow = Prisma.JobPostingGetPayload<{
+type StoredPublicJobRow = Prisma.JobPostingGetPayload<{
   include: ReturnType<typeof publicInclude>;
-}> & { score: number };
+}>;
+
+export type PublicJobRow = Omit<StoredPublicJobRow, "reviewAggregate"> & {
+  reviewAggregate?: StoredPublicJobRow["reviewAggregate"];
+  score: number;
+};
 
 type RankedRow = {
   id: string;
@@ -96,6 +108,15 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
     Prisma.sql`j."publishedAt" IS NOT NULL AND j."publishedAt" <= ${now}`,
     Prisma.sql`(j."applicationDeadline" IS NULL OR j."applicationDeadline" > ${now})`,
     Prisma.sql`EXISTS (SELECT 1 FROM "Company" c WHERE c."id" = j."companyId" AND c."verifiedAt" IS NOT NULL)`,
+    Prisma.sql`(
+      NOT EXISTS (SELECT 1 FROM "JobPostReviewAggregate" r WHERE r."publicJobPostingId" = j."id")
+      OR EXISTS (
+        SELECT 1 FROM "JobPostReviewAggregate" r
+        WHERE r."publicJobPostingId" = j."id"
+          AND r."approvedVersionId" IS NOT NULL
+          AND r."closedAt" IS NULL
+      )
+    )`,
   ];
   for (const token of input.normalizedQuery.split(" ").filter(Boolean)) {
     if (input.searchBy === "TITLE") {
@@ -271,7 +292,19 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
     const row = await prisma.jobPosting.findFirst({
       where: {
         slug,
-        status: { in: ["ACTIVE", "CLOSED", "EXPIRED"] },
+        OR: [
+          {
+            reviewAggregate: null,
+            status: { in: ["ACTIVE", "CLOSED", "EXPIRED"] },
+          },
+          {
+            reviewAggregate: {
+              is: { approvedVersionId: { not: null }, closedAt: null },
+            },
+            status: "ACTIVE",
+            applicationDeadline: { gt: now },
+          },
+        ],
         approvedAt: { not: null },
         publishedAt: { not: null, lte: now },
         company: { verifiedAt: { not: null } },
@@ -292,11 +325,25 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
         status: "ACTIVE",
         approvedAt: { not: null },
         publishedAt: { not: null, lte: now },
-        OR: [
-          { applicationDeadline: null },
-          { applicationDeadline: { gt: now } },
-        ],
         company: { verifiedAt: { not: null } },
+        AND: [
+          {
+            OR: [
+              { applicationDeadline: null },
+              { applicationDeadline: { gt: now } },
+            ],
+          },
+          {
+            OR: [
+              { reviewAggregate: null },
+              {
+                reviewAggregate: {
+                  is: { approvedVersionId: { not: null }, closedAt: null },
+                },
+              },
+            ],
+          },
+        ],
       },
       take: 100,
       include: publicInclude(actorUserId),
@@ -314,11 +361,25 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
         status: "ACTIVE",
         approvedAt: { not: null },
         publishedAt: { not: null, lte: now },
-        OR: [
-          { applicationDeadline: null },
-          { applicationDeadline: { gt: now } },
-        ],
         company: { verifiedAt: { not: null } },
+        AND: [
+          {
+            OR: [
+              { applicationDeadline: null },
+              { applicationDeadline: { gt: now } },
+            ],
+          },
+          {
+            OR: [
+              { reviewAggregate: null },
+              {
+                reviewAggregate: {
+                  is: { approvedVersionId: { not: null }, closedAt: null },
+                },
+              },
+            ],
+          },
+        ],
       },
       orderBy: [{ publishedAt: "desc" }, { id: "asc" }],
       take: 160,
@@ -335,6 +396,14 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
         approvedAt: { not: null },
         publishedAt: { not: null, lte: now },
         company: { verifiedAt: { not: null } },
+        OR: [
+          { reviewAggregate: null },
+          {
+            reviewAggregate: {
+              is: { approvedVersionId: { not: null }, closedAt: null },
+            },
+          },
+        ],
       },
       select: { id: true, status: true, applicationDeadline: true },
     });

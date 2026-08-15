@@ -93,6 +93,12 @@ export function JobPostReviewShow() {
             <pre>{JSON.stringify(record.decision, null, 2)}</pre>
           )}
         />
+        <TextField source="decision.reasonCode" label="Public reason code" />
+        <TextField
+          source="decision.publicExplanation"
+          label="Public explanation"
+        />
+        <TextField source="decision.decidedAt" label="Decided at" />
         <FunctionField
           label="Immutable history"
           render={(record) => (

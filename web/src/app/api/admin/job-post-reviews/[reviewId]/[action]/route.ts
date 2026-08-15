@@ -21,14 +21,17 @@ export async function POST(
     if (
       !reviewId ||
       reviewId.length > 128 ||
-      !["claim", "reassign"].includes(action)
+      !["claim", "reassign", "approve", "reject"].includes(action)
     )
       throw new AdminHttpError(404, "TARGET_UNAVAILABLE");
     const command = await parseAdminJson(request, adminReviewCommandSchema);
-    const expectedCommand = action === "claim" ? "CLAIM" : "REASSIGN";
+    const expectedCommand = {
+      claim: "CLAIM",
+      reassign: "REASSIGN",
+      approve: "APPROVE",
+      reject: "REJECT",
+    }[action];
     if (command.command !== expectedCommand)
-      throw new AdminHttpError(422, "COMMAND_PATH_MISMATCH");
-    if (command.command !== "CLAIM" && command.command !== "REASSIGN")
       throw new AdminHttpError(422, "COMMAND_PATH_MISMATCH");
     const headers = commandHeaders(request, { strictIfMatch: true });
     if (
@@ -38,8 +41,19 @@ export async function POST(
       headers.expectedVersion < 1
     )
       throw new AdminHttpError(422, "VALIDATION_FAILED");
+    const service = new JobPostReviewService();
+    if (command.command === "CLAIM" || command.command === "REASSIGN")
+      return adminJson(
+        await service.assign({
+          authority,
+          reviewId,
+          command,
+          expectedVersion: headers.expectedVersion,
+          idempotencyKey: headers.idempotencyKey,
+        }),
+      );
     return adminJson(
-      await new JobPostReviewService().assign({
+      await service.decide({
         authority,
         reviewId,
         command,

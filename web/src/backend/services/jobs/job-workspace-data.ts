@@ -13,6 +13,8 @@ import { PrismaApplicationTrackingRepository } from "@/backend/repositories/jobs
 import { configuredJsonJobCatalogueRepository } from "@/backend/repositories/jobs/job-catalogue-repository-factory";
 import { readUserJobState } from "./user-job-state-store";
 import { readMockAppliedJobIds } from "./recruiter-job-posting-data";
+import { prisma } from "@/backend/database/prisma";
+import { jobReviewSnapshotSchema } from "@/shared/contracts/recruiter-job-posting";
 
 const workspaceJobsRepository =
   configuredJsonJobCatalogueRepository("jobs.json");
@@ -113,7 +115,7 @@ async function readCatalog(): Promise<JobCatalog> {
   catalogPromise ??= Promise.all([
     workspaceJobsRepository.read(),
     workspaceCompaniesRepository.read(),
-  ]).then(([jobValues, companyValues]) => {
+  ]).then(async ([jobValues, companyValues]) => {
     const jobs = z.array(sourceJobSchema).parse(jobValues) as SourceJob[];
     const companies = z
       .array(sourceCompanySchema)
@@ -127,8 +129,66 @@ async function readCatalog(): Promise<JobCatalog> {
             ? "closed"
             : job.status,
     }));
+    const aggregates = await prisma.jobPostReviewAggregate.findMany({
+      where: { jobId: { in: normalizedJobs.map((job) => job.id) } },
+      include: {
+        approvedVersion: { select: { snapshot: true } },
+        publicJobPosting: {
+          select: {
+            status: true,
+            publishedAt: true,
+            updatedAt: true,
+            applicationDeadline: true,
+            _count: { select: { applications: true } },
+          },
+        },
+        company: {
+          select: {
+            verificationState: true,
+            verifiedAt: true,
+            verificationInactiveAt: true,
+          },
+        },
+      },
+    });
+    const managedByJobId = new Map(
+      aggregates.map((aggregate) => [aggregate.jobId, aggregate]),
+    );
+    const observedAt = new Date();
+    const selectedJobs = normalizedJobs.flatMap((job) => {
+      const managed = managedByJobId.get(job.id);
+      if (!managed) return [job];
+      const snapshot = jobReviewSnapshotSchema.safeParse(
+        managed.approvedVersion?.snapshot,
+      );
+      const projection = managed.publicJobPosting;
+      const active =
+        snapshot.success &&
+        projection?.status === "ACTIVE" &&
+        projection.publishedAt !== null &&
+        managed.closedAt === null &&
+        managed.company.verificationState === "ACTIVE" &&
+        managed.company.verifiedAt !== null &&
+        managed.company.verificationInactiveAt === null &&
+        (!projection.applicationDeadline ||
+          projection.applicationDeadline > observedAt);
+      if (!active || !snapshot.success || !projection?.publishedAt) return [];
+      const projected = sourceJobSchema.safeParse({
+        ...snapshot.data,
+        status: "active",
+        approvalComment: null,
+        isVerified: true,
+        postedAt: projection.publishedAt.toISOString(),
+        updatedAt: projection.updatedAt.toISOString(),
+        stats: {
+          viewCount: 0,
+          applicantCount: projection._count.applications,
+        },
+      });
+      return projected.success ? [projected.data] : [];
+    });
     return {
-      jobs: normalizedJobs,
+      jobs: selectedJobs,
       companies: new Map(companies.map((company) => [company.id, company])),
     };
   });
