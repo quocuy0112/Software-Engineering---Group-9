@@ -363914,11 +363914,11 @@
     "id": "job-003357",
     "slug": "it-comtor-bac-ninh-003357",
     "companyId": "comp-0115-compass-capital",
-    "title": "IT Comtor",
-    "shortPitch": "Step up as IT Comtor and help lead our it operations & support efforts.",
     "industry": "Information Technology (IT)",
     "industryCode": "r03",
     "subIndustry": "IT Operations & Support",
+    "title": "IT Comtor",
+    "shortPitch": "Step up as IT Comtor and help lead our it operations & support efforts.",
     "categoryIds": [
       "r03-it-operations-support"
     ],
@@ -363951,7 +363951,8 @@
     "education": "College degree or above",
     "age": "26-34",
     "numberOfHires": 2,
-    "status": "open",
+    "status": "active",
+    "approvalComment": null,
     "isUrgent": true,
     "isVerified": false,
     "postedAt": "2026-07-18T00:00:00.000Z",
@@ -364015,9 +364016,8 @@
     },
     "stats": {
       "viewCount": 1135,
-      "applicantCount": 105
-    },
-    "approvalComment": null
+      "applicantCount": 107
+    }
   },
   {
     "id": "job-003358",
@@ -407497,11 +407497,11 @@
     "id": "job-003759",
     "slug": "it-comtor-hanoi-003759",
     "companyId": "comp-0115-compass-capital",
-    "title": "IT Comtor",
-    "shortPitch": "Step up as IT Comtor and help lead our it operations & support efforts.",
     "industry": "Information Technology (IT)",
     "industryCode": "r03",
     "subIndustry": "IT Operations & Support",
+    "title": "IT Comtor",
+    "shortPitch": "Step up as IT Comtor and help lead our it operations & support efforts.",
     "categoryIds": [
       "r03-it-operations-support"
     ],
@@ -407534,7 +407534,8 @@
     "education": "College degree or above",
     "age": "25-30",
     "numberOfHires": 1,
-    "status": "open",
+    "status": "active",
+    "approvalComment": null,
     "isUrgent": false,
     "isVerified": true,
     "postedAt": "2026-07-17T00:00:00.000Z",
@@ -407598,9 +407599,8 @@
     },
     "stats": {
       "viewCount": 1618,
-      "applicantCount": 218
-    },
-    "approvalComment": null
+      "applicantCount": 219
+    }
   },
   {
     "id": "job-003760",
@@ -432544,11 +432544,11 @@
     "id": "job-003990",
     "slug": "proofreader-hai-phong-003990",
     "companyId": "comp-0164-horizon-manufacturing",
-    "title": "Proofreader",
-    "shortPitch": "Step up as Proofreader and help lead our translation efforts.",
     "industry": "Translation / Interpretation",
     "industryCode": "r24",
     "subIndustry": "Translation",
+    "title": "Proofreader",
+    "shortPitch": "Step up as Proofreader and help lead our translation efforts.",
     "categoryIds": [
       "r24-translation-general"
     ],
@@ -432581,7 +432581,8 @@
     "education": "College degree or above",
     "age": "28-33",
     "numberOfHires": 3,
-    "status": "open",
+    "status": "active",
+    "approvalComment": null,
     "isUrgent": true,
     "isVerified": true,
     "postedAt": "2026-07-17T00:00:00.000Z",
@@ -432645,9 +432646,8 @@
     },
     "stats": {
       "viewCount": 2682,
-      "applicantCount": 153
-    },
-    "approvalComment": null
+      "applicantCount": 154
+    }
   },
   {
     "id": "job-003991",
@@ -489480,11 +489480,11 @@
     "id": "job-004515",
     "slug": "react-native-developer-da-nang-004515",
     "companyId": "comp-0171-apex-trading-co",
-    "title": "React Native Developer",
-    "shortPitch": "Step up as React Native Developer and help lead our software development efforts.",
     "industry": "Information Technology (IT)",
     "industryCode": "r03",
     "subIndustry": "Software Development",
+    "title": "React Native Developer",
+    "shortPitch": "Step up as React Native Developer and help lead our software development efforts.",
     "categoryIds": [
       "r03-software-development"
     ],
@@ -489517,7 +489517,8 @@
     "education": "College degree or above",
     "age": "26-32",
     "numberOfHires": 5,
-    "status": "open",
+    "status": "active",
+    "approvalComment": null,
     "isUrgent": true,
     "isVerified": true,
     "postedAt": "2026-07-19T00:00:00.000Z",
@@ -489581,9 +489582,8 @@
     },
     "stats": {
       "viewCount": 1394,
-      "applicantCount": 118
-    },
-    "approvalComment": null
+      "applicantCount": 120
+    }
   },
   {
     "id": "job-004516",

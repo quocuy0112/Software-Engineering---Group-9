@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export function ApplicationDocumentViewer({
   jobId,
@@ -20,22 +20,6 @@ export function ApplicationDocumentViewer({
   const previewUrl = `/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(applicationId)}/documents/${kind}`;
   const downloadUrl = `${previewUrl}/download`;
 
-  useEffect(() => {
-    const controller = new AbortController();
-    void fetch(previewUrl, { cache: "no-store", signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) throw new Error("Preview unavailable.");
-        setState("ready");
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) {
-          setState("error");
-          setMessage("The original document could not be previewed.");
-        }
-      });
-    return () => controller.abort();
-  }, [previewUrl]);
-
   return (
     <div className="application-document-overlay" role="dialog" aria-modal="true" aria-labelledby="application-document-title">
       <div className="application-document-dialog">
@@ -43,8 +27,8 @@ export function ApplicationDocumentViewer({
         <h2 id="application-document-title">{fileName ?? (kind === "cv" ? "Original CV" : "Cover letter")}</h2>
         {state === "loading" ? <p role="status">Loading document preview…</p> : null}
         {state === "error" ? <p role="alert">{message} Download the original file instead.</p> : null}
-        {state === "ready" ? (
-          <iframe title={`${kind === "cv" ? "CV" : "Cover letter"} preview`} src={previewUrl} />
+        {state !== "error" ? (
+          <iframe title={`${kind === "cv" ? "CV" : "Cover letter"} preview`} src={previewUrl} onLoad={() => setState("ready")} onError={() => { setState("error"); setMessage("The original document could not be previewed."); }} />
         ) : null}
         <a href={downloadUrl} download={fileName ?? undefined}>Download original {kind === "cv" ? "CV" : "cover letter"}</a>
       </div>

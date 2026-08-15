@@ -1,0 +1,21 @@
+{
+  "problem solving": ["problem solving", "troubleshooting", "troubleshoot", "troubleshot", "debugging", "debug", "diagnosed", "diagnose", "resolved issues", "issue resolution", "giải quyết vấn đề", "xử lý sự cố"],
+  "process improvement": ["process improvement", "process optimization", "workflow improvement", "optimized workflow", "standardized process", "standardized workflow", "reduced process errors", "cải tiến quy trình", "cải thiện quy trình", "tối ưu quy trình"],
+  "customer focus": ["customer focus", "customer-focused", "customer service", "guest service", "client service", "customer satisfaction", "client satisfaction", "customer relationship", "chăm sóc khách hàng", "dịch vụ khách hàng", "hài lòng khách hàng"],
+  "teamwork": ["teamwork", "team player", "team-oriented", "collaborative", "collaborated", "cross-functional team", "worked with the team", "làm việc nhóm", "phối hợp nhóm"],
+  "english proficiency": ["english proficiency", "english communication", "english fluency", "fluent english", "fluent in english", "proficient in english", "good command of english", "ielts", "toeic", "english - fluent", "english - good", "tiếng anh", "giao tiếp tiếng anh"],
+  "time management": ["time management", "prioritization", "prioritized tasks", "met deadlines", "deadline management", "managed schedules", "quản lý thời gian", "ưu tiên công việc", "đúng hạn"],
+  "attention to detail": ["attention to detail", "detail-oriented", "detail oriented", "high accuracy", "with accuracy", "accurate", "chú ý đến chi tiết", "tỉ mỉ", "tỉ mỉ và chính xác"],
+  "project management": ["project management", "project coordination", "coordinated projects", "project manager", "project budgets", "project schedule", "project tracking", "quản lý dự án", "điều phối dự án"],
+  "reporting": ["reporting", "reported results", "reported performance", "prepared reports", "prepared a report", "daily reports", "weekly reports", "báo cáo", "báo cáo kết quả"],
+  "leadership": ["leadership", "led a team", "led the team", "supervised a team", "team leader", "team lead", "coached", "mentored", "managed a team", "lãnh đạo", "quản lý đội nhóm", "dẫn dắt đội nhóm"],
+  "planning": ["planning", "planned", "planning skills", "strategic planning", "training roadmap", "visit schedules", "content calendars", "lập kế hoạch", "kế hoạch", "lên kế hoạch"],
+  "negotiation": ["negotiation", "negotiated", "negotiating", "negotiate", "contract clauses", "đàm phán", "thương lượng"],
+  "communication": ["communication", "communicated", "communication skills", "presented", "presentation skills", "stakeholder communication", "giao tiếp", "kỹ năng giao tiếp", "thuyết trình"],
+  "data analysis": ["data analysis", "analyzed data", "analyzing data", "data analytics", "performance metrics", "crash reports", "sales tracking", "phân tích dữ liệu", "phân tích số liệu"],
+  "ms office": ["ms office", "microsoft office", "microsoft excel", "ms excel", "ms word", "microsoft word", "powerpoint", "tin học văn phòng"],
+  "transport & warehousing": ["transport", "warehouse", "warehousing", "inventory", "logistics", "supply chain", "stock handling", "vận tải", "kho vận", "quản lý kho", "chuỗi cung ứng"],
+  "architecture & interior design": ["architecture", "architectural", "interior design", "autocad", "blueprints", "architectural drawings", "kiến trúc", "thiết kế nội thất", "bản vẽ kiến trúc"],
+  "agriculture & science": ["agriculture", "agricultural", "biology", "laboratory", "lab equipment", "aquaculture", "science", "nông nghiệp", "sinh học", "phòng thí nghiệm", "khoa học"],
+  "translation": ["translation", "translated", "translator", "localization", "terminology", "biên dịch", "phiên dịch", "dịch thuật"]
+}

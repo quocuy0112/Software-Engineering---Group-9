@@ -68,6 +68,41 @@ describe("CV parser and draft factory", () => {
     ).rejects.toMatchObject({ code: "PARSER_OUTPUT_INVALID" });
   });
 
+  it("normalizes a model's current entry when it also supplies an end date", async () => {
+    const writes: any[] = [];
+    const base = buildCvFixtureParserOutput();
+    const output = {
+      ...base,
+      experiences: [
+        {
+          ...base.experiences[0]!,
+          isCurrent: true,
+          endDate: "2025-01-01",
+        },
+      ],
+    };
+    const service = new CreateCvDraftService({
+      saveDraft: async (draft) => {
+        writes.push(draft);
+        return draft;
+      },
+    });
+    await service.execute({
+      accountId: "account_fixture",
+      uploadId: "upload_fixture_current",
+      parseJobId: "parse_fixture_current",
+      profileId: "profile_fixture",
+      sourceProfileRevision: 7,
+      output,
+      segments,
+      expiresAt: new Date("2026-08-31T00:00:00.000Z"),
+    });
+    const payload = writes[0]?.proposalPayload as {
+      experiences: Array<{ value: { endDate: string | null } }>;
+    };
+    expect(payload.experiences[0]?.value.endDate).toBeNull();
+  });
+
   it("does not expose any CandidateProfile mutation dependency", () => {
     expect(CreateCvDraftService.toString()).not.toMatch(
       /candidateProfile[.]update|profileExperience[.]create/u,

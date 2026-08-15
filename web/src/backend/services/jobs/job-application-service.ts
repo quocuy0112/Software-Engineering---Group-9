@@ -18,6 +18,7 @@ import type {
   DirectApplicationCvSource,
   PreparedDirectApplicationCv,
 } from "./prepare-direct-application-cv";
+import { z } from "zod";
 
 function binding(
   command: ApplicationSubmission,
@@ -79,7 +80,7 @@ export class JobApplicationService {
     private readonly repository?: ApplicationRepositoryPort,
     private readonly csrfTokenFactory?: (
       sessionId: string,
-      ) => string | Promise<string>,
+    ) => string | Promise<string>,
     private readonly audit?: Pick<PrismaAuditRepository, "append">,
   ) {}
 
@@ -174,14 +175,22 @@ export class JobApplicationService {
       ) {
         throw new JobServiceError(400, {
           code: "APPLICATION_COVER_LETTER_INELIGIBLE",
-          message: applicationFailureMessage("APPLICATION_COVER_LETTER_INELIGIBLE"),
+          message: applicationFailureMessage(
+            "APPLICATION_COVER_LETTER_INELIGIBLE",
+          ),
         });
       }
-      if (command.coverLetter && typeof command.coverLetter !== "string" && command.coverLetter.kind === "FILE") {
+      if (
+        command.coverLetter &&
+        typeof command.coverLetter !== "string" &&
+        command.coverLetter.kind === "FILE"
+      ) {
         if (!directCoverLetterSource) {
           throw new JobServiceError(400, {
             code: "APPLICATION_COVER_LETTER_INELIGIBLE",
-            message: applicationFailureMessage("APPLICATION_COVER_LETTER_INELIGIBLE"),
+            message: applicationFailureMessage(
+              "APPLICATION_COVER_LETTER_INELIGIBLE",
+            ),
           });
         }
         try {
@@ -191,7 +200,9 @@ export class JobApplicationService {
         } catch {
           throw new JobServiceError(400, {
             code: "APPLICATION_COVER_LETTER_INELIGIBLE",
-            message: applicationFailureMessage("APPLICATION_COVER_LETTER_INELIGIBLE"),
+            message: applicationFailureMessage(
+              "APPLICATION_COVER_LETTER_INELIGIBLE",
+            ),
           });
         }
       }
@@ -218,7 +229,8 @@ export class JobApplicationService {
       return { ...result.application, created: result.created };
     } catch (error) {
       if (directCv) await directCv.cleanup().catch(() => undefined);
-      if (directCoverLetter) await directCoverLetter.cleanup().catch(() => undefined);
+      if (directCoverLetter)
+        await directCoverLetter.cleanup().catch(() => undefined);
       await (this.audit ?? new PrismaAuditRepository())
         .append({
           occurredAt: now,
@@ -245,11 +257,31 @@ export class JobApplicationService {
           "IDEMPOTENCY_KEY_REUSED",
           "JOB_NO_LONGER_ACCEPTING_APPLICATIONS",
         ].includes(error.code);
-        throw new JobServiceError(conflict ? 409 : 403, {
-          code: error.code,
-          message: conflict
-            ? "The application could not be submitted in its current state."
-            : applicationFailureMessage(error.code),
+        const invalidApplication = [
+          "APPLICATION_PROFILE_INCOMPLETE",
+          "APPLICATION_CV_INELIGIBLE",
+          "APPLICATION_ANSWER_REQUIRED",
+          "APPLICATION_ANSWER_INVALID",
+          "APPLICATION_ANSWER_UNKNOWN",
+          "APPLICATION_ANSWER_DUPLICATE",
+          "APPLICATION_CONSENT_STALE",
+          "APPLICATION_TEXT_TOO_LONG",
+          "APPLICATION_COVER_LETTER_INELIGIBLE",
+        ].includes(error.code);
+        throw new JobServiceError(
+          conflict ? 409 : invalidApplication ? 400 : 403,
+          {
+            code: error.code,
+            message: conflict
+              ? "The application could not be submitted in its current state."
+              : applicationFailureMessage(error.code),
+          },
+        );
+      }
+      if (error instanceof z.ZodError) {
+        throw new JobServiceError(400, {
+          code: "APPLICATION_SUBMISSION_INVALID",
+          message: "Review the application fields and try again.",
         });
       }
       throw error;

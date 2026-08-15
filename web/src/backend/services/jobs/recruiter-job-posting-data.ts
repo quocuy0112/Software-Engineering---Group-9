@@ -316,6 +316,23 @@ async function readCatalog() {
   return { jobs, companies, rawJobs, rawCompanies };
 }
 
+export async function authorizeLegacyRecruiterJob(
+  userId: string,
+  jobId: string,
+) {
+  const { jobs, companies } = await readCatalog();
+  const job = jobs.find((item) => item.id === jobId);
+  if (!job) return null;
+  const company = companies.find((item) => item.id === job.companyId);
+  if (
+    !company ||
+    company.verificationStatus !== "approved" ||
+    (company.ownerUserId !== userId && !company.memberUserIds.includes(userId))
+  )
+    return null;
+  return { jobId: job.id, companyId: company.id, jobTitle: job.title };
+}
+
 function replaceRawJob(rawJobs: unknown[], updated: JobCatalogItem) {
   let replaced = false;
   const next = rawJobs.map((value) => {

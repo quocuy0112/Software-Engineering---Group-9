@@ -37,4 +37,157 @@ describe("deterministic automatic matching", () => {
     expect(result.incompletenessLabel).toContain("parsing");
     expect(result.foundRequiredSkills[0]?.evidence[0]?.sectionLabel).toBe("CV body");
   });
+
+  it("matches only controlled semantic aliases and keeps verbatim evidence", () => {
+    const result = calculateAutomaticMatch({
+      ...base,
+      requiredSkills: [
+        { code: "problem-solving", label: "Problem Solving" },
+        { code: "teamwork", label: "Teamwork" },
+      ],
+      cvText: "Troubleshot production equipment and worked as a collaborative team player for 4 years.",
+    }).result;
+    expect(result.foundRequiredSkills.map((skill) => skill.skillCode)).toEqual(["problem-solving", "teamwork"]);
+    expect(result.foundRequiredSkills[0]?.evidence[0]?.excerpt).toContain("Troubleshot production equipment");
+    expect(result.score).toBe(100);
+  });
+
+  it("does not treat a partial word as a skill match", () => {
+    const result = calculateAutomaticMatch({
+      ...base,
+      requiredSkills: [{ code: "teamwork", label: "Teamwork" }],
+      cvText: "The candidate completed paperwork for 4 years.",
+    }).result;
+    expect(result.foundRequiredSkills).toHaveLength(0);
+    expect(result.missingRequiredSkills.map((skill) => skill.skillCode)).toEqual(["teamwork"]);
+  });
+
+  it("does not promote weak or explicitly negative evidence", () => {
+    const result = calculateAutomaticMatch({
+      ...base,
+      requiredSkills: [
+        { code: "english", label: "English Proficiency" },
+        { code: "planning", label: "Planning" },
+        { code: "attention", label: "Attention to Detail" },
+      ],
+      cvText: "English - Elementary (self-study, no certificate). No professional experience with planning or attention-to-detail tasks required in a work setting.",
+    }).result;
+    expect(result.foundRequiredSkills).toHaveLength(0);
+    expect(result.missingRequiredSkills.map((skill) => skill.skillCode)).toEqual(["english", "planning", "attention"]);
+  });
+
+  it("keeps later positive evidence after an earlier negative mention", () => {
+    const result = calculateAutomaticMatch({
+      ...base,
+      requiredSkills: [{ code: "planning", label: "Planning" }],
+      cvText: "No professional experience with planning. Planned and delivered a training roadmap for 4 years.",
+    }).result;
+    expect(result.foundRequiredSkills.map((skill) => skill.skillCode)).toEqual(["planning"]);
+    expect(result.foundRequiredSkills[0]?.evidence[0]?.excerpt).toContain("Planned and delivered");
+  });
+
+  it("normalizes aliases for criteria containing punctuation", () => {
+    const result = calculateAutomaticMatch({
+      ...base,
+      requiredSkills: [{ code: "transport", label: "Transport & Warehousing" }],
+      cvText: "Handled inventory counting and warehouse stock control for 4 years.",
+    }).result;
+    expect(result.foundRequiredSkills.map((skill) => skill.skillCode)).toEqual(["transport"]);
+    expect(result.foundRequiredSkills[0]?.evidence[0]?.excerpt).toContain("inventory counting");
+  });
+
+  it("does not penalize a CV when the job has no minimum experience", () => {
+    const result = calculateAutomaticMatch({
+      ...base,
+      minimumExperienceYears: 0,
+      cvText: "React and TypeScript projects.",
+    });
+    expect(result.experiencePoints).toBe(25);
+    expect(result.result.score).toBe(100);
+  });
+
+  it("treats an absent required-skill list as neutral rather than a zero", () => {
+    const result = calculateAutomaticMatch({
+      ...base,
+      requiredSkills: [],
+      minimumExperienceYears: 4,
+      cvText: "No explicit duration was provided.",
+    });
+    expect(result.requiredSkillPoints).toBe(75);
+    expect(result.result.score).toBe(75);
+  });
+
+  it("recognizes month-based experience without inventing a full year", () => {
+    const result = calculateAutomaticMatch({
+      ...base,
+      cvText: "React and TypeScript delivery for 18 months.",
+    });
+    expect(result.result.detectedExperience).toEqual({ kind: "DETECTED", years: 1.5, label: "1.5 years detected" });
+    expect(result.experiencePoints).toBe(9.375);
+  });
+
+  it("recovers role duration from work-history date ranges without counting education dates", () => {
+    const result = calculateAutomaticMatch({
+      ...base,
+      cvText: "WORK EXPERIENCE\nIT Comtor 06/2024 – Present\nEDUCATION\nBachelor 2019–2023",
+    }).result;
+    expect(result.detectedExperience.kind).toBe("DETECTED");
+    expect(result.detectedExperience.kind === "DETECTED" ? result.detectedExperience.years : 0).toBeGreaterThan(1);
+  });
+
+  it("does not count flattened-PDF education dates as employment", () => {
+    const result = calculateAutomaticMatch({
+      ...base,
+      cvText: "WORK EXPERIENCE IT Comtor 06/2024 – Present IT Project Support 03/2023 – 05/2024 EDUCATION Bachelor 2019 – 2023",
+    }).result;
+    expect(result.detectedExperience.kind).toBe("DETECTED");
+    expect(result.detectedExperience.kind === "DETECTED" ? result.detectedExperience.years : 0).toBeLessThan(3);
+  });
+
+  it("keeps verbatim evidence for skills listed in a flattened CV and repeated in work bullets", () => {
+    const result = calculateAutomaticMatch({
+      ...base,
+      requiredSkills: [
+        { code: "data-analysis", label: "Data Analysis" },
+        { code: "process-improvement", label: "Process Improvement" },
+        { code: "problem-solving", label: "Problem Solving" },
+      ],
+      preferredSkills: [],
+      cvText: [
+        "SKILLS React Native TypeScript JavaScript (ES6+) REST API Integration Git Data Analysis Process Improvement Problem Solving Agile/Scrum",
+        "WORK EXPERIENCE React Native Developer",
+        "Performed data analysis on crash reports and performance metrics to prioritize technical debt and improve app stability.",
+        "Contributed to process improvement by introducing code review checklists, cutting release regression issues by 25%.",
+        "Practiced problem-solving skills by debugging cross-platform layout issues on iOS and Android.",
+      ].join(" "),
+    }).result;
+
+    expect(result.foundRequiredSkills.map((skill) => skill.skillCode)).toEqual([
+      "data-analysis",
+      "process-improvement",
+      "problem-solving",
+    ]);
+    expect(result.foundRequiredSkills.map((skill) => skill.evidence[0]?.excerpt)).toEqual([
+      expect.stringContaining("Performed data analysis"),
+      expect.stringContaining("Contributed to process improvement"),
+      expect.stringContaining("Practiced problem-solving"),
+    ]);
+  });
+
+  it("matches Vietnamese evidence with or without diacritics", () => {
+    const result = calculateAutomaticMatch({
+      ...base,
+      requiredSkills: [{ code: "communication", label: "Communication" }],
+      cvText: "Có kỹ năng giao tiếp và làm việc với khách hàng trong 4 năm.",
+    }).result;
+    expect(result.foundRequiredSkills.map((skill) => skill.skillCode)).toEqual(["communication"]);
+    expect(result.foundRequiredSkills[0]?.evidence[0]?.excerpt).toContain("giao tiếp");
+
+    const unaccented = calculateAutomaticMatch({
+      ...base,
+      requiredSkills: [{ code: "negotiation", label: "Negotiation" }],
+      cvText: "Ky nang dam phan hop dong trong 4 nam.",
+    }).result;
+    expect(unaccented.foundRequiredSkills.map((skill) => skill.skillCode)).toEqual(["negotiation"]);
+  });
 });

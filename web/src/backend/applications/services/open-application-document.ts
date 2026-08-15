@@ -47,10 +47,25 @@ export class OpenApplicationDocumentService {
     }
     try {
       const storage = this.storage ?? createApplicationDocumentStorage();
-      const stream = storage.open(
+      await storage.assertReady();
+      const source = storage.open(
         document.storageKey,
         document.byteLength,
       );
+      const iterator = source[Symbol.asyncIterator]();
+      const first = await iterator.next();
+      const stream = (async function* () {
+        try {
+          if (!first.done) yield first.value;
+          while (true) {
+            const next = await iterator.next();
+            if (next.done) return;
+            yield next.value;
+          }
+        } finally {
+          await iterator.return?.();
+        }
+      })();
       return Object.freeze({ document, stream });
     } catch {
       throw new OpenApplicationDocumentError("UNAVAILABLE");

@@ -65,6 +65,13 @@ export const aiFindingSchema = z.object({
   evidence: z.string().min(1).max(2_000),
 }).strict();
 
+export const aiDataQualityNoteSchema = z.object({
+  id: z.string().min(1),
+  bucket: z.enum(["input_limitation", "extraction_uncertainty"]),
+  title: z.string().min(1).max(160),
+  evidence: z.string().min(1).max(2_000),
+}).strict();
+
 export const aiQuestionsSchema = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("GENERATED"),
@@ -80,12 +87,15 @@ export const aiAssessmentSchema = z.object({
   confidenceLevel: z.enum(["LOW", "STANDARD"]),
   confidenceLabel: z.string().min(1),
   humanReviewGuidance: z.string().min(1).nullable(),
+  requiresHumanReview: z.boolean(),
   provider: z.string().min(1),
   modelVersion: z.string().min(1),
   promptVersion: z.string().min(1),
   policyVersion: z.string().min(1),
   overallSummary: z.string().min(1),
   breakdown: z.array(z.string().min(1).max(300)).length(3),
+  assessmentLimitedByDataQuality: z.boolean(),
+  dataQualityNotes: z.array(aiDataQualityNoteSchema).max(30),
   findings: z.array(aiFindingSchema),
   compliance: z.object({
     code: z.literal("SENSITIVE_ATTRIBUTES_EXCLUDED"),

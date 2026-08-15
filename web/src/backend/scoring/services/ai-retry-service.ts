@@ -39,6 +39,19 @@ export class AiRetryService {
       targetScoringConfigVersionId: current.automatic.configVersion,
       reusedAutomaticMatchResultId: current.automatic.resultId,
     });
+    await this.db.scoringWorkItem.upsert({
+      where: {
+        operationId_jobApplicationId: {
+          operationId: operation.operationId,
+          jobApplicationId: application.id,
+        },
+      },
+      create: {
+        operationId: operation.operationId,
+        jobApplicationId: application.id,
+      },
+      update: {},
+    });
     await this.db.jobApplication.update({ where: { id: application.id }, data: { scoringStatus: "PENDING" } });
     await new PrismaAuditRepository(this.db).append({
       occurredAt: now,

@@ -88,7 +88,7 @@ export function CandidateScoreDrawer({ jobId, jobTitle, candidate, onClose, onSe
         <div className="ai-ranking-drawer__body">
           {error ? <div className="ai-ranking-error" role="alert">{error}<button type="button" onClick={() => setError(null)}>Dismiss</button></div> : null}
           {detail?.rescoreInProgress ? <div className="ai-ranking-progress-banner" role="status">Rescoring in progress - results will update automatically. The current result stays visible.</div> : null}
-          {activeTab === "automatic" ? <AutomaticMatchTab automatic={automatic} finalScore={finalScore} retrying={scoring.kind === "PENDING"} /> : activeTab === "ai" ? <AiAssessmentTab state={scoring} onRetry={() => setRetryConfirm(true)} /> : <DocumentsTab key={openDocument ?? "documents"} jobId={jobId} applicationId={candidate.applicationId} parsingWarning={automatic?.mayBeIncomplete} openKind={openDocument} />}
+          {activeTab === "automatic" ? <AutomaticMatchTab automatic={automatic} finalScore={finalScore} retrying={scoring.kind === "PENDING"} /> : activeTab === "ai" ? <AiAssessmentTab state={scoring} onRetry={() => setRetryConfirm(true)} /> : <DocumentsTab key={openDocument ?? "documents"} jobId={jobId} applicationId={candidate.applicationId} automatic={automatic} dataQualityNotes={scoring.kind === "SCORED" ? scoring.aiAssessment.dataQualityNotes : []} openKind={openDocument} />}
         </div>
         <footer className="ai-ranking-drawer__footer">
           <button type="button" className="ai-ranking-button ai-ranking-button--secondary" onClick={onSetPriority}>{String.fromCharCode(9734)} {candidate.manuallyPrioritized ? "Edit priority" : "Set priority"}</button>

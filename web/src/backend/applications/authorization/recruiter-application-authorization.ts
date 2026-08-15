@@ -1,8 +1,14 @@
 import "server-only";
 
 import { prisma } from "@/backend/database/prisma";
+import { authorizeLegacyRecruiterJob } from "@/backend/services/jobs/recruiter-job-posting-data";
 
-const recruiterRoles = ["OWNER", "HR_MANAGER", "RECRUITER", "HIRING_MANAGER"] as const;
+const recruiterRoles = [
+  "OWNER",
+  "HR_MANAGER",
+  "RECRUITER",
+  "HIRING_MANAGER",
+] as const;
 
 export type RecruiterAuthorizationResult = Readonly<{
   authorized: boolean;
@@ -35,8 +41,16 @@ export class RecruiterApplicationAuthorization {
       },
       select: { id: true, companyId: true, title: true },
     });
-    return row
-      ? { authorized: true, jobId: row.id, companyId: row.companyId, jobTitle: row.title }
+    if (row)
+      return {
+        authorized: true,
+        jobId: row.id,
+        companyId: row.companyId,
+        jobTitle: row.title,
+      };
+    const legacy = await authorizeLegacyRecruiterJob(userId, jobId);
+    return legacy
+      ? { authorized: true, ...legacy }
       : { authorized: false, jobId, companyId: "", jobTitle: "" };
   }
 
@@ -51,7 +65,9 @@ export class RecruiterApplicationAuthorization {
       where: { id: applicationId, jobPostingId: jobId },
       select: { id: true },
     });
-    return application ? result : { authorized: false, jobId, companyId: "", jobTitle: "" };
+    return application
+      ? result
+      : { authorized: false, jobId, companyId: "", jobTitle: "" };
   }
 }
 

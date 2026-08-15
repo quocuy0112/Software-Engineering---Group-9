@@ -87,16 +87,18 @@ if (run("docker", ["--version"]).status !== 0)
   throw new Error("Docker is required.");
 if (run("docker", ["compose", "version"]).status !== 0)
   throw new Error("Docker Compose is required.");
-const databasePassword = randomBytes(36).toString("base64url");
 const authSecret = randomBytes(48).toString("base64url");
 const tokenSecret = randomBytes(48).toString("base64url");
-const databaseUrl = `postgresql://smarthire:${encodeURIComponent(databasePassword)}@localhost:55432/smarthire?schema=public`;
 const rootEnvironmentPath = resolve(root, ".env");
 const webEnvironmentPath = resolve(root, "web/.env.local");
 const existingRootEnvironment =
   await readEnvironmentIfPresent(rootEnvironmentPath);
 const existingWebEnvironment =
   await readEnvironmentIfPresent(webEnvironmentPath);
+const databasePassword =
+  existingRootEnvironment.POSTGRES_PASSWORD ||
+  randomBytes(36).toString("base64url");
+const databaseUrl = `postgresql://smarthire:${encodeURIComponent(databasePassword)}@localhost:55432/smarthire?schema=public`;
 if (
   existingRootEnvironment.CV_ARTIFACT_KEY_V1 &&
   existingWebEnvironment.CV_ARTIFACT_KEY_V1 &&

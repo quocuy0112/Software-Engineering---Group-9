@@ -680,6 +680,19 @@
   padding: var(--sh-space-6);
 }
 
+.recruiter-candidates-page { display: grid; gap: 24px; }
+.recruiter-candidate-campaign-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 18px; }
+.recruiter-candidate-campaign { display: grid; gap: 24px; min-height: 210px; padding: 24px; border: 1px solid var(--sh-color-border, #dfe5e8); border-radius: 18px; background: var(--sh-color-surface, #fff); box-shadow: 0 8px 24px rgb(31 55 62 / 7%); }
+.recruiter-candidate-campaign h2 { margin: 12px 0 6px; font-size: 20px; }
+.recruiter-candidate-campaign p { margin: 0; color: var(--sh-color-text-muted, #66777d); }
+.recruiter-candidate-campaign__status { display: inline-flex; padding: 5px 10px; border-radius: 999px; background: #edf8f4; color: #176b52; font-size: 12px; font-weight: 700; }
+.recruiter-candidate-campaign__status.is-closed { background: #f2f4f5; color: #536269; }
+.recruiter-candidate-campaign__footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: auto; }
+
+@media (max-width: 560px) {
+  .recruiter-candidate-campaign__footer { align-items: stretch; flex-direction: column; }
+}
+
 @media (max-width: 900px) {
   .recruiter-stat-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1781,6 +1794,12 @@
 .ai-ranking-keywords strong { width: 100%; color: var(--sh-color-text-muted); font-size: 10px; }
 .ai-ranking-keywords span { padding: 3px 5px; border-radius: 4px; color: var(--sh-color-brand-primary); background: var(--sh-color-brand-soft); font-size: 10px; }
 .ai-ranking-documents-note { padding: 11px; border-radius: var(--sh-radius-sm); color: var(--sh-color-text-muted); background: var(--sh-color-surface-subtle); font-size: 11px; }
+.ai-ranking-data-quality { margin: 12px 0; padding: 13px; border: 1px solid color-mix(in srgb, var(--sh-color-warning) 35%, transparent); border-radius: var(--sh-radius-sm); color: var(--sh-color-text); background: var(--sh-color-warning-bg); }
+.ai-ranking-data-quality h3 { margin: 0; font-size: 13px; }
+.ai-ranking-data-quality p { margin: 5px 0 8px; color: var(--sh-color-text-muted); font-size: 12px; }
+.ai-ranking-data-quality ul { display: grid; gap: 7px; margin: 0; padding-left: 18px; }
+.ai-ranking-data-quality li { display: grid; gap: 2px; font-size: 12px; }
+.ai-ranking-data-quality li span { color: var(--sh-color-text-muted); }
 
 /* Confirmation frame shared by rescore, priority and stage decisions */
 .ai-ranking-modal-backdrop { z-index: 120; display: grid; place-items: center; padding: 20px; }

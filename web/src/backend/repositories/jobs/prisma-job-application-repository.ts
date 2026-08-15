@@ -23,6 +23,11 @@ import { createInAppNotification } from "@/backend/notifications/notification-se
 import { NotificationRecipientPolicy } from "@/backend/notifications/notification-recipient-policy";
 import { createApplicationDocumentStorage } from "@/backend/applications/storage/factory";
 import type { ApplicationDocumentStoragePort } from "@/backend/applications/storage/application-document-storage";
+import {
+  createCvWorkerCryptor,
+  createCvWorkerIntegrityReader,
+  createCvWorkerStorage,
+} from "@/backend/cv/workers/cv-worker-resources";
 
 type CandidateApplicationForm = {
   job: {
@@ -97,6 +102,124 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
 
   private documentStorage() {
     return this.applicationStorage ?? createApplicationDocumentStorage();
+  }
+
+  private async promoteSavedCv(sourceCv: {
+    id: string;
+    candidateUserId: string;
+    byteSize: number;
+    checksumSha256: string;
+  }) {
+    const copyFromExistingApplication = async () => {
+      const peer = await this.db.applicationDocument.findFirst({
+        where: {
+          sourceCandidateCvId: sourceCv.id,
+          contentDigestHmac: sourceCv.checksumSha256,
+          byteLength: sourceCv.byteSize,
+          committedAt: { not: null },
+          deletedAt: null,
+          application: { candidateUserId: sourceCv.candidateUserId },
+        },
+        orderBy: { createdAt: "desc" },
+        select: { storageKeyEncrypted: true, byteLength: true },
+      });
+      if (!peer) return null;
+      const sourceStorage = this.documentStorage();
+      const destination = this.documentStorage();
+      await sourceStorage.assertReady();
+      await destination.assertReady();
+      try {
+        const stored = await destination.put({
+          expectedBytes: peer.byteLength,
+          source: sourceStorage.open(peer.storageKeyEncrypted, peer.byteLength),
+        });
+        return { stored, destination };
+      } catch {
+        return null;
+      }
+    };
+    const uploadId = sourceCv.id.startsWith("candidate-cv-")
+      ? sourceCv.id.slice("candidate-cv-".length)
+      : null;
+    if (!uploadId) {
+      const recovered = await copyFromExistingApplication();
+      if (recovered) return recovered;
+      throw new ApplicationRepositoryError("APPLICATION_CV_INELIGIBLE");
+    }
+
+    const rows = await this.db.$queryRaw<
+      Array<{
+        id: string;
+        storageLocator: string;
+        encryptionKeyVersion: number;
+        encryptionIvHex: string;
+        authenticationTagHex: string;
+        plaintextBytes: number;
+        ciphertextBytes: number;
+        plaintextSha256Hex: string;
+      }>
+    >`
+      SELECT artifact."id",
+             artifact."storageLocator",
+             artifact."encryptionKeyVersion",
+             encode(artifact."encryptionIv", 'hex') AS "encryptionIvHex",
+             encode(artifact."authenticationTag", 'hex') AS "authenticationTagHex",
+             artifact."plaintextBytes",
+             artifact."ciphertextBytes",
+             encode(artifact."plaintextSha256", 'hex') AS "plaintextSha256Hex"
+        FROM "CvStoredArtifact" artifact
+       WHERE artifact."uploadId" = ${uploadId}
+         AND artifact."accountId" = ${sourceCv.candidateUserId}
+         AND artifact."kind" = 'SOURCE_DOCUMENT'
+         AND artifact."status" = 'AVAILABLE'
+         AND artifact."deletedAt" IS NULL
+       ORDER BY artifact."availableAt" DESC NULLS LAST, artifact."createdAt" DESC
+       LIMIT 1
+    `;
+    const artifact = rows[0];
+    if (
+      !artifact ||
+      artifact.plaintextBytes !== sourceCv.byteSize ||
+      artifact.plaintextSha256Hex !== sourceCv.checksumSha256
+    ) {
+      const recovered = await copyFromExistingApplication();
+      if (recovered) return recovered;
+      throw new ApplicationRepositoryError("APPLICATION_CV_INELIGIBLE");
+    }
+
+    const sourceStorage = createCvWorkerStorage();
+    await sourceStorage.assertReady();
+    const verified = await createCvWorkerIntegrityReader(
+      sourceStorage,
+      createCvWorkerCryptor(),
+    ).verify({
+      locator: artifact.storageLocator,
+      ciphertextBytes: artifact.ciphertextBytes,
+      plaintextBytes: artifact.plaintextBytes,
+      plaintextSha256: Buffer.from(artifact.plaintextSha256Hex, "hex"),
+      context: {
+        accountId: sourceCv.candidateUserId,
+        uploadId,
+        artifactId: artifact.id,
+        kind: "SOURCE_DOCUMENT",
+      },
+      envelope: {
+        keyVersion: artifact.encryptionKeyVersion,
+        iv: Buffer.from(artifact.encryptionIvHex, "hex"),
+        authenticationTag: Buffer.from(artifact.authenticationTagHex, "hex"),
+      },
+    });
+    try {
+      const destination = this.documentStorage();
+      await destination.assertReady();
+      const stored = await destination.put({
+        expectedBytes: verified.plaintextBytes,
+        source: verified.open(),
+      });
+      return { stored, destination };
+    } finally {
+      await verified.dispose();
+    }
   }
 
   async getCandidateForm(userId: string, jobId: string, now: Date) {
@@ -270,7 +393,10 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
         },
       });
       if (existingByKey) {
-        if (existingByKey.submissionBindingDigest !== input.submissionBindingDigest) {
+        if (
+          existingByKey.submissionBindingDigest !==
+          input.submissionBindingDigest
+        ) {
           throw new ApplicationRepositoryError("IDEMPOTENCY_KEY_REUSED");
         }
         return { application: outcome(existingByKey, false), created: false };
@@ -284,7 +410,10 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
         },
       });
       if (existingDuplicate) {
-        return { application: outcome(existingDuplicate, false), created: false };
+        return {
+          application: outcome(existingDuplicate, false),
+          created: false,
+        };
       }
       const sourceCv = input.directCv
         ? null
@@ -303,15 +432,25 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
               archivedAt: true,
             },
           });
-      if (!input.directCv && sourceCv?.candidateUserId === input.candidateUserId) {
+      if (
+        !input.directCv &&
+        sourceCv?.candidateUserId === input.candidateUserId
+      ) {
         promotedStorage = this.documentStorage();
-        const sourceStorage = (await import("@/backend/cv/workers/cv-worker-resources")).createCvWorkerStorage();
-        await promotedStorage.assertReady();
-        await sourceStorage.assertReady();
-        const stored = await promotedStorage.put({
-          expectedBytes: sourceCv.byteSize,
-          source: sourceStorage.open(sourceCv.storageKey, sourceCv.byteSize),
-        });
+        let stored: Awaited<ReturnType<ApplicationDocumentStoragePort["put"]>>;
+        if (sourceCv.storageKey.startsWith("candidate-cv-")) {
+          const promotion = await this.promoteSavedCv(sourceCv);
+          promotedStorage = promotion.destination;
+          stored = promotion.stored;
+        } else {
+          const sourceStorage = createCvWorkerStorage();
+          await promotedStorage.assertReady();
+          await sourceStorage.assertReady();
+          stored = await promotedStorage.put({
+            expectedBytes: sourceCv.byteSize,
+            source: sourceStorage.open(sourceCv.storageKey, sourceCv.byteSize),
+          });
+        }
         promotedApplicationDocument = {
           promotionId: randomUUID(),
           storageKey: stored.locator,
@@ -562,7 +701,8 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
                     sourceCandidateCvId:
                       promotedApplicationDocument?.sourceCvId ?? cv.id,
                     sourceCandidateCvVersion:
-                      promotedApplicationDocument?.sourceCvVersion ?? cv.version,
+                      promotedApplicationDocument?.sourceCvVersion ??
+                      cv.version,
                     safetyAssessmentId: `application-safety-${cv.id}`,
                     committedAt: input.occurredAt,
                   },
@@ -571,11 +711,14 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
                         {
                           kind: ApplicationDocumentKind.COVER_LETTER,
                           storagePurposeVersion: "application-document-v1",
-                          storageKeyEncrypted: promotedCoverLetterDocument.storageKey,
-                          originalFilenameEncrypted: promotedCoverLetterDocument.fileName,
+                          storageKeyEncrypted:
+                            promotedCoverLetterDocument.storageKey,
+                          originalFilenameEncrypted:
+                            promotedCoverLetterDocument.fileName,
                           mediaType: promotedCoverLetterDocument.mediaType,
                           byteLength: promotedCoverLetterDocument.byteLength,
-                          contentDigestHmac: promotedCoverLetterDocument.checksumSha256,
+                          contentDigestHmac:
+                            promotedCoverLetterDocument.checksumSha256,
                           safetyAssessmentId: `application-safety-${promotedCoverLetterDocument.promotionId}`,
                           committedAt: input.occurredAt,
                         },
@@ -598,29 +741,36 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
                     artifactPromotions: {
                       create: [
                         {
-                        id: promotedApplicationDocument.promotionId,
-                        candidate: { connect: { id: input.candidateUserId } },
-                        jobPosting: { connect: { id: input.jobId } },
-                        kind: ApplicationDocumentKind.CV,
-                        storagePurposeVersion: "application-document-v1",
-                        storageKeyEncrypted: promotedApplicationDocument.storageKey,
-                        state: ApplicationArtifactPromotionState.COMMITTED,
-                        orphanDeleteAfter: new Date(
-                          input.occurredAt.getTime() + 24 * 60 * 60 * 1000,
-                        ),
+                          id: promotedApplicationDocument.promotionId,
+                          candidate: { connect: { id: input.candidateUserId } },
+                          jobPosting: { connect: { id: input.jobId } },
+                          kind: ApplicationDocumentKind.CV,
+                          storagePurposeVersion: "application-document-v1",
+                          storageKeyEncrypted:
+                            promotedApplicationDocument.storageKey,
+                          state: ApplicationArtifactPromotionState.COMMITTED,
+                          orphanDeleteAfter: new Date(
+                            input.occurredAt.getTime() + 24 * 60 * 60 * 1000,
+                          ),
                         },
                         ...(promotedCoverLetterDocument
                           ? [
                               {
                                 id: promotedCoverLetterDocument.promotionId,
-                                candidate: { connect: { id: input.candidateUserId } },
+                                candidate: {
+                                  connect: { id: input.candidateUserId },
+                                },
                                 jobPosting: { connect: { id: input.jobId } },
                                 kind: ApplicationDocumentKind.COVER_LETTER,
-                                storagePurposeVersion: "application-document-v1",
-                                storageKeyEncrypted: promotedCoverLetterDocument.storageKey,
-                                state: ApplicationArtifactPromotionState.COMMITTED,
+                                storagePurposeVersion:
+                                  "application-document-v1",
+                                storageKeyEncrypted:
+                                  promotedCoverLetterDocument.storageKey,
+                                state:
+                                  ApplicationArtifactPromotionState.COMMITTED,
                                 orphanDeleteAfter: new Date(
-                                  input.occurredAt.getTime() + 24 * 60 * 60 * 1000,
+                                  input.occurredAt.getTime() +
+                                    24 * 60 * 60 * 1000,
                                 ),
                               },
                             ]
@@ -651,6 +801,32 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
               },
             },
           });
+          if (input.command.aiAnalysisConsent) {
+            const scoringOperation = await tx.scoringOperation.create({
+              data: {
+                kind: "INITIAL",
+                jobPostingId: input.jobId,
+                jobApplicationId: created.id,
+                requestedByUserId: input.candidateUserId,
+                requestedAt: input.occurredAt,
+                confirmationIntent: true,
+                idempotencyKey: `initial-scoring:${created.id}`,
+                targetJobDescriptionVersionId: `job-${job.id}-v${job.version}`,
+                targetScoringConfigVersionId: "hybrid-60-40-v1",
+                totalCount: 1,
+              },
+            });
+            await tx.scoringWorkItem.create({
+              data: {
+                operationId: scoringOperation.id,
+                jobApplicationId: created.id,
+              },
+            });
+            await tx.jobApplication.update({
+              where: { id: created.id },
+              data: { scoringStatus: "PROCESSING" },
+            });
+          }
           await createInAppNotification(tx, {
             recipientUserId: input.candidateUserId,
             kind: "APPLICATION_SUBMITTED",
@@ -660,10 +836,9 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
             contextType: "APPLICATION",
             contextId: created.id,
           });
-          const companyRecipients =
-            await new NotificationRecipientPolicy(tx).activeCompanyRecipients(
-              job.company.id,
-            );
+          const companyRecipients = await new NotificationRecipientPolicy(
+            tx,
+          ).activeCompanyRecipients(job.company.id);
           for (const recipientUserId of companyRecipients) {
             await createInAppNotification(tx, {
               recipientUserId,

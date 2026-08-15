@@ -130,14 +130,25 @@ function evidence(
 }
 
 function validateDates(output: CvParserAnyOutput) {
+  const currentYear = new Date().getUTCFullYear();
+  const assertPlausibleCvDate = (field: string, value: string) => {
+    assertIsoDate(field, value);
+    const year = Number(value.slice(0, 4));
+    // ISO syntax alone is not enough here: an LLM can turn `06/2024` into
+    // `0634-06-01`, which is technically parseable but impossible for a
+    // contemporary CV. Treat that as an extraction error and require a retry
+    // or manual correction instead of persisting corrupted profile data.
+    if (year < 1900 || year > currentYear + 1)
+      throw new CvDraftCreationError("PARSER_OUTPUT_INVALID");
+  };
   for (const [group, values] of [
     ["experiences", output.experiences],
     ["education", output.education],
   ] as const) {
     values.forEach((value, index) => {
-      assertIsoDate(`${group}.${index}.startDate`, value.startDate);
+      assertPlausibleCvDate(`${group}.${index}.startDate`, value.startDate);
       if (value.endDate)
-        assertIsoDate(`${group}.${index}.endDate`, value.endDate);
+        assertPlausibleCvDate(`${group}.${index}.endDate`, value.endDate);
       if (
         (value.isCurrent && value.endDate) ||
         (!value.isCurrent && !value.endDate)
@@ -147,6 +158,25 @@ function validateDates(output: CvParserAnyOutput) {
         throw new CvDraftCreationError("PARSER_OUTPUT_INVALID");
     });
   }
+}
+
+/**
+ * Models sometimes emit the current period twice: `isCurrent: true` and an
+ * end date equal to today/current year.  The profile contract represents a
+ * current role with a null end date, so normalize that harmless contradiction
+ * before validating the draft instead of discarding an otherwise valid CV.
+ */
+function normalizeCurrentDatePairs(
+  output: CvParserAnyOutput,
+): CvParserAnyOutput {
+  const normalize = <T extends { isCurrent: boolean; endDate: string | null }>(
+    value: T,
+  ): T => (value.isCurrent && value.endDate ? { ...value, endDate: null } : value);
+  return {
+    ...output,
+    experiences: output.experiences.map(normalize),
+    education: output.education.map(normalize),
+  };
 }
 
 function buildPayload(output: CvParserAnyOutput, newId: () => string) {
@@ -382,7 +412,9 @@ export class CreateCvDraftService {
     dispatchEvidence?: DraftDispatchEvidence;
   }): Promise<DraftWrite> {
     try {
-      const output = cvParserAnyOutputSchema.parse(input.output);
+      const output = normalizeCurrentDatePairs(
+        cvParserAnyOutputSchema.parse(input.output),
+      );
       const available = new Set(input.segments.map((segment) => segment.id));
       if (!validateParserEvidenceMembership(output, available))
         throw new CvDraftCreationError("PARSER_OUTPUT_INVALID");

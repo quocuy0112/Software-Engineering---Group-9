@@ -9,6 +9,7 @@ import type {
   ScoringOperation,
 } from "@/shared/contracts/scoring";
 import type { ScoringRepositoryPort, PublishedScoringRecord } from "./scoring-repository";
+import { SKILL_NORMALIZATION_VERSION } from "../domain/skill-evidence-extractor";
 
 /* The generated Prisma include projection is intentionally narrowed at the
  * contract boundary below; the projection contains encrypted text fields. */
@@ -24,6 +25,60 @@ const parseStatus = (value: string | undefined, snapshotVersion: string, parserV
 
 function priorityLabel(value: ManualPriority["value"]) {
   return value === "HIGH" ? "High review priority" : value === "LOW" ? "Low review priority" : value === "HOLD" ? "Hold" : "Normal";
+}
+
+function humanAiFindingTitle(value: string): string {
+  const normalized = value.trim();
+  return {
+    required_skills_match: "Required skills match",
+    experience_match: "Experience match",
+    preferred_skills_match: "Preferred skills match",
+    education_certifications: "Education and certifications",
+    languages: "Language proficiency",
+    "Skill found verbatim": "Skill found",
+    input_limitation: "Input limitation",
+    extraction_uncertainty: "Extraction uncertainty",
+    data_quality_notes: "Data quality review",
+    "Data quality review": "Data quality review",
+    "Extraction flag": "Extraction flag",
+  }[normalized] ?? normalized;
+}
+
+function aiQualityCategory(title: string, evidence: string): string {
+  const value = `${title} ${evidence}`.toLocaleLowerCase("en-US");
+  if (/date|employment|startdate|enddate|duration|redact/iu.test(value)) return "employment_dates";
+  if (/duplicate|repeated|appears more than once/iu.test(value)) return "duplicate_records";
+  if (/bullet|responsibilit|no .*provided/iu.test(value)) return "missing_responsibilities";
+  if (/cover letter/iu.test(value)) return "missing_cover_letter";
+  if (/anomal|unrelated|merge|cross.?candidate|stale/iu.test(value)) return "anomalous_profile_data";
+  return value.replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+}
+
+function normalizedEvidenceText(value: string): string {
+  return value
+    .normalize("NFKD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLocaleLowerCase("en-US")
+    .replace(/[^\p{L}\p{N}+#.]+/gu, " ")
+    .trim();
+}
+
+function deterministicStrengthFallback(
+  automatic: AutomaticMatch,
+  findings: AiAssessment["findings"],
+): AiAssessment["findings"] {
+  return automatic.foundRequiredSkills
+    .filter((skill) => {
+      const label = normalizedEvidenceText(skill.label);
+      return !findings.some((finding) => finding.kind === "STRENGTH" && normalizedEvidenceText(`${finding.title} ${finding.evidence}`).includes(label));
+    })
+    .map((skill) => ({
+      id: `deterministic-skill-${skill.skillCode}`,
+      kind: "STRENGTH" as const,
+      title: "Skill found",
+      evidence: skill.evidence[0]?.excerpt
+        ?? `Matched by deterministic CV evidence: ${skill.label}. Verbatim excerpt is unavailable for this scoring run.`,
+    }));
 }
 
 function operationProjection(row: {
@@ -119,7 +174,7 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
     });
     if (!row) return null;
     const automatic = this.projectAutomatic(row.automaticMatch);
-    const ai = row.aiAssessment ? this.projectAi(row.aiAssessment) : null;
+    const ai = row.aiAssessment ? this.projectAi(row.aiAssessment, automatic) : null;
     const finalScore = row.finalScore === null || !ai
       ? null
       : {
@@ -188,21 +243,63 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
     };
   }
 
-  private projectAi(row: any): AiAssessment {
+  private projectAi(row: any, automatic?: AutomaticMatch): AiAssessment {
+    const dataQualityNotes = row.findings
+      .filter((finding: any) => typeof finding.kind === "string" && finding.kind.startsWith("DATA_QUALITY"))
+      .map((finding: any) => {
+        const bucket = finding.kind.endsWith("INPUT_LIMITATION") ? "input_limitation" : "extraction_uncertainty";
+        return {
+          id: finding.id,
+          bucket,
+          title: humanAiFindingTitle(finding.titleEncrypted),
+          evidence: finding.evidenceEncrypted,
+        };
+      })
+      .filter((finding: any, index: number, values: any[]) => values.findIndex((candidate) => aiQualityCategory(candidate.title, candidate.evidence) === aiQualityCategory(finding.title, finding.evidence)) === index);
+    const visibleFindings = row.findings
+      .filter((finding: any) => !String(finding.kind).startsWith("DATA_QUALITY"))
+      .map((finding: any) => {
+        const title = humanAiFindingTitle(finding.titleEncrypted);
+        return { id: finding.id, kind: finding.kind, title, evidence: finding.evidenceEncrypted };
+      })
+      .filter((finding: any, index: number, values: any[]) => values.findIndex((candidate) => `${candidate.kind}|${candidate.title}|${candidate.evidence}`.toLocaleLowerCase("en-US") === `${finding.kind}|${finding.title}|${finding.evidence}`.toLocaleLowerCase("en-US")) === index)
+      .filter((finding: any, index: number, values: any[]) => finding.kind !== "STRENGTH" || values.findIndex((candidate) => candidate.kind === "STRENGTH" && candidate.evidence.toLocaleLowerCase("en-US") === finding.evidence.toLocaleLowerCase("en-US")) === index);
+    const legacyQualityNotes = visibleFindings.filter((finding: any) => ["Data quality review", "Extraction flag", "Input limitation", "Extraction uncertainty"].includes(finding.title));
+    const normalizedVisibleFindings = visibleFindings.filter((finding: any) => !["Data quality review", "Extraction flag", "Input limitation", "Extraction uncertainty"].includes(finding.title));
+    for (const finding of legacyQualityNotes) {
+      const bucket = finding.evidence.startsWith("input_limitation:") ? "input_limitation" : "extraction_uncertainty";
+      const title = finding.evidence.match(/date|employment/iu) ? "Employment dates" : finding.evidence.match(/duplicate/iu) ? "Duplicate profile records" : finding.evidence.match(/bullet|responsibilit/iu) ? "Missing responsibilities" : "Input limitation";
+      if (!dataQualityNotes.some((note: any) => aiQualityCategory(note.title, note.evidence) === aiQualityCategory(title, finding.evidence))) dataQualityNotes.push({ id: finding.id, bucket, title, evidence: finding.evidence });
+    }
+    const assessmentLimitedByDataQuality = dataQualityNotes.length > 0 && (row.confidenceLevel === "LOW" || Boolean(row.humanReviewGuidance));
+    const fallbackStrengths = automatic
+      ? deterministicStrengthFallback(automatic, normalizedVisibleFindings)
+      : [];
     return {
       assessmentId: row.id,
       score: Number(row.score),
       confidencePercent: row.confidencePercent,
       confidenceLevel: row.confidenceLevel,
       confidenceLabel: row.confidenceLabel,
-      humanReviewGuidance: row.humanReviewGuidance,
+      humanReviewGuidance: assessmentLimitedByDataQuality
+        ? "Assessment is limited by CV data quality. Review the notes in the CV & Cover letter tab before using the score."
+        : row.humanReviewGuidance,
+      requiresHumanReview: row.confidenceLevel === "LOW" || Boolean(row.humanReviewGuidance),
       provider: row.providerAdapterVersion,
       modelVersion: row.modelVersion,
       promptVersion: row.promptVersion,
       policyVersion: row.sensitiveAttributePolicyVersion,
-      overallSummary: row.overallSummaryEncrypted,
+      overallSummary: assessmentLimitedByDataQuality
+        ? "Low data quality — assessment limited. The CV could not be assessed reliably; manual review is required."
+        : row.overallSummaryEncrypted,
       breakdown: [row.technicalAbilitySummaryEncrypted, row.roleFitSummaryEncrypted, row.deductionSummaryEncrypted],
-      findings: row.findings.map((finding: any) => ({ id: finding.id, kind: finding.kind, title: finding.titleEncrypted, evidence: finding.evidenceEncrypted })),
+      assessmentLimitedByDataQuality,
+      dataQualityNotes,
+      // Data-quality warnings should limit confidence, not hide positive
+      // evidence. Older published rows may have no AI STRENGTH findings, so
+      // project the deterministic matches as a transparent compatibility
+      // fallback until the application is rescored with the fixed adapter.
+      findings: [...normalizedVisibleFindings, ...fallbackStrengths],
       compliance: { code: "SENSITIVE_ATTRIBUTES_EXCLUDED", label: row.complianceStatementLabel },
       questions: row.questions.length
         ? { kind: "GENERATED", items: row.questions.map((question: any) => ({ question: question.questionEncrypted, pointToVerifyId: question.pointToVerifyFindingId })) }
@@ -223,8 +320,14 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
           scoringConfigVersionId: input.automatic.configVersion,
           parserBundleVersion: input.automatic.parserVersion,
           score: input.automatic.score,
-          requiredSkillPoints: 0,
-          experiencePoints: 0,
+          requiredSkillPoints: input.automatic.foundRequiredSkills.length + input.automatic.missingRequiredSkills.length === 0
+            ? 75
+            : (input.automatic.foundRequiredSkills.length / (input.automatic.foundRequiredSkills.length + input.automatic.missingRequiredSkills.length)) * 75,
+          experiencePoints: input.automatic.minimumExperienceYears === null || input.automatic.minimumExperienceYears <= 0
+            ? 25
+            : input.automatic.detectedExperience.kind === "DETECTED"
+              ? Math.min(25, (input.automatic.detectedExperience.years / Math.max(1, input.automatic.minimumExperienceYears)) * 25)
+              : 0,
           preferredSkillBonus: 0,
           minimumExperienceYears: input.automatic.minimumExperienceYears,
           detectedExperienceYears: input.automatic.detectedExperience.kind === "DETECTED" ? input.automatic.detectedExperience.years : null,
@@ -239,7 +342,16 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
               skillLabel: item.label,
               requirementKind: item.requirementKind,
               matchState: item.matchState,
-              normalizationVersion: "skill-normalization-v1",
+              normalizationVersion: SKILL_NORMALIZATION_VERSION,
+              excerpts: {
+                create: item.evidence.map((excerpt) => ({
+                  excerptEncrypted: excerpt.excerpt,
+                  ...(excerpt.pageNumber !== undefined ? { pageNumber: excerpt.pageNumber } : {}),
+                  ...(excerpt.sectionLabel !== undefined ? { sectionLabel: excerpt.sectionLabel } : {}),
+                  cvSnapshotVersionId: excerpt.cvSnapshotVersion,
+                  parserVersion: excerpt.parserVersion,
+                })),
+              },
             })),
           },
           parseResults: {
@@ -257,31 +369,42 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
           },
         },
       });
-      const ai = input.ai ? await tx.aiAssessment.create({
+      const aiInput = input.ai;
+      const ai = aiInput ? await tx.aiAssessment.create({
         data: {
           jobApplicationId: input.applicationId,
           automaticMatchResultId: automatic.id,
-          score: input.ai.score,
-          confidencePercent: input.ai.confidencePercent,
-          confidenceLevel: input.ai.confidenceLevel,
-          confidenceLabel: input.ai.confidenceLabel,
-          humanReviewGuidance: input.ai.humanReviewGuidance,
-          providerAdapterVersion: input.ai.provider,
-          providerModel: input.ai.modelVersion,
-          modelVersion: input.ai.modelVersion,
-          promptVersion: input.ai.promptVersion,
-          assessmentSchemaVersion: "ai-assessment-v1",
-          sensitiveAttributePolicyVersion: input.ai.policyVersion,
-          overallSummaryEncrypted: input.ai.overallSummary,
-          technicalAbilitySummaryEncrypted: input.ai.breakdown[0] ?? "Not provided",
-          roleFitSummaryEncrypted: input.ai.breakdown[1] ?? "Not provided",
-          deductionSummaryEncrypted: input.ai.breakdown[2] ?? "Not provided",
-          complianceStatementCode: input.ai.compliance.code,
-          complianceStatementLabel: input.ai.compliance.label,
-          questionState: input.ai.questions.kind,
-          questionFallbackLabel: input.ai.questions.kind === "INSUFFICIENT_DATA" ? input.ai.questions.fallbackMessage : null,
+          score: aiInput.score,
+          confidencePercent: aiInput.confidencePercent,
+          confidenceLevel: aiInput.confidenceLevel,
+          confidenceLabel: aiInput.confidenceLabel,
+          humanReviewGuidance: aiInput.humanReviewGuidance,
+          providerAdapterVersion: aiInput.provider,
+          providerModel: aiInput.modelVersion,
+          modelVersion: aiInput.modelVersion,
+          promptVersion: aiInput.promptVersion,
+          assessmentSchemaVersion: "ai-assessment-v4",
+          sensitiveAttributePolicyVersion: aiInput.policyVersion,
+          overallSummaryEncrypted: aiInput.overallSummary,
+          technicalAbilitySummaryEncrypted: aiInput.breakdown[0] ?? "Not provided",
+          roleFitSummaryEncrypted: aiInput.breakdown[1] ?? "Not provided",
+          deductionSummaryEncrypted: aiInput.breakdown[2] ?? "Not provided",
+          complianceStatementCode: aiInput.compliance.code,
+          complianceStatementLabel: aiInput.compliance.label,
+          questionState: aiInput.questions.kind,
+          questionFallbackLabel: aiInput.questions.kind === "INSUFFICIENT_DATA" ? aiInput.questions.fallbackMessage : null,
           computedAt: new Date(),
-          findings: { create: input.ai.findings.map((finding, ordinal) => ({ kind: finding.kind, titleEncrypted: finding.title, evidenceEncrypted: finding.evidence, ordinal })) },
+          findings: {
+            create: [
+              ...aiInput.findings.map((finding, ordinal) => ({ kind: finding.kind, titleEncrypted: finding.title, evidenceEncrypted: finding.evidence, ordinal })),
+              ...aiInput.dataQualityNotes.map((note, index) => ({
+                kind: note.bucket === "input_limitation" ? "DATA_QUALITY_INPUT_LIMITATION" : "DATA_QUALITY_EXTRACTION_UNCERTAINTY",
+                titleEncrypted: note.title,
+                evidenceEncrypted: note.evidence,
+                ordinal: aiInput.findings.length + index,
+              })),
+            ],
+          },
         },
       }) : null;
       const published = await tx.applicationScoringResult.create({
@@ -311,7 +434,7 @@ export class PrismaScoringRepository implements ScoringRepositoryPort {
           publishedAt: new Date(),
         },
       });
-      const fenced = await tx.jobApplication.updateMany({ where: { id: input.applicationId, scoringGeneration: application.scoringGeneration }, data: { scoringGeneration: { increment: 1 }, currentScoringResultId: published.id } });
+      const fenced = await tx.jobApplication.updateMany({ where: { id: input.applicationId, scoringGeneration: application.scoringGeneration }, data: { scoringGeneration: { increment: 1 }, currentScoringResultId: published.id, scoringStatus: input.finalScore ? "COMPLETED" : "FAILED", aiMatchScore: input.ai?.score ?? null } });
       if (fenced.count !== 1) throw new Error("SCORING_GENERATION_CONFLICT");
       return published;
     });

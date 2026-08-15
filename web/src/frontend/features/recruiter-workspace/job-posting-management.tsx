@@ -843,7 +843,12 @@ export function RecruiterWorkspaceNavigation({
       href: "/recruiter",
       active: pathname === "/recruiter" || pathname.startsWith("/recruiter/jobs"),
     },
-    { label: "Candidates", icon: "candidates", active: false },
+    {
+      label: "Candidates",
+      icon: "candidates",
+      href: "/recruiter/candidates",
+      active: pathname === "/recruiter/candidates",
+    },
     {
       label: "Company settings",
       icon: "settings",
