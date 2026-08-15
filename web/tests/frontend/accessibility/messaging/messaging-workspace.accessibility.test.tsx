@@ -14,8 +14,9 @@ vi.mock("@/frontend/features/messaging/client/messaging-api", () => ({
 async function expectNoSeriousViolations(container: HTMLElement) {
   const result = await axe.run(container);
   expect(
-    result.violations.filter((violation) =>
-      violation.impact === "serious" || violation.impact === "critical",
+    result.violations.filter(
+      (violation) =>
+        violation.impact === "serious" || violation.impact === "critical",
     ),
   ).toEqual([]);
 }
@@ -24,11 +25,23 @@ describe("messaging accessibility", () => {
   it("passes discovery and non-color presence checks", async () => {
     const { container } = render(
       <main>
-        <StartConversation csrfProof="csrf" initialItems={[]} onOpened={() => undefined} />
-        <ConversationHeader name="Recruiter B" contextLabel="Software Engineer" presence="OFFLINE" />
+        <StartConversation
+          csrfProof="csrf"
+          initialItems={[]}
+          locale="vi"
+          onOpened={() => undefined}
+        />
+        <ConversationHeader
+          name="Recruiter B"
+          contextLabel="Software Engineer"
+          locale="vi"
+          presence="OFFLINE"
+        />
       </main>,
     );
-    expect(screen.getByLabelText("Recruiter B is offline")).toHaveTextContent("Offline");
+    expect(
+      screen.getByLabelText("Recruiter B đang ngoại tuyến"),
+    ).toHaveTextContent("Ngoại tuyến");
     await expectNoSeriousViolations(container);
   });
 
@@ -40,6 +53,7 @@ describe("messaging accessibility", () => {
           targetUserId="user-b"
           targetName="Recruiter B"
           blocked={false}
+          locale="vi"
           onChanged={() => undefined}
         />
         <ReportMessagingDialog
@@ -47,11 +61,12 @@ describe("messaging accessibility", () => {
           conversationId="conversation-1"
           targetUserId="user-b"
           messages={[]}
+          locale="vi"
         />
       </main>,
     );
-    fireEvent.click(screen.getByRole("button", { name: "Block Recruiter B" }));
-    fireEvent.click(screen.getByRole("button", { name: "Report" }));
+    fireEvent.click(screen.getByRole("button", { name: "Chặn Recruiter B" }));
+    fireEvent.click(screen.getByRole("button", { name: "Báo cáo" }));
     expect(screen.getAllByRole("dialog")).toHaveLength(2);
     await expectNoSeriousViolations(container);
   });

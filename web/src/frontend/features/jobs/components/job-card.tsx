@@ -77,6 +77,15 @@ function QuickViewIcon() {
   );
 }
 
+function ClockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5v5l3.2 1.8" />
+    </svg>
+  );
+}
+
 const hoverActionClassName =
   "job-icon-button job-card-hover-action transition-[opacity,transform] duration-150";
 
@@ -108,6 +117,9 @@ export function JobCardHeader({
           {formatSalary(job.salary)}
         </p>
         <p className="job-card-timing">
+          <span className="job-card-timing-icon" aria-hidden="true">
+            <ClockIcon />
+          </span>
           <time
             dateTime={
               timeMode === "updated"
@@ -129,7 +141,7 @@ export function JobCardBody({ job }: { job: JobCardData }) {
     labels[job.employmentType] ?? job.employmentType,
     labels[job.experienceLevel] ?? job.experienceLevel,
   ];
-  const taxonomyPreview = tagValues.slice(0, 3).join(" | ");
+  const skillPreview = tagValues.slice(0, 3);
   const overflowTags = tagValues.slice(3);
 
   return (
@@ -142,16 +154,16 @@ export function JobCardBody({ job }: { job: JobCardData }) {
         <span>{job.location}</span>
       </p>
       <div className="job-card-tags" aria-label="Job tags">
-        {secondaryTags.map((tag) => (
-          <span className="job-card-tag" key={tag}>
+        {secondaryTags.map((tag, index) => (
+          <span className="job-card-tag job-card-tag--neutral" key={tag + index}>
             {tag}
           </span>
         ))}
-        {taxonomyPreview ? (
-          <span className="job-card-tag job-card-tag--taxonomy">
-            {taxonomyPreview}
+        {skillPreview.map((tag) => (
+          <span className="job-card-tag job-card-tag--skill" key={tag}>
+            {tag}
           </span>
-        ) : null}
+        ))}
         {overflowTags.length ? (
           <details className="job-card-overflow">
             <summary

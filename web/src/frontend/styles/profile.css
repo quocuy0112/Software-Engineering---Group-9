@@ -50,21 +50,14 @@
 
 @media (max-width: 479px) {
   .profile-navigation {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    overflow-x: visible;
+    gap: var(--sh-space-1);
+    overflow-x: auto;
+    scrollbar-width: thin;
   }
 
   .profile-navigation a {
-    min-width: 0;
     padding-inline: var(--sh-space-2);
-    line-height: var(--sh-line-height-body-sm);
-    text-align: center;
-    white-space: normal;
-  }
-
-  .profile-navigation a:last-child {
-    grid-column: 1 / -1;
+    white-space: nowrap;
   }
 }
 
@@ -297,31 +290,45 @@
   white-space: nowrap;
 }
 
-.profile-account-id-value button {
+.professional-profile-page .profile-account-id-value button {
   display: inline-grid;
   width: 36px;
   height: 36px;
+  min-height: 36px;
   flex: 0 0 36px;
   place-items: center;
+  padding: 0;
   border: 1px solid var(--sh-color-border-default);
   border-radius: var(--sh-radius-sm);
   background: var(--sh-color-surface-card);
   color: var(--sh-color-brand-primary);
+  box-shadow: none;
   cursor: pointer;
 }
 
-.profile-account-id-value button:hover {
+.professional-profile-page
+  .profile-account-id-value
+  button:hover:not(:disabled) {
   border-color: var(--sh-color-brand-primary);
   background: var(--sh-color-brand-soft);
+  transform: none;
 }
 
-.profile-account-id-value button:focus-visible {
+.professional-profile-page .profile-account-id-value button:focus-visible {
   outline: 3px solid var(--sh-color-border-focus);
   outline-offset: 2px;
 }
 
-.profile-account-id-value button[data-state="copied"] {
+.professional-profile-page
+  .profile-account-id-value
+  button[data-state="copied"] {
+  border-color: color-mix(
+    in srgb,
+    var(--sh-color-success) 32%,
+    var(--sh-color-border-subtle)
+  );
   color: var(--sh-color-success);
+  background: var(--sh-color-success-bg);
 }
 
 .profile-account-id-value svg {

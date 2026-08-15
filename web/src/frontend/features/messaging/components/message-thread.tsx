@@ -1,4 +1,11 @@
+import Link from "next/link";
+import type { WorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import type { MessageHistoryPage } from "../client/use-message-history";
+import {
+  getConversationContextLabel,
+  getJobContextLabel,
+} from "../messaging-context";
+import { messagingCopy } from "../messaging-copy";
 import { MessageComposer } from "./message-composer";
 import { BlockParticipantDialog } from "./block-participant-dialog";
 import { ReportMessagingDialog } from "./report-messaging-dialog";
@@ -13,6 +20,8 @@ export function MessageThread({
   onBack,
   csrfProof,
   onBlockedChanged,
+  hasConversations = true,
+  locale = "en",
 }: {
   currentUserId?: string;
   page: MessageHistoryPage | null;
@@ -21,25 +30,30 @@ export function MessageThread({
   onBack: () => void;
   csrfProof: string;
   onBlockedChanged: (blocked: boolean) => void;
+  hasConversations?: boolean;
+  locale?: WorkspaceLocale;
 }) {
+  const copy = messagingCopy(locale);
+
   useNotificationContextRead({
     enabled: Boolean(page) && !error,
     contextType: "CONVERSATION",
     contextId: page?.conversation.id,
     csrfProof,
   });
-  if (error)
+  if (error) {
     return (
       <section
         className="messaging-thread-state messaging-thread-error"
         role="alert"
       >
         <span aria-hidden="true">!</span>
-        <h2>We could not load this conversation</h2>
+        <h2>{copy.loadConversationError}</h2>
         <p>{error}</p>
       </section>
     );
-  if (!page)
+  }
+  if (!page) {
     return (
       <section className="messaging-thread-state" role="status">
         <span className="messaging-thread-state-icon" aria-hidden="true">
@@ -48,36 +62,68 @@ export function MessageThread({
             <path d="M8 9h8M8 13h5" />
           </svg>
         </span>
-        <h2>Your professional inbox</h2>
-        <p>Select a conversation to read messages.</p>
-        <small>
-          Messages are private, durable, and protected by your SmartHire
-          session.
-        </small>
+        <h2>{hasConversations ? copy.inboxTitle : copy.noConversations}</h2>
+        <p>
+          {hasConversations
+            ? copy.selectConversation
+            : copy.noConversationsDescription}
+        </p>
+        {hasConversations ? (
+          <small>{copy.privacyNotice}</small>
+        ) : (
+          <div className="messaging-empty-actions">
+            <Link className="messaging-primary-button" href="/jobs">
+              {copy.applyForJobs}
+            </Link>
+            <Link className="messaging-secondary-button" href="/connections">
+              {copy.viewConnections}
+            </Link>
+          </div>
+        )}
       </section>
     );
+  }
+
+  const jobContextLabel = getJobContextLabel(page.conversation.context);
+  const formatter = new Intl.DateTimeFormat(
+    locale === "vi" ? "vi-VN" : "en-US",
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+    },
+  );
   return (
     <section
       className="messaging-thread"
-      aria-label={`Conversation with ${page.conversation.otherParticipant.name}`}
+      aria-label={`${copy.threadWith} ${page.conversation.otherParticipant.name}`}
     >
       <header className="messaging-thread-header">
         <button
           type="button"
           className="messaging-mobile-back messaging-icon-button"
-          aria-label="Back to conversations"
+          aria-label={copy.backToConversations}
           onClick={onBack}
         >
           <svg aria-hidden="true" viewBox="0 0 24 24">
             <path d="m15 18-6-6 6-6" />
           </svg>
-          <span className="sr-only">Back to conversations</span>
+          <span className="sr-only">{copy.backToConversations}</span>
         </button>
+        {/*
+         * TODO: cần API trả về jobSlug — context.reference là application ID,
+         * nên chưa thể tạo liên kết chi tiết việc làm một cách an toàn.
+         */}
         <ConversationHeader
           name={page.conversation.otherParticipant.name}
           image={page.conversation.otherParticipant.image}
-          contextLabel={page.conversation.context.label}
+          contextLabel={
+            jobContextLabel
+              ? copy.jobConversation
+              : getConversationContextLabel(page.conversation.context, locale)
+          }
+          jobContextLabel={jobContextLabel}
           presence={page.conversation.presence}
+          locale={locale}
         />
         <div className="messaging-thread-actions">
           <BlockParticipantDialog
@@ -85,6 +131,7 @@ export function MessageThread({
             targetUserId={page.conversation.otherParticipant.id}
             targetName={page.conversation.otherParticipant.name}
             blocked={page.conversation.blocked}
+            locale={locale}
             onChanged={onBlockedChanged}
           />
           <ReportMessagingDialog
@@ -92,12 +139,13 @@ export function MessageThread({
             conversationId={page.conversation.id}
             targetUserId={page.conversation.otherParticipant.id}
             messages={page.items}
+            locale={locale}
           />
         </div>
       </header>
       {page.conversation.accessMode === "READ_ONLY" ? (
         <p className="messaging-blocked-banner" role="status">
-          This connection has ended. Retained conversation history is read-only.
+          {copy.connectionEnded}
         </p>
       ) : page.conversation.blocked ? (
         <p className="messaging-blocked-banner" role="status">
@@ -105,7 +153,7 @@ export function MessageThread({
             <circle cx="12" cy="12" r="9" />
             <path d="m6 6 12 12" />
           </svg>
-          Messaging is blocked. Existing history remains available.
+          {copy.blockedConversation}
         </p>
       ) : null}
       <div className="messaging-history">
@@ -118,12 +166,12 @@ export function MessageThread({
             <svg aria-hidden="true" viewBox="0 0 24 24">
               <path d="m8 12 4-4 4 4M12 8v9" />
             </svg>
-            Load older messages
+            {copy.loadOlder}
           </button>
         ) : (
-          <p className="messaging-history-start">Start of conversation</p>
+          <p className="messaging-history-start">{copy.conversationStarted}</p>
         )}
-        <ol aria-label="Messages">
+        <ol aria-label={copy.pageTitle}>
           {page.items.map((message) => {
             const outgoing = message.senderId === currentUserId;
             return (
@@ -135,10 +183,7 @@ export function MessageThread({
                   <p>{message.content}</p>
                   <span className="messaging-message-meta">
                     <time dateTime={message.createdAt}>
-                      {new Intl.DateTimeFormat("en-US", {
-                        hour: "numeric",
-                        minute: "2-digit",
-                      }).format(new Date(message.createdAt))}
+                      {formatter.format(new Date(message.createdAt))}
                     </time>
                     {!currentUserId || outgoing ? (
                       <span className="messaging-delivery-state">
@@ -151,7 +196,9 @@ export function MessageThread({
                             <path d="m5 12 4 4L19 6" />
                           </svg>
                         )}
-                        {message.delivery === "READ" ? "Read" : "Sent"}
+                        {message.delivery === "READ"
+                          ? copy.deliveryRead
+                          : copy.deliverySent}
                       </span>
                     ) : null}
                   </span>
@@ -163,6 +210,7 @@ export function MessageThread({
       </div>
       <MessageComposer
         conversationId={page.conversation.id}
+        locale={locale}
         disabled={
           page.conversation.blocked ||
           page.conversation.accessMode === "READ_ONLY"

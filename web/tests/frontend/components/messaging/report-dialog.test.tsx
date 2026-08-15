@@ -14,6 +14,7 @@ describe("ReportMessagingDialog", () => {
     );
     render(
       <ReportMessagingDialog
+        locale="vi"
         csrfProof="csrf"
         conversationId="conversation-1"
         targetUserId="user-b"
@@ -30,24 +31,29 @@ describe("ReportMessagingDialog", () => {
         ]}
       />,
     );
-    const trigger = screen.getByRole("button", { name: "Report" });
+    const trigger = screen.getByRole("button", { name: "Báo cáo" });
     fireEvent.click(trigger);
-    fireEvent.change(screen.getByLabelText("Category"), { target: { value: "OTHER" } });
-    fireEvent.click(screen.getByRole("button", { name: "Submit report" }));
-    expect(screen.getByRole("status")).toHaveTextContent(/at least 10 characters/i);
-    fireEvent.change(screen.getByLabelText("Details (optional)"), {
+    fireEvent.change(screen.getByLabelText("Danh mục"), {
+      target: { value: "OTHER" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Gửi báo cáo" }));
+    expect(screen.getByRole("status")).toHaveTextContent(/ít nhất 10 ký tự/i);
+    fireEvent.change(screen.getByLabelText("Chi tiết (không bắt buộc)"), {
       target: { value: "Enough detail to explain this report." },
     });
-    fireEvent.change(screen.getByLabelText("Evidence message (optional)"), {
-      target: { value: "message-1" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: "Submit report" }));
+    fireEvent.change(
+      screen.getByLabelText("Tin nhắn làm bằng chứng (không bắt buộc)"),
+      {
+        target: { value: "message-1" },
+      },
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Gửi báo cáo" }));
     await waitFor(() =>
       expect(screen.getByRole("status")).toHaveTextContent(
-        "Report received and queued for protected review.",
+        "Đã nhận báo cáo và chuyển đến quy trình xem xét bảo mật.",
       ),
     );
-    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    fireEvent.click(screen.getByRole("button", { name: "Đóng" }));
     await waitFor(() => expect(trigger).toHaveFocus());
   });
 });

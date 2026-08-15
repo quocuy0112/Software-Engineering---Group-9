@@ -1,16 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import type { WorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
 import { messageContentSchema } from "@/shared/contracts/messaging/messages";
+import { messagingCopy } from "../messaging-copy";
 import { useSendMessage } from "../client/use-send-message";
 
 export function MessageComposer({
   conversationId,
   disabled = false,
+  locale = "en",
 }: {
   conversationId: string;
   disabled?: boolean;
+  locale?: WorkspaceLocale;
 }) {
+  const copy = messagingCopy(locale);
   const [content, setContent] = useState("");
   const [validation, setValidation] = useState<string | null>(null);
   const { outbox, send } = useSendMessage(conversationId);
@@ -18,7 +23,7 @@ export function MessageComposer({
   async function submit() {
     const parsed = messageContentSchema.safeParse(content);
     if (!parsed.success) {
-      setValidation("Enter between 1 and 2,000 characters.");
+      setValidation(copy.validation);
       return;
     }
     setValidation(null);
@@ -27,8 +32,8 @@ export function MessageComposer({
   }
 
   return (
-    <section className="messaging-composer" aria-label="Message composer">
-      <ul className="messaging-outbox" aria-label="Outgoing messages">
+    <section className="messaging-composer" aria-label={copy.composeMessage}>
+      <ul className="messaging-outbox" aria-label={copy.sendingMessages}>
         {outbox.map((item) => (
           <li
             key={item.clientOperationId}
@@ -39,14 +44,18 @@ export function MessageComposer({
               {item.status === "PENDING" ? (
                 <span className="messaging-spinner" aria-hidden="true" />
               ) : null}
-              {item.status.toLocaleLowerCase()}
+              {item.status === "PENDING"
+                ? copy.sending
+                : item.status === "SENT"
+                  ? copy.deliverySent
+                  : copy.sendFailed}
             </span>
             {item.status === "FAILED" ? (
               <button
                 type="button"
                 onClick={() => void send(item.content, item.clientOperationId)}
               >
-                Retry
+                {copy.retry}
               </button>
             ) : null}
           </li>
@@ -59,11 +68,11 @@ export function MessageComposer({
         }}
       >
         <label className="messaging-composer-field">
-          <span className="sr-only">Message</span>
+          <span className="sr-only">{copy.message}</span>
           <textarea
-            aria-label="Message"
+            aria-label={copy.message}
             placeholder={
-              disabled ? "This conversation is read-only" : "Write a message..."
+              disabled ? copy.readOnlyConversation : copy.writeMessage
             }
             value={content}
             maxLength={2_000}
@@ -89,15 +98,13 @@ export function MessageComposer({
           type="submit"
           disabled={disabled}
         >
-          <span>Send</span>
+          <span>{copy.send}</span>
           <svg aria-hidden="true" viewBox="0 0 24 24">
             <path d="m22 2-7 20-4-9-9-4zM22 2 11 13" />
           </svg>
         </button>
       </form>
-      <p className="messaging-composer-hint">
-        Press Enter to send · Shift + Enter for a new line
-      </p>
+      <p className="messaging-composer-hint">{copy.sendHint}</p>
       {validation ? (
         <p className="messaging-inline-alert" role="alert">
           {validation}

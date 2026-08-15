@@ -53,7 +53,10 @@ export const auth = betterAuth({
   session: {
     modelName: "Session",
     expiresIn: 60 * 60 * 24 * 7 - 60,
-    updateAge: 60 * 60 * 24,
+    // SmartHire enforces an independent seven-day absolute ceiling. A sliding
+    // Better Auth refresh would move expiresAt beyond absoluteExpiresAt and
+    // weaken that ceiling, so provider-managed refresh is intentionally off.
+    disableSessionRefresh: true,
     cookieCache: { enabled: false },
     additionalFields: {
       lastActivityAt: {

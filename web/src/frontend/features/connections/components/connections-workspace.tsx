@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useCallback, useState } from "react";
+import { useWorkspaceLocale } from "@/frontend/features/dashboard/client/workspace-locale";
+import { WorkspacePageHeader } from "@/frontend/features/dashboard/components/page-header";
 import type {
   ConnectionNotificationProjection,
   ParticipantProposal,
@@ -9,23 +11,19 @@ import type {
 } from "@/shared/contracts/connections";
 import { useConnectionInvalidation } from "../client/use-connection-invalidation";
 
-const connectionDateFormatter = new Intl.DateTimeFormat("en-GB", {
-  dateStyle: "medium",
-  timeZone: "Asia/Ho_Chi_Minh",
-});
-
-const connectionDateTimeFormatter = new Intl.DateTimeFormat("en-GB", {
-  dateStyle: "medium",
-  timeStyle: "short",
-  timeZone: "Asia/Ho_Chi_Minh",
-});
-
-function formatConnectionDate(value: string) {
-  return connectionDateFormatter.format(new Date(value));
+function formatConnectionDate(value: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeZone: "Asia/Ho_Chi_Minh",
+  }).format(new Date(value));
 }
 
-function formatConnectionDateTime(value: string) {
-  return connectionDateTimeFormatter.format(new Date(value));
+function formatConnectionDateTime(value: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Ho_Chi_Minh",
+  }).format(new Date(value));
 }
 
 async function connectionApi(
@@ -45,10 +43,152 @@ async function connectionApi(
   });
   const body = await response.json().catch(() => ({}));
   if (!response.ok)
-    throw new Error(
-      body.error?.message ?? "Professional connection request failed.",
-    );
+    throw new Error(body.error?.message ?? "CONNECTION_REQUEST_FAILED");
   return body;
+}
+
+function connectionCopy(locale: "vi" | "en") {
+  return locale === "vi"
+    ? {
+        kicker: "KẾT NỐI CÓ ĐỒNG THUẬN",
+        title: "Kết nối chuyên nghiệp",
+        description:
+          "Xem xét từng đề xuất độc lập. Tin nhắn chỉ mở khi cả hai bên chấp nhận.",
+        connected: "Đang kết nối trực tuyến",
+        offline: "Ngoại tuyến",
+        connecting: "Đang kết nối",
+        flow: [
+          {
+            title: "Admin đề xuất",
+            description: "Quản trị viên giới thiệu 2 tài khoản với nhau",
+          },
+          {
+            title: "Cả 2 bên đồng ý",
+            description: "Không bên nào bị kết nối khi chưa xác nhận",
+          },
+          {
+            title: "Mở khoá nhắn tin",
+            description: "Chỉ lúc này mới nhắn tin riêng được với nhau",
+          },
+        ],
+        consent: "SỰ ĐỒNG THUẬN CỦA BẠN",
+        proposals: "Đề xuất kết nối",
+        pending: "đang chờ",
+        noProposals: "Chưa có đề xuất",
+        noProposalsCopy:
+          "Quản trị viên có thể giới thiệu hai tài khoản, nhưng không thể tạo kết nối nếu thiếu sự chấp thuận của cả hai bên.",
+        detailsRemoved: "Chi tiết đã được xoá",
+        proposalNotRetained: "Nội dung đề xuất không còn được lưu.",
+        status: "Trạng thái",
+        expires: "Hết hạn",
+        acceptedWaiting: "Đã chấp nhận — đang chờ",
+        accept: "Chấp nhận",
+        decline: "Từ chối",
+        messagingAccess: "QUYỀN NHẮN TIN",
+        connections: "Kết nối của bạn",
+        active: "đang hoạt động",
+        noConnections: "Chưa có kết nối",
+        noConnectionsCopy:
+          "Sau khi cả hai bên chấp nhận đề xuất, kết nối sẽ xuất hiện tại đây và có thể nhắn tin riêng tư.",
+        messagingEnabled: "Đã bật nhắn tin",
+        connectionEnded: "Kết nối đã kết thúc — lịch sử chỉ đọc",
+        openMessages: "Mở tin nhắn",
+        disconnect: "Ngắt kết nối",
+        viewHistory: "Xem lịch sử",
+        updates: "CẬP NHẬT",
+        notifications: "Thông báo",
+        unread: "chưa đọc",
+        noUpdates:
+          "Không có thông báo mới. Thay đổi về đề xuất và kết nối sẽ xuất hiện ở đây.",
+        endConfirm: (name: string) =>
+          `Kết thúc kết nối với ${name}? Lịch sử trò chuyện hiện có sẽ chuyển sang chỉ đọc.`,
+        saveError: "Không thể lưu lựa chọn của bạn.",
+        disconnectError: "Không thể kết thúc kết nối.",
+        locale: "vi-VN",
+      }
+    : {
+        kicker: "CONSENT-BASED NETWORK",
+        title: "Professional Connections",
+        description:
+          "Review proposals independently. Messaging opens only after both people accept.",
+        connected: "Realtime connected",
+        offline: "Offline",
+        connecting: "Connecting",
+        flow: [
+          {
+            title: "Admin proposes",
+            description:
+              "A Platform Administrator introduces two accounts to each other",
+          },
+          {
+            title: "Both people accept",
+            description: "Neither side is connected until both confirm",
+          },
+          {
+            title: "Messaging unlocked",
+            description: "Only then can the two message each other privately",
+          },
+        ],
+        consent: "YOUR CONSENT",
+        proposals: "Connection proposals",
+        pending: "pending",
+        noProposals: "No proposals",
+        noProposalsCopy:
+          "A Platform Administrator may introduce two accounts, but cannot connect them without both approvals.",
+        detailsRemoved: "Details removed",
+        proposalNotRetained: "Proposal detail is no longer retained.",
+        status: "Status",
+        expires: "Expires",
+        acceptedWaiting: "Accepted — waiting",
+        accept: "Accept",
+        decline: "Decline",
+        messagingAccess: "MESSAGING ACCESS",
+        connections: "Your connections",
+        active: "active",
+        noConnections: "No connections yet",
+        noConnectionsCopy:
+          "After both people accept a proposal, the connection appears here and becomes eligible for private messaging.",
+        messagingEnabled: "Messaging enabled",
+        connectionEnded: "Connection ended — history remains read-only",
+        openMessages: "Open messages",
+        disconnect: "Disconnect",
+        viewHistory: "View history",
+        updates: "UPDATES",
+        notifications: "Notifications",
+        unread: "unread",
+        noUpdates:
+          "No updates. Proposal and connection changes will appear here.",
+        endConfirm: (name: string) =>
+          `End your connection with ${name}? Existing chat history becomes read-only.`,
+        saveError: "Unable to save your decision.",
+        disconnectError: "Unable to end this connection.",
+        locale: "en-GB",
+      };
+}
+
+function proposalStateLabel(
+  state: ParticipantProposal["state"],
+  locale: "vi" | "en",
+) {
+  const labels =
+    locale === "vi"
+      ? {
+          PENDING_BOTH: "Đang chờ cả hai bên",
+          PARTIALLY_ACCEPTED: "Đang chờ phản hồi",
+          ACCEPTED: "Đã chấp nhận",
+          DECLINED: "Đã từ chối",
+          EXPIRED: "Đã hết hạn",
+          CANCELLED: "Đã huỷ",
+        }
+      : {
+          PENDING_BOTH: "Waiting for both people",
+          PARTIALLY_ACCEPTED: "Waiting for a response",
+          ACCEPTED: "Accepted",
+          DECLINED: "Declined",
+          EXPIRED: "Expired",
+          CANCELLED: "Cancelled",
+        };
+  return labels[state] ?? state.replaceAll("_", " ");
 }
 
 export function ConnectionsWorkspace({
@@ -62,12 +202,13 @@ export function ConnectionsWorkspace({
   initialConnections: ProfessionalConnectionProjection[];
   initialNotifications: ConnectionNotificationProjection[];
 }) {
+  const locale = useWorkspaceLocale();
+  const copy = connectionCopy(locale);
   const [proposals, setProposals] = useState(initialProposals);
   const [connections, setConnections] = useState(initialConnections);
   const [notifications, setNotifications] = useState(initialNotifications);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
   const refresh = useCallback(async () => {
     const [proposalBody, connectionBody, notificationBody] = await Promise.all([
       connectionApi("/api/connections/proposals?limit=50", csrfProof),
@@ -81,7 +222,9 @@ export function ConnectionsWorkspace({
   const realtime = useConnectionInvalidation(
     useCallback(() => void refresh(), [refresh]),
   );
-
+  const activeProposals = proposals.filter((item) =>
+    ["PENDING_BOTH", "PARTIALLY_ACCEPTED"].includes(item.state),
+  );
   async function decide(
     proposal: ParticipantProposal,
     decision: "ACCEPTED" | "DECLINED",
@@ -104,21 +247,19 @@ export function ConnectionsWorkspace({
       await refresh();
     } catch (reason) {
       setError(
-        reason instanceof Error
+        reason instanceof Error &&
+          reason.message !== "CONNECTION_REQUEST_FAILED"
           ? reason.message
-          : "Unable to save your decision.",
+          : copy.saveError,
       );
       await refresh().catch(() => undefined);
     } finally {
       setBusyId(null);
     }
   }
-
   async function disconnect(connection: ProfessionalConnectionProjection) {
     if (
-      !window.confirm(
-        `End your connection with ${connection.otherParticipant.displayName}? Existing chat history becomes read-only.`,
-      )
+      !window.confirm(copy.endConfirm(connection.otherParticipant.displayName))
     )
       return;
     setBusyId(connection.id);
@@ -139,25 +280,22 @@ export function ConnectionsWorkspace({
       await refresh();
     } catch (reason) {
       setError(
-        reason instanceof Error
+        reason instanceof Error &&
+          reason.message !== "CONNECTION_REQUEST_FAILED"
           ? reason.message
-          : "Unable to end this connection.",
+          : copy.disconnectError,
       );
       await refresh().catch(() => undefined);
     } finally {
       setBusyId(null);
     }
   }
-
   async function markRead(notification: ConnectionNotificationProjection) {
     if (notification.readAt) return;
     await connectionApi(
       `/api/connections/notifications/${encodeURIComponent(notification.id)}/read`,
       csrfProof,
-      {
-        method: "POST",
-        headers: { "idempotency-key": crypto.randomUUID() },
-      },
+      { method: "POST", headers: { "idempotency-key": crypto.randomUUID() } },
     );
     setNotifications((items) =>
       items.map((item) =>
@@ -167,51 +305,71 @@ export function ConnectionsWorkspace({
       ),
     );
   }
-
-  const activeProposals = proposals.filter((item) =>
-    ["PENDING_BOTH", "PARTIALLY_ACCEPTED"].includes(item.state),
-  );
+  const realtimeLabel =
+    realtime === "CONNECTED"
+      ? copy.connected
+      : realtime === "OFFLINE"
+        ? copy.offline
+        : copy.connecting;
   return (
     <main className="connections-workspace">
-      <header className="connections-hero">
-        <div>
-          <p className="connections-kicker">CONSENT-BASED NETWORK</p>
-          <h1>Professional Connections</h1>
-          <p>
-            Review proposals independently. Messaging opens only after both
-            people accept.
-          </p>
-        </div>
-        <span
-          className="connections-realtime"
-          data-state={realtime.toLowerCase()}
-          role="status"
-        >
-          {realtime === "CONNECTED"
-            ? "Realtime connected"
-            : realtime === "OFFLINE"
-              ? "Offline"
-              : "Connecting"}
-        </span>
-      </header>
+      <WorkspacePageHeader
+        eyebrow={copy.kicker}
+        title={copy.title}
+        subtitle={copy.description}
+        statusBadge={{
+          label: realtimeLabel,
+          state: realtime.toLowerCase() as
+            | "connected"
+            | "connecting"
+            | "reconnecting"
+            | "offline",
+        }}
+      />
       {error ? (
         <p className="connections-alert" role="alert">
           {error}
         </p>
       ) : null}
+      <section className="connections-flow" aria-label={copy.title}>
+        {copy.flow.map((step, index) => (
+          <div className="connections-flow__group" key={step.title}>
+            <article className="connections-flow__step">
+              <span
+                className="connections-flow__icon"
+                data-step={index + 1}
+                aria-hidden="true"
+              >
+                <ConsentFlowIcon step={index + 1} />
+              </span>
+              <div>
+                <h2>{step.title}</h2>
+                <p>{step.description}</p>
+              </div>
+            </article>
+            {index < copy.flow.length - 1 ? (
+              <span className="connections-flow__arrow" aria-hidden="true">
+                <ArrowIcon />
+              </span>
+            ) : null}
+          </div>
+        ))}
+      </section>
       <section className="connections-grid">
-        <article className="connections-panel">
+        <article className="connections-panel connections-panel--mini">
           <header>
             <div>
-              <p>YOUR CONSENT</p>
-              <h2>Connection proposals</h2>
+              <p>{copy.consent}</p>
+              <h2>{copy.proposals}</h2>
             </div>
-            <span>{activeProposals.length} pending</span>
+            <span>
+              {activeProposals.length} {copy.pending}
+            </span>
           </header>
           {proposals.length === 0 ? (
-            <Empty
-              title="No proposals"
-              copy="A Platform Administrator may introduce two accounts, but cannot connect them without both approvals."
+            <CompactEmpty
+              title={copy.noProposals}
+              description={copy.noProposalsCopy}
             />
           ) : (
             <div className="connection-card-list">
@@ -219,35 +377,34 @@ export function ConnectionsWorkspace({
                 const active = ["PENDING_BOTH", "PARTIALLY_ACCEPTED"].includes(
                   proposal.state,
                 );
+                const name =
+                  proposal.otherParticipant?.displayName ?? copy.detailsRemoved;
                 return (
                   <section className="connection-card" key={proposal.id}>
                     <div className="connection-person">
                       <div className="connection-avatar" aria-hidden="true">
-                        {proposal.otherParticipant?.displayName
-                          .slice(0, 1)
-                          .toUpperCase() ?? "?"}
+                        {name.slice(0, 1).toUpperCase()}
                       </div>
                       <div>
-                        <h3>
-                          {proposal.otherParticipant?.displayName ??
-                            "Details removed"}
-                        </h3>
-                        <p>
-                          {proposal.reason ??
-                            "Proposal detail is no longer retained."}
-                        </p>
+                        <h3>{name}</h3>
+                        <p>{proposal.reason ?? copy.proposalNotRetained}</p>
                       </div>
                     </div>
                     <dl>
                       <div>
-                        <dt>Status</dt>
+                        <dt>{copy.status}</dt>
                         <dd data-state={proposal.state.toLowerCase()}>
-                          {proposal.state.replaceAll("_", " ")}
+                          {proposalStateLabel(proposal.state, locale)}
                         </dd>
                       </div>
                       <div>
-                        <dt>Expires</dt>
-                        <dd>{formatConnectionDate(proposal.expiresAt)}</dd>
+                        <dt>{copy.expires}</dt>
+                        <dd>
+                          {formatConnectionDate(
+                            proposal.expiresAt,
+                            copy.locale,
+                          )}
+                        </dd>
                       </div>
                     </dl>
                     {active ? (
@@ -262,8 +419,8 @@ export function ConnectionsWorkspace({
                           onClick={() => void decide(proposal, "ACCEPTED")}
                         >
                           {proposal.myDecision === "ACCEPTED"
-                            ? "Accepted — waiting"
-                            : "Accept"}
+                            ? copy.acceptedWaiting
+                            : copy.accept}
                         </button>
                         <button
                           type="button"
@@ -271,7 +428,7 @@ export function ConnectionsWorkspace({
                           disabled={busyId === proposal.id}
                           onClick={() => void decide(proposal, "DECLINED")}
                         >
-                          Decline
+                          {copy.decline}
                         </button>
                       </div>
                     ) : null}
@@ -281,21 +438,21 @@ export function ConnectionsWorkspace({
             </div>
           )}
         </article>
-        <article className="connections-panel">
+        <article className="connections-panel connections-panel--mini">
           <header>
             <div>
-              <p>MESSAGING ACCESS</p>
-              <h2>Your connections</h2>
+              <p>{copy.messagingAccess}</p>
+              <h2>{copy.connections}</h2>
             </div>
             <span>
               {connections.filter((item) => item.state === "ACCEPTED").length}{" "}
-              active
+              {copy.active}
             </span>
           </header>
           {connections.length === 0 ? (
-            <Empty
-              title="No connections yet"
-              copy="After both people accept a proposal, the connection appears here and becomes eligible for private messaging."
+            <CompactEmpty
+              title={copy.noConnections}
+              description={copy.noConnectionsCopy}
             />
           ) : (
             <div className="connection-card-list">
@@ -314,8 +471,8 @@ export function ConnectionsWorkspace({
                       <h3>{connection.otherParticipant.displayName}</h3>
                       <p>
                         {connection.state === "ACCEPTED"
-                          ? "Messaging enabled"
-                          : "Connection ended — history remains read-only"}
+                          ? copy.messagingEnabled
+                          : copy.connectionEnded}
                       </p>
                     </div>
                   </div>
@@ -323,7 +480,7 @@ export function ConnectionsWorkspace({
                     {connection.state === "ACCEPTED" ? (
                       <>
                         <Link className="primary link" href="/messages">
-                          Open messages
+                          {copy.openMessages}
                         </Link>
                         <button
                           type="button"
@@ -331,12 +488,12 @@ export function ConnectionsWorkspace({
                           disabled={busyId === connection.id}
                           onClick={() => void disconnect(connection)}
                         >
-                          Disconnect
+                          {copy.disconnect}
                         </button>
                       </>
                     ) : (
                       <Link className="secondary link" href="/messages">
-                        View history
+                        {copy.viewHistory}
                       </Link>
                     )}
                   </div>
@@ -345,21 +502,18 @@ export function ConnectionsWorkspace({
             </div>
           )}
         </article>
-        <aside className="connections-panel notifications">
-          <header>
-            <div>
-              <p>UPDATES</p>
-              <h2>Notifications</h2>
-            </div>
-            <span>
-              {notifications.filter((item) => !item.readAt).length} unread
-            </span>
-          </header>
+        <aside
+          className="connections-notification-strip"
+          data-populated={notifications.length > 0}
+          aria-label={copy.notifications}
+        >
           {notifications.length === 0 ? (
-            <Empty
-              title="No updates"
-              copy="Proposal and connection changes will appear here."
-            />
+            <div className="connections-notification-strip__empty">
+              <span aria-hidden="true">
+                <NotificationIcon />
+              </span>
+              <p>{copy.noUpdates}</p>
+            </div>
           ) : (
             <div className="notification-list">
               {notifications.map((notification) => (
@@ -372,7 +526,10 @@ export function ConnectionsWorkspace({
                   <strong>{notification.title}</strong>
                   <span>{notification.message}</span>
                   <time dateTime={notification.createdAt}>
-                    {formatConnectionDateTime(notification.createdAt)}
+                    {formatConnectionDateTime(
+                      notification.createdAt,
+                      copy.locale,
+                    )}
                   </time>
                 </button>
               ))}
@@ -384,12 +541,70 @@ export function ConnectionsWorkspace({
   );
 }
 
-function Empty({ title, copy }: { title: string; copy: string }) {
+function CompactEmpty({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
   return (
-    <div className="connections-empty">
-      <span aria-hidden="true">◎</span>
-      <h3>{title}</h3>
-      <p>{copy}</p>
+    <div className="connections-mini-empty">
+      <span aria-hidden="true">
+        <EmptyStateIcon />
+      </span>
+      <p>
+        <strong>{title}.</strong> {description}
+      </p>
     </div>
+  );
+}
+
+function ConsentFlowIcon({ step }: { step: number }) {
+  if (step === 1)
+    return (
+      <svg viewBox="0 0 24 24">
+        <circle cx="9" cy="7" r="3" />
+        <path d="M3.5 20.5a5.5 5.5 0 0 1 11 0M18 7v6m-3-3h6" />
+      </svg>
+    );
+  if (step === 2)
+    return (
+      <svg viewBox="0 0 24 24">
+        <path d="m5 12 4.2 4.2L19 6.5" />
+        <path d="M21 12a9 9 0 1 1-3-6.7" />
+      </svg>
+    );
+  return (
+    <svg viewBox="0 0 24 24">
+      <path d="M19.5 11.5A4.5 4.5 0 0 1 15 16h-5l-4.5 3v-7.5A4.5 4.5 0 0 1 10 7h2" />
+      <rect x="14" y="6.5" width="6" height="5.5" rx="1" />
+      <path d="M15.5 6.5V5a1.5 1.5 0 0 1 3 0v1.5" />
+    </svg>
+  );
+}
+
+function ArrowIcon() {
+  return (
+    <svg viewBox="0 0 24 24">
+      <path d="M4 12h15m-5-5 5 5-5 5" />
+    </svg>
+  );
+}
+
+function EmptyStateIcon() {
+  return (
+    <svg viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="7" />
+      <path d="M12 8v4m0 3h.01" />
+    </svg>
+  );
+}
+
+function NotificationIcon() {
+  return (
+    <svg viewBox="0 0 24 24">
+      <path d="M18 10a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
+    </svg>
   );
 }

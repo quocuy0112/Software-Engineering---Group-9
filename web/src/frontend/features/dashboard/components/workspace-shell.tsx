@@ -195,18 +195,26 @@ function WorkspaceShellContent({
   )
     ? workspaceProfile.image
     : null;
-  const copy =
-    locale === "vi"
+  const copy = getWorkspaceCopy(locale, workspaceProfile.name);
+  function getWorkspaceCopy(currentLocale: WorkspaceLocale, name: string) {
+    return currentLocale === "vi"
       ? {
-          product: "Không gian nghề nghiệp",
+          product: "Không gian nhân tài",
           sidebar: "Thanh bên không gian làm việc",
           expand: "Mở rộng thanh bên",
           collapse: "Thu gọn thanh bên",
           workspace: "Không gian ứng viên",
           greeting: "Chào mừng trở lại",
-          openProfile: `Mở hồ sơ của ${workspaceProfile.name}`,
+          recruiterWorkspace: "Không gian nhà tuyển dụng",
+          recruiterGreeting: "Quản lý quy trình tuyển dụng",
+          candidateWorkspace: "Không gian ứng viên",
+          openProfile: `Mở hồ sơ của ${name}`,
           manageProfile: "Quản lý hồ sơ",
           signOutError: "Không thể đăng xuất. Hãy thử lại.",
+          resizeSidebar: "Điều chỉnh kích thước thanh bên",
+          widthOf: "trên",
+          resizeSidebarHint:
+            "Kéo để điều chỉnh kích thước. Nhấp đúp để đặt lại độ rộng mặc định.",
         }
       : {
           product: "Talent workspace",
@@ -215,13 +223,23 @@ function WorkspaceShellContent({
           collapse: "Collapse workspace sidebar",
           workspace: "Candidate workspace",
           greeting: "Welcome back",
-          openProfile: `Open profile for ${workspaceProfile.name}`,
-          manageProfile: "Manage your profile",
+          recruiterWorkspace: "Recruiter workspace",
+          recruiterGreeting: "Manage your hiring workflow",
+          candidateWorkspace: "Candidate workspace",
+          openProfile: `Open profile for ${name}`,
+          manageProfile: "Manage profile",
           signOutError: "Unable to sign out. Please try again.",
+          resizeSidebar: "Resize workspace sidebar",
+          widthOf: "of",
+          resizeSidebarHint:
+            "Drag to resize. Double-click to reset the default width.",
         };
+  }
+
+  const accountTitle = `${workspaceProfile.name} — ${workspaceProfile.email || copy.manageProfile}`;
 
   function persistWorkspaceMode(mode: WorkspaceMode) {
-    if (mode === 'recruiter') openRecruiterWorkspace();
+    if (mode === "recruiter") openRecruiterWorkspace();
     else openCandidateWorkspace();
   }
 
@@ -231,12 +249,12 @@ function WorkspaceShellContent({
 
   function openRecruiterWorkspace() {
     document.cookie = `${WORKSPACE_MODE_COOKIE}=recruiter; Path=/; Max-Age=31536000; SameSite=Lax`;
-    startNavigation(() => router.push('/recruiter'));
+    startNavigation(() => router.push("/recruiter"));
   }
 
   function openCandidateWorkspace() {
     clearPersistedWorkspaceMode();
-    startNavigation(() => router.push('/dashboard'));
+    startNavigation(() => router.push("/dashboard"));
   }
 
   async function signOut() {
@@ -352,14 +370,14 @@ function WorkspaceShellContent({
             className="workspace-sidebar-resize-handle"
             role="separator"
             tabIndex={sidebarCollapsed ? -1 : 0}
-            aria-label="Resize workspace sidebar"
+            aria-label={copy.resizeSidebar}
             aria-orientation="vertical"
             aria-valuemin={SIDEBAR_MINIMUM_WIDTH}
             aria-valuemax={sidebarMaximumWidth}
             aria-valuenow={sidebarWidth}
-            aria-valuetext={`${sidebarWidth}px of ${sidebarMaximumWidth}px`}
-            aria-description="Drag to resize. Double-click to reset the default width."
-            title="Drag to resize. Double-click to reset the default width."
+            aria-valuetext={`${sidebarWidth}px ${copy.widthOf} ${sidebarMaximumWidth}px`}
+            aria-description={copy.resizeSidebarHint}
+            title={copy.resizeSidebarHint}
             onPointerDown={startSidebarResize}
             onPointerMove={resizeSidebar}
             onPointerUp={finishSidebarResize}
@@ -395,12 +413,12 @@ function WorkspaceShellContent({
             <div>
               <p className="workspace-topbar-kicker">
                 {workspaceMode === "recruiter"
-                  ? "Recruiter workspace"
+                  ? copy.recruiterWorkspace
                   : copy.workspace}
               </p>
               <p className="workspace-topbar-title">
                 {workspaceMode === "recruiter"
-                  ? "Manage your hiring pipeline"
+                  ? copy.recruiterGreeting
                   : copy.greeting}
               </p>
             </div>
@@ -414,11 +432,7 @@ function WorkspaceShellContent({
                 className="workspace-account-chip"
                 href="/profile"
                 aria-label={copy.openProfile}
-                title={
-                  workspaceProfile.name +
-                  " — " +
-                  (workspaceProfile.email || copy.manageProfile)
-                }
+                title={accountTitle}
               >
                 <span className="workspace-account-avatar" aria-hidden="true">
                   {avatar ? (
@@ -454,7 +468,7 @@ function WorkspaceShellContent({
                     &lt;
                   </span>
                   <span className="recruiter-header-action__label">
-                    Candidate workspace
+                    {copy.candidateWorkspace}
                   </span>
                 </button>
               ) : (
@@ -476,15 +490,13 @@ function WorkspaceShellContent({
             data-workspace-mode={workspaceMode}
           >
             <CsrfProofProvider value={csrfProof}>
-              {workspaceMode === "recruiter" ? (
-                recruiterContent ?? (
-                  <RecruiterJobPostingManagement
-                    initialData={initialRecruiterJobData}
-                  />
-                )
-              ) : (
-                children
-              )}
+              {workspaceMode === "recruiter"
+                ? (recruiterContent ?? (
+                    <RecruiterJobPostingManagement
+                      initialData={initialRecruiterJobData}
+                    />
+                  ))
+                : children}
             </CsrfProofProvider>
           </section>
         </div>

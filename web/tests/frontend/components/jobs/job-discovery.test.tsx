@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   ApplyButton,
   JobCardView,
@@ -127,10 +127,32 @@ describe("job discovery presentation", () => {
     fireEvent.change(screen.getByLabelText(/location/i), {
       target: { value: "Đà Nẵng" },
     });
-    expect(screen.getByRole("button", { name: /search jobs/i })).toBeEnabled();
-    expect(screen.getByRole("link", { name: /clear all/i })).toHaveAttribute(
-      "href",
-      "/jobs",
+    expect(
+      screen.queryByRole("button", { name: /search jobs/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getAllByRole("link", { name: /clear filters/i }).at(-1),
+    ).toHaveAttribute("href", "/jobs");
+  });
+
+  it("reports text and discrete filter changes with the right trigger", () => {
+    const onCriteriaChange = vi.fn();
+    render(<JobSearchForm criteria={{}} onCriteriaChange={onCriteriaChange} />);
+
+    fireEvent.change(screen.getByLabelText(/keywords/i), {
+      target: { value: "TypeScript" },
+    });
+    expect(onCriteriaChange).toHaveBeenLastCalledWith(
+      { q: "TypeScript" },
+      "debounced",
+    );
+
+    fireEvent.change(screen.getByLabelText(/employment type/i), {
+      target: { value: "FULL_TIME" },
+    });
+    expect(onCriteriaChange).toHaveBeenLastCalledWith(
+      { employmentType: "FULL_TIME" },
+      "immediate",
     );
   });
 

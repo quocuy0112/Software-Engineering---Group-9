@@ -35,6 +35,7 @@ describe("conversation workspace projections", () => {
     const onSelect = vi.fn();
     render(
       <ConversationList
+        locale="vi"
         items={[summary]}
         selectedId={null}
         onSelect={onSelect}
@@ -42,7 +43,8 @@ describe("conversation workspace projections", () => {
         hasMore={false}
       />,
     );
-    expect(screen.getByLabelText("2 unread messages")).toBeVisible();
+    expect(screen.getByLabelText("2 tin nhắn chưa đọc")).toBeVisible();
+    expect(screen.getByText("Software Engineer · SmartHire")).toBeVisible();
     fireEvent.click(screen.getByRole("button", { name: /recruiter b/i }));
     expect(onSelect).toHaveBeenCalledWith("conversation-1");
   });
@@ -51,6 +53,7 @@ describe("conversation workspace projections", () => {
     const onBack = vi.fn();
     render(
       <MessageThread
+        locale="vi"
         currentUserId="user-a"
         csrfProof="csrf"
         error={null}
@@ -83,11 +86,41 @@ describe("conversation workspace projections", () => {
       "data-direction",
       "outgoing",
     );
-    expect(screen.getByText("Read")).toBeVisible();
-    expect(screen.getByRole("button", { name: /load older/i })).toBeVisible();
+    expect(screen.getByText("Đã xem")).toBeVisible();
+    expect(screen.getByText("Software Engineer · SmartHire")).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: /tải tin nhắn cũ hơn/i }),
+    ).toBeVisible();
     fireEvent.click(
-      screen.getByRole("button", { name: /back to conversations/i }),
+      screen.getByRole("button", {
+        name: /quay lại danh sách cuộc trò chuyện/i,
+      }),
     );
     expect(onBack).toHaveBeenCalled();
+  });
+
+  it("guides a candidate without conversations to jobs and connections", () => {
+    render(
+      <MessageThread
+        locale="vi"
+        csrfProof="csrf"
+        error={null}
+        page={null}
+        hasConversations={false}
+        onBack={() => undefined}
+        onLoadOlder={() => undefined}
+        onBlockedChanged={() => undefined}
+      />,
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Chưa có cuộc trò chuyện nào" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: "Xem việc làm phù hợp" }),
+    ).toHaveAttribute("href", "/jobs");
+    expect(
+      screen.getByRole("link", { name: "Xem danh bạ kết nối" }),
+    ).toHaveAttribute("href", "/connections");
   });
 });
