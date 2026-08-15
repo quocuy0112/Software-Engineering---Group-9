@@ -1,5 +1,6 @@
 import "server-only";
 import { prisma } from "@/backend/database/prisma";
+import { notifyActionableAdministrators } from "@/backend/notifications/admin-notification-fanout";
 
 export type SecurityNotificationOpsAlert = {
   alertKey: string;
@@ -71,20 +72,34 @@ export async function alertSecurityNotificationDead(
     select: {
       id: true,
       kind: true,
+      targetUserId: true,
       deliveryDeadline: true,
       failureCategory: true,
     },
   });
   if (!work) return false;
-  const claimed = await prisma.securityNotificationWork.updateMany({
-    where: {
-      id: work.id,
-      status: "MANUAL_INTERVENTION_REQUIRED",
-      opsAlertedAt: null,
-    },
-    data: { opsAlertedAt: now },
+  const claimed = await prisma.$transaction(async (tx) => {
+    const updated = await tx.securityNotificationWork.updateMany({
+      where: {
+        id: work.id,
+        status: "MANUAL_INTERVENTION_REQUIRED",
+        opsAlertedAt: null,
+      },
+      data: { opsAlertedAt: now },
+    });
+    if (updated.count !== 1) return false;
+    await notifyActionableAdministrators(tx, {
+      kind: "DELIVERY_MANUAL_INTERVENTION_REQUIRED",
+      eventKey: `${work.id}:manual-intervention`,
+      correlationId: `delivery-intervention:${work.id}`,
+      occurredAt: now,
+      contextType: "ACCOUNT",
+      contextId: work.targetUserId,
+      state: "MANUAL_INTERVENTION_REQUIRED",
+    });
+    return true;
   });
-  if (claimed.count !== 1) return false;
+  if (!claimed) return false;
   const alert = {
     alertKey: `account-security-dead:${work.id}`,
     workReference: work.id,

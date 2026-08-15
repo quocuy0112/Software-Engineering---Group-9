@@ -9,6 +9,10 @@ const compatibilityMigration = readFileSync(
   "prisma/migrations/031_smarthire/migration.sql",
   "utf8",
 );
+const adminActionableMigration = readFileSync(
+  "prisma/migrations/035_actionable_admin_notifications/migration.sql",
+  "utf8",
+);
 
 describe("unified notification migration", () => {
   it("is additive, constrained, indexed, and idempotently backfills connections", () => {
@@ -40,6 +44,23 @@ describe("unified notification migration", () => {
     expect(compatibilityMigration).toContain("SELECT 1;");
     expect(compatibilityMigration).not.toMatch(
       /CREATE\s+(TYPE|TABLE)|ALTER\s+TABLE/iu,
+    );
+  });
+
+  it("adds only the allow-listed actionable administrator enum values", () => {
+    for (const kind of [
+      "SUPPORT_CASE_RECEIVED",
+      "SUPPORT_REQUESTER_REPLIED",
+      "SUPPORT_CASE_REOPENED",
+      "MESSAGE_REPORT_RECEIVED_ADMIN",
+      "MODERATION_REPORT_RECEIVED_ADMIN",
+      "VERIFICATION_REVIEW_OVERDUE",
+      "DELIVERY_MANUAL_INTERVENTION_REQUIRED",
+    ]) {
+      expect(adminActionableMigration).toContain(`'${kind}'`);
+    }
+    expect(adminActionableMigration).not.toMatch(
+      /DROP\s+(TABLE|TYPE|COLUMN)/iu,
     );
   });
 });

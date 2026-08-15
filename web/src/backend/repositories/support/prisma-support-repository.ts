@@ -14,6 +14,7 @@ import type {
 } from "@/shared/contracts/support";
 import { SupportError } from "@/backend/support/support-errors";
 import { createInAppNotification } from "@/backend/notifications/notification-service";
+import { notifyActionableAdministrators } from "@/backend/notifications/admin-notification-fanout";
 
 type SupportDb = typeof prisma | Prisma.TransactionClient;
 type SupportState =
@@ -236,6 +237,15 @@ export class PrismaSupportRepository {
       version: row.version,
       occurredAt: input.now,
     });
+    await notifyActionableAdministrators(this.db, {
+      kind: "SUPPORT_CASE_RECEIVED",
+      eventKey: `${row.id}:created:${row.version}`,
+      correlationId: input.clientOperationId,
+      occurredAt: input.now,
+      contextType: "SUPPORT_CASE",
+      contextId: row.id,
+      state: row.state,
+    });
     const detail = await this.detailRequester(row.id, input.userId);
     if (!detail) throw new SupportError("PERSISTENCE_UNAVAILABLE", 503, true);
     return {
@@ -347,6 +357,16 @@ export class PrismaSupportRepository {
       state: "WAITING_FOR_SUPPORT",
       version,
       occurredAt: input.now,
+    });
+    await notifyActionableAdministrators(this.db, {
+      kind: reopened ? "SUPPORT_CASE_REOPENED" : "SUPPORT_REQUESTER_REPLIED",
+      eventKey: `${row.id}:${reopened ? "reopened" : "requester-replied"}:${version}`,
+      correlationId: input.clientOperationId,
+      occurredAt: input.now,
+      contextType: "SUPPORT_CASE",
+      contextId: row.id,
+      preferredRecipientUserId: row.currentAssigneeUserId,
+      state: "WAITING_FOR_SUPPORT",
     });
     const detail = await this.detailRequester(row.id, input.userId);
     if (!detail) throw new SupportError("PERSISTENCE_UNAVAILABLE", 503, true);

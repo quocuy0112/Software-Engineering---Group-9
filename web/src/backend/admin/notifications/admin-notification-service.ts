@@ -3,6 +3,7 @@ import "server-only";
 import type { Prisma } from "@/backend/generated/prisma/client";
 import { prisma } from "@/backend/database/prisma";
 import { NotificationService } from "@/backend/notifications/notification-service";
+import { PrismaNotificationRepository } from "@/backend/repositories/notifications/prisma-notification-repository";
 import { renderNotificationCopy } from "@/backend/notifications/event-policy";
 import {
   notificationItemSchema,
@@ -46,7 +47,9 @@ const toItem = (row: NotificationRow): NotificationItem => {
 
 export class AdminNotificationService {
   constructor(
-    private readonly notifications = new NotificationService(),
+    private readonly notifications = new NotificationService(
+      new PrismaNotificationRepository(prisma, "ALL"),
+    ),
     private readonly now: () => Date = () => new Date(),
   ) {}
 

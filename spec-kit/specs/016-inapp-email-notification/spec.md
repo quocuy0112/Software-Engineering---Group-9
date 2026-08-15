@@ -1,12 +1,12 @@
 # Feature Specification: In-App Notification Center
 
-**Feature Branch**: `015-inapp-email-notification`
+**Feature Branch**: `016-inapp-email-notification`
 
 **Feature Directory**: `016-inapp-email-notification`
 
 **Created**: 2026-08-14
 
-**Status**: Implemented
+**Status**: Implemented - actionable administrator notification extension
 
 **Input**: Build a complete in-app notification center without changing existing email notification behavior. Every existing event-notification email must also be represented in-app, while in-app-only events do not have to send email. Action and proof emails remain private delivery mechanisms and are not copied into the notification center.
 
@@ -20,7 +20,7 @@
 - **Q: How long are user-visible in-app notifications retained?** → **A:** Ninety days from creation. Originating audit and workflow records keep their independent retention rules.
 - **Q: Which new emails are added by this feature?** → **A:** None by default. Feature 016 adds in-app coverage and may only add a new email if a separately identified critical off-app safety gap is proven during implementation and covered by an explicit requirement update.
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Receive Security and Account Events In-App (Priority: P1)
 
@@ -123,6 +123,25 @@ Operators can diagnose notification creation and delivery failures without expos
 2. **Given** notification persistence fails before a transaction commits, **When** the operation returns, **Then** the system does not report a successful notification and does not leave a partial notification record.
 3. **Given** a failed notification job is retried, **When** processing later succeeds, **Then** one notification is visible and operational logs identify the event without logging confidential payloads.
 
+---
+
+### User Story 7 - Receive Actionable Administrator Alerts (Priority: P1)
+
+Platform administrators receive recipient-isolated, actionable in-app alerts when a user creates work that requires administrator review or when an existing operational workflow reaches a state requiring manual intervention. Notification copy remains generic and never includes support content, report evidence, user contact details, private notes, privileged rationale, or protected verification evidence.
+
+**Why this priority**: Support, moderation, messaging-safety, verification availability, and failed security delivery are time-sensitive administrator queues. Requiring administrators to keep every queue open risks missed work, while broadcasting private case content would violate least privilege.
+
+**Independent Test**: Trigger each supported administrator event and verify exact active-recipient selection, assignment-aware routing, severity, safe generic copy, protected destination re-authorization, idempotency, and absence of restricted content.
+
+**Acceptance Scenarios**:
+
+1. **Given** a requester creates an unassigned support case, **When** the transaction commits, **Then** every currently active platform administrator receives one generic `SUPPORT_CASE_RECEIVED` notification linked only by the case reference.
+2. **Given** a requester replies to or reopens an assigned support case, **When** the transaction commits, **Then** only the active assigned administrator receives the corresponding alert; if the assignment is absent or no longer active, the alert falls back to active platform administrators.
+3. **Given** a user submits a new messaging or general moderation report, **When** the report transaction commits, **Then** active platform administrators receive one generic report-review alert without reporter detail, target detail, message content, evidence, or contact data.
+4. **Given** protected verification evidence remains unavailable for at least the existing 15-minute escalation threshold, **When** the deadline worker claims the escalation once, **Then** active platform administrators receive one high-severity verification attention alert.
+5. **Given** security-notification delivery reaches `MANUAL_INTERVENTION_REQUIRED`, **When** the existing operations alert is claimed, **Then** active platform administrators receive one critical in-app alert and the existing external operations alert behavior remains unchanged.
+6. **Given** a request, worker, or provider retries any supported event, **When** fan-out repeats, **Then** each intended administrator still owns at most one notification for that logical event.
+
 ### Edge Cases
 
 - A recipient account is deleted, suspended, or loses a company membership between event creation and notification retrieval.
@@ -138,7 +157,7 @@ Operators can diagnose notification creation and delivery failures without expos
 - A report contains restricted evidence; the reporter receives only status-safe content.
 - An event occurs before a recipient preference row exists; mandatory defaults must be applied safely.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -187,22 +206,30 @@ Operators can diagnose notification creation and delivery failures without expos
 - **FR-043**: Legacy professional-connection notification data MUST be migrated or safely bridged so users do not receive duplicate visible notifications for the same event.
 - **FR-044**: Existing recruitment notification work items MUST be consumed, bridged, or replaced without losing application submission, application received, or application stage-change events.
 - **FR-045**: The system MUST provide deterministic test coverage for event policy, recipient authorization, idempotency, preferences, pagination, read mutations, active-context clearing, secret exclusion, and email behavior preservation.
+- **FR-046**: New support cases MUST create `SUPPORT_CASE_RECEIVED` notifications for currently active platform administrators. Requester replies and reopened cases MUST target the active assigned administrator when one exists and otherwise fall back to currently active platform administrators.
+- **FR-047**: New messaging and general moderation reports MUST create generic administrator review notifications for currently active platform administrators without changing reporter receipts or introducing new email.
+- **FR-048**: A verification evidence-viewer outage that reaches the existing 15-minute escalation threshold MUST create one high-severity administrator notification per request escalation.
+- **FR-049**: A security-notification work item that reaches `MANUAL_INTERVENTION_REQUIRED` MUST create one critical administrator notification while preserving the existing operations webhook/log alert behavior.
+- **FR-050**: Administrator notification fan-out MUST include only grants in `ACTIVE` state whose user account is active and not deleted at the event time; assignment-aware support delivery MUST fall back safely when the assignee is not currently authorized.
+- **FR-051**: Actionable administrator notifications MUST contain only an allow-listed event kind, severity, generic localized copy, opaque resource reference, safe state, event time, and idempotency/correlation identity. They MUST NOT contain support subject or content, report detail or evidence, email, phone, business-license data, private notes, assignment reason, privileged rationale, or arbitrary user text.
+- **FR-052**: Administrator event creation MUST be transaction-compatible and idempotent per logical event and recipient. A replay MUST NOT create duplicates, and a notification failure inside an originating transaction MUST NOT leave a partial business write.
 
 ### Notification Channel Policy
 
-| Event family | In-app | Existing email | New email |
-|---|---:|---:|---:|
-| Security/account completed events | Mandatory | Preserve current behavior | None by default |
-| Verification workflow outcomes | Mandatory | Preserve current behavior | None by default |
-| Application stage changes | Mandatory | Preserve current preference behavior | None |
-| Application submitted/received | Mandatory | Not required | None |
-| Support workflow updates | Mandatory | Preserve current behavior | None |
-| Professional connections | Mandatory | Preserve current behavior | None |
-| New messages and report receipts | Mandatory | Not required | None |
-| Optional recommendations/reminders | Preference-controlled | Not required | Only through a separately approved requirement |
-| Verification, reset, recovery proof, and one-time-code delivery | Excluded | Preserve current behavior | None |
+| Event family                                                           |                In-app |                        Existing email |                                      New email |
+| ---------------------------------------------------------------------- | --------------------: | ------------------------------------: | ---------------------------------------------: |
+| Security/account completed events                                      |             Mandatory |             Preserve current behavior |                                None by default |
+| Verification workflow outcomes                                         |             Mandatory |             Preserve current behavior |                                None by default |
+| Application stage changes                                              |             Mandatory |  Preserve current preference behavior |                                           None |
+| Application submitted/received                                         |             Mandatory |                          Not required |                                           None |
+| Support workflow updates                                               |             Mandatory |             Preserve current behavior |                                           None |
+| Professional connections                                               |             Mandatory |             Preserve current behavior |                                           None |
+| New messages and report receipts                                       |             Mandatory |                          Not required |                                           None |
+| Actionable administrator support/report/verification/operations alerts |             Mandatory | Preserve existing operations behavior |                                           None |
+| Optional recommendations/reminders                                     | Preference-controlled |                          Not required | Only through a separately approved requirement |
+| Verification, reset, recovery proof, and one-time-code delivery        |              Excluded |             Preserve current behavior |                                           None |
 
-### Key Entities *(include if feature involves data)*
+### Key Entities _(include if feature involves data)_
 
 - **In-App Notification**: A safe, user-visible record of one event for one recipient, including category, severity, display copy, destination, context, read state, expiry, and idempotency identity.
 - **Notification Event Policy**: The allow-listed definition for an event kind, including severity, eligible channels, recipients, preference behavior, safe copy builder, context type, and destination rules.
@@ -210,7 +237,7 @@ Operators can diagnose notification creation and delivery failures without expos
 - **Recipient Preference**: A user's optional channel/category choices. Mandatory security and access notifications override optional suppression.
 - **Delivery Correlation**: A non-secret identity connecting one business event to its channel attempts for deduplication and diagnostics without coupling channel success.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 
@@ -227,7 +254,7 @@ Operators can diagnose notification creation and delivery failures without expos
 
 ## Assumptions
 
-- The user-created branch name remains `015-inapp-email-notification`; the specification directory uses sequential Feature 016 because Feature 015 is already assigned to candidate hybrid ranking.
+- The active implementation branch is `016-inapp-email-notification` and the specification directory uses the same Feature 016 identifier.
 - Existing authentication, authorization, application shells, localization, job, messaging, support, moderation, verification, connection, and email-outbox capabilities are extended rather than replaced.
 - Notification copy is a concise event summary, not a copy of an email body.
 - New email templates are out of scope unless implementation analysis finds a critical off-app safety event that has no existing email and cannot be adequately handled in-app; any such addition must not alter existing templates or delivery rules.

@@ -7,6 +7,7 @@ import {
   moderationPriority,
 } from "@/shared/contracts/admin/moderation";
 import { createInAppNotification } from "@/backend/notifications/notification-service";
+import { notifyActionableAdministrators } from "@/backend/notifications/admin-notification-fanout";
 const acknowledgement = "Thanks. Your concern was received for review.";
 type Actor = { userId: string; sessionId: string };
 function unavailable() {
@@ -125,6 +126,15 @@ export class ModerationSubmissionService {
           occurredAt: now,
           contextType: "MODERATION_REPORT",
           contextId: created.id,
+        });
+        await notifyActionableAdministrators(tx, {
+          kind: "MODERATION_REPORT_RECEIVED_ADMIN",
+          eventKey: `${created.id}:received`,
+          correlationId: created.id,
+          occurredAt: now,
+          contextType: "MODERATION_REPORT",
+          contextId: created.id,
+          state: "PENDING_REVIEW",
         });
         return created;
       });

@@ -128,6 +128,11 @@ enum InAppNotificationContextType {
   MODERATION_REPORT
 }
 
+enum InAppNotificationAudience {
+  USER
+  ADMIN
+}
+
 enum InAppNotificationKind {
   EMAIL_CHANGE_REQUESTED_ALERT
   PASSWORD_CHANGED
@@ -152,6 +157,9 @@ enum InAppNotificationKind {
   VERIFICATION_EXPIRED
   SUPPORT_WAITING_FOR_USER
   SUPPORT_RESOLVED
+  SUPPORT_CASE_RECEIVED
+  SUPPORT_REQUESTER_REPLIED
+  SUPPORT_CASE_REOPENED
   CONNECTION_PROPOSAL_CREATED
   CONNECTION_PROPOSAL_UPDATED
   CONNECTION_PROPOSAL_INACTIVE
@@ -161,9 +169,13 @@ enum InAppNotificationKind {
   MESSAGE_REPORT_RECEIVED
   MESSAGE_REPORT_RESOLVED
   MESSAGE_REPORT_DISMISSED
+  MESSAGE_REPORT_RECEIVED_ADMIN
   MODERATION_REPORT_RECEIVED
   MODERATION_REPORT_RESOLVED
   MODERATION_REPORT_DISMISSED
+  MODERATION_REPORT_RECEIVED_ADMIN
+  VERIFICATION_REVIEW_OVERDUE
+  DELIVERY_MANUAL_INTERVENTION_REQUIRED
 }
 
 enum PreferenceLanguage {
@@ -758,84 +770,84 @@ enum ImageSearchAdmissionSubject {
 }
 
 model UserAccount {
-  id                             String                                  @id
-  name                           String
-  email                          String                                  @unique
-  normalizedEmail                String                                  @unique
-  emailVerified                  Boolean                                 @default(false)
-  image                          String?
-  state                          AccountState                            @default(PENDING_VERIFICATION)
-  version                        Int                                     @default(1)
-  twoFactorEnabled               Boolean                                 @default(false)
-  stateChangedAt                 DateTime                                @default(now())
-  deletedAt                      DateTime?
-  createdAt                      DateTime                                @default(now())
-  updatedAt                      DateTime                                @updatedAt
-  accounts                       AuthProviderAccount[]
-  sessions                       Session[]
-  verifications                  Verification[]
-  twoFactor                      TwoFactor?
-  candidateIdentity              CandidateIdentity?
-  securityTokens                 SecurityToken[]
-  passwordResetOperations        PasswordResetOperation[]
-  fullAccountRecoveryOperations  FullAccountRecoveryOperation[]
-  challenges                     AuthenticationChallenge[]
-  outbox                         EmailOutbox[]
-  preferences                    AccountPreferences?
-  jobWorkspaceState              UserJobWorkspaceState?
-  emailChangeRequests            EmailChangeRequest[]
-  passwordChangeAttemptWindow    PasswordChangeAttemptWindow?
-  passwordChangeOperations       PasswordChangeOperation[]
-  savedJobs                      SavedJob[]
-  jobReports                     JobReport[]
-  cvQuota                        CvAccountQuota?
-  cvUploads                      CvUpload[]
-  cvStoredArtifacts              CvStoredArtifact[]
-  cvScanAssessments              CvScanAssessment[]
-  cvExtractions                  CvExtraction[]
-  cvParseJobs                    CvParseJob[]
-  cvRetryRequests                CvRetryRequest[]
-  cvDrafts                       CvDraft[]
-  cvConsentEvents                CvProcessingConsent[]
-  cvConfirmations                CvImportConfirmation[]
-  imageSearchQueries             SearchImageQuery[]
-  imageSearchConsents            SearchProcessingConsent[]
-  companyMemberships             CompanyMembership[]
-  platformAdministratorGrants    PlatformAdministratorGrant[]
-  recruiterVerificationRequests  RecruiterVerificationRequest[]
+  id                              String                                  @id
+  name                            String
+  email                           String                                  @unique
+  normalizedEmail                 String                                  @unique
+  emailVerified                   Boolean                                 @default(false)
+  image                           String?
+  state                           AccountState                            @default(PENDING_VERIFICATION)
+  version                         Int                                     @default(1)
+  twoFactorEnabled                Boolean                                 @default(false)
+  stateChangedAt                  DateTime                                @default(now())
+  deletedAt                       DateTime?
+  createdAt                       DateTime                                @default(now())
+  updatedAt                       DateTime                                @updatedAt
+  accounts                        AuthProviderAccount[]
+  sessions                        Session[]
+  verifications                   Verification[]
+  twoFactor                       TwoFactor?
+  candidateIdentity               CandidateIdentity?
+  securityTokens                  SecurityToken[]
+  passwordResetOperations         PasswordResetOperation[]
+  fullAccountRecoveryOperations   FullAccountRecoveryOperation[]
+  challenges                      AuthenticationChallenge[]
+  outbox                          EmailOutbox[]
+  preferences                     AccountPreferences?
+  jobWorkspaceState               UserJobWorkspaceState?
+  emailChangeRequests             EmailChangeRequest[]
+  passwordChangeAttemptWindow     PasswordChangeAttemptWindow?
+  passwordChangeOperations        PasswordChangeOperation[]
+  savedJobs                       SavedJob[]
+  jobReports                      JobReport[]
+  cvQuota                         CvAccountQuota?
+  cvUploads                       CvUpload[]
+  cvStoredArtifacts               CvStoredArtifact[]
+  cvScanAssessments               CvScanAssessment[]
+  cvExtractions                   CvExtraction[]
+  cvParseJobs                     CvParseJob[]
+  cvRetryRequests                 CvRetryRequest[]
+  cvDrafts                        CvDraft[]
+  cvConsentEvents                 CvProcessingConsent[]
+  cvConfirmations                 CvImportConfirmation[]
+  imageSearchQueries              SearchImageQuery[]
+  imageSearchConsents             SearchProcessingConsent[]
+  companyMemberships              CompanyMembership[]
+  platformAdministratorGrants     PlatformAdministratorGrant[]
+  recruiterVerificationRequests   RecruiterVerificationRequest[]
   employerVerificationPreparation EmployerVerificationPreparation?
-  businessRegistrySnapshots      BusinessRegistryLookupSnapshot[]
-  companyEmailChallenges         CompanyContactEmailChallenge[]
-  submittedModerationReports     ModerationReport[]                      @relation("ModerationReporter")
-  professionalConnectionsLow     ProfessionalConnection[]                @relation("ProfessionalConnectionLow")
-  professionalConnectionsHigh    ProfessionalConnection[]                @relation("ProfessionalConnectionHigh")
-  professionalConnectionsRevoked ProfessionalConnection[]                @relation("ProfessionalConnectionRevoker")
-  connectionProposalsLow         ProfessionalConnectionProposal[]        @relation("ConnectionProposalLow")
-  connectionProposalsHigh        ProfessionalConnectionProposal[]        @relation("ConnectionProposalHigh")
-  connectionProposalsCreated     ProfessionalConnectionProposal[]        @relation("ConnectionProposalCreator")
-  connectionProposalDecisions    ProfessionalConnectionDecision[]        @relation("ConnectionProposalDecisionParticipant")
-  connectionProposalHistory      ProfessionalConnectionProposalHistory[] @relation("ConnectionProposalHistoryActor")
-  connectionNotifications        ProfessionalConnectionNotification[]    @relation("ConnectionNotificationRecipient")
-  inAppNotifications             InAppNotification[]                     @relation("InAppNotificationRecipient")
-  connectionCommandReceipts      ProfessionalConnectionCommandReceipt[]  @relation("ConnectionCommandActor")
-  messagingConversationsLow      MessagingConversation[]                 @relation("MessagingConversationLow")
-  messagingConversationsHigh     MessagingConversation[]                 @relation("MessagingConversationHigh")
-  messagingParticipants          MessagingConversationParticipant[]
-  messagingMessages              MessagingMessage[]
-  messagingBlocksInitiated       UserMessagingBlock[]                    @relation("MessagingBlocker")
-  messagingBlocksReceived        UserMessagingBlock[]                    @relation("MessagingBlocked")
-  submittedMessagingReports      MessagingReport[]                       @relation("MessagingReporter")
-  targetedMessagingReports       MessagingReport[]                       @relation("MessagingTarget")
-  assignedMessagingReports       MessagingReport[]                       @relation("MessagingReportAssignee")
-  handledMessagingReports        MessagingReport[]                       @relation("MessagingReportHandler")
-  messagingReportReviewEvents    MessagingReportReviewEvent[]            @relation("MessagingReportReviewActor")
-  messagingReportPrivateNotes    MessagingReportPrivateNote[]            @relation("MessagingReportNoteAuthor")
-  supportConversationsRequested  SupportConversation[]                   @relation("SupportRequester")
-  supportConversationsAssigned   SupportConversation[]                   @relation("SupportCurrentAssignee")
-  supportMessages                SupportMessage[]
-  supportAssignmentsReceived     SupportAssignment[]                     @relation("SupportAssignmentAssignee")
-  supportAssignmentsMade         SupportAssignment[]                     @relation("SupportAssignmentActor")
-  supportInternalNotes           SupportInternalNote[]
+  businessRegistrySnapshots       BusinessRegistryLookupSnapshot[]
+  companyEmailChallenges          CompanyContactEmailChallenge[]
+  submittedModerationReports      ModerationReport[]                      @relation("ModerationReporter")
+  professionalConnectionsLow      ProfessionalConnection[]                @relation("ProfessionalConnectionLow")
+  professionalConnectionsHigh     ProfessionalConnection[]                @relation("ProfessionalConnectionHigh")
+  professionalConnectionsRevoked  ProfessionalConnection[]                @relation("ProfessionalConnectionRevoker")
+  connectionProposalsLow          ProfessionalConnectionProposal[]        @relation("ConnectionProposalLow")
+  connectionProposalsHigh         ProfessionalConnectionProposal[]        @relation("ConnectionProposalHigh")
+  connectionProposalsCreated      ProfessionalConnectionProposal[]        @relation("ConnectionProposalCreator")
+  connectionProposalDecisions     ProfessionalConnectionDecision[]        @relation("ConnectionProposalDecisionParticipant")
+  connectionProposalHistory       ProfessionalConnectionProposalHistory[] @relation("ConnectionProposalHistoryActor")
+  connectionNotifications         ProfessionalConnectionNotification[]    @relation("ConnectionNotificationRecipient")
+  inAppNotifications              InAppNotification[]                     @relation("InAppNotificationRecipient")
+  connectionCommandReceipts       ProfessionalConnectionCommandReceipt[]  @relation("ConnectionCommandActor")
+  messagingConversationsLow       MessagingConversation[]                 @relation("MessagingConversationLow")
+  messagingConversationsHigh      MessagingConversation[]                 @relation("MessagingConversationHigh")
+  messagingParticipants           MessagingConversationParticipant[]
+  messagingMessages               MessagingMessage[]
+  messagingBlocksInitiated        UserMessagingBlock[]                    @relation("MessagingBlocker")
+  messagingBlocksReceived         UserMessagingBlock[]                    @relation("MessagingBlocked")
+  submittedMessagingReports       MessagingReport[]                       @relation("MessagingReporter")
+  targetedMessagingReports        MessagingReport[]                       @relation("MessagingTarget")
+  assignedMessagingReports        MessagingReport[]                       @relation("MessagingReportAssignee")
+  handledMessagingReports         MessagingReport[]                       @relation("MessagingReportHandler")
+  messagingReportReviewEvents     MessagingReportReviewEvent[]            @relation("MessagingReportReviewActor")
+  messagingReportPrivateNotes     MessagingReportPrivateNote[]            @relation("MessagingReportNoteAuthor")
+  supportConversationsRequested   SupportConversation[]                   @relation("SupportRequester")
+  supportConversationsAssigned    SupportConversation[]                   @relation("SupportCurrentAssignee")
+  supportMessages                 SupportMessage[]
+  supportAssignmentsReceived      SupportAssignment[]                     @relation("SupportAssignmentAssignee")
+  supportAssignmentsMade          SupportAssignment[]                     @relation("SupportAssignmentActor")
+  supportInternalNotes            SupportInternalNote[]
 
   @@index([state, id])
   @@index([state, createdAt(sort: Desc), id])
@@ -1279,7 +1291,7 @@ model EmailOutbox {
   supportConversation              SupportConversation?            @relation(fields: [supportConversationId], references: [id], onDelete: SetNull)
   professionalConnectionProposal   ProfessionalConnectionProposal? @relation(fields: [professionalConnectionProposalId], references: [id], onDelete: SetNull)
   professionalConnection           ProfessionalConnection?         @relation(fields: [professionalConnectionId], references: [id], onDelete: SetNull)
-  companyEmailChallenge            CompanyContactEmailChallenge?    @relation("CompanyEmailChallengeOutbox", fields: [companyEmailChallengeId], references: [id], onDelete: SetNull)
+  companyEmailChallenge            CompanyContactEmailChallenge?   @relation("CompanyEmailChallengeOutbox", fields: [companyEmailChallengeId], references: [id], onDelete: SetNull)
   securityNotificationWork         SecurityNotificationWork?
   verificationNotificationEvent    VerificationNotificationEvent?
 
@@ -1293,29 +1305,31 @@ model EmailOutbox {
 }
 
 model InAppNotification {
-  id                 String                       @id @default(cuid())
-  recipientUserId    String
-  kind               InAppNotificationKind
-  category           InAppNotificationCategory
-  severity           InAppNotificationSeverity
-  title              String                       @db.VarChar(120)
-  summary            String                       @db.VarChar(500)
-  variables          Json?
-  href               String?                      @db.VarChar(500)
-  contextType        InAppNotificationContextType?
-  contextId          String?                      @db.VarChar(128)
-  deduplicationKey   String                       @unique @db.VarChar(255)
-  correlationId      String                       @db.VarChar(128)
-  occurrenceCount    Int                          @default(1)
-  readAt             DateTime?
-  expiresAt          DateTime
-  createdAt          DateTime                     @default(now())
-  lastOccurredAt     DateTime                     @default(now())
-  updatedAt          DateTime                     @updatedAt
-  recipient          UserAccount                  @relation("InAppNotificationRecipient", fields: [recipientUserId], references: [id], onDelete: Cascade)
+  id               String                        @id @default(cuid())
+  recipientUserId  String
+  kind             InAppNotificationKind
+  category         InAppNotificationCategory
+  severity         InAppNotificationSeverity
+  audience         InAppNotificationAudience     @default(USER)
+  title            String                        @db.VarChar(120)
+  summary          String                        @db.VarChar(500)
+  variables        Json?
+  href             String?                       @db.VarChar(500)
+  contextType      InAppNotificationContextType?
+  contextId        String?                       @db.VarChar(128)
+  deduplicationKey String                        @unique @db.VarChar(255)
+  correlationId    String                        @db.VarChar(128)
+  occurrenceCount  Int                           @default(1)
+  readAt           DateTime?
+  expiresAt        DateTime
+  createdAt        DateTime                      @default(now())
+  lastOccurredAt   DateTime                      @default(now())
+  updatedAt        DateTime                      @updatedAt
+  recipient        UserAccount                   @relation("InAppNotificationRecipient", fields: [recipientUserId], references: [id], onDelete: Cascade)
 
   @@index([recipientUserId, lastOccurredAt(sort: Desc), id(sort: Desc)])
   @@index([recipientUserId, readAt, expiresAt])
+  @@index([recipientUserId, audience, readAt, expiresAt])
   @@index([recipientUserId, contextType, contextId, readAt], map: "InAppNotification_recipientUserId_contextType_contextId_readAt_")
   @@index([expiresAt, id])
 }
@@ -1460,18 +1474,18 @@ model CompanyAccessPrerequisite {
 }
 
 model RecruiterVerificationRequest {
-  id                       String                        @id @default(cuid())
-  submissionIdempotencyKey String?                       @unique
+  id                       String                          @id @default(cuid())
+  submissionIdempotencyKey String?                         @unique
   applicantUserId          String
   submittedCompanyName     String
   normalizedTaxIdentifier  String
   targetCompanyId          String?
   requestedRole            CompanyMembershipRole
   prerequisiteId           String?
-  state                    RecruiterVerificationState    @default(PENDING_CHECKS)
+  state                    RecruiterVerificationState      @default(PENDING_CHECKS)
   currentEvidenceId        String?
-  currentSubmissionVersion Int                           @default(1)
-  resubmissionCount        Int                           @default(0)
+  currentSubmissionVersion Int                             @default(1)
+  resubmissionCount        Int                             @default(0)
   assignedAdminUserId      String?
   changesRequestedAt       DateTime?
   delayedAt                DateTime?
@@ -1481,11 +1495,11 @@ model RecruiterVerificationRequest {
   viewerUnavailableSince   DateTime?
   viewerEscalatedAt        DateTime?
   viewerDelayNotifiedAt    DateTime?
-  version                  Int                           @default(1)
-  createdAt                DateTime                      @default(now())
-  updatedAt                DateTime                      @updatedAt
-  applicant                UserAccount                   @relation(fields: [applicantUserId], references: [id], onDelete: Restrict)
-  targetCompany            Company?                      @relation(fields: [targetCompanyId], references: [id], onDelete: Restrict)
+  version                  Int                             @default(1)
+  createdAt                DateTime                        @default(now())
+  updatedAt                DateTime                        @updatedAt
+  applicant                UserAccount                     @relation(fields: [applicantUserId], references: [id], onDelete: Restrict)
+  targetCompany            Company?                        @relation(fields: [targetCompanyId], references: [id], onDelete: Restrict)
   evidence                 BusinessLicenseEvidence[]
   safetyAttempts           VerificationSafetyAttempt[]
   decisions                VerificationDecisionHistory[]
@@ -1516,7 +1530,7 @@ model VerificationNotificationEvent {
   inAppNotificationRef  String?                               @unique
   createdAt             DateTime                              @default(now())
   updatedAt             DateTime                              @updatedAt
-  request               RecruiterVerificationRequest           @relation(fields: [verificationRequestId], references: [id], onDelete: Cascade)
+  request               RecruiterVerificationRequest          @relation(fields: [verificationRequestId], references: [id], onDelete: Cascade)
   emailOutbox           EmailOutbox?                          @relation(fields: [emailOutboxId], references: [id], onDelete: SetNull)
 
   @@index([verificationRequestId, eventKind])
@@ -1552,33 +1566,33 @@ model EmployerVerificationPreparation {
 }
 
 model BusinessRegistryLookupSnapshot {
-  id                           String                         @id @default(cuid())
-  applicantUserId              String
-  normalizedTaxIdentifier      String
-  providerKey                  String
-  outcome                      BusinessRegistryLookupOutcome
-  registryLegalName            String?
-  registryInternationalName    String?
-  registryShortName            String?
-  registryRegisteredAddress    String?
-  registryEstablishedAt        DateTime?
-  registryLegalStatus          String?
-  registryEntityType           String?
-  registryRepresentativeName   String?
-  responseDigest               String
-  checkedAt                    DateTime
-  expiresAt                    DateTime
-  acceptedRequestId            String?                        @unique
-  acceptedAt                   DateTime?
-  inaccessibleAt               DateTime?
-  deleteAfter                  DateTime?
-  deletedAt                    DateTime?
-  createdAt                    DateTime                       @default(now())
-  applicant                    UserAccount                    @relation(fields: [applicantUserId], references: [id], onDelete: Restrict)
-  currentPreparation           EmployerVerificationPreparation? @relation("CurrentPreparationSnapshot")
-  emailChallenges              CompanyContactEmailChallenge[]
-  acceptedRequest              RecruiterVerificationRequest?  @relation("AcceptedRegistrySnapshot", fields: [acceptedRequestId], references: [id], onDelete: SetNull)
-  businessFacts                VerificationBusinessFacts?
+  id                         String                           @id @default(cuid())
+  applicantUserId            String
+  normalizedTaxIdentifier    String
+  providerKey                String
+  outcome                    BusinessRegistryLookupOutcome
+  registryLegalName          String?
+  registryInternationalName  String?
+  registryShortName          String?
+  registryRegisteredAddress  String?
+  registryEstablishedAt      DateTime?
+  registryLegalStatus        String?
+  registryEntityType         String?
+  registryRepresentativeName String?
+  responseDigest             String
+  checkedAt                  DateTime
+  expiresAt                  DateTime
+  acceptedRequestId          String?                          @unique
+  acceptedAt                 DateTime?
+  inaccessibleAt             DateTime?
+  deleteAfter                DateTime?
+  deletedAt                  DateTime?
+  createdAt                  DateTime                         @default(now())
+  applicant                  UserAccount                      @relation(fields: [applicantUserId], references: [id], onDelete: Restrict)
+  currentPreparation         EmployerVerificationPreparation? @relation("CurrentPreparationSnapshot")
+  emailChallenges            CompanyContactEmailChallenge[]
+  acceptedRequest            RecruiterVerificationRequest?    @relation("AcceptedRegistrySnapshot", fields: [acceptedRequestId], references: [id], onDelete: SetNull)
+  businessFacts              VerificationBusinessFacts?
 
   @@index([applicantUserId, normalizedTaxIdentifier, expiresAt])
   @@index([expiresAt, acceptedRequestId, inaccessibleAt])
@@ -1586,26 +1600,26 @@ model BusinessRegistryLookupSnapshot {
 }
 
 model CompanyContactEmailChallenge {
-  id                         String                     @id @default(cuid())
-  applicantUserId            String
-  lookupSnapshotId           String
-  normalizedTaxIdentifier    String
-  normalizedEmail            String?
-  emailDigest                String
-  tokenDigest                String?                    @unique
-  state                      CompanyEmailChallengeState @default(PENDING)
-  expiresAt                  DateTime
-  verifiedAt                 DateTime?
-  consumedAt                 DateTime?
-  supersededAt               DateTime?
-  sensitiveInaccessibleAt    DateTime?
-  sensitiveDeleteAfter       DateTime?
-  metadataDeleteAfter        DateTime
-  createdAt                  DateTime                    @default(now())
-  updatedAt                  DateTime                    @updatedAt
-  applicant                  UserAccount                 @relation(fields: [applicantUserId], references: [id], onDelete: Cascade)
-  lookupSnapshot             BusinessRegistryLookupSnapshot @relation(fields: [lookupSnapshotId], references: [id], onDelete: Cascade)
-  outbox                     EmailOutbox[]               @relation("CompanyEmailChallengeOutbox")
+  id                      String                         @id @default(cuid())
+  applicantUserId         String
+  lookupSnapshotId        String
+  normalizedTaxIdentifier String
+  normalizedEmail         String?
+  emailDigest             String
+  tokenDigest             String?                        @unique
+  state                   CompanyEmailChallengeState     @default(PENDING)
+  expiresAt               DateTime
+  verifiedAt              DateTime?
+  consumedAt              DateTime?
+  supersededAt            DateTime?
+  sensitiveInaccessibleAt DateTime?
+  sensitiveDeleteAfter    DateTime?
+  metadataDeleteAfter     DateTime
+  createdAt               DateTime                       @default(now())
+  updatedAt               DateTime                       @updatedAt
+  applicant               UserAccount                    @relation(fields: [applicantUserId], references: [id], onDelete: Cascade)
+  lookupSnapshot          BusinessRegistryLookupSnapshot @relation(fields: [lookupSnapshotId], references: [id], onDelete: Cascade)
+  outbox                  EmailOutbox[]                  @relation("CompanyEmailChallengeOutbox")
 
   @@index([applicantUserId, lookupSnapshotId, state])
   @@index([expiresAt, state])
@@ -1614,32 +1628,32 @@ model CompanyContactEmailChallenge {
 }
 
 model VerificationBusinessFacts {
-  requestId                       String                        @id
-  lookupSnapshotId                String                        @unique
-  applicantLegalName              String
-  applicantRegisteredAddress      String
-  operatingAddress                String?
-  companyEmail                    String
-  companyEmailVerifiedAt          DateTime
-  companyEmailFreeProvider        Boolean
-  companyEmailWebsiteDomainMatch  Boolean?
-  emailSignalVersion              String
-  companyPhoneE164                String
-  companyPhoneVerified            Boolean                       @default(false)
-  websiteOrigin                   String?
-  relationship                    EmployerApplicantRelationship
-  currentJobTitle                 String
-  authorityExplanation            String?
-  legalNameDiffers                Boolean
-  registeredAddressDiffers        Boolean
-  mismatchExplanation             String?
-  accuracyDeclaredAt              DateTime
-  documentConsentAt               DateTime
-  policyVersion                   String
-  normalizationVersion            String
-  createdAt                       DateTime                       @default(now())
-  request                         RecruiterVerificationRequest  @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  lookupSnapshot                  BusinessRegistryLookupSnapshot @relation(fields: [lookupSnapshotId], references: [id], onDelete: Restrict)
+  requestId                      String                         @id
+  lookupSnapshotId               String                         @unique
+  applicantLegalName             String
+  applicantRegisteredAddress     String
+  operatingAddress               String?
+  companyEmail                   String
+  companyEmailVerifiedAt         DateTime
+  companyEmailFreeProvider       Boolean
+  companyEmailWebsiteDomainMatch Boolean?
+  emailSignalVersion             String
+  companyPhoneE164               String
+  companyPhoneVerified           Boolean                        @default(false)
+  websiteOrigin                  String?
+  relationship                   EmployerApplicantRelationship
+  currentJobTitle                String
+  authorityExplanation           String?
+  legalNameDiffers               Boolean
+  registeredAddressDiffers       Boolean
+  mismatchExplanation            String?
+  accuracyDeclaredAt             DateTime
+  documentConsentAt              DateTime
+  policyVersion                  String
+  normalizationVersion           String
+  createdAt                      DateTime                       @default(now())
+  request                        RecruiterVerificationRequest   @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  lookupSnapshot                 BusinessRegistryLookupSnapshot @relation(fields: [lookupSnapshotId], references: [id], onDelete: Restrict)
 }
 
 model BusinessLicenseEvidence {
@@ -2383,7 +2397,7 @@ model MessagingReportPrivateNote {
   normalizedText    String          @db.VarChar(2000)
   createdAt         DateTime        @default(now())
   report            MessagingReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
-  authorAdmin       UserAccount      @relation("MessagingReportNoteAuthor", fields: [authorAdminUserId], references: [id], onDelete: Restrict)
+  authorAdmin       UserAccount     @relation("MessagingReportNoteAuthor", fields: [authorAdminUserId], references: [id], onDelete: Restrict)
 
   @@index([reportId, createdAt, id])
 }
