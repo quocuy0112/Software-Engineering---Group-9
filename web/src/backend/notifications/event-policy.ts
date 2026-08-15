@@ -11,7 +11,7 @@ import { notificationKindSchema } from "@/shared/contracts/notifications";
 export const notificationVariablesSchema = z
   .object({
     companyName: z.string().trim().min(1).max(120).optional(),
-    audience: z.enum(["ADMIN"]).optional(),
+    audience: z.enum(["USER", "ADMIN"]).optional(),
     stage: z.string().trim().min(1).max(64).optional(),
     state: z.string().trim().min(1).max(64).optional(),
     count: z.number().int().min(1).max(999).optional(),
@@ -463,6 +463,33 @@ const policies = {
       "A security notification could not be delivered and requires administrator intervention.",
     ),
   },
+  JOB_POST_REVIEW_REQUESTED_ADMIN: {
+    category: "MODERATION",
+    severity: "MEDIUM",
+    title: { vi: "Bài đăng cần xem xét", en: "Job post awaiting review" },
+    summary: generic(
+      "Một bài đăng tuyển dụng mới đang chờ quản trị viên xem xét.",
+      "A new job post is awaiting administrator review.",
+    ),
+  },
+  JOB_POST_APPROVED: {
+    category: "MODERATION",
+    severity: "LOW",
+    title: { vi: "Bài đăng đã được duyệt", en: "Job post approved" },
+    summary: generic(
+      "Bài đăng tuyển dụng của bạn đã được duyệt.",
+      "Your job post has been approved.",
+    ),
+  },
+  JOB_POST_REJECTED: {
+    category: "MODERATION",
+    severity: "MEDIUM",
+    title: { vi: "Bài đăng cần chỉnh sửa", en: "Job post needs revision" },
+    summary: generic(
+      "Bài đăng tuyển dụng của bạn cần được chỉnh sửa trước khi gửi lại.",
+      "Your job post needs revision before it can be submitted again.",
+    ),
+  },
 } satisfies Record<NotificationKind, Policy>;
 
 const hrefForContext = (
@@ -484,6 +511,10 @@ const hrefForContext = (
     return "/connections";
   if (contextType === "CONVERSATION")
     return `/messages?conversation=${encodeURIComponent(contextId)}`;
+  if (contextType === "JOB_POST_REVIEW")
+    return kind === "JOB_POST_REVIEW_REQUESTED_ADMIN"
+      ? `/admin/job-post-reviews/${encodeURIComponent(contextId)}`
+      : `/recruiter/job-postings?review=${encodeURIComponent(contextId)}`;
   return null;
 };
 

@@ -287,6 +287,31 @@ export type ModerationPrivateNote = Prisma.ModerationPrivateNoteModel
  */
 export type JobPosting = Prisma.JobPostingModel
 /**
+ * Model JobPostReviewAggregate
+ * 
+ */
+export type JobPostReviewAggregate = Prisma.JobPostReviewAggregateModel
+/**
+ * Model JobPostReviewVersion
+ * 
+ */
+export type JobPostReviewVersion = Prisma.JobPostReviewVersionModel
+/**
+ * Model JobPostReviewHistory
+ * 
+ */
+export type JobPostReviewHistory = Prisma.JobPostReviewHistoryModel
+/**
+ * Model JobPostReviewPrivateNote
+ * 
+ */
+export type JobPostReviewPrivateNote = Prisma.JobPostReviewPrivateNoteModel
+/**
+ * Model JobCatalogueWriteLease
+ * 
+ */
+export type JobCatalogueWriteLease = Prisma.JobCatalogueWriteLeaseModel
+/**
  * Model JobPostingSkill
  * 
  */

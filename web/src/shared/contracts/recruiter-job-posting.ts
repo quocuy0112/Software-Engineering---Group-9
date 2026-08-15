@@ -6,11 +6,40 @@ import {
   type JobCatalogItem,
   type JobPostingStatus,
 } from "./jobs/catalog";
+import { z } from "zod";
 
 export { companyCatalogSchema, jobCatalogSchema, jobPostingStatusSchema };
 export type { CompanyCatalogItem, JobCatalogItem, JobPostingStatus };
 
 export type RecruiterJobStatus = JobPostingStatus;
+
+const serverOwnedJobFields = {
+  status: true,
+  approvalComment: true,
+  isVerified: true,
+  postedAt: true,
+  updatedAt: true,
+  stats: true,
+} as const;
+
+/** Immutable, normalized content captured by the server at submission time. */
+export const jobReviewSnapshotSchema = jobCatalogSchema
+  .omit(serverOwnedJobFields)
+  .strict();
+
+/** Fields a Recruiter may author. Identity and lifecycle facts are server-derived. */
+export const recruiterJobReviewInputSchema = jobReviewSnapshotSchema
+  .omit({ id: true, slug: true, companyId: true })
+  .strict();
+
+export const submitJobReviewCommandSchema = z
+  .object({ expectedWorkingUpdatedAt: z.string().datetime() })
+  .strict();
+
+export type JobReviewSnapshot = z.infer<typeof jobReviewSnapshotSchema>;
+export type RecruiterJobReviewInput = z.infer<
+  typeof recruiterJobReviewInputSchema
+>;
 
 export const recruiterJobStatusMeta: Record<
   RecruiterJobStatus,
@@ -63,7 +92,9 @@ export type RecruiterJobManagementData = {
   companies: RecruiterCompanyView[];
   companyId: string | null;
   companyProfileComplete?: boolean;
-  missingCompanyProfileFields?: Array<"name" | "industry" | "size" | "address" | "logo">;
+  missingCompanyProfileFields?: Array<
+    "name" | "industry" | "size" | "address" | "logo"
+  >;
 };
 
 export type RecruiterJobFieldErrors = Record<string, string>;
@@ -79,7 +110,10 @@ export function parseVndInput(value: string): number {
   const normalized = value.trim().toLowerCase();
   if (!normalized) return 0;
 
-  const hasMillionSuffix = /(?:tr|trieu|triÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡u|m)\s*$/iu.test(normalized);
+  const hasMillionSuffix =
+    /(?:tr|trieu|triÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡u|m)\s*$/iu.test(
+      normalized,
+    );
   if (hasMillionSuffix) {
     const numericPart = normalized
       .replace(/(?:tr|trieu|triÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡u|m)\s*$/iu, "")

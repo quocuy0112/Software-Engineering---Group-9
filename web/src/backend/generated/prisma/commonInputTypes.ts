@@ -1170,6 +1170,74 @@ export type EnumJobPostingStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumJobPostingStatusFilter<$PrismaModel>
 }
 
+export type EnumJobPostReviewStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobPostReviewState | Prisma.EnumJobPostReviewStateFieldRefInput<$PrismaModel>
+  in?: $Enums.JobPostReviewState[] | Prisma.ListEnumJobPostReviewStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JobPostReviewState[] | Prisma.ListEnumJobPostReviewStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJobPostReviewStateFilter<$PrismaModel> | $Enums.JobPostReviewState
+}
+
+export type EnumJobPostReviewReasonCodeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobPostReviewReasonCode | Prisma.EnumJobPostReviewReasonCodeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.JobPostReviewReasonCode[] | Prisma.ListEnumJobPostReviewReasonCodeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.JobPostReviewReasonCode[] | Prisma.ListEnumJobPostReviewReasonCodeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumJobPostReviewReasonCodeNullableFilter<$PrismaModel> | $Enums.JobPostReviewReasonCode | null
+}
+
+export type EnumJobPostReviewStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobPostReviewState | Prisma.EnumJobPostReviewStateFieldRefInput<$PrismaModel>
+  in?: $Enums.JobPostReviewState[] | Prisma.ListEnumJobPostReviewStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JobPostReviewState[] | Prisma.ListEnumJobPostReviewStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJobPostReviewStateWithAggregatesFilter<$PrismaModel> | $Enums.JobPostReviewState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJobPostReviewStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJobPostReviewStateFilter<$PrismaModel>
+}
+
+export type EnumJobPostReviewReasonCodeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobPostReviewReasonCode | Prisma.EnumJobPostReviewReasonCodeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.JobPostReviewReasonCode[] | Prisma.ListEnumJobPostReviewReasonCodeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.JobPostReviewReasonCode[] | Prisma.ListEnumJobPostReviewReasonCodeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumJobPostReviewReasonCodeNullableWithAggregatesFilter<$PrismaModel> | $Enums.JobPostReviewReasonCode | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJobPostReviewReasonCodeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJobPostReviewReasonCodeNullableFilter<$PrismaModel>
+}
+
+export type EnumJobPostReviewHistoryActionFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobPostReviewHistoryAction | Prisma.EnumJobPostReviewHistoryActionFieldRefInput<$PrismaModel>
+  in?: $Enums.JobPostReviewHistoryAction[] | Prisma.ListEnumJobPostReviewHistoryActionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JobPostReviewHistoryAction[] | Prisma.ListEnumJobPostReviewHistoryActionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJobPostReviewHistoryActionFilter<$PrismaModel> | $Enums.JobPostReviewHistoryAction
+}
+
+export type EnumJobPostReviewStateNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobPostReviewState | Prisma.EnumJobPostReviewStateFieldRefInput<$PrismaModel> | null
+  in?: $Enums.JobPostReviewState[] | Prisma.ListEnumJobPostReviewStateFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.JobPostReviewState[] | Prisma.ListEnumJobPostReviewStateFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumJobPostReviewStateNullableFilter<$PrismaModel> | $Enums.JobPostReviewState | null
+}
+
+export type EnumJobPostReviewHistoryActionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobPostReviewHistoryAction | Prisma.EnumJobPostReviewHistoryActionFieldRefInput<$PrismaModel>
+  in?: $Enums.JobPostReviewHistoryAction[] | Prisma.ListEnumJobPostReviewHistoryActionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JobPostReviewHistoryAction[] | Prisma.ListEnumJobPostReviewHistoryActionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJobPostReviewHistoryActionWithAggregatesFilter<$PrismaModel> | $Enums.JobPostReviewHistoryAction
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJobPostReviewHistoryActionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJobPostReviewHistoryActionFilter<$PrismaModel>
+}
+
+export type EnumJobPostReviewStateNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobPostReviewState | Prisma.EnumJobPostReviewStateFieldRefInput<$PrismaModel> | null
+  in?: $Enums.JobPostReviewState[] | Prisma.ListEnumJobPostReviewStateFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.JobPostReviewState[] | Prisma.ListEnumJobPostReviewStateFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumJobPostReviewStateNullableWithAggregatesFilter<$PrismaModel> | $Enums.JobPostReviewState | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJobPostReviewStateNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJobPostReviewStateNullableFilter<$PrismaModel>
+}
+
 export type EnumApplicationQuestionKindFilter<$PrismaModel = never> = {
   equals?: $Enums.ApplicationQuestionKind | Prisma.EnumApplicationQuestionKindFieldRefInput<$PrismaModel>
   in?: $Enums.ApplicationQuestionKind[] | Prisma.ListEnumApplicationQuestionKindFieldRefInput<$PrismaModel>
@@ -3201,6 +3269,74 @@ export type NestedEnumJobPostingStatusWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumJobPostingStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumJobPostingStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumJobPostReviewStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobPostReviewState | Prisma.EnumJobPostReviewStateFieldRefInput<$PrismaModel>
+  in?: $Enums.JobPostReviewState[] | Prisma.ListEnumJobPostReviewStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JobPostReviewState[] | Prisma.ListEnumJobPostReviewStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJobPostReviewStateFilter<$PrismaModel> | $Enums.JobPostReviewState
+}
+
+export type NestedEnumJobPostReviewReasonCodeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobPostReviewReasonCode | Prisma.EnumJobPostReviewReasonCodeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.JobPostReviewReasonCode[] | Prisma.ListEnumJobPostReviewReasonCodeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.JobPostReviewReasonCode[] | Prisma.ListEnumJobPostReviewReasonCodeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumJobPostReviewReasonCodeNullableFilter<$PrismaModel> | $Enums.JobPostReviewReasonCode | null
+}
+
+export type NestedEnumJobPostReviewStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobPostReviewState | Prisma.EnumJobPostReviewStateFieldRefInput<$PrismaModel>
+  in?: $Enums.JobPostReviewState[] | Prisma.ListEnumJobPostReviewStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JobPostReviewState[] | Prisma.ListEnumJobPostReviewStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJobPostReviewStateWithAggregatesFilter<$PrismaModel> | $Enums.JobPostReviewState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJobPostReviewStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJobPostReviewStateFilter<$PrismaModel>
+}
+
+export type NestedEnumJobPostReviewReasonCodeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobPostReviewReasonCode | Prisma.EnumJobPostReviewReasonCodeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.JobPostReviewReasonCode[] | Prisma.ListEnumJobPostReviewReasonCodeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.JobPostReviewReasonCode[] | Prisma.ListEnumJobPostReviewReasonCodeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumJobPostReviewReasonCodeNullableWithAggregatesFilter<$PrismaModel> | $Enums.JobPostReviewReasonCode | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJobPostReviewReasonCodeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJobPostReviewReasonCodeNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumJobPostReviewHistoryActionFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobPostReviewHistoryAction | Prisma.EnumJobPostReviewHistoryActionFieldRefInput<$PrismaModel>
+  in?: $Enums.JobPostReviewHistoryAction[] | Prisma.ListEnumJobPostReviewHistoryActionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JobPostReviewHistoryAction[] | Prisma.ListEnumJobPostReviewHistoryActionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJobPostReviewHistoryActionFilter<$PrismaModel> | $Enums.JobPostReviewHistoryAction
+}
+
+export type NestedEnumJobPostReviewStateNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobPostReviewState | Prisma.EnumJobPostReviewStateFieldRefInput<$PrismaModel> | null
+  in?: $Enums.JobPostReviewState[] | Prisma.ListEnumJobPostReviewStateFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.JobPostReviewState[] | Prisma.ListEnumJobPostReviewStateFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumJobPostReviewStateNullableFilter<$PrismaModel> | $Enums.JobPostReviewState | null
+}
+
+export type NestedEnumJobPostReviewHistoryActionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobPostReviewHistoryAction | Prisma.EnumJobPostReviewHistoryActionFieldRefInput<$PrismaModel>
+  in?: $Enums.JobPostReviewHistoryAction[] | Prisma.ListEnumJobPostReviewHistoryActionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JobPostReviewHistoryAction[] | Prisma.ListEnumJobPostReviewHistoryActionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJobPostReviewHistoryActionWithAggregatesFilter<$PrismaModel> | $Enums.JobPostReviewHistoryAction
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJobPostReviewHistoryActionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJobPostReviewHistoryActionFilter<$PrismaModel>
+}
+
+export type NestedEnumJobPostReviewStateNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JobPostReviewState | Prisma.EnumJobPostReviewStateFieldRefInput<$PrismaModel> | null
+  in?: $Enums.JobPostReviewState[] | Prisma.ListEnumJobPostReviewStateFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.JobPostReviewState[] | Prisma.ListEnumJobPostReviewStateFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumJobPostReviewStateNullableWithAggregatesFilter<$PrismaModel> | $Enums.JobPostReviewState | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJobPostReviewStateNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJobPostReviewStateNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumApplicationQuestionKindFilter<$PrismaModel = never> = {

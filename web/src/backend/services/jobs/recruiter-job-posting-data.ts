@@ -1,10 +1,9 @@
 import "server-only";
 
 import { randomUUID } from "node:crypto";
-import { readFile, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
 import { z } from "zod";
 import { prisma } from "@/backend/database/prisma";
+import { configuredJsonJobCatalogueRepository } from "@/backend/repositories/jobs/job-catalogue-repository-factory";
 import {
   companyCatalogSchema,
   recruiterCompanySettingsInputSchema,
@@ -21,10 +20,11 @@ import type {
   RecruiterJobManagementData,
 } from "@/shared/contracts/recruiter-job-posting";
 
-const dataPath = (name: string) => resolve(process.cwd(), "data", "jobs", name);
-const jobsPath = dataPath("jobs.json");
-const companiesPath = dataPath("companies.json");
-const applicationsPath = dataPath("applications.json");
+const jobsRepository = configuredJsonJobCatalogueRepository("jobs.json");
+const companiesRepository =
+  configuredJsonJobCatalogueRepository("companies.json");
+const applicationsRepository =
+  configuredJsonJobCatalogueRepository("applications.json");
 const MAX_COMPANY_LOGO_BYTES = 800 * 1024;
 type CompanyProfileField =
   RecruiterCompanySettings["missingProfileFields"][number];
@@ -145,14 +145,6 @@ function withWriteLock<T>(operation: () => Promise<T>) {
     () => undefined,
   );
   return next;
-}
-
-async function readJson(path: string) {
-  return JSON.parse(await readFile(path, "utf8")) as unknown;
-}
-
-async function writeJson(path: string, value: unknown) {
-  await writeFile(path, JSON.stringify(value, null, 2) + "\n", "utf8");
 }
 
 function normalizedStatus(value: string): JobPostingStatus {
@@ -306,8 +298,8 @@ async function authorizedCompanies(
 
 async function readCatalog() {
   const [jobsValue, companiesValue] = await Promise.all([
-    readJson(jobsPath),
-    readJson(companiesPath),
+    jobsRepository.read(),
+    companiesRepository.read(),
   ]);
   const rawJobs = z.array(z.unknown()).parse(jobsValue);
   const rawCompanies = z.array(z.unknown()).parse(companiesValue);
@@ -358,7 +350,7 @@ function replaceOrAppendRawCompany(
 
 async function readApplications(): Promise<JobApplicationRecord[]> {
   try {
-    const value = await readJson(applicationsPath);
+    const value = await applicationsRepository.read();
     return z.array(applicationSchema).parse(value);
   } catch {
     return [];
@@ -458,7 +450,7 @@ export async function createRecruiterJob(
       throw new Error("Company profile is incomplete.");
     }
     const job = jobFromCommand(raw, company.id, status, now);
-    await writeJson(jobsPath, [...rawJobs, job]);
+    await jobsRepository.mutate(() => [...rawJobs, job]);
     return { ...job, company } satisfies RecruiterJob;
   });
 }
@@ -503,7 +495,7 @@ export async function updateRecruiterJob(userId: string, raw: unknown) {
         applicantCount: current.stats.applicantCount,
       },
     });
-    await writeJson(jobsPath, replaceRawJob(rawJobs, updated));
+    await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
     return { ...updated, company } satisfies RecruiterJob;
   });
 }
@@ -527,7 +519,7 @@ export async function closeRecruiterJob(userId: string, jobId: string) {
       status: "closed",
       updatedAt: new Date().toISOString(),
     });
-    await writeJson(jobsPath, replaceRawJob(rawJobs, updated));
+    await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
     return { ...updated, company } satisfies RecruiterJob;
   });
 }
@@ -557,7 +549,7 @@ export async function ensureRecruiterCompany(
       verificationStatus: "pending",
       jobCount: 0,
     });
-    await writeJson(companiesPath, [...rawCompanies, company]);
+    await companiesRepository.mutate(() => [...rawCompanies, company]);
     return { ...company, ownerUserId: userId } satisfies RecruiterCompany;
   });
 }
@@ -617,8 +609,7 @@ export async function updateRecruiterCompanySettings(
       website: editable.website,
       description: editable.description,
     });
-    await writeJson(
-      companiesPath,
+    await companiesRepository.mutate(() =>
       replaceOrAppendRawCompany(rawCompanies, updated),
     );
     if (company.databaseBacked && company.databaseId) {
@@ -666,17 +657,20 @@ export async function recordApplication(
         applicantCount: job.stats.applicantCount + 1,
       },
     });
-    await writeJson(jobsPath, replaceRawJob(rawJobs, updated));
-    await writeJson(applicationsPath, [
-      ...applications,
-      {
-        id: `application-${randomUUID()}`,
-        jobId,
-        userId,
-        appliedAt: new Date().toISOString(),
-        status,
-      },
-    ] satisfies JobApplicationRecord[]);
+    await jobsRepository.mutate(() => replaceRawJob(rawJobs, updated));
+    await applicationsRepository.mutate(
+      () =>
+        [
+          ...applications,
+          {
+            id: `application-${randomUUID()}`,
+            jobId,
+            userId,
+            appliedAt: new Date().toISOString(),
+            status,
+          },
+        ] satisfies JobApplicationRecord[],
+    );
     return updated;
   });
 }

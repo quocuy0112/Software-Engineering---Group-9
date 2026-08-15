@@ -1,7 +1,5 @@
 import "server-only";
 
-import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
 import { z } from "zod";
 import type { JobCard } from "@/shared/contracts/jobs/discovery";
 import type { JobPreferences } from "@/shared/contracts/jobs/preferences";
@@ -12,10 +10,14 @@ import type {
 import type { UserJobState } from "@/shared/contracts/jobs/catalog";
 import { normalizeSalaryAmount } from "@/shared/utils/jobs/job-display";
 import { PrismaApplicationTrackingRepository } from "@/backend/repositories/jobs/prisma-application-tracking-repository";
+import { configuredJsonJobCatalogueRepository } from "@/backend/repositories/jobs/job-catalogue-repository-factory";
 import { readUserJobState } from "./user-job-state-store";
 import { readMockAppliedJobIds } from "./recruiter-job-posting-data";
 
-const dataPath = (name: string) => resolve(process.cwd(), "data", "jobs", name);
+const workspaceJobsRepository =
+  configuredJsonJobCatalogueRepository("jobs.json");
+const workspaceCompaniesRepository =
+  configuredJsonJobCatalogueRepository("companies.json");
 
 const sourceCompanySchema = z
   .object({
@@ -109,15 +111,13 @@ let catalogPromise: Promise<JobCatalog> | undefined;
 
 async function readCatalog(): Promise<JobCatalog> {
   catalogPromise ??= Promise.all([
-    readFile(dataPath("jobs.json"), "utf8"),
-    readFile(dataPath("companies.json"), "utf8"),
-  ]).then(([jobsText, companiesText]) => {
-    const jobs = z
-      .array(sourceJobSchema)
-      .parse(JSON.parse(jobsText)) as SourceJob[];
+    workspaceJobsRepository.read(),
+    workspaceCompaniesRepository.read(),
+  ]).then(([jobValues, companyValues]) => {
+    const jobs = z.array(sourceJobSchema).parse(jobValues) as SourceJob[];
     const companies = z
       .array(sourceCompanySchema)
-      .parse(JSON.parse(companiesText)) as SourceCompany[];
+      .parse(companyValues) as SourceCompany[];
     const normalizedJobs = jobs.map((job) => ({
       ...job,
       status:

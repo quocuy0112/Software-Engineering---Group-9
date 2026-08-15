@@ -126,6 +126,7 @@ enum InAppNotificationContextType {
   CONVERSATION
   MESSAGING_REPORT
   MODERATION_REPORT
+  JOB_POST_REVIEW
 }
 
 enum InAppNotificationAudience {
@@ -176,6 +177,9 @@ enum InAppNotificationKind {
   MODERATION_REPORT_RECEIVED_ADMIN
   VERIFICATION_REVIEW_OVERDUE
   DELIVERY_MANUAL_INTERVENTION_REQUIRED
+  JOB_POST_REVIEW_REQUESTED_ADMIN
+  JOB_POST_APPROVED
+  JOB_POST_REJECTED
 }
 
 enum PreferenceLanguage {
@@ -253,6 +257,35 @@ enum SalaryPeriod {
   HOUR
   MONTH
   YEAR
+}
+
+enum JobPostReviewState {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum JobPostReviewReasonCode {
+  INCOMPLETE_OR_UNCLEAR
+  MISLEADING_CONTENT
+  COMPENSATION_OR_LOCATION_UNCLEAR
+  DISCRIMINATORY_OR_PROHIBITED
+  COMPANY_OR_ROLE_MISMATCH
+  DUPLICATE_OR_SPAM
+  EXPIRED_OR_INVALID_DEADLINE
+  POLICY_OR_LEGAL_RISK
+  OTHER_ACTION_REQUIRED
+}
+
+enum JobPostReviewHistoryAction {
+  SUBMITTED
+  CLAIMED
+  REASSIGNED
+  APPROVED
+  REJECTED
+  RESUBMITTED
+  LEGACY_BASELINE_IMPORTED
+  CLOSED
 }
 
 enum ApplicationQuestionKind {
@@ -848,6 +881,12 @@ model UserAccount {
   supportAssignmentsReceived      SupportAssignment[]                     @relation("SupportAssignmentAssignee")
   supportAssignmentsMade          SupportAssignment[]                     @relation("SupportAssignmentActor")
   supportInternalNotes            SupportInternalNote[]
+  submittedJobPostReviews         JobPostReviewVersion[]                  @relation("JobPostReviewSubmitter")
+  assignedJobPostReviews          JobPostReviewVersion[]                  @relation("JobPostReviewAssignee")
+  decidedJobPostReviews           JobPostReviewVersion[]                  @relation("JobPostReviewDecider")
+  closedJobPostReviewAggregates   JobPostReviewAggregate[]                @relation("JobPostReviewCloser")
+  jobPostReviewHistory            JobPostReviewHistory[]                  @relation("JobPostReviewHistoryActor")
+  jobPostReviewPrivateNotes       JobPostReviewPrivateNote[]              @relation("JobPostReviewNoteAuthor")
 
   @@index([state, id])
   @@index([state, createdAt(sort: Desc), id])
@@ -1379,25 +1418,27 @@ model Company {
   recruiterVerificationRequests RecruiterVerificationRequest[]
   accessPrerequisites           CompanyAccessPrerequisite[]
   messagingConversations        MessagingConversation[]
+  jobPostReviewAggregates       JobPostReviewAggregate[]
 
   @@index([verifiedAt, id])
 }
 
 model CompanyMembership {
-  id                String                     @id @default(cuid())
-  companyId         String
-  userId            String
-  role              CompanyMembershipRole
-  status            CompanyMembershipStatus    @default(ACTIVE)
-  priorApprovedRole CompanyMembershipRole?
-  version           Int                        @default(1)
-  stateChangedAt    DateTime                   @default(now())
-  removedAt         DateTime?
-  createdAt         DateTime                   @default(now())
-  updatedAt         DateTime                   @updatedAt
-  company           Company                    @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  user              UserAccount                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  history           CompanyMembershipHistory[]
+  id                      String                     @id @default(cuid())
+  companyId               String
+  userId                  String
+  role                    CompanyMembershipRole
+  status                  CompanyMembershipStatus    @default(ACTIVE)
+  priorApprovedRole       CompanyMembershipRole?
+  version                 Int                        @default(1)
+  stateChangedAt          DateTime                   @default(now())
+  removedAt               DateTime?
+  createdAt               DateTime                   @default(now())
+  updatedAt               DateTime                   @updatedAt
+  company                 Company                    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user                    UserAccount                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  history                 CompanyMembershipHistory[]
+  submittedJobPostReviews JobPostReviewVersion[]
 
   @@unique([companyId, userId])
   @@index([userId, status])
@@ -1869,9 +1910,9 @@ model ModerationPrivateNote {
 }
 
 model JobPosting {
-  id                       String                @id @default(cuid())
+  id                       String                  @id @default(cuid())
   companyId                String
-  slug                     String                @unique
+  slug                     String                  @unique
   title                    String
   normalizedTitle          String
   summary                  String
@@ -1887,26 +1928,27 @@ model JobPosting {
   employmentType           EmploymentType
   experienceLevel          ExperienceLevel
   workArrangement          WorkArrangement
-  salaryMin                Decimal?              @db.Decimal(14, 2)
-  salaryMax                Decimal?              @db.Decimal(14, 2)
-  salaryCurrency           String?               @db.VarChar(3)
+  salaryMin                Decimal?                @db.Decimal(14, 2)
+  salaryMax                Decimal?                @db.Decimal(14, 2)
+  salaryCurrency           String?                 @db.VarChar(3)
   salaryPeriod             SalaryPeriod?
-  searchDocumentNormalized String                @db.Text
-  status                   JobPostingStatus      @default(DRAFT)
+  searchDocumentNormalized String                  @db.Text
+  status                   JobPostingStatus        @default(DRAFT)
   approvedAt               DateTime?
   publishedAt              DateTime?
   applicationDeadline      DateTime?
   closedAt                 DateTime?
   removedAt                DateTime?
-  version                  Int                   @default(1)
-  createdAt                DateTime              @default(now())
-  updatedAt                DateTime              @updatedAt
-  company                  Company               @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  version                  Int                     @default(1)
+  createdAt                DateTime                @default(now())
+  updatedAt                DateTime                @updatedAt
+  company                  Company                 @relation(fields: [companyId], references: [id], onDelete: Restrict)
   skills                   JobPostingSkill[]
   questions                ApplicationQuestion[]
   savedBy                  SavedJob[]
   reports                  JobReport[]
   applications             JobApplication[]
+  reviewAggregate          JobPostReviewAggregate?
 
   @@index([status, publishedAt(sort: Desc), id])
   @@index([status, applicationDeadline, id])
@@ -1916,6 +1958,114 @@ model JobPosting {
   @@index([normalizedTitle(ops: raw("gin_trgm_ops"))], type: Gin, map: "JobPosting_normalizedTitle_trgm_idx")
   @@index([normalizedLocation(ops: raw("gin_trgm_ops"))], type: Gin, map: "JobPosting_normalizedLocation_trgm_idx")
   @@index([searchDocumentNormalized(ops: raw("gin_trgm_ops"))], type: Gin, map: "JobPosting_searchDocumentNormalized_trgm_idx")
+}
+
+model JobPostReviewAggregate {
+  id                 String                 @id @default(cuid())
+  jobId              String                 @unique @db.VarChar(128)
+  companyId          String
+  latestSequence     Int                    @default(1)
+  pendingVersionId   String?                @unique
+  approvedVersionId  String?                @unique
+  publicJobPostingId String?                @unique
+  closedAt           DateTime?
+  closedByUserId     String?
+  version            Int                    @default(1)
+  adoptedAt          DateTime               @default(now())
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+  company            Company                @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  closedBy           UserAccount?           @relation("JobPostReviewCloser", fields: [closedByUserId], references: [id], onDelete: Restrict)
+  versions           JobPostReviewVersion[] @relation("JobPostReviewVersions")
+  pendingVersion     JobPostReviewVersion?  @relation("JobPostReviewPendingVersion", fields: [pendingVersionId], references: [id], onDelete: Restrict)
+  approvedVersion    JobPostReviewVersion?  @relation("JobPostReviewApprovedVersion", fields: [approvedVersionId], references: [id], onDelete: Restrict)
+  publicJobPosting   JobPosting?            @relation(fields: [publicJobPostingId], references: [id], onDelete: Restrict)
+
+  @@index([companyId, updatedAt(sort: Desc), id])
+  @@index([pendingVersionId, version])
+}
+
+model JobPostReviewVersion {
+  id                       String                     @id @default(cuid())
+  reviewAggregateId        String
+  sequence                 Int
+  snapshot                 Json
+  snapshotSchemaVersion    String                     @db.VarChar(32)
+  snapshotSha256           String                     @db.Char(64)
+  state                    JobPostReviewState         @default(PENDING_REVIEW)
+  submittedByUserId        String?
+  submittedMembershipId    String?
+  submissionIdempotencyKey String?                    @db.VarChar(128)
+  submissionRequestHash    String?                    @db.Char(64)
+  submittedAt              DateTime                   @default(now())
+  assignedAdminUserId      String?
+  assignedAt               DateTime?
+  decidedByAdminUserId     String?
+  decidedAt                DateTime?
+  publishedAt              DateTime?
+  reasonCode               JobPostReviewReasonCode?
+  publicExplanation        String?                    @db.VarChar(1000)
+  decisionCorrelationId    String?                    @unique @db.VarChar(128)
+  importedBaseline         Boolean                    @default(false)
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime                   @updatedAt
+  aggregate                JobPostReviewAggregate     @relation("JobPostReviewVersions", fields: [reviewAggregateId], references: [id], onDelete: Restrict)
+  pendingForAggregate      JobPostReviewAggregate?    @relation("JobPostReviewPendingVersion")
+  approvedForAggregate     JobPostReviewAggregate?    @relation("JobPostReviewApprovedVersion")
+  submittedBy              UserAccount?               @relation("JobPostReviewSubmitter", fields: [submittedByUserId], references: [id], onDelete: Restrict)
+  submittedMembership      CompanyMembership?         @relation(fields: [submittedMembershipId], references: [id], onDelete: Restrict)
+  assignedAdmin            UserAccount?               @relation("JobPostReviewAssignee", fields: [assignedAdminUserId], references: [id], onDelete: Restrict)
+  decidedByAdmin           UserAccount?               @relation("JobPostReviewDecider", fields: [decidedByAdminUserId], references: [id], onDelete: Restrict)
+  history                  JobPostReviewHistory[]
+  privateNotes             JobPostReviewPrivateNote[]
+
+  @@unique([reviewAggregateId, sequence])
+  @@unique([reviewAggregateId, snapshotSha256])
+  @@unique([submittedByUserId, submissionIdempotencyKey], map: "JobPostReviewVersion_submission_actor_key")
+  @@index([state, submittedAt, id])
+  @@index([assignedAdminUserId, state, submittedAt])
+}
+
+model JobPostReviewHistory {
+  id                        String                     @id @default(cuid())
+  reviewVersionId           String
+  action                    JobPostReviewHistoryAction
+  actorUserId               String?
+  priorState                JobPostReviewState?
+  resultingState            JobPostReviewState
+  priorAssigneeUserId       String?
+  resultingAssigneeUserId   String?
+  resultingAggregateVersion Int
+  correlationId             String                     @db.VarChar(128)
+  occurredAt                DateTime                   @default(now())
+  reviewVersion             JobPostReviewVersion       @relation(fields: [reviewVersionId], references: [id], onDelete: Restrict)
+  actor                     UserAccount?               @relation("JobPostReviewHistoryActor", fields: [actorUserId], references: [id], onDelete: Restrict)
+
+  @@unique([reviewVersionId, resultingAggregateVersion, action])
+  @@index([reviewVersionId, occurredAt, id])
+}
+
+model JobPostReviewPrivateNote {
+  id                String               @id @default(cuid())
+  reviewVersionId   String
+  authorAdminUserId String
+  normalizedText    String               @db.VarChar(2000)
+  createdAt         DateTime             @default(now())
+  reviewVersion     JobPostReviewVersion @relation(fields: [reviewVersionId], references: [id], onDelete: Restrict)
+  authorAdmin       UserAccount          @relation("JobPostReviewNoteAuthor", fields: [authorAdminUserId], references: [id], onDelete: Restrict)
+
+  @@index([reviewVersionId, createdAt, id])
+}
+
+model JobCatalogueWriteLease {
+  catalogueKey            String   @id @db.Char(64)
+  ownerTokenHash          String   @db.Char(64)
+  leaseExpiresAt          DateTime
+  expectedCatalogueSha256 String   @db.Char(64)
+  version                 Int      @default(1)
+  updatedAt               DateTime @updatedAt
+
+  @@index([leaseExpiresAt])
 }
 
 model JobPostingSkill {
