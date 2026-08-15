@@ -1,7 +1,26 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  ArrowRight,
+  BriefcaseBusiness,
+  ShieldCheck,
+  SlidersHorizontal,
+  UserRound,
+} from "lucide-react";
 import { Badge } from "@/frontend/components/ui/badge";
+import { Button } from "@/frontend/components/ui/button";
+import { ChecklistRow } from "@/frontend/components/ui/checklist-row";
+import { FeatureCard } from "@/frontend/components/ui/feature-card";
+import { Panel } from "@/frontend/components/ui/design-system";
+import { ProgressRing } from "@/frontend/components/ui/progress-ring";
+import { PageHeader } from "@/frontend/components/layout/page-header";
+import {
+  computeProfileCompleteness,
+  getProfileCompletion,
+  type ProfileCompletionSection,
+} from "@/frontend/features/profile/lib/profile-completeness";
+import { pluralize } from "@/shared/utils/pluralize";
 import { useWorkspaceLocale } from "../client/workspace-locale";
 import type { CandidateProfileContract } from "@/shared/contracts/account/profile";
 
@@ -12,209 +31,123 @@ export function DashboardView({
   account: { name: string; hasAvatar: boolean; twoFactorEnabled: boolean };
   profile: CandidateProfileContract;
 }) {
+  const router = useRouter();
   const locale = useWorkspaceLocale();
   const copy = dashboardCopy(locale);
-  const headlineLength = profile.basics.headline?.trim().length ?? 0;
-  const summaryLength = profile.basics.summary?.trim().length ?? 0;
-  const detailedExperience = profile.experience.some(
-    (entry) => (entry.description?.trim().length ?? 0) >= 80,
-  );
-  const steps = [
-    {
-      label: copy.basics,
-      complete: headlineLength >= 20 && summaryLength >= 120,
-      hint: copy.basicsPending,
-      href: "/profile#profile-basics-section",
-    },
-    {
-      label: copy.avatar,
-      complete: account.hasAvatar,
-      hint: copy.avatarPending,
-      href: "/profile#profile-avatar-section",
-    },
-    {
-      label: copy.skillsStep,
-      complete: profile.skills.length >= 3,
-      hint: copy.skillsPending,
-      href: "/profile#profile-skills-section",
-    },
-    {
-      label: copy.experienceStep,
-      complete: profile.experience.length > 0,
-      hint: copy.experiencePending,
-      href: "/profile#profile-experience-section",
-    },
-    {
-      label: copy.educationStep,
-      complete: profile.education.length > 0,
-      hint: copy.educationPending,
-      href: "/profile#profile-education-section",
-    },
-    {
-      label: copy.socialStep,
-      complete: profile.socialLinks.length > 0,
-      hint: copy.socialPending,
-      href: "/profile#profile-social-section",
-    },
-  ];
-  const completed = steps.filter((step) => step.complete).length;
-  const completion = Math.round(
-    (headlineLength >= 20 ? 10 : headlineLength > 0 ? 5 : 0) +
-      (summaryLength >= 120 ? 15 : summaryLength > 0 ? 7 : 0) +
-      (account.hasAvatar ? 15 : 0) +
-      Math.min(profile.skills.length / 3, 1) * 20 +
-      (profile.experience.length > 0 ? 15 : 0) +
-      (detailedExperience ? 5 : 0) +
-      (profile.education.length > 0 ? 10 : 0) +
-      (profile.socialLinks.length > 0 ? 10 : 0),
-  );
-  const remaining = steps.length - completed;
+  const profileCompletion = getProfileCompletion(profile, account.hasAvatar);
+  const completion = computeProfileCompleteness(profile, account.hasAvatar);
+  const steps = profileCompletion.items.map((item) => ({
+    ...item,
+    label: copy.steps[item.key].label,
+    hint: copy.steps[item.key].hint,
+  }));
+  const remaining = steps.filter((step) => !step.complete).length;
 
   return (
-    <div className="dashboard-page">
-      <header className="page-heading">
-        <div>
-          <p className="workspace-kicker">{copy.kicker}</p>
-          <h1 id="workspace-page-title">{copy.title}</h1>
-          <p className="page-heading-copy">{copy.subtitle}</p>
-        </div>
-        <Badge className="page-heading-badge" tone="info">
-          {copy.badge}
-        </Badge>
-      </header>
+    <div className="candidate-dashboard-page">
+      <PageHeader
+        eyebrow={copy.kicker}
+        title={copy.title}
+        subtitle={copy.subtitle}
+        rightSlot={<Badge tone="info">{copy.badge}</Badge>}
+      />
 
-      <section
-        className="dashboard-hero"
-        aria-labelledby="dashboard-welcome-title"
+      <Panel
+        className="candidate-dashboard-hero"
+        accentBorder="blue"
+        showDivider={false}
+        eyebrow={copy.welcome}
+        title={copy.heroTitle(account.name)}
+        titleId="dashboard-welcome-title"
+        rightSlot={
+          <ProgressRing
+            percent={completion}
+            label={copy.completion}
+            caption={copy.complete}
+          />
+        }
       >
-        <div className="dashboard-hero-copy">
-          <p className="dashboard-hero-eyebrow">{copy.welcome}</p>
-          <h2 id="dashboard-welcome-title">{copy.heroTitle(account.name)}</h2>
-          <p>{copy.heroCopy}</p>
-          <Link className="dashboard-hero-cta" href="/profile">
-            {completion < 100 ? copy.completeProfile : copy.viewProfile}
-            <DashboardIcon name="arrow" />
-          </Link>
-        </div>
-        <div
-          className="dashboard-progress"
-          role="progressbar"
-          aria-label={copy.completion}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={completion}
-          aria-valuetext={`${completion}% ${copy.complete}`}
-        >
-          <svg viewBox="0 0 120 120" aria-hidden="true">
-            <circle
-              className="dashboard-progress-track"
-              cx="60"
-              cy="60"
-              r="52"
-              pathLength="100"
-            />
-            <circle
-              className="dashboard-progress-value"
-              cx="60"
-              cy="60"
-              r="52"
-              pathLength="100"
-              strokeDasharray={`${completion} 100`}
-            />
-          </svg>
-          <span>
-            <strong>{completion}%</strong>
-            <small>{copy.complete}</small>
-          </span>
-        </div>
-      </section>
+        <p>{copy.heroCopy}</p>
+        <Button onClick={() => router.push("/profile")}>
+          {completion < 100 ? copy.completeProfile : copy.viewProfile}
+          <ArrowRight aria-hidden="true" />
+        </Button>
+      </Panel>
 
       <section
-        className="dashboard-feature-grid"
+        className="candidate-dashboard-grid"
         aria-label={copy.workspaceSections}
       >
-        <Link className="feature-card dashboard-current-card" href="/profile">
-          <div className="feature-icon" aria-hidden="true">
-            <DashboardIcon name="profile" />
-          </div>
-          <h2>{copy.profileTitle}</h2>
-          <p>{copy.profileCopy}</p>
-          <span className="dashboard-card-meta">
-            {profile.skills.length} {copy.skills} · {profile.experience.length}{" "}
-            {copy.experiences}
-          </span>
-        </Link>
-        <Link className="feature-card dashboard-current-card" href="/jobs">
-          <div className="feature-icon" aria-hidden="true">
-            <DashboardIcon name="jobs" />
-          </div>
-          <h2>{copy.jobsTitle}</h2>
-          <p>{copy.jobsCopy}</p>
-          <Badge tone="info">{copy.browseJobs}</Badge>
-        </Link>
-        <Link
-          className="feature-card dashboard-current-card"
+        <FeatureCard
+          href="/profile"
+          icon={<UserRound />}
+          title={copy.profileTitle}
+          description={copy.profileCopy}
+          footer={
+            <span className="sh-count-pill">
+              {profile.skills.length}{" "}
+              {pluralize(profile.skills.length, copy.skill, copy.skills)}
+              {" · "}
+              {profile.experience.length}{" "}
+              {pluralize(
+                profile.experience.length,
+                copy.experience,
+                copy.experiences,
+              )}
+            </span>
+          }
+        />
+        <FeatureCard
+          href="/jobs"
+          icon={<BriefcaseBusiness />}
+          title={copy.jobsTitle}
+          description={copy.jobsCopy}
+          footer={<Badge tone="info">{copy.browseJobs}</Badge>}
+        />
+        <FeatureCard
           href="/profile/security"
-        >
-          <div className="feature-icon" aria-hidden="true">
-            <DashboardIcon name="shield" />
-          </div>
-          <h2>{copy.securityTitle}</h2>
-          <p>{copy.securityCopy}</p>
-          <Badge tone={account.twoFactorEnabled ? "success" : "warning"}>
-            {account.twoFactorEnabled ? copy.protected : copy.recommended}
-          </Badge>
-        </Link>
-        <Link
-          className="feature-card dashboard-current-card"
+          icon={<ShieldCheck />}
+          tone="teal"
+          title={copy.securityTitle}
+          description={copy.securityCopy}
+          footer={
+            <Badge tone={account.twoFactorEnabled ? "success" : "warning"}>
+              {account.twoFactorEnabled ? copy.protected : copy.recommended}
+            </Badge>
+          }
+        />
+        <FeatureCard
           href="/profile/preferences"
-        >
-          <div className="feature-icon" aria-hidden="true">
-            <DashboardIcon name="preferences" />
-          </div>
-          <h2>{copy.preferencesTitle}</h2>
-          <p>{copy.preferencesCopy}</p>
-          <Badge tone="info">{copy.configured}</Badge>
-        </Link>
+          icon={<SlidersHorizontal />}
+          title={copy.preferencesTitle}
+          description={copy.preferencesCopy}
+          footer={<Badge tone="info">{copy.configured}</Badge>}
+        />
       </section>
 
-      <div className="dashboard-lower-grid">
-        <section
-          className="dashboard-panel"
-          aria-labelledby="profile-next-steps-title"
-        >
-          <div className="dashboard-panel-header">
-            <div>
-              <p className="panel-kicker">{copy.nextKicker}</p>
-              <h2 id="profile-next-steps-title">{copy.nextTitle}</h2>
-            </div>
-            <strong className="dashboard-step-count">
-              {copy.remaining(remaining)}
-            </strong>
-          </div>
-          <ul className="account-checklist">
-            {steps.map((step) => (
-              <li key={step.label} data-complete={step.complete}>
-                <Link href={step.href}>
-                  <span
-                    className={`checklist-icon${step.complete ? "" : "checklist-icon--soft"}`}
-                    aria-hidden="true"
-                  >
-                    <DashboardIcon name={step.complete ? "check" : "plus"} />
-                  </span>
-                  <span>
-                    <strong>{step.label}</strong>
-                    <small>{step.complete ? copy.done : step.hint}</small>
-                  </span>
-                  <span className="shortcut-arrow" aria-hidden="true">
-                    <DashboardIcon name="arrow" />
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      </div>
+      <Panel
+        className="candidate-dashboard-steps"
+        eyebrow={copy.nextKicker}
+        title={copy.nextTitle}
+        titleId="profile-next-steps-title"
+        rightSlot={
+          <span className="candidate-dashboard-steps__count">
+            {copy.stepsLeft(remaining)}
+          </span>
+        }
+      >
+        <ul className="sh-checklist">
+          {steps.map((step) => (
+            <ChecklistRow
+              key={step.key}
+              status={step.complete ? "done" : "todo"}
+              title={step.label}
+              subtitle={step.complete ? copy.done : step.hint}
+              onClick={() => router.push(`/profile#${step.targetId}`)}
+            />
+          ))}
+        </ul>
+      </Panel>
     </div>
   );
 }
@@ -238,7 +171,9 @@ function dashboardCopy(locale: "vi" | "en") {
       complete: "hoàn tất",
       profileTitle: "Hồ sơ chuyên nghiệp",
       profileCopy: "Quản lý phần giới thiệu, kinh nghiệm, học vấn và kỹ năng.",
+      skill: "kỹ năng",
       skills: "kỹ năng",
+      experience: "kinh nghiệm",
       experiences: "kinh nghiệm",
       jobsTitle: "Cơ hội việc làm",
       jobsCopy: "Tìm, lọc, lưu hoặc ứng tuyển vào các vị trí đang mở.",
@@ -248,30 +183,21 @@ function dashboardCopy(locale: "vi" | "en") {
         "Quản lý mật khẩu, xác thực hai lớp và các phiên đăng nhập.",
       protected: "Đã bật 2FA",
       recommended: "Nên bật 2FA",
-      preferencesTitle: "Tùy chọn cá nhân",
-      preferencesCopy: "Xem lại múi giờ và tùy chọn thông báo bảo mật.",
+      preferencesTitle: "Tuỳ chọn cá nhân",
+      preferencesCopy: "Xem lại múi giờ và tuỳ chọn thông báo bảo mật.",
       configured: "Đã sẵn sàng",
       nextKicker: "BƯỚC TIẾP THEO",
       nextTitle: "Làm hồ sơ của bạn nổi bật hơn",
-      basics: "Thêm tiêu đề và phần giới thiệu",
-      avatar: "Thêm ảnh hồ sơ",
-      skillsStep: "Thêm những kỹ năng nổi bật",
-      experienceStep: "Thêm kinh nghiệm làm việc",
-      educationStep: "Thêm học vấn",
-      socialStep: "Thêm liên kết chuyên nghiệp",
       done: "Hoàn tất",
-      pending: "Cần chú ý",
-      basicsPending: "Dùng tiêu đề từ 20 ký tự và phần giới thiệu từ 120 ký tự",
-      skillsPending: "Thêm ít nhất 3 kỹ năng nổi bật",
-      experiencePending: "Thêm ít nhất một kinh nghiệm",
-      educationPending: "Thêm ít nhất một mục học vấn",
-      avatarPending: "Tải lên ảnh hồ sơ rõ nét",
-      socialPending: "Thêm ít nhất một liên kết hồ sơ hoặc website",
-      remaining: (count: number) =>
-        count === 0 ? "Hồ sơ đã sẵn sàng" : `Còn ${count} bước`,
+      stepsLeft: (count: number) =>
+        count === 0
+          ? "Hồ sơ đã sẵn sàng"
+          : `Còn ${count} ${pluralize(count, "bước", "bước")}`,
+      steps: profileStepCopy("vi"),
       workspaceSections: "Khu vực quản lý việc làm, hồ sơ và tài khoản",
     };
   }
+
   return {
     kicker: "YOUR CAREER WORKSPACE",
     title: "Dashboard",
@@ -288,7 +214,9 @@ function dashboardCopy(locale: "vi" | "en") {
     complete: "complete",
     profileTitle: "Professional profile",
     profileCopy: "Manage your introduction, experience, education, and skills.",
+    skill: "skill",
     skills: "skills",
+    experience: "experience",
     experiences: "experiences",
     jobsTitle: "Job opportunities",
     jobsCopy: "Search and filter active roles, then save or apply when ready.",
@@ -303,88 +231,66 @@ function dashboardCopy(locale: "vi" | "en") {
     configured: "Available",
     nextKicker: "NEXT STEPS",
     nextTitle: "Make your profile stronger",
-    basics: "Add a headline and summary",
-    avatar: "Add a profile photo",
-    skillsStep: "Add your strongest skills",
-    experienceStep: "Add work experience",
-    educationStep: "Add education",
-    socialStep: "Add a professional link",
     done: "Complete",
-    pending: "Needs attention",
-    basicsPending: "Use a 20+ character headline and 120+ character summary",
-    skillsPending: "Add at least 3 strong skills",
-    experiencePending: "Add at least one experience",
-    educationPending: "Add at least one education entry",
-    avatarPending: "Upload a clear profile photo",
-    socialPending: "Add at least one profile or website",
-    remaining: (count: number) =>
-      count === 0 ? "Profile ready" : `${count} steps left`,
+    stepsLeft: (count: number) =>
+      count === 0
+        ? "All steps complete"
+        : `${count} ${pluralize(count, "step left", "steps left")}`,
+    steps: profileStepCopy("en"),
     workspaceSections: "Job, profile, and account management areas",
   };
 }
 
-function DashboardIcon({
-  name,
-}: {
-  name:
-    | "arrow"
-    | "check"
-    | "device"
-    | "jobs"
-    | "plus"
-    | "preferences"
-    | "profile"
-    | "shield"
-    | "spark"
-    | "team";
-}) {
-  const paths: Record<typeof name, React.ReactNode> = {
-    arrow: <path d="M5 12h14m-5-5 5 5-5 5" />,
-    check: <path d="m5 12 4 4L19 6" />,
-    device: (
-      <>
-        <rect x="4" y="5" width="16" height="12" rx="2" />
-        <path d="M9 20h6" />
-      </>
-    ),
-    jobs: (
-      <>
-        <rect x="3" y="7" width="18" height="12" rx="2" />
-        <path d="M8 7V5.5A2.5 2.5 0 0 1 10.5 3h3A2.5 2.5 0 0 1 16 5.5V7M3 11h18M9 11v1.5h6V11" />
-      </>
-    ),
-    plus: <path d="M12 5v14M5 12h14" />,
-    preferences: (
-      <>
-        <path d="M4 7h10M18 7h2M4 17h2M10 17h10" />
-        <circle cx="16" cy="7" r="2" />
-        <circle cx="8" cy="17" r="2" />
-      </>
-    ),
-    profile: (
-      <>
-        <circle cx="12" cy="8" r="3.5" />
-        <path d="M5 20c.8-4 3.1-6 7-6s6.2 2 7 6" />
-      </>
-    ),
-    shield: (
-      <path d="M12 3 5.5 5.5v5.2c0 4.1 2.3 7.6 6.5 9.3 4.2-1.7 6.5-5.2 6.5-9.3V5.5L12 3Zm-3 9 2 2 4-5" />
-    ),
-    spark: (
-      <path d="m12 3 1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3Z" />
-    ),
-    team: (
-      <>
-        <circle cx="9" cy="8" r="3" />
-        <circle cx="17" cy="9" r="2" />
-        <path d="M3.5 20c.6-4 2.5-6 5.5-6s4.9 2 5.5 6M14.5 15c2.8-.4 4.8 1.2 5.5 4" />
-      </>
-    ),
-  };
+function profileStepCopy(
+  locale: "vi" | "en",
+): Record<ProfileCompletionSection, { label: string; hint: string }> {
+  if (locale === "vi") {
+    return {
+      avatar: { label: "Thêm ảnh hồ sơ", hint: "Tải lên ảnh hồ sơ rõ nét" },
+      basics: {
+        label: "Thêm tiêu đề và phần giới thiệu",
+        hint: "Dùng tiêu đề từ 20 ký tự và phần giới thiệu từ 120 ký tự",
+      },
+      skills: { label: "Thêm kỹ năng nổi bật", hint: "Thêm ít nhất 3 kỹ năng" },
+      experience: {
+        label: "Thêm kinh nghiệm làm việc",
+        hint: "Thêm ít nhất một kinh nghiệm",
+      },
+      education: {
+        label: "Thêm học vấn",
+        hint: "Thêm ít nhất một mục học vấn",
+      },
+      socialLinks: {
+        label: "Thêm liên kết chuyên nghiệp",
+        hint: "Thêm ít nhất một liên kết hồ sơ hoặc website",
+      },
+    };
+  }
 
-  return (
-    <svg className="dashboard-icon" viewBox="0 0 24 24" focusable="false">
-      {paths[name]}
-    </svg>
-  );
+  return {
+    avatar: {
+      label: "Add a profile photo",
+      hint: "Upload a clear profile photo",
+    },
+    basics: {
+      label: "Add a headline and summary",
+      hint: "Use a 20+ character headline and 120+ character summary",
+    },
+    skills: {
+      label: "Add your strongest skills",
+      hint: "Add at least 3 strong skills",
+    },
+    experience: {
+      label: "Add work experience",
+      hint: "Add at least one experience",
+    },
+    education: {
+      label: "Add education",
+      hint: "Add at least one education entry",
+    },
+    socialLinks: {
+      label: "Add a professional link",
+      hint: "Add at least one profile or website",
+    },
+  };
 }

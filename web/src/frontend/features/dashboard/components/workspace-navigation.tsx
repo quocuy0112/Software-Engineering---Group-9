@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useWorkspaceLocale } from "../client/workspace-locale";
+import { WorkspaceNavIcon } from "./workspace-navigation-icons";
 
 export function WorkspaceNavigation({
   busy,
@@ -149,7 +150,7 @@ export function WorkspaceNavigation({
                   title={collapsed ? destination.label : undefined}
                   onClick={() => setMenuOpen(false)}
                 >
-                  <NavIcon name={destination.icon} />
+                  <WorkspaceNavIcon name={destination.icon} />
                   <span className="workspace-navigation-label">
                     {destination.label}
                   </span>
@@ -187,7 +188,7 @@ export function WorkspaceNavigation({
               collapsed ? (busy ? copy.signingOut : copy.signOut) : undefined
             }
           >
-            <NavIcon name="signout" />
+            <WorkspaceNavIcon name="signout" />
             <span className="workspace-navigation-label">
               {busy ? copy.signingOut : copy.signOut}
             </span>
@@ -195,65 +196,5 @@ export function WorkspaceNavigation({
         </div>
       </nav>
     </>
-  );
-}
-
-function NavIcon({ name }: { name: string }) {
-  if (name === "signout") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
-        <path d="M8 4H4.5A1.5 1.5 0 0 0 3 5.5v9A1.5 1.5 0 0 0 4.5 16H8" />
-        <path d="M11 6.5 14.5 10 11 13.5M7 10h7.5" />
-      </svg>
-    );
-  }
-  if (name === "profile") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
-        <circle cx="10" cy="6.5" r="3" />
-        <path d="M4 17c.7-3.2 2.7-4.8 6-4.8s5.3 1.6 6 4.8" />
-      </svg>
-    );
-  }
-  if (name === "jobs") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
-        <rect x="3" y="6" width="14" height="10" rx="2" />
-        <path d="M7 6V4.8C7 3.8 7.8 3 8.8 3h2.4c1 0 1.8.8 1.8 1.8V6M3 10h14M8 10v1h4v-1" />
-      </svg>
-    );
-  }
-  if (name === "messages") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
-        <path d="M3 4.5h14v9H8l-4 3v-3H3z" />
-        <path d="M6 8h8M6 10.5h5" />
-      </svg>
-    );
-  }
-  if (name === "support") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
-        <path d="M4 9a6 6 0 0 1 12 0v4a2 2 0 0 1-2 2h-2" />
-        <path d="M4 9v3H2V9h2M16 9h2v3h-2M8 16h4" />
-      </svg>
-    );
-  }
-  if (name === "connections") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
-        <circle cx="6" cy="7" r="2.5" />
-        <circle cx="14" cy="7" r="2.5" />
-        <path d="M2.5 16c.4-3 1.6-4.5 3.5-4.5S9.1 13 9.5 16M10.5 16c.4-3 1.6-4.5 3.5-4.5s3.1 1.5 3.5 4.5M8.5 8.5h3" />
-      </svg>
-    );
-  }
-  return (
-    <svg aria-hidden="true" viewBox="0 0 20 20" className="nav-icon">
-      <rect x="3" y="3" width="5" height="5" rx="1" />
-      <rect x="12" y="3" width="5" height="5" rx="1" />
-      <rect x="3" y="12" width="5" height="5" rx="1" />
-      <rect x="12" y="12" width="5" height="5" rx="1" />
-    </svg>
   );
 }

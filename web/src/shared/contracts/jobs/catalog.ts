@@ -15,9 +15,7 @@ export const companyLogoSchema = z
       .string()
       .min(32)
       .max(1_100_000)
-      .regex(
-        /^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/u,
-      ),
+      .regex(/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/u),
   ])
   .nullable();
 
@@ -131,6 +129,7 @@ export const companyCatalogSchema = z
     id: z.string().min(1).max(128),
     slug: z.string().min(1).max(200),
     name: z.string().min(1).max(160),
+    entityType: z.string().trim().max(120).nullable().optional(),
     logo: companyLogoSchema,
     size: z.string().min(1).max(80),
     industry: z.string().min(1).max(160),
@@ -187,6 +186,7 @@ export type RecruiterCompanySettings = {
   id: string;
   slug: string;
   name: string;
+  entityType: string | null;
   logo: string | null;
   size: string;
   industry: string;
@@ -198,7 +198,9 @@ export type RecruiterCompanySettings = {
   taxCode: string;
   verificationStatus: "pending" | "approved" | "rejected";
   profileComplete: boolean;
-  missingProfileFields: Array<"name" | "industry" | "size" | "address" | "logo">;
+  missingProfileFields: Array<
+    "name" | "industry" | "size" | "address" | "logo"
+  >;
 };
 
 export type RecruiterCompanySettingsInput = z.infer<

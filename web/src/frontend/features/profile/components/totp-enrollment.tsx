@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+import { ShieldCheck } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormFeedback } from "@/frontend/features/authentication/components/form-feedback";
@@ -357,7 +358,7 @@ export function TotpEnrollment({ onEnabled }: { onEnabled?: () => void }) {
     >
       <div className="security-panel-heading">
         <span className="security-panel-icon" aria-hidden="true">
-          ◇
+          <ShieldCheck size={20} />
         </span>
         <div>
           <p className="panel-kicker">{copy.kicker}</p>

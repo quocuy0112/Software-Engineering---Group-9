@@ -74,6 +74,12 @@ export function usePasswordChange(csrfProof: string) {
     setValues((current) => ({ ...current, [field]: value }));
   };
 
+  const clear = () => {
+    setValues(emptyValues);
+    setFeedback(null);
+    idempotency.current = null;
+  };
+
   const fail = (
     message: string,
     fieldErrors?: FieldErrors,
@@ -171,6 +177,7 @@ export function usePasswordChange(csrfProof: string) {
     retryAfterSeconds,
     locked: lockedUntil !== null,
     updateValue,
+    clear,
     submit,
   };
 }

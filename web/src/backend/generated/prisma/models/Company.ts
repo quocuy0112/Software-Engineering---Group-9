@@ -29,6 +29,7 @@ export type CompanyMinAggregateOutputType = {
   slug: string | null
   legalName: string | null
   displayName: string | null
+  entityType: string | null
   logoUrl: string | null
   websiteUrl: string | null
   publicDescription: string | null
@@ -49,6 +50,7 @@ export type CompanyMaxAggregateOutputType = {
   slug: string | null
   legalName: string | null
   displayName: string | null
+  entityType: string | null
   logoUrl: string | null
   websiteUrl: string | null
   publicDescription: string | null
@@ -69,6 +71,7 @@ export type CompanyCountAggregateOutputType = {
   slug: number
   legalName: number
   displayName: number
+  entityType: number
   logoUrl: number
   websiteUrl: number
   publicDescription: number
@@ -91,6 +94,7 @@ export type CompanyMinAggregateInputType = {
   slug?: true
   legalName?: true
   displayName?: true
+  entityType?: true
   logoUrl?: true
   websiteUrl?: true
   publicDescription?: true
@@ -111,6 +115,7 @@ export type CompanyMaxAggregateInputType = {
   slug?: true
   legalName?: true
   displayName?: true
+  entityType?: true
   logoUrl?: true
   websiteUrl?: true
   publicDescription?: true
@@ -131,6 +136,7 @@ export type CompanyCountAggregateInputType = {
   slug?: true
   legalName?: true
   displayName?: true
+  entityType?: true
   logoUrl?: true
   websiteUrl?: true
   publicDescription?: true
@@ -224,6 +230,7 @@ export type CompanyGroupByOutputType = {
   slug: string
   legalName: string
   displayName: string
+  entityType: string | null
   logoUrl: string | null
   websiteUrl: string | null
   publicDescription: string | null
@@ -265,6 +272,7 @@ export type CompanyWhereInput = {
   slug?: Prisma.StringFilter<"Company"> | string
   legalName?: Prisma.StringFilter<"Company"> | string
   displayName?: Prisma.StringFilter<"Company"> | string
+  entityType?: Prisma.StringNullableFilter<"Company"> | string | null
   logoUrl?: Prisma.StringNullableFilter<"Company"> | string | null
   websiteUrl?: Prisma.StringNullableFilter<"Company"> | string | null
   publicDescription?: Prisma.StringNullableFilter<"Company"> | string | null
@@ -290,6 +298,7 @@ export type CompanyOrderByWithRelationInput = {
   slug?: Prisma.SortOrder
   legalName?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
+  entityType?: Prisma.SortOrderInput | Prisma.SortOrder
   logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   websiteUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   publicDescription?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -319,6 +328,7 @@ export type CompanyWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.CompanyWhereInput | Prisma.CompanyWhereInput[]
   legalName?: Prisma.StringFilter<"Company"> | string
   displayName?: Prisma.StringFilter<"Company"> | string
+  entityType?: Prisma.StringNullableFilter<"Company"> | string | null
   logoUrl?: Prisma.StringNullableFilter<"Company"> | string | null
   websiteUrl?: Prisma.StringNullableFilter<"Company"> | string | null
   publicDescription?: Prisma.StringNullableFilter<"Company"> | string | null
@@ -343,6 +353,7 @@ export type CompanyOrderByWithAggregationInput = {
   slug?: Prisma.SortOrder
   legalName?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
+  entityType?: Prisma.SortOrderInput | Prisma.SortOrder
   logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   websiteUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   publicDescription?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -369,6 +380,7 @@ export type CompanyScalarWhereWithAggregatesInput = {
   slug?: Prisma.StringWithAggregatesFilter<"Company"> | string
   legalName?: Prisma.StringWithAggregatesFilter<"Company"> | string
   displayName?: Prisma.StringWithAggregatesFilter<"Company"> | string
+  entityType?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
   logoUrl?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
   websiteUrl?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
   publicDescription?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
@@ -389,6 +401,7 @@ export type CompanyCreateInput = {
   slug: string
   legalName: string
   displayName: string
+  entityType?: string | null
   logoUrl?: string | null
   websiteUrl?: string | null
   publicDescription?: string | null
@@ -414,6 +427,7 @@ export type CompanyUncheckedCreateInput = {
   slug: string
   legalName: string
   displayName: string
+  entityType?: string | null
   logoUrl?: string | null
   websiteUrl?: string | null
   publicDescription?: string | null
@@ -439,6 +453,7 @@ export type CompanyUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -464,6 +479,7 @@ export type CompanyUncheckedUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -489,6 +505,7 @@ export type CompanyCreateManyInput = {
   slug: string
   legalName: string
   displayName: string
+  entityType?: string | null
   logoUrl?: string | null
   websiteUrl?: string | null
   publicDescription?: string | null
@@ -509,6 +526,7 @@ export type CompanyUpdateManyMutationInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -529,6 +547,7 @@ export type CompanyUncheckedUpdateManyInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -549,6 +568,7 @@ export type CompanyCountOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   legalName?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
+  entityType?: Prisma.SortOrder
   logoUrl?: Prisma.SortOrder
   websiteUrl?: Prisma.SortOrder
   publicDescription?: Prisma.SortOrder
@@ -569,6 +589,7 @@ export type CompanyMaxOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   legalName?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
+  entityType?: Prisma.SortOrder
   logoUrl?: Prisma.SortOrder
   websiteUrl?: Prisma.SortOrder
   publicDescription?: Prisma.SortOrder
@@ -589,6 +610,7 @@ export type CompanyMinOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   legalName?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
+  entityType?: Prisma.SortOrder
   logoUrl?: Prisma.SortOrder
   websiteUrl?: Prisma.SortOrder
   publicDescription?: Prisma.SortOrder
@@ -697,6 +719,7 @@ export type CompanyCreateWithoutMembershipsInput = {
   slug: string
   legalName: string
   displayName: string
+  entityType?: string | null
   logoUrl?: string | null
   websiteUrl?: string | null
   publicDescription?: string | null
@@ -721,6 +744,7 @@ export type CompanyUncheckedCreateWithoutMembershipsInput = {
   slug: string
   legalName: string
   displayName: string
+  entityType?: string | null
   logoUrl?: string | null
   websiteUrl?: string | null
   publicDescription?: string | null
@@ -761,6 +785,7 @@ export type CompanyUpdateWithoutMembershipsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -785,6 +810,7 @@ export type CompanyUncheckedUpdateWithoutMembershipsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -809,6 +835,7 @@ export type CompanyCreateWithoutAccessPrerequisitesInput = {
   slug: string
   legalName: string
   displayName: string
+  entityType?: string | null
   logoUrl?: string | null
   websiteUrl?: string | null
   publicDescription?: string | null
@@ -833,6 +860,7 @@ export type CompanyUncheckedCreateWithoutAccessPrerequisitesInput = {
   slug: string
   legalName: string
   displayName: string
+  entityType?: string | null
   logoUrl?: string | null
   websiteUrl?: string | null
   publicDescription?: string | null
@@ -873,6 +901,7 @@ export type CompanyUpdateWithoutAccessPrerequisitesInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -897,6 +926,7 @@ export type CompanyUncheckedUpdateWithoutAccessPrerequisitesInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -921,6 +951,7 @@ export type CompanyCreateWithoutRecruiterVerificationRequestsInput = {
   slug: string
   legalName: string
   displayName: string
+  entityType?: string | null
   logoUrl?: string | null
   websiteUrl?: string | null
   publicDescription?: string | null
@@ -945,6 +976,7 @@ export type CompanyUncheckedCreateWithoutRecruiterVerificationRequestsInput = {
   slug: string
   legalName: string
   displayName: string
+  entityType?: string | null
   logoUrl?: string | null
   websiteUrl?: string | null
   publicDescription?: string | null
@@ -985,6 +1017,7 @@ export type CompanyUpdateWithoutRecruiterVerificationRequestsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1009,6 +1042,7 @@ export type CompanyUncheckedUpdateWithoutRecruiterVerificationRequestsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1033,6 +1067,7 @@ export type CompanyCreateWithoutJobPostingsInput = {
   slug: string
   legalName: string
   displayName: string
+  entityType?: string | null
   logoUrl?: string | null
   websiteUrl?: string | null
   publicDescription?: string | null
@@ -1057,6 +1092,7 @@ export type CompanyUncheckedCreateWithoutJobPostingsInput = {
   slug: string
   legalName: string
   displayName: string
+  entityType?: string | null
   logoUrl?: string | null
   websiteUrl?: string | null
   publicDescription?: string | null
@@ -1097,6 +1133,7 @@ export type CompanyUpdateWithoutJobPostingsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1121,6 +1158,7 @@ export type CompanyUncheckedUpdateWithoutJobPostingsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1145,6 +1183,7 @@ export type CompanyCreateWithoutMessagingConversationsInput = {
   slug: string
   legalName: string
   displayName: string
+  entityType?: string | null
   logoUrl?: string | null
   websiteUrl?: string | null
   publicDescription?: string | null
@@ -1169,6 +1208,7 @@ export type CompanyUncheckedCreateWithoutMessagingConversationsInput = {
   slug: string
   legalName: string
   displayName: string
+  entityType?: string | null
   logoUrl?: string | null
   websiteUrl?: string | null
   publicDescription?: string | null
@@ -1209,6 +1249,7 @@ export type CompanyUpdateWithoutMessagingConversationsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1233,6 +1274,7 @@ export type CompanyUncheckedUpdateWithoutMessagingConversationsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  entityType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   websiteUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1324,6 +1366,7 @@ export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   slug?: boolean
   legalName?: boolean
   displayName?: boolean
+  entityType?: boolean
   logoUrl?: boolean
   websiteUrl?: boolean
   publicDescription?: boolean
@@ -1350,6 +1393,7 @@ export type CompanySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   slug?: boolean
   legalName?: boolean
   displayName?: boolean
+  entityType?: boolean
   logoUrl?: boolean
   websiteUrl?: boolean
   publicDescription?: boolean
@@ -1370,6 +1414,7 @@ export type CompanySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   slug?: boolean
   legalName?: boolean
   displayName?: boolean
+  entityType?: boolean
   logoUrl?: boolean
   websiteUrl?: boolean
   publicDescription?: boolean
@@ -1390,6 +1435,7 @@ export type CompanySelectScalar = {
   slug?: boolean
   legalName?: boolean
   displayName?: boolean
+  entityType?: boolean
   logoUrl?: boolean
   websiteUrl?: boolean
   publicDescription?: boolean
@@ -1405,7 +1451,7 @@ export type CompanySelectScalar = {
   updatedAt?: boolean
 }
 
-export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "legalName" | "displayName" | "logoUrl" | "websiteUrl" | "publicDescription" | "publicLocation" | "size" | "industry" | "address" | "verifiedAt" | "normalizedTaxIdentifier" | "verificationState" | "verificationInactiveAt" | "createdAt" | "updatedAt", ExtArgs["result"]["company"]>
+export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "legalName" | "displayName" | "entityType" | "logoUrl" | "websiteUrl" | "publicDescription" | "publicLocation" | "size" | "industry" | "address" | "verifiedAt" | "normalizedTaxIdentifier" | "verificationState" | "verificationInactiveAt" | "createdAt" | "updatedAt", ExtArgs["result"]["company"]>
 export type CompanyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jobPostings?: boolean | Prisma.Company$jobPostingsArgs<ExtArgs>
   memberships?: boolean | Prisma.Company$membershipsArgs<ExtArgs>
@@ -1431,6 +1477,7 @@ export type $CompanyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     slug: string
     legalName: string
     displayName: string
+    entityType: string | null
     logoUrl: string | null
     websiteUrl: string | null
     publicDescription: string | null
@@ -1876,6 +1923,7 @@ export interface CompanyFieldRefs {
   readonly slug: Prisma.FieldRef<"Company", 'String'>
   readonly legalName: Prisma.FieldRef<"Company", 'String'>
   readonly displayName: Prisma.FieldRef<"Company", 'String'>
+  readonly entityType: Prisma.FieldRef<"Company", 'String'>
   readonly logoUrl: Prisma.FieldRef<"Company", 'String'>
   readonly websiteUrl: Prisma.FieldRef<"Company", 'String'>
   readonly publicDescription: Prisma.FieldRef<"Company", 'String'>

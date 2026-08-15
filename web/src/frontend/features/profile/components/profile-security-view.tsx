@@ -2,7 +2,7 @@
 
 import { ProfileNavigation } from "./profile-navigation";
 import { ProfileSecurity } from "./profile-security";
-import { Badge } from "@/frontend/components/ui/badge";
+import { PageHeader } from "@/frontend/components/layout/page-header";
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
 
 type ProfileSecurityViewProps = {
@@ -37,17 +37,18 @@ export function ProfileSecurityView({
         };
   return (
     <div className="profile-page profile-page--standalone">
-      <header className="page-heading profile-heading">
-        <div>
-          <p className="workspace-kicker">{copy.kicker}</p>
-          <h1 id="workspace-page-title">{copy.title}</h1>
-          <p className="page-heading-copy">{copy.subtitle}</p>
-        </div>
-        <Badge tone={twoFactorEnabled ? "success" : "warning"}>
-          {twoFactorEnabled ? copy.enabled : copy.recommended}
-        </Badge>
-      </header>
       <ProfileNavigation active="security" />
+      <PageHeader
+        className="profile-heading"
+        eyebrow={copy.kicker}
+        title={copy.title}
+        titleId="workspace-page-title"
+        subtitle={copy.subtitle}
+        status={{
+          label: twoFactorEnabled ? copy.enabled : copy.recommended,
+          tone: twoFactorEnabled ? "success" : "warning",
+        }}
+      />
       <ProfileSecurity
         initialTwoFactorEnabled={twoFactorEnabled}
         recoveryCompleted={recoveryCompleted}

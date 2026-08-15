@@ -6,6 +6,7 @@ import {
 } from "@/backend/repositories/admin/prisma-admin-command-repository";
 import { AuditWriter } from "@/backend/admin/audit/audit-writer";
 import { createVerificationDecisionNotification } from "@/backend/admin/notifications/verification-notification-event";
+import { splitCompanyIdentity } from "@/shared/contracts/employer-verification/business-verification";
 import { loadVerificationDecisionEligibility } from "./verification-decision-eligibility";
 
 export type ApprovalCommand = {
@@ -71,11 +72,17 @@ export class VerificationApprovalTransaction {
           if (!eligible.prerequisite) throw new Error("RELATIONSHIP_REQUIRED");
         } else {
           role = "OWNER";
+          const identity = splitCompanyIdentity(
+            row.acceptedRegistrySnapshot?.registryLegalName ??
+              row.submittedCompanyName,
+            row.acceptedRegistrySnapshot?.registryEntityType,
+          );
           const company = await tx.company.create({
             data: {
-              slug: slug(row.submittedCompanyName, row.id),
-              legalName: row.submittedCompanyName,
-              displayName: row.submittedCompanyName,
+              slug: slug(identity.name, row.id),
+              legalName: identity.name,
+              displayName: identity.name,
+              entityType: identity.entityType,
               normalizedTaxIdentifier: row.normalizedTaxIdentifier,
               verificationState: "ACTIVE",
               verifiedAt: now,

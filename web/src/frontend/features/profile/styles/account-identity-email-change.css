@@ -22,10 +22,13 @@
 }
 
 .account-panel-heading h2 {
-  margin: var(--sh-space-1) 0 var(--sh-space-4);
-  color: var(--sh-color-text-primary);
-  font-size: var(--sh-font-size-h3);
-  line-height: var(--sh-line-height-h3);
+  margin: 6px 0 var(--sh-space-4);
+  color: var(--sh-profile-text);
+  font-family: var(--sh-profile-font-body);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0;
 }
 
 .account-identity-panel form {

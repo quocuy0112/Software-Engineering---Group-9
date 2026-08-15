@@ -108,6 +108,11 @@ export function useAccountPreferences(
   const dirty =
     JSON.stringify(preferences) !== JSON.stringify(savedPreferences);
 
+  const discard = () => {
+    setPreferences(savedPreferences);
+    setFeedback(null);
+  };
+
   return {
     preferences,
     feedback,
@@ -115,6 +120,7 @@ export function useAccountPreferences(
     dirty,
     update,
     save,
+    discard,
     currentLocale,
   };
 }
