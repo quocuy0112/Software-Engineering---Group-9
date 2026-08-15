@@ -1590,3 +1590,68 @@
     font-size: 0.875rem;
   }
 }
+
+.recruiter-review-feedback {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-left: 4px solid #991b1b;
+  background: #fef2f2;
+  border-radius: 0.5rem;
+}
+
+.recruiter-review-feedback__reason {
+  margin: 0 0 0.5rem 0;
+  color: #991b1b;
+  font-weight: 600;
+}
+
+.recruiter-review-feedback__explanation {
+  margin: 0.5rem 0;
+  color: #7f1d1d;
+  line-height: 1.5;
+}
+
+.recruiter-review-feedback__guidance {
+  margin: 0.75rem 0 0 0;
+  color: #7f1d1d;
+  font-style: italic;
+  font-size: 0.875rem;
+}
+
+.recruiter-review-approved-note {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid #166534;
+  background: #f0fdf4;
+  border-radius: 0.5rem;
+  color: #166534;
+  font-weight: 500;
+}
+
+.recruiter-editor-rejection-notice {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 2px solid #991b1b;
+  background: #fef2f2;
+  border-radius: 0.5rem;
+}
+
+.recruiter-editor-rejection-notice > strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #991b1b;
+  font-size: 1.125rem;
+}
+
+.recruiter-editor-rejection-notice > p {
+  margin: 0.5rem 0;
+  color: #7f1d1d;
+  line-height: 1.5;
+}
+
+.recruiter-editor-rejection-notice > p:last-child {
+  font-style: italic;
+  font-size: 0.875rem;
+}
+
+}

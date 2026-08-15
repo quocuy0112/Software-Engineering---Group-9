@@ -27,6 +27,21 @@ import {
 } from "./job-posting-editor-options";
 import { JobPostingPreview } from "./job-posting-preview";
 
+function formatReasonCode(code: string): string {
+  const reasonLabels: Record<string, string> = {
+    INCOMPLETE_OR_UNCLEAR: "Incomplete or unclear information",
+    MISLEADING_CONTENT: "Misleading content",
+    INAPPROPRIATE_LANGUAGE: "Inappropriate language",
+    DUPLICATE_POSTING: "Duplicate posting",
+    INVALID_REQUIREMENTS: "Invalid requirements",
+    INSUFFICIENT_COMPENSATION: "Insufficient compensation details",
+    VERIFICATION_MISMATCH: "Verification mismatch",
+    PROHIBITED_CONTENT: "Prohibited content",
+    OTHER: "Other reason",
+  };
+  return reasonLabels[code] || code.replace(/_/g, " ");
+}
+
 function FieldError({
   field,
   errors,
@@ -138,7 +153,7 @@ export function JobPostingEditor({
   onBack,
   onSaved,
 }: {
-  initialJob: JobCatalogItem;
+  initialJob: RecruiterJob;
   companyName: string;
   onBack: () => void;
   onSaved: (job: RecruiterJob) => void;
@@ -200,6 +215,7 @@ export function JobPostingEditor({
     clearFieldErrors(...fields);
     setJob((current) => ({
       ...updater(current),
+      company: current.company,
       updatedAt: new Date().toISOString(),
     }));
   };
@@ -285,7 +301,10 @@ export function JobPostingEditor({
     if (readOnly) return;
     const prepared = prepareRecruiterJobForSave(job);
     const nextErrors = validateRecruiterJobForSave(prepared, targetStatus);
-    setJob(prepared);
+    setJob((current) => ({
+      ...prepared,
+      company: current.company,
+    }));
     setFieldErrors(nextErrors);
     if (Object.keys(nextErrors).length) {
       setOpenSections((current) => {
@@ -463,6 +482,24 @@ export function JobPostingEditor({
           Build a complete, structured listing and review exactly what
           candidates will see.
         </p>
+        {job.review?.state === "REJECTED" && job.review.reasonCode ? (
+          <div
+            className="recruiter-editor-rejection-notice"
+            role="alert"
+            aria-live="polite"
+          >
+            <strong>Revision needed</strong>
+            <p>
+              <strong>{formatReasonCode(job.review.reasonCode)}</strong>
+              {job.review.publicExplanation
+                ? `: ${job.review.publicExplanation}`
+                : null}
+            </p>
+            <p>
+              Make the required changes and submit again for a new review.
+            </p>
+          </div>
+        ) : null}
       </div>
 
       <div className="recruiter-editor-progress recruiter-surface-card">

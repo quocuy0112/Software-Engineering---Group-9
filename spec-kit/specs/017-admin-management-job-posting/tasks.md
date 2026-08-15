@@ -177,23 +177,23 @@
 
 ### Tests for User Story 4
 
-- [ ] T085 [P] [US4] Add eligible submitter, lost membership, unrelated member, multi-company, duplicate outcome, safe payload, and recipient-read-state tests in `web/tests/backend/integration/job-post-reviews/recruiter-outcome-notification.test.ts` (FR-022, FR-023, SC-006)
-- [ ] T086 [P] [US4] Add rejected revision, changed content hash, new sequence, repeated/concurrent resubmit, preserved history, and prior approved visibility tests in `web/tests/backend/integration/job-post-reviews/recruiter-resubmission.test.ts` (FR-005, FR-008, FR-024, SC-004)
-- [ ] T087 [P] [US4] Add lost-membership direct notification/detail denial and authorized company-workspace discovery tests in `web/tests/security/job-post-reviews/recruiter-outcome-isolation.test.ts` (FR-022, FR-023, FR-027)
-- [ ] T088 [P] [US4] Add approved/rejected notification navigation, feedback display, revise/resubmit, pending replacement, and recovery component tests in `web/tests/frontend/components/recruiter-workspace/job-post-review-outcome.test.tsx` (FR-022-FR-024, FR-029)
-- [ ] T089 [P] [US4] Add outcome announcement, rejection-reason semantics, private-note absence, keyboard revise/resubmit, focus recovery, and axe tests in `web/tests/frontend/accessibility/job-post-reviews/recruiter-outcome.accessibility.test.tsx` (FR-023, FR-024, FR-029, SC-008)
+- [X] T085 [P] [US4] Add eligible submitter, lost membership, unrelated member, multi-company, duplicate outcome, safe payload, and recipient-read-state tests in `web/tests/backend/integration/job-post-reviews/recruiter-outcome-notification.test.ts` (FR-022, FR-023, SC-006)
+- [X] T086 [P] [US4] Add rejected revision, changed content hash, new sequence, repeated/concurrent resubmit, preserved history, and prior approved visibility tests in `web/tests/backend/integration/job-post-reviews/recruiter-resubmission.test.ts` (FR-005, FR-008, FR-024, SC-004)
+- [X] T087 [P] [US4] Add lost-membership direct notification/detail denial and authorized company-workspace discovery tests in `web/tests/security/job-post-reviews/recruiter-outcome-isolation.test.ts` (FR-022, FR-023, FR-027)
+- [X] T088 [P] [US4] Add approved/rejected notification navigation, feedback display, revise/resubmit, pending replacement, and recovery component tests in `web/tests/frontend/components/recruiter-workspace/job-post-review-outcome.test.tsx` (FR-022-FR-024, FR-029)
+- [X] T089 [P] [US4] Add outcome announcement, rejection-reason semantics, private-note absence, keyboard revise/resubmit, focus recovery, and axe tests in `web/tests/frontend/accessibility/job-post-reviews/recruiter-outcome.accessibility.test.tsx` (FR-023, FR-024, FR-029, SC-008)
 
 ### Implementation for User Story 4
 
-- [ ] T090 [US4] Enforce current qualifying membership before outcome notification and tenant-scoped fallback discovery in `web/src/backend/jobs/review/job-post-review-service.ts` (FR-022, FR-023, FR-027)
-- [ ] T091 [US4] Add safe approved/rejected outcome rendering and Recruiter destinations in `web/src/backend/notifications/event-policy.ts` and `web/src/frontend/features/notifications/notification-copy.ts` (FR-022, FR-023)
-- [ ] T092 [US4] Implement rejected-revision and distinct resubmission orchestration with preserved aggregate history in `web/src/backend/jobs/review/job-post-submission-service.ts` (FR-005, FR-024)
-- [ ] T093 [US4] Return tenant-safe public reason/explanation, approved outcome, current sequence, and authorized discovery from `web/src/backend/services/jobs/recruiter-job-posting-data.ts` (FR-022-FR-024)
-- [ ] T094 [US4] Implement approved/rejected feedback, revise entry, resubmit confirmation, and lost-access recovery in `web/src/frontend/features/recruiter-workspace/job-posting-management.tsx` (FR-022-FR-024, FR-029)
-- [ ] T095 [US4] Implement rejected-version editing, public reason display, and new-version submit behavior in `web/src/frontend/features/recruiter-workspace/job-posting-editor.tsx` (FR-019, FR-024, FR-029)
-- [ ] T096 [P] [US4] Add outcome, reason, resubmit, and pending-replacement styles to `web/src/frontend/styles/recruiter-workspace-full.css` (FR-029, SC-008)
-- [ ] T097 [US4] Validate User Story 4 and record focused results in `spec-kit/specs/017-admin-management-job-posting/quickstart.md` (SC-004, SC-006-SC-009)
-- [ ] T098 [US4] Commit the completed Recruiter outcome/resubmission logical group with an English message; use Git history as the commit-hash evidence referenced by `spec-kit/specs/017-admin-management-job-posting/quickstart.md`
+- [X] T090 [US4] Enforce current qualifying membership before outcome notification and tenant-scoped fallback discovery in `web/src/backend/jobs/review/job-post-review-service.ts` (FR-022, FR-023, FR-027)
+- [X] T091 [US4] Add safe approved/rejected outcome rendering and Recruiter destinations in `web/src/backend/notifications/event-policy.ts` and `web/src/frontend/features/notifications/notification-copy.ts` (FR-022, FR-023)
+- [X] T092 [US4] Implement rejected-revision and distinct resubmission orchestration with preserved aggregate history in `web/src/backend/jobs/review/job-post-submission-service.ts` (FR-005, FR-024)
+- [X] T093 [US4] Return tenant-safe public reason/explanation, approved outcome, current sequence, and authorized discovery from `web/src/backend/services/jobs/recruiter-job-posting-data.ts` (FR-022-FR-024)
+- [X] T094 [US4] Implement approved/rejected feedback, revise entry, resubmit confirmation, and lost-access recovery in `web/src/frontend/features/recruiter-workspace/job-posting-management.tsx` (FR-022-FR-024, FR-029)
+- [X] T095 [US4] Implement rejected-version editing, public reason display, and new-version submit behavior in `web/src/frontend/features/recruiter-workspace/job-posting-editor.tsx` (FR-019, FR-024, FR-029)
+- [X] T096 [P] [US4] Add outcome, reason, resubmit, and pending-replacement styles to `web/src/frontend/styles/recruiter-workspace-full.css` (FR-029, SC-008)
+- [X] T097 [US4] Validate User Story 4 and record focused results in `spec-kit/specs/017-admin-management-job-posting/quickstart.md` (SC-004, SC-006-SC-009)
+- [X] T098 [US4] Commit the completed Recruiter outcome/resubmission logical group with an English message; use Git history as the commit-hash evidence referenced by `spec-kit/specs/017-admin-management-job-posting/quickstart.md`
 
 **Checkpoint**: All four P1 user stories form one complete human-controlled P0 review workflow.
 

@@ -125,6 +125,12 @@ Expected:
 
 ## Active Edit and Resubmission
 
+### Recorded User Story 4 evidence (2026-08-15)
+
+- `npm.cmd run typecheck`: passed after restoring the recruiter workspace `company` projection on the editor, management, and route-view paths.
+- Focused Vitest command for outcome notification, resubmission, isolation, UI, and accessibility: 5 files passed, 155 tests passed.
+- The remaining Phase 7 release gates were not run in this pass.
+
 1. Materially edit an active legacy job and confirm the pre-edit content is captured as an imported approved baseline with an exact linked/created public projection before the JSON working record changes.
 2. Simulate failure of that first JSON edit and confirm the imported baseline remains unchanged and public; retry the edit successfully.
 3. Submit the edit, approve it, and confirm the public content changes atomically to the new snapshot.
