@@ -13,10 +13,100 @@ import {
 import type { AiAssessment, AutomaticMatch } from "@/shared/contracts/scoring";
 import { ApplicationDocumentViewer } from "./application-document-viewer";
 
-type Metadata = {
-  cv: { available: boolean; fileName: string | null };
-  coverLetter: { kind: "NONE" | "TEXT" | "DOCUMENT"; fileName?: string | null };
-};
+type DocumentKind = "cv" | "cover-letter";
+
+type PreviewSegment = Readonly<{
+  id: string;
+  kind: "heading" | "paragraph" | "list-item";
+  text: string;
+}>;
+
+type PreviewDocument = Readonly<{
+  kind: DocumentKind;
+  fileName: string | null;
+  mediaType: string | null;
+  pageCount: number | null;
+  segments: readonly PreviewSegment[];
+}>;
+
+type PreviewState =
+  | { status: "loading" }
+  | { status: "ready"; document: PreviewDocument }
+  | { status: "missing" }
+  | { status: "error"; message: string };
+
+function initialPreviewState(): Record<DocumentKind, PreviewState> {
+  return {
+    cv: { status: "loading" },
+    "cover-letter": { status: "loading" },
+  };
+}
+
+function versionSuffix(value: string) {
+  return value.match(/v\d+(?:\.\d+)?$/iu)?.[0] ?? value;
+}
+
+function isPreviewDocument(value: unknown): value is PreviewDocument {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Record<string, unknown>;
+  return (
+    (candidate.kind === "cv" || candidate.kind === "cover-letter") &&
+    (candidate.fileName === null || typeof candidate.fileName === "string") &&
+    (candidate.mediaType === null || typeof candidate.mediaType === "string") &&
+    (candidate.pageCount === null || typeof candidate.pageCount === "number") &&
+    Array.isArray(candidate.segments) &&
+    candidate.segments.every(
+      (segment) =>
+        Boolean(segment) &&
+        typeof segment === "object" &&
+        typeof (segment as Record<string, unknown>).id === "string" &&
+        typeof (segment as Record<string, unknown>).text === "string",
+    )
+  );
+}
+
+async function loadPreview(
+  jobId: string,
+  applicationId: string,
+  kind: DocumentKind,
+  signal: AbortSignal,
+): Promise<PreviewState> {
+  try {
+    const response = await fetch(
+      `/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications/${encodeURIComponent(applicationId)}/documents/${kind}/text`,
+      { cache: "no-store", signal },
+    );
+    const payload = (await response.json().catch(() => null)) as Record<
+      string,
+      unknown
+    > | null;
+    if (response.status === 404 || payload?.code === "DOCUMENT_NOT_FOUND") {
+      return { status: "missing" };
+    }
+    if (!response.ok) {
+      return {
+        status: "error",
+        message:
+          typeof payload?.message === "string"
+            ? payload.message
+            : "Couldn't load document — try downloading the original.",
+      };
+    }
+    if (!isPreviewDocument(payload)) {
+      return {
+        status: "error",
+        message: "Couldn't load document — try downloading the original.",
+      };
+    }
+    return { status: "ready", document: payload };
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") throw error;
+    return {
+      status: "error",
+      message: "Couldn't load document — try downloading the original.",
+    };
+  }
+}
 
 export function DocumentsTab({
   jobId,
@@ -24,49 +114,54 @@ export function DocumentsTab({
   automatic,
   dataQualityNotes = [],
   openKind,
+  openRequest = 0,
 }: {
   jobId: string;
   applicationId: string;
   automatic?: AutomaticMatch | null;
   dataQualityNotes?: AiAssessment["dataQualityNotes"];
-  openKind?: "cv" | "cover-letter" | null;
+  openKind?: DocumentKind | null;
+  openRequest?: number;
 }) {
-  const [viewer, setViewer] = useState<"cv" | "cover-letter" | null>(
-    openKind ?? null,
-  );
-  const [metadata, setMetadata] = useState<Metadata | null>(null);
+  const [previews, setPreviews] = useState(initialPreviewState);
+  const [viewer, setViewer] = useState<DocumentKind | null>(null);
 
   useEffect(() => {
-    let cancelled = false;
-    void fetch(
-      `/api/recruiter/jobs/${encodeURIComponent(jobId)}/applications?limit=100`,
-      { cache: "no-store" },
+    const controller = new AbortController();
+    void Promise.all(
+      (["cv", "cover-letter"] as const).map(
+        async (kind) =>
+          [
+            kind,
+            await loadPreview(jobId, applicationId, kind, controller.signal),
+          ] as const,
+      ),
     )
-      .then((response) =>
-        response.ok
-          ? response.json()
-          : Promise.reject(new Error("metadata unavailable")),
-      )
-      .then((page: { items?: Array<Metadata & { applicationId: string }> }) => {
-        if (!cancelled)
-          setMetadata(
-            page.items?.find((item) => item.applicationId === applicationId) ??
-              null,
-          );
+      .then((entries) => {
+        if (controller.signal.aborted) return;
+        setPreviews(
+          Object.fromEntries(entries) as Record<DocumentKind, PreviewState>,
+        );
       })
-      .catch(() => {
-        if (!cancelled) setMetadata(null);
-      });
-    return () => {
-      cancelled = true;
-    };
+      .catch(() => undefined);
+    return () => controller.abort();
   }, [applicationId, jobId]);
 
+  useEffect(() => {
+    if (!openKind || openRequest < 1) return;
+    const frame = window.requestAnimationFrame(() => {
+      setViewer(openKind);
+      document
+        .getElementById(`document-preview-${openKind}`)
+        ?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [openKind, openRequest]);
+
   const parse = automatic?.cvParse;
-  const parsingWarning = automatic?.mayBeIncomplete ?? false;
-  const coverAvailable =
-    metadata?.coverLetter.kind === "DOCUMENT" ||
-    metadata?.coverLetter.kind === "TEXT";
+  const parsingWarning =
+    parse?.code !== "PARSED_SUCCESSFULLY" ||
+    automatic?.mayBeIncomplete === true;
   const detectedKeywords = useMemo(
     () =>
       Array.from(
@@ -79,41 +174,35 @@ export function DocumentsTab({
       ).slice(0, 8),
     [automatic],
   );
+  const processingValue = parse
+    ? `${(parse.processingMilliseconds / 1000).toFixed(1)}s · CV snapshot ${versionSuffix(parse.snapshotVersion)} · JD ${versionSuffix(automatic?.jdVersion ?? "—")}`
+    : "—";
 
   return (
     <div className="documents-tab">
       <div
-        className={`document-parser-status${parsingWarning || dataQualityNotes.length ? "is-warning" : ""}`}
+        className={
+          parsingWarning
+            ? "document-parser-status is-warning"
+            : "document-parser-status"
+        }
       >
         <span className="document-parser-status__icon" aria-hidden="true">
-          {parsingWarning || dataQualityNotes.length ? (
-            <AlertTriangle />
-          ) : (
-            <CheckCircle2 />
-          )}
+          {parsingWarning ? <AlertTriangle /> : <CheckCircle2 />}
         </span>
         <div>
           <span>Document parsing status</span>
           <strong>
-            {parse?.label ?? "Parsing status unavailable"}
-            {parse ? ` · ${parse.parserVersion}` : ""}
+            {parse
+              ? `${parse.label} · ${parse.parserVersion}`
+              : "Parsing status unavailable"}
           </strong>
-          {parsingWarning ? (
-            <p>
-              Automatic and AI scores may be incomplete because parsing reported
-              an issue.
-            </p>
-          ) : null}
         </div>
         <div className="document-parser-status__time">
           <span>
             <Clock3 aria-hidden="true" /> Processing time
           </span>
-          <strong>
-            {parse
-              ? `${(parse.processingMilliseconds / 1000).toFixed(1)}s · ${parse.snapshotVersion}`
-              : "—"}
-          </strong>
+          <strong>{processingValue}</strong>
         </div>
       </div>
 
@@ -128,6 +217,10 @@ export function DocumentsTab({
               <li key={note.id}>
                 <strong>{note.title}</strong>
                 <span>
+                  {note.severity === "HIGH"
+                    ? "High-severity data issue"
+                    : "Minor data issue"}{" "}
+                  ·{" "}
                   {note.bucket === "input_limitation"
                     ? "Input limitation"
                     : "Extraction uncertainty"}{" "}
@@ -140,52 +233,55 @@ export function DocumentsTab({
       ) : null}
 
       <div className="document-preview-grid">
-        {metadata?.cv.available !== false ? (
-          <DocumentCard
-            title="Original CV"
-            fileName={metadata?.cv.fileName ?? "Candidate CV"}
-            kind="cv"
-            onOpen={() => setViewer("cv")}
-          />
-        ) : null}
-        {coverAvailable ? (
-          <DocumentCard
-            title="Cover letter"
-            fileName={
-              metadata?.coverLetter.fileName ??
-              (metadata?.coverLetter.kind === "TEXT"
-                ? "Submitted cover letter"
-                : "Cover letter")
-            }
-            kind="cover-letter"
-            keywords={detectedKeywords}
-            onOpen={() => setViewer("cover-letter")}
-          />
-        ) : (
-          <div className="document-missing-card">
-            <FileText aria-hidden="true" />
-            <strong>Cover letter not provided</strong>
-            <p>This application did not include a cover letter.</p>
-          </div>
-        )}
+        <DocumentCard
+          id="document-preview-cv"
+          title="Original CV"
+          fileName={
+            previews.cv.status === "ready"
+              ? previews.cv.document.fileName
+              : "Candidate CV"
+          }
+          kind="cv"
+          state={previews.cv}
+          onOpenOriginal={() => setViewer("cv")}
+        />
+        <DocumentCard
+          id="document-preview-cover-letter"
+          title="Cover letter"
+          fileName={
+            previews["cover-letter"].status === "ready"
+              ? previews["cover-letter"].document.fileName
+              : "Cover letter"
+          }
+          kind="cover-letter"
+          state={previews["cover-letter"]}
+          keywords={detectedKeywords}
+          onOpenOriginal={() => setViewer("cover-letter")}
+        />
       </div>
 
       <div className="documents-verification-note">
         <Eye aria-hidden="true" />
         <span>
-          Use this preview to verify evidence. Open the original file for
-          full-page verification.
+          Use this preview to verify evidence. Select &quot;View original
+          CV&quot; or &quot;View cover letter&quot; to open the full file.
         </span>
       </div>
+
       {viewer ? (
         <ApplicationDocumentViewer
+          key={viewer}
           jobId={jobId}
           applicationId={applicationId}
           kind={viewer}
           fileName={
             viewer === "cv"
-              ? metadata?.cv.fileName
-              : metadata?.coverLetter.fileName
+              ? previews.cv.status === "ready"
+                ? previews.cv.document.fileName
+                : null
+              : previews["cover-letter"].status === "ready"
+                ? previews["cover-letter"].document.fileName
+                : null
           }
           onClose={() => setViewer(null)}
         />
@@ -195,70 +291,131 @@ export function DocumentsTab({
 }
 
 function DocumentCard({
+  id,
   title,
   fileName,
   kind,
+  state,
   keywords = [],
-  onOpen,
+  onOpenOriginal,
 }: {
+  id: string;
   title: string;
-  fileName: string;
-  kind: "cv" | "cover-letter";
+  fileName: string | null;
+  kind: DocumentKind;
+  state: PreviewState;
   keywords?: string[];
-  onOpen: () => void;
+  onOpenOriginal: () => void;
 }) {
+  const label = fileName ?? (kind === "cv" ? "Candidate CV" : "Cover letter");
   return (
-    <article className="document-preview-card">
+    <article className="document-preview-card" id={id}>
       <header>
         <div>
           <span className="document-preview-card__title">
             <FileText aria-hidden="true" /> {title}
           </span>
-          <small>{fileName}</small>
+          <small>{label}</small>
         </div>
-        <button type="button" aria-label={`More options for ${title}`}>
+        <button
+          type="button"
+          aria-label={`Open original ${title}`}
+          onClick={onOpenOriginal}
+          title={`Open original ${title}`}
+        >
           <Ellipsis aria-hidden="true" />
         </button>
       </header>
-      <button type="button" className="document-paper-button" onClick={onOpen}>
-        <span className="document-paper">
-          {kind === "cv" ? (
-            <>
-              <strong>NGUYỄN MINH ANH</strong>
-              <b>SENIOR BACKEND DEVELOPER</b>
-              <i>
-                Backend engineer with experience building Java/Spring Boot
-                services, high-performance APIs, and PostgreSQL data systems.
-              </i>
-              <em>EXPERIENCE</em>
-              <i>
-                • Developed backend services and designed REST APIs for a
-                payment platform.
-              </i>
-              <em>SKILLS</em>
-              <i>Java · Spring Boot · REST API · PostgreSQL · Docker</i>
-            </>
-          ) : (
-            <>
-              <strong>Dear SmartHire Recruitment Team,</strong>
-              <i>
-                I am applying for the role because I want to contribute my
-                experience building stable, scalable backend systems.
-              </i>
-              <i>
-                Over the past four years, I have developed Java/Spring Boot
-                services, designed REST APIs, and optimized PostgreSQL.
-              </i>
-              <i>Sincerely,</i>
-              <b>Nguyễn Minh Anh</b>
-            </>
-          )}
-        </span>
-        <span className="document-open-link">
-          <Eye aria-hidden="true" /> Open original
-        </span>
-      </button>
-      {keywords.length ? (
+      <div className="document-preview-surface">
+        {state.status === "loading" ? (
+          <div className="document-preview-loading" role="status">
+            <FileText aria-hidden="true" />
+            <strong>Loading preview</strong>
+            <span>Preparing the parsed document content.</span>
+          </div>
+        ) : state.status === "ready" ? (
+          <ParsedDocumentPreview
+            document={state.document}
+            kind={kind}
+            keywords={keywords}
+          />
+        ) : state.status === "missing" && kind === "cover-letter" ? (
+          <div className="document-missing-card">
+            <FileText aria-hidden="true" />
+            <strong>Cover letter not provided</strong>
+            <p>This application did not include a cover letter.</p>
+          </div>
+        ) : (
+          <div className="document-preview-error" role="alert">
+            <AlertTriangle aria-hidden="true" />
+            <strong>
+              {state.status === "missing"
+                ? "Couldn't load document"
+                : "Document preview unavailable"}
+            </strong>
+            <p>
+              {state.status === "missing"
+                ? "The original document is not available."
+                : state.message}
+            </p>
+            <button type="button" onClick={onOpenOriginal}>
+              View original
+            </button>
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
+
+function ParsedDocumentPreview({
+  document,
+  kind,
+  keywords,
+}: {
+  document: PreviewDocument;
+  kind: DocumentKind;
+  keywords: string[];
+}) {
+  const lines = document.segments.flatMap((segment) =>
+    segment.text
+      .split(/\r?\n+/u)
+      .map((text) => ({ segment, text: text.trim() }))
+      .filter(({ text }) => text.length > 0),
+  );
+
+  return (
+    <div className="document-parsed-paper">
+      <div className="document-parsed-paper__content">
+        {lines.map(({ segment, text }, index) => {
+          const isList =
+            segment.kind === "list-item" || /^[•●▪*-]\s+/u.test(text);
+          const cleanText = text.replace(/^[•●▪*-]\s+/u, "");
+          const isHeading =
+            segment.kind === "heading" ||
+            (cleanText.length <= 64 &&
+              (/^[A-ZÀ-Ỹ0-9][A-ZÀ-Ỹ\s&/(),.-]{3,}$/u.test(cleanText) ||
+                /^(professional summary|experience|skills|education|certifications|languages)$/iu.test(
+                  cleanText,
+                )));
+
+          if (isHeading) {
+            return <h4 key={`${segment.id}-${index}`}>{cleanText}</h4>;
+          }
+          if (isList) {
+            return (
+              <p
+                className="document-parsed-paper__list-item"
+                key={`${segment.id}-${index}`}
+              >
+                {cleanText}
+              </p>
+            );
+          }
+          return <p key={`${segment.id}-${index}`}>{cleanText}</p>;
+        })}
+      </div>
+      {kind === "cover-letter" && keywords.length ? (
         <div className="document-keywords">
           <strong>
             <Tag aria-hidden="true" /> Detected keywords
@@ -270,6 +427,9 @@ function DocumentCard({
           </div>
         </div>
       ) : null}
-    </article>
+      <span className="document-parsed-paper__page">
+        {document.pageCount ? `1 / ${document.pageCount}` : "Parsed preview"}
+      </span>
+    </div>
   );
 }

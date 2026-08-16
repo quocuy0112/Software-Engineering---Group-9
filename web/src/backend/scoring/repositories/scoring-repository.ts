@@ -16,6 +16,7 @@ export type PublishedScoringRecord = Readonly<{
   finalScore: FinalScore | null;
   operationId: string;
   consecutiveFailures: number;
+  safeFailureCode?: string | null;
   rescoreInProgress: boolean;
 }>;
 
@@ -41,6 +42,7 @@ export type ScoringRepositoryPort = Readonly<{
     ai: AiAssessment | null;
     finalScore: FinalScore | null;
     consecutiveFailures?: number;
+    safeFailureCode?: string;
   }): Promise<PublishedScoringRecord>;
   setPriority(input: {
     applicationId: string;
@@ -77,7 +79,7 @@ export function scoringStateFromPublished(record: PublishedScoringRecord | null)
     aiAssessment: {
       kind: "UNAVAILABLE",
       label: "Unavailable",
-      safeFailureCode: "AI_PROVIDER_UNAVAILABLE",
+      safeFailureCode: record.safeFailureCode ?? "AI_PROVIDER_UNAVAILABLE",
       supportGuidance: record.consecutiveFailures >= 3
         ? "Repeated AI failure — try later or contact support."
         : null,

@@ -8,6 +8,8 @@ import {
   Check,
   CircleAlert,
   CircleX,
+  ChevronLeft,
+  ChevronRight,
   Grid2X2,
   List,
   LoaderCircle,
@@ -34,6 +36,112 @@ function departmentFor(job: RecruiterJob) {
     job.description.generalInfo.department?.trim() ||
     job.categoryFamily ||
     job.industry
+  );
+}
+
+type CampaignPaginationItem = number | "ellipsis";
+
+function campaignPaginationItems(
+  pageCount: number,
+  pageIndex: number,
+): CampaignPaginationItem[] {
+  if (pageCount <= 7) {
+    return Array.from({ length: pageCount }, (_, index) => index);
+  }
+
+  const visiblePages = new Set([0, pageCount - 1, pageIndex]);
+  if (pageIndex > 0) visiblePages.add(pageIndex - 1);
+  if (pageIndex < pageCount - 1) visiblePages.add(pageIndex + 1);
+  const sortedPages = Array.from(visiblePages).sort((left, right) => left - right);
+  const items: CampaignPaginationItem[] = [];
+
+  sortedPages.forEach((page, index) => {
+    if (index > 0 && page - sortedPages[index - 1] > 1) {
+      items.push("ellipsis");
+    }
+    items.push(page);
+  });
+
+  return items;
+}
+
+function CampaignPagination({
+  pageIndex,
+  pageCount,
+  pageSize,
+  total,
+  onPage,
+  onPageSize,
+}: {
+  pageIndex: number;
+  pageCount: number;
+  pageSize: number;
+  total: number;
+  onPage: (pageIndex: number) => void;
+  onPageSize: (pageSize: number) => void;
+}) {
+  const start = pageIndex * pageSize + 1;
+  const end = Math.min((pageIndex + 1) * pageSize, total);
+  return (
+    <footer className="ranking-pagination campaign-pagination">
+      <span>
+        Showing {start}–{end} of {total} campaigns
+      </span>
+      <label>
+        <span>Campaigns per page</span>
+        <select
+          value={pageSize}
+          onChange={(event) => onPageSize(Number(event.target.value))}
+        >
+          <option value={12}>12 / page</option>
+          <option value={24}>24 / page</option>
+          <option value={48}>48 / page</option>
+        </select>
+      </label>
+      <nav
+        className="ranking-pager campaign-pagination__pager"
+        aria-label="Campaign pagination"
+      >
+        <button
+          type="button"
+          onClick={() => onPage(pageIndex - 1)}
+          disabled={pageIndex === 0}
+          aria-label="Previous page"
+        >
+          <ChevronLeft aria-hidden="true" />
+        </button>
+        {campaignPaginationItems(pageCount, pageIndex).map((item, index) =>
+          item === "ellipsis" ? (
+            <span
+              className="campaign-pagination__ellipsis"
+              key={`ellipsis-${index}`}
+              aria-hidden="true"
+            >
+              …
+            </span>
+          ) : (
+            <button
+              type="button"
+              className={item === pageIndex ? "is-current" : undefined}
+              key={item}
+              onClick={() => onPage(item)}
+              aria-label={`Page ${item + 1}`}
+              aria-current={item === pageIndex ? "page" : undefined}
+            >
+              {item + 1}
+            </button>
+          ),
+        )}
+        <button
+          type="button"
+          onClick={() => onPage(pageIndex + 1)}
+          disabled={pageIndex === pageCount - 1}
+          aria-label="Next page"
+        >
+          <ChevronRight aria-hidden="true" />
+        </button>
+      </nav>
+    </footer>
   );
 }
 
@@ -186,6 +294,8 @@ export function RecruiterCandidatesPage({ jobs }: { jobs: RecruiterJob[] }) {
   const [status, setStatus] = useState<"ALL" | "active" | "closed">("ALL");
   const [department, setDepartment] = useState("ALL");
   const [view, setView] = useState<"grid" | "list">("grid");
+  const [campaignPageIndex, setCampaignPageIndex] = useState(0);
+  const [campaignPageSize, setCampaignPageSize] = useState(12);
   const selectableJobs = useMemo(
     () =>
       jobs
@@ -222,6 +332,26 @@ export function RecruiterCandidatesPage({ jobs }: { jobs: RecruiterJob[] }) {
         .includes(normalizedSearch);
     });
   }, [department, search, selectableJobs, status]);
+  const campaignPageCount = Math.max(
+    1,
+    Math.ceil(filteredJobs.length / campaignPageSize),
+  );
+  const currentCampaignPageIndex = Math.min(
+    campaignPageIndex,
+    campaignPageCount - 1,
+  );
+  const pagedJobs = filteredJobs.slice(
+    currentCampaignPageIndex * campaignPageSize,
+    (currentCampaignPageIndex + 1) * campaignPageSize,
+  );
+  const hasCampaignFilters =
+    Boolean(search.trim()) || status !== "ALL" || department !== "ALL";
+  const clearCampaignFilters = () => {
+    setSearch("");
+    setStatus("ALL");
+    setDepartment("ALL");
+    setCampaignPageIndex(0);
+  };
   const selectedJob = selectableJobs.find((job) => job.id === selectedJobId);
 
   if (selectedJob) {
@@ -288,7 +418,10 @@ export function RecruiterCandidatesPage({ jobs }: { jobs: RecruiterJob[] }) {
           <span className="sr-only">Search campaigns</span>
           <input
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              setCampaignPageIndex(0);
+            }}
             placeholder="Search by role, company, or department"
           />
         </label>
@@ -296,7 +429,10 @@ export function RecruiterCandidatesPage({ jobs }: { jobs: RecruiterJob[] }) {
           <span>Status</span>
           <select
             value={status}
-            onChange={(event) => setStatus(event.target.value as typeof status)}
+            onChange={(event) => {
+              setStatus(event.target.value as typeof status);
+              setCampaignPageIndex(0);
+            }}
           >
             <option value="ALL">All statuses</option>
             <option value="active">Active</option>
@@ -307,7 +443,10 @@ export function RecruiterCandidatesPage({ jobs }: { jobs: RecruiterJob[] }) {
           <span>Department</span>
           <select
             value={department}
-            onChange={(event) => setDepartment(event.target.value)}
+            onChange={(event) => {
+              setDepartment(event.target.value);
+              setCampaignPageIndex(0);
+            }}
           >
             <option value="ALL">All departments</option>
             {departments.map((item) => (
@@ -342,24 +481,21 @@ export function RecruiterCandidatesPage({ jobs }: { jobs: RecruiterJob[] }) {
       <div className="campaign-results-toolbar">
         <div>
           <strong>
-            {filteredJobs.length}{" "}
-            {filteredJobs.length === 1 ? "campaign" : "campaigns"}
+            {filteredJobs.length
+              ? `Showing ${currentCampaignPageIndex * campaignPageSize + 1}–${Math.min((currentCampaignPageIndex + 1) * campaignPageSize, filteredJobs.length)} of ${filteredJobs.length} campaigns`
+              : "Showing 0–0 of 0 campaigns"}
           </strong>
           <span>
-            {search || status !== "ALL" || department !== "ALL"
+            {hasCampaignFilters
               ? "matching your filters"
               : "ready for candidate review"}
           </span>
         </div>
-        {search || status !== "ALL" || department !== "ALL" ? (
+        {hasCampaignFilters ? (
           <button
             type="button"
             className="ai-ranking-clear-button"
-            onClick={() => {
-              setSearch("");
-              setStatus("ALL");
-              setDepartment("ALL");
-            }}
+            onClick={clearCampaignFilters}
           >
             Clear filters
           </button>
@@ -387,11 +523,7 @@ export function RecruiterCandidatesPage({ jobs }: { jobs: RecruiterJob[] }) {
           <button
             type="button"
             className="ai-ranking-button ai-ranking-button--secondary"
-            onClick={() => {
-              setSearch("");
-              setStatus("ALL");
-              setDepartment("ALL");
-            }}
+            onClick={clearCampaignFilters}
           >
             Clear filters
           </button>
@@ -401,7 +533,7 @@ export function RecruiterCandidatesPage({ jobs }: { jobs: RecruiterJob[] }) {
           className={`campaign-card-grid campaign-card-grid--${view}`}
           role="list"
         >
-          {filteredJobs.map((job) => (
+          {pagedJobs.map((job) => (
             <div role="listitem" key={job.id}>
               <CampaignCard
                 job={job}
@@ -415,6 +547,19 @@ export function RecruiterCandidatesPage({ jobs }: { jobs: RecruiterJob[] }) {
           ))}
         </div>
       )}
+      {filteredJobs.length > 0 ? (
+        <CampaignPagination
+          pageIndex={currentCampaignPageIndex}
+          pageCount={campaignPageCount}
+          pageSize={campaignPageSize}
+          total={filteredJobs.length}
+          onPage={setCampaignPageIndex}
+          onPageSize={(nextPageSize) => {
+            setCampaignPageSize(nextPageSize);
+            setCampaignPageIndex(0);
+          }}
+        />
+      ) : null}
     </section>
   );
 }

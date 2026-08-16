@@ -127,10 +127,21 @@ export class ScoringWorker {
           leaseOwner: null,
           leaseExpiresAt: null,
           completedAt: now,
-          lastSafeFailureCode: null,
         },
       });
       if (changed.count !== 1) return;
+      // A work item can fail before an automatic result is published (for
+      // example when the CV artifact is missing). Do not leave that
+      // application in PROCESSING forever. Existing scores remain visible for
+      // rescore failures, so only reset applications without a current result.
+      await tx.jobApplication.updateMany({
+        where: {
+          id: input.applicationId,
+          currentScoringResultId: null,
+          scoringStatus: { in: ["PROCESSING", "PENDING"] },
+        },
+        data: { scoringStatus: "FAILED" },
+      });
       await this.reconcileInTransaction(tx, input.operationId, now);
     });
   }

@@ -20,8 +20,20 @@ export type RankingTone =
   | "purple"
   | "slate";
 
+const pipelineStageLabels: Record<string, string> = {
+  APPLIED: "New",
+  VIEWED: "Screened",
+  SHORTLISTED: "Under review",
+  WAITLISTED: "Needs details",
+  INTERVIEWING: "Interviewing",
+  OFFERED: "Offer",
+  HIRED: "Hired",
+  OFFER_DECLINED: "Offer declined",
+  REJECTED: "Rejected",
+};
+
 export function statusLabel(value: string) {
-  return value
+  return pipelineStageLabels[value] ?? value
     .replaceAll("_", " ")
     .toLowerCase()
     .replace(/\b\w/gu, (letter) => letter.toUpperCase());
@@ -29,6 +41,11 @@ export function statusLabel(value: string) {
 
 export function formatScore(value: number | null | undefined) {
   return value === null || value === undefined ? "—" : value.toFixed(1);
+}
+
+export function formatTableScore(value: number | null | undefined) {
+  if (value === null || value === undefined) return "\u2014";
+  return Number.isInteger(value) ? String(value) : value.toFixed(1);
 }
 
 export type ScoreBadgeMeta = {

@@ -20,18 +20,40 @@ export class ScoringDetailService {
         jobPostingId: true,
         scoringStatus: true,
         scoringOperations: {
-          where: { state: { in: ["QUEUED", "RUNNING"] }, kind: { in: ["AI_RETRY", "JOB_RESCORE"] } },
+          where: {
+            state: { in: ["QUEUED", "RUNNING"] },
+            kind: { in: ["INITIAL", "AI_RETRY", "JOB_RESCORE"] },
+          },
           orderBy: { requestedAt: "desc" },
-          take: 2,
+          take: 3,
           select: { id: true, kind: true },
+        },
+        jobPosting: {
+          select: {
+            scoringOperations: {
+              where: {
+                state: { in: ["QUEUED", "RUNNING"] },
+                kind: "JOB_RESCORE",
+              },
+              orderBy: { requestedAt: "desc" },
+              take: 1,
+              select: { id: true, kind: true },
+            },
+          },
         },
       },
     });
     if (!application || !(await this.authorization.authorizeApplication(userId, application.jobPostingId, application.id)).authorized) throw new Error("APPLICATION_UNAVAILABLE");
 
     const current = await this.scoring.findCurrent(application.id);
-    const retry = application.scoringOperations.find((operation) => operation.kind === "AI_RETRY");
-    const activeRescore = application.scoringOperations.some((operation) => operation.kind === "JOB_RESCORE");
+    const activeOperation =
+      application.scoringOperations[0] ??
+      application.jobPosting.scoringOperations[0];
+    const retry = activeOperation?.kind === "AI_RETRY" ? activeOperation : null;
+    const activeRescore =
+      application.scoringOperations.some(
+        (operation) => operation.kind === "JOB_RESCORE",
+      ) || application.jobPosting.scoringOperations.length > 0;
     let scoring: ScoringState;
     if (retry && current?.automatic) {
       scoring = { kind: "PENDING", label: "Pending", operationId: retry.id, automaticMatch: current.automatic };
@@ -42,10 +64,16 @@ export class ScoringDetailService {
         kind: "UNAVAILABLE",
         label: "Unavailable",
         automaticMatch: current.automatic,
-        aiAssessment: { kind: "UNAVAILABLE", label: "Unavailable", safeFailureCode: "AI_PROVIDER_UNAVAILABLE", supportGuidance: current.consecutiveFailures >= 3 ? "Repeated AI failure - try later or contact support." : null },
+        aiAssessment: { kind: "UNAVAILABLE", label: "Unavailable", safeFailureCode: current.safeFailureCode ?? "AI_PROVIDER_UNAVAILABLE", supportGuidance: current.consecutiveFailures >= 3 ? "Repeated AI failure - try later or contact support." : null },
         finalScore: { kind: "NOT_CALCULATED", label: "Not calculated" },
         retryAllowed: true,
         consecutiveFailures: Math.max(1, current.consecutiveFailures),
+      };
+    } else if (activeOperation) {
+      scoring = {
+        kind: "PROCESSING",
+        label: "Processing",
+        operationId: activeOperation.id,
       };
     } else if (application.scoringStatus === "PENDING") {
       scoring = { kind: "PENDING", label: "Pending", operationId: "pending-" + application.id, automaticMatch: null };

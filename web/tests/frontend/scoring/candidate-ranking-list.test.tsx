@@ -24,6 +24,7 @@ const page = {
   processingExclusionLabel: null,
   defaultRejectedExclusionLabel: "Rejected candidates are excluded from the active pipeline.",
   rescoreInProgress: false,
+  lastScoredAt: "2026-07-30T02:42:00.000Z",
   filteredCandidates: 1,
   totalCandidates: 1,
   summary: { total: 1, strong: 0, review: 0, low: 0, processing: 1 },
@@ -40,6 +41,13 @@ describe("candidate ranking list", () => {
     expect(await screen.findByText("Candidate One")).toBeInTheDocument();
     expect(screen.getByText("Scores support decision-making only.")).toBeInTheDocument();
     expect(screen.getAllByText("Processing").length).toBeGreaterThan(0);
+    expect(screen.getByRole("link", { name: "Recruitment" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Campaigns" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Senior Engineer" })).toBeInTheDocument();
+    expect(screen.getByText(/1 applications/)).toBeInTheDocument();
+    expect(screen.getByText(/Last scored:/)).toBeInTheDocument();
+    expect(screen.getAllByText("New").length).toBeGreaterThan(0);
+    expect(screen.getByRole("columnheader", { name: "AI" })).toBeInTheDocument();
     expect(screen.getAllByText("—").length).toBeGreaterThan(0);
   });
 
