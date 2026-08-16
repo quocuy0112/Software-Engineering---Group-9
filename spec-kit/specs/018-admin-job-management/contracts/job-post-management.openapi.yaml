@@ -20,6 +20,14 @@ paths:
         - { name: applicationState, in: query, schema: { $ref: '#/components/schemas/ApplicationState' } }
         - { name: reportState, in: query, schema: { type: string, enum: [ANY, REPORTED, UNREPORTED] } }
         - { name: featured, in: query, schema: { type: boolean } }
+        - { name: companyId, in: query, schema: { type: string, minLength: 1, maxLength: 128 } }
+        - { name: recruiterId, in: query, schema: { type: string, minLength: 1, maxLength: 128 } }
+        - { name: approverId, in: query, schema: { type: string, minLength: 1, maxLength: 128 } }
+        - { name: approvedFrom, in: query, schema: { type: string, format: date-time } }
+        - { name: approvedTo, in: query, schema: { type: string, format: date-time } }
+        - { name: publishedFrom, in: query, schema: { type: string, format: date-time } }
+        - { name: publishedTo, in: query, schema: { type: string, format: date-time } }
+        - { name: minimumReports, in: query, schema: { type: integer, minimum: 1, maximum: 100000 } }
       responses:
         '200': { $ref: '#/components/responses/ManagedJobPage' }
         '401': { $ref: '#/components/responses/Unauthorized' }
@@ -43,7 +51,7 @@ paths:
         - name: action
           in: path
           required: true
-          schema: { type: string, enum: [hide, restore, close-applications, reopen-applications, archive, request-changes, soft-delete, feature, unfeature, enforce] }
+          schema: { type: string, enum: [hide, restore, close-applications, reopen-applications, archive, request-changes, soft-delete, feature, amend-feature, unfeature, enforce] }
         - $ref: '#/components/parameters/IdempotencyKey'
         - $ref: '#/components/parameters/ExpectedVersion'
       requestBody:
@@ -100,6 +108,8 @@ components:
         - $ref: '#/components/schemas/ReasonCommand'
         - $ref: '#/components/schemas/RequestChangesCommand'
         - $ref: '#/components/schemas/FeatureCommand'
+        - $ref: '#/components/schemas/AmendFeatureCommand'
+        - $ref: '#/components/schemas/UnfeatureCommand'
         - $ref: '#/components/schemas/EnforceCommand'
       discriminator: { propertyName: command }
     ReasonCommand:
@@ -107,7 +117,7 @@ components:
       additionalProperties: false
       required: [command, confirmation, reason]
       properties:
-        command: { type: string, enum: [HIDE, RESTORE, CLOSE_APPLICATIONS, REOPEN_APPLICATIONS, ARCHIVE, SOFT_DELETE, UNFEATURE] }
+        command: { type: string, enum: [HIDE, RESTORE, CLOSE_APPLICATIONS, REOPEN_APPLICATIONS, ARCHIVE, SOFT_DELETE] }
         confirmation: { const: true }
         reason: { type: string, minLength: 1, maxLength: 1000 }
     RequestChangesCommand:
@@ -131,6 +141,27 @@ components:
         endsAt: { type: string, format: date-time }
         priority: { type: integer, minimum: 1, maximum: 100 }
         reason: { type: string, minLength: 1, maxLength: 1000 }
+    AmendFeatureCommand:
+      type: object
+      additionalProperties: false
+      required: [command, confirmation, featureId, startsAt, endsAt, priority, reason]
+      properties:
+        command: { const: AMEND_FEATURE }
+        confirmation: { const: true }
+        featureId: { type: string, minLength: 1, maxLength: 128 }
+        startsAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+        priority: { type: integer, minimum: 1, maximum: 100 }
+        reason: { type: string, minLength: 1, maxLength: 1000 }
+    UnfeatureCommand:
+      type: object
+      additionalProperties: false
+      required: [command, confirmation, featureId, reason]
+      properties:
+        command: { const: UNFEATURE }
+        confirmation: { const: true }
+        featureId: { type: string, minLength: 1, maxLength: 128 }
+        reason: { type: string, minLength: 1, maxLength: 1000 }
     EnforceCommand:
       type: object
       additionalProperties: false
@@ -140,6 +171,7 @@ components:
         confirmation: { const: true }
         type: { type: string, enum: [HIDE_JOB, CLOSE_APPLICATIONS, REQUEST_CHANGES, SOFT_DELETE_JOB, SUSPEND_COMPANY, SUSPEND_RECRUITER] }
         reason: { type: string, minLength: 1, maxLength: 1000 }
+        publicExplanation: { type: [string, 'null'], minLength: 20, maxLength: 1000, description: Required when type is REQUEST_CHANGES; visible only to the authorized recruiter. }
         reportIds: { type: array, minItems: 1, maxItems: 100, items: { type: string, minLength: 1, maxLength: 128 } }
     CommandResult:
       type: object

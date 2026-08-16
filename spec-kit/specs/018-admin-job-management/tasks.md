@@ -53,7 +53,7 @@
 
 ### Implementation
 
-- [ ] T019 [US1] Implement safe list/detail projections, full-text normalized search, filters, report summary, and pagination in `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
+- [ ] T019 [US1] Implement safe list/detail projections, full-text normalized search, company/recruiter/approver/date/report/featured filters, report summary, and pagination in `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
 - [ ] T020 [US1] Implement list/detail orchestration and response contracts in `web/src/backend/jobs/management/job-post-management-service.ts` and `web/src/app/api/admin/job-postings/{route.ts,[jobId]/route.ts}`
 - [ ] T021 [P] [US1] Build dense React Admin list filters, state chips, report summary, and row navigation in `web/src/frontend/features/admin/job-post-management/job-post-management-list.tsx`
 - [ ] T022 [P] [US1] Build structured job management detail cards, version comparison, metadata, reports, feature, and timeline sections in `web/src/frontend/features/admin/job-post-management/job-post-management-show.tsx`
@@ -126,8 +126,8 @@
 
 ### Implementation
 
-- [ ] T044 [US4] Implement configured placement capacity, atomic overlap checks, eligibility, and schedule/cancel persistence in `web/src/backend/jobs/management/job-post-feature-policy.ts` and `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
-- [ ] T045 [US4] Implement feature command orchestration, history/audit/receipt, and routes in `web/src/backend/jobs/management/job-post-management-service.ts` and `web/src/app/api/admin/job-postings/[jobId]/[action]/route.ts`
+- [ ] T044 [US4] Implement configured placement capacity, atomic overlap checks, eligibility, and schedule/amend/cancel persistence keyed by feature ID in `web/src/backend/jobs/management/job-post-feature-policy.ts` and `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
+- [ ] T045 [US4] Implement feature create/amend/cancel command orchestration, history/audit/receipt, and routes in `web/src/backend/jobs/management/job-post-management-service.ts` and `web/src/app/api/admin/job-postings/[jobId]/[action]/route.ts`
 - [ ] T046 [US4] Build feature scheduling/removal controls and active/scheduled placement presentation in `web/src/frontend/features/admin/job-post-management/job-post-management-action-panel.tsx` and `web/src/frontend/features/admin/job-post-management/job-post-management-show.tsx`
 
 **Checkpoint**: Featured placement is bounded, scoped, auditable, and cannot overbook under concurrent use.
@@ -148,7 +148,7 @@
 
 ### Implementation
 
-- [ ] T050 [US5] Implement enforcement aggregate, target validation, report-link creation, report-state outcome, history, audit, and notifications in `web/src/backend/jobs/management/job-post-enforcement-service.ts` and `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
+- [ ] T050 [US5] Implement enforcement aggregate, target validation, REQUEST_CHANGES public-explanation validation, report-link creation, report-state outcome, history, audit, and notifications in `web/src/backend/jobs/management/job-post-enforcement-service.ts` and `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
 - [ ] T051 [US5] Integrate report detail/list projections and command delegation in `web/src/backend/admin/moderation/moderation-review-service.ts`, `web/src/backend/repositories/admin/prisma-moderation-repository.ts`, and `web/src/app/api/admin/moderation-reports/[reportId]/[action]/route.ts`
 - [ ] T052 [US5] Build report selection/enforcement evidence UI in `web/src/frontend/features/admin/job-post-management/job-post-management-action-panel.tsx`, `web/src/frontend/features/admin/moderation/moderation-review-show.tsx`, and `web/src/frontend/features/admin/moderation/report-action-panel.tsx`
 

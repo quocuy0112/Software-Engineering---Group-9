@@ -93,9 +93,9 @@ Candidate and Recruiter Readers
 
 1. All active administrators retain normal review access.
 2. `JOB_POST_MODERATE` controls inspection, hide/restore, close/reopen, archive, and correction requests.
-3. `JOB_POST_FEATURE` controls feature create/change/cancel.
+3. `JOB_POST_FEATURE` controls feature create, amendment, and cancellation.
 4. `JOB_POST_ENFORCE` controls soft deletion and actions against company/recruiter authority; every enforcement still has an explicit human confirmation and reason.
-5. Migration/seed compatibility grants the narrow minimum scope for existing operational administrator fixtures and requires explicit provisioning for elevated actions.
+5. Add a `PlatformAdministratorGrantScopeAssignment` relation rather than an implicit enum relation. Migration/seed compatibility grants the narrow minimum scope for existing operational administrator fixtures and requires explicit provisioning for elevated actions.
 
 ### Background Lifecycle
 

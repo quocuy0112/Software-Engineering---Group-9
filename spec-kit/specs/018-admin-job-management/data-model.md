@@ -82,7 +82,8 @@ JobPostReviewAggregate 1--* JobPostOperationalHistory
 JobPostReviewAggregate 1--* JobPostEnforcementTarget
 JobPostEnforcementAction 1--* JobPostEnforcementTarget
 ModerationReport *--* JobPostEnforcementAction
-PlatformAdministratorGrant *--* PlatformAdministratorScope
+PlatformAdministratorGrant 1--* PlatformAdministratorGrantScopeAssignment
+PlatformAdministratorGrantScopeAssignment *--1 PlatformAdministratorScope
 ```
 
 ## State Transition Matrix
