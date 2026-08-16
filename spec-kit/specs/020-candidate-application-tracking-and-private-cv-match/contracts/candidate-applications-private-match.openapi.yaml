@@ -1,0 +1,471 @@
+openapi: 3.1.0
+info:
+  title: SmartHire Candidate Applications and Private CV Match API
+  version: 1.0.0
+  description: Candidate-owned contracts for Feature 018. Private-match schemas are never employer-facing.
+servers:
+  - url: /
+paths:
+  /api/candidate/application-drafts:
+    get:
+      operationId: getApplicationDraft
+      parameters:
+        - $ref: '#/components/parameters/JobIdQuery'
+      responses:
+        '200':
+          description: Owned active draft or null
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [draft]
+                properties:
+                  draft:
+                    oneOf:
+                      - $ref: '#/components/schemas/ApplicationDraft'
+                      - type: 'null'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    put:
+      operationId: saveApplicationDraft
+      parameters:
+        - $ref: '#/components/parameters/CsrfToken'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveDraftCommand' }
+      responses:
+        '200':
+          description: Created or updated single candidate-job draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApplicationDraft' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/candidate/applications:
+    post:
+      operationId: submitApplication
+      parameters:
+        - $ref: '#/components/parameters/CsrfToken'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [draftId, expectedRevision, informationConfirmed]
+              properties:
+                draftId: { type: string, minLength: 1, maxLength: 128 }
+                expectedRevision: { type: integer, minimum: 1 }
+                informationConfirmed: { const: true }
+      responses:
+        '201':
+          description: Newly accepted immutable Application
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApplicationReceipt' }
+        '200':
+          description: Idempotent replay returns the existing Application receipt
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApplicationReceipt' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/candidate/applications/{applicationId}:
+    get:
+      operationId: getCandidateApplicationTracker
+      parameters:
+        - $ref: '#/components/parameters/ApplicationId'
+      responses:
+        '200':
+          description: Candidate-safe owned Application projection
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApplicationTracker' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+  /api/candidate/applications/{applicationId}/withdraw:
+    post:
+      operationId: withdrawCandidateApplication
+      parameters:
+        - $ref: '#/components/parameters/ApplicationId'
+        - $ref: '#/components/parameters/CsrfToken'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [expectedVersion, confirmed]
+              properties:
+                expectedVersion: { type: integer, minimum: 1 }
+                confirmed: { const: true }
+      responses:
+        '200':
+          description: Idempotent withdrawal outcome
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WithdrawalOutcome' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/candidate/applications/{applicationId}/notification-preferences:
+    patch:
+      operationId: updateApplicationNotificationPreferences
+      parameters:
+        - $ref: '#/components/parameters/ApplicationId'
+        - $ref: '#/components/parameters/CsrfToken'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [emailEnabled, inAppEnabled, expectedVersion]
+              properties:
+                emailEnabled: { type: boolean }
+                inAppEnabled: { type: boolean }
+                expectedVersion: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: Application-local settings
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NotificationPreference' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/candidate/private-cv-matches:
+    post:
+      operationId: createPrivateCvMatch
+      parameters:
+        - $ref: '#/components/parameters/CsrfToken'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [jobId, cvVersionId]
+              properties:
+                jobId: { type: string, minLength: 1, maxLength: 128 }
+                cvVersionId: { type: string, minLength: 1, maxLength: 128 }
+      responses:
+        '202':
+          description: Private asynchronous check accepted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PrivateMatchStatus' }
+        '200':
+          description: Idempotent replay
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PrivateMatchStatus' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/candidate/private-cv-matches/{checkId}:
+    get:
+      operationId: getPrivateCvMatch
+      parameters:
+        - $ref: '#/components/parameters/CheckId'
+      responses:
+        '200':
+          description: Owner-only private status, limited report, or full report
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PrivateMatchStatus'
+                  - $ref: '#/components/schemas/LimitedPrivateReport'
+                  - $ref: '#/components/schemas/FullPrivateReport'
+                discriminator:
+                  propertyName: view
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+    delete:
+      operationId: deletePrivateCvMatch
+      parameters:
+        - $ref: '#/components/parameters/CheckId'
+        - $ref: '#/components/parameters/CsrfToken'
+      responses:
+        '204': { description: Access revoked immediately; cleanup scheduled }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+  /api/candidate/private-cv-matches/{checkId}/retry-ai:
+    post:
+      operationId: retryPrivateCvMatchAi
+      parameters:
+        - $ref: '#/components/parameters/CheckId'
+        - $ref: '#/components/parameters/CsrfToken'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '202':
+          description: AI-only retry accepted against fixed inputs
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PrivateMatchStatus' }
+        '200':
+          description: Idempotent replay
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PrivateMatchStatus' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+components:
+  parameters:
+    ApplicationId:
+      name: applicationId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    CheckId:
+      name: checkId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    JobIdQuery:
+      name: jobId
+      in: query
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    CsrfToken:
+      name: x-csrf-token
+      in: header
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 2048 }
+    IdempotencyKey:
+      name: idempotency-key
+      in: header
+      required: true
+      schema: { type: string, minLength: 16, maxLength: 128 }
+  schemas:
+    FileDescriptor:
+      type: object
+      additionalProperties: false
+      required: [versionId, displayName, mimeType, byteSize, parseStatus]
+      properties:
+        versionId: { type: string }
+        displayName: { type: string, maxLength: 255 }
+        mimeType: { type: string, enum: [application/pdf, application/vnd.openxmlformats-officedocument.wordprocessingml.document] }
+        byteSize: { type: integer, minimum: 1, maximum: 5000000 }
+        pageCount: { type: [integer, 'null'], minimum: 1 }
+        parseStatus: { type: string, enum: [READY, PARTIAL, FAILED] }
+    ApplicationDraft:
+      type: object
+      additionalProperties: false
+      required: [draftId, jobId, revision, personalInformation, cv, coverLetter, message, updatedAt, expiresAt]
+      properties:
+        draftId: { type: string }
+        jobId: { type: string }
+        revision: { type: integer, minimum: 1 }
+        personalInformation: { type: object, additionalProperties: true }
+        cv: { $ref: '#/components/schemas/FileDescriptor' }
+        coverLetter: { type: [object, 'null'], additionalProperties: true }
+        message: { type: [string, 'null'], maxLength: 2000 }
+        updatedAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+    SaveDraftCommand:
+      type: object
+      additionalProperties: false
+      required: [jobId, expectedRevision, personalInformation, cvVersionId]
+      properties:
+        jobId: { type: string }
+        expectedRevision: { type: [integer, 'null'], minimum: 1 }
+        personalInformation: { type: object, additionalProperties: true }
+        cvVersionId: { type: string }
+        coverLetter: { type: [object, 'null'], additionalProperties: true }
+        message: { type: [string, 'null'], maxLength: 2000 }
+    IntakeStep:
+      type: object
+      additionalProperties: false
+      required: [code, status, timestamp]
+      properties:
+        code: { type: string, enum: [APPLICATION_RECEIVED, CHECKING_FILES, SENT_TO_RECRUITER] }
+        status: { type: string, enum: [PENDING, ACTIVE, COMPLETE, ATTENTION_REQUIRED] }
+        timestamp: { type: [string, 'null'], format: date-time }
+    ApplicationIntake:
+      type: object
+      additionalProperties: false
+      required: [progressPercent, steps]
+      properties:
+        progressPercent: { type: integer, minimum: 0, maximum: 100 }
+        steps: { type: array, minItems: 3, maxItems: 3, items: { $ref: '#/components/schemas/IntakeStep' } }
+    ApplicationReceipt:
+      type: object
+      additionalProperties: false
+      required: [applicationId, submittedAt, publicStage, intake, files]
+      properties:
+        applicationId: { type: string }
+        submittedAt: { type: string, format: date-time }
+        publicStage: { const: APPLICATION_SUBMITTED }
+        intake: { $ref: '#/components/schemas/ApplicationIntake' }
+        files: { type: array, minItems: 1, items: { $ref: '#/components/schemas/FileDescriptor' } }
+    PublicUpdate:
+      type: object
+      additionalProperties: false
+      required: [id, kind, title, occurredAt]
+      properties:
+        id: { type: string }
+        kind: { type: string, enum: [SUBMITTED, UNDER_REVIEW, INTERVIEW, OUTCOME, WITHDRAWN, TECHNICAL_UPDATE] }
+        title: { type: string, maxLength: 160 }
+        occurredAt: { type: string, format: date-time }
+    NotificationPreference:
+      type: object
+      additionalProperties: false
+      required: [emailEnabled, inAppEnabled, version, updatedAt]
+      properties:
+        emailEnabled: { type: boolean }
+        inAppEnabled: { type: boolean }
+        version: { type: integer, minimum: 1 }
+        updatedAt: { type: string, format: date-time }
+    ApplicationTracker:
+      type: object
+      additionalProperties: false
+      required: [applicationId, publicStage, publicOutcome, lastUpdatedAt, stageVersion, intake, updates, files, notificationPreference, canWithdraw]
+      properties:
+        applicationId: { type: string }
+        publicStage: { type: string, enum: [APPLICATION_SUBMITTED, UNDER_REVIEW, INTERVIEW, OUTCOME] }
+        publicOutcome: { type: [string, 'null'], enum: [OFFERED, HIRED, OFFER_DECLINED, REJECTED, WITHDRAWN, null] }
+        lastUpdatedAt: { type: string, format: date-time }
+        stageVersion: { type: integer, minimum: 1 }
+        intake: { $ref: '#/components/schemas/ApplicationIntake' }
+        updates: { type: array, items: { $ref: '#/components/schemas/PublicUpdate' } }
+        files: { type: array, minItems: 1, items: { $ref: '#/components/schemas/FileDescriptor' } }
+        notificationPreference: { $ref: '#/components/schemas/NotificationPreference' }
+        canWithdraw: { type: boolean }
+    WithdrawalOutcome:
+      type: object
+      additionalProperties: false
+      required: [applicationId, outcome, withdrawnAt, preservedStage, version]
+      properties:
+        applicationId: { type: string }
+        outcome: { const: WITHDRAWN }
+        withdrawnAt: { type: string, format: date-time }
+        preservedStage: { type: string, enum: [APPLIED, VIEWED, SHORTLISTED, WAITLISTED] }
+        version: { type: integer, minimum: 1 }
+    SourceProvenance:
+      type: object
+      additionalProperties: false
+      required: [cvVersionId, cvVersion, jdVersion, scoringConfigVersion, aiProvider, aiModel, promptVersion, inputPolicyVersion]
+      properties:
+        cvVersionId: { type: string }
+        cvVersion: { type: integer, minimum: 1 }
+        jdVersion: { type: integer, minimum: 1 }
+        scoringConfigVersion: { type: string }
+        aiProvider: { type: [string, 'null'], maxLength: 100 }
+        aiModel: { type: [string, 'null'], maxLength: 200 }
+        promptVersion: { type: [string, 'null'], maxLength: 100 }
+        inputPolicyVersion: { type: [string, 'null'], maxLength: 100 }
+    PrivateMatchStatus:
+      type: object
+      additionalProperties: false
+      required: [view, checkId, state, createdAt, expiresAt, provenance]
+      properties:
+        view: { const: STATUS }
+        checkId: { type: string }
+        state: { type: string, enum: [QUEUED, ANALYZING, FAILED] }
+        createdAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+        provenance: { $ref: '#/components/schemas/SourceProvenance' }
+    EvidenceItem:
+      type: object
+      additionalProperties: false
+      required: [type, quote, criterion]
+      properties:
+        type: { type: string, enum: [SKILL, PROJECT, IMPACT, EXPERIENCE, EDUCATION, OTHER] }
+        quote: { type: string, maxLength: 1000 }
+        criterion: { type: string, maxLength: 300 }
+    AutomaticComponent:
+      type: object
+      additionalProperties: false
+      required: [score, weight, weightedContribution, evidenceCoverage, matchedRequirements, gaps, evidence]
+      properties:
+        score: { type: number, minimum: 0, maximum: 100 }
+        weight: { const: 0.6 }
+        weightedContribution: { type: number, minimum: 0, maximum: 60 }
+        evidenceCoverage: { type: number, minimum: 0, maximum: 100 }
+        matchedRequirements: { type: array, items: { type: string, maxLength: 200 } }
+        gaps: { type: array, items: { type: string, maxLength: 500 } }
+        evidence: { type: array, items: { $ref: '#/components/schemas/EvidenceItem' } }
+    LimitedPrivateReport:
+      type: object
+      additionalProperties: false
+      required: [view, checkId, mode, automatic, aiEvaluation, hybridScore, matchBand, provenance, canRetryAi, canApply]
+      properties:
+        view: { const: LIMITED_REPORT }
+        checkId: { type: string }
+        mode: { const: LIMITED }
+        automatic: { $ref: '#/components/schemas/AutomaticComponent' }
+        aiEvaluation: { type: 'null' }
+        hybridScore: { type: 'null' }
+        matchBand: { type: 'null' }
+        provenance: { $ref: '#/components/schemas/SourceProvenance' }
+        canRetryAi: { const: true }
+        canApply: { type: boolean }
+    FullPrivateReport:
+      type: object
+      additionalProperties: false
+      required: [view, checkId, mode, hybridScore, matchBand, automatic, aiEvaluation, evidenceConfidence, summary, actions, provenance, canApply]
+      properties:
+        view: { const: FULL_REPORT }
+        checkId: { type: string }
+        mode: { const: HYBRID }
+        hybridScore: { type: number, minimum: 0, maximum: 100, multipleOf: 0.1 }
+        matchBand: { type: string, enum: [HIGH_MATCH, MEDIUM_MATCH, LOW_MATCH] }
+        automatic: { $ref: '#/components/schemas/AutomaticComponent' }
+        aiEvaluation:
+          type: object
+          additionalProperties: false
+          required: [score, weight, weightedContribution]
+          properties:
+            score: { type: number, minimum: 0, maximum: 100 }
+            weight: { const: 0.4 }
+            weightedContribution: { type: number, minimum: 0, maximum: 40 }
+        evidenceConfidence: { type: number, minimum: 0, maximum: 100 }
+        summary: { type: string, maxLength: 1000 }
+        actions: { type: array, items: { type: string, maxLength: 500 } }
+        provenance: { $ref: '#/components/schemas/SourceProvenance' }
+        canApply: { type: boolean }
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [code]
+      properties:
+        code:
+          type: string
+          enum: [AUTH_REQUIRED, FORBIDDEN, INVALID_REQUEST, UNAVAILABLE, CONFLICT, JOB_UNAVAILABLE, CV_UNAVAILABLE, CV_NOT_PARSED, WITHDRAWAL_NOT_ALLOWED, INTERNAL_FAILURE]
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+    Forbidden:
+      description: CSRF or authority check failed
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+    Invalid:
+      description: Request validation failed
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+    Unavailable:
+      description: Missing, expired, deleted, or not owned; response is indistinguishable
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+    Conflict:
+      description: Stale revision/version or invalid current state
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
