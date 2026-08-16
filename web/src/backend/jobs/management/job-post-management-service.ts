@@ -465,13 +465,17 @@ export class JobPostManagementService {
           ) {
             await createInAppNotification(tx, {
               recipientUserId: row.approvedVersion.submittedByUserId,
-              kind: "JOB_POST_REJECTED",
+              kind: "JOB_POST_CHANGES_REQUESTED",
               deduplicationKey: `job-post-correction:${row.id}:${version}`,
               correlationId,
               occurredAt: now,
               contextType: "JOB_POST_REVIEW",
               contextId: row.approvedVersionId,
-              variables: { audience: "USER", state: "CHANGES_REQUESTED" },
+              variables: {
+                audience: "USER",
+                recipientRole: "RECRUITER",
+                state: "CHANGES_REQUESTED",
+              },
             });
           }
           return {

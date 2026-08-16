@@ -46,6 +46,7 @@ export const notificationKinds = [
   "JOB_POST_REVIEW_REQUESTED_ADMIN",
   "JOB_POST_APPROVED",
   "JOB_POST_REJECTED",
+  "JOB_POST_CHANGES_REQUESTED",
 ] as const;
 
 export const notificationKindSchema = z.enum(notificationKinds);
@@ -73,6 +74,16 @@ export const notificationSeverities = [
 ] as const;
 export const notificationSeveritySchema = z.enum(notificationSeverities);
 export type NotificationSeverity = z.infer<typeof notificationSeveritySchema>;
+
+export const notificationRecipientRoles = [
+  "CANDIDATE",
+  "RECRUITER",
+  "ADMIN",
+] as const;
+export const notificationRecipientRoleSchema = z.enum(notificationRecipientRoles);
+export type NotificationRecipientRole = z.infer<
+  typeof notificationRecipientRoleSchema
+>;
 
 export const notificationContextTypes = [
   "ACCOUNT",

@@ -178,6 +178,15 @@ export const InAppNotificationAudience = {
 export type InAppNotificationAudience = (typeof InAppNotificationAudience)[keyof typeof InAppNotificationAudience]
 
 
+export const InAppNotificationRecipientRole = {
+  CANDIDATE: 'CANDIDATE',
+  RECRUITER: 'RECRUITER',
+  ADMIN: 'ADMIN'
+} as const
+
+export type InAppNotificationRecipientRole = (typeof InAppNotificationRecipientRole)[keyof typeof InAppNotificationRecipientRole]
+
+
 export const InAppNotificationKind = {
   EMAIL_CHANGE_REQUESTED_ALERT: 'EMAIL_CHANGE_REQUESTED_ALERT',
   PASSWORD_CHANGED: 'PASSWORD_CHANGED',
@@ -223,7 +232,8 @@ export const InAppNotificationKind = {
   DELIVERY_MANUAL_INTERVENTION_REQUIRED: 'DELIVERY_MANUAL_INTERVENTION_REQUIRED',
   JOB_POST_REVIEW_REQUESTED_ADMIN: 'JOB_POST_REVIEW_REQUESTED_ADMIN',
   JOB_POST_APPROVED: 'JOB_POST_APPROVED',
-  JOB_POST_REJECTED: 'JOB_POST_REJECTED'
+  JOB_POST_REJECTED: 'JOB_POST_REJECTED',
+  JOB_POST_CHANGES_REQUESTED: 'JOB_POST_CHANGES_REQUESTED'
 } as const
 
 export type InAppNotificationKind = (typeof InAppNotificationKind)[keyof typeof InAppNotificationKind]

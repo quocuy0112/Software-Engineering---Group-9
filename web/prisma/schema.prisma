@@ -134,6 +134,14 @@ enum InAppNotificationAudience {
   ADMIN
 }
 
+/// Immutable audience selected when the event was emitted.  This preserves the
+/// meaning of a notification for accounts that later gain or lose another role.
+enum InAppNotificationRecipientRole {
+  CANDIDATE
+  RECRUITER
+  ADMIN
+}
+
 enum InAppNotificationKind {
   EMAIL_CHANGE_REQUESTED_ALERT
   PASSWORD_CHANGED
@@ -180,6 +188,7 @@ enum InAppNotificationKind {
   JOB_POST_REVIEW_REQUESTED_ADMIN
   JOB_POST_APPROVED
   JOB_POST_REJECTED
+  JOB_POST_CHANGES_REQUESTED
 }
 
 enum PreferenceLanguage {
@@ -1491,6 +1500,7 @@ model InAppNotification {
   category         InAppNotificationCategory
   severity         InAppNotificationSeverity
   audience         InAppNotificationAudience     @default(USER)
+  recipientRole    InAppNotificationRecipientRole @default(CANDIDATE)
   title            String                        @db.VarChar(120)
   summary          String                        @db.VarChar(500)
   variables        Json?
@@ -1510,6 +1520,7 @@ model InAppNotification {
   @@index([recipientUserId, lastOccurredAt(sort: Desc), id(sort: Desc)])
   @@index([recipientUserId, readAt, expiresAt])
   @@index([recipientUserId, audience, readAt, expiresAt])
+  @@index([recipientUserId, recipientRole, readAt, expiresAt])
   @@index([recipientUserId, contextType, contextId, readAt], map: "InAppNotification_recipientUserId_contextType_contextId_readAt_")
   @@index([expiresAt, id])
 }

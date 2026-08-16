@@ -519,6 +519,13 @@ export type EnumInAppNotificationAudienceFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumInAppNotificationAudienceFilter<$PrismaModel> | $Enums.InAppNotificationAudience
 }
 
+export type EnumInAppNotificationRecipientRoleFilter<$PrismaModel = never> = {
+  equals?: $Enums.InAppNotificationRecipientRole | Prisma.EnumInAppNotificationRecipientRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.InAppNotificationRecipientRole[] | Prisma.ListEnumInAppNotificationRecipientRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.InAppNotificationRecipientRole[] | Prisma.ListEnumInAppNotificationRecipientRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumInAppNotificationRecipientRoleFilter<$PrismaModel> | $Enums.InAppNotificationRecipientRole
+}
+
 export type JsonNullableFilter<$PrismaModel = never> =
 | Prisma.PatchUndefined<
     Prisma.Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -588,6 +595,16 @@ export type EnumInAppNotificationAudienceWithAggregatesFilter<$PrismaModel = nev
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumInAppNotificationAudienceFilter<$PrismaModel>
   _max?: Prisma.NestedEnumInAppNotificationAudienceFilter<$PrismaModel>
+}
+
+export type EnumInAppNotificationRecipientRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.InAppNotificationRecipientRole | Prisma.EnumInAppNotificationRecipientRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.InAppNotificationRecipientRole[] | Prisma.ListEnumInAppNotificationRecipientRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.InAppNotificationRecipientRole[] | Prisma.ListEnumInAppNotificationRecipientRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumInAppNotificationRecipientRoleWithAggregatesFilter<$PrismaModel> | $Enums.InAppNotificationRecipientRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumInAppNotificationRecipientRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumInAppNotificationRecipientRoleFilter<$PrismaModel>
 }
 
 export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
@@ -3042,6 +3059,13 @@ export type NestedEnumInAppNotificationAudienceFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumInAppNotificationAudienceFilter<$PrismaModel> | $Enums.InAppNotificationAudience
 }
 
+export type NestedEnumInAppNotificationRecipientRoleFilter<$PrismaModel = never> = {
+  equals?: $Enums.InAppNotificationRecipientRole | Prisma.EnumInAppNotificationRecipientRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.InAppNotificationRecipientRole[] | Prisma.ListEnumInAppNotificationRecipientRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.InAppNotificationRecipientRole[] | Prisma.ListEnumInAppNotificationRecipientRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumInAppNotificationRecipientRoleFilter<$PrismaModel> | $Enums.InAppNotificationRecipientRole
+}
+
 export type NestedEnumInAppNotificationContextTypeNullableFilter<$PrismaModel = never> = {
   equals?: $Enums.InAppNotificationContextType | Prisma.EnumInAppNotificationContextTypeFieldRefInput<$PrismaModel> | null
   in?: $Enums.InAppNotificationContextType[] | Prisma.ListEnumInAppNotificationContextTypeFieldRefInput<$PrismaModel> | null
@@ -3087,6 +3111,16 @@ export type NestedEnumInAppNotificationAudienceWithAggregatesFilter<$PrismaModel
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumInAppNotificationAudienceFilter<$PrismaModel>
   _max?: Prisma.NestedEnumInAppNotificationAudienceFilter<$PrismaModel>
+}
+
+export type NestedEnumInAppNotificationRecipientRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.InAppNotificationRecipientRole | Prisma.EnumInAppNotificationRecipientRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.InAppNotificationRecipientRole[] | Prisma.ListEnumInAppNotificationRecipientRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.InAppNotificationRecipientRole[] | Prisma.ListEnumInAppNotificationRecipientRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumInAppNotificationRecipientRoleWithAggregatesFilter<$PrismaModel> | $Enums.InAppNotificationRecipientRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumInAppNotificationRecipientRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumInAppNotificationRecipientRoleFilter<$PrismaModel>
 }
 
 export type NestedJsonNullableFilter<$PrismaModel = never> =
