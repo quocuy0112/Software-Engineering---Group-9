@@ -32,7 +32,7 @@
 - [X] T011 Implement versioned command service with AdminRequestBoundary/command receipts/audit/notifications in `web/src/backend/jobs/management/job-post-management-service.ts`
 - [X] T012 Integrate approved revision satisfaction and candidate projection guards into `web/src/backend/jobs/review/job-post-review-service.ts`, `web/src/backend/repositories/jobs/prisma-job-post-review-repository.ts`, and candidate job read/application boundaries
 - [X] T013 Add protected list/detail/command routes and strict path-command validation in `web/src/app/api/admin/job-postings/route.ts`, `web/src/app/api/admin/job-postings/[jobId]/route.ts`, and `web/src/app/api/admin/job-postings/[jobId]/[action]/route.ts`
-- [ ] T014 Add foundational authorization, idempotency, projection-integrity, and migration tests in `web/tests/security/job-post-management/`, `web/tests/backend/integration/job-post-management/`, and `web/tests/architecture/job-post-management-boundaries.test.ts`
+- [X] T014 Add foundational authorization, idempotency, projection-integrity, and migration tests in `web/tests/security/job-post-management/`, `web/tests/backend/integration/job-post-management/`, and `web/tests/architecture/job-post-management-boundaries.test.ts`
 
 **Checkpoint**: Migration, state authority, strict command boundary, and candidate safety are ready. No user story UI is enabled before this checkpoint passes.
 
@@ -47,9 +47,9 @@
 ### Tests
 
 - [X] T015 [P] [US1] Add list/detail contract tests in `web/tests/backend/contract/job-post-management/list-detail.contract.test.ts`
-- [ ] T016 [P] [US1] Add repository integration tests for safe search, filters, report aggregation, version joins, and pagination in `web/tests/backend/integration/job-post-management/list-detail.integration.test.ts`
-- [ ] T017 [P] [US1] Add security tests for anonymous, inactive, cross-company, and unscoped administrator reads in `web/tests/security/job-post-management/list-detail-authorization.test.ts`
-- [ ] T018 [P] [US1] Add component and accessibility tests in `web/tests/frontend/components/admin-management/job-post-management-list.test.tsx` and `web/tests/frontend/accessibility/admin-management/job-post-management-list.accessibility.test.tsx`
+- [X] T016 [P] [US1] Add repository integration tests for safe search, filters, report aggregation, version joins, and pagination in `web/tests/backend/integration/job-post-management/list-detail.integration.test.ts`
+- [X] T017 [P] [US1] Add security tests for anonymous, inactive, cross-company, and unscoped administrator reads in `web/tests/security/job-post-management/list-detail-authorization.test.ts`
+- [X] T018 [P] [US1] Add component and accessibility tests in `web/tests/frontend/components/admin-management/job-post-management-list.test.tsx` and `web/tests/frontend/accessibility/admin-management/job-post-management-list.accessibility.test.tsx`
 
 ### Implementation
 
@@ -72,9 +72,9 @@
 ### Tests
 
 - [X] T024 [P] [US2] Add command contract tests for hide, restore, close, reopen, archive, and soft-delete payloads in `web/tests/backend/contract/job-post-management/lifecycle.contract.test.ts`
-- [ ] T025 [P] [US2] Add transaction/integration tests for state matrix, projection synchronization, command replay, stale conflict, and archive recovery in `web/tests/backend/integration/job-post-management/lifecycle.integration.test.ts`
-- [ ] T026 [P] [US2] Add candidate visibility/application regression tests in `web/tests/backend/integration/jobs/job-post-management-visibility.integration.test.ts`
-- [ ] T027 [P] [US2] Add lifecycle action-panel component/accessibility tests in `web/tests/frontend/components/admin-management/job-post-management-lifecycle.test.tsx` and `web/tests/frontend/accessibility/admin-management/job-post-management-lifecycle.accessibility.test.tsx`
+- [X] T025 [P] [US2] Add transaction/integration tests for state matrix, projection synchronization, command replay, stale conflict, and archive recovery in `web/tests/backend/integration/job-post-management/lifecycle.integration.test.ts`
+- [X] T026 [P] [US2] Add candidate visibility/application regression tests in `web/tests/backend/integration/jobs/job-post-management-visibility.integration.test.ts`
+- [X] T027 [P] [US2] Add lifecycle action-panel component/accessibility tests in `web/tests/frontend/components/admin-management/job-post-management-lifecycle.test.tsx` and `web/tests/frontend/accessibility/admin-management/job-post-management-lifecycle.accessibility.test.tsx`
 
 ### Implementation
 
@@ -97,14 +97,14 @@
 ### Tests
 
 - [X] T033 [P] [US3] Add correction command and recruiter projection contract tests in `web/tests/backend/contract/job-post-management/correction-request.contract.test.ts`
-- [ ] T034 [P] [US3] Add correction/live-version integration and concurrency tests in `web/tests/backend/integration/job-post-management/correction-request.integration.test.ts`
-- [ ] T035 [P] [US3] Add recruiter workspace and administrator detail component tests in `web/tests/frontend/components/recruiter-workspace/job-post-correction-request.test.tsx` and `web/tests/frontend/components/admin-management/job-post-management-correction.test.tsx`
+- [X] T034 [P] [US3] Add correction/live-version integration and concurrency tests in `web/tests/backend/integration/job-post-management/correction-request.integration.test.ts`
+- [X] T035 [P] [US3] Add recruiter workspace and administrator detail component tests in `web/tests/frontend/components/recruiter-workspace/job-post-correction-request.test.tsx` and `web/tests/frontend/components/admin-management/job-post-management-correction.test.tsx`
 
 ### Implementation
 
 - [X] T036 [US3] Implement correction-request persistence, single-open-request invariant, and immediate-hide composition in `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts` and `web/src/backend/jobs/management/job-post-management-service.ts`
 - [X] T037 [US3] Link recruiter submission and review approval/rejection to correction-request state in `web/src/backend/jobs/review/job-post-review-service.ts`, `web/src/backend/repositories/jobs/prisma-job-post-review-repository.ts`, and `web/src/backend/jobs/review/job-post-publication-projector.ts`
-- [ ] T038 [US3] Expose authorized correction context and read-only version labels in `web/src/backend/jobs/review/job-post-review-service-factory.ts`, recruiter job APIs, and `web/src/shared/contracts/recruiter-job-posting.ts`
+- [X] T038 [US3] Expose authorized correction context and read-only version labels in `web/src/backend/jobs/review/job-post-review-service-factory.ts`, recruiter job APIs, and `web/src/shared/contracts/recruiter-job-posting.ts`
 - [X] T039 [US3] Build administrator correction-request controls and live/pending version distinction in `web/src/frontend/features/admin/job-post-management/job-post-management-action-panel.tsx` and `web/src/frontend/features/admin/job-post-management/job-post-management-show.tsx`
 - [X] T040 [US3] Build recruiter correction banner and revision-submit guidance in `web/src/frontend/features/recruiter/jobs/` and `web/src/frontend/styles/recruiter-workspace-full.css`
 
@@ -121,8 +121,8 @@
 ### Tests
 
 - [X] T041 [P] [US4] Add feature command and placement-capacity contract tests in `web/tests/backend/contract/job-post-management/featured-placement.contract.test.ts`
-- [ ] T042 [P] [US4] Add feature window, eligibility, concurrent-capacity, replay, and cancellation integration tests in `web/tests/backend/integration/job-post-management/featured-placement.integration.test.ts`
-- [ ] T043 [P] [US4] Add feature control component/accessibility tests in `web/tests/frontend/components/admin-management/job-post-management-feature.test.tsx` and `web/tests/frontend/accessibility/admin-management/job-post-management-feature.accessibility.test.tsx`
+- [X] T042 [P] [US4] Add feature window, eligibility, concurrent-capacity, replay, and cancellation integration tests in `web/tests/backend/integration/job-post-management/featured-placement.integration.test.ts`
+- [X] T043 [P] [US4] Add feature control component/accessibility tests in `web/tests/frontend/components/admin-management/job-post-management-feature.test.tsx` and `web/tests/frontend/accessibility/admin-management/job-post-management-feature.accessibility.test.tsx`
 
 ### Implementation
 
@@ -143,13 +143,13 @@
 ### Tests
 
 - [X] T047 [P] [US5] Add enforcement/link command contracts in `web/tests/backend/contract/job-post-management/enforcement.contract.test.ts`
-- [ ] T048 [P] [US5] Add many-to-many report/enforcement, authorization, idempotency, and audit integration tests in `web/tests/backend/integration/job-post-management/enforcement.integration.test.ts`
-- [ ] T049 [P] [US5] Add report-detail and job-detail enforcement UI tests in `web/tests/frontend/components/admin-management/job-post-management-enforcement.test.tsx` and `web/tests/frontend/components/admin-management/moderation-report-enforcement.test.tsx`
+- [X] T048 [P] [US5] Add many-to-many report/enforcement, authorization, idempotency, and audit integration tests in `web/tests/backend/integration/job-post-management/enforcement.integration.test.ts`
+- [X] T049 [P] [US5] Add report-detail and job-detail enforcement UI tests in `web/tests/frontend/components/admin-management/job-post-management-enforcement.test.tsx` and `web/tests/frontend/components/admin-management/moderation-report-enforcement.test.tsx`
 
 ### Implementation
 
 - [ ] T050 [US5] Implement enforcement aggregate, target validation, REQUEST_CHANGES public-explanation validation, report-link creation, report-state outcome, history, audit, and notifications in `web/src/backend/jobs/management/job-post-enforcement-service.ts` and `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
-- [ ] T051 [US5] Integrate report detail/list projections and command delegation in `web/src/backend/admin/moderation/moderation-review-service.ts`, `web/src/backend/repositories/admin/prisma-moderation-repository.ts`, and `web/src/app/api/admin/moderation-reports/[reportId]/[action]/route.ts`
+- [X] T051 [US5] Integrate report detail/list projections and command delegation in `web/src/backend/admin/moderation/moderation-review-service.ts`, `web/src/backend/repositories/admin/prisma-moderation-repository.ts`, and `web/src/app/api/admin/moderation-reports/[reportId]/[action]/route.ts`
 - [X] T052 [US5] Build report selection/enforcement evidence UI in `web/src/frontend/features/admin/job-post-management/job-post-management-action-panel.tsx`, `web/src/frontend/features/admin/moderation/moderation-review-show.tsx`, and `web/src/frontend/features/admin/moderation/report-action-panel.tsx`
 
 **Checkpoint**: Reports are operationally meaningful and retain many-to-many enforcement evidence.
@@ -161,7 +161,7 @@
 **Purpose**: Complete lifecycle automation, observability, security, documentation, and end-to-end validation.
 
 - [X] T053 Implement bounded retry-safe deadline archive loop and worker registration in `web/src/backend/admin/workers/job-post-lifecycle-loop.ts`, `web/src/backend/admin/workers/admin-worker-runtime.ts`, and `web/src/backend/admin/workers/admin-worker-entry.ts`
-- [ ] T054 [P] Add lifecycle worker integration/reliability tests in `web/tests/backend/integration/job-post-management/lifecycle-worker.integration.test.ts` and `web/tests/performance/job-post-management/lifecycle-worker.reliability.test.ts`
+- [X] T054 [P] Add lifecycle worker integration/reliability tests in `web/tests/backend/integration/job-post-management/lifecycle-worker.integration.test.ts` and `web/tests/performance/job-post-management/lifecycle-worker.reliability.test.ts`
 - [X] T055 [P] Complete migration reconciliation checks and performance measurement in `web/scripts/verify-job-post-management-migration.mjs`, `web/scripts/measure-job-post-management-performance.mjs`, and `web/package.json`
 - [ ] T056 [P] Add architecture, privacy, scope-escalation, stale-command, and reporter-data-exposure tests in `web/tests/architecture/job-post-management-boundaries.test.ts` and `web/tests/security/job-post-management/`
 - [ ] T057 Add targeted administrator/recruiter/candidate Playwright flows in `web/tests/system/e2e/job-post-management/`
