@@ -9,6 +9,7 @@ import {
   AdminCommandConflict,
 } from "@/backend/repositories/admin/prisma-admin-command-repository";
 import { PrismaAuditRepository } from "@/backend/repositories/audit/prisma-audit-repository";
+import { createInAppNotification } from "@/backend/notifications/notification-service";
 import {
   findManagedJobPostDetail,
   findManagedJobPostForCommand,
@@ -463,6 +464,23 @@ export class JobPostManagementService {
               applicationState,
             },
           });
+          if (
+            (command.command === "REQUEST_CHANGES" ||
+              (command.command === "ENFORCE" &&
+                command.type === "REQUEST_CHANGES")) &&
+            row.approvedVersion?.submittedByUserId
+          ) {
+            await createInAppNotification(tx, {
+              recipientUserId: row.approvedVersion.submittedByUserId,
+              kind: "JOB_POST_REJECTED",
+              deduplicationKey: `job-post-correction:${row.id}:${version}`,
+              correlationId,
+              occurredAt: now,
+              contextType: "JOB_POST_REVIEW",
+              contextId: row.approvedVersionId,
+              variables: { audience: "USER", state: "CHANGES_REQUESTED" },
+            });
+          }
           return {
             jobId,
             version,
