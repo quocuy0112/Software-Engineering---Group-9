@@ -177,9 +177,6 @@ export class PrismaAccountDirectoryRepository {
     }>,
   ) {
     const accountIds = rows.map((row) => row.id);
-    const companyIds = [
-      ...new Set(rows.flatMap((row) => row.recruiterCompanyIds)),
-    ];
     let candidate:
       | Map<string, { cvCount: number; applicationCount: number }>
       | undefined;
@@ -231,16 +228,17 @@ export class PrismaAccountDirectoryRepository {
       candidateUnavailable = true;
     }
     try {
-      const jobRows = companyIds.length
-        ? await this.db.jobPosting.groupBy({
-            by: ["companyId", "status"],
+      const jobRows = accountIds.length
+        ? await this.db.jobPostReviewAggregate.findMany({
             where: {
-              companyId: { in: companyIds },
-              status: {
-                in: ["ACTIVE", "PENDING_REVIEW", "REJECTED", "DRAFT", "CLOSED"],
+              approvedVersion: {
+                is: { submittedByUserId: { in: accountIds } },
               },
             },
-            _count: { _all: true },
+            select: {
+              approvedVersion: { select: { submittedByUserId: true } },
+              publicJobPosting: { select: { status: true } },
+            },
           })
         : [];
       recruiter = new Map();
@@ -253,13 +251,14 @@ export class PrismaAccountDirectoryRepository {
           closed: 0,
         };
         for (const job of jobRows) {
-          if (!row.recruiterCompanyIds.includes(job.companyId)) continue;
+          if (job.approvedVersion?.submittedByUserId !== row.id) continue;
+          if (!job.publicJobPosting) continue;
           const key =
-            job.status === "PENDING_REVIEW"
+            job.publicJobPosting.status === "PENDING_REVIEW"
               ? "pendingReview"
-              : job.status.toLowerCase();
+              : job.publicJobPosting.status.toLowerCase();
           if (key in counts)
-            counts[key as keyof typeof counts] += job._count._all;
+            counts[key as keyof typeof counts] += 1;
         }
         recruiter.set(row.id, counts);
       }

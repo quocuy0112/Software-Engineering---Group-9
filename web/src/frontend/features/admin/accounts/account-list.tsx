@@ -56,7 +56,7 @@ function counts(record: Record<string, unknown>) {
   if (value.unavailable === true) return "Unavailable";
   if (value.kind === "CANDIDATE")
     return `CVs ${value.cvCount}; applications ${value.applicationCount}`;
-  return `Active ${value.active}; pending ${value.pendingReview}; rejected ${value.rejected}; draft ${value.draft}; closed ${value.closed}`;
+  return `Submitted jobs — active ${value.active}; pending ${value.pendingReview}; rejected ${value.rejected}; draft ${value.draft}; closed ${value.closed}`;
 }
 
 export function AccountList() {
