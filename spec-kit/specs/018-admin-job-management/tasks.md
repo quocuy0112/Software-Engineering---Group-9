@@ -12,10 +12,10 @@
 
 **Purpose**: Establish feature-specific test, script, and contract boundaries.
 
-- [ ] T001 Create job-post-management test directories and feature test script entries in `web/tests/**/job-post-management/` and `web/package.json`
-- [ ] T002 [P] Create shared operational contracts and contract tests in `web/src/shared/contracts/admin/job-post-management.ts` and `web/tests/shared/unit/contracts/job-post-management/`
+- [X] T001 Create job-post-management test directories and feature test script entries in `web/tests/**/job-post-management/` and `web/package.json`
+- [X] T002 [P] Create shared operational contracts and contract tests in `web/src/shared/contracts/admin/job-post-management.ts` and `web/tests/shared/unit/contracts/job-post-management/`
 - [ ] T003 [P] Add OpenAPI parity validation for `spec-kit/specs/018-admin-job-management/contracts/job-post-management.openapi.yaml` in `web/tests/backend/contract/job-post-management/openapi-parity.test.ts`
-- [ ] T004 [P] Create migration verification and performance-script skeletons in `web/scripts/verify-job-post-management-migration.mjs` and `web/scripts/measure-job-post-management-performance.mjs`
+- [X] T004 [P] Create migration verification and performance-script skeletons in `web/scripts/verify-job-post-management-migration.mjs` and `web/scripts/measure-job-post-management-performance.mjs`
 
 ---
 
@@ -23,15 +23,15 @@
 
 **Purpose**: Add authoritative storage, scoped authorization, shared command protection, and candidate projection guards before any story endpoint exists.
 
-- [ ] T005 Extend admin grant scopes, job operational enums, aggregate relations, correction, feature, enforcement, report-link, and operational-history models in `web/prisma/schema.prisma`
-- [ ] T006 Create additive/backfill-safe migration and indexes in `web/prisma/migrations/0xx_admin_job_post_management/migration.sql`
+- [X] T005 Extend admin grant scopes, job operational enums, aggregate relations, correction, feature, enforcement, report-link, and operational-history models in `web/prisma/schema.prisma`
+- [X] T006 Create additive/backfill-safe migration and indexes in `web/prisma/migrations/0xx_admin_job_post_management/migration.sql`
 - [ ] T007 Generate Prisma client and implement migration/backfill invariants in `web/scripts/verify-job-post-management-migration.mjs`
 - [ ] T008 [P] Implement scope evaluation and explicit action policy in `web/src/backend/jobs/management/job-post-management-policy.ts` and `web/tests/backend/unit/job-post-management/job-post-management-policy.test.ts`
 - [ ] T009 [P] Implement safe operation events and metrics boundary in `web/src/backend/jobs/management/job-post-management-operations.ts` and `web/tests/backend/unit/job-post-management/job-post-management-operations.test.ts`
 - [ ] T010 Implement transactional repository queries, aggregate locking, report summaries, feature overlap capacity checks, and public projection sync in `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
 - [ ] T011 Implement versioned command service with AdminRequestBoundary/command receipts/audit/notifications in `web/src/backend/jobs/management/job-post-management-service.ts`
 - [ ] T012 Integrate approved revision satisfaction and candidate projection guards into `web/src/backend/jobs/review/job-post-review-service.ts`, `web/src/backend/repositories/jobs/prisma-job-post-review-repository.ts`, and candidate job read/application boundaries
-- [ ] T013 Add protected list/detail/command routes and strict path-command validation in `web/src/app/api/admin/job-postings/route.ts`, `web/src/app/api/admin/job-postings/[jobId]/route.ts`, and `web/src/app/api/admin/job-postings/[jobId]/[action]/route.ts`
+- [X] T013 Add protected list/detail/command routes and strict path-command validation in `web/src/app/api/admin/job-postings/route.ts`, `web/src/app/api/admin/job-postings/[jobId]/route.ts`, and `web/src/app/api/admin/job-postings/[jobId]/[action]/route.ts`
 - [ ] T014 Add foundational authorization, idempotency, projection-integrity, and migration tests in `web/tests/security/job-post-management/`, `web/tests/backend/integration/job-post-management/`, and `web/tests/architecture/job-post-management-boundaries.test.ts`
 
 **Checkpoint**: Migration, state authority, strict command boundary, and candidate safety are ready. No user story UI is enabled before this checkpoint passes.
@@ -160,9 +160,9 @@
 
 **Purpose**: Complete lifecycle automation, observability, security, documentation, and end-to-end validation.
 
-- [ ] T053 Implement bounded retry-safe deadline archive loop and worker registration in `web/src/backend/admin/workers/job-post-lifecycle-loop.ts`, `web/src/backend/admin/workers/admin-worker-runtime.ts`, and `web/src/backend/admin/workers/admin-worker-entry.ts`
+- [X] T053 Implement bounded retry-safe deadline archive loop and worker registration in `web/src/backend/admin/workers/job-post-lifecycle-loop.ts`, `web/src/backend/admin/workers/admin-worker-runtime.ts`, and `web/src/backend/admin/workers/admin-worker-entry.ts`
 - [ ] T054 [P] Add lifecycle worker integration/reliability tests in `web/tests/backend/integration/job-post-management/lifecycle-worker.integration.test.ts` and `web/tests/performance/job-post-management/lifecycle-worker.reliability.test.ts`
-- [ ] T055 [P] Complete migration reconciliation checks and performance measurement in `web/scripts/verify-job-post-management-migration.mjs`, `web/scripts/measure-job-post-management-performance.mjs`, and `web/package.json`
+- [X] T055 [P] Complete migration reconciliation checks and performance measurement in `web/scripts/verify-job-post-management-migration.mjs`, `web/scripts/measure-job-post-management-performance.mjs`, and `web/package.json`
 - [ ] T056 [P] Add architecture, privacy, scope-escalation, stale-command, and reporter-data-exposure tests in `web/tests/architecture/job-post-management-boundaries.test.ts` and `web/tests/security/job-post-management/`
 - [ ] T057 Add targeted administrator/recruiter/candidate Playwright flows in `web/tests/system/e2e/job-post-management/`
 - [ ] T058 Update [quickstart.md](./quickstart.md), validate all scenarios, run formatter/typecheck/targeted suites, and record results in `spec-kit/specs/018-admin-job-management/quickstart.md`
