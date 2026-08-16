@@ -28,7 +28,7 @@
 - [X] T007 Generate Prisma client and implement migration/backfill invariants in `web/scripts/verify-job-post-management-migration.mjs`
 - [X] T008 [P] Implement scope evaluation and explicit action policy in `web/src/backend/jobs/management/job-post-management-policy.ts` and `web/tests/backend/unit/job-post-management/job-post-management-policy.test.ts`
 - [X] T009 [P] Implement safe operation events and metrics boundary in `web/src/backend/jobs/management/job-post-management-operations.ts` and `web/tests/backend/unit/job-post-management/job-post-management-operations.test.ts`
-- [ ] T010 Implement transactional repository queries, aggregate locking, report summaries, feature overlap capacity checks, and public projection sync in `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
+- [X] T010 Implement transactional repository queries, aggregate locking, report summaries, feature overlap capacity checks, and public projection sync in `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
 - [ ] T011 Implement versioned command service with AdminRequestBoundary/command receipts/audit/notifications in `web/src/backend/jobs/management/job-post-management-service.ts`
 - [ ] T012 Integrate approved revision satisfaction and candidate projection guards into `web/src/backend/jobs/review/job-post-review-service.ts`, `web/src/backend/repositories/jobs/prisma-job-post-review-repository.ts`, and candidate job read/application boundaries
 - [X] T013 Add protected list/detail/command routes and strict path-command validation in `web/src/app/api/admin/job-postings/route.ts`, `web/src/app/api/admin/job-postings/[jobId]/route.ts`, and `web/src/app/api/admin/job-postings/[jobId]/[action]/route.ts`
@@ -53,7 +53,7 @@
 
 ### Implementation
 
-- [ ] T019 [US1] Implement safe list/detail projections, full-text normalized search, company/recruiter/approver/date/report/featured filters, report summary, and pagination in `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
+- [X] T019 [US1] Implement safe list/detail projections, full-text normalized search, company/recruiter/approver/date/report/featured filters, report summary, and pagination in `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
 - [X] T020 [US1] Implement list/detail orchestration and response contracts in `web/src/backend/jobs/management/job-post-management-service.ts` and `web/src/app/api/admin/job-postings/{route.ts,[jobId]/route.ts}`
 - [X] T021 [P] [US1] Build dense React Admin list filters, state chips, report summary, and row navigation in `web/src/frontend/features/admin/job-post-management/job-post-management-list.tsx`
 - [X] T022 [P] [US1] Build structured job management detail cards, version comparison, metadata, reports, feature, and timeline sections in `web/src/frontend/features/admin/job-post-management/job-post-management-show.tsx`

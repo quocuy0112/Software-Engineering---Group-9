@@ -306,8 +306,9 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
                 visibilityState: "PUBLISHED",
               },
             },
-            status: "ACTIVE",
-            applicationDeadline: { gt: now },
+            // A closed managed job remains readable as public history, but is
+            // excluded from discovery by the ACTIVE-only discovery queries.
+            status: { in: ["ACTIVE", "CLOSED"] },
           },
         ],
         approvedAt: { not: null },

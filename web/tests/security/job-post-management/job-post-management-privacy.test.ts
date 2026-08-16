@@ -9,14 +9,19 @@ const service = readFileSync(
   ),
   "utf8",
 );
+const repository = readFileSync(
+  resolve(
+    process.cwd(),
+    "src/backend/repositories/jobs/prisma-job-post-management-repository.ts",
+  ),
+  "utf8",
+);
 
 describe("job post management privacy", () => {
   it("does not return reporter identities in administrator job detail", () => {
-    expect(service).toContain("distinctReporterCount");
-    expect(service).toMatch(/reports: reports\.map\([\s\S]*id: report\.id/u);
-    expect(service).not.toMatch(
-      /reports: reports\.map\([\s\S]*reporterUserId/u,
-    );
+    expect(repository).toContain("distinctReporterCount");
+    expect(repository).toMatch(/reports: reports\.map\([\s\S]*\.\.\.report/u);
+    expect(repository).toContain("reporterUserId: _reporterUserId");
   });
 
   it("requires an active scoped grant for all management reads and writes", () => {

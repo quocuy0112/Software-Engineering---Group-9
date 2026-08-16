@@ -3,9 +3,244 @@ import {
   Prisma,
   type Prisma as PrismaTypes,
 } from "@/backend/generated/prisma/client";
+import { prisma } from "@/backend/database/prisma";
 import { FEATURED_PLACEMENT_CAPACITY } from "@/backend/jobs/management/job-post-management-policy";
+import type { z } from "zod";
+import type { jobManagementListQuerySchema } from "@/shared/contracts/admin/job-post-management";
 
 type Transaction = PrismaTypes.TransactionClient;
+type JobManagementListInput = z.infer<typeof jobManagementListQuerySchema>;
+
+/** Safe, consolidated management projections. Reporter identities never leave this boundary. */
+export async function listManagedJobPosts(input: JobManagementListInput) {
+  const search = input.q?.toLowerCase();
+  const reportGroups =
+    input.reportState === "ANY" || (!input.reportState && !input.minimumReports)
+      ? []
+      : await prisma.moderationReport.groupBy({
+          by: ["jobReference"],
+          where: { jobReference: { not: null }, state: "PENDING_REVIEW" },
+          _count: { _all: true },
+        });
+  const matchingReportJobIds = reportGroups
+    .filter((row) =>
+      input.minimumReports ? row._count._all >= input.minimumReports : true,
+    )
+    .map((row) => row.jobReference)
+    .filter((jobId): jobId is string => Boolean(jobId));
+  const where: Prisma.JobPostReviewAggregateWhereInput = {
+    approvedVersionId: { not: null },
+    ...(input.visibility ? { visibilityState: input.visibility } : {}),
+    ...(input.applicationState
+      ? { applicationState: input.applicationState }
+      : {}),
+    ...(input.companyId ? { companyId: input.companyId } : {}),
+    ...(input.featured
+      ? {
+          featuredPlacements: {
+            some: { state: { in: ["SCHEDULED", "ACTIVE"] } },
+          },
+        }
+      : {}),
+    ...(input.reportState === "REPORTED" || input.minimumReports
+      ? { jobId: { in: matchingReportJobIds } }
+      : input.reportState === "UNREPORTED"
+        ? {
+            jobId: {
+              notIn: reportGroups
+                .map((row) => row.jobReference)
+                .filter((id): id is string => Boolean(id)),
+            },
+          }
+        : {}),
+    AND: [
+      ...(input.recruiterId
+        ? [
+            {
+              approvedVersion: { is: { submittedByUserId: input.recruiterId } },
+            },
+          ]
+        : []),
+      ...(input.approverId
+        ? [
+            {
+              approvedVersion: {
+                is: { decidedByAdminUserId: input.approverId },
+              },
+            },
+          ]
+        : []),
+      ...(input.approvedFrom || input.approvedTo
+        ? [
+            {
+              publicJobPosting: {
+                is: {
+                  approvedAt: {
+                    ...(input.approvedFrom ? { gte: input.approvedFrom } : {}),
+                    ...(input.approvedTo ? { lte: input.approvedTo } : {}),
+                  },
+                },
+              },
+            },
+          ]
+        : []),
+      ...(input.publishedFrom || input.publishedTo
+        ? [
+            {
+              publicJobPosting: {
+                is: {
+                  publishedAt: {
+                    ...(input.publishedFrom
+                      ? { gte: input.publishedFrom }
+                      : {}),
+                    ...(input.publishedTo ? { lte: input.publishedTo } : {}),
+                  },
+                },
+              },
+            },
+          ]
+        : []),
+    ],
+    ...(search
+      ? {
+          OR: [
+            {
+              publicJobPosting: {
+                is: { normalizedTitle: { contains: search } },
+              },
+            },
+            {
+              company: {
+                displayName: { contains: input.q!, mode: "insensitive" },
+              },
+            },
+            {
+              approvedVersion: {
+                submittedBy: {
+                  is: { name: { contains: input.q!, mode: "insensitive" } },
+                },
+              },
+            },
+          ],
+        }
+      : {}),
+  };
+  const [rows, total] = await Promise.all([
+    prisma.jobPostReviewAggregate.findMany({
+      where,
+      skip: (input.page - 1) * input.perPage,
+      take: input.perPage,
+      orderBy: { updatedAt: "desc" },
+      include: {
+        company: { select: { displayName: true } },
+        publicJobPosting: {
+          select: { title: true, approvedAt: true, publishedAt: true },
+        },
+        approvedVersion: {
+          select: {
+            submittedBy: { select: { name: true } },
+            decidedByAdmin: { select: { name: true } },
+          },
+        },
+        featuredPlacements: {
+          where: { state: { in: ["SCHEDULED", "ACTIVE"] } },
+          select: { id: true },
+          take: 1,
+        },
+      },
+    }),
+    prisma.jobPostReviewAggregate.count({ where }),
+  ]);
+  const reportRows = await prisma.moderationReport.groupBy({
+    by: ["jobReference"],
+    where: {
+      jobReference: { in: rows.map((row) => row.jobId) },
+      state: "PENDING_REVIEW",
+    },
+    _count: { _all: true },
+  });
+  const reportCount = new Map(
+    reportRows.map((row) => [row.jobReference, row._count._all]),
+  );
+  return {
+    data: rows.map((row) => ({
+      id: row.jobId,
+      title: row.publicJobPosting?.title ?? "Unavailable job",
+      company: row.company.displayName,
+      recruiter: row.approvedVersion?.submittedBy?.name ?? null,
+      approver: row.approvedVersion?.decidedByAdmin?.name ?? null,
+      visibility: row.visibilityState,
+      applicationState: row.applicationState,
+      approvedAt: row.publicJobPosting?.approvedAt?.toISOString() ?? null,
+      publishedAt: row.publicJobPosting?.publishedAt?.toISOString() ?? null,
+      featured: row.featuredPlacements.length > 0,
+      reportCount: reportCount.get(row.jobId) ?? 0,
+      version: row.version,
+    })),
+    total,
+  };
+}
+
+export async function findManagedJobPostDetail(jobId: string) {
+  const row = await prisma.jobPostReviewAggregate.findUnique({
+    where: { jobId },
+    include: {
+      company: {
+        select: { id: true, displayName: true, verificationState: true },
+      },
+      publicJobPosting: true,
+      approvedVersion: {
+        include: {
+          submittedBy: { select: { id: true, name: true } },
+          decidedByAdmin: { select: { id: true, name: true } },
+        },
+      },
+      pendingVersion: {
+        select: { id: true, sequence: true, submittedAt: true, state: true },
+      },
+      correctionRequests: { orderBy: { createdAt: "desc" } },
+      featuredPlacements: { orderBy: { startsAt: "desc" } },
+      operationalHistory: { orderBy: { occurredAt: "desc" }, take: 100 },
+      enforcementTargets: {
+        include: { enforcementAction: { include: { reportLinks: true } } },
+      },
+    },
+  });
+  if (!row) return null;
+  const reports = await prisma.moderationReport.findMany({
+    where: { jobReference: jobId, state: "PENDING_REVIEW" },
+    select: {
+      id: true,
+      reporterUserId: true,
+      priority: true,
+      category: true,
+      createdAt: true,
+    },
+  });
+  const priorities = { CRITICAL: 3, HIGH: 2, NORMAL: 1 } as const;
+  const highestPriority = reports.reduce<keyof typeof priorities | null>(
+    (highest, report) =>
+      !highest || priorities[report.priority] > priorities[highest]
+        ? report.priority
+        : highest,
+    null,
+  );
+  return {
+    ...row,
+    id: row.jobId,
+    version: row.version,
+    reportSummary: {
+      activeCount: reports.length,
+      distinctReporterCount: new Set(
+        reports.map((report) => report.reporterUserId),
+      ).size,
+      highestPriority,
+    },
+    reports: reports.map(
+      ({ reporterUserId: _reporterUserId, ...report }) => report,
+    ),
+  };
+}
 
 export async function findManagedJobPostForCommand(
   tx: Transaction,
