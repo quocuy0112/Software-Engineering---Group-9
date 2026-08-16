@@ -25,6 +25,7 @@ export async function recordAccountCommand(
       | "admin.sessions_revoked_all";
     reasonCategory: string;
     explanation: string;
+    recipientName: string;
     priorState: string;
     resultingState: string;
     resultingVersion: number;
@@ -84,6 +85,7 @@ export async function recordAccountCommand(
       targetUserId: input.targetUserId,
       kind: eventKind,
       payloadRef: {
+        recipientName: input.recipientName,
         resultingState: input.resultingState,
         occurredAt: input.occurredAt.toISOString(),
         reasonCategory: input.reasonCategory,
