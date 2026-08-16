@@ -282,7 +282,12 @@ export class JobPostManagementService {
         ).size,
         highestPriority,
       },
-      reports: reports.map(({ reporterUserId: _private, ...report }) => report),
+      reports: reports.map((report) => ({
+        id: report.id,
+        priority: report.priority,
+        category: report.category,
+        createdAt: report.createdAt,
+      })),
     };
   }
 
@@ -335,7 +340,7 @@ export class JobPostManagementService {
           let visibility = row.visibilityState;
           let applicationState = row.applicationState;
           const now = new Date();
-          let reason = "reason" in command ? command.reason : null;
+          const reason = "reason" in command ? command.reason : null;
           const data: Prisma.JobPostReviewAggregateUpdateManyMutationInput = {
             version: { increment: 1 },
             operationalVersion: { increment: 1 },

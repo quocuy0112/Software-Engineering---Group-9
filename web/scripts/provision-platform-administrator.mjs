@@ -130,11 +130,12 @@ try {
       },
     });
 
-    const scopes = await transaction.platformAdministratorGrantScopeAssignment.findMany({
-      where: { grantId: grant.id },
-      select: { scope: true },
-      orderBy: { scope: "asc" },
-    });
+    const scopes =
+      await transaction.platformAdministratorGrantScopeAssignment.findMany({
+        where: { grantId: grant.id },
+        select: { scope: true },
+        orderBy: { scope: "asc" },
+      });
     return {
       grantId: grant.id,
       userId: user.id,
