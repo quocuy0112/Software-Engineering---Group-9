@@ -45,18 +45,13 @@ export function CandidateScoreDrawer({
   onReject: () => void;
   onScoringChanged: () => void;
 }) {
-  const [activeTab, setActiveTab] = useState<Tab>(() => {
-    if (typeof window === "undefined") return "automatic";
-    const stored = window.sessionStorage.getItem("smartHire.scoreDrawerTab");
-    return stored === "automatic" || stored === "ai" || stored === "documents"
-      ? stored
-      : "automatic";
-  });
+  const [activeTab, setActiveTab] = useState<Tab>("automatic");
   const [detail, setDetail] = useState<ScoringDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [retryConfirm, setRetryConfirm] = useState(false);
   const [scoreConfirm, setScoreConfirm] = useState(false);
   const [scoringActionLoading, setScoringActionLoading] = useState(false);
+  const [documentCacheVersion, setDocumentCacheVersion] = useState(0);
   const [openDocument, setOpenDocument] = useState<
     "cv" | "cover-letter" | null
   >(null);
@@ -214,6 +209,7 @@ export function CandidateScoreDrawer({
   };
   const scoreCandidate = async () => {
     setScoreConfirm(false);
+    setDocumentCacheVersion((current) => current + 1);
     setScoringActionLoading(true);
     setError(null);
     try {
@@ -466,13 +462,9 @@ export function CandidateScoreDrawer({
               jobId={jobId}
               applicationId={candidate.applicationId}
               automatic={automatic}
-              dataQualityNotes={
-                scoring.kind === "SCORED"
-                  ? scoring.aiAssessment.dataQualityNotes
-                  : []
-              }
               openKind={openDocument}
               openRequest={openDocumentRequest}
+              documentCacheVersion={documentCacheVersion}
             />
           )}
         </div>

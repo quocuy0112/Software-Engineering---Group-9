@@ -75,7 +75,8 @@ describe("candidate CV library", () => {
         create: expect.objectContaining({
           id: "candidate-cv-upload-openai-1",
           candidateUserId: "user-1",
-          displayName: "imported-cv-upload-openai-1.pdf",
+          displayName: "candidate-cv.pdf",
+          fileName: "candidate-cv.pdf",
           confirmedAt: new Date("2026-08-07T00:00:00.000Z"),
         }),
       }),
@@ -85,37 +86,119 @@ describe("candidate CV library", () => {
   it("updates the stable upload-derived row when its storage key is stale", async () => {
     const upsert = vi.fn().mockResolvedValue({});
     const db = {
-      cvUpload: { findMany: vi.fn().mockResolvedValue([{ id: "upload-1", declaredMediaType: "application/pdf", actualBytes: 10, sourceSha256: new Uint8Array(32), confirmedAt: new Date("2026-08-07T00:00:00.000Z"), displayFilenameCiphertext: null }]) },
+      cvUpload: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "upload-1",
+            declaredMediaType: "application/pdf",
+            actualBytes: 10,
+            sourceSha256: new Uint8Array(32),
+            confirmedAt: new Date("2026-08-07T00:00:00.000Z"),
+            displayFilenameCiphertext: null,
+          },
+        ]),
+      },
       candidateCv: {
-        findMany: vi.fn().mockResolvedValue([{ id: "candidate-cv-upload-1", candidateUserId: "user-1", storageKey: "stale-key", displayName: "Imported CV" }]),
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "candidate-cv-upload-1",
+            candidateUserId: "user-1",
+            storageKey: "stale-key",
+            displayName: "Imported CV",
+          },
+        ]),
         upsert,
       },
     } as never;
 
     await ensureCandidateCvLibrary("user-1", db);
 
-    expect(upsert).toHaveBeenCalledWith(expect.objectContaining({
-      where: { id: "candidate-cv-upload-1" },
-      update: expect.objectContaining({ storageKey: "candidate-cv-upload-1" }),
-    }));
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "candidate-cv-upload-1" },
+        update: expect.objectContaining({
+          storageKey: "candidate-cv-upload-1",
+        }),
+      }),
+    );
   });
 
   it("keeps a materialized private-storage locator stable when the library is listed", async () => {
     const upsert = vi.fn().mockResolvedValue({});
     const materialized = "A".repeat(43);
     const db = {
-      cvUpload: { findMany: vi.fn().mockResolvedValue([{ id: "upload-1", declaredMediaType: "application/pdf", actualBytes: 10, sourceSha256: new Uint8Array(32), confirmedAt: new Date("2026-08-07T00:00:00.000Z"), displayFilenameCiphertext: null }]) },
+      cvUpload: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "upload-1",
+            declaredMediaType: "application/pdf",
+            actualBytes: 10,
+            sourceSha256: new Uint8Array(32),
+            confirmedAt: new Date("2026-08-07T00:00:00.000Z"),
+            displayFilenameCiphertext: null,
+          },
+        ]),
+      },
       candidateCv: {
-        findMany: vi.fn().mockResolvedValue([{ id: "candidate-cv-upload-1", candidateUserId: "user-1", storageKey: materialized, displayName: "Imported CV" }]),
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "candidate-cv-upload-1",
+            candidateUserId: "user-1",
+            storageKey: materialized,
+            displayName: "Imported CV",
+          },
+        ]),
         upsert,
       },
     } as never;
 
     await ensureCandidateCvLibrary("user-1", db);
 
-    expect(upsert).toHaveBeenCalledWith(expect.objectContaining({
-      update: expect.objectContaining({ storageKey: materialized }),
-    }));
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        update: expect.objectContaining({ storageKey: materialized }),
+      }),
+    );
+  });
+
+  it("preserves a user filename after upload metadata is scrubbed", async () => {
+    const upsert = vi.fn().mockResolvedValue({});
+    const db = {
+      cvUpload: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "upload-1",
+            declaredMediaType: "application/pdf",
+            actualBytes: 10,
+            sourceSha256: new Uint8Array(32),
+            confirmedAt: new Date("2026-08-07T00:00:00.000Z"),
+            displayFilenameCiphertext: null,
+          },
+        ]),
+      },
+      candidateCv: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "candidate-cv-upload-1",
+            candidateUserId: "user-1",
+            storageKey: "candidate-cv-upload-1",
+            displayName: "cv-02_LE_THI_HOA.pdf",
+            fileName: "cv-02_LE_THI_HOA.pdf",
+          },
+        ]),
+        upsert,
+      },
+    } as never;
+
+    await ensureCandidateCvLibrary("user-1", db);
+
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        update: expect.objectContaining({
+          fileName: "cv-02_LE_THI_HOA.pdf",
+        }),
+      }),
+    );
   });
 
   it("renames the display label and archives without touching the storage metadata", async () => {
@@ -156,7 +239,10 @@ describe("candidate CV library", () => {
     expect(renamed.displayName).toBe("Tuấn CV - Community Manager");
     expect(update.mock.calls[0]?.[0]).toMatchObject({
       where: { id: "candidate-cv-1" },
-      data: { displayName: "Tuấn CV - Community Manager" },
+      data: {
+        displayName: "Tuấn CV - Community Manager",
+        fileName: expect.stringMatching(/\.pdf$/u),
+      },
     });
 
     const deleted = await archiveCandidateCv("user-1", "candidate-cv-1", db);

@@ -333,7 +333,7 @@ describe("identity navigation shells", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Post a Job" }));
 
-    expect(navigation.push).toHaveBeenCalledWith("/recruiter");
+    expect(navigation.push).toHaveBeenCalledWith("/recruiter/job-postings");
     expect(document.cookie).toContain("smarthire-workspace-mode=recruiter");
   });
 

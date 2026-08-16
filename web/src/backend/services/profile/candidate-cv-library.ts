@@ -16,11 +16,33 @@ function initialDisplayName(originalName: string | null, fallback: string) {
   return value.slice(0, 200);
 }
 
+function renamedFilename(value: string, current: string) {
+  const normalized = value
+    .normalize("NFKC")
+    .replace(/[\\/\r\n]/gu, "_")
+    .replace(/[^\p{L}\p{N}._ -]/gu, "_")
+    .trim()
+    .slice(0, 255);
+  if (!normalized) return current;
+  if (/\.[A-Za-z0-9]{1,8}$/u.test(normalized)) return normalized;
+  const extension = current.match(/\.[A-Za-z0-9]{1,8}$/u)?.[0] ?? "";
+  return `${normalized}${extension}`.slice(0, 255);
+}
+
+function isGeneratedFilename(value: string | undefined): boolean {
+  return Boolean(
+    value &&
+    /^(?:imported-cv|application-cv|candidate-cv)-[A-Za-z0-9-]+\.[A-Za-z0-9]{1,8}$/iu.test(
+      value,
+    ),
+  );
+}
+
 function isMaterializedStorageLocator(value: string | undefined): boolean {
   return Boolean(
     value &&
-      !value.startsWith("candidate-cv-") &&
-      /^[A-Za-z0-9_-]{32,128}$/u.test(value),
+    !value.startsWith("candidate-cv-") &&
+    /^[A-Za-z0-9_-]{32,128}$/u.test(value),
   );
 }
 
@@ -133,10 +155,18 @@ export async function ensureCandidateCvLibrary(
             { storageKey: { in: desiredStorageKeys } },
           ],
         },
-        select: { id: true, candidateUserId: true, storageKey: true, displayName: true },
+        select: {
+          id: true,
+          candidateUserId: true,
+          storageKey: true,
+          displayName: true,
+          fileName: true,
+        },
       })
     : [];
-  const existingByStorageKey = new Map(legacyRows.map((row) => [row.storageKey, row]));
+  const existingByStorageKey = new Map(
+    legacyRows.map((row) => [row.storageKey, row]),
+  );
   const existingById = new Map(legacyRows.map((row) => [row.id, row]));
 
   await Promise.all(
@@ -151,17 +181,23 @@ export async function ensureCandidateCvLibrary(
         upload.declaredMediaType === "application/pdf" ? "pdf" : "docx";
       const storageKey = "candidate-cv-" + upload.id;
       const desiredId = storageKey;
-      const fileName = "imported-cv-" + upload.id + "." + extension;
+      const fallbackFileName = "candidate-cv." + extension;
+      const existing =
+        existingByStorageKey.get(storageKey) ?? existingById.get(desiredId);
+      if (existing && existing.candidateUserId !== userId) return;
+      const recoveredName = safeFilename(upload.displayFilenameCiphertext, {
+        accountId: userId,
+        uploadId: upload.id,
+      });
+      const existingUserFilename =
+        existing && !isGeneratedFilename(existing.fileName)
+          ? existing.fileName
+          : null;
       const originalName = initialDisplayName(
-        safeFilename(upload.displayFilenameCiphertext, {
-          accountId: userId,
-          uploadId: upload.id,
-        }),
-        fileName,
+        recoveredName ?? existingUserFilename,
+        fallbackFileName,
       );
       const checksumSha256 = Buffer.from(upload.sourceSha256).toString("hex");
-      const existing = existingByStorageKey.get(storageKey) ?? existingById.get(desiredId);
-      if (existing && existing.candidateUserId !== userId) return;
       const stableId = existing?.id ?? desiredId;
       await db.candidateCv.upsert({
         where: { id: stableId },
@@ -169,7 +205,7 @@ export async function ensureCandidateCvLibrary(
           id: desiredId,
           candidateUserId: userId,
           displayName: originalName,
-          fileName,
+          fileName: originalName,
           mimeType: upload.declaredMediaType,
           byteSize: upload.actualBytes,
           storageKey,
@@ -178,7 +214,9 @@ export async function ensureCandidateCvLibrary(
           confirmedAt: upload.confirmedAt,
         },
         update: {
-          ...(existing?.displayName === "Imported CV"
+          ...(existing &&
+          (existing.displayName === "Imported CV" ||
+            isGeneratedFilename(existing.displayName))
             ? { displayName: originalName }
             : {}),
           // A confirmed import is first projected with the stable
@@ -191,7 +229,7 @@ export async function ensureCandidateCvLibrary(
             existing && isMaterializedStorageLocator(existing.storageKey)
               ? existing.storageKey
               : storageKey,
-          fileName,
+          fileName: existingUserFilename ?? originalName,
           mimeType: upload.declaredMediaType,
           byteSize: upload.actualBytes,
           checksumSha256,
@@ -272,7 +310,12 @@ export async function renameCandidateCv(
   if (!existing || !existing.confirmedAt) throw new CandidateCvNotFoundError();
   const updated = await db.candidateCv.update({
     where: { id: existing.id },
-    data: { displayName },
+    // `storageKey` remains an internal locator. A rename updates the
+    // user-facing original filename metadata instead.
+    data: {
+      displayName,
+      fileName: renamedFilename(displayName, existing.fileName),
+    },
     select: {
       id: true,
       displayName: true,

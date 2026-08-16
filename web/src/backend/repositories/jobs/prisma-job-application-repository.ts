@@ -360,6 +360,7 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
   }
 
   async submit(input: Parameters<ApplicationRepositoryPort["submit"]>[0]) {
+    await ensureCandidateCvLibrary(input.candidateUserId, this.db);
     let promotedStorage: ApplicationDocumentStoragePort | null = null;
     let promotedApplicationDocument:
       | {
@@ -514,7 +515,7 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
           const candidate = await tx.candidateIdentity.findFirst({
             where: { userId: input.candidateUserId, user: { state: "ACTIVE" } },
             include: {
-              user: { select: { name: true } },
+              user: { select: { name: true, email: true } },
               profile: {
                 include: {
                   skills: {
@@ -592,7 +593,10 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
               candidate: {
                 userId: candidate.userId,
                 name: candidate.user.name,
+                email: candidate.user.email,
                 headline: candidate.profile.headline,
+                summary: candidate.profile.summary,
+                phone: candidate.profile.phone,
                 location: candidate.profile.location,
                 skills: candidate.profile.skills.map((item) => ({
                   id: item.skillId,

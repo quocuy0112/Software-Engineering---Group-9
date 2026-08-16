@@ -8,6 +8,15 @@ import {
   OpenApplicationDocumentError,
   OpenApplicationDocumentService,
 } from "@/backend/applications/services/open-application-document";
+import {
+  buildStructuredDocumentContent,
+  DOCUMENT_PREVIEW_PARSER_VERSION,
+} from "@/backend/applications/services/document-preview-parser";
+import {
+  getCachedDocumentPreview,
+  setCachedDocumentPreview,
+} from "@/backend/applications/services/document-preview-cache";
+import { structuredDocumentPreviewSchema } from "@/shared/contracts/applications/document-preview";
 
 const noStore = {
   "Cache-Control": "private, no-store",
@@ -15,11 +24,6 @@ const noStore = {
 };
 
 type DocumentKind = "cv" | "cover-letter";
-type PreviewSegment = Readonly<{
-  id: string;
-  kind: "heading" | "paragraph" | "list-item";
-  text: string;
-}>;
 
 function isDocumentKind(value: unknown): value is DocumentKind {
   return value === "cv" || value === "cover-letter";
@@ -44,6 +48,63 @@ function extractionKind(mediaType: string | null) {
   )
     return "DOCX" as const;
   return null;
+}
+
+function cacheVersion(request: Request) {
+  const value = new URL(request.url).searchParams.get("cacheVersion");
+  return value && value.length <= 120 ? value : "latest";
+}
+
+function cacheKey(input: {
+  applicationId: string;
+  kind: DocumentKind;
+  contentVersion: string | null | undefined;
+  scoringVersion: string;
+}) {
+  return [
+    input.applicationId,
+    input.kind,
+    input.contentVersion ?? "unknown-content",
+    input.scoringVersion,
+    DOCUMENT_PREVIEW_PARSER_VERSION,
+  ].join(":");
+}
+
+function profileFallbackPreview(input: {
+  kind: DocumentKind;
+  fileName: string | null;
+  mediaType: string | null;
+  applicationProfileSnapshot?: unknown;
+  startedAt: number;
+}) {
+  if (input.kind !== "cv") return null;
+  const content = buildStructuredDocumentContent({
+    kind: "cv",
+    segments: [],
+    applicationProfileSnapshot: input.applicationProfileSnapshot,
+    preferProfileSnapshot: true,
+  });
+  if (
+    content.kind !== "cv" ||
+    (!content.name &&
+      !content.title &&
+      !content.summary &&
+      !content.experience.length &&
+      !content.education.length &&
+      !content.skills.length)
+  ) {
+    return null;
+  }
+  return structuredDocumentPreviewSchema.parse({
+    kind: "cv",
+    fileName: input.fileName,
+    mediaType: input.mediaType,
+    pageCount: null,
+    parserVersion: DOCUMENT_PREVIEW_PARSER_VERSION,
+    processingMilliseconds: Math.max(0, Date.now() - input.startedAt),
+    cacheHit: false,
+    content,
+  });
 }
 
 export async function GET(
@@ -74,6 +135,7 @@ export async function GET(
     );
   }
 
+  const startedAt = Date.now();
   try {
     const result = await new OpenApplicationDocumentService().execute({
       userId: current.userId,
@@ -82,33 +144,73 @@ export async function GET(
       kind,
       preview: false,
     });
-    let segments: readonly PreviewSegment[];
-    let pageCount: number | null = null;
+    const key = cacheKey({
+      applicationId,
+      kind,
+      contentVersion: result.document.contentVersion,
+      scoringVersion: cacheVersion(request),
+    });
+    const cached = getCachedDocumentPreview(key);
+    if (cached) {
+      return NextResponse.json(
+        structuredDocumentPreviewSchema.parse({
+          ...cached,
+          fileName: result.document.fileName ?? cached.fileName,
+        }),
+        { headers: noStore },
+      );
+    }
 
-    if (result.document.text !== null) {
-      segments = textSegments(result.document.text);
-      pageCount = 1;
-    } else {
-      const parserKind = extractionKind(result.document.mediaType);
-      if (!parserKind || !result.stream) {
-        return NextResponse.json(
-          {
-            code: "PREVIEW_UNAVAILABLE",
-            message: "Parsed preview is unavailable for this document.",
-          },
-          { status: 409, headers: noStore },
-        );
+    let segments;
+    let pageCount: number | null = null;
+    try {
+      if (result.document.text !== null) {
+        segments = textSegments(result.document.text);
+        pageCount = 1;
+      } else {
+        const parserKind = extractionKind(result.document.mediaType);
+        if (!parserKind || !result.stream) {
+          return NextResponse.json(
+            {
+              code: "PREVIEW_UNAVAILABLE",
+              message: "Parsed preview is unavailable for this document.",
+            },
+            { status: 409, headers: noStore },
+          );
+        }
+        const extracted = await new IsolatedDocumentExtractor().extract({
+          kind: parserKind,
+          scanStatus: "CLEAN",
+          source: result.stream,
+        });
+        segments = extracted.segments;
+        pageCount = extracted.pageCount;
       }
-      const extracted = await new IsolatedDocumentExtractor().extract({
-        kind: parserKind,
-        scanStatus: "CLEAN",
-        source: result.stream,
+    } catch (error) {
+      const fallback = profileFallbackPreview({
+        kind,
+        fileName: result.document.fileName,
+        mediaType: result.document.mediaType,
+        applicationProfileSnapshot: result.document.applicationProfileSnapshot,
+        startedAt,
       });
-      segments = extracted.segments;
-      pageCount = extracted.pageCount;
+      if (fallback) {
+        return NextResponse.json(fallback, { headers: noStore });
+      }
+      throw error;
     }
 
     if (!segments.length) {
+      const fallback = profileFallbackPreview({
+        kind,
+        fileName: result.document.fileName,
+        mediaType: result.document.mediaType,
+        applicationProfileSnapshot: result.document.applicationProfileSnapshot,
+        startedAt,
+      });
+      if (fallback) {
+        return NextResponse.json(fallback, { headers: noStore });
+      }
       return NextResponse.json(
         {
           code: "DOCUMENT_PARSE_FAILED",
@@ -119,16 +221,27 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(
-      {
-        kind,
-        fileName: result.document.fileName,
-        mediaType: result.document.mediaType,
-        pageCount,
-        segments,
-      },
-      { headers: noStore },
-    );
+    const content = buildStructuredDocumentContent({
+      kind,
+      segments,
+      applicationProfileSnapshot: result.document.applicationProfileSnapshot,
+      preferProfileSnapshot:
+        kind === "cv" &&
+        result.document.applicationProfileSnapshot !== null &&
+        result.document.applicationProfileSnapshot !== undefined,
+    });
+    const preview = structuredDocumentPreviewSchema.parse({
+      kind,
+      fileName: result.document.fileName,
+      mediaType: result.document.mediaType,
+      pageCount,
+      parserVersion: DOCUMENT_PREVIEW_PARSER_VERSION,
+      processingMilliseconds: Math.max(0, Date.now() - startedAt),
+      cacheHit: false,
+      content,
+    });
+    setCachedDocumentPreview(key, preview);
+    return NextResponse.json(preview, { headers: noStore });
   } catch (error) {
     if (error instanceof OpenApplicationDocumentError) {
       const notFound = error.code === "UNAVAILABLE";

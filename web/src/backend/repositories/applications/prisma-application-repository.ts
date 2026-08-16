@@ -1,7 +1,8 @@
 import "server-only";
 
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { prisma } from "@/backend/database/prisma";
+import { safeFilename } from "@/backend/services/cv-import/cv-import-projection";
 import {
   applicationPageSchema,
   type ApplicationPage,
@@ -23,7 +24,9 @@ type Cursor = Readonly<{
 }>;
 
 function encodeCursor(cursor: Cursor): string {
-  const body = Buffer.from(JSON.stringify(cursor), "utf8").toString("base64url");
+  const body = Buffer.from(JSON.stringify(cursor), "utf8").toString(
+    "base64url",
+  );
   const signature = createHmac("sha256", cursorSecret())
     .update(body)
     .digest("base64url");
@@ -82,10 +85,56 @@ function previewSupported(mediaType: string): boolean {
 function decodeCoverLetterText(value: string): string {
   if (!value.startsWith("b64:v1:")) return value;
   try {
-    return Buffer.from(value.slice("b64:v1:".length), "base64").toString("utf8");
+    return Buffer.from(value.slice("b64:v1:".length), "base64").toString(
+      "utf8",
+    );
   } catch {
     return value;
   }
+}
+
+function isInternalFilename(value: string | null): boolean {
+  return Boolean(
+    value &&
+    (/^(?:imported-cv|application-cv|candidate-cv)-[A-Za-z0-9-]+\.[A-Za-z0-9]{1,8}$/iu.test(
+      value,
+    ) ||
+      /^[A-Za-z0-9_-]{32,128}\.[A-Za-z0-9]{1,8}$/u.test(value)),
+  );
+}
+
+async function originalFilename(input: {
+  db: typeof prisma;
+  kind: "cv" | "cover-letter";
+  application: {
+    candidateUserId: string;
+    selectedCvId: string;
+    selectedCv: { fileName: string } | null;
+  };
+  document: {
+    originalFilenameEncrypted: string;
+    sourceCandidateCvId: string | null;
+  };
+}): Promise<string> {
+  const stored = input.document.originalFilenameEncrypted;
+  if (!isInternalFilename(stored)) return stored;
+  const sourceId =
+    input.document.sourceCandidateCvId ?? input.application.selectedCvId;
+  if (sourceId.startsWith("candidate-cv-")) {
+    const uploadId = sourceId.slice("candidate-cv-".length);
+    const upload = await input.db.cvUpload.findFirst({
+      where: { id: uploadId, accountId: input.application.candidateUserId },
+      select: { accountId: true, displayFilenameCiphertext: true },
+    });
+    const recovered = safeFilename(upload?.displayFilenameCiphertext ?? null, {
+      accountId: input.application.candidateUserId,
+      uploadId,
+    });
+    if (recovered && !isInternalFilename(recovered)) return recovered;
+  }
+  const selected = input.application.selectedCv?.fileName;
+  if (selected && !isInternalFilename(selected)) return selected;
+  return input.kind === "cv" ? "candidate-cv.pdf" : "cover-letter.pdf";
 }
 
 function coverLetterProjection(row: {
@@ -166,7 +215,12 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort {
         candidate: {
           select: {
             user: {
-              select: { name: true, email: true, emailVerified: true, image: true },
+              select: {
+                name: true,
+                email: true,
+                emailVerified: true,
+                image: true,
+              },
             },
           },
         },
@@ -197,7 +251,10 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort {
           stage: row.stage,
           cv: {
             available: true,
-            mediaType: cv.mediaType as "application/pdf" | "application/msword" | "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            mediaType: cv.mediaType as
+              | "application/pdf"
+              | "application/msword"
+              | "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             previewSupported: previewSupported(cv.mediaType),
           },
           coverLetter: coverLetterProjection(row),
@@ -237,8 +294,12 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort {
       },
       select: {
         id: true,
+        candidateUserId: true,
+        selectedCvId: true,
         jobPostingId: true,
         coverLetter: true,
+        profileSnapshot: true,
+        selectedCv: { select: { fileName: true } },
         applicationDocuments: {
           where: {
             kind: input.kind === "cv" ? "CV" : "COVER_LETTER",
@@ -248,6 +309,8 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort {
           select: {
             kind: true,
             originalFilenameEncrypted: true,
+            contentDigestHmac: true,
+            sourceCandidateCvId: true,
             mediaType: true,
             byteLength: true,
             storageKeyEncrypted: true,
@@ -255,12 +318,19 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort {
           take: 1,
         },
         coverLetterText: {
-          select: { textEncrypted: true, characterCount: true, deletedAt: true },
+          select: {
+            textEncrypted: true,
+            characterCount: true,
+            deletedAt: true,
+          },
         },
       },
     });
     if (!application) return null;
-    if (input.kind === "cover-letter" && application.applicationDocuments.length === 0) {
+    if (
+      input.kind === "cover-letter" &&
+      application.applicationDocuments.length === 0
+    ) {
       const text =
         application.coverLetterText && !application.coverLetterText.deletedAt
           ? decodeCoverLetterText(application.coverLetterText.textEncrypted)
@@ -278,6 +348,9 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort {
         storageKey: null,
         text,
         previewSupported: true,
+        contentVersion: createHash("sha256").update(text, "utf8").digest("hex"),
+        applicationProfileSnapshot: application.profileSnapshot,
+        sourceCandidateCvId: null,
       };
     }
     const document = application.applicationDocuments[0];
@@ -286,12 +359,20 @@ export class PrismaApplicationRepository implements ApplicationRepositoryPort {
       applicationId: application.id,
       jobId: application.jobPostingId,
       kind: input.kind,
-      fileName: document.originalFilenameEncrypted,
+      fileName: await originalFilename({
+        db: this.db,
+        kind: input.kind,
+        application,
+        document,
+      }),
       mediaType: document.mediaType,
       byteLength: document.byteLength,
       storageKey: document.storageKeyEncrypted,
       text: null,
       previewSupported: previewSupported(document.mediaType),
+      contentVersion: document.contentDigestHmac,
+      applicationProfileSnapshot: application.profileSnapshot,
+      sourceCandidateCvId: document.sourceCandidateCvId,
     };
   }
 }

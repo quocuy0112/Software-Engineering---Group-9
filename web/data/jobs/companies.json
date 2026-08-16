@@ -256,8 +256,10 @@
       "reviewCount": 105
     },
     "jobCount": 86,
-    "ownerUserId": null,
-    "memberUserIds": [],
+    "ownerUserId": "fdfd9703-c87b-42a6-bc8c-20530b464ee3",
+    "memberUserIds": [
+      "fdfd9703-c87b-42a6-bc8c-20530b464ee3"
+    ],
     "taxCode": "9790888489",
     "verificationStatus": "approved"
   },

@@ -7,6 +7,7 @@ import type {
   NotificationSeverity,
 } from "@/shared/contracts/notifications";
 import { notificationKindSchema } from "@/shared/contracts/notifications";
+import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
 
 export const notificationVariablesSchema = z
   .object({
@@ -499,10 +500,10 @@ const hrefForContext = (
 ) => {
   if (!contextType || !contextId) return null;
   if (contextType === "ACCOUNT") return "/profile/security";
-  if (contextType === "MEMBERSHIP") return "/recruiter";
+  if (contextType === "MEMBERSHIP") return recruiterRoutes.jobPostings;
   if (contextType === "APPLICATION")
     return kind === "APPLICATION_RECEIVED"
-      ? "/recruiter"
+      ? recruiterRoutes.jobPostings
       : `/jobs/applied/${encodeURIComponent(contextId)}`;
   if (contextType === "VERIFICATION_REQUEST")
     return "/dashboard/employer-verification";
@@ -514,7 +515,7 @@ const hrefForContext = (
   if (contextType === "JOB_POST_REVIEW")
     return kind === "JOB_POST_REVIEW_REQUESTED_ADMIN"
       ? `/admin/job-post-reviews/${encodeURIComponent(contextId)}`
-      : `/recruiter/job-postings?review=${encodeURIComponent(contextId)}`;
+      : `${recruiterRoutes.jobPostings}?review=${encodeURIComponent(contextId)}`;
   return null;
 };
 

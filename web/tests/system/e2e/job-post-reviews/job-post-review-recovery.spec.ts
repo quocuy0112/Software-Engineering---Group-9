@@ -14,7 +14,7 @@ test.describe("job post review recovery", () => {
   test("handles stale refresh and unavailable review states without leaking content", async ({
     page,
   }) => {
-    await page.goto(`${recruiterOrigin}/recruiter`);
+    await page.goto(`${recruiterOrigin}/recruiter/job-postings`);
     await expect(page.locator("body")).toContainText(/Job postings|Company setup required/u);
   });
 });
