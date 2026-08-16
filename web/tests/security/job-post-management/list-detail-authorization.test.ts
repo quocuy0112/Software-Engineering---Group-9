@@ -11,7 +11,7 @@ describe("managed job reads", () => {
     expect(service).toContain('state: "ACTIVE"');
     expect(service).toContain("expiresAt: { gt: new Date() }");
     expect(service).toContain(
-      'this.assertScope(authority, "JOB_POST_MODERATE")',
+      "this.assertActiveGrant(authority)",
     );
     expect(service).toContain("userId: authority.userId");
   });

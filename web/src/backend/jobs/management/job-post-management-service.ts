@@ -1,8 +1,5 @@
 import "server-only";
-import {
-  Prisma,
-  type PlatformAdministratorScope,
-} from "@/backend/generated/prisma/client";
+import { Prisma } from "@/backend/generated/prisma/client";
 import { prisma } from "@/backend/database/prisma";
 import {
   PrismaAdminCommandRepository,
@@ -22,10 +19,7 @@ import {
   jobManagementCommandSchema,
   jobManagementListQuerySchema,
 } from "@/shared/contracts/admin/job-post-management";
-import {
-  assertJobPostManagementTransition,
-  jobPostManagementScope,
-} from "./job-post-management-policy";
+import { assertJobPostManagementTransition } from "./job-post-management-policy";
 import { emitJobPostManagementOperation } from "./job-post-management-operations";
 
 function stateOf(row: {
@@ -41,9 +35,9 @@ function stateOf(row: {
 }
 
 export class JobPostManagementService {
-  async assertScope(
+  /** An active Platform Administrator grant authorizes every job operation. */
+  async assertActiveGrant(
     authority: AdminAuthority,
-    scope: PlatformAdministratorScope,
     tx = prisma,
   ) {
     const grant = await tx.platformAdministratorGrant.findFirst({
@@ -52,7 +46,6 @@ export class JobPostManagementService {
         userId: authority.userId,
         state: "ACTIVE",
         OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
-        scopes: { some: { scope } },
       },
       select: { id: true },
     });
@@ -60,13 +53,13 @@ export class JobPostManagementService {
   }
 
   async list(authority: AdminAuthority, query: unknown) {
-    await this.assertScope(authority, "JOB_POST_MODERATE");
+    await this.assertActiveGrant(authority);
     const input = jobManagementListQuerySchema.parse(query);
     return listManagedJobPosts(input);
   }
 
   async detail(authority: AdminAuthority, jobId: string) {
-    await this.assertScope(authority, "JOB_POST_MODERATE");
+    await this.assertActiveGrant(authority);
     const row = await findManagedJobPostDetail(jobId);
     if (!row) throw new Error("TARGET_UNAVAILABLE");
     return row;
@@ -80,7 +73,7 @@ export class JobPostManagementService {
     idempotencyKey: string,
   ) {
     const command = jobManagementCommandSchema.parse(raw);
-    await this.assertScope(authority, jobPostManagementScope[command.command]);
+    await this.assertActiveGrant(authority);
     const startedAt = Date.now();
     try {
       const result = await new PrismaAdminCommandRepository().execute(

@@ -1,23 +1,5 @@
-import type { PlatformAdministratorScope } from "@/backend/generated/prisma/client";
 import type { JobManagementCommand } from "@/shared/contracts/admin/job-post-management";
 import { assertFeatureWindow } from "./job-post-feature-policy";
-
-export const jobPostManagementScope: Record<
-  JobManagementCommand["command"],
-  PlatformAdministratorScope
-> = {
-  HIDE: "JOB_POST_MODERATE",
-  RESTORE: "JOB_POST_MODERATE",
-  CLOSE_APPLICATIONS: "JOB_POST_MODERATE",
-  REOPEN_APPLICATIONS: "JOB_POST_MODERATE",
-  ARCHIVE: "JOB_POST_MODERATE",
-  REQUEST_CHANGES: "JOB_POST_MODERATE",
-  FEATURE: "JOB_POST_FEATURE",
-  AMEND_FEATURE: "JOB_POST_FEATURE",
-  UNFEATURE: "JOB_POST_FEATURE",
-  SOFT_DELETE: "JOB_POST_ENFORCE",
-  ENFORCE: "JOB_POST_ENFORCE",
-};
 
 type OperationalState = {
   visibility: "PUBLISHED" | "HIDDEN" | "ARCHIVED";

@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  assertJobPostManagementTransition,
-  jobPostManagementScope,
-} from "@/backend/jobs/management/job-post-management-policy";
+import { assertJobPostManagementTransition } from "@/backend/jobs/management/job-post-management-policy";
 import {
   assertFeatureWindow,
   FEATURED_PLACEMENT_CAPACITY,
@@ -71,9 +68,7 @@ describe("job post management policy", () => {
     ).toThrow("VALIDATION_FAILED");
   });
 
-  it("maps elevated commands and exposes a bounded capacity", () => {
-    expect(jobPostManagementScope.SOFT_DELETE).toBe("JOB_POST_ENFORCE");
-    expect(jobPostManagementScope.FEATURE).toBe("JOB_POST_FEATURE");
+  it("keeps feature placement capacity bounded for every administrator", () => {
     expect(FEATURED_PLACEMENT_CAPACITY).toBe(6);
     expect(() =>
       assertFeatureWindow({
