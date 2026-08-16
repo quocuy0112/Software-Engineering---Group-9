@@ -8,6 +8,16 @@
 
 **Input**: User description: "Build post-publication job management for administrators, including visibility and application lifecycle controls, featured placement, report triage links, enforcement audit, and revision requests that preserve a live approved version."
 
+## Clarifications
+
+### Session 2026-08-16
+
+- Q: Is a job's operational status one combined lifecycle? -> A: No. Candidate visibility and application intake are independent state dimensions.
+- Q: What happens to a live job when changes are requested? -> A: Its approved live version remains candidate-visible unless the moderator explicitly hides it; recruiter edits create a separate pending revision for review.
+- Q: How do archive and deletion differ? -> A: Archive is reversible normal lifecycle completion; soft deletion is elevated enforcement that preserves evidence and cannot use ordinary restore.
+- Q: Can one report map to only one enforcement? -> A: No. Reports and enforcement actions use many-to-many links.
+- Q: How are featured conflicts handled? -> A: Bounded placement capacity is checked atomically for overlapping feature intervals.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Find and Inspect a Published Job (Priority: P1)
