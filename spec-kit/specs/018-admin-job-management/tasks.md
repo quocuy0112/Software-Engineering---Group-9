@@ -148,7 +148,7 @@
 
 ### Implementation
 
-- [ ] T050 [US5] Implement enforcement aggregate, target validation, REQUEST_CHANGES public-explanation validation, report-link creation, report-state outcome, history, audit, and notifications in `web/src/backend/jobs/management/job-post-enforcement-service.ts` and `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
+- [X] T050 [US5] Implement enforcement aggregate, target validation, REQUEST_CHANGES public-explanation validation, report-link creation, report-state outcome, history, audit, and notifications in `web/src/backend/jobs/management/job-post-enforcement-service.ts` and `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
 - [X] T051 [US5] Integrate report detail/list projections and command delegation in `web/src/backend/admin/moderation/moderation-review-service.ts`, `web/src/backend/repositories/admin/prisma-moderation-repository.ts`, and `web/src/app/api/admin/moderation-reports/[reportId]/[action]/route.ts`
 - [X] T052 [US5] Build report selection/enforcement evidence UI in `web/src/frontend/features/admin/job-post-management/job-post-management-action-panel.tsx`, `web/src/frontend/features/admin/moderation/moderation-review-show.tsx`, and `web/src/frontend/features/admin/moderation/report-action-panel.tsx`
 
@@ -163,9 +163,9 @@
 - [X] T053 Implement bounded retry-safe deadline archive loop and worker registration in `web/src/backend/admin/workers/job-post-lifecycle-loop.ts`, `web/src/backend/admin/workers/admin-worker-runtime.ts`, and `web/src/backend/admin/workers/admin-worker-entry.ts`
 - [X] T054 [P] Add lifecycle worker integration/reliability tests in `web/tests/backend/integration/job-post-management/lifecycle-worker.integration.test.ts` and `web/tests/performance/job-post-management/lifecycle-worker.reliability.test.ts`
 - [X] T055 [P] Complete migration reconciliation checks and performance measurement in `web/scripts/verify-job-post-management-migration.mjs`, `web/scripts/measure-job-post-management-performance.mjs`, and `web/package.json`
-- [ ] T056 [P] Add architecture, privacy, scope-escalation, stale-command, and reporter-data-exposure tests in `web/tests/architecture/job-post-management-boundaries.test.ts` and `web/tests/security/job-post-management/`
-- [ ] T057 Add targeted administrator/recruiter/candidate Playwright flows in `web/tests/system/e2e/job-post-management/`
-- [ ] T058 Update [quickstart.md](./quickstart.md), validate all scenarios, run formatter/typecheck/targeted suites, and record results in `spec-kit/specs/018-admin-job-management/quickstart.md`
+- [X] T056 [P] Add architecture, privacy, scope-escalation, stale-command, and reporter-data-exposure tests in `web/tests/architecture/job-post-management-boundaries.test.ts` and `web/tests/security/job-post-management/`
+- [X] T057 Add targeted administrator/recruiter/candidate Playwright flows in `web/tests/system/e2e/job-post-management/`
+- [X] T058 Update [quickstart.md](./quickstart.md), validate all scenarios, run formatter/typecheck/targeted suites, and record results in `spec-kit/specs/018-admin-job-management/quickstart.md`
 
 ---
 

@@ -75,3 +75,8 @@ The feature adds the last two scripts. Run targeted unit, contract, integration,
 3. `npm run typecheck --workspace @smarthire/web`
 4. `npm run test:job-post-management --workspace @smarthire/web`
 5. `npm run perf:job-post-management --workspace @smarthire/web -- --self-test`
+6. `npm run typecheck --workspace @smarthire/web` after repository, feature-policy, enforcement, and notification changes.
+7. `npm run test:job-post-management --workspace @smarthire/web` with 29 tests passing across contracts, integration, security, architecture, worker reliability, and component/accessibility boundaries.
+8. `npm run build --workspace @smarthire/web` completed successfully. The build retains two unrelated dynamic-filesystem tracing warnings in the job-catalogue and business-evidence modules.
+
+The Playwright flow at `web/tests/system/e2e/job-post-management/` is intentionally fixture-gated. Set `JOB_POST_MANAGEMENT_E2E_READY=1` only after provisioning the administrator, recruiter, candidate, and managed-job records described above.
