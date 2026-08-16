@@ -126,7 +126,7 @@
 
 ### Implementation
 
-- [ ] T044 [US4] Implement configured placement capacity, atomic overlap checks, eligibility, and schedule/amend/cancel persistence keyed by feature ID in `web/src/backend/jobs/management/job-post-feature-policy.ts` and `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
+- [X] T044 [US4] Implement configured placement capacity, atomic overlap checks, eligibility, and schedule/amend/cancel persistence keyed by feature ID in `web/src/backend/jobs/management/job-post-feature-policy.ts` and `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
 - [X] T045 [US4] Implement feature create/amend/cancel command orchestration, history/audit/receipt, and routes in `web/src/backend/jobs/management/job-post-management-service.ts` and `web/src/app/api/admin/job-postings/[jobId]/[action]/route.ts`
 - [X] T046 [US4] Build feature scheduling/removal controls and active/scheduled placement presentation in `web/src/frontend/features/admin/job-post-management/job-post-management-action-panel.tsx` and `web/src/frontend/features/admin/job-post-management/job-post-management-show.tsx`
 

@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   assertJobPostManagementTransition,
-  FEATURED_PLACEMENT_CAPACITY,
   jobPostManagementScope,
 } from "@/backend/jobs/management/job-post-management-policy";
+import {
+  assertFeatureWindow,
+  FEATURED_PLACEMENT_CAPACITY,
+} from "@/backend/jobs/management/job-post-feature-policy";
 
 const now = new Date("2026-08-16T00:00:00.000Z");
 const state = {
@@ -72,5 +75,16 @@ describe("job post management policy", () => {
     expect(jobPostManagementScope.SOFT_DELETE).toBe("JOB_POST_ENFORCE");
     expect(jobPostManagementScope.FEATURE).toBe("JOB_POST_FEATURE");
     expect(FEATURED_PLACEMENT_CAPACITY).toBe(6);
+    expect(() =>
+      assertFeatureWindow({
+        command: "FEATURE",
+        confirmation: true,
+        placement: "HOME_FEATURED",
+        startsAt: now,
+        endsAt: now,
+        priority: 1,
+        reason: "Invalid feature window",
+      }),
+    ).toThrow("VALIDATION_FAILED");
   });
 });

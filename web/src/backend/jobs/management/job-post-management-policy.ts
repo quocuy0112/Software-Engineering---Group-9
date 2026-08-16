@@ -1,5 +1,6 @@
 import type { PlatformAdministratorScope } from "@/backend/generated/prisma/client";
 import type { JobManagementCommand } from "@/shared/contracts/admin/job-post-management";
+import { assertFeatureWindow } from "./job-post-feature-policy";
 
 export const jobPostManagementScope: Record<
   JobManagementCommand["command"],
@@ -17,8 +18,6 @@ export const jobPostManagementScope: Record<
   SOFT_DELETE: "JOB_POST_ENFORCE",
   ENFORCE: "JOB_POST_ENFORCE",
 };
-
-export const FEATURED_PLACEMENT_CAPACITY = 6;
 
 type OperationalState = {
   visibility: "PUBLISHED" | "HIDDEN" | "ARCHIVED";
@@ -64,11 +63,11 @@ export function assertJobPostManagementTransition(
       break;
     case "FEATURE":
     case "AMEND_FEATURE":
+      assertFeatureWindow(command);
       if (
         state.visibility !== "PUBLISHED" ||
         state.applicationState !== "OPEN" ||
-        (state.applicationDeadline && state.applicationDeadline <= now) ||
-        command.endsAt <= command.startsAt
+        (state.applicationDeadline && state.applicationDeadline <= now)
       ) {
         throw new Error("VALIDATION_FAILED");
       }

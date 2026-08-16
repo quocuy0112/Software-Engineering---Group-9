@@ -4,7 +4,7 @@ import {
   type Prisma as PrismaTypes,
 } from "@/backend/generated/prisma/client";
 import { prisma } from "@/backend/database/prisma";
-import { FEATURED_PLACEMENT_CAPACITY } from "@/backend/jobs/management/job-post-management-policy";
+import { FEATURED_PLACEMENT_CAPACITY } from "@/backend/jobs/management/job-post-feature-policy";
 import type { z } from "zod";
 import type { jobManagementListQuerySchema } from "@/shared/contracts/admin/job-post-management";
 
