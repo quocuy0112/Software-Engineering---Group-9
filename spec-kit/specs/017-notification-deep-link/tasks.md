@@ -9,7 +9,7 @@
 ## Phase 2: Foundational
 
 - [ ] T002 Add immutable recipient audience, nullable href rollout migration, and shared notification contract updates in `web/prisma/schema.prisma`, `web/prisma/migrations/`, and `web/src/shared/contracts/notifications/index.ts`
-- [ ] T003 Implement audience-aware, current-state `NotificationDestinationResolver` and stop storing generated hrefs in `web/src/backend/notifications/event-policy.ts` and `web/src/backend/notifications/notification-destination-resolver.ts`
+- [X] T003 Implement audience-aware, current-state `NotificationDestinationResolver` and stop storing generated hrefs in `web/src/backend/notifications/event-policy.ts` and `web/src/backend/notifications/notification-destination-resolver.ts`
 - [ ] T004 Resolve transient hrefs at notification list serving time and cover kind/audience/group/staleness contracts in `web/src/backend/notifications/notification-service.ts` and `web/tests/backend/contract/notifications/notification-deep-link.test.ts`
 
 ## Phase 3: User Story 1 - Safe current destinations (P1)

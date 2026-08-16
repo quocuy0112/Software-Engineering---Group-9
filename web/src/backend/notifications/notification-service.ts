@@ -14,6 +14,7 @@ import type {
   NotificationItem,
 } from "@/shared/contracts/notifications";
 import { emitNotificationOperation } from "@/backend/notifications/notification-operations";
+import { resolveNotificationHref } from "@/backend/notifications/notification-destination-resolver";
 
 type NotificationDb = PrismaClient | Prisma.TransactionClient;
 
@@ -27,6 +28,7 @@ const toItem = (
     summary: string;
     variables?: unknown;
     href: string | null;
+    audience: "USER" | "ADMIN";
     contextType: NotificationItem["contextType"];
     contextId: string | null;
     occurrenceCount: number;
@@ -47,7 +49,14 @@ const toItem = (
     severity: row.severity,
     title: localized?.title ?? row.title,
     summary: localized?.summary ?? row.summary,
-    href: row.href,
+    href: resolveNotificationHref({
+      kind: row.kind,
+      contextType: row.contextType,
+      contextId: row.contextId,
+      recipientAudience: row.audience,
+      occurrenceCount: row.occurrenceCount,
+      lastOccurredAt: row.lastOccurredAt,
+    }),
     contextType: row.contextType,
     contextId: row.contextId,
     occurrenceCount: row.occurrenceCount,
