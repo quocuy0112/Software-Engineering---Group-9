@@ -852,6 +852,7 @@ export class PrismaJobApplicationRepository implements ApplicationRepositoryPort
               occurredAt: input.occurredAt,
               contextType: "APPLICATION",
               contextId: created.id,
+              variables: { recipientRole: "RECRUITER", jobId: input.jobId },
             });
           }
           if (input.directCv) {

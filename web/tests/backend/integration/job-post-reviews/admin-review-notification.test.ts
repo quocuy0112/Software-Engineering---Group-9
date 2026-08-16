@@ -1,28 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { adminNotificationTarget } from "@/frontend/features/admin/notifications/admin-notification-navigation";
-import { notificationItemSchema } from "@/shared/contracts/notifications";
+import { resolveNotificationHref } from "@/backend/notifications/notification-destination-resolver";
 
 describe("Administrator review notification navigation", () => {
   it("targets the exact protected review version", () => {
-    const item = notificationItemSchema.parse({
-      id: "n1",
+    const href = resolveNotificationHref({
       kind: "JOB_POST_REVIEW_REQUESTED_ADMIN",
-      category: "MODERATION",
-      severity: "MEDIUM",
-      title: "Review awaiting",
-      summary: "A review awaits.",
-      href: "/admin/job-post-reviews/review-1",
       contextType: "JOB_POST_REVIEW",
       contextId: "review-1",
+      recipientRole: "ADMIN",
       occurrenceCount: 1,
-      readAt: null,
-      createdAt: "2026-08-15T00:00:00.000Z",
-      lastOccurredAt: "2026-08-15T00:00:00.000Z",
-      expiresAt: "2026-11-01T00:00:00.000Z",
+      lastOccurredAt: new Date("2026-08-15T00:00:00.000Z"),
+      adminOrigin: "https://console.example.test",
     });
-    expect(adminNotificationTarget(item)).toEqual({
-      resource: "job-post-reviews",
-      id: "review-1",
-    });
+    expect(href).toBe("https://console.example.test/#/job-post-reviews/review-1/show");
   });
 });

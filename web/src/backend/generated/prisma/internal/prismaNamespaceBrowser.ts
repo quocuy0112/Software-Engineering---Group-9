@@ -615,6 +615,7 @@ export const InAppNotificationScalarFieldEnum = {
   category: 'category',
   severity: 'severity',
   audience: 'audience',
+  recipientRole: 'recipientRole',
   title: 'title',
   summary: 'summary',
   variables: 'variables',

@@ -28,7 +28,7 @@ const toItem = (
     summary: string;
     variables?: unknown;
     href: string | null;
-    audience: "USER" | "ADMIN";
+    recipientRole: "CANDIDATE" | "RECRUITER" | "ADMIN";
     contextType: NotificationItem["contextType"];
     contextId: string | null;
     occurrenceCount: number;
@@ -53,9 +53,13 @@ const toItem = (
       kind: row.kind,
       contextType: row.contextType,
       contextId: row.contextId,
-      recipientAudience: row.audience,
+      recipientRole: row.recipientRole,
       occurrenceCount: row.occurrenceCount,
       lastOccurredAt: row.lastOccurredAt,
+      jobId:
+        typeof row.variables === "object" && row.variables !== null && "jobId" in row.variables && typeof row.variables.jobId === "string"
+          ? row.variables.jobId
+          : null,
     }),
     contextType: row.contextType,
     contextId: row.contextId,
