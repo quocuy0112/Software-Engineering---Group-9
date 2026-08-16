@@ -46,7 +46,7 @@
 
 ### Tests
 
-- [ ] T015 [P] [US1] Add list/detail contract tests in `web/tests/backend/contract/job-post-management/list-detail.contract.test.ts`
+- [X] T015 [P] [US1] Add list/detail contract tests in `web/tests/backend/contract/job-post-management/list-detail.contract.test.ts`
 - [ ] T016 [P] [US1] Add repository integration tests for safe search, filters, report aggregation, version joins, and pagination in `web/tests/backend/integration/job-post-management/list-detail.integration.test.ts`
 - [ ] T017 [P] [US1] Add security tests for anonymous, inactive, cross-company, and unscoped administrator reads in `web/tests/security/job-post-management/list-detail-authorization.test.ts`
 - [ ] T018 [P] [US1] Add component and accessibility tests in `web/tests/frontend/components/admin-management/job-post-management-list.test.tsx` and `web/tests/frontend/accessibility/admin-management/job-post-management-list.accessibility.test.tsx`
