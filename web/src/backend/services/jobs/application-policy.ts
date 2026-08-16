@@ -33,7 +33,10 @@ export type ApplicationPolicyContext = {
   candidate: {
     userId: string;
     name: string;
+    email?: string | null;
     headline: string | null;
+    summary?: string | null;
+    phone?: string | null;
     location: string | null;
     skills: Array<{ id: string; label: string }>;
     experience: Array<{
@@ -96,7 +99,9 @@ function plainText(value: string | null, maximum: number, required = false) {
   return normalized || null;
 }
 
-function coverLetterText(value: ApplicationSubmission["coverLetter"]): string | null {
+function coverLetterText(
+  value: ApplicationSubmission["coverLetter"],
+): string | null {
   if (value === null) return null;
   if (typeof value === "string") return value;
   if (value.kind === "NONE") return null;
@@ -201,7 +206,10 @@ export function prepareApplicationSubmission(
     profileSnapshot: {
       v: 1,
       candidateName: context.candidate.name,
+      email: context.candidate.email ?? null,
       headline: context.candidate.headline!,
+      summary: context.candidate.summary ?? null,
+      phone: context.candidate.phone ?? null,
       location: context.candidate.location!,
       skills: context.candidate.skills,
       experience: context.candidate.experience.map((item) => ({

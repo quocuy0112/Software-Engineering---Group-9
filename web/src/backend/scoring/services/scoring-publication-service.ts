@@ -5,7 +5,13 @@ import type { AiAssessment, AutomaticMatch } from "@/shared/contracts/scoring";
 export class ScoringPublicationService {
   constructor(private readonly repository: ScoringRepositoryPort) {}
 
-  async publishDeterministic(input: { applicationId: string; operationId: string; automatic: AutomaticMatch; consecutiveFailures?: number }) {
+  async publishDeterministic(input: {
+    applicationId: string;
+    operationId: string;
+    automatic: AutomaticMatch;
+    consecutiveFailures?: number;
+    failureCode?: string;
+  }) {
     return this.repository.publish({
       applicationId: input.applicationId,
       operationId: input.operationId,
@@ -13,6 +19,7 @@ export class ScoringPublicationService {
       ai: null,
       finalScore: null,
       consecutiveFailures: input.consecutiveFailures,
+      safeFailureCode: input.failureCode,
     });
   }
 
@@ -36,6 +43,7 @@ export class ScoringPublicationService {
       ai: input.ai,
       finalScore,
       consecutiveFailures: 0,
+      safeFailureCode: undefined,
     });
   }
 }

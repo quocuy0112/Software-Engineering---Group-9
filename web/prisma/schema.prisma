@@ -413,6 +413,8 @@ enum ScoringSkillMatchState {
 enum ScoringAiConfidenceLevel {
   LOW
   STANDARD
+  MEDIUM
+  HIGH
 }
 
 enum ScoringAiQuestionState {
@@ -3700,6 +3702,7 @@ model AiAssessment {
   technicalAbilitySummaryEncrypted String           @db.Text
   roleFitSummaryEncrypted String                    @db.Text
   deductionSummaryEncrypted String                  @db.Text
+  scoreReasoningJsonEncrypted String?               @db.Text
   complianceStatementCode String
   complianceStatementLabel String
   questionState           ScoringAiQuestionState

@@ -53,6 +53,7 @@ export const authenticationAuditAction = z.enum([
   "job.application.denied",
   "job.application.failed",
   "SCORING_RESCORE_REQUESTED",
+  "APPLICATION_SCORING_REQUESTED",
   "AI_RETRY_REQUESTED",
   "MANUAL_PRIORITY_SET",
   "MANUAL_PRIORITY_REMOVED",

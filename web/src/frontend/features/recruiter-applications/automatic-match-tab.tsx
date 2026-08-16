@@ -1,31 +1,284 @@
 "use client";
 
-import type { AutomaticMatch, FinalScore } from "@/shared/contracts/scoring";
+import {
+  Calculator,
+  Check,
+  CircleAlert,
+  CircleX,
+  FileSearch,
+  Minus,
+  Plus,
+} from "lucide-react";
+import type {
+  AutomaticMatch,
+  FinalScore,
+  SkillEvidence,
+} from "@/shared/contracts/scoring";
 
-function SkillGroup({ title, items, tone, icon }: { title: string; items: AutomaticMatch["foundRequiredSkills"]; tone: "found" | "missing" | "preferred"; icon: string }) {
-  return <section className={"ai-ranking-skill-group ai-ranking-skill-group--" + tone}><h3><span aria-hidden="true">{icon}</span>{title}</h3>{items.length ? <ul>{items.map((item) => <li key={item.requirementKind + "-" + item.skillCode}><strong>{item.label}</strong>{item.evidence.length ? <span>{item.evidence[0]?.excerpt}</span> : <span>{item.matchState === "FOUND" ? "Evidence excerpt unavailable for this scoring run." : "No matching evidence found in the CV."}</span>}</li>)}</ul> : <p className="ai-ranking-muted">None detected.</p>}</section>;
+function SkillChips({
+  title,
+  items,
+  tone,
+  icon: Icon,
+}: {
+  title: string;
+  items: SkillEvidence[];
+  tone: "found" | "missing" | "preferred";
+  icon: typeof Check;
+}) {
+  return (
+    <div className={`automatic-skill-group automatic-skill-group--${tone}`}>
+      <span className="automatic-skill-group__label">
+        <Icon aria-hidden="true" /> {title}
+      </span>
+      {items.length ? (
+        <div className="automatic-skill-chips">
+          {items.map((item) => (
+            <span
+              className="automatic-skill-chip"
+              key={`${item.requirementKind}-${item.skillCode}`}
+            >
+              <Icon aria-hidden="true" /> {item.label}
+            </span>
+          ))}
+        </div>
+      ) : (
+        <span className="ranking-muted-text">None detected</span>
+      )}
+    </div>
+  );
 }
 
-export function AutomaticMatchTab({ automatic, finalScore, retrying = false }: { automatic: AutomaticMatch | null; finalScore: FinalScore | null; retrying?: boolean }) {
-  if (!automatic) return <div className="ai-ranking-empty-panel" role="status"><span aria-hidden="true">{String.fromCharCode(8635)}</span><h3>Automatic match is processing</h3><p>The deterministic result will appear here when the CV and job snapshots are ready.</p></div>;
+function ScoreCard({
+  title,
+  value,
+  meta,
+  tone,
+  progress,
+}: {
+  title: string;
+  value: string;
+  meta: string;
+  tone: "blue" | "purple" | "green";
+  progress: number;
+}) {
   return (
-    <div className="ai-ranking-tab-content">
-      <div className="ai-ranking-score-cards" aria-label="Score components">
-        <article><span>Automatic match</span><strong>{automatic.score}</strong><small>60% weight</small></article>
-        <article><span>AI assessment</span><strong>{finalScore ? "Ready" : retrying ? "Processing" : "Unavailable"}</strong><small>40% weight</small></article>
-        <article><span>Final score</span><strong>{finalScore ? finalScore.value : String.fromCharCode(8212)}</strong><small>{finalScore ? finalScore.band.label : retrying ? "Pending" : "Not calculated"}</small></article>
+    <article className={`automatic-score-card automatic-score-card--${tone}`}>
+      <div>
+        <span>{title}</span>
+        <small>{meta}</small>
       </div>
-      <div className="ai-ranking-formula-row"><strong>{finalScore ? finalScore.formulaText : retrying ? "Deterministic " + automatic.score + " ready - AI retry in progress" : "Deterministic match: " + automatic.score + "/100 - AI unavailable"}</strong><span>JD {automatic.jdVersion} - CV {automatic.cvVersion} - Config {automatic.configVersion}</span></div>
-      <p className="ai-ranking-muted">Automatic rubric: 75% required-skill evidence + 25% relevant experience. Preferred skills are evidence-only and do not add points.</p>
-      {automatic.mayBeIncomplete ? <div className="ai-ranking-warning" role="status"><span aria-hidden="true">!</span>{automatic.incompletenessLabel}</div> : null}
-      <div className="ai-ranking-skill-grid"><SkillGroup title="Skills found" items={automatic.foundRequiredSkills} tone="found" icon={String.fromCharCode(10003)} /><SkillGroup title="Missing required skills" items={automatic.missingRequiredSkills} tone="missing" icon={String.fromCharCode(10005)} /></div>
-      <SkillGroup title="Preferred skills" items={automatic.preferredSkills} tone="preferred" icon="+" />
-      <section className="ai-ranking-evidence-block">
-        <div className="ai-ranking-section-title"><h3>Experience</h3><span>Deterministic evidence</span></div>
-        <div className="ai-ranking-experience-grid"><div><span>Minimum required</span><strong>{automatic.minimumExperienceYears === null ? "Not specified" : automatic.minimumExperienceYears + " years"}</strong></div><div><span>Years detected in CV</span><strong>{automatic.detectedExperience.kind === "DETECTED" ? automatic.detectedExperience.years + " years" : "Not detected"}</strong></div></div>
-        <p>{automatic.minimumExperienceYears === null || automatic.minimumExperienceYears <= 0 ? "No minimum experience requirement is configured." : automatic.detectedExperience.kind === "DETECTED" ? automatic.detectedExperience.years >= automatic.minimumExperienceYears ? "Exceeds the requirement by " + Math.max(0, automatic.detectedExperience.years - automatic.minimumExperienceYears) + " year" + (automatic.detectedExperience.years - automatic.minimumExperienceYears === 1 ? "" : "s") + "." : "Does not yet meet the minimum experience requirement." : "Experience could not be established from the CV; no number was inferred."}</p>
+      <strong>{value}</strong>
+      <span className="automatic-score-card__track">
+        <span style={{ width: `${Math.max(0, Math.min(100, progress))}%` }} />
+      </span>
+    </article>
+  );
+}
+
+export function AutomaticMatchTab({
+  automatic,
+  finalScore,
+  aiScore,
+  retrying = false,
+}: {
+  automatic: AutomaticMatch | null;
+  finalScore: FinalScore | null;
+  aiScore?: number | null;
+  retrying?: boolean;
+}) {
+  if (!automatic) {
+    return (
+      <div className="ranking-empty-panel" role="status">
+        <LoaderPlaceholder />
+        <h3>Automatic match is processing</h3>
+        <p>
+          The deterministic result will appear here when the CV and job
+          snapshots are ready.
+        </p>
+      </div>
+    );
+  }
+
+  const experienceDelta =
+    automatic.minimumExperienceYears === null ||
+    automatic.detectedExperience.kind !== "DETECTED"
+      ? null
+      : automatic.detectedExperience.years - automatic.minimumExperienceYears;
+  const evidence = [
+    ...automatic.foundRequiredSkills,
+    ...automatic.preferredSkills,
+  ].flatMap((item) => item.evidence.map((excerpt) => ({ item, excerpt })));
+
+  return (
+    <div className="ranking-tab-content automatic-match-tab">
+      <div className="automatic-score-cards" aria-label="Score components">
+        <ScoreCard
+          title="Automatic match"
+          value={`${automatic.score}/100`}
+          meta="Weight 60%"
+          tone="blue"
+          progress={automatic.score}
+        />
+        <ScoreCard
+          title="AI assessment"
+          value={
+            finalScore && aiScore !== null && aiScore !== undefined
+              ? `${aiScore}/100`
+              : retrying
+                ? "Processing"
+                : "Unavailable"
+          }
+          meta="Weight 40%"
+          tone="purple"
+          progress={aiScore ?? 0}
+        />
+        <ScoreCard
+          title="Final score"
+          value={
+            finalScore
+              ? `${finalScore.value}/100`
+              : retrying
+                ? "Pending"
+                : "—/100"
+          }
+          meta="Result"
+          tone="green"
+          progress={finalScore?.value ?? automatic.score}
+        />
+      </div>
+
+      <div className="automatic-formula-row">
+        <span className="automatic-formula-row__icon" aria-hidden="true">
+          <Calculator />
+        </span>
+        <strong>
+          {finalScore
+            ? finalScore.formulaText
+            : retrying
+              ? `Deterministic ${automatic.score}/100 ready · AI retry in progress`
+              : `Deterministic match: ${automatic.score}/100 · AI unavailable`}
+        </strong>
+        <span>
+          JD {automatic.jdVersion} · CV {automatic.cvVersion} · Config{" "}
+          {automatic.configVersion}
+        </span>
+      </div>
+
+      {automatic.mayBeIncomplete ? (
+        <div className="ranking-warning" role="status">
+          <CircleAlert aria-hidden="true" />
+          <span>
+            {automatic.incompletenessLabel ??
+              "Some source data may be incomplete."}
+          </span>
+        </div>
+      ) : null}
+
+      <div className="automatic-match-grid">
+        <section className="ranking-panel automatic-skills-panel">
+          <div className="ranking-section-heading">
+            <h3>Skills required for the role</h3>
+          </div>
+          <SkillChips
+            title="Found in the CV"
+            items={automatic.foundRequiredSkills}
+            tone="found"
+            icon={Check}
+          />
+          <SkillChips
+            title="Missing required skill"
+            items={automatic.missingRequiredSkills}
+            tone="missing"
+            icon={CircleX}
+          />
+          <SkillChips
+            title="Preferred skills"
+            items={automatic.preferredSkills}
+            tone="preferred"
+            icon={Plus}
+          />
+        </section>
+        <section className="ranking-panel automatic-experience-panel">
+          <div className="ranking-section-heading">
+            <h3>Experience</h3>
+          </div>
+          <div className="experience-metric experience-metric--required">
+            <span>Minimum required</span>
+            <strong>
+              {automatic.minimumExperienceYears === null
+                ? "Not specified"
+                : `${automatic.minimumExperienceYears} years`}
+            </strong>
+          </div>
+          <div className="experience-metric experience-metric--detected">
+            <span>Detected in the CV</span>
+            <strong>
+              {automatic.detectedExperience.kind === "DETECTED"
+                ? `${automatic.detectedExperience.years} years`
+                : "Not detected"}
+            </strong>
+          </div>
+          <div
+            className={`experience-delta ${experienceDelta !== null && experienceDelta >= 0 ? "is-positive" : "is-warning"}`}
+          >
+            {experienceDelta !== null && experienceDelta >= 0 ? (
+              <Check aria-hidden="true" />
+            ) : (
+              <CircleAlert aria-hidden="true" />
+            )}
+            <span>
+              {automatic.minimumExperienceYears === null ||
+              automatic.minimumExperienceYears <= 0
+                ? "No minimum configured"
+                : experienceDelta !== null && experienceDelta >= 0
+                  ? `Exceeds requirement by ${experienceDelta} ${experienceDelta === 1 ? "year" : "years"}`
+                  : "Minimum experience not established"}
+            </span>
+          </div>
+        </section>
+      </div>
+
+      <section className="ranking-panel evidence-panel">
+        <div className="ranking-section-heading">
+          <h3>
+            <FileSearch aria-hidden="true" /> Evidence found in the CV
+          </h3>
+          <span className="ranking-version-tag">
+            CV &middot; pages 1&ndash;2
+          </span>
+        </div>
+        {evidence.length ? (
+          <div className="evidence-list">
+            {evidence.map(({ item, excerpt }) => (
+              <div
+                className="evidence-row"
+                key={`${item.skillCode}-${excerpt.excerpt}`}
+              >
+                <span className="evidence-row__skill">{item.label}</span>
+                <blockquote>&ldquo;{excerpt.excerpt}&rdquo;</blockquote>
+                <span className="evidence-row__page">
+                  {excerpt.pageNumber
+                    ? `Page ${excerpt.pageNumber}`
+                    : (excerpt.sectionLabel ?? "CV")}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="ranking-muted-text">
+            No evidence excerpts were detected for this scoring snapshot.
+          </p>
+        )}
       </section>
-      <section className="ai-ranking-evidence-block"><div className="ai-ranking-section-title"><h3>Evidence found in the CV</h3><span>Verbatim excerpts</span></div><div className="ai-ranking-evidence-list">{[...automatic.foundRequiredSkills, ...automatic.preferredSkills].flatMap((item) => item.evidence.map((evidence) => <blockquote key={item.skillCode + "-" + evidence.excerpt}><p>&quot;{evidence.excerpt}&quot;</p><cite>{item.label} - {evidence.pageNumber ? "Page " + evidence.pageNumber : evidence.sectionLabel}</cite></blockquote>))}{![...automatic.foundRequiredSkills, ...automatic.preferredSkills].some((item) => item.evidence.length) ? <p className="ai-ranking-muted">{automatic.foundRequiredSkills.some((item) => item.matchState === "FOUND") ? "Evidence excerpts were not retained for this scoring run. Re-run matching to refresh them." : "No evidence excerpts were detected."}</p> : null}</div></section>
     </div>
+  );
+}
+
+function LoaderPlaceholder() {
+  return (
+    <span className="ranking-empty-panel__icon" aria-hidden="true">
+      <Minus />
+    </span>
   );
 }

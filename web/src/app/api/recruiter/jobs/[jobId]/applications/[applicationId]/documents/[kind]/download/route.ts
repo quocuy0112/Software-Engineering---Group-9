@@ -19,7 +19,7 @@ function safeFileName(value: string | null, kind: string) {
 
 export async function GET(
   request: Request,
-  context: { params: Promise<{ jobId: string; applicationId: string; kind: string }> },
+  context: { params: Promise<unknown> },
 ) {
   const current = await requireSession(request.headers);
   if (!current) {
@@ -28,8 +28,16 @@ export async function GET(
       { status: 401, headers: noStore },
     );
   }
-  const params = await context.params;
-  const kind = params.kind === "cv" || params.kind === "cover-letter" ? params.kind : null;
+  const rawParams = await context.params;
+  const params =
+    rawParams && typeof rawParams === "object"
+      ? (rawParams as Record<string, unknown>)
+      : {};
+  const jobId = typeof params.jobId === "string" ? params.jobId : "";
+  const applicationId =
+    typeof params.applicationId === "string" ? params.applicationId : "";
+  const rawKind = typeof params.kind === "string" ? params.kind : "";
+  const kind = rawKind === "cv" || rawKind === "cover-letter" ? rawKind : null;
   if (!kind) {
     return NextResponse.json(
       { code: "INVALID_REQUEST", message: "The document kind is invalid." },
@@ -39,8 +47,8 @@ export async function GET(
   try {
     const result = await new OpenApplicationDocumentService().execute({
       userId: current.userId,
-      jobId: params.jobId,
-      applicationId: params.applicationId,
+      jobId,
+      applicationId,
       kind,
       preview: false,
     });

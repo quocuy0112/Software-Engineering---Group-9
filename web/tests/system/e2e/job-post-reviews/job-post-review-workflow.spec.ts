@@ -16,7 +16,7 @@ test.describe("job post review workflow", () => {
   test("submit, claim, approve, reject, and resubmit flow stays navigable", async ({
     page,
   }) => {
-    await page.goto(`${recruiterOrigin}/recruiter`);
+    await page.goto(`${recruiterOrigin}/recruiter/job-postings`);
     await expect(page.getByRole("heading", { name: /Job postings/u })).toBeVisible();
     await page.goto(`${adminOrigin}/admin/job-post-reviews`);
     await expect(page.getByRole("heading", { name: /Job post reviews/u })).toBeVisible();

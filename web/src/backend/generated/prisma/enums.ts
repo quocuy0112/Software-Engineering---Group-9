@@ -552,7 +552,9 @@ export type ScoringSkillMatchState = (typeof ScoringSkillMatchState)[keyof typeo
 
 export const ScoringAiConfidenceLevel = {
   LOW: 'LOW',
-  STANDARD: 'STANDARD'
+  STANDARD: 'STANDARD',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH'
 } as const
 
 export type ScoringAiConfidenceLevel = (typeof ScoringAiConfidenceLevel)[keyof typeof ScoringAiConfidenceLevel]

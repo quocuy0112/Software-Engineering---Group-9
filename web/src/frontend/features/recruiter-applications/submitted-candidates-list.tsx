@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { RefreshCw } from "lucide-react";
 import type { SubmittedCandidate } from "@/shared/contracts/applications";
 import { useSubmittedCandidates } from "./use-submitted-candidates";
 import { ApplicationDocumentViewer } from "./application-document-viewer";
@@ -73,8 +74,17 @@ export function SubmittedCandidatesList({
   jobTitle: string;
   onBack?: () => void;
 }) {
-  const { items, nextCursor, loading, loadingMore, error, retry, loadMore } =
-    useSubmittedCandidates(jobId);
+  const {
+    items,
+    nextCursor,
+    loading,
+    loadingMore,
+    refreshing,
+    error,
+    retry,
+    refresh,
+    loadMore,
+  } = useSubmittedCandidates(jobId);
   const [viewer, setViewer] = useState<{
     applicationId: string;
     kind: "cv" | "cover-letter";
@@ -82,43 +92,106 @@ export function SubmittedCandidatesList({
   } | null>(null);
 
   return (
-    <section className="submitted-candidates" aria-labelledby="submitted-candidates-title">
-      {onBack ? <button type="button" onClick={onBack}>Back to job postings</button> : null}
-      <p className="recruiter-eyebrow">Submitted candidates</p>
-      <h1 id="submitted-candidates-title">{jobTitle}</h1>
-      <p>Review the evidence candidates submitted for this job. Scores are not part of this view.</p>
-      <div aria-live="polite" aria-busy={loading || loadingMore}>
+    <section
+      className="submitted-candidates"
+      aria-labelledby="submitted-candidates-title"
+    >
+      {onBack ? (
+        <button type="button" onClick={onBack}>
+          Back to job postings
+        </button>
+      ) : null}
+      <div className="submitted-candidates__header">
+        <div>
+          <p className="recruiter-eyebrow">Submitted candidates</p>
+          <h1 id="submitted-candidates-title">{jobTitle}</h1>
+          <p>
+            Review the evidence candidates submitted for this job.{" "}
+            {"Scores are not part of this view."}
+          </p>
+        </div>
+        <button
+          type="button"
+          className="submitted-candidates__refresh-button"
+          onClick={refresh}
+          disabled={loading || refreshing}
+        >
+          <RefreshCw
+            aria-hidden="true"
+            className={refreshing ? "is-spinning" : undefined}
+          />
+          {refreshing ? "Refreshing…" : "Refresh"}
+        </button>
+      </div>
+      <div aria-live="polite" aria-busy={loading || loadingMore || refreshing}>
         {loading ? <p role="status">Loading submitted candidates…</p> : null}
+        {refreshing ? (
+          <p role="status">Updating submitted candidates…</p>
+        ) : null}
         {error ? (
           <div role="alert">
             <p>Submitted candidates could not be loaded.</p>
-            <button type="button" onClick={retry}>Retry</button>
+            <button type="button" onClick={retry}>
+              Retry
+            </button>
           </div>
         ) : null}
-        {!loading && !error && items.length === 0 ? (
+        {!loading && items.length === 0 && !error ? (
           <p>No candidates have applied to this job yet.</p>
         ) : null}
-        {!loading && !error && items.length > 0 ? (
-          <div className="submitted-candidates-table" role="list" aria-label="Submitted candidates">
+        {!loading && items.length > 0 ? (
+          <div
+            className="submitted-candidates-table"
+            role="list"
+            aria-label="Submitted candidates"
+          >
             {items.map((candidate) => (
-              <article key={candidate.applicationId} role="listitem" className="submitted-candidate-row">
+              <article
+                key={candidate.applicationId}
+                role="listitem"
+                className="submitted-candidate-row"
+              >
                 <div>
                   <strong>{candidate.candidate.displayName}</strong>
                   <span>{candidate.candidate.verifiedEmail}</span>
-                  {candidate.candidate.sharedPhone ? <span>{candidate.candidate.sharedPhone}</span> : null}
+                  {candidate.candidate.sharedPhone ? (
+                    <span>{candidate.candidate.sharedPhone}</span>
+                  ) : null}
                 </div>
                 <div>
                   <span>Applied {formatDate(candidate.submittedAt)}</span>
                   <span>{candidate.stage.replaceAll("_", " ")}</span>
                 </div>
-                <DocumentActions candidate={candidate} jobId={jobId} onView={(kind, fileName) => setViewer({ applicationId: candidate.applicationId, kind, fileName })} />
+                <DocumentActions
+                  candidate={candidate}
+                  jobId={jobId}
+                  onView={(kind, fileName) =>
+                    setViewer({
+                      applicationId: candidate.applicationId,
+                      kind,
+                      fileName,
+                    })
+                  }
+                />
               </article>
             ))}
           </div>
         ) : null}
       </div>
-      {nextCursor ? <button type="button" onClick={loadMore} disabled={loadingMore}>{loadingMore ? "Loading…" : "Load more candidates"}</button> : null}
-      {viewer ? <ApplicationDocumentViewer jobId={jobId} applicationId={viewer.applicationId} kind={viewer.kind} fileName={viewer.fileName} onClose={() => setViewer(null)} /> : null}
+      {nextCursor ? (
+        <button type="button" onClick={loadMore} disabled={loadingMore}>
+          {loadingMore ? "Loading…" : "Load more candidates"}
+        </button>
+      ) : null}
+      {viewer ? (
+        <ApplicationDocumentViewer
+          jobId={jobId}
+          applicationId={viewer.applicationId}
+          kind={viewer.kind}
+          fileName={viewer.fileName}
+          onClose={() => setViewer(null)}
+        />
+      ) : null}
     </section>
   );
 }

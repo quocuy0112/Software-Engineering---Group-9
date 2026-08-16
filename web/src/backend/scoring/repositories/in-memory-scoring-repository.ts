@@ -46,6 +46,7 @@ export class InMemoryScoringRepository implements ScoringRepositoryPort {
       finalScore: input.finalScore,
       operationId: input.operationId,
       consecutiveFailures: input.consecutiveFailures ?? (input.ai ? 0 : (previous?.consecutiveFailures ?? 0) + 1),
+      safeFailureCode: input.safeFailureCode ?? (input.ai ? null : (previous?.safeFailureCode ?? "AI_PROVIDER_UNAVAILABLE")),
       rescoreInProgress: false,
     };
     this.records.set(input.applicationId, record);

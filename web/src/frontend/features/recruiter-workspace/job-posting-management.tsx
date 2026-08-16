@@ -20,6 +20,7 @@ import {
   type RecruiterJobStatus,
 } from "@/shared/contracts/recruiter-job-posting";
 import type { JobCatalogItem } from "@/shared/contracts/jobs/catalog";
+import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
 
 const tabs: Array<{
   value: "active" | "draft" | "pending_approval" | "closed";
@@ -637,7 +638,7 @@ export function RecruiterJobPostingManagement({
       return;
     }
     if (onNavigate) {
-      onNavigate("/recruiter/jobs/create");
+      onNavigate(recruiterRoutes.jobPostingCreate);
       return;
     }
     setEditorJob(
@@ -647,7 +648,7 @@ export function RecruiterJobPostingManagement({
   };
   const openEdit = (job: RecruiterJob) => {
     if (onNavigate) {
-      onNavigate(`/recruiter/jobs/${encodeURIComponent(job.id)}/edit`);
+      onNavigate(recruiterRoutes.jobPostingEdit(job.id));
       return;
     }
     setEditorJob(job);
@@ -917,6 +918,10 @@ export function RecruiterJobPostingManagement({
                   job={job}
                   onEdit={() => openEdit(job)}
                   onApplicants={() => {
+                    if (onNavigate) {
+                      onNavigate(recruiterRoutes.candidateRanking(job.id));
+                      return;
+                    }
                     setApplicantJob(job);
                     setView("applicants");
                   }}
@@ -976,15 +981,20 @@ export function RecruiterWorkspaceNavigation({
     {
       label: "Job postings",
       icon: "jobs",
-      href: "/recruiter",
+      href: recruiterRoutes.jobPostings,
       active:
-        pathname === "/recruiter" || pathname.startsWith("/recruiter/jobs"),
+        pathname === "/recruiter" ||
+        pathname === recruiterRoutes.jobPostings ||
+        pathname.startsWith("/recruiter/jobs") ||
+        pathname.startsWith(`${recruiterRoutes.jobPostings}/`),
     },
     {
       label: "Candidates",
       icon: "candidates",
-      href: "/recruiter/candidates",
-      active: pathname === "/recruiter/candidates",
+      href: recruiterRoutes.candidates,
+      active:
+        pathname === recruiterRoutes.candidates ||
+        pathname.startsWith(`${recruiterRoutes.candidates}/`),
     },
     {
       label: "Company settings",

@@ -12,6 +12,9 @@ export type ApplicationDocumentRecord = Readonly<{
   storageKey: string | null;
   text: string | null;
   previewSupported: boolean;
+  contentVersion?: string | null;
+  applicationProfileSnapshot?: unknown;
+  sourceCandidateCvId?: string | null;
 }>;
 
 export type ApplicationRepositoryPort = Readonly<{

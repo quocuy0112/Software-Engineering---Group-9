@@ -35,50 +35,50 @@ export function createScoringWorkProcessor(): ScoringWorkProcessor {
   const repository = new PrismaScoringRepository(prisma);
   const aiProvider = new ApprovedAiAssessmentAdapter();
   return async (input) => {
-    const row = await prisma.jobApplication.findUnique({
-      where: { id: input.applicationId },
-      select: {
-        candidateUserId: true,
-        cvSnapshot: true,
-        jobSnapshot: true,
-        coverLetter: true,
-        applicationDocuments: {
-          where: {
-            kind: "CV",
-            committedAt: { not: null },
-            deletedAt: null,
+    const [row, operation] = await Promise.all([
+      prisma.jobApplication.findUnique({
+        where: { id: input.applicationId },
+        select: {
+          candidateUserId: true,
+          cvSnapshot: true,
+          jobSnapshot: true,
+          coverLetter: true,
+          applicationDocuments: {
+            where: {
+              kind: "CV",
+              committedAt: { not: null },
+              deletedAt: null,
+            },
+            take: 1,
+            select: {
+              mediaType: true,
+              storageKeyEncrypted: true,
+              byteLength: true,
+            },
           },
-          take: 1,
-          select: {
-            mediaType: true,
-            storageKeyEncrypted: true,
-            byteLength: true,
-          },
-        },
-        jobPosting: {
-          select: {
-            skills: {
-              orderBy: { position: "asc" },
-              select: {
-                skillId: true,
-                displayName: true,
-                required: true,
+          jobPosting: {
+            select: {
+              skills: {
+                orderBy: { position: "asc" },
+                select: {
+                  skillId: true,
+                  displayName: true,
+                  required: true,
+                },
               },
             },
           },
         },
-        scoringOperations: {
-          where: { id: input.operationId },
-          take: 1,
-          select: {
-            kind: true,
-            targetJobDescriptionVersionId: true,
-            targetScoringConfigVersionId: true,
-          },
+      }),
+      prisma.scoringOperation.findUnique({
+        where: { id: input.operationId },
+        select: {
+          kind: true,
+          targetJobDescriptionVersionId: true,
+          targetScoringConfigVersionId: true,
         },
-      },
-    });
-    const operation = row?.scoringOperations[0];
+      }),
+    ]);
     if (!row || !operation) throw new Error("SCORING_INPUT_UNAVAILABLE");
     const cv = record(row.cvSnapshot);
     const job = record(row.jobSnapshot);
@@ -168,12 +168,15 @@ export function createScoringWorkProcessor(): ScoringWorkProcessor {
       return "SCORED";
     } catch (error) {
       if (!(error instanceof AiAssessmentProviderError)) throw error;
-      console.warn(`[application-scoring] AI_ASSESSMENT_FALLBACK ${input.applicationId} ${error.code}`);
+      console.warn(
+        `[application-scoring] AI_ASSESSMENT_FALLBACK ${input.applicationId} ${error.code}${error.diagnostic ? ` ${error.diagnostic}` : ""}`,
+      );
       await publication.publishDeterministic({
         applicationId: input.applicationId,
         operationId: input.operationId,
         automatic,
         consecutiveFailures: (existing?.consecutiveFailures ?? 0) + 1,
+        failureCode: error.code,
       });
       return "DETERMINISTIC_ONLY";
     }

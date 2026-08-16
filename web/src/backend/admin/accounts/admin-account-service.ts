@@ -252,6 +252,7 @@ export class AdminAccountService {
           action,
           reasonCategory: normalizedCommand.reasonCategory,
           explanation: normalizedCommand.explanation,
+          recipientName: account.name,
           priorState,
           resultingState,
           resultingVersion: account.version + 1,

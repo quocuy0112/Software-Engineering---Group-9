@@ -140,6 +140,13 @@ const legacyStatusMap: Record<
 };
 
 let writeQueue: Promise<void> = Promise.resolve();
+type RecruiterCatalog = {
+  jobs: JobCatalogItem[];
+  companies: RecruiterCompany[];
+  rawJobs: unknown[];
+  rawCompanies: unknown[];
+};
+let catalogRead: Promise<RecruiterCatalog> | null = null;
 
 function withWriteLock<T>(operation: () => Promise<T>) {
   const next = writeQueue.then(operation, operation);
@@ -313,32 +320,83 @@ async function authorizedCompanies(
 }
 
 async function readCatalog() {
-  const [jobsValue, companiesValue] = await Promise.all([
-    jobsRepository.read(),
-    companiesRepository.read(),
-  ]);
-  const rawJobs = z.array(z.unknown()).parse(jobsValue);
-  const rawCompanies = z.array(z.unknown()).parse(companiesValue);
-  const jobs = rawJobs.map(normalizeJob);
-  const companies = rawCompanies.map(normalizeCompany);
-  return { jobs, companies, rawJobs, rawCompanies };
+  if (catalogRead) return catalogRead;
+
+  catalogRead = Promise.all([jobsRepository.read(), companiesRepository.read()])
+    .then(([jobsValue, companiesValue]) => {
+      const rawJobs = z.array(z.unknown()).parse(jobsValue);
+      const rawCompanies = z.array(z.unknown()).parse(companiesValue);
+      const jobs = rawJobs.map(normalizeJob);
+      const companies = rawCompanies.map(normalizeCompany);
+      return { jobs, companies, rawJobs, rawCompanies };
+    })
+    .then((catalog) => catalog);
+  try {
+    return await catalogRead;
+  } finally {
+    catalogRead = null;
+  }
+}
+
+export async function authorizeLegacyRecruiterJobs(
+  userId: string,
+  jobIds: readonly string[],
+) {
+  const requestedJobIds = new Set(jobIds);
+  const authorized = new Map<
+    string,
+    { jobId: string; companyId: string; jobTitle: string }
+  >();
+  if (requestedJobIds.size === 0) return authorized;
+
+  const { jobs, companies } = await readCatalog();
+  const databaseCompanies = await readDatabaseAuthorizedCompanies(userId);
+  const databaseCompanyIds = new Set(
+    databaseCompanies.map((company) => company.id),
+  );
+  const databaseCompanyIdsByTaxCode = new Set(
+    databaseCompanies
+      .map((company) => company.normalizedTaxIdentifier)
+      .filter((taxCode): taxCode is string => Boolean(taxCode)),
+  );
+  const companyById = new Map(
+    companies.map((company) => [company.id, company]),
+  );
+  for (const job of jobs) {
+    if (!requestedJobIds.has(job.id)) continue;
+    const company = companyById.get(job.companyId);
+    const companyAuthorizedByDatabase = Boolean(
+      databaseCompanyIds.has(job.companyId) ||
+      (company &&
+        (databaseCompanyIds.has(company.id) ||
+          (company.taxCode &&
+            databaseCompanyIdsByTaxCode.has(company.taxCode)))),
+    );
+    if (
+      (!company && !databaseCompanyIds.has(job.companyId)) ||
+      (company &&
+        !companyAuthorizedByDatabase &&
+        (company.verificationStatus !== "approved" ||
+          (company.ownerUserId !== userId &&
+            !company.memberUserIds.includes(userId))))
+    )
+      continue;
+    authorized.set(job.id, {
+      jobId: job.id,
+      companyId: company?.id ?? job.companyId,
+      jobTitle: job.title,
+    });
+  }
+  return authorized;
 }
 
 export async function authorizeLegacyRecruiterJob(
   userId: string,
   jobId: string,
 ) {
-  const { jobs, companies } = await readCatalog();
-  const job = jobs.find((item) => item.id === jobId);
-  if (!job) return null;
-  const company = companies.find((item) => item.id === job.companyId);
-  if (
-    !company ||
-    company.verificationStatus !== "approved" ||
-    (company.ownerUserId !== userId && !company.memberUserIds.includes(userId))
-  )
-    return null;
-  return { jobId: job.id, companyId: company.id, jobTitle: job.title };
+  return (
+    (await authorizeLegacyRecruiterJobs(userId, [jobId])).get(jobId) ?? null
+  );
 }
 
 function replaceRawJob(rawJobs: unknown[], updated: JobCatalogItem) {

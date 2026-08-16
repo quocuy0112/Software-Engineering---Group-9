@@ -1,7 +1,7 @@
 import "server-only";
 
 import { prisma } from "@/backend/database/prisma";
-import { authorizeLegacyRecruiterJob } from "@/backend/services/jobs/recruiter-job-posting-data";
+import { authorizeLegacyRecruiterJobs } from "@/backend/services/jobs/recruiter-job-posting-data";
 
 const recruiterRoles = [
   "OWNER",
@@ -20,13 +20,18 @@ export type RecruiterAuthorizationResult = Readonly<{
 export class RecruiterApplicationAuthorization {
   constructor(private readonly db: typeof prisma = prisma) {}
 
-  async authorizeJob(
+  async authorizeJobs(
     userId: string,
-    jobId: string,
-  ): Promise<RecruiterAuthorizationResult> {
-    const row = await this.db.jobPosting.findFirst({
+    jobIds: readonly string[],
+  ): Promise<RecruiterAuthorizationResult[]> {
+    const requestedJobIds = [
+      ...new Set(jobIds.map((jobId) => jobId.trim()).filter(Boolean)),
+    ];
+    if (requestedJobIds.length === 0) return [];
+
+    const databaseRows = await this.db.jobPosting.findMany({
       where: {
-        id: jobId,
+        id: { in: requestedJobIds },
         company: {
           verificationState: "ACTIVE",
           verifiedAt: { not: null },
@@ -41,17 +46,52 @@ export class RecruiterApplicationAuthorization {
       },
       select: { id: true, companyId: true, title: true },
     });
-    if (row)
-      return {
-        authorized: true,
-        jobId: row.id,
-        companyId: row.companyId,
-        jobTitle: row.title,
-      };
-    const legacy = await authorizeLegacyRecruiterJob(userId, jobId);
-    return legacy
-      ? { authorized: true, ...legacy }
-      : { authorized: false, jobId, companyId: "", jobTitle: "" };
+    const databaseById = new Map(
+      databaseRows.map((row) => [
+        row.id,
+        {
+          authorized: true,
+          jobId: row.id,
+          companyId: row.companyId,
+          jobTitle: row.title,
+        } satisfies RecruiterAuthorizationResult,
+      ]),
+    );
+    const legacyIds = requestedJobIds.filter(
+      (jobId) => !databaseById.has(jobId),
+    );
+    const legacyById =
+      legacyIds.length > 0
+        ? await authorizeLegacyRecruiterJobs(userId, legacyIds)
+        : new Map();
+    const denied = (jobId: string): RecruiterAuthorizationResult => ({
+      authorized: false,
+      jobId,
+      companyId: "",
+      jobTitle: "",
+    });
+
+    return requestedJobIds.map(
+      (jobId) =>
+        databaseById.get(jobId) ??
+        (legacyById.get(jobId)
+          ? { authorized: true, ...legacyById.get(jobId)! }
+          : denied(jobId)),
+    );
+  }
+
+  async authorizeJob(
+    userId: string,
+    jobId: string,
+  ): Promise<RecruiterAuthorizationResult> {
+    return (
+      (await this.authorizeJobs(userId, [jobId]))[0] ?? {
+        authorized: false,
+        jobId,
+        companyId: "",
+        jobTitle: "",
+      }
+    );
   }
 
   async authorizeApplication(

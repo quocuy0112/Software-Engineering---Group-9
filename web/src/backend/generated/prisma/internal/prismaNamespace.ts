@@ -12179,6 +12179,7 @@ export const AiAssessmentScalarFieldEnum = {
   technicalAbilitySummaryEncrypted: 'technicalAbilitySummaryEncrypted',
   roleFitSummaryEncrypted: 'roleFitSummaryEncrypted',
   deductionSummaryEncrypted: 'deductionSummaryEncrypted',
+  scoreReasoningJsonEncrypted: 'scoreReasoningJsonEncrypted',
   complianceStatementCode: 'complianceStatementCode',
   complianceStatementLabel: 'complianceStatementLabel',
   questionState: 'questionState',

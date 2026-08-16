@@ -33,7 +33,11 @@ export type AiProviderFailureCode =
   | "AI_PROVIDER_RETRY_EXHAUSTED";
 
 export class AiAssessmentProviderError extends Error {
-  constructor(readonly code: AiProviderFailureCode, readonly transient = false) {
+  constructor(
+    readonly code: AiProviderFailureCode,
+    readonly transient = false,
+    readonly diagnostic?: string,
+  ) {
     super(code);
   }
 }
