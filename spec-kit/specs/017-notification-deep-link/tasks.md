@@ -4,7 +4,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T001 Create notification deep-link fixtures and resolver test matrix in `web/tests/backend/unit/notifications/notification-destination-resolver.test.ts`
+- [X] T001 Create notification deep-link fixtures and resolver test matrix in `web/tests/backend/unit/notifications/notification-destination-resolver.test.ts`
 
 ## Phase 2: Foundational
 
