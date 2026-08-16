@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { DIRECT_APPLICATION_CV_ID } from "@/shared/contracts/jobs/actions";
 
 const databaseAvailable = Boolean(process.env.DATABASE_URL);
 
@@ -44,7 +45,7 @@ describe.skipIf(!databaseAvailable)("transactional job application", () => {
       idempotencyKey: "application-key-00000001",
       submissionBindingDigest: "b".repeat(64),
       command: {
-        cvId: fixture.confirmedCvIds[0]!,
+        cvId: DIRECT_APPLICATION_CV_ID,
         answers: fixture.jobs.active.questions.map((question) => ({
           questionId: question.id,
           value: question.kind === "BOOLEAN" ? true : "Five years",
@@ -52,6 +53,18 @@ describe.skipIf(!databaseAvailable)("transactional job application", () => {
         coverLetter: null,
         consentVersion: "2026-08-01",
         consentAccepted: true as const,
+      },
+      // This test exercises the application transaction itself.  Supplying
+      // the already-prepared direct document keeps it independent from the
+      // private CV-storage fixture; saved-CV promotion has its own coverage.
+      directCv: {
+        id: DIRECT_APPLICATION_CV_ID,
+        displayName: "Confirmed CV",
+        fileName: "candidate.pdf",
+        mimeType: "application/pdf",
+        byteSize: 32_000,
+        storageKey: "test-direct-application-cv",
+        checksumSha256: "c".repeat(64),
       },
       activeConsentVersion: "2026-08-01",
       occurredAt: fixture.now,

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { ShieldCheck } from "lucide-react";
 import { AuthStatus } from "@/frontend/features/authentication/components/auth-status";
 import { PasswordField } from "@/frontend/features/authentication/components/password-field";
 import { useReplayableStatus } from "@/frontend/features/authentication/components/use-status";
@@ -234,7 +235,7 @@ export function TwoFactorManagement({
           className="security-panel-icon security-panel-icon--success"
           aria-hidden="true"
         >
-          ◎
+          <ShieldCheck size={20} />
         </span>
         <div>
           <p className="panel-kicker">{copy.kicker}</p>

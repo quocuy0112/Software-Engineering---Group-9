@@ -24,6 +24,7 @@ import {
 import { GetProfileAggregateService } from "@/backend/services/profile/get-profile-aggregate";
 import { normalizeSalaryAmount } from "@/shared/utils/jobs/job-display";
 import { rankJobsForCandidate } from "./candidate-job-match";
+import { jobReviewSnapshotSchema } from "@/shared/contracts/recruiter-job-posting";
 
 const experienceYears: Record<string, number> = {
   ENTRY: 0,
@@ -33,6 +34,13 @@ const experienceYears: Record<string, number> = {
   LEAD: 6,
   MANAGER: 7,
 };
+
+function approvedSnapshot(row: PublicJobRow) {
+  const parsed = jobReviewSnapshotSchema.safeParse(
+    row.reviewAggregate?.approvedVersion?.snapshot,
+  );
+  return parsed.success ? parsed.data : null;
+}
 
 type CandidateSignal = JobSimilarityInput & { row: PublicJobRow };
 
@@ -106,13 +114,17 @@ function similarityInput(row: PublicJobRow): JobSimilarityInput {
     skillTags?: unknown;
     location?: unknown;
   };
-  const skillTags = Array.isArray(signals.skillTags)
-    ? signals.skillTags.filter(
-        (skill): skill is string => typeof skill === "string",
-      )
-    : row.skills.map((skill) => skill.displayName);
-  const location =
-    signals.location && typeof signals.location === "object"
+  const snapshot = approvedSnapshot(row);
+  const skillTags = snapshot
+    ? snapshot.skillTags
+    : Array.isArray(signals.skillTags)
+      ? signals.skillTags.filter(
+          (skill): skill is string => typeof skill === "string",
+        )
+      : row.skills.map((skill) => skill.displayName);
+  const location = snapshot
+    ? snapshot.location.city
+    : signals.location && typeof signals.location === "object"
       ? (signals.location as { city?: unknown }).city
       : signals.location;
 
@@ -122,13 +134,16 @@ function similarityInput(row: PublicJobRow): JobSimilarityInput {
     companyId: row.companyId,
     industry: row.company.industry ?? undefined,
     status: row.status === "ACTIVE" ? "open" : row.status.toLowerCase(),
-    categoryIds: Array.isArray(signals.categoryIds)
-      ? signals.categoryIds.filter(
-          (category): category is string => typeof category === "string",
-        )
-      : undefined,
-    categoryFamily:
-      typeof signals.categoryFamily === "string"
+    categoryIds: snapshot
+      ? snapshot.categoryIds
+      : Array.isArray(signals.categoryIds)
+        ? signals.categoryIds.filter(
+            (category): category is string => typeof category === "string",
+          )
+        : undefined,
+    categoryFamily: snapshot
+      ? snapshot.categoryFamily
+      : typeof signals.categoryFamily === "string"
         ? signals.categoryFamily
         : undefined,
     skillTags,
@@ -157,6 +172,7 @@ function card(
     categoryIds?: unknown;
     categoryFamily?: unknown;
   };
+  const snapshot = approvedSnapshot(row);
   const authenticated = actor.kind === "user";
   const urgent =
     row.applicationDeadline !== null &&
@@ -176,7 +192,9 @@ function card(
     employmentType: row.employmentType,
     experienceLevel: row.experienceLevel,
     workArrangement: row.workArrangement,
-    salary: salary(row),
+    salary: snapshot
+      ? { ...salary(row)!, isNegotiable: snapshot.salary.isNegotiable }
+      : salary(row),
     summary: row.summary,
     education: row.education ?? undefined,
     numberOfHires: row.numberOfHires ?? undefined,
@@ -184,26 +202,34 @@ function card(
     skills: row.skills.map((skill) => skill.displayName),
     requirementHighlights: textBullets(row.requirements),
     benefitHighlights: textBullets(row.benefits),
-    benefitItems: textBullets(row.benefits).map((label) => ({
-      icon: "spark",
-      label,
-    })),
+    benefitItems:
+      snapshot?.description.benefits ??
+      textBullets(row.benefits).map((label) => ({
+        icon: "spark",
+        label,
+      })),
     publishedAt: row.publishedAt!.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
     applicationDeadline: row.applicationDeadline?.toISOString() ?? null,
-    isUrgent: urgent,
-    workOnSaturday: false,
+    isUrgent: snapshot?.isUrgent ?? urgent,
+    workOnSaturday: snapshot?.workOnSaturday ?? false,
     isVerified: true,
-    categoryIds: Array.isArray(signals.categoryIds)
-      ? signals.categoryIds.filter(
-          (category): category is string => typeof category === "string",
-        )
-      : undefined,
-    categoryFamily:
-      typeof signals.categoryFamily === "string"
+    categoryIds: snapshot
+      ? snapshot.categoryIds
+      : Array.isArray(signals.categoryIds)
+        ? signals.categoryIds.filter(
+            (category): category is string => typeof category === "string",
+          )
+        : undefined,
+    categoryFamily: snapshot
+      ? snapshot.categoryFamily
+      : typeof signals.categoryFamily === "string"
         ? signals.categoryFamily
         : undefined,
-    experienceMinYears: experienceYears[row.experienceLevel] ?? undefined,
+    experienceMinYears:
+      snapshot?.experience.minYears ??
+      experienceYears[row.experienceLevel] ??
+      undefined,
     matchScore,
     actions: {
       authenticated,
@@ -389,10 +415,18 @@ export class JobDiscoveryService {
         canApply: state === "ACTIVE" && !summary.actions.applied,
       },
       state,
-      description: row.description,
-      responsibilities: row.responsibilities,
-      requirements: row.requirements,
-      benefits: row.benefits,
+      description:
+        approvedSnapshot(row)?.description.overview ?? row.description,
+      responsibilities:
+        approvedSnapshot(row)?.description.responsibilities.join("\n") ??
+        row.responsibilities,
+      requirements:
+        approvedSnapshot(row)?.description.requirements.join("\n") ??
+        row.requirements,
+      benefits:
+        approvedSnapshot(row)
+          ?.description.benefits.map((benefit) => benefit.label)
+          .join("\n") ?? row.benefits,
       canonicalUrl: new URL("/jobs/" + row.slug, canonicalOrigin).toString(),
       relatedJobs,
       recommendedJobs,

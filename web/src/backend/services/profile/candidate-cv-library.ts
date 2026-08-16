@@ -16,6 +16,36 @@ function initialDisplayName(originalName: string | null, fallback: string) {
   return value.slice(0, 200);
 }
 
+function renamedFilename(value: string, current: string) {
+  const normalized = value
+    .normalize("NFKC")
+    .replace(/[\\/\r\n]/gu, "_")
+    .replace(/[^\p{L}\p{N}._ -]/gu, "_")
+    .trim()
+    .slice(0, 255);
+  if (!normalized) return current;
+  if (/\.[A-Za-z0-9]{1,8}$/u.test(normalized)) return normalized;
+  const extension = current.match(/\.[A-Za-z0-9]{1,8}$/u)?.[0] ?? "";
+  return `${normalized}${extension}`.slice(0, 255);
+}
+
+function isGeneratedFilename(value: string | undefined): boolean {
+  return Boolean(
+    value &&
+    /^(?:imported-cv|application-cv|candidate-cv)-[A-Za-z0-9-]+\.[A-Za-z0-9]{1,8}$/iu.test(
+      value,
+    ),
+  );
+}
+
+function isMaterializedStorageLocator(value: string | undefined): boolean {
+  return Boolean(
+    value &&
+    !value.startsWith("candidate-cv-") &&
+    /^[A-Za-z0-9_-]{32,128}$/u.test(value),
+  );
+}
+
 type ConfirmedCvImport = Readonly<{
   id: string;
   declaredMediaType: string;
@@ -115,20 +145,29 @@ export async function ensureCandidateCvLibrary(
 ) {
   const imports = await confirmedCvImports(userId, db);
 
+  const desiredIds = imports.map((upload) => "candidate-cv-" + upload.id);
+  const desiredStorageKeys = [...desiredIds];
   const legacyRows = imports.length
     ? await db.candidateCv.findMany({
         where: {
-          candidateUserId: userId,
-          storageKey: {
-            in: imports.map((upload) => "candidate-cv-" + upload.id),
-          },
+          OR: [
+            { id: { in: desiredIds } },
+            { storageKey: { in: desiredStorageKeys } },
+          ],
         },
-        select: { storageKey: true, displayName: true },
+        select: {
+          id: true,
+          candidateUserId: true,
+          storageKey: true,
+          displayName: true,
+          fileName: true,
+        },
       })
     : [];
   const existingByStorageKey = new Map(
-    legacyRows.map((row) => [row.storageKey, row.displayName]),
+    legacyRows.map((row) => [row.storageKey, row]),
   );
+  const existingById = new Map(legacyRows.map((row) => [row.id, row]));
 
   await Promise.all(
     imports.map(async (upload) => {
@@ -141,23 +180,32 @@ export async function ensureCandidateCvLibrary(
       const extension =
         upload.declaredMediaType === "application/pdf" ? "pdf" : "docx";
       const storageKey = "candidate-cv-" + upload.id;
-      const fileName = "imported-cv-" + upload.id + "." + extension;
+      const desiredId = storageKey;
+      const fallbackFileName = "candidate-cv." + extension;
+      const existing =
+        existingByStorageKey.get(storageKey) ?? existingById.get(desiredId);
+      if (existing && existing.candidateUserId !== userId) return;
+      const recoveredName = safeFilename(upload.displayFilenameCiphertext, {
+        accountId: userId,
+        uploadId: upload.id,
+      });
+      const existingUserFilename =
+        existing && !isGeneratedFilename(existing.fileName)
+          ? existing.fileName
+          : null;
       const originalName = initialDisplayName(
-        safeFilename(upload.displayFilenameCiphertext, {
-          accountId: userId,
-          uploadId: upload.id,
-        }),
-        fileName,
+        recoveredName ?? existingUserFilename,
+        fallbackFileName,
       );
       const checksumSha256 = Buffer.from(upload.sourceSha256).toString("hex");
-      const legacyDisplayName = existingByStorageKey.get(storageKey);
+      const stableId = existing?.id ?? desiredId;
       await db.candidateCv.upsert({
-        where: { storageKey },
+        where: { id: stableId },
         create: {
-          id: "candidate-cv-" + upload.id,
+          id: desiredId,
           candidateUserId: userId,
           displayName: originalName,
-          fileName,
+          fileName: originalName,
           mimeType: upload.declaredMediaType,
           byteSize: upload.actualBytes,
           storageKey,
@@ -166,10 +214,22 @@ export async function ensureCandidateCvLibrary(
           confirmedAt: upload.confirmedAt,
         },
         update: {
-          ...(legacyDisplayName === "Imported CV"
+          ...(existing &&
+          (existing.displayName === "Imported CV" ||
+            isGeneratedFilename(existing.displayName))
             ? { displayName: originalName }
             : {}),
-          fileName,
+          // A confirmed import is first projected with the stable
+          // `candidate-cv-<uploadId>` bridge key.  The confirmation flow then
+          // materializes a plaintext copy and replaces that bridge with a
+          // private-storage locator.  Do not overwrite the materialized
+          // locator every time the library is listed (the old behavior made
+          // profile CVs and subsequent application promotions unreadable).
+          storageKey:
+            existing && isMaterializedStorageLocator(existing.storageKey)
+              ? existing.storageKey
+              : storageKey,
+          fileName: existingUserFilename ?? originalName,
           mimeType: upload.declaredMediaType,
           byteSize: upload.actualBytes,
           checksumSha256,
@@ -250,7 +310,12 @@ export async function renameCandidateCv(
   if (!existing || !existing.confirmedAt) throw new CandidateCvNotFoundError();
   const updated = await db.candidateCv.update({
     where: { id: existing.id },
-    data: { displayName },
+    // `storageKey` remains an internal locator. A rename updates the
+    // user-facing original filename metadata instead.
+    data: {
+      displayName,
+      fileName: renamedFilename(displayName, existing.fileName),
+    },
     select: {
       id: true,
       displayName: true,

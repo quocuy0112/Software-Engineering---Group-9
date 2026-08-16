@@ -5,8 +5,10 @@ import { JobPostingEditor } from './job-posting-editor';
 import { RecruiterJobPostingManagement } from './job-posting-management';
 import {
   createEmptyJobPosting,
+  type RecruiterJob,
   type RecruiterJobManagementData,
 } from '@/shared/contracts/recruiter-job-posting';
+import { recruiterRoutes } from '@/shared/routing/recruiter-routes';
 
 type RecruiterRouteViewProps = {
   view: 'list' | 'create' | 'edit';
@@ -36,9 +38,15 @@ export function RecruiterRouteView({
   }
 
   const job =
-    view === 'edit'
+      view === 'edit'
       ? initialData.jobs.find((item) => item.id === jobId)
-      : createEmptyJobPosting(initialData.companyId);
+      : ({
+          ...createEmptyJobPosting(initialData.companyId),
+          company:
+            initialData.companies.find(
+              (item) => item.id === initialData.companyId,
+            ) ?? initialData.companies[0],
+        } as RecruiterJob);
 
   if (!job) {
     return (
@@ -48,7 +56,7 @@ export function RecruiterRouteView({
         <button
           className='recruiter-primary-button'
           type='button'
-          onClick={() => router.replace('/recruiter')}
+          onClick={() => router.replace(recruiterRoutes.jobPostings)}
         >
           Back to job postings
         </button>
@@ -61,7 +69,7 @@ export function RecruiterRouteView({
       initialJob={job}
       companyName={companyName}
       onBack={() => router.back()}
-      onSaved={() => router.replace('/recruiter')}
+      onSaved={() => router.replace(recruiterRoutes.jobPostings)}
     />
   );
 }

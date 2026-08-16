@@ -9,11 +9,11 @@
 
 **Purpose**: Establish additive module and contract scaffolding without changing Group 1 behavior.
 
-- [ ] T001 Create scoring module directories and public boundaries in `web/src/backend/scoring/index.ts`
-- [ ] T002 [P] Create shared scoring contract barrel in `web/src/shared/contracts/scoring/index.ts`
-- [ ] T003 [P] Create focused test directory fixtures in `web/tests/backend/scoring/fixtures.ts`
-- [ ] T004 [P] Add scoring worker entrypoint wiring in `web/scripts/run-application-scoring-worker.mjs`
-- [ ] T005 Add Feature 015 environment validation placeholders without provider secrets in `web/src/backend/scoring/providers/config.ts`
+- [X] T001 Create scoring module directories and public boundaries in `web/src/backend/scoring/index.ts`
+- [X] T002 [P] Create shared scoring contract barrel in `web/src/shared/contracts/scoring/index.ts`
+- [X] T003 [P] Create focused test directory fixtures in `web/tests/backend/scoring/fixtures.ts`
+- [X] T004 [P] Add scoring worker entrypoint wiring in `web/scripts/run-application-scoring-worker.mjs`
+- [X] T005 Add Feature 015 environment validation placeholders without provider secrets in `web/src/backend/scoring/providers/config.ts`
 
 ---
 
@@ -24,21 +24,21 @@
 **⚠️ CRITICAL**: No user-story work starts until this phase is complete.
 
 - [ ] T006 Write migration preflight and non-authoritative scalar-score assertions in `web/tests/backend/scoring/migration-preflight.test.ts`
-- [ ] T007 Extend Prisma schema with immutable scoring, parse/evidence, operation, attempt, priority, and stage-detail models in `web/prisma/schema.prisma`
-- [ ] T008 Create additive forward migration with uniqueness, partial-active-priority, lineage, and ranking indexes in `web/prisma/migrations/*_candidate_hybrid_ranking/migration.sql`
-- [ ] T009 [P] Define discriminated scoring-state, parsing, formula, list, operation, priority, and decision schemas in `web/src/shared/contracts/scoring/schemas.ts`
+- [X] T007 Extend Prisma schema with immutable scoring, parse/evidence, operation, attempt, priority, and stage-detail models in `web/prisma/schema.prisma`
+- [X] T008 Create additive forward migration with uniqueness, partial-active-priority, lineage, and ranking indexes in `web/prisma/migrations/*_candidate_hybrid_ranking/migration.sql`
+- [X] T009 [P] Define discriminated scoring-state, parsing, formula, list, operation, priority, and decision schemas in `web/src/shared/contracts/scoring/schemas.ts`
 - [ ] T010 [P] Add OpenAPI/shared-contract parity tests in `web/tests/shared/scoring/openapi-parity.test.ts`
 - [ ] T011 [P] Add tenant/role/job authority and revocation tests in `web/tests/security/scoring/authorization.test.ts`
-- [ ] T012 Extend Group 1 recruiter authorization instead of duplicating document access in `web/src/backend/applications/authorization/recruiter-application-authorization.ts`
-- [ ] T013 Define repository ports and transactional publication contracts in `web/src/backend/scoring/repositories/scoring-repository.ts`
-- [ ] T014 Implement Prisma scoring repository with immutable publication and generation fencing in `web/src/backend/scoring/repositories/prisma-scoring-repository.ts`
-- [ ] T015 [P] Define `AiAssessmentProviderPort` and normalized provider errors in `web/src/backend/scoring/providers/ai-assessment-provider-port.ts`
+- [X] T012 Extend Group 1 recruiter authorization instead of duplicating document access in `web/src/backend/applications/authorization/recruiter-application-authorization.ts`
+- [X] T013 Define repository ports and transactional publication contracts in `web/src/backend/scoring/repositories/scoring-repository.ts`
+- [X] T014 Implement Prisma scoring repository with immutable publication and generation fencing in `web/src/backend/scoring/repositories/prisma-scoring-repository.ts`
+- [X] T015 [P] Define `AiAssessmentProviderPort` and normalized provider errors in `web/src/backend/scoring/providers/ai-assessment-provider-port.ts`
 - [ ] T016 [P] Add provider timeout, malformed output, redaction, retry/backoff, circuit-breaker tests in `web/tests/backend/scoring/ai-provider-boundary.test.ts`
-- [ ] T017 Implement approved AI adapter with schema validation and bounded resilience in `web/src/backend/scoring/providers/approved-ai-assessment-adapter.ts`
-- [ ] T018 Implement leased work claiming, stale-result fencing, and reconciled counters in `web/src/backend/scoring/workers/scoring-worker.ts`
+- [X] T017 Implement approved AI adapter with schema validation and bounded resilience in `web/src/backend/scoring/providers/approved-ai-assessment-adapter.ts`
+- [X] T018 Implement leased work claiming, stale-result fencing, and reconciled counters in `web/src/backend/scoring/workers/scoring-worker.ts`
 - [ ] T019 [P] Add worker lease/idempotency/late-response tests in `web/tests/backend/scoring/scoring-worker-concurrency.test.ts`
-- [ ] T020 Extend structured audit action/reason allowlists in `web/src/backend/audit/application-audit-events.ts`
-- [ ] T021 Add derived-evidence retention/erasure/legal-hold integration in `web/src/backend/scoring/workers/scoring-retention.ts`
+- [X] T020 Extend structured audit action/reason allowlists in `web/src/backend/audit/application-audit-events.ts`
+- [X] T021 Add derived-evidence retention/erasure/legal-hold integration in `web/src/backend/scoring/workers/scoring-retention.ts`
 - [ ] T022 [P] Add privacy/log/provider-payload/internal-note leakage tests in `web/tests/security/scoring/privacy.test.ts`
 
 **Checkpoint**: Foundational authorities are additive, provider independent, tenant safe, and migration ready.
@@ -51,12 +51,12 @@
 
 **Independent Test**: With AI disabled, exact CV/JD/config fixtures produce the expected 0–100 result and evidence while final remains not calculated.
 
-- [ ] T023 [P] [US1] Add deterministic reproducibility, zero-skill, missing-skill, preferred-skill, and experience tests in `web/tests/backend/scoring/automatic-match.test.ts`
+- [X] T023 [P] [US1] Add deterministic reproducibility, zero-skill, missing-skill, preferred-skill, and experience tests in `web/tests/backend/scoring/automatic-match.test.ts`
 - [ ] T024 [P] [US1] Add parser status/provenance and incomplete-score tests in `web/tests/backend/scoring/parser-provenance.test.ts`
-- [ ] T025 [US1] Implement versioned CV/JD parser orchestration in `web/src/backend/scoring/services/document-parsing-service.ts`
-- [ ] T026 [US1] Implement normalized skill and verbatim source-span extraction in `web/src/backend/scoring/domain/skill-evidence-extractor.ts`
-- [ ] T027 [US1] Implement deterministic skill/experience calculation in `web/src/backend/scoring/domain/automatic-match-calculator.ts`
-- [ ] T028 [US1] Implement automatic result service and immutable persistence in `web/src/backend/scoring/services/automatic-match-service.ts`
+- [X] T025 [US1] Implement versioned CV/JD parser orchestration in `web/src/backend/scoring/services/document-parsing-service.ts`
+- [X] T026 [US1] Implement normalized skill and verbatim source-span extraction in `web/src/backend/scoring/domain/skill-evidence-extractor.ts`
+- [X] T027 [US1] Implement deterministic skill/experience calculation in `web/src/backend/scoring/domain/automatic-match-calculator.ts`
+- [X] T028 [US1] Implement automatic result service and immutable persistence in `web/src/backend/scoring/services/automatic-match-service.ts`
 - [ ] T029 [P] [US1] Add automatic-match response projection tests in `web/tests/shared/scoring/automatic-match-contract.test.ts`
 
 ---
@@ -67,15 +67,15 @@
 
 **Independent Test**: Automatic 92 and AI 88 publish 90.4 with complete provenance/explanation; timeout/malformed responses preserve fallback.
 
-- [ ] T030 [P] [US2] Add hybrid formula, one-rounding, lineage mismatch, and no-partial-final tests in `web/tests/backend/scoring/hybrid-score.test.ts`
+- [X] T030 [P] [US2] Add hybrid formula, one-rounding, lineage mismatch, and no-partial-final tests in `web/tests/backend/scoring/hybrid-score.test.ts`
 - [ ] T031 [P] [US2] Add AI explanation, confidence, compliance, question-link/fallback tests in `web/tests/backend/scoring/ai-assessment.test.ts`
-- [ ] T032 [US2] Implement provider-neutral AI assessment normalization in `web/src/backend/scoring/services/ai-assessment-service.ts`
-- [ ] T033 [US2] Implement fixed versioned hybrid formula and score-band labels in `web/src/backend/scoring/domain/hybrid-score-calculator.ts`
-- [ ] T034 [US2] Implement atomic scored/deterministic-fallback publication in `web/src/backend/scoring/services/scoring-publication-service.ts`
-- [ ] T035 [US2] Implement authorized scoring detail route in `web/src/app/api/recruiter/applications/[applicationId]/scoring/route.ts`
+- [X] T032 [US2] Implement provider-neutral AI assessment normalization in `web/src/backend/scoring/services/ai-assessment-service.ts`
+- [X] T033 [US2] Implement fixed versioned hybrid formula and score-band labels in `web/src/backend/scoring/domain/hybrid-score-calculator.ts`
+- [X] T034 [US2] Implement atomic scored/deterministic-fallback publication in `web/src/backend/scoring/services/scoring-publication-service.ts`
+- [X] T035 [US2] Implement authorized scoring detail route in `web/src/app/api/recruiter/applications/[applicationId]/scoring/route.ts`
 - [ ] T036 [P] [US2] Add detail route contract/authorization/state-union tests in `web/tests/backend/scoring/scoring-detail-route.test.ts`
-- [ ] T037 [P] [US2] Implement score drawer automatic/AI tabs with explicit labels in `web/src/frontend/features/recruiter-applications/candidate-score-drawer.tsx`
-- [ ] T038 [P] [US2] Implement Group 1 viewer-composing documents tab in `web/src/frontend/features/recruiter-applications/documents-tab.tsx`
+- [X] T037 [P] [US2] Implement score drawer automatic/AI tabs with explicit labels in `web/src/frontend/features/recruiter-applications/candidate-score-drawer.tsx`
+- [X] T038 [P] [US2] Implement Group 1 viewer-composing documents tab in `web/src/frontend/features/recruiter-applications/documents-tab.tsx`
 - [ ] T039 [US2] Add drawer accessibility/state/parser-warning tests in `web/tests/frontend/scoring/candidate-score-drawer.test.tsx`
 
 ---
@@ -87,13 +87,13 @@
 **Independent Test**: A snapshot traversal remains exact across mid-browse rescore and page-size changes cannot reinterpret cursors.
 
 - [ ] T040 [P] [US3] Add ranking, non-final grouping, filter-chip, processing-exclusion tests in `web/tests/backend/scoring/ranked-list.test.ts`
-- [ ] T041 [P] [US3] Add snapshot cursor tamper/filter/job/page-size binding tests in `web/tests/security/scoring/ranking-cursor.test.ts`
-- [ ] T042 [US3] Implement immutable ranking snapshot repository in `web/src/backend/scoring/pagination/ranking-snapshot-repository.ts`
-- [ ] T043 [US3] Implement score-aware keyset cursor codec in `web/src/backend/scoring/pagination/ranking-cursor.ts`
+- [X] T041 [P] [US3] Add snapshot cursor tamper/filter/job/page-size binding tests in `web/tests/security/scoring/ranking-cursor.test.ts`
+- [X] T042 [US3] Implement immutable ranking snapshot repository in `web/src/backend/scoring/pagination/ranking-snapshot-repository.ts`
+- [X] T043 [US3] Implement score-aware keyset cursor codec in `web/src/backend/scoring/pagination/ranking-cursor.ts`
 - [ ] T044 [US3] Extend recruiter list query with sort/filter/status metadata in `web/src/backend/applications/services/recruiter-application-service.ts`
-- [ ] T045 [US3] Implement ranked list route in `web/src/app/api/recruiter/jobs/[jobId]/applications/ranked/route.ts`
-- [ ] T046 [P] [US3] Implement ranking list and removable filter chips in `web/src/frontend/features/recruiter-applications/candidate-ranking-list.tsx`
-- [ ] T047 [US3] Add list accessibility, no-color-only, exclusion-copy, and pagination tests in `web/tests/frontend/scoring/candidate-ranking-list.test.tsx`
+- [X] T045 [US3] Implement ranked list route in `web/src/app/api/recruiter/jobs/[jobId]/applications/ranked/route.ts`
+- [X] T046 [P] [US3] Implement ranking list and removable filter chips in `web/src/frontend/features/recruiter-applications/candidate-ranking-list.tsx`
+- [X] T047 [US3] Add list accessibility, no-color-only, exclusion-copy, and pagination tests in `web/tests/frontend/scoring/candidate-ranking-list.test.tsx`
 
 ---
 
@@ -104,10 +104,10 @@
 **Independent Test**: Mixed outcomes publish independently, open reads never blank, and zero-item batch completes cleanly.
 
 - [ ] T048 [P] [US4] Add old-score continuity, partial-failure, supersession, priority-preservation, and zero-item tests in `web/tests/backend/scoring/job-rescore.test.ts`
-- [ ] T049 [US4] Implement job rescore orchestration and item enumeration in `web/src/backend/scoring/services/job-rescore-service.ts`
-- [ ] T050 [US4] Implement rescore trigger/status routes in `web/src/app/api/recruiter/jobs/[jobId]/scoring/rescore/route.ts`
-- [ ] T051 [US4] Implement operation status route in `web/src/app/api/recruiter/jobs/[jobId]/scoring/rescore/[operationId]/route.ts`
-- [ ] T052 [P] [US4] Implement accessible confirmation/in-progress UI in `web/src/frontend/features/recruiter-applications/rescore-confirm-modal.tsx`
+- [X] T049 [US4] Implement job rescore orchestration and item enumeration in `web/src/backend/scoring/services/job-rescore-service.ts`
+- [X] T050 [US4] Implement rescore trigger/status routes in `web/src/app/api/recruiter/jobs/[jobId]/scoring/rescore/route.ts`
+- [X] T051 [US4] Implement operation status route in `web/src/app/api/recruiter/jobs/[jobId]/scoring/rescore/[operationId]/route.ts`
+- [X] T052 [P] [US4] Implement accessible confirmation/in-progress UI in `web/src/frontend/features/recruiter-applications/rescore-confirm-modal.tsx`
 - [ ] T053 [US4] Add cancel/ESC/no-side-effect and live old-result continuity tests in `web/tests/frontend/scoring/rescore-flow.test.tsx`
 
 ---
@@ -119,9 +119,9 @@
 **Independent Test**: Retry from unavailable never invokes deterministic calculation and returns to scored/unavailable persistently.
 
 - [ ] T054 [P] [US5] Add AI-only reuse, duplicate-click, reopen, success/failure, and support-threshold tests in `web/tests/backend/scoring/ai-retry.test.ts`
-- [ ] T055 [US5] Implement AI retry orchestration with automatic-result binding in `web/src/backend/scoring/services/ai-retry-service.ts`
-- [ ] T056 [US5] Implement confirmed AI retry route in `web/src/app/api/recruiter/applications/[applicationId]/scoring/retry-ai/route.ts`
-- [ ] T057 [US5] Implement retrying/unavailable drawer states in `web/src/frontend/features/recruiter-applications/ai-assessment-tab.tsx`
+- [X] T055 [US5] Implement AI retry orchestration with automatic-result binding in `web/src/backend/scoring/services/ai-retry-service.ts`
+- [X] T056 [US5] Implement confirmed AI retry route in `web/src/app/api/recruiter/applications/[applicationId]/scoring/retry-ai/route.ts`
+- [X] T057 [US5] Implement retrying/unavailable drawer states in `web/src/frontend/features/recruiter-applications/ai-assessment-tab.tsx`
 - [ ] T058 [US5] Add background-close/reopen and distinct-state UI tests in `web/tests/frontend/scoring/ai-retry-flow.test.tsx`
 
 ---
@@ -133,9 +133,9 @@
 **Independent Test**: Concurrent writes have one winner, history is complete, and rescore leaves priority unchanged.
 
 - [ ] T059 [P] [US6] Add one-active-row, required-reason, history, CAS, and score-immutability tests in `web/tests/backend/scoring/manual-priority.test.ts`
-- [ ] T060 [US6] Implement manual priority service and audit integration in `web/src/backend/scoring/services/manual-priority-service.ts`
-- [ ] T061 [US6] Implement set/remove priority route in `web/src/app/api/recruiter/applications/[applicationId]/priority/route.ts`
-- [ ] T062 [P] [US6] Implement set/change/remove confirmation UI in `web/src/frontend/features/recruiter-applications/manual-priority-modal.tsx`
+- [X] T060 [US6] Implement manual priority service and audit integration in `web/src/backend/scoring/services/manual-priority-service.ts`
+- [X] T061 [US6] Implement set/remove priority route in `web/src/app/api/recruiter/applications/[applicationId]/priority/route.ts`
+- [X] T062 [P] [US6] Implement set/change/remove confirmation UI in `web/src/frontend/features/recruiter-applications/manual-priority-modal.tsx`
 - [ ] T063 [US6] Add reason validation, conflict refresh, label, focus, and cancel tests in `web/tests/frontend/scoring/manual-priority-modal.test.tsx`
 
 ---
@@ -148,9 +148,9 @@
 
 - [ ] T064 [P] [US7] Add allowed/disallowed stage, CAS race, idempotency, and atomicity tests in `web/tests/backend/scoring/interview-decision.test.ts`
 - [ ] T065 [P] [US7] Add exactly-once notification outbox/delivery tests in `web/tests/backend/scoring/interview-notification.test.ts`
-- [ ] T066 [US7] Extend canonical application decision service in `web/src/backend/applications/services/recruiter-application-decision-service.ts`
-- [ ] T067 [US7] Implement interview decision route in `web/src/app/api/recruiter/applications/[applicationId]/decisions/interview/route.ts`
-- [ ] T068 [P] [US7] Implement shared transition confirmation UI in `web/src/frontend/features/recruiter-applications/stage-transition-confirm-modal.tsx`
+- [X] T066 [US7] Extend canonical application decision service in `web/src/backend/applications/services/recruiter-application-decision-service.ts`
+- [X] T067 [US7] Implement interview decision route in `web/src/app/api/recruiter/applications/[applicationId]/decisions/interview/route.ts`
+- [X] T068 [P] [US7] Implement shared transition confirmation UI in `web/src/frontend/features/recruiter-applications/stage-transition-confirm-modal.tsx`
 - [ ] T069 [US7] Add immediate status, invalid-action, keyboard, and confirmation tests in `web/tests/frontend/scoring/interview-transition.test.tsx`
 
 ---
@@ -163,9 +163,9 @@
 
 - [ ] T070 [P] [US8] Add reason allowlist, source-stage, CAS race, atomicity, and no-notification tests in `web/tests/backend/scoring/reject-decision.test.ts`
 - [ ] T071 [P] [US8] Add internal-note candidate/API/notification non-disclosure tests in `web/tests/security/scoring/rejection-note.test.ts`
-- [ ] T072 [US8] Add reject command and structured stage detail to canonical decision service in `web/src/backend/applications/services/recruiter-application-decision-service.ts`
-- [ ] T073 [US8] Implement reject route in `web/src/app/api/recruiter/applications/[applicationId]/decisions/reject/route.ts`
-- [ ] T074 [P] [US8] Implement rejection confirmation UI in `web/src/frontend/features/recruiter-applications/reject-candidate-modal.tsx`
+- [X] T072 [US8] Add reject command and structured stage detail to canonical decision service in `web/src/backend/applications/services/recruiter-application-decision-service.ts`
+- [X] T073 [US8] Implement reject route in `web/src/app/api/recruiter/applications/[applicationId]/decisions/reject/route.ts`
+- [X] T074 [P] [US8] Implement rejection confirmation UI in `web/src/frontend/features/recruiter-applications/reject-candidate-modal.tsx`
 - [ ] T075 [US8] Add required-reason, non-default destructive focus, cancel, immediate status, and active-filter tests in `web/tests/frontend/scoring/reject-candidate-modal.test.tsx`
 
 ---
@@ -174,13 +174,13 @@
 
 **Purpose**: Prove governance, scale, regression safety, and operational recovery.
 
-- [ ] T076 [P] Add architecture guard preventing scoring-to-stage mutation and direct provider/UI document access in `web/tests/architecture/scoring/boundaries.test.ts`
+- [X] T076 [P] Add architecture guard preventing scoring-to-stage mutation and direct provider/UI document access in `web/tests/architecture/scoring/boundaries.test.ts`
 - [ ] T077 [P] Add complete actor/time/reason and no-score-trigger governance tests in `web/tests/security/scoring/human-decision-governance.test.ts`
 - [ ] T078 [P] Add all-state no-color-only/accessibility audit in `web/tests/frontend/scoring/accessibility.test.tsx`
 - [ ] T079 Build 10,000-row ranked/filter/rescore benchmark harness in `web/tests/performance/scoring/candidate-ranking-rescore.perf.ts`
-- [ ] T080 Record required percentile/throughput/error/provider evidence in `spec-kit/specs/015-candidate-hybrid-ranking/performance-evidence.md`
+- [X] T080 Record required percentile/throughput/error/provider evidence in `spec-kit/specs/015-candidate-hybrid-ranking/performance-evidence.md`
 - [ ] T081 [P] Add migration rollback/forward-recovery and stale-worker probe in `web/tests/system/scoring/recovery.test.ts`
-- [ ] T082 Run and record Feature 012 Group 1 submission/document/retention/list regression suite in `spec-kit/specs/015-candidate-hybrid-ranking/quickstart-evidence.md`
+- [X] T082 Run and record Feature 012 Group 1 submission/document/retention/list regression suite in `spec-kit/specs/015-candidate-hybrid-ranking/quickstart-evidence.md`
 - [ ] T083 Run Feature 015 focused suites, production build, migration verification, worker probe, E2E, and all quickstart sections in `spec-kit/specs/015-candidate-hybrid-ranking/quickstart-evidence.md`
 
 ---

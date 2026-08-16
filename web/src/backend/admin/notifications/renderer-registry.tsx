@@ -35,6 +35,7 @@ const eventBase = z.object({
 });
 const accountPayload = eventBase.extend({
   resultingState: z.enum(["ACTIVE", "SUSPENDED"]),
+  recipientName: z.string().trim().min(1).max(120).optional(),
   reasonCategory: z.string().trim().min(1).max(80).default("OTHER"),
   supportPath: z.literal("/support/account-security").default("/support/account-security"),
 });
@@ -126,6 +127,7 @@ export async function renderFeature006Email(input: {
           | "ALL_SESSIONS_REVOKED"
       >,
       supportUrl: new URL("/support/account-security", input.appUrl).toString(),
+      appUrl: input.appUrl,
     };
     return {
       subject:

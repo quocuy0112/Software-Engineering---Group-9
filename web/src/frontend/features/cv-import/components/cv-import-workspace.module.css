@@ -1,219 +1,33 @@
 .root {
   display: grid;
   min-width: 0;
-  gap: var(--sh-space-5);
+  gap: 16px;
 }
 
-.uploadPanel,
-.historyPanel {
-  min-width: 0;
-  padding: var(--sh-card-padding);
-  border: 1px solid var(--sh-color-border-subtle);
-  border-radius: var(--sh-radius-lg);
-  background: var(--sh-color-surface-card);
-  box-shadow: var(--sh-shadow-card);
-}
-
-.sectionHeading {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--sh-space-4);
-  margin-bottom: var(--sh-space-5);
-  padding-bottom: var(--sh-space-4);
-  border-bottom: 1px solid var(--sh-color-border-subtle);
-}
-
-.sectionHeading p,
-.sectionHeading h2 {
+.panel {
   margin: 0;
-}
-
-.sectionHeading p {
-  color: var(--sh-color-brand-primary);
-  font-size: var(--sh-font-size-caption);
-  font-weight: var(--sh-font-weight-bold);
-  line-height: var(--sh-line-height-caption);
-  letter-spacing: 0.1em;
-}
-
-.sectionHeading h2 {
-  margin-top: var(--sh-space-1);
-  font-size: var(--sh-font-size-h2);
-  line-height: var(--sh-line-height-h2);
-  letter-spacing: -0.02em;
-}
-
-.sectionHeading > span {
-  display: inline-flex;
-  min-height: 30px;
-  flex: 0 0 auto;
-  align-items: center;
-  padding: 0 var(--sh-space-3);
-  border-radius: var(--sh-radius-full);
-  color: var(--sh-color-text-secondary);
-  background: var(--sh-color-surface-subtle);
-  font-size: var(--sh-font-size-caption);
-  font-weight: var(--sh-font-weight-semibold);
-}
-
-.workflowProgress {
-  --progress-accent: var(--sh-color-info);
-  --progress-background: var(--sh-color-info-bg);
-  display: grid;
-  min-width: 0;
-  grid-template-columns: 28px minmax(0, 1fr) minmax(7rem, 11rem) auto;
-  align-items: center;
-  gap: var(--sh-space-4);
-  padding: var(--sh-space-3) var(--sh-space-4);
-  border: 1px solid color-mix(in srgb, var(--progress-accent) 35%, transparent);
-  border-radius: var(--sh-radius-sm);
-  color: var(--progress-accent);
-  background: var(--progress-background);
-  transition:
-    border-color 220ms ease,
-    color 220ms ease,
-    background-color 220ms ease;
-}
-
-.workflowProgress[data-state="AWAITING_CONSENT"],
-.workflowProgress[data-state="AI_PENDING"] {
-  --progress-accent: var(--sh-color-warning);
-  --progress-background: var(--sh-color-warning-bg);
-}
-
-.workflowProgress[data-state="SUCCESS"] {
-  --progress-accent: var(--sh-color-success);
-  --progress-background: var(--sh-color-success-bg);
-}
-
-.workflowProgress[data-state="ERROR"],
-.workflowProgress[data-state="STATUS_ERROR"] {
-  --progress-accent: var(--sh-color-error);
-  --progress-background: var(--sh-color-error-bg);
-}
-
-.progressIcon {
-  display: block;
-  width: 18px;
-  height: 18px;
-  justify-self: center;
-  border: 3px solid color-mix(in srgb, var(--progress-accent) 28%, transparent);
-  border-top-color: var(--progress-accent);
-  border-radius: var(--sh-radius-full);
-}
-
-.workflowProgress:not([data-state="IDLE"]):not([data-state="SUCCESS"]):not(
-    [data-state="COMPLETE"]
-  ):not([data-state="ERROR"]):not([data-state="STATUS_ERROR"])
-  .progressIcon {
-  animation: cvWorkspaceSpin 900ms linear infinite;
-}
-
-.workflowProgress:is(
-    [data-state="IDLE"],
-    [data-state="SUCCESS"],
-    [data-state="COMPLETE"],
-    [data-state="ERROR"],
-    [data-state="STATUS_ERROR"]
-  )
-  .progressIcon {
-  border-color: var(--progress-accent);
-  background: var(--progress-accent);
-}
-
-.workflowStatus {
-  display: grid;
-  min-width: 0;
-  min-height: 0;
-  gap: 2px;
-  margin: 0;
-  font-size: var(--sh-font-size-body-sm);
-}
-
-.workflowStatus strong {
-  font-weight: var(--sh-font-weight-bold);
-}
-
-.workflowStatus span {
-  color: var(--sh-color-text-secondary);
-  font-size: var(--sh-font-size-caption);
-  line-height: var(--sh-line-height-caption);
-}
-
-.progressTrack {
-  height: 7px;
-  overflow: hidden;
-  border-radius: var(--sh-radius-full);
-  background: color-mix(in srgb, var(--progress-accent) 17%, transparent);
-}
-
-.progressTrack > span {
-  display: block;
-  min-width: 2px;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--progress-accent);
-  transition: width 400ms ease;
 }
 
 .statusLink {
   display: inline-flex;
-  min-height: 40px;
-  flex: 0 0 auto;
+  min-height: 36px;
   align-items: center;
-  gap: var(--sh-space-2);
-  padding: 0 var(--sh-space-3);
-  border-radius: var(--sh-radius-sm);
-  color: var(--sh-color-brand-primary);
-  background: var(--sh-color-surface-card);
-  font-size: var(--sh-font-size-body-sm);
-  font-weight: var(--sh-font-weight-semibold);
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--sh-profile-border);
+  border-radius: var(--sh-profile-radius-sm);
+  color: var(--sh-profile-primary);
+  background: var(--sh-profile-surface);
+  font-size: 13px;
+  font-weight: 600;
   text-decoration: none;
-  box-shadow: var(--sh-shadow-control);
 }
 
 .statusLink:hover {
-  color: var(--sh-color-brand-primary-hover);
-  text-decoration: underline;
+  color: var(--sh-profile-primary-dark);
+  border-color: var(--sh-profile-primary);
 }
 
-@keyframes cvWorkspaceSpin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (max-width: 32rem) {
-  .uploadPanel,
-  .historyPanel {
-    padding: var(--sh-space-4);
-    border-radius: var(--sh-radius-md);
-  }
-
-  .sectionHeading {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .workflowProgress {
-    align-items: stretch;
-    grid-template-columns: 24px minmax(0, 1fr);
-  }
-
-  .progressTrack,
-  .statusLink {
-    grid-column: 1 / -1;
-  }
-
-  .statusLink {
-    justify-content: center;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .root * {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
+@media (max-width: 760px) {
+  .statusLink { justify-content: center; }
 }

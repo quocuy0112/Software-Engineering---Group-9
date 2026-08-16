@@ -43,6 +43,9 @@ export const notificationKinds = [
   "MODERATION_REPORT_RECEIVED_ADMIN",
   "VERIFICATION_REVIEW_OVERDUE",
   "DELIVERY_MANUAL_INTERVENTION_REQUIRED",
+  "JOB_POST_REVIEW_REQUESTED_ADMIN",
+  "JOB_POST_APPROVED",
+  "JOB_POST_REJECTED",
 ] as const;
 
 export const notificationKindSchema = z.enum(notificationKinds);
@@ -82,6 +85,7 @@ export const notificationContextTypes = [
   "CONVERSATION",
   "MESSAGING_REPORT",
   "MODERATION_REPORT",
+  "JOB_POST_REVIEW",
 ] as const;
 export const notificationContextTypeSchema = z.enum(notificationContextTypes);
 export type NotificationContextType = z.infer<

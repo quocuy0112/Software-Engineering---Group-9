@@ -44,8 +44,14 @@ describe("account identity and email-change accessibility", () => {
     expect(screen.getByText("candidate@example.test")).toBeVisible();
     expect(screen.getByText("Active")).toBeVisible();
     expect(screen.getByText(/31.*2026|2026/)).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "Save full name" }),
+    ).toBeDisabled();
     const name = screen.getByLabelText("Full name");
     fireEvent.change(name, { target: { value: "Nguyen Van Binh" } });
+    expect(
+      screen.getByRole("button", { name: "Save full name" }),
+    ).toBeEnabled();
     fireEvent.click(screen.getByRole("button", { name: "Save full name" }));
     expect(await screen.findByRole("status")).toHaveTextContent(
       "Account identity saved.",

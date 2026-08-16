@@ -286,6 +286,7 @@ export type CandidateCvWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"CandidateCv"> | Date | string
   candidate?: Prisma.XOR<Prisma.CandidateIdentityScalarRelationFilter, Prisma.CandidateIdentityWhereInput>
   applications?: Prisma.JobApplicationListRelationFilter
+  applicationDocuments?: Prisma.ApplicationDocumentListRelationFilter
 }
 
 export type CandidateCvOrderByWithRelationInput = {
@@ -304,6 +305,7 @@ export type CandidateCvOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   candidate?: Prisma.CandidateIdentityOrderByWithRelationInput
   applications?: Prisma.JobApplicationOrderByRelationAggregateInput
+  applicationDocuments?: Prisma.ApplicationDocumentOrderByRelationAggregateInput
 }
 
 export type CandidateCvWhereUniqueInput = Prisma.AtLeast<{
@@ -325,6 +327,7 @@ export type CandidateCvWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"CandidateCv"> | Date | string
   candidate?: Prisma.XOR<Prisma.CandidateIdentityScalarRelationFilter, Prisma.CandidateIdentityWhereInput>
   applications?: Prisma.JobApplicationListRelationFilter
+  applicationDocuments?: Prisma.ApplicationDocumentListRelationFilter
 }, "id" | "storageKey">
 
 export type CandidateCvOrderByWithAggregationInput = {
@@ -382,6 +385,7 @@ export type CandidateCvCreateInput = {
   updatedAt?: Date | string
   candidate: Prisma.CandidateIdentityCreateNestedOneWithoutCvsInput
   applications?: Prisma.JobApplicationCreateNestedManyWithoutSelectedCvInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutSourceCandidateCvInput
 }
 
 export type CandidateCvUncheckedCreateInput = {
@@ -399,6 +403,7 @@ export type CandidateCvUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   applications?: Prisma.JobApplicationUncheckedCreateNestedManyWithoutSelectedCvInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutSourceCandidateCvInput
 }
 
 export type CandidateCvUpdateInput = {
@@ -416,6 +421,7 @@ export type CandidateCvUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutCvsNestedInput
   applications?: Prisma.JobApplicationUpdateManyWithoutSelectedCvNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutSourceCandidateCvNestedInput
 }
 
 export type CandidateCvUncheckedUpdateInput = {
@@ -433,6 +439,7 @@ export type CandidateCvUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   applications?: Prisma.JobApplicationUncheckedUpdateManyWithoutSelectedCvNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutSourceCandidateCvNestedInput
 }
 
 export type CandidateCvCreateManyInput = {
@@ -555,6 +562,11 @@ export type CandidateCvScalarRelationFilter = {
   isNot?: Prisma.CandidateCvWhereInput
 }
 
+export type CandidateCvNullableScalarRelationFilter = {
+  is?: Prisma.CandidateCvWhereInput | null
+  isNot?: Prisma.CandidateCvWhereInput | null
+}
+
 export type CandidateCvCreateNestedManyWithoutCandidateInput = {
   create?: Prisma.XOR<Prisma.CandidateCvCreateWithoutCandidateInput, Prisma.CandidateCvUncheckedCreateWithoutCandidateInput> | Prisma.CandidateCvCreateWithoutCandidateInput[] | Prisma.CandidateCvUncheckedCreateWithoutCandidateInput[]
   connectOrCreate?: Prisma.CandidateCvCreateOrConnectWithoutCandidateInput | Prisma.CandidateCvCreateOrConnectWithoutCandidateInput[]
@@ -611,6 +623,22 @@ export type CandidateCvUpdateOneRequiredWithoutApplicationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CandidateCvUpdateToOneWithWhereWithoutApplicationsInput, Prisma.CandidateCvUpdateWithoutApplicationsInput>, Prisma.CandidateCvUncheckedUpdateWithoutApplicationsInput>
 }
 
+export type CandidateCvCreateNestedOneWithoutApplicationDocumentsInput = {
+  create?: Prisma.XOR<Prisma.CandidateCvCreateWithoutApplicationDocumentsInput, Prisma.CandidateCvUncheckedCreateWithoutApplicationDocumentsInput>
+  connectOrCreate?: Prisma.CandidateCvCreateOrConnectWithoutApplicationDocumentsInput
+  connect?: Prisma.CandidateCvWhereUniqueInput
+}
+
+export type CandidateCvUpdateOneWithoutApplicationDocumentsNestedInput = {
+  create?: Prisma.XOR<Prisma.CandidateCvCreateWithoutApplicationDocumentsInput, Prisma.CandidateCvUncheckedCreateWithoutApplicationDocumentsInput>
+  connectOrCreate?: Prisma.CandidateCvCreateOrConnectWithoutApplicationDocumentsInput
+  upsert?: Prisma.CandidateCvUpsertWithoutApplicationDocumentsInput
+  disconnect?: Prisma.CandidateCvWhereInput | boolean
+  delete?: Prisma.CandidateCvWhereInput | boolean
+  connect?: Prisma.CandidateCvWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CandidateCvUpdateToOneWithWhereWithoutApplicationDocumentsInput, Prisma.CandidateCvUpdateWithoutApplicationDocumentsInput>, Prisma.CandidateCvUncheckedUpdateWithoutApplicationDocumentsInput>
+}
+
 export type CandidateCvCreateWithoutCandidateInput = {
   id?: string
   displayName: string
@@ -625,6 +653,7 @@ export type CandidateCvCreateWithoutCandidateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   applications?: Prisma.JobApplicationCreateNestedManyWithoutSelectedCvInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutSourceCandidateCvInput
 }
 
 export type CandidateCvUncheckedCreateWithoutCandidateInput = {
@@ -641,6 +670,7 @@ export type CandidateCvUncheckedCreateWithoutCandidateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   applications?: Prisma.JobApplicationUncheckedCreateNestedManyWithoutSelectedCvInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutSourceCandidateCvInput
 }
 
 export type CandidateCvCreateOrConnectWithoutCandidateInput = {
@@ -702,6 +732,7 @@ export type CandidateCvCreateWithoutApplicationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   candidate: Prisma.CandidateIdentityCreateNestedOneWithoutCvsInput
+  applicationDocuments?: Prisma.ApplicationDocumentCreateNestedManyWithoutSourceCandidateCvInput
 }
 
 export type CandidateCvUncheckedCreateWithoutApplicationsInput = {
@@ -718,6 +749,7 @@ export type CandidateCvUncheckedCreateWithoutApplicationsInput = {
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedCreateNestedManyWithoutSourceCandidateCvInput
 }
 
 export type CandidateCvCreateOrConnectWithoutApplicationsInput = {
@@ -750,6 +782,7 @@ export type CandidateCvUpdateWithoutApplicationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutCvsNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutSourceCandidateCvNestedInput
 }
 
 export type CandidateCvUncheckedUpdateWithoutApplicationsInput = {
@@ -766,6 +799,91 @@ export type CandidateCvUncheckedUpdateWithoutApplicationsInput = {
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutSourceCandidateCvNestedInput
+}
+
+export type CandidateCvCreateWithoutApplicationDocumentsInput = {
+  id?: string
+  displayName: string
+  fileName: string
+  mimeType: string
+  byteSize: number
+  storageKey: string
+  checksumSha256: string
+  version?: number
+  confirmedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateIdentityCreateNestedOneWithoutCvsInput
+  applications?: Prisma.JobApplicationCreateNestedManyWithoutSelectedCvInput
+}
+
+export type CandidateCvUncheckedCreateWithoutApplicationDocumentsInput = {
+  id?: string
+  candidateUserId: string
+  displayName: string
+  fileName: string
+  mimeType: string
+  byteSize: number
+  storageKey: string
+  checksumSha256: string
+  version?: number
+  confirmedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  applications?: Prisma.JobApplicationUncheckedCreateNestedManyWithoutSelectedCvInput
+}
+
+export type CandidateCvCreateOrConnectWithoutApplicationDocumentsInput = {
+  where: Prisma.CandidateCvWhereUniqueInput
+  create: Prisma.XOR<Prisma.CandidateCvCreateWithoutApplicationDocumentsInput, Prisma.CandidateCvUncheckedCreateWithoutApplicationDocumentsInput>
+}
+
+export type CandidateCvUpsertWithoutApplicationDocumentsInput = {
+  update: Prisma.XOR<Prisma.CandidateCvUpdateWithoutApplicationDocumentsInput, Prisma.CandidateCvUncheckedUpdateWithoutApplicationDocumentsInput>
+  create: Prisma.XOR<Prisma.CandidateCvCreateWithoutApplicationDocumentsInput, Prisma.CandidateCvUncheckedCreateWithoutApplicationDocumentsInput>
+  where?: Prisma.CandidateCvWhereInput
+}
+
+export type CandidateCvUpdateToOneWithWhereWithoutApplicationDocumentsInput = {
+  where?: Prisma.CandidateCvWhereInput
+  data: Prisma.XOR<Prisma.CandidateCvUpdateWithoutApplicationDocumentsInput, Prisma.CandidateCvUncheckedUpdateWithoutApplicationDocumentsInput>
+}
+
+export type CandidateCvUpdateWithoutApplicationDocumentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  byteSize?: Prisma.IntFieldUpdateOperationsInput | number
+  storageKey?: Prisma.StringFieldUpdateOperationsInput | string
+  checksumSha256?: Prisma.StringFieldUpdateOperationsInput | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateIdentityUpdateOneRequiredWithoutCvsNestedInput
+  applications?: Prisma.JobApplicationUpdateManyWithoutSelectedCvNestedInput
+}
+
+export type CandidateCvUncheckedUpdateWithoutApplicationDocumentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  byteSize?: Prisma.IntFieldUpdateOperationsInput | number
+  storageKey?: Prisma.StringFieldUpdateOperationsInput | string
+  checksumSha256?: Prisma.StringFieldUpdateOperationsInput | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  applications?: Prisma.JobApplicationUncheckedUpdateManyWithoutSelectedCvNestedInput
 }
 
 export type CandidateCvCreateManyCandidateInput = {
@@ -797,6 +915,7 @@ export type CandidateCvUpdateWithoutCandidateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   applications?: Prisma.JobApplicationUpdateManyWithoutSelectedCvNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUpdateManyWithoutSourceCandidateCvNestedInput
 }
 
 export type CandidateCvUncheckedUpdateWithoutCandidateInput = {
@@ -813,6 +932,7 @@ export type CandidateCvUncheckedUpdateWithoutCandidateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   applications?: Prisma.JobApplicationUncheckedUpdateManyWithoutSelectedCvNestedInput
+  applicationDocuments?: Prisma.ApplicationDocumentUncheckedUpdateManyWithoutSourceCandidateCvNestedInput
 }
 
 export type CandidateCvUncheckedUpdateManyWithoutCandidateInput = {
@@ -837,10 +957,12 @@ export type CandidateCvUncheckedUpdateManyWithoutCandidateInput = {
 
 export type CandidateCvCountOutputType = {
   applications: number
+  applicationDocuments: number
 }
 
 export type CandidateCvCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   applications?: boolean | CandidateCvCountOutputTypeCountApplicationsArgs
+  applicationDocuments?: boolean | CandidateCvCountOutputTypeCountApplicationDocumentsArgs
 }
 
 /**
@@ -860,6 +982,13 @@ export type CandidateCvCountOutputTypeCountApplicationsArgs<ExtArgs extends runt
   where?: Prisma.JobApplicationWhereInput
 }
 
+/**
+ * CandidateCvCountOutputType without action
+ */
+export type CandidateCvCountOutputTypeCountApplicationDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ApplicationDocumentWhereInput
+}
+
 
 export type CandidateCvSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -877,6 +1006,7 @@ export type CandidateCvSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   updatedAt?: boolean
   candidate?: boolean | Prisma.CandidateIdentityDefaultArgs<ExtArgs>
   applications?: boolean | Prisma.CandidateCv$applicationsArgs<ExtArgs>
+  applicationDocuments?: boolean | Prisma.CandidateCv$applicationDocumentsArgs<ExtArgs>
   _count?: boolean | Prisma.CandidateCvCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["candidateCv"]>
 
@@ -934,6 +1064,7 @@ export type CandidateCvOmit<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type CandidateCvInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   candidate?: boolean | Prisma.CandidateIdentityDefaultArgs<ExtArgs>
   applications?: boolean | Prisma.CandidateCv$applicationsArgs<ExtArgs>
+  applicationDocuments?: boolean | Prisma.CandidateCv$applicationDocumentsArgs<ExtArgs>
   _count?: boolean | Prisma.CandidateCvCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CandidateCvIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -948,6 +1079,7 @@ export type $CandidateCvPayload<ExtArgs extends runtime.Types.Extensions.Interna
   objects: {
     candidate: Prisma.$CandidateIdentityPayload<ExtArgs>
     applications: Prisma.$JobApplicationPayload<ExtArgs>[]
+    applicationDocuments: Prisma.$ApplicationDocumentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1359,6 +1491,7 @@ export interface Prisma__CandidateCvClient<T, Null = never, ExtArgs extends runt
   readonly [Symbol.toStringTag]: "PrismaPromise"
   candidate<T extends Prisma.CandidateIdentityDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CandidateIdentityDefaultArgs<ExtArgs>>): Prisma.Prisma__CandidateIdentityClient<runtime.Types.Result.GetResult<Prisma.$CandidateIdentityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   applications<T extends Prisma.CandidateCv$applicationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CandidateCv$applicationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobApplicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  applicationDocuments<T extends Prisma.CandidateCv$applicationDocumentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CandidateCv$applicationDocumentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1823,6 +1956,30 @@ export type CandidateCv$applicationsArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.JobApplicationScalarFieldEnum | Prisma.JobApplicationScalarFieldEnum[]
+}
+
+/**
+ * CandidateCv.applicationDocuments
+ */
+export type CandidateCv$applicationDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ApplicationDocument
+   */
+  select?: Prisma.ApplicationDocumentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ApplicationDocument
+   */
+  omit?: Prisma.ApplicationDocumentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ApplicationDocumentInclude<ExtArgs> | null
+  where?: Prisma.ApplicationDocumentWhereInput
+  orderBy?: Prisma.ApplicationDocumentOrderByWithRelationInput | Prisma.ApplicationDocumentOrderByWithRelationInput[]
+  cursor?: Prisma.ApplicationDocumentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ApplicationDocumentScalarFieldEnum | Prisma.ApplicationDocumentScalarFieldEnum[]
 }
 
 /**

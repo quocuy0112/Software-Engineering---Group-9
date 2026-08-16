@@ -3,10 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useWorkspaceLocale } from "../../dashboard/client/workspace-locale";
-import type {
-  CvImportStage,
-  CvParserClass,
-  CvUploadStatus,
+import {
+  CV_UPLOAD_ATTEMPTS_PER_ROLLING_HOUR,
+  cvApiErrorSchema,
+  type CvImportStage,
+  type CvParserClass,
+  type CvUploadStatus,
 } from "@/shared/contracts/cv-import/common";
 import {
   cvImportStatusResponseSchema,
@@ -39,6 +41,61 @@ export type CvUploadProgress = Readonly<{
   uploadId: string | null;
   parserClass: CvParserClass | null;
 }>;
+
+function parserUnavailableMessage(
+  locale: CvLocale,
+  parserClass: CvParserClass,
+): string {
+  if (parserClass === "EXTERNAL_OPENAI") {
+    return locale === "vi"
+      ? "OpenAI hiện không khả dụng. Hãy kiểm tra OPENAI_API_KEY và cấu hình parser phía server, sau đó khởi động lại web server và CV worker."
+      : "OpenAI parsing is unavailable. Check OPENAI_API_KEY and the server parser configuration, then restart the web server and CV worker.";
+  }
+  return locale === "vi"
+    ? "Bộ phân tích SmartHire hiện không khả dụng trong môi trường này."
+    : "SmartHire deterministic parsing is not available in this environment.";
+}
+
+function uploadRateLimitedMessage(
+  locale: CvLocale,
+  response: Response,
+): string {
+  const retryAfter = Number(response.headers.get("retry-after"));
+  if (!Number.isSafeInteger(retryAfter) || retryAfter < 1) {
+    return cvKnownError(
+      locale,
+      "The upload attempt limit has been reached.",
+      "UPLOAD_RATE_LIMITED",
+    );
+  }
+  const minutes = Math.max(1, Math.ceil(retryAfter / 60));
+  if (locale === "vi") {
+    return `Bạn đã đạt giới hạn ${CV_UPLOAD_ATTEMPTS_PER_ROLLING_HOUR} lượt tải CV trong một giờ. Hãy thử lại sau khoảng ${minutes} phút.`;
+  }
+  return `The upload attempt limit has been reached. Try again in about ${minutes} minute${minutes === 1 ? "" : "s"}.`;
+}
+
+async function admissionErrorMessage(
+  response: Response,
+  parserClass: CvParserClass,
+  locale: CvLocale,
+): Promise<string> {
+  const payload = await response.json().catch(() => null);
+  const parsed = cvApiErrorSchema.safeParse(payload);
+  if (!parsed.success) return parserUnavailableMessage(locale, parserClass);
+
+  const error = parsed.data.error;
+  if (error.code === "UPLOAD_RATE_LIMITED") {
+    return uploadRateLimitedMessage(locale, response);
+  }
+  if (
+    parserClass === "EXTERNAL_OPENAI" &&
+    error.code === "CV_PROCESSING_UNAVAILABLE"
+  ) {
+    return parserUnavailableMessage(locale, parserClass);
+  }
+  return cvKnownError(locale, error.message, error.code);
+}
 
 function requestKey() {
   return `cv-${crypto.randomUUID()}`;
@@ -354,8 +411,7 @@ export function useCvImport(input: { csrfProof: string }) {
         ...current,
         state: "PROCESSING",
         percentage: Math.max(current.percentage, 15),
-        title:
-          locale === "vi" ? "Đang tiếp tục nhập CV" : "Resuming CV import",
+        title: locale === "vi" ? "Đang tiếp tục nhập CV" : "Resuming CV import",
         message:
           locale === "vi"
             ? "Đang làm mới trạng thái nhập CV…"
@@ -404,12 +460,15 @@ export function useCvImport(input: { csrfProof: string }) {
             parserClass,
           }),
         });
-        if (!reservationResponse.ok)
+        if (!reservationResponse.ok) {
           throw new Error(
-            parserClass === "EXTERNAL_OPENAI"
-              ? "OpenAI parsing is not available. Check the server key and parser configuration."
-              : "SmartHire deterministic parsing is not available in this environment.",
+            await admissionErrorMessage(
+              reservationResponse,
+              parserClass,
+              locale,
+            ),
           );
+        }
         const reservation = (await reservationResponse.json()) as {
           uploadId: string;
           contentUrl: string;

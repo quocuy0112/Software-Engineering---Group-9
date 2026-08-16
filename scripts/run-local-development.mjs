@@ -1,11 +1,15 @@
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, lstatSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import process from "node:process";
 
 const shutdownTimeoutMs = 5_000;
 const commandLineArgs = new Set(process.argv.slice(2));
-const webRoot = join(process.cwd(), "web");
+// Playwright invokes this supervisor from web/, while root scripts invoke it
+// from the repository root. Resolve from the script location so both modes
+// launch the same workspace.
+const workspace = resolve(dirname(import.meta.filename), "..");
+const webRoot = join(workspace, "web");
 
 const children = new Map();
 let shutdownPromise;

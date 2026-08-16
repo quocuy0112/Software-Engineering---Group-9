@@ -263,6 +263,31 @@ export type ModerationPrivateNote = Prisma.ModerationPrivateNoteModel
  */
 export type JobPosting = Prisma.JobPostingModel
 /**
+ * Model JobPostReviewAggregate
+ * 
+ */
+export type JobPostReviewAggregate = Prisma.JobPostReviewAggregateModel
+/**
+ * Model JobPostReviewVersion
+ * 
+ */
+export type JobPostReviewVersion = Prisma.JobPostReviewVersionModel
+/**
+ * Model JobPostReviewHistory
+ * 
+ */
+export type JobPostReviewHistory = Prisma.JobPostReviewHistoryModel
+/**
+ * Model JobPostReviewPrivateNote
+ * 
+ */
+export type JobPostReviewPrivateNote = Prisma.JobPostReviewPrivateNoteModel
+/**
+ * Model JobCatalogueWriteLease
+ * 
+ */
+export type JobCatalogueWriteLease = Prisma.JobCatalogueWriteLeaseModel
+/**
  * Model JobPostingSkill
  * 
  */
@@ -292,6 +317,26 @@ export type JobReport = Prisma.JobReportModel
  * 
  */
 export type JobApplication = Prisma.JobApplicationModel
+/**
+ * Model ApplicationDocument
+ * 
+ */
+export type ApplicationDocument = Prisma.ApplicationDocumentModel
+/**
+ * Model ApplicationCoverLetterText
+ * 
+ */
+export type ApplicationCoverLetterText = Prisma.ApplicationCoverLetterTextModel
+/**
+ * Model ApplicationArtifactPromotion
+ * 
+ */
+export type ApplicationArtifactPromotion = Prisma.ApplicationArtifactPromotionModel
+/**
+ * Model ApplicationDocumentLegalHold
+ * 
+ */
+export type ApplicationDocumentLegalHold = Prisma.ApplicationDocumentLegalHoldModel
 /**
  * Model ProfessionalConnection
  * 
@@ -499,3 +544,73 @@ export type ImageSearchAdmissionEvent = Prisma.ImageSearchAdmissionEventModel
  * refresh their respective component.
  */
 export type ImageSearchOperationalEvidence = Prisma.ImageSearchOperationalEvidenceModel
+/**
+ * Model AutomaticMatchResult
+ * 
+ */
+export type AutomaticMatchResult = Prisma.AutomaticMatchResultModel
+/**
+ * Model DocumentParseResult
+ * 
+ */
+export type DocumentParseResult = Prisma.DocumentParseResultModel
+/**
+ * Model SkillEvidenceExtraction
+ * 
+ */
+export type SkillEvidenceExtraction = Prisma.SkillEvidenceExtractionModel
+/**
+ * Model CvEvidenceExcerpt
+ * 
+ */
+export type CvEvidenceExcerpt = Prisma.CvEvidenceExcerptModel
+/**
+ * Model AiAssessment
+ * 
+ */
+export type AiAssessment = Prisma.AiAssessmentModel
+/**
+ * Model AiAssessmentFinding
+ * 
+ */
+export type AiAssessmentFinding = Prisma.AiAssessmentFindingModel
+/**
+ * Model AiSuggestedInterviewQuestion
+ * 
+ */
+export type AiSuggestedInterviewQuestion = Prisma.AiSuggestedInterviewQuestionModel
+/**
+ * Model ScoringOperation
+ * 
+ */
+export type ScoringOperation = Prisma.ScoringOperationModel
+/**
+ * Model ScoringWorkItem
+ * 
+ */
+export type ScoringWorkItem = Prisma.ScoringWorkItemModel
+/**
+ * Model AiAssessmentAttempt
+ * 
+ */
+export type AiAssessmentAttempt = Prisma.AiAssessmentAttemptModel
+/**
+ * Model ApplicationScoringResult
+ * 
+ */
+export type ApplicationScoringResult = Prisma.ApplicationScoringResultModel
+/**
+ * Model ManualApplicationPriority
+ * 
+ */
+export type ManualApplicationPriority = Prisma.ManualApplicationPriorityModel
+/**
+ * Model RankingSnapshot
+ * 
+ */
+export type RankingSnapshot = Prisma.RankingSnapshotModel
+/**
+ * Model RankingSnapshotRow
+ * 
+ */
+export type RankingSnapshotRow = Prisma.RankingSnapshotRowModel

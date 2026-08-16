@@ -2,8 +2,16 @@ import { constants } from "node:fs";
 import { access, lstat } from "node:fs/promises";
 import { createConnection } from "node:net";
 import { isAbsolute } from "node:path";
+import nextEnv from "@next/env";
 
 import { checkCvScanner } from "./check-cv-scanner.mjs";
+
+const { loadEnvConfig } = nextEnv;
+
+// Keep direct local-worker runs consistent with the custom web server. Docker
+// injects its environment explicitly; loadEnvConfig leaves those values in
+// place when no env files are present in the image.
+loadEnvConfig(process.cwd(), process.env.NODE_ENV !== "production");
 
 const probeTcp = (host, port, timeoutMs = 5_000) =>
   new Promise((resolve, reject) => {

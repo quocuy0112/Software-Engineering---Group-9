@@ -1,9 +1,4 @@
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { describe, expect, it, vi } from "vitest";
@@ -24,7 +19,9 @@ vi.mock("next/navigation", () => ({
 }));
 vi.mock(
   "@/frontend/features/notifications/components/notification-center",
-  () => ({ NotificationCenter: () => <div data-testid="notification-center" /> }),
+  () => ({
+    NotificationCenter: () => <div data-testid="notification-center" />,
+  }),
 );
 
 const emptyProfile = {
@@ -336,7 +333,7 @@ describe("identity navigation shells", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Post a Job" }));
 
-    expect(navigation.push).toHaveBeenCalledWith("/recruiter");
+    expect(navigation.push).toHaveBeenCalledWith("/recruiter/job-postings");
     expect(document.cookie).toContain("smarthire-workspace-mode=recruiter");
   });
 
@@ -433,10 +430,13 @@ describe("identity navigation shells", () => {
     expect(
       screen.getByRole("progressbar", { name: "Profile completion" }),
     ).toHaveAttribute("aria-valuenow", "100");
-    expect(screen.getByText("Profile ready")).toBeVisible();
-    expect(
-      screen.getByRole("link", { name: /Add a professional link/i }),
-    ).toHaveAttribute("href", "/profile#profile-social-section");
+    expect(screen.getByText("All steps complete")).toBeVisible();
+    fireEvent.click(
+      screen.getByRole("button", { name: /Add a professional link/i }),
+    );
+    expect(navigation.push).toHaveBeenCalledWith(
+      "/profile#profile-social-section",
+    );
   });
 
   it("exposes directly addressable profile tabs with active state", () => {

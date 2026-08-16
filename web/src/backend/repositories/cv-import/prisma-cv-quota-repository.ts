@@ -122,8 +122,11 @@ export class PrismaCvQuotaRepository {
         const quota = quotaRows[0];
         if (!quota) throw new CvImportServiceError("CV_PROCESSING_UNAVAILABLE");
 
-        const rolling = await transaction.$queryRaw<Array<{ count: bigint }>>`
-          SELECT COUNT(*)::bigint AS "count"
+        const rolling = await transaction.$queryRaw<
+          Array<{ count: bigint; oldest: Date | null }>
+        >`
+          SELECT COUNT(*)::bigint AS "count",
+                 MIN("createdAt") AS "oldest"
             FROM "CvUpload"
            WHERE "accountId" = ${input.accountId}
              AND "createdAt" > ${new Date(input.now.getTime() - 60 * 60_000)}
@@ -131,8 +134,18 @@ export class PrismaCvQuotaRepository {
         if (
           Number(rolling[0]?.count ?? 0) >= CV_UPLOAD_ATTEMPTS_PER_ROLLING_HOUR
         ) {
+          const oldest = rolling[0]?.oldest;
+          const retryAfterSeconds = oldest
+            ? Math.max(
+                1,
+                Math.ceil(
+                  (oldest.getTime() + 60 * 60_000 - input.now.getTime()) /
+                    1_000,
+                ),
+              )
+            : 60 * 60;
           throw new CvImportServiceError("UPLOAD_RATE_LIMITED", {
-            retryAfterSeconds: 60 * 60,
+            retryAfterSeconds,
           });
         }
         const retained = await transaction.$queryRaw<Array<{ count: bigint }>>`

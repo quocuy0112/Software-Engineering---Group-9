@@ -4,16 +4,23 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/frontend/components/ui/badge";
+import {
+  WorkspaceNavIcon,
+  type WorkspaceNavIconName,
+} from "@/frontend/features/dashboard/components/workspace-navigation-icons";
 import { CompanyAvatar } from "@/frontend/features/jobs/components/company-avatar";
 import { JobPostingEditor } from "./job-posting-editor";
+import { CandidateRankingList } from "@/frontend/features/recruiter-applications/candidate-ranking-list";
 import {
   createEmptyJobPosting,
   recruiterJobStatusMeta,
+  type RecruiterCompanyView,
   type RecruiterJob,
   type RecruiterJobManagementData,
   type RecruiterJobStatus,
 } from "@/shared/contracts/recruiter-job-posting";
 import type { JobCatalogItem } from "@/shared/contracts/jobs/catalog";
+import { recruiterRoutes } from "@/shared/routing/recruiter-routes";
 
 const tabs: Array<{
   value: "active" | "draft" | "pending_approval" | "closed";
@@ -38,6 +45,8 @@ function Icon({
     | "briefcase"
     | "users"
     | "clock"
+    | "check"
+    | "warning"
     | "calendar"
     | "search"
     | "plus"
@@ -88,6 +97,12 @@ function Icon({
     ),
     close: <path d="M6 6l12 12M18 6 6 18" />,
     check: <path d="m5 12 4 4L19 6" />,
+    warning: (
+      <>
+        <path d="M12 2 2 19.5h20L12 2z" />
+        <path d="M12 9v4M12 17h.01" />
+      </>
+    ),
   } as const;
   return (
     <svg className="recruiter-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -123,6 +138,21 @@ function isClosingSoon(job: RecruiterJob) {
   if (job.status !== "active" || !job.applyDeadline) return false;
   const remaining = new Date(job.applyDeadline).getTime() - Date.now();
   return remaining >= 0 && remaining <= 7 * 86_400_000;
+}
+
+function formatReasonCode(code: string): string {
+  const reasonLabels: Record<string, string> = {
+    INCOMPLETE_OR_UNCLEAR: "Incomplete or unclear information",
+    MISLEADING_CONTENT: "Misleading content",
+    INAPPROPRIATE_LANGUAGE: "Inappropriate language",
+    DUPLICATE_POSTING: "Duplicate posting",
+    INVALID_REQUIREMENTS: "Invalid requirements",
+    INSUFFICIENT_COMPENSATION: "Insufficient compensation details",
+    VERIFICATION_MISMATCH: "Verification mismatch",
+    PROHIBITED_CONTENT: "Prohibited content",
+    OTHER: "Other reason",
+  };
+  return reasonLabels[code] || code.replace(/_/g, " ");
 }
 
 function statusForTab(job: RecruiterJob, tab: (typeof tabs)[number]["value"]) {
@@ -204,6 +234,57 @@ function JobPostingCard({
           <span aria-hidden="true">|</span>
           {arrangementLabel(job)}
         </p>
+        {job.review ? (
+          <>
+            <p
+              className={`recruiter-review-state recruiter-review-state--${job.review.state.toLowerCase()}`}
+              role="status"
+              aria-live="polite"
+            >
+              <Icon
+                name={
+                  job.review.state === "APPROVED"
+                    ? "check"
+                    : job.review.state === "REJECTED"
+                      ? "warning"
+                      : "clock"
+                }
+                aria-hidden="true"
+              />
+              <strong>
+                Review version {job.review.sequence}:{" "}
+                {job.review.state.replace("_", " ")}
+              </strong>
+              {job.review.readOnly
+                ? " — This submitted version is locked while an Administrator reviews it."
+                : null}
+            </p>
+            {job.review.state === "REJECTED" && job.review.reasonCode ? (
+              <div
+                className="recruiter-review-feedback"
+                role="region"
+                aria-label="Rejection feedback"
+              >
+                <p className="recruiter-review-feedback__reason">
+                  <strong>{formatReasonCode(job.review.reasonCode)}</strong>
+                </p>
+                {job.review.publicExplanation ? (
+                  <p className="recruiter-review-feedback__explanation">
+                    {job.review.publicExplanation}
+                  </p>
+                ) : null}
+                <p className="recruiter-review-feedback__guidance">
+                  Revise the posting and submit again to request a new review.
+                </p>
+              </div>
+            ) : null}
+            {job.review.state === "APPROVED" ? (
+              <p className="recruiter-review-approved-note" role="status">
+                This job post has been approved and is visible to candidates.
+              </p>
+            ) : null}
+          </>
+        ) : null}
         <div className="recruiter-job-card__chips" aria-label="Skills">
           {job.skillTags.slice(0, 6).map((skill) => (
             <span className="recruiter-skill-chip" key={skill}>
@@ -229,11 +310,20 @@ function JobPostingCard({
             type="button"
             className="recruiter-outline-button"
             onClick={onEdit}
+            aria-label={
+              job.status === "rejected"
+                ? `Revise rejected job posting: ${title}`
+                : job.status === "pending_approval"
+                  ? `View job posting under review: ${title}`
+                  : `Edit job posting: ${title}`
+            }
           >
             <Icon name="edit" />
-            {job.status === "pending_approval"
-              ? "View posting"
-              : "Edit posting"}
+            {job.status === "rejected"
+              ? "Revise posting"
+              : job.status === "pending_approval"
+                ? "View posting"
+                : "Edit posting"}
           </button>
           {job.status === "active" ? (
             <button
@@ -350,7 +440,7 @@ function CompanyProfileRequiredState({
 }: {
   missingFields: Array<"name" | "industry" | "size" | "address" | "logo">;
 }) {
-  const labels: Record<typeof missingFields[number], string> = {
+  const labels: Record<(typeof missingFields)[number], string> = {
     name: "Company name",
     industry: "Industry",
     size: "Company size",
@@ -364,21 +454,64 @@ function CompanyProfileRequiredState({
       </span>
       <div>
         <h2>Complete company profile before posting</h2>
-        <p>Create job posting is locked until the following fields are complete.</p>
+        <p>
+          Create job posting is locked until the following fields are complete.
+        </p>
         <ul className="recruiter-company-required__list">
-          {missingFields.map((field) => <li key={field}>{labels[field]}</li>)}
+          {missingFields.map((field) => (
+            <li key={field}>{labels[field]}</li>
+          ))}
         </ul>
       </div>
-      <Link className="recruiter-primary-button" href="/recruiter/company-settings?required=profile">
+      <Link
+        className="recruiter-primary-button"
+        href="/recruiter/company-settings?required=profile"
+      >
         Open company settings
       </Link>
     </section>
   );
 }
+
+function withCompany(
+  job: JobCatalogItem,
+  companies: RecruiterCompanyView[],
+): RecruiterJob {
+  const company =
+    companies.find((item) => item.id === job.companyId) ?? companies[0];
+  if (!company) {
+    throw new Error("Company data is required for recruiter jobs.");
+  }
+  return {
+    ...job,
+    company,
+  };
+}
+
+function withCompanyFromState(
+  job: JobCatalogItem,
+  companies: RecruiterCompanyView[],
+  existing?: RecruiterJobManagementData["jobs"],
+): RecruiterJob {
+  const company =
+    existing?.find((item) => item.id === job.id)?.company ??
+    companies.find((item) => item.id === job.companyId) ??
+    companies[0];
+  if (!company) {
+    throw new Error("Company data is required for recruiter jobs.");
+  }
+  return {
+    ...job,
+    company,
+  };
+}
 export function RecruiterJobPostingManagement({
   initialData,
   onNavigate,
-}: { initialData?: RecruiterJobManagementData | null; onNavigate?: (href: string) => void } = {}) {
+}: {
+  initialData?: RecruiterJobManagementData | null;
+  onNavigate?: (href: string) => void;
+} = {}) {
   const [data, setData] = useState<RecruiterJobManagementData | null>(
     initialData ?? null,
   );
@@ -390,7 +523,7 @@ export function RecruiterJobPostingManagement({
   const [view, setView] = useState<"dashboard" | "editor" | "applicants">(
     "dashboard",
   );
-  const [editorJob, setEditorJob] = useState<JobCatalogItem | null>(null);
+  const [editorJob, setEditorJob] = useState<RecruiterJob | null>(null);
   const [applicantJob, setApplicantJob] = useState<RecruiterJob | null>(null);
   const [message, setMessage] = useState("");
 
@@ -487,15 +620,15 @@ export function RecruiterJobPostingManagement({
       return;
     }
     if (onNavigate) {
-      onNavigate('/recruiter/jobs/create');
+      onNavigate(recruiterRoutes.jobPostingCreate);
       return;
     }
-    setEditorJob(createEmptyJobPosting(current.companyId));
+    setEditorJob(withCompany(createEmptyJobPosting(current.companyId), current.companies));
     setView("editor");
   };
   const openEdit = (job: RecruiterJob) => {
     if (onNavigate) {
-      onNavigate(`/recruiter/jobs/${encodeURIComponent(job.id)}/edit`);
+      onNavigate(recruiterRoutes.jobPostingEdit(job.id));
       return;
     }
     setEditorJob(job);
@@ -504,12 +637,15 @@ export function RecruiterJobPostingManagement({
   const receiveSavedJob = (job: RecruiterJob) => {
     setData((currentData) => {
       const next = currentData ?? emptyData;
+      const normalizedJob = withCompanyFromState(job, next.companies, next.jobs);
       const exists = next.jobs.some((item) => item.id === job.id);
       return {
         ...next,
         jobs: exists
-          ? next.jobs.map((item) => (item.id === job.id ? job : item))
-          : [job, ...next.jobs],
+          ? next.jobs.map((item) =>
+              item.id === normalizedJob.id ? normalizedJob : item,
+            )
+          : [normalizedJob, ...next.jobs],
       };
     });
     setMessage("Job posting saved to the mock database.");
@@ -530,13 +666,13 @@ export function RecruiterJobPostingManagement({
       { method: "DELETE" },
     );
     const payload = (await response.json().catch(() => null)) as
-      | (RecruiterJob & { message?: string })
+      | (JobCatalogItem & { message?: string })
       | null;
     if (!response.ok || !payload) {
       setMessage(payload?.message ?? "Unable to close this posting.");
       return;
     }
-    receiveSavedJob(payload);
+    receiveSavedJob(withCompanyFromState(payload, current.companies, current.jobs));
     setMessage("Job posting closed and saved to the mock database.");
   };
 
@@ -553,13 +689,13 @@ export function RecruiterJobPostingManagement({
       }),
     });
     const payload = (await response.json().catch(() => null)) as
-      | (RecruiterJob & { message?: string })
+      | (JobCatalogItem & { message?: string })
       | null;
     if (!response.ok || !payload) {
       setMessage(payload?.message ?? "Unable to extend this deadline.");
       return;
     }
-    receiveSavedJob(payload);
+    receiveSavedJob(withCompanyFromState(payload, current.companies, current.jobs));
     setMessage("Application deadline extended by 30 days.");
   };
   if (view === "editor" && editorJob)
@@ -573,24 +709,11 @@ export function RecruiterJobPostingManagement({
     );
   if (view === "applicants" && applicantJob)
     return (
-      <section className="recruiter-applicants recruiter-surface-card">
-        <button
-          type="button"
-          className="recruiter-back-button"
-          onClick={() => setView("dashboard")}
-        >
-          Back to job postings
-        </button>
-        <p className="recruiter-eyebrow">Candidate list</p>
-        <h1>{applicantJob.title}</h1>
-        <p>
-          {applicantJob.stats.applicantCount
-            ? String(applicantJob.stats.applicantCount) +
-              " candidates have applied to this posting."
-            : "No applicants yet."}
-        </p>
-        <StatusPill status={applicantJob.status} />
-      </section>
+      <CandidateRankingList
+        jobId={applicantJob.id}
+        jobTitle={applicantJob.title}
+        onBack={() => setView("dashboard")}
+      />
     );
 
   if (!loading && current.companyProfileComplete === false) {
@@ -602,12 +725,26 @@ export function RecruiterJobPostingManagement({
             <h1>Job postings</h1>
             <p>Complete the company identity before opening a new role.</p>
           </div>
-          <button type="button" className="recruiter-primary-button" onClick={openCreate}>
+          <button
+            type="button"
+            className="recruiter-primary-button"
+            onClick={openCreate}
+          >
             <Icon name="plus" />
             Create job posting
           </button>
         </header>
-        <CompanyProfileRequiredState missingFields={current.missingCompanyProfileFields ?? ["name", "industry", "size", "address", "logo"]} />
+        <CompanyProfileRequiredState
+          missingFields={
+            current.missingCompanyProfileFields ?? [
+              "name",
+              "industry",
+              "size",
+              "address",
+              "logo",
+            ]
+          }
+        />
       </div>
     );
   }
@@ -753,6 +890,10 @@ export function RecruiterJobPostingManagement({
                   job={job}
                   onEdit={() => openEdit(job)}
                   onApplicants={() => {
+                    if (onNavigate) {
+                      onNavigate(recruiterRoutes.candidateRanking(job.id));
+                      return;
+                    }
                     setApplicantJob(job);
                     setView("applicants");
                   }}
@@ -779,7 +920,7 @@ export function RecruiterJobPostingManagement({
             aria-label="Dismiss message"
             onClick={() => setMessage("")}
           >
-          <Icon name="close" />
+            <Icon name="close" />
           </button>
         </div>
       ) : null}
@@ -787,50 +928,10 @@ export function RecruiterJobPostingManagement({
   );
 }
 
-type RecruiterNavIconName = "overview" | "jobs" | "candidates" | "settings" | "signout";
-
-function RecruiterNavIcon({ name }: { name: RecruiterNavIconName }) {
-  const paths = {
-    overview: (
-      <>
-        <rect x="3" y="3" width="7" height="7" rx="1.5" />
-        <rect x="14" y="3" width="7" height="7" rx="1.5" />
-        <rect x="3" y="14" width="7" height="7" rx="1.5" />
-        <rect x="14" y="14" width="7" height="7" rx="1.5" />
-      </>
-    ),
-    jobs: (
-      <>
-        <rect x="3" y="7" width="18" height="13" rx="2" />
-        <path d="M8 7V5.5A2.5 2.5 0 0 1 10.5 3h3A2.5 2.5 0 0 1 16 5.5V7M3 12h18M9 12v2h6v-2" />
-      </>
-    ),
-    candidates: (
-      <>
-        <circle cx="9" cy="8" r="3" />
-        <circle cx="17" cy="9" r="2" />
-        <path d="M3.5 20c.6-4 2.5-6 5.5-6s4.9 2 5.5 6M14.5 15c2.8-.4 4.8 1.2 5.5 4" />
-      </>
-    ),
-    settings: (
-      <>
-        <circle cx="12" cy="12" r="3" />
-        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V20h-2.5v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H7v-2.5h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5V4h2.5v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.2v2.5h-.2a1.7 1.7 0 0 0-1.5 1.4Z" />
-      </>
-    ),
-    signout: (
-      <>
-        <path d="M8 4H4.5A1.5 1.5 0 0 0 3 5.5v9A1.5 1.5 0 0 0 4.5 16H8" />
-        <path d="M11 6.5 14.5 10 11 13.5M7 10h7.5" />
-      </>
-    ),
-  } as const;
-  return (
-    <svg className="nav-icon recruiter-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-      {paths[name]}
-    </svg>
-  );
-}
+type RecruiterNavIconName = Exclude<
+  WorkspaceNavIconName,
+  "messages" | "support" | "profile"
+>;
 
 export function RecruiterWorkspaceNavigation({
   collapsed,
@@ -848,14 +949,25 @@ export function RecruiterWorkspaceNavigation({
     href?: string;
     active: boolean;
   }> = [
-    { label: "Overview", icon: "overview", active: false },
+    { label: "Overview", icon: "dashboard", active: false },
     {
       label: "Job postings",
       icon: "jobs",
-      href: "/recruiter",
-      active: pathname === "/recruiter" || pathname.startsWith("/recruiter/jobs"),
+      href: recruiterRoutes.jobPostings,
+      active:
+        pathname === "/recruiter" ||
+        pathname === recruiterRoutes.jobPostings ||
+        pathname.startsWith("/recruiter/jobs") ||
+        pathname.startsWith(`${recruiterRoutes.jobPostings}/`),
     },
-    { label: "Candidates", icon: "candidates", active: false },
+    {
+      label: "Candidates",
+      icon: "candidates",
+      href: recruiterRoutes.candidates,
+      active:
+        pathname === recruiterRoutes.candidates ||
+        pathname.startsWith(`${recruiterRoutes.candidates}/`),
+    },
     {
       label: "Company settings",
       icon: "settings",
@@ -879,9 +991,11 @@ export function RecruiterWorkspaceNavigation({
         {destinations.map((item) => {
           const content = (
             <>
-              <RecruiterNavIcon name={item.icon} />
+              <WorkspaceNavIcon name={item.icon} />
               <span className="workspace-navigation-label">{item.label}</span>
-              {!item.href ? <span className="recruiter-nav-soon">Soon</span> : null}
+              {!item.href ? (
+                <span className="recruiter-nav-soon">Soon</span>
+              ) : null}
             </>
           );
           return item.href ? (
@@ -912,7 +1026,7 @@ export function RecruiterWorkspaceNavigation({
           disabled={busy}
           aria-busy={busy}
         >
-          <RecruiterNavIcon name="signout" />
+          <WorkspaceNavIcon name="signout" />
           <span className="workspace-navigation-label">
             {busy ? "Signing out..." : "Sign out"}
           </span>

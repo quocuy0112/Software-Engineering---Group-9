@@ -57,7 +57,8 @@ function mutationErrorResponse(error: unknown, fallback: string) {
   }
   if (
     message === "This job posting cannot be edited in its current status." ||
-    message === "This job posting cannot be closed in its current status."
+    message === "This job posting cannot be closed in its current status." ||
+    message === "This job posting is locked while review is pending."
   ) {
     return errorResponse(message, 409);
   }
@@ -82,9 +83,9 @@ export async function POST(request: Request) {
   if (!current) return errorResponse("Authentication required.", 401);
   try {
     const body = (await request.json()) as { status?: unknown; job?: unknown };
-    if (body.status !== "draft" && body.status !== "pending_approval") {
-      return errorResponse("Choose draft or pending approval status.", 422, {
-        status: "Choose draft or pending approval status.",
+    if (body.status !== "draft") {
+      return errorResponse("Only draft content can be saved here.", 422, {
+        status: "Use the review submission action after saving the draft.",
       });
     }
     const job = await createRecruiterJob(current.userId, body.job, body.status);
@@ -98,7 +99,13 @@ export async function PATCH(request: Request) {
   const current = await actor(request);
   if (!current) return errorResponse("Authentication required.", 401);
   try {
-    const job = await updateRecruiterJob(current.userId, await request.json());
+    const body = (await request.json()) as Record<string, unknown>;
+    if (body.status !== "draft" && body.status !== "rejected")
+      return errorResponse("Only draft content can be saved here.", 422);
+    const job = await updateRecruiterJob(current.userId, {
+      ...body,
+      status: "draft",
+    });
     return NextResponse.json(job, { headers: noStore });
   } catch (error) {
     return mutationErrorResponse(error, "Unable to update job posting.");

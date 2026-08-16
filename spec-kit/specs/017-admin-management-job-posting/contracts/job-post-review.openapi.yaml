@@ -1,0 +1,458 @@
+openapi: 3.1.0
+info:
+  title: SmartHire Administrator Job-Post Review API
+  version: 1.0.0
+  description: Protected Recruiter submission and Platform Administrator review contracts for JSON-backed job content.
+servers:
+  - url: /
+security:
+  - browserSession: []
+paths:
+  /api/recruiter/job-postings/{jobId}/submit-review:
+    post:
+      operationId: submitJobPostReview
+      summary: Submit the current authorized JSON working job as an immutable review version.
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitReviewCommand'
+      responses:
+        '201':
+          description: New pending review created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecruiterReviewProjection'
+        '200':
+          description: Idempotent replay of the existing pending version.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecruiterReviewProjection'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /api/admin/job-post-reviews:
+    get:
+      operationId: listJobPostReviews
+      summary: List bounded protected job-review queue rows.
+      parameters:
+        - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - { name: perPage, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 25 } }
+        - { name: state, in: query, schema: { $ref: '#/components/schemas/ReviewState' } }
+        - { name: assignment, in: query, schema: { type: string, enum: [ANY, UNASSIGNED, MINE] } }
+        - { name: companyId, in: query, schema: { type: string, maxLength: 128 } }
+        - { name: minimumAgeHours, in: query, schema: { type: integer, minimum: 0, maximum: 8760 } }
+        - { name: sequence, in: query, schema: { type: integer, minimum: 1 } }
+      responses:
+        '200':
+          description: Paginated review rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [data, total, calculatedAt]
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/ReviewQueueItem' } }
+                  total: { type: integer, minimum: 0 }
+                  calculatedAt: { type: string, format: date-time }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /api/admin/job-post-reviews/{reviewId}:
+    get:
+      operationId: getJobPostReview
+      summary: Read the complete protected review projection.
+      parameters:
+        - $ref: '#/components/parameters/ReviewId'
+      responses:
+        '200':
+          description: Review detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewDetail'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+  /api/admin/job-post-reviews/{reviewId}/{action}:
+    post:
+      operationId: changeJobPostReview
+      summary: Claim, reassign, approve, or reject the expected pending review version.
+      description: The discriminated body command MUST match the path action after case normalization; mismatch returns 422 without mutation.
+      parameters:
+        - $ref: '#/components/parameters/ReviewId'
+        - name: action
+          in: path
+          required: true
+          schema: { type: string, enum: [claim, reassign, approve, reject] }
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/ExpectedVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminReviewCommand'
+      responses:
+        '200':
+          description: Authoritative command result or idempotent replay.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminReviewCommandResult'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+components:
+  securitySchemes:
+    browserSession:
+      type: apiKey
+      in: cookie
+      name: better-auth.session_token
+      description: Existing server-controlled Better Auth session; no second credential is introduced.
+  parameters:
+    JobId:
+      name: jobId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    ReviewId:
+      name: reviewId
+      in: path
+      required: true
+      description: Externally addressable Job Review Version ID; never a review aggregate ID.
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    IdempotencyKey:
+      name: idempotency-key
+      in: header
+      required: true
+      schema: { type: string, minLength: 16, maxLength: 128 }
+    ExpectedVersion:
+      name: if-match
+      in: header
+      required: true
+      schema: { type: string, pattern: '^"[1-9][0-9]*"$' }
+  schemas:
+    ReviewState:
+      type: string
+      enum: [PENDING_REVIEW, APPROVED, REJECTED]
+    ReviewReasonCode:
+      type: string
+      enum:
+        - INCOMPLETE_OR_UNCLEAR
+        - MISLEADING_CONTENT
+        - COMPENSATION_OR_LOCATION_UNCLEAR
+        - DISCRIMINATORY_OR_PROHIBITED
+        - COMPANY_OR_ROLE_MISMATCH
+        - DUPLICATE_OR_SPAM
+        - EXPIRED_OR_INVALID_DEADLINE
+        - POLICY_OR_LEGAL_RISK
+        - OTHER_ACTION_REQUIRED
+    JobLocation:
+      type: object
+      additionalProperties: false
+      required: [city, district, isNationwideRemote]
+      properties:
+        city: { type: string, minLength: 1, maxLength: 160 }
+        district: { type: [string, 'null'], maxLength: 160 }
+        isNationwideRemote: { type: boolean }
+    JobSalary:
+      type: object
+      additionalProperties: false
+      required: [min, max, currency, period, isNegotiable]
+      properties:
+        min: { type: number, minimum: 0 }
+        max: { type: number, minimum: 0 }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        period: { type: string, enum: [hour, month, year] }
+        isNegotiable: { type: boolean }
+    JobExperience:
+      type: object
+      additionalProperties: false
+      required: [minYears, label]
+      properties:
+        minYears: { type: integer, minimum: 0 }
+        label: { type: string, minLength: 1, maxLength: 80 }
+    JobBenefit:
+      type: object
+      additionalProperties: false
+      required: [icon, label]
+      properties:
+        icon: { type: string, minLength: 1, maxLength: 80 }
+        label: { type: string, minLength: 1, maxLength: 300 }
+    JobGeneralInfo:
+      type: object
+      additionalProperties: false
+      required: [reportsTo, department, workingHours, workAddress]
+      properties:
+        reportsTo: { type: [string, 'null'], maxLength: 160 }
+        department: { type: [string, 'null'], maxLength: 160 }
+        workingHours: { type: [string, 'null'], maxLength: 300 }
+        workAddress: { type: [string, 'null'], maxLength: 300 }
+    JobDescription:
+      type: object
+      additionalProperties: false
+      required: [overview, topReasonsToJoin, responsibilities, requirements, benefits, generalInfo]
+      properties:
+        overview: { type: string, minLength: 1, maxLength: 20000 }
+        topReasonsToJoin:
+          type: array
+          maxItems: 100
+          items: { type: string, minLength: 1, maxLength: 2000 }
+        responsibilities:
+          type: array
+          maxItems: 100
+          items: { type: string, minLength: 1, maxLength: 2000 }
+        requirements:
+          type: array
+          maxItems: 100
+          items: { type: string, minLength: 1, maxLength: 2000 }
+        benefits:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/JobBenefit' }
+        generalInfo: { $ref: '#/components/schemas/JobGeneralInfo' }
+    JobReviewSnapshot:
+      type: object
+      additionalProperties: false
+      description: Complete normalized submitted content. Status, approval feedback, verification display, statistics, lifecycle/publication timestamps, ownership input, and other server-controlled review fields are excluded or server-derived.
+      required: [id, slug, companyId, industry, industryCode, subIndustry, title, shortPitch, categoryIds, categoryFamily, skillTags, location, salary, experience, level, employmentType, workArrangement, workOnSaturday, education, age, numberOfHires, isUrgent, applyDeadline, description]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 128 }
+        slug: { type: string, minLength: 1, maxLength: 220 }
+        companyId: { type: string, minLength: 1, maxLength: 128 }
+        industry: { type: string, minLength: 1, maxLength: 160 }
+        industryCode: { type: string, maxLength: 80 }
+        subIndustry: { type: string, minLength: 1, maxLength: 160 }
+        title: { type: string, minLength: 1, maxLength: 200 }
+        shortPitch: { type: string, minLength: 1, maxLength: 500 }
+        categoryIds:
+          type: array
+          maxItems: 20
+          items: { type: string, minLength: 1, maxLength: 128 }
+        categoryFamily: { type: string, minLength: 1, maxLength: 80 }
+        skillTags:
+          type: array
+          maxItems: 50
+          items: { type: string, minLength: 1, maxLength: 80 }
+        location: { $ref: '#/components/schemas/JobLocation' }
+        salary: { $ref: '#/components/schemas/JobSalary' }
+        experience: { $ref: '#/components/schemas/JobExperience' }
+        level: { type: string, minLength: 1, maxLength: 80 }
+        employmentType: { type: string, minLength: 1, maxLength: 80 }
+        workArrangement: { type: string, minLength: 1, maxLength: 80 }
+        workOnSaturday: { type: boolean }
+        education: { type: string, minLength: 1, maxLength: 200 }
+        age: { type: string, maxLength: 80 }
+        numberOfHires: { type: integer, minimum: 1 }
+        isUrgent: { type: boolean }
+        applyDeadline: { type: [string, 'null'], format: date-time }
+        description: { $ref: '#/components/schemas/JobDescription' }
+    SubmitReviewCommand:
+      type: object
+      additionalProperties: false
+      required: [expectedWorkingUpdatedAt]
+      properties:
+        expectedWorkingUpdatedAt: { type: string, format: date-time }
+    RecruiterReviewProjection:
+      type: object
+      additionalProperties: false
+      required: [reviewId, jobId, sequence, state, readOnly, submittedAt, version]
+      properties:
+        reviewId: { type: string }
+        jobId: { type: string }
+        sequence: { type: integer, minimum: 1 }
+        state: { $ref: '#/components/schemas/ReviewState' }
+        readOnly: { type: boolean }
+        reasonCode: { oneOf: [{ $ref: '#/components/schemas/ReviewReasonCode' }, { type: 'null' }] }
+        publicExplanation: { type: [string, 'null'], maxLength: 1000 }
+        submittedAt: { type: string, format: date-time }
+        decidedAt: { type: [string, 'null'], format: date-time }
+        version: { type: integer, minimum: 1 }
+    ReviewQueueItem:
+      type: object
+      additionalProperties: false
+      required: [id, jobId, jobTitle, companyId, companyDisplayName, sequence, state, assignment, submittedAt, ageSeconds, version]
+      properties:
+        id: { type: string }
+        jobId: { type: string }
+        jobTitle: { type: string, minLength: 1, maxLength: 200 }
+        companyId: { type: string }
+        companyDisplayName: { type: string, minLength: 1, maxLength: 200 }
+        sequence: { type: integer, minimum: 1 }
+        state: { $ref: '#/components/schemas/ReviewState' }
+        assignment: { type: [string, 'null'] }
+        submittedAt: { type: string, format: date-time }
+        ageSeconds: { type: integer, minimum: 0 }
+        version: { type: integer, minimum: 1 }
+        integrityState: { type: string, enum: [VALID, BLOCKED] }
+    ReviewDetail:
+      type: object
+      additionalProperties: false
+      required: [id, jobId, companyId, sequence, state, assignment, submittedAt, ageSeconds, version, integrityState, snapshot, snapshotSchemaVersion, snapshotSha256, company, submitter, decision, history, privateNotes]
+      properties:
+        id: { type: string }
+        jobId: { type: string }
+        companyId: { type: string }
+        sequence: { type: integer, minimum: 1 }
+        state: { $ref: '#/components/schemas/ReviewState' }
+        assignment: { type: [string, 'null'] }
+        submittedAt: { type: string, format: date-time }
+        ageSeconds: { type: integer, minimum: 0 }
+        version: { type: integer, minimum: 1 }
+        integrityState: { type: string, enum: [VALID, BLOCKED] }
+        snapshot: { $ref: '#/components/schemas/JobReviewSnapshot' }
+        snapshotSchemaVersion: { type: string }
+        snapshotSha256: { type: string, pattern: '^[a-f0-9]{64}$' }
+        company:
+          type: object
+          additionalProperties: false
+          required: [id, displayName, verificationState, active]
+          properties:
+            id: { type: string }
+            displayName: { type: string, minLength: 1, maxLength: 200, description: Current safe company display name; excluded from notification payloads. }
+            verificationState: { type: string }
+            active: { type: boolean }
+            protectedVerificationHref: { type: [string, 'null'] }
+        submitter:
+          type: object
+          additionalProperties: false
+          required: [accountId, displayName, membershipState, currentlyEligible]
+          properties:
+            accountId: { type: string }
+            displayName: { type: string, minLength: 1, maxLength: 200, description: Current bounded display name only; no email or contact data. }
+            membershipState: { type: string }
+            currentlyEligible: { type: boolean }
+        priorApprovedSnapshot:
+          oneOf:
+            - $ref: '#/components/schemas/JobReviewSnapshot'
+            - type: 'null'
+        decision:
+          oneOf:
+            - $ref: '#/components/schemas/ReviewDecision'
+            - type: 'null'
+        history: { type: array, items: { $ref: '#/components/schemas/ReviewHistoryItem' } }
+        privateNotes: { type: array, items: { $ref: '#/components/schemas/PrivateNote' } }
+    ReviewDecision:
+      type: object
+      additionalProperties: false
+      required: [adminUserId, decidedAt, publishedAt, reasonCode, publicExplanation]
+      properties:
+        adminUserId: { type: [string, 'null'], description: Null only for a labeled imported baseline. }
+        decidedAt: { type: string, format: date-time }
+        publishedAt: { type: [string, 'null'], format: date-time }
+        reasonCode:
+          oneOf:
+            - $ref: '#/components/schemas/ReviewReasonCode'
+            - type: 'null'
+        publicExplanation: { type: [string, 'null'], maxLength: 1000 }
+    ReviewHistoryItem:
+      type: object
+      additionalProperties: false
+      required: [id, action, resultingState, resultingVersion, occurredAt]
+      properties:
+        id: { type: string }
+        action: { type: string }
+        resultingState: { $ref: '#/components/schemas/ReviewState' }
+        resultingVersion: { type: integer, minimum: 1 }
+        occurredAt: { type: string, format: date-time }
+    PrivateNote:
+      type: object
+      additionalProperties: false
+      required: [id, authorAdminUserId, normalizedText, createdAt]
+      properties:
+        id: { type: string }
+        authorAdminUserId: { type: string }
+        normalizedText: { type: string, minLength: 1, maxLength: 2000 }
+        createdAt: { type: string, format: date-time }
+    AdminReviewCommand:
+      oneOf:
+        - $ref: '#/components/schemas/ClaimReviewCommand'
+        - $ref: '#/components/schemas/ReassignReviewCommand'
+        - $ref: '#/components/schemas/ApproveReviewCommand'
+        - $ref: '#/components/schemas/RejectReviewCommand'
+      discriminator:
+        propertyName: command
+        mapping:
+          CLAIM: '#/components/schemas/ClaimReviewCommand'
+          REASSIGN: '#/components/schemas/ReassignReviewCommand'
+          APPROVE: '#/components/schemas/ApproveReviewCommand'
+          REJECT: '#/components/schemas/RejectReviewCommand'
+    ClaimReviewCommand:
+      type: object
+      additionalProperties: false
+      required: [command]
+      properties:
+        command: { type: string, const: CLAIM }
+    ReassignReviewCommand:
+      type: object
+      additionalProperties: false
+      required: [command, targetAdminUserId]
+      properties:
+        command: { type: string, const: REASSIGN }
+        targetAdminUserId: { type: string, minLength: 1, maxLength: 128 }
+    ApproveReviewCommand:
+      type: object
+      additionalProperties: false
+      required: [command]
+      properties:
+        command: { type: string, const: APPROVE }
+    RejectReviewCommand:
+      type: object
+      additionalProperties: false
+      required: [command, reasonCode, publicExplanation]
+      properties:
+        command: { type: string, const: REJECT }
+        reasonCode: { $ref: '#/components/schemas/ReviewReasonCode' }
+        publicExplanation: { type: string, minLength: 20, maxLength: 1000 }
+        privateNote: { type: string, minLength: 1, maxLength: 2000 }
+    AdminReviewCommandResult:
+      type: object
+      additionalProperties: false
+      required: [reviewId, state, assignedAdminUserId, version, correlationId]
+      properties:
+        reviewId: { type: string }
+        state: { $ref: '#/components/schemas/ReviewState' }
+        assignedAdminUserId: { type: [string, 'null'] }
+        version: { type: integer, minimum: 1 }
+        correlationId: { type: string }
+        status: { type: string, enum: [SUCCESS, ACTION_BLOCKED] }
+        code: { type: string, maxLength: 64 }
+        replayed: { type: boolean }
+    ErrorEnvelope:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        currentVersion: { type: integer, minimum: 1 }
+        fieldErrors:
+          type: object
+          additionalProperties: { type: string }
+  responses:
+    Unauthorized:
+      description: Authentication required.
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorEnvelope' } } }
+    Forbidden:
+      description: Current authority is insufficient.
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorEnvelope' } } }
+    Unavailable:
+      description: Target unavailable without existence disclosure.
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorEnvelope' } } }
+    Conflict:
+      description: Stale, conflicting, already-terminal, or changed idempotency binding.
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorEnvelope' } } }
+    ValidationFailed:
+      description: Strict bounded input validation failed.
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorEnvelope' } } }
