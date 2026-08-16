@@ -135,6 +135,13 @@ export const authenticationAuditAction = z.enum([
   "connection.revoked",
   "connection.notification_read",
   "connection.content_deleted",
+  "job_post_review.submitted",
+  "job_post_review.claimed",
+  "job_post_review.reassigned",
+  "job_post_review.approved",
+  "job_post_review.rejected",
+  "job_post_review.approval_blocked",
+  "job_post_review.closed",
 ]);
 
 const auditContextSchema = z
@@ -233,6 +240,7 @@ export const authenticationAuditEventSchema = z
       "connection_proposal",
       "professional_connection",
       "connection_notification",
+      "job_post_review",
     ]),
     targetId: z.string().min(1).nullable().optional(),
     result: z.enum(["SUCCESS", "FAILURE", "DENIED"]),

@@ -35,4 +35,3 @@ describe("CV AI preflight", () => {
     })).toEqual([]);
   });
 });
-

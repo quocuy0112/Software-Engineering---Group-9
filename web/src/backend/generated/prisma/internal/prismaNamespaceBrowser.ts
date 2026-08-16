@@ -100,6 +100,11 @@ export const ModelName = {
   ModerationReportHistory: 'ModerationReportHistory',
   ModerationPrivateNote: 'ModerationPrivateNote',
   JobPosting: 'JobPosting',
+  JobPostReviewAggregate: 'JobPostReviewAggregate',
+  JobPostReviewVersion: 'JobPostReviewVersion',
+  JobPostReviewHistory: 'JobPostReviewHistory',
+  JobPostReviewPrivateNote: 'JobPostReviewPrivateNote',
+  JobCatalogueWriteLease: 'JobCatalogueWriteLease',
   JobPostingSkill: 'JobPostingSkill',
   ApplicationQuestion: 'ApplicationQuestion',
   CandidateCv: 'CandidateCv',
@@ -1142,6 +1147,94 @@ export const JobPostingScalarFieldEnum = {
 } as const
 
 export type JobPostingScalarFieldEnum = (typeof JobPostingScalarFieldEnum)[keyof typeof JobPostingScalarFieldEnum]
+
+
+export const JobPostReviewAggregateScalarFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  companyId: 'companyId',
+  latestSequence: 'latestSequence',
+  pendingVersionId: 'pendingVersionId',
+  approvedVersionId: 'approvedVersionId',
+  publicJobPostingId: 'publicJobPostingId',
+  closedAt: 'closedAt',
+  closedByUserId: 'closedByUserId',
+  version: 'version',
+  adoptedAt: 'adoptedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobPostReviewAggregateScalarFieldEnum = (typeof JobPostReviewAggregateScalarFieldEnum)[keyof typeof JobPostReviewAggregateScalarFieldEnum]
+
+
+export const JobPostReviewVersionScalarFieldEnum = {
+  id: 'id',
+  reviewAggregateId: 'reviewAggregateId',
+  sequence: 'sequence',
+  snapshot: 'snapshot',
+  snapshotSchemaVersion: 'snapshotSchemaVersion',
+  snapshotSha256: 'snapshotSha256',
+  state: 'state',
+  submittedByUserId: 'submittedByUserId',
+  submittedMembershipId: 'submittedMembershipId',
+  submissionIdempotencyKey: 'submissionIdempotencyKey',
+  submissionRequestHash: 'submissionRequestHash',
+  submittedAt: 'submittedAt',
+  assignedAdminUserId: 'assignedAdminUserId',
+  assignedAt: 'assignedAt',
+  decidedByAdminUserId: 'decidedByAdminUserId',
+  decidedAt: 'decidedAt',
+  publishedAt: 'publishedAt',
+  reasonCode: 'reasonCode',
+  publicExplanation: 'publicExplanation',
+  decisionCorrelationId: 'decisionCorrelationId',
+  importedBaseline: 'importedBaseline',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobPostReviewVersionScalarFieldEnum = (typeof JobPostReviewVersionScalarFieldEnum)[keyof typeof JobPostReviewVersionScalarFieldEnum]
+
+
+export const JobPostReviewHistoryScalarFieldEnum = {
+  id: 'id',
+  reviewVersionId: 'reviewVersionId',
+  action: 'action',
+  actorUserId: 'actorUserId',
+  priorState: 'priorState',
+  resultingState: 'resultingState',
+  priorAssigneeUserId: 'priorAssigneeUserId',
+  resultingAssigneeUserId: 'resultingAssigneeUserId',
+  resultingAggregateVersion: 'resultingAggregateVersion',
+  correlationId: 'correlationId',
+  occurredAt: 'occurredAt'
+} as const
+
+export type JobPostReviewHistoryScalarFieldEnum = (typeof JobPostReviewHistoryScalarFieldEnum)[keyof typeof JobPostReviewHistoryScalarFieldEnum]
+
+
+export const JobPostReviewPrivateNoteScalarFieldEnum = {
+  id: 'id',
+  reviewVersionId: 'reviewVersionId',
+  authorAdminUserId: 'authorAdminUserId',
+  normalizedText: 'normalizedText',
+  createdAt: 'createdAt'
+} as const
+
+export type JobPostReviewPrivateNoteScalarFieldEnum = (typeof JobPostReviewPrivateNoteScalarFieldEnum)[keyof typeof JobPostReviewPrivateNoteScalarFieldEnum]
+
+
+export const JobCatalogueWriteLeaseScalarFieldEnum = {
+  catalogueKey: 'catalogueKey',
+  ownerTokenHash: 'ownerTokenHash',
+  leaseExpiresAt: 'leaseExpiresAt',
+  expectedCatalogueSha256: 'expectedCatalogueSha256',
+  version: 'version',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobCatalogueWriteLeaseScalarFieldEnum = (typeof JobCatalogueWriteLeaseScalarFieldEnum)[keyof typeof JobCatalogueWriteLeaseScalarFieldEnum]
 
 
 export const JobPostingSkillScalarFieldEnum = {
