@@ -71,7 +71,7 @@
 
 ### Tests
 
-- [ ] T024 [P] [US2] Add command contract tests for hide, restore, close, reopen, archive, and soft-delete payloads in `web/tests/backend/contract/job-post-management/lifecycle.contract.test.ts`
+- [X] T024 [P] [US2] Add command contract tests for hide, restore, close, reopen, archive, and soft-delete payloads in `web/tests/backend/contract/job-post-management/lifecycle.contract.test.ts`
 - [ ] T025 [P] [US2] Add transaction/integration tests for state matrix, projection synchronization, command replay, stale conflict, and archive recovery in `web/tests/backend/integration/job-post-management/lifecycle.integration.test.ts`
 - [ ] T026 [P] [US2] Add candidate visibility/application regression tests in `web/tests/backend/integration/jobs/job-post-management-visibility.integration.test.ts`
 - [ ] T027 [P] [US2] Add lifecycle action-panel component/accessibility tests in `web/tests/frontend/components/admin-management/job-post-management-lifecycle.test.tsx` and `web/tests/frontend/accessibility/admin-management/job-post-management-lifecycle.accessibility.test.tsx`
@@ -96,7 +96,7 @@
 
 ### Tests
 
-- [ ] T033 [P] [US3] Add correction command and recruiter projection contract tests in `web/tests/backend/contract/job-post-management/correction-request.contract.test.ts`
+- [X] T033 [P] [US3] Add correction command and recruiter projection contract tests in `web/tests/backend/contract/job-post-management/correction-request.contract.test.ts`
 - [ ] T034 [P] [US3] Add correction/live-version integration and concurrency tests in `web/tests/backend/integration/job-post-management/correction-request.integration.test.ts`
 - [ ] T035 [P] [US3] Add recruiter workspace and administrator detail component tests in `web/tests/frontend/components/recruiter-workspace/job-post-correction-request.test.tsx` and `web/tests/frontend/components/admin-management/job-post-management-correction.test.tsx`
 
@@ -120,7 +120,7 @@
 
 ### Tests
 
-- [ ] T041 [P] [US4] Add feature command and placement-capacity contract tests in `web/tests/backend/contract/job-post-management/featured-placement.contract.test.ts`
+- [X] T041 [P] [US4] Add feature command and placement-capacity contract tests in `web/tests/backend/contract/job-post-management/featured-placement.contract.test.ts`
 - [ ] T042 [P] [US4] Add feature window, eligibility, concurrent-capacity, replay, and cancellation integration tests in `web/tests/backend/integration/job-post-management/featured-placement.integration.test.ts`
 - [ ] T043 [P] [US4] Add feature control component/accessibility tests in `web/tests/frontend/components/admin-management/job-post-management-feature.test.tsx` and `web/tests/frontend/accessibility/admin-management/job-post-management-feature.accessibility.test.tsx`
 
@@ -142,7 +142,7 @@
 
 ### Tests
 
-- [ ] T047 [P] [US5] Add enforcement/link command contracts in `web/tests/backend/contract/job-post-management/enforcement.contract.test.ts`
+- [X] T047 [P] [US5] Add enforcement/link command contracts in `web/tests/backend/contract/job-post-management/enforcement.contract.test.ts`
 - [ ] T048 [P] [US5] Add many-to-many report/enforcement, authorization, idempotency, and audit integration tests in `web/tests/backend/integration/job-post-management/enforcement.integration.test.ts`
 - [ ] T049 [P] [US5] Add report-detail and job-detail enforcement UI tests in `web/tests/frontend/components/admin-management/job-post-management-enforcement.test.tsx` and `web/tests/frontend/components/admin-management/moderation-report-enforcement.test.tsx`
 
