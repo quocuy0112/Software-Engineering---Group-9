@@ -16,6 +16,12 @@ export function ImageSearchPrivacyNotice() {
           ? "SmartHire chỉ quét và nhận dạng văn bản để đề xuất bộ lọc việc làm. Hình ảnh và văn bản nhận dạng được xóa trong vòng 15 phút; không dùng để phân tích khuôn mặt, danh tính, thuộc tính nhạy cảm hoặc ứng viên."
           : "SmartHire scans and recognizes text only to propose public job filters. Images and recognized text are deleted within 15 minutes and are not used for face, identity, protected-attribute, or candidate analysis."}
       </p>
+      <span className="image-search-retention-callout">
+        <span aria-hidden="true">◷</span>
+        {vi
+          ? "Tự động xoá ảnh và văn bản đã nhận diện sau 15 phút"
+          : "Images and recognized text are deleted after 15 minutes"}
+      </span>
     </div>
   );
 }

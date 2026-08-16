@@ -51,7 +51,7 @@ function query(input: Record<string, string | string[] | undefined>) {
 }
 
 const vietnameseCopy: JobsLiveCopy = {
-  kicker: "Cơ hội từ Smart Hire",
+  kicker: "Không gian ứng viên",
   title: "Việc làm",
   intro:
     "Khám phá các cơ hội đã được xác minh và tìm công việc phù hợp với bước tiến tiếp theo của bạn.",
@@ -76,7 +76,7 @@ const vietnameseCopy: JobsLiveCopy = {
 };
 
 const englishCopy: JobsLiveCopy = {
-  kicker: "Smart Hire opportunities",
+  kicker: "Candidate workspace",
   title: "Jobs",
   intro:
     "Discover verified opportunities and find work that fits your next career move.",

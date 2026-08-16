@@ -25,6 +25,8 @@
   --sh-color-brand-primary: #1d4ed8;
   --sh-color-brand-primary-hover: #1e40af;
   --sh-color-brand-primary-pressed: #1e3a8a;
+  /* Auth-only: full-screen brand panel; never use for in-app cards or sections. */
+  --primary-deep: #0b1b4d;
   --sh-color-brand-accent: #3b82f6;
   --sh-color-brand-soft: #dbeafe;
   --sh-color-surface-page: #f6f8fc;
@@ -40,11 +42,15 @@
   --sh-color-border-strong: #475569;
   --sh-color-border-focus: #2563eb;
   --sh-color-focus-ring-bg: #dbeafe;
+  /* Positive state language: active, verified, connected, and saved. */
   --sh-color-success: #15803d;
   --sh-color-success-bg: #f0fdf4;
+  /* Amber is both a warning/review tone and the semantic rating accent. */
   --sh-color-warning: #a16207;
   --sh-color-warning-bg: #fefce8;
+  --sh-color-rating: var(--sh-color-warning);
   --sh-color-error: #b91c1c;
+  --danger: var(--sh-color-error);
   --sh-color-error-bg: #fef2f2;
   --sh-color-info: #1d4ed8;
   --sh-color-info-bg: #eff6ff;
@@ -89,6 +95,8 @@
     BlinkMacSystemFont, "Segoe UI", sans-serif;
   --sh-font-family-label:
     "Manrope Variable", "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  --sh-font-family-display:
+    "Space Grotesk", "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
   --sh-font-size-display: 32px;
   --sh-font-size-h1: 28px;
   --sh-font-size-h2: 24px;
@@ -130,6 +138,9 @@
   --sh-profile-primary: #2954e5;
   --sh-profile-primary-dark: #122b8c;
   --sh-profile-primary-light: #dee8ff;
+  --sh-profile-purple: #6d5bd0;
+  --sh-profile-purple-light: #e8e4fa;
+  --sh-profile-purple-dark: #3e2fa0;
   --sh-profile-teal: #0ea57e;
   --sh-profile-teal-light: #dcf6ee;
   --sh-profile-teal-dark: #0a7f62;
@@ -177,11 +188,15 @@
   --sh-color-border-strong: #a9b9ce;
   --sh-color-border-focus: #7db3ff;
   --sh-color-focus-ring-bg: #1e3a5f;
+  /* Positive state language: active, verified, connected, and saved. */
   --sh-color-success: #4ade80;
   --sh-color-success-bg: #123a2a;
+  /* Amber also carries rating emphasis; it is not a low-rating warning. */
   --sh-color-warning: #fbbf24;
   --sh-color-warning-bg: #3b2f12;
+  --sh-color-rating: var(--sh-color-warning);
   --sh-color-error: #f87171;
+  --danger: var(--sh-color-error);
   --sh-color-error-bg: #3a1720;
   --sh-color-info: #93c5fd;
   --sh-color-info-bg: #152e50;
