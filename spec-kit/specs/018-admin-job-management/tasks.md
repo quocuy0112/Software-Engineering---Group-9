@@ -14,7 +14,7 @@
 
 - [X] T001 Create job-post-management test directories and feature test script entries in `web/tests/**/job-post-management/` and `web/package.json`
 - [X] T002 [P] Create shared operational contracts and contract tests in `web/src/shared/contracts/admin/job-post-management.ts` and `web/tests/shared/unit/contracts/job-post-management/`
-- [ ] T003 [P] Add OpenAPI parity validation for `spec-kit/specs/018-admin-job-management/contracts/job-post-management.openapi.yaml` in `web/tests/backend/contract/job-post-management/openapi-parity.test.ts`
+- [X] T003 [P] Add OpenAPI parity validation for `spec-kit/specs/018-admin-job-management/contracts/job-post-management.openapi.yaml` in `web/tests/backend/contract/job-post-management/openapi-parity.test.ts`
 - [X] T004 [P] Create migration verification and performance-script skeletons in `web/scripts/verify-job-post-management-migration.mjs` and `web/scripts/measure-job-post-management-performance.mjs`
 
 ---
@@ -25,9 +25,9 @@
 
 - [X] T005 Extend admin grant scopes, job operational enums, aggregate relations, correction, feature, enforcement, report-link, and operational-history models in `web/prisma/schema.prisma`
 - [X] T006 Create additive/backfill-safe migration and indexes in `web/prisma/migrations/0xx_admin_job_post_management/migration.sql`
-- [ ] T007 Generate Prisma client and implement migration/backfill invariants in `web/scripts/verify-job-post-management-migration.mjs`
-- [ ] T008 [P] Implement scope evaluation and explicit action policy in `web/src/backend/jobs/management/job-post-management-policy.ts` and `web/tests/backend/unit/job-post-management/job-post-management-policy.test.ts`
-- [ ] T009 [P] Implement safe operation events and metrics boundary in `web/src/backend/jobs/management/job-post-management-operations.ts` and `web/tests/backend/unit/job-post-management/job-post-management-operations.test.ts`
+- [X] T007 Generate Prisma client and implement migration/backfill invariants in `web/scripts/verify-job-post-management-migration.mjs`
+- [X] T008 [P] Implement scope evaluation and explicit action policy in `web/src/backend/jobs/management/job-post-management-policy.ts` and `web/tests/backend/unit/job-post-management/job-post-management-policy.test.ts`
+- [X] T009 [P] Implement safe operation events and metrics boundary in `web/src/backend/jobs/management/job-post-management-operations.ts` and `web/tests/backend/unit/job-post-management/job-post-management-operations.test.ts`
 - [ ] T010 Implement transactional repository queries, aggregate locking, report summaries, feature overlap capacity checks, and public projection sync in `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
 - [ ] T011 Implement versioned command service with AdminRequestBoundary/command receipts/audit/notifications in `web/src/backend/jobs/management/job-post-management-service.ts`
 - [ ] T012 Integrate approved revision satisfaction and candidate projection guards into `web/src/backend/jobs/review/job-post-review-service.ts`, `web/src/backend/repositories/jobs/prisma-job-post-review-repository.ts`, and candidate job read/application boundaries
@@ -54,10 +54,10 @@
 ### Implementation
 
 - [ ] T019 [US1] Implement safe list/detail projections, full-text normalized search, company/recruiter/approver/date/report/featured filters, report summary, and pagination in `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
-- [ ] T020 [US1] Implement list/detail orchestration and response contracts in `web/src/backend/jobs/management/job-post-management-service.ts` and `web/src/app/api/admin/job-postings/{route.ts,[jobId]/route.ts}`
-- [ ] T021 [P] [US1] Build dense React Admin list filters, state chips, report summary, and row navigation in `web/src/frontend/features/admin/job-post-management/job-post-management-list.tsx`
-- [ ] T022 [P] [US1] Build structured job management detail cards, version comparison, metadata, reports, feature, and timeline sections in `web/src/frontend/features/admin/job-post-management/job-post-management-show.tsx`
-- [ ] T023 [US1] Register the `job-postings` admin resource, navigation label, icon, and data-provider mapping in `web/src/frontend/features/admin/app/admin-app.tsx` and `web/src/frontend/features/admin/layout/admin-layout.tsx`
+- [X] T020 [US1] Implement list/detail orchestration and response contracts in `web/src/backend/jobs/management/job-post-management-service.ts` and `web/src/app/api/admin/job-postings/{route.ts,[jobId]/route.ts}`
+- [X] T021 [P] [US1] Build dense React Admin list filters, state chips, report summary, and row navigation in `web/src/frontend/features/admin/job-post-management/job-post-management-list.tsx`
+- [X] T022 [P] [US1] Build structured job management detail cards, version comparison, metadata, reports, feature, and timeline sections in `web/src/frontend/features/admin/job-post-management/job-post-management-show.tsx`
+- [X] T023 [US1] Register the `job-postings` admin resource, navigation label, icon, and data-provider mapping in `web/src/frontend/features/admin/app/admin-app.tsx` and `web/src/frontend/features/admin/layout/admin-layout.tsx`
 
 **Checkpoint**: Administrators can independently find and inspect safe operational detail for a managed job.
 
@@ -80,9 +80,9 @@
 
 - [ ] T028 [US2] Implement state-transition validation, required reasons, scoped authorization, command receipts, history, audit, and safe notifications in `web/src/backend/jobs/management/job-post-management-policy.ts` and `web/src/backend/jobs/management/job-post-management-service.ts`
 - [ ] T029 [US2] Implement aggregate/public-projection updates and terminal soft-delete safeguards in `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
-- [ ] T030 [US2] Implement lifecycle command endpoint handling and neutral errors in `web/src/app/api/admin/job-postings/[jobId]/[action]/route.ts`
-- [ ] T031 [US2] Build confirmation-based hide/restore/close/reopen/archive/soft-delete controls with conflict recovery in `web/src/frontend/features/admin/job-post-management/job-post-management-action-panel.tsx`
-- [ ] T032 [US2] Surface independent state, command outcomes, and candidate-effect guidance in `web/src/frontend/features/admin/job-post-management/job-post-management-show.tsx`
+- [X] T030 [US2] Implement lifecycle command endpoint handling and neutral errors in `web/src/app/api/admin/job-postings/[jobId]/[action]/route.ts`
+- [X] T031 [US2] Build confirmation-based hide/restore/close/reopen/archive/soft-delete controls with conflict recovery in `web/src/frontend/features/admin/job-post-management/job-post-management-action-panel.tsx`
+- [X] T032 [US2] Surface independent state, command outcomes, and candidate-effect guidance in `web/src/frontend/features/admin/job-post-management/job-post-management-show.tsx`
 
 **Checkpoint**: Lifecycle actions are independently safe, auditable, accessible, and reflected by candidate readers.
 
@@ -105,8 +105,8 @@
 - [ ] T036 [US3] Implement correction-request persistence, single-open-request invariant, and immediate-hide composition in `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts` and `web/src/backend/jobs/management/job-post-management-service.ts`
 - [ ] T037 [US3] Link recruiter submission and review approval/rejection to correction-request state in `web/src/backend/jobs/review/job-post-review-service.ts`, `web/src/backend/repositories/jobs/prisma-job-post-review-repository.ts`, and `web/src/backend/jobs/review/job-post-publication-projector.ts`
 - [ ] T038 [US3] Expose authorized correction context and read-only version labels in `web/src/backend/jobs/review/job-post-review-service-factory.ts`, recruiter job APIs, and `web/src/shared/contracts/recruiter-job-posting.ts`
-- [ ] T039 [US3] Build administrator correction-request controls and live/pending version distinction in `web/src/frontend/features/admin/job-post-management/job-post-management-action-panel.tsx` and `web/src/frontend/features/admin/job-post-management/job-post-management-show.tsx`
-- [ ] T040 [US3] Build recruiter correction banner and revision-submit guidance in `web/src/frontend/features/recruiter/jobs/` and `web/src/frontend/styles/recruiter-workspace-full.css`
+- [X] T039 [US3] Build administrator correction-request controls and live/pending version distinction in `web/src/frontend/features/admin/job-post-management/job-post-management-action-panel.tsx` and `web/src/frontend/features/admin/job-post-management/job-post-management-show.tsx`
+- [X] T040 [US3] Build recruiter correction banner and revision-submit guidance in `web/src/frontend/features/recruiter/jobs/` and `web/src/frontend/styles/recruiter-workspace-full.css`
 
 **Checkpoint**: A pending correction can never overwrite or silently replace the live approved version.
 
@@ -127,8 +127,8 @@
 ### Implementation
 
 - [ ] T044 [US4] Implement configured placement capacity, atomic overlap checks, eligibility, and schedule/amend/cancel persistence keyed by feature ID in `web/src/backend/jobs/management/job-post-feature-policy.ts` and `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
-- [ ] T045 [US4] Implement feature create/amend/cancel command orchestration, history/audit/receipt, and routes in `web/src/backend/jobs/management/job-post-management-service.ts` and `web/src/app/api/admin/job-postings/[jobId]/[action]/route.ts`
-- [ ] T046 [US4] Build feature scheduling/removal controls and active/scheduled placement presentation in `web/src/frontend/features/admin/job-post-management/job-post-management-action-panel.tsx` and `web/src/frontend/features/admin/job-post-management/job-post-management-show.tsx`
+- [X] T045 [US4] Implement feature create/amend/cancel command orchestration, history/audit/receipt, and routes in `web/src/backend/jobs/management/job-post-management-service.ts` and `web/src/app/api/admin/job-postings/[jobId]/[action]/route.ts`
+- [X] T046 [US4] Build feature scheduling/removal controls and active/scheduled placement presentation in `web/src/frontend/features/admin/job-post-management/job-post-management-action-panel.tsx` and `web/src/frontend/features/admin/job-post-management/job-post-management-show.tsx`
 
 **Checkpoint**: Featured placement is bounded, scoped, auditable, and cannot overbook under concurrent use.
 
@@ -150,7 +150,7 @@
 
 - [ ] T050 [US5] Implement enforcement aggregate, target validation, REQUEST_CHANGES public-explanation validation, report-link creation, report-state outcome, history, audit, and notifications in `web/src/backend/jobs/management/job-post-enforcement-service.ts` and `web/src/backend/repositories/jobs/prisma-job-post-management-repository.ts`
 - [ ] T051 [US5] Integrate report detail/list projections and command delegation in `web/src/backend/admin/moderation/moderation-review-service.ts`, `web/src/backend/repositories/admin/prisma-moderation-repository.ts`, and `web/src/app/api/admin/moderation-reports/[reportId]/[action]/route.ts`
-- [ ] T052 [US5] Build report selection/enforcement evidence UI in `web/src/frontend/features/admin/job-post-management/job-post-management-action-panel.tsx`, `web/src/frontend/features/admin/moderation/moderation-review-show.tsx`, and `web/src/frontend/features/admin/moderation/report-action-panel.tsx`
+- [X] T052 [US5] Build report selection/enforcement evidence UI in `web/src/frontend/features/admin/job-post-management/job-post-management-action-panel.tsx`, `web/src/frontend/features/admin/moderation/moderation-review-show.tsx`, and `web/src/frontend/features/admin/moderation/report-action-panel.tsx`
 
 **Checkpoint**: Reports are operationally meaningful and retain many-to-many enforcement evidence.
 
