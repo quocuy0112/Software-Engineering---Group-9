@@ -1,8 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import {
+  ArrowRight,
+  BriefcaseBusiness,
+  Building2,
+  Check,
+  CircleAlert,
+  CircleX,
+  Grid2X2,
+  List,
+  LoaderCircle,
+  Search,
+  SlidersHorizontal,
+  Users,
+} from "lucide-react";
 import type { RecruiterJob } from "@/shared/contracts/recruiter-job-posting";
 import { CandidateRankingList } from "./candidate-ranking-list";
+import { RankingSkeleton, type RankingTone } from "./candidate-ranking-ui";
+import {
+  useCampaignScoringStats,
+  type CampaignScoringStats,
+} from "./use-campaign-scoring-stats";
 
 const visibleStatuses = new Set<RecruiterJob["status"]>(["active", "closed"]);
 
@@ -10,15 +29,199 @@ function applicationLabel(count: number) {
   return `${count.toLocaleString("en-US")} ${count === 1 ? "candidate" : "candidates"}`;
 }
 
+function departmentFor(job: RecruiterJob) {
+  return (
+    job.description.generalInfo.department?.trim() ||
+    job.categoryFamily ||
+    job.industry
+  );
+}
+
+function CampaignSummary({
+  stats,
+  fallbackTotal,
+  loading,
+  error,
+}: {
+  stats?: CampaignScoringStats;
+  fallbackTotal: number;
+  loading: boolean;
+  error: boolean;
+}) {
+  const items: Array<{
+    label: string;
+    value: number | null;
+    tone: RankingTone;
+    icon: typeof Check;
+  }> = [
+    {
+      label: "strong match",
+      value: error && !stats ? null : (stats?.strong ?? 0),
+      tone: "green",
+      icon: Check,
+    },
+    {
+      label: "review needed",
+      value: error && !stats ? null : (stats?.review ?? 0),
+      tone: "amber",
+      icon: CircleAlert,
+    },
+    {
+      label: "low match",
+      value: error && !stats ? null : (stats?.low ?? 0),
+      tone: "red",
+      icon: CircleX,
+    },
+  ];
+  const total = stats?.total ?? fallbackTotal;
+  return (
+    <div
+      className="campaign-summary-strip"
+      aria-label="Candidate scoring summary"
+    >
+      {items.map(({ label, value, tone, icon: Icon }) => (
+        <span
+          className={`campaign-summary-strip__item campaign-summary-strip__item--${tone}`}
+          key={label}
+        >
+          <Icon aria-hidden="true" />
+          {loading ? (
+            <RankingSkeleton className="ranking-skeleton--inline" />
+          ) : value === null ? (
+            <strong title="Scoring insights are temporarily unavailable">
+              —
+            </strong>
+          ) : (
+            <strong>{value}</strong>
+          )}
+          <small>{label}</small>
+        </span>
+      ))}
+      <span className="campaign-summary-strip__total">
+        <Users aria-hidden="true" />
+        {loading ? (
+          <RankingSkeleton className="ranking-skeleton--inline" />
+        ) : (
+          <strong>{total.toLocaleString("en-US")}</strong>
+        )}
+        <small>total</small>
+      </span>
+    </div>
+  );
+}
+
+function CampaignCard({
+  job,
+  view,
+  stats,
+  statsLoading,
+  statsError,
+  onOpen,
+}: {
+  job: RecruiterJob;
+  view: "grid" | "list";
+  stats?: CampaignScoringStats;
+  statsLoading: boolean;
+  statsError: boolean;
+  onOpen: () => void;
+}) {
+  const isActive = job.status === "active";
+  return (
+    <article className={`campaign-card campaign-card--${view}`}>
+      <div className="campaign-card__main">
+        <div className="campaign-card__topline">
+          <span
+            className={`campaign-status-pill campaign-status-pill--${isActive ? "active" : "closed"}`}
+          >
+            <span className="campaign-status-pill__dot" aria-hidden="true" />
+            {isActive ? "Active" : "Closed"}
+          </span>
+          <span className="campaign-card__department">
+            <BriefcaseBusiness aria-hidden="true" />
+            {departmentFor(job)}
+          </span>
+        </div>
+        <h2>{job.title || "Untitled job posting"}</h2>
+        <p className="campaign-card__company">
+          <Building2 aria-hidden="true" />
+          {job.company.name}
+        </p>
+        <div className="campaign-card__applicants">
+          <strong>{applicationLabel(job.stats.applicantCount)}</strong>
+          <span>Applications received</span>
+        </div>
+      </div>
+      <CampaignSummary
+        stats={stats}
+        fallbackTotal={job.stats.applicantCount}
+        loading={statsLoading && !stats}
+        error={statsError}
+      />
+      <div className="campaign-card__footer">
+        <span className="campaign-card__updated">
+          Updated{" "}
+          {new Date(job.updatedAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })}
+        </span>
+        <button
+          type="button"
+          className="campaign-card__action"
+          onClick={onOpen}
+          aria-label={`Review candidates for ${job.title || "Untitled job posting"}`}
+        >
+          Review candidates
+          <ArrowRight aria-hidden="true" />
+        </button>
+      </div>
+    </article>
+  );
+}
+
 export function RecruiterCandidatesPage({ jobs }: { jobs: RecruiterJob[] }) {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
-  const selectableJobs = jobs
-    .filter((job) => visibleStatuses.has(job.status))
-    .sort(
-      (left, right) =>
-        right.stats.applicantCount - left.stats.applicantCount ||
-        right.updatedAt.localeCompare(left.updatedAt),
-    );
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<"ALL" | "active" | "closed">("ALL");
+  const [department, setDepartment] = useState("ALL");
+  const [view, setView] = useState<"grid" | "list">("grid");
+  const selectableJobs = useMemo(
+    () =>
+      jobs
+        .filter((job) => visibleStatuses.has(job.status))
+        .sort(
+          (left, right) =>
+            right.stats.applicantCount - left.stats.applicantCount ||
+            right.updatedAt.localeCompare(left.updatedAt),
+        ),
+    [jobs],
+  );
+  const {
+    stats,
+    error: statsError,
+    loading: statsLoading,
+  } = useCampaignScoringStats(selectableJobs);
+  const departments = useMemo(
+    () =>
+      Array.from(new Set(selectableJobs.map(departmentFor))).sort((a, b) =>
+        a.localeCompare(b),
+      ),
+    [selectableJobs],
+  );
+  const filteredJobs = useMemo(() => {
+    const normalizedSearch = search.trim().toLocaleLowerCase();
+    return selectableJobs.filter((job) => {
+      if (status !== "ALL" && job.status !== status) return false;
+      if (department !== "ALL" && departmentFor(job) !== department)
+        return false;
+      if (!normalizedSearch) return true;
+      return [job.title, job.company.name, departmentFor(job)]
+        .join(" ")
+        .toLocaleLowerCase()
+        .includes(normalizedSearch);
+    });
+  }, [department, search, selectableJobs, status]);
   const selectedJob = selectableJobs.find((job) => job.id === selectedJobId);
 
   if (selectedJob) {
@@ -36,65 +239,179 @@ export function RecruiterCandidatesPage({ jobs }: { jobs: RecruiterJob[] }) {
       className="recruiter-management recruiter-candidates-page"
       aria-labelledby="recruiter-candidates-title"
     >
-      <header className="recruiter-management__heading">
+      <header className="campaign-page-header">
         <div>
           <p className="recruiter-eyebrow">Recruiter workspace</p>
           <h1 id="recruiter-candidates-title">Candidates</h1>
           <p>
-            Choose a hiring campaign to review applications, CV evidence, and
-            advisory scores.
+            Choose a campaign to review applications, evidence, and hybrid
+            scoring in one focused workspace.
           </p>
+        </div>
+        <div className="campaign-page-header__meta">
+          <span>
+            <Users aria-hidden="true" /> {selectableJobs.length} campaigns
+          </span>
+          <span>
+            <LoaderCircle
+              aria-hidden="true"
+              className={statsLoading ? "is-spinning" : undefined}
+            />{" "}
+            {statsLoading
+              ? "Updating insights"
+              : statsError
+                ? "Insights unavailable"
+                : "Insights up to date"}
+          </span>
         </div>
       </header>
 
-      <div className="ai-ranking-human-banner" role="note">
-        <span aria-hidden="true">i</span>
+      <div
+        className="ai-ranking-human-banner campaign-trust-banner"
+        role="note"
+      >
+        <span className="campaign-trust-banner__icon" aria-hidden="true">
+          <SlidersHorizontal />
+        </span>
         <div>
-          <strong>Scores are visible to recruiters only.</strong>
+          <strong>Scores support decision-making only.</strong>
           <span>
-            Automatic and AI scores support review; every hiring decision
-            remains with the recruiter.
+            Automatic and AI scores help you prioritize review; every hiring
+            decision remains with the recruiter.
           </span>
         </div>
       </div>
 
+      <div className="campaign-toolbar" role="search">
+        <label className="campaign-search-field">
+          <Search aria-hidden="true" />
+          <span className="sr-only">Search campaigns</span>
+          <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search by role, company, or department"
+          />
+        </label>
+        <label className="campaign-filter-field">
+          <span>Status</span>
+          <select
+            value={status}
+            onChange={(event) => setStatus(event.target.value as typeof status)}
+          >
+            <option value="ALL">All statuses</option>
+            <option value="active">Active</option>
+            <option value="closed">Closed</option>
+          </select>
+        </label>
+        <label className="campaign-filter-field">
+          <span>Department</span>
+          <select
+            value={department}
+            onChange={(event) => setDepartment(event.target.value)}
+          >
+            <option value="ALL">All departments</option>
+            {departments.map((item) => (
+              <option value={item} key={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="campaign-view-toggle" aria-label="Campaign view">
+          <button
+            type="button"
+            className={view === "grid" ? "is-active" : ""}
+            onClick={() => setView("grid")}
+            aria-label="Grid view"
+            aria-pressed={view === "grid"}
+          >
+            <Grid2X2 aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className={view === "list" ? "is-active" : ""}
+            onClick={() => setView("list")}
+            aria-label="List view"
+            aria-pressed={view === "list"}
+          >
+            <List aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+
+      <div className="campaign-results-toolbar">
+        <div>
+          <strong>
+            {filteredJobs.length}{" "}
+            {filteredJobs.length === 1 ? "campaign" : "campaigns"}
+          </strong>
+          <span>
+            {search || status !== "ALL" || department !== "ALL"
+              ? "matching your filters"
+              : "ready for candidate review"}
+          </span>
+        </div>
+        {search || status !== "ALL" || department !== "ALL" ? (
+          <button
+            type="button"
+            className="ai-ranking-clear-button"
+            onClick={() => {
+              setSearch("");
+              setStatus("ALL");
+              setDepartment("ALL");
+            }}
+          >
+            Clear filters
+          </button>
+        ) : null}
+      </div>
+
       {selectableJobs.length === 0 ? (
-        <div className="recruiter-empty-state recruiter-surface-card">
-          <h2>No hiring campaigns are ready for candidate review.</h2>
+        <div className="campaign-empty-state recruiter-surface-card">
+          <span className="campaign-empty-state__icon" aria-hidden="true">
+            <BriefcaseBusiness />
+          </span>
+          <h2>No campaigns are ready for candidate review</h2>
           <p>
             Active and closed job postings will appear here after they are
             available to candidates.
           </p>
         </div>
+      ) : filteredJobs.length === 0 ? (
+        <div className="campaign-empty-state recruiter-surface-card">
+          <span className="campaign-empty-state__icon" aria-hidden="true">
+            <Search />
+          </span>
+          <h2>No campaigns match these filters</h2>
+          <p>Try a different role, status, or department.</p>
+          <button
+            type="button"
+            className="ai-ranking-button ai-ranking-button--secondary"
+            onClick={() => {
+              setSearch("");
+              setStatus("ALL");
+              setDepartment("ALL");
+            }}
+          >
+            Clear filters
+          </button>
+        </div>
       ) : (
-        <div className="recruiter-candidate-campaign-grid" role="list">
-          {selectableJobs.map((job) => (
-            <article
-              className="recruiter-candidate-campaign"
-              role="listitem"
-              key={job.id}
-            >
-              <div>
-                <span
-                  className={`recruiter-candidate-campaign__status is-${job.status}`}
-                >
-                  {job.status === "active" ? "Active" : "Closed"}
-                </span>
-                <h2>{job.title || "Untitled job posting"}</h2>
-                <p>{job.company.name}</p>
-              </div>
-              <div className="recruiter-candidate-campaign__footer">
-                <strong>{applicationLabel(job.stats.applicantCount)}</strong>
-                <button
-                  type="button"
-                  className="recruiter-primary-button"
-                  onClick={() => setSelectedJobId(job.id)}
-                  aria-label={`Review candidates for ${job.title || "Untitled job posting"}`}
-                >
-                  Review candidates
-                </button>
-              </div>
-            </article>
+        <div
+          className={`campaign-card-grid campaign-card-grid--${view}`}
+          role="list"
+        >
+          {filteredJobs.map((job) => (
+            <div role="listitem" key={job.id}>
+              <CampaignCard
+                job={job}
+                view={view}
+                stats={stats[job.id]}
+                statsLoading={statsLoading}
+                statsError={Boolean(statsError)}
+                onOpen={() => setSelectedJobId(job.id)}
+              />
+            </div>
           ))}
         </div>
       )}

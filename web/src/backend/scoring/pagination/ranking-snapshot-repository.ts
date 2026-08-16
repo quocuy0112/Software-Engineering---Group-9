@@ -124,18 +124,41 @@ export class PrismaRankingSnapshotRepository {
                 },
               },
             },
-            include: { rows: { orderBy: { rankPosition: "asc" } } },
+            select: {
+              id: true,
+              jobPostingId: true,
+              generation: true,
+              filterHash: true,
+              sort: true,
+              pageSize: true,
+              expiresAt: true,
+            },
           });
           return created;
         });
-        return toRecord(snapshot);
+        return {
+          snapshotId: snapshot.id,
+          jobPostingId: snapshot.jobPostingId,
+          generation: snapshot.generation,
+          filterHash: snapshot.filterHash,
+          sort: snapshot.sort,
+          pageSize: snapshot.pageSize,
+          expiresAt: snapshot.expiresAt.toISOString(),
+          rows: input.rows,
+        };
       } catch (error) {
         lastError = error;
-        if (!(error instanceof Prisma.PrismaClientKnownRequestError) || error.code !== "P2002") throw error;
+        if (
+          !(error instanceof Prisma.PrismaClientKnownRequestError) ||
+          error.code !== "P2002"
+        )
+          throw error;
       }
     }
 
-    throw lastError instanceof Error ? lastError : new Error("RANKING_SNAPSHOT_CREATE_FAILED");
+    throw lastError instanceof Error
+      ? lastError
+      : new Error("RANKING_SNAPSHOT_CREATE_FAILED");
   }
 
   async find(input: {
@@ -161,6 +184,8 @@ export class PrismaRankingSnapshotRepository {
   }
 
   async deleteExpired(now = new Date()) {
-    return this.db.rankingSnapshot.deleteMany({ where: { expiresAt: { lte: now } } });
+    return this.db.rankingSnapshot.deleteMany({
+      where: { expiresAt: { lte: now } },
+    });
   }
 }
