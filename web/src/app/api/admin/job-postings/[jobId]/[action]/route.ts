@@ -3,7 +3,7 @@ import { JobPostManagementService } from "@/backend/jobs/management/job-post-man
 import { AdminRequestBoundary } from "@/backend/security/admin-request-boundary";
 import { jobManagementCommandSchema } from "@/shared/contracts/admin/job-post-management";
 
-const actionCommands: Record<string, string> = { hide: "HIDE", restore: "RESTORE", "close-applications": "CLOSE_APPLICATIONS", "reopen-applications": "REOPEN_APPLICATIONS", archive: "ARCHIVE", "request-changes": "REQUEST_CHANGES", "soft-delete": "SOFT_DELETE", feature: "FEATURE", unfeature: "UNFEATURE" };
+const actionCommands: Record<string, string> = { hide: "HIDE", restore: "RESTORE", "close-applications": "CLOSE_APPLICATIONS", "reopen-applications": "REOPEN_APPLICATIONS", archive: "ARCHIVE", "request-changes": "REQUEST_CHANGES", "soft-delete": "SOFT_DELETE", feature: "FEATURE", unfeature: "UNFEATURE", enforce: "ENFORCE" };
 
 export async function POST(request: Request, context: { params: Promise<{ jobId: string; action: string }> }) {
   try {

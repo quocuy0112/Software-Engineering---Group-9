@@ -7,7 +7,7 @@ import type { AdminAuthority } from "@/backend/security/admin-request-boundary";
 import { jobManagementCommandSchema, jobManagementListQuerySchema, type JobManagementCommand } from "@/shared/contracts/admin/job-post-management";
 
 const scopes: Record<JobManagementCommand["command"], PlatformAdministratorScope> = {
-  HIDE: "JOB_POST_MODERATE", RESTORE: "JOB_POST_MODERATE", CLOSE_APPLICATIONS: "JOB_POST_MODERATE", REOPEN_APPLICATIONS: "JOB_POST_MODERATE", ARCHIVE: "JOB_POST_MODERATE", REQUEST_CHANGES: "JOB_POST_MODERATE", FEATURE: "JOB_POST_FEATURE", UNFEATURE: "JOB_POST_FEATURE", SOFT_DELETE: "JOB_POST_ENFORCE",
+  HIDE: "JOB_POST_MODERATE", RESTORE: "JOB_POST_MODERATE", CLOSE_APPLICATIONS: "JOB_POST_MODERATE", REOPEN_APPLICATIONS: "JOB_POST_MODERATE", ARCHIVE: "JOB_POST_MODERATE", REQUEST_CHANGES: "JOB_POST_MODERATE", FEATURE: "JOB_POST_FEATURE", UNFEATURE: "JOB_POST_FEATURE", SOFT_DELETE: "JOB_POST_ENFORCE", ENFORCE: "JOB_POST_ENFORCE",
 };
 
 function stateOf(row: { visibilityState: string; applicationState: string; softDeletedAt: Date | null }) {
@@ -64,19 +64,40 @@ export class JobPostManagementService {
       if (command.command === "CLOSE_APPLICATIONS") { applicationState = "CLOSED"; Object.assign(data, { applicationState, applicationClosedAt: now, applicationClosedByUserId: authority.userId }); }
       if (command.command === "REOPEN_APPLICATIONS") { applicationState = "OPEN"; Object.assign(data, { applicationState, applicationClosedAt: null, applicationClosedByUserId: null }); }
       if (command.command === "ARCHIVE") { visibility = "ARCHIVED"; applicationState = "CLOSED"; Object.assign(data, { visibilityState: visibility, applicationState, archivedAt: now, archivedByUserId: authority.userId }); }
-      if (command.command === "SOFT_DELETE") { visibility = "HIDDEN"; applicationState = "CLOSED"; Object.assign(data, { visibilityState: visibility, applicationState, softDeletedAt: now, softDeletedByUserId: authority.userId, softDeleteReason: reason }); }
+      if (command.command === "SOFT_DELETE" || (command.command === "ENFORCE" && command.type === "SOFT_DELETE_JOB")) { visibility = "HIDDEN"; applicationState = "CLOSED"; Object.assign(data, { visibilityState: visibility, applicationState, softDeletedAt: now, softDeletedByUserId: authority.userId, softDeleteReason: reason }); }
       if (command.command === "REQUEST_CHANGES" && command.hideImmediately) { visibility = "HIDDEN"; Object.assign(data, { visibilityState: visibility, hiddenAt: now, hiddenByUserId: authority.userId, hiddenReason: command.publicExplanation }); }
+      if (command.command === "ENFORCE" && command.type === "HIDE_JOB") { visibility = "HIDDEN"; Object.assign(data, { visibilityState: visibility, hiddenAt: now, hiddenByUserId: authority.userId, hiddenReason: reason }); }
+      if (command.command === "ENFORCE" && command.type === "CLOSE_APPLICATIONS") { applicationState = "CLOSED"; Object.assign(data, { applicationState, applicationClosedAt: now, applicationClosedByUserId: authority.userId }); }
+      if (command.command === "ENFORCE" && command.type === "REQUEST_CHANGES") { visibility = "HIDDEN"; Object.assign(data, { visibilityState: visibility, hiddenAt: now, hiddenByUserId: authority.userId, hiddenReason: command.publicExplanation }); }
       const changed = await tx.jobPostReviewAggregate.updateMany({ where: { id: row.id, version: expectedVersion }, data });
       if (changed.count !== 1) throw new AdminCommandConflict("STALE_CONFLICT");
       if (command.command === "REQUEST_CHANGES") await tx.jobPostRevisionRequest.create({ data: { aggregateId: row.id, liveVersionId: row.approvedVersionId, requestedByAdminUserId: authority.userId, publicExplanation: command.publicExplanation, hideImmediately: command.hideImmediately } });
-      if (command.command === "FEATURE") { if (command.endsAt <= command.startsAt) throw new Error("VALIDATION_FAILED"); await tx.jobPostFeaturedPlacement.create({ data: { aggregateId: row.id, placement: command.placement, priority: command.priority, startsAt: command.startsAt, endsAt: command.endsAt, reason: command.reason, createdByAdminUserId: authority.userId } }); }
+      if (command.command === "ENFORCE" && command.type === "REQUEST_CHANGES") await tx.jobPostRevisionRequest.create({ data: { aggregateId: row.id, liveVersionId: row.approvedVersionId, requestedByAdminUserId: authority.userId, publicExplanation: command.publicExplanation!, hideImmediately: true } });
+      if (command.command === "FEATURE") {
+        if (command.endsAt <= command.startsAt || visibility !== "PUBLISHED" || applicationState !== "OPEN") throw new Error("VALIDATION_FAILED");
+        await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${command.placement}))`);
+        const booked = await tx.jobPostFeaturedPlacement.count({ where: { placement: command.placement, state: { in: ["SCHEDULED", "ACTIVE"] }, startsAt: { lt: command.endsAt }, endsAt: { gt: command.startsAt } } });
+        if (booked >= 6) throw new Error("FEATURE_CAPACITY_CONFLICT");
+        await tx.jobPostFeaturedPlacement.create({ data: { aggregateId: row.id, placement: command.placement, priority: command.priority, startsAt: command.startsAt, endsAt: command.endsAt, state: command.startsAt <= now ? "ACTIVE" : "SCHEDULED", reason: command.reason, createdByAdminUserId: authority.userId } });
+      }
       if (command.command === "UNFEATURE") await tx.jobPostFeaturedPlacement.updateMany({ where: { id: command.featureId, aggregateId: row.id, state: { in: ["SCHEDULED", "ACTIVE"] } }, data: { state: "CANCELLED", cancelledAt: now, cancelledByAdminUserId: authority.userId, version: { increment: 1 } } });
+      if (command.command === "ENFORCE") {
+        const reports = await tx.moderationReport.findMany({ where: { id: { in: command.reportIds }, jobReference: jobId, state: "PENDING_REVIEW" }, select: { id: true, version: true, state: true } });
+        if (reports.length !== command.reportIds.length) throw new Error("REPORT_TARGET_UNAVAILABLE");
+        const action = await tx.jobPostEnforcementAction.create({ data: { correlationId, type: command.type, actorAdminUserId: authority.userId, actorSessionId: authority.sessionId, reason: command.reason, publicExplanation: command.publicExplanation } });
+        await tx.jobPostEnforcementTarget.create({ data: { enforcementActionId: action.id, aggregateId: row.id, targetType: "JOB", targetReference: jobId, priorState: prior, resultingState: { visibility, applicationState } } });
+        await tx.moderationReportEnforcementLink.createMany({ data: reports.map((report) => ({ moderationReportId: report.id, enforcementActionId: action.id })) });
+        for (const report of reports) {
+          await tx.moderationReport.update({ where: { id: report.id }, data: { state: "RESOLVED", terminalAt: now, unresolvedKey: null, version: { increment: 1 } } });
+          await tx.moderationReportHistory.create({ data: { reportId: report.id, actorAdminUserId: authority.userId, action: "enforced", priorState: report.state, resultingState: "RESOLVED", resultingVersion: report.version + 1, enforcementCorrelationId: correlationId, occurredAt: now } });
+        }
+      }
       const publicStatus = visibility === "PUBLISHED" ? applicationState === "OPEN" ? "ACTIVE" : "CLOSED" : "REMOVED";
       await tx.jobPosting.update({ where: { id: row.publicJobPostingId! }, data: { status: publicStatus, closedAt: applicationState === "CLOSED" ? now : null, removedAt: visibility === "PUBLISHED" ? null : now, version: { increment: 1 } } });
       const version = expectedVersion + 1;
-      await tx.jobPostOperationalHistory.create({ data: { aggregateId: row.id, action: command.command, actorUserId: authority.userId, correlationId, priorState: prior, resultingState: { visibility, applicationState }, reason: command.command === "REQUEST_CHANGES" ? command.publicExplanation : reason, version, occurredAt: now } });
+      await tx.jobPostOperationalHistory.create({ data: { aggregateId: row.id, action: command.command, actorUserId: authority.userId, correlationId, priorState: prior, resultingState: { visibility, applicationState }, reason: command.command === "REQUEST_CHANGES" ? command.publicExplanation : command.command === "ENFORCE" && command.type === "REQUEST_CHANGES" ? command.publicExplanation : reason, version, occurredAt: now } });
       const auditAction = {
-        HIDE: "job_post_management.hide", RESTORE: "job_post_management.restore", CLOSE_APPLICATIONS: "job_post_management.close_applications", REOPEN_APPLICATIONS: "job_post_management.reopen_applications", ARCHIVE: "job_post_management.archive", SOFT_DELETE: "job_post_management.soft_delete", REQUEST_CHANGES: "job_post_management.request_changes", FEATURE: "job_post_management.feature", UNFEATURE: "job_post_management.unfeature",
+        HIDE: "job_post_management.hide", RESTORE: "job_post_management.restore", CLOSE_APPLICATIONS: "job_post_management.close_applications", REOPEN_APPLICATIONS: "job_post_management.reopen_applications", ARCHIVE: "job_post_management.archive", SOFT_DELETE: "job_post_management.soft_delete", REQUEST_CHANGES: "job_post_management.request_changes", FEATURE: "job_post_management.feature", UNFEATURE: "job_post_management.unfeature", ENFORCE: "job_post_management.enforce",
       } as const;
       await new PrismaAuditRepository(tx).append({ occurredAt: now, actorType: "user", actorUserId: authority.userId, actorSessionId: authority.sessionId, action: auditAction[command.command], targetType: "job_posting", targetId: jobId, result: "SUCCESS", correlationId, context: { targetVersion: version, priorState: JSON.stringify(prior), resultingState: JSON.stringify({ visibility, applicationState }), visibility, applicationState } });
       return { jobId, version, visibility, applicationState, status: "SUCCESS" as const };

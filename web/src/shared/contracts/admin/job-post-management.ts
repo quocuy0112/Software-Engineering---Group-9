@@ -31,6 +31,16 @@ export const jobManagementCommandSchema = z.discriminatedUnion("command", [
     featureId: z.string().min(1).max(128),
     reason,
   }),
+  confirmation.extend({
+    command: z.literal("ENFORCE"),
+    type: z.enum(["HIDE_JOB", "CLOSE_APPLICATIONS", "REQUEST_CHANGES", "SOFT_DELETE_JOB"]),
+    reportIds: z.array(z.string().min(1).max(128)).min(1).max(100),
+    reason,
+    publicExplanation: normalizedText(0, 1000).optional(),
+  }).superRefine((value, context) => {
+    if (value.type === "REQUEST_CHANGES" && (value.publicExplanation?.length ?? 0) < 20)
+      context.addIssue({ code: "custom", path: ["publicExplanation"], message: "REQUEST_CHANGES requires 20-1,000 characters" });
+  }),
 ]);
 
 export type JobManagementCommand = z.infer<typeof jobManagementCommandSchema>;

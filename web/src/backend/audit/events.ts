@@ -151,6 +151,7 @@ export const authenticationAuditAction = z.enum([
   "job_post_management.request_changes",
   "job_post_management.feature",
   "job_post_management.unfeature",
+  "job_post_management.enforce",
 ]);
 
 const auditContextSchema = z
