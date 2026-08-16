@@ -24,6 +24,14 @@ function hasControlCharacter(value: string) {
   });
 }
 
+function hasRequiredComposition(value: string) {
+  return (
+    /\p{Lu}/u.test(value) &&
+    /\p{N}/u.test(value) &&
+    /[^\p{L}\p{N}\s]/u.test(value)
+  );
+}
+
 export type PasswordPolicyResult =
   | { accepted: true }
   | {
@@ -80,7 +88,8 @@ export class PasswordPolicy {
       return {
         accepted: false,
         code: "PASSWORD_POLICY",
-        message: "Use 12–128 characters without control characters.",
+        message:
+          "Use 12–128 characters with an uppercase letter, number, and special character; control characters are not allowed.",
       };
     }
     if (
@@ -99,6 +108,16 @@ export class PasswordPolicy {
         code: "PASSWORD_COMPROMISED",
         message:
           "Choose a password that has not appeared in common password lists.",
+      };
+    }
+    if (!hasRequiredComposition(password)) {
+      if (context)
+        await this.appendAudit("password.policy_rejected", "DENIED", context);
+      return {
+        accepted: false,
+        code: "PASSWORD_POLICY",
+        message:
+          "Use 12–128 characters with an uppercase letter, number, and special character; control characters are not allowed.",
       };
     }
     return { accepted: true };

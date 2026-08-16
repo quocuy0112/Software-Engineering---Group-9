@@ -25,7 +25,7 @@ export function PasswordField({
           {...props}
           id={id}
           type={visible ? "text" : "password"}
-          aria-invalid={Boolean(error)}
+          aria-invalid={Boolean(error) || Boolean(props["aria-invalid"])}
           aria-describedby={error ? errorId : props["aria-describedby"]}
         />
         <PasswordVisibilityButton
