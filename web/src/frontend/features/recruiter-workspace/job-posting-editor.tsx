@@ -501,8 +501,20 @@ export function JobPostingEditor({
                 ? `: ${job.review.publicExplanation}`
                 : null}
             </p>
+            <p>Make the required changes and submit again for a new review.</p>
+          </div>
+        ) : null}
+        {job.correctionRequest ? (
+          <div
+            className="recruiter-editor-rejection-notice"
+            role="status"
+            aria-live="polite"
+          >
+            <strong>Administrator requested changes</strong>
+            <p>{job.correctionRequest.publicExplanation}</p>
             <p>
-              Make the required changes and submit again for a new review.
+              The current approved version remains live until your revised
+              version is reviewed.
             </p>
           </div>
         ) : null}

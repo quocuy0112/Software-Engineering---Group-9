@@ -285,6 +285,24 @@ function JobPostingCard({
             ) : null}
           </>
         ) : null}
+        {job.correctionRequest ? (
+          <div
+            className="recruiter-review-feedback"
+            role="region"
+            aria-label="Administrator correction request"
+          >
+            <p className="recruiter-review-feedback__reason">
+              <strong>Administrator requested changes</strong>
+            </p>
+            <p className="recruiter-review-feedback__explanation">
+              {job.correctionRequest.publicExplanation}
+            </p>
+            <p className="recruiter-review-feedback__guidance">
+              Your approved version remains live while you revise and submit a
+              new version for review.
+            </p>
+          </div>
+        ) : null}
         <div className="recruiter-job-card__chips" aria-label="Skills">
           {job.skillTags.slice(0, 6).map((skill) => (
             <span className="recruiter-skill-chip" key={skill}>
@@ -623,7 +641,9 @@ export function RecruiterJobPostingManagement({
       onNavigate(recruiterRoutes.jobPostingCreate);
       return;
     }
-    setEditorJob(withCompany(createEmptyJobPosting(current.companyId), current.companies));
+    setEditorJob(
+      withCompany(createEmptyJobPosting(current.companyId), current.companies),
+    );
     setView("editor");
   };
   const openEdit = (job: RecruiterJob) => {
@@ -637,7 +657,11 @@ export function RecruiterJobPostingManagement({
   const receiveSavedJob = (job: RecruiterJob) => {
     setData((currentData) => {
       const next = currentData ?? emptyData;
-      const normalizedJob = withCompanyFromState(job, next.companies, next.jobs);
+      const normalizedJob = withCompanyFromState(
+        job,
+        next.companies,
+        next.jobs,
+      );
       const exists = next.jobs.some((item) => item.id === job.id);
       return {
         ...next,
@@ -672,7 +696,9 @@ export function RecruiterJobPostingManagement({
       setMessage(payload?.message ?? "Unable to close this posting.");
       return;
     }
-    receiveSavedJob(withCompanyFromState(payload, current.companies, current.jobs));
+    receiveSavedJob(
+      withCompanyFromState(payload, current.companies, current.jobs),
+    );
     setMessage("Job posting closed and saved to the mock database.");
   };
 
@@ -695,7 +721,9 @@ export function RecruiterJobPostingManagement({
       setMessage(payload?.message ?? "Unable to extend this deadline.");
       return;
     }
-    receiveSavedJob(withCompanyFromState(payload, current.companies, current.jobs));
+    receiveSavedJob(
+      withCompanyFromState(payload, current.companies, current.jobs),
+    );
     setMessage("Application deadline extended by 30 days.");
   };
   if (view === "editor" && editorJob)

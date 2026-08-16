@@ -581,11 +581,8 @@ export function buildNotification(
     audience: variables.audience === "ADMIN" ? "ADMIN" : "USER",
     title,
     summary,
-    href: hrefForContext(
-      kind,
-      contextType ?? undefined,
-      contextId ?? undefined,
-    ),
+    // Context is durable; href is resolved for the current recipient when served.
+    href: null,
     contextType,
     contextId,
     deduplicationKey: input.deduplicationKey,

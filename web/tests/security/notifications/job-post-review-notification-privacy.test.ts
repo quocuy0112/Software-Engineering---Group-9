@@ -20,7 +20,7 @@ describe("job-post review notification privacy", () => {
     }, "EN");
     expect(notification.title).toBe("Job post awaiting review");
     expect(notification.summary).not.toMatch(/title|company|submitter|reason|evidence|note/iu);
-    expect(notification.href).toBe("/admin/job-post-reviews/review-version-1");
+    expect(notification.href).toBeNull();
   });
 
   it.each(["JOB_POST_APPROVED", "JOB_POST_REJECTED"] as const)(
@@ -34,7 +34,7 @@ describe("job-post review notification privacy", () => {
       }, "EN");
       const serialized = JSON.stringify(notification);
       expect(serialized).not.toMatch(/snapshot|privateNote|publicExplanation|evidence|phone|email/iu);
-      expect(notification.href).toBe("/recruiter/job-postings?review=review-version-1");
+      expect(notification.href).toBeNull();
     },
   );
 

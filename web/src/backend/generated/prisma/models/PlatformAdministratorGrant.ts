@@ -242,6 +242,7 @@ export type PlatformAdministratorGrantWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"PlatformAdministratorGrant"> | Date | string
   user?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   sessionPolicy?: Prisma.XOR<Prisma.AdministratorSessionPolicyNullableScalarRelationFilter, Prisma.AdministratorSessionPolicyWhereInput> | null
+  scopes?: Prisma.PlatformAdministratorGrantScopeAssignmentListRelationFilter
 }
 
 export type PlatformAdministratorGrantOrderByWithRelationInput = {
@@ -255,6 +256,7 @@ export type PlatformAdministratorGrantOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserAccountOrderByWithRelationInput
   sessionPolicy?: Prisma.AdministratorSessionPolicyOrderByWithRelationInput
+  scopes?: Prisma.PlatformAdministratorGrantScopeAssignmentOrderByRelationAggregateInput
 }
 
 export type PlatformAdministratorGrantWhereUniqueInput = Prisma.AtLeast<{
@@ -271,6 +273,7 @@ export type PlatformAdministratorGrantWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"PlatformAdministratorGrant"> | Date | string
   user?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   sessionPolicy?: Prisma.XOR<Prisma.AdministratorSessionPolicyNullableScalarRelationFilter, Prisma.AdministratorSessionPolicyWhereInput> | null
+  scopes?: Prisma.PlatformAdministratorGrantScopeAssignmentListRelationFilter
 }, "id" | "userId">
 
 export type PlatformAdministratorGrantOrderByWithAggregationInput = {
@@ -313,6 +316,7 @@ export type PlatformAdministratorGrantCreateInput = {
   updatedAt?: Date | string
   user: Prisma.UserAccountCreateNestedOneWithoutPlatformAdministratorGrantsInput
   sessionPolicy?: Prisma.AdministratorSessionPolicyCreateNestedOneWithoutGrantInput
+  scopes?: Prisma.PlatformAdministratorGrantScopeAssignmentCreateNestedManyWithoutGrantInput
 }
 
 export type PlatformAdministratorGrantUncheckedCreateInput = {
@@ -325,6 +329,7 @@ export type PlatformAdministratorGrantUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   sessionPolicy?: Prisma.AdministratorSessionPolicyUncheckedCreateNestedOneWithoutGrantInput
+  scopes?: Prisma.PlatformAdministratorGrantScopeAssignmentUncheckedCreateNestedManyWithoutGrantInput
 }
 
 export type PlatformAdministratorGrantUpdateInput = {
@@ -337,6 +342,7 @@ export type PlatformAdministratorGrantUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserAccountUpdateOneRequiredWithoutPlatformAdministratorGrantsNestedInput
   sessionPolicy?: Prisma.AdministratorSessionPolicyUpdateOneWithoutGrantNestedInput
+  scopes?: Prisma.PlatformAdministratorGrantScopeAssignmentUpdateManyWithoutGrantNestedInput
 }
 
 export type PlatformAdministratorGrantUncheckedUpdateInput = {
@@ -349,6 +355,7 @@ export type PlatformAdministratorGrantUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessionPolicy?: Prisma.AdministratorSessionPolicyUncheckedUpdateOneWithoutGrantNestedInput
+  scopes?: Prisma.PlatformAdministratorGrantScopeAssignmentUncheckedUpdateManyWithoutGrantNestedInput
 }
 
 export type PlatformAdministratorGrantCreateManyInput = {
@@ -485,6 +492,20 @@ export type EnumAdministratorGrantStateFieldUpdateOperationsInput = {
   set?: $Enums.AdministratorGrantState
 }
 
+export type PlatformAdministratorGrantCreateNestedOneWithoutScopesInput = {
+  create?: Prisma.XOR<Prisma.PlatformAdministratorGrantCreateWithoutScopesInput, Prisma.PlatformAdministratorGrantUncheckedCreateWithoutScopesInput>
+  connectOrCreate?: Prisma.PlatformAdministratorGrantCreateOrConnectWithoutScopesInput
+  connect?: Prisma.PlatformAdministratorGrantWhereUniqueInput
+}
+
+export type PlatformAdministratorGrantUpdateOneRequiredWithoutScopesNestedInput = {
+  create?: Prisma.XOR<Prisma.PlatformAdministratorGrantCreateWithoutScopesInput, Prisma.PlatformAdministratorGrantUncheckedCreateWithoutScopesInput>
+  connectOrCreate?: Prisma.PlatformAdministratorGrantCreateOrConnectWithoutScopesInput
+  upsert?: Prisma.PlatformAdministratorGrantUpsertWithoutScopesInput
+  connect?: Prisma.PlatformAdministratorGrantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlatformAdministratorGrantUpdateToOneWithWhereWithoutScopesInput, Prisma.PlatformAdministratorGrantUpdateWithoutScopesInput>, Prisma.PlatformAdministratorGrantUncheckedUpdateWithoutScopesInput>
+}
+
 export type PlatformAdministratorGrantCreateNestedOneWithoutSessionPolicyInput = {
   create?: Prisma.XOR<Prisma.PlatformAdministratorGrantCreateWithoutSessionPolicyInput, Prisma.PlatformAdministratorGrantUncheckedCreateWithoutSessionPolicyInput>
   connectOrCreate?: Prisma.PlatformAdministratorGrantCreateOrConnectWithoutSessionPolicyInput
@@ -508,6 +529,7 @@ export type PlatformAdministratorGrantCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   sessionPolicy?: Prisma.AdministratorSessionPolicyCreateNestedOneWithoutGrantInput
+  scopes?: Prisma.PlatformAdministratorGrantScopeAssignmentCreateNestedManyWithoutGrantInput
 }
 
 export type PlatformAdministratorGrantUncheckedCreateWithoutUserInput = {
@@ -519,6 +541,7 @@ export type PlatformAdministratorGrantUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   sessionPolicy?: Prisma.AdministratorSessionPolicyUncheckedCreateNestedOneWithoutGrantInput
+  scopes?: Prisma.PlatformAdministratorGrantScopeAssignmentUncheckedCreateNestedManyWithoutGrantInput
 }
 
 export type PlatformAdministratorGrantCreateOrConnectWithoutUserInput = {
@@ -561,6 +584,70 @@ export type PlatformAdministratorGrantScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"PlatformAdministratorGrant"> | Date | string
 }
 
+export type PlatformAdministratorGrantCreateWithoutScopesInput = {
+  id?: string
+  state?: $Enums.AdministratorGrantState
+  expiresAt?: Date | string | null
+  stateChangedAt?: Date | string
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserAccountCreateNestedOneWithoutPlatformAdministratorGrantsInput
+  sessionPolicy?: Prisma.AdministratorSessionPolicyCreateNestedOneWithoutGrantInput
+}
+
+export type PlatformAdministratorGrantUncheckedCreateWithoutScopesInput = {
+  id?: string
+  userId: string
+  state?: $Enums.AdministratorGrantState
+  expiresAt?: Date | string | null
+  stateChangedAt?: Date | string
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessionPolicy?: Prisma.AdministratorSessionPolicyUncheckedCreateNestedOneWithoutGrantInput
+}
+
+export type PlatformAdministratorGrantCreateOrConnectWithoutScopesInput = {
+  where: Prisma.PlatformAdministratorGrantWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlatformAdministratorGrantCreateWithoutScopesInput, Prisma.PlatformAdministratorGrantUncheckedCreateWithoutScopesInput>
+}
+
+export type PlatformAdministratorGrantUpsertWithoutScopesInput = {
+  update: Prisma.XOR<Prisma.PlatformAdministratorGrantUpdateWithoutScopesInput, Prisma.PlatformAdministratorGrantUncheckedUpdateWithoutScopesInput>
+  create: Prisma.XOR<Prisma.PlatformAdministratorGrantCreateWithoutScopesInput, Prisma.PlatformAdministratorGrantUncheckedCreateWithoutScopesInput>
+  where?: Prisma.PlatformAdministratorGrantWhereInput
+}
+
+export type PlatformAdministratorGrantUpdateToOneWithWhereWithoutScopesInput = {
+  where?: Prisma.PlatformAdministratorGrantWhereInput
+  data: Prisma.XOR<Prisma.PlatformAdministratorGrantUpdateWithoutScopesInput, Prisma.PlatformAdministratorGrantUncheckedUpdateWithoutScopesInput>
+}
+
+export type PlatformAdministratorGrantUpdateWithoutScopesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumAdministratorGrantStateFieldUpdateOperationsInput | $Enums.AdministratorGrantState
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserAccountUpdateOneRequiredWithoutPlatformAdministratorGrantsNestedInput
+  sessionPolicy?: Prisma.AdministratorSessionPolicyUpdateOneWithoutGrantNestedInput
+}
+
+export type PlatformAdministratorGrantUncheckedUpdateWithoutScopesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumAdministratorGrantStateFieldUpdateOperationsInput | $Enums.AdministratorGrantState
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stateChangedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessionPolicy?: Prisma.AdministratorSessionPolicyUncheckedUpdateOneWithoutGrantNestedInput
+}
+
 export type PlatformAdministratorGrantCreateWithoutSessionPolicyInput = {
   id?: string
   state?: $Enums.AdministratorGrantState
@@ -570,6 +657,7 @@ export type PlatformAdministratorGrantCreateWithoutSessionPolicyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserAccountCreateNestedOneWithoutPlatformAdministratorGrantsInput
+  scopes?: Prisma.PlatformAdministratorGrantScopeAssignmentCreateNestedManyWithoutGrantInput
 }
 
 export type PlatformAdministratorGrantUncheckedCreateWithoutSessionPolicyInput = {
@@ -581,6 +669,7 @@ export type PlatformAdministratorGrantUncheckedCreateWithoutSessionPolicyInput =
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  scopes?: Prisma.PlatformAdministratorGrantScopeAssignmentUncheckedCreateNestedManyWithoutGrantInput
 }
 
 export type PlatformAdministratorGrantCreateOrConnectWithoutSessionPolicyInput = {
@@ -608,6 +697,7 @@ export type PlatformAdministratorGrantUpdateWithoutSessionPolicyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserAccountUpdateOneRequiredWithoutPlatformAdministratorGrantsNestedInput
+  scopes?: Prisma.PlatformAdministratorGrantScopeAssignmentUpdateManyWithoutGrantNestedInput
 }
 
 export type PlatformAdministratorGrantUncheckedUpdateWithoutSessionPolicyInput = {
@@ -619,6 +709,7 @@ export type PlatformAdministratorGrantUncheckedUpdateWithoutSessionPolicyInput =
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  scopes?: Prisma.PlatformAdministratorGrantScopeAssignmentUncheckedUpdateManyWithoutGrantNestedInput
 }
 
 export type PlatformAdministratorGrantCreateManyUserInput = {
@@ -640,6 +731,7 @@ export type PlatformAdministratorGrantUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessionPolicy?: Prisma.AdministratorSessionPolicyUpdateOneWithoutGrantNestedInput
+  scopes?: Prisma.PlatformAdministratorGrantScopeAssignmentUpdateManyWithoutGrantNestedInput
 }
 
 export type PlatformAdministratorGrantUncheckedUpdateWithoutUserInput = {
@@ -651,6 +743,7 @@ export type PlatformAdministratorGrantUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessionPolicy?: Prisma.AdministratorSessionPolicyUncheckedUpdateOneWithoutGrantNestedInput
+  scopes?: Prisma.PlatformAdministratorGrantScopeAssignmentUncheckedUpdateManyWithoutGrantNestedInput
 }
 
 export type PlatformAdministratorGrantUncheckedUpdateManyWithoutUserInput = {
@@ -664,6 +757,35 @@ export type PlatformAdministratorGrantUncheckedUpdateManyWithoutUserInput = {
 }
 
 
+/**
+ * Count Type PlatformAdministratorGrantCountOutputType
+ */
+
+export type PlatformAdministratorGrantCountOutputType = {
+  scopes: number
+}
+
+export type PlatformAdministratorGrantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  scopes?: boolean | PlatformAdministratorGrantCountOutputTypeCountScopesArgs
+}
+
+/**
+ * PlatformAdministratorGrantCountOutputType without action
+ */
+export type PlatformAdministratorGrantCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlatformAdministratorGrantCountOutputType
+   */
+  select?: Prisma.PlatformAdministratorGrantCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * PlatformAdministratorGrantCountOutputType without action
+ */
+export type PlatformAdministratorGrantCountOutputTypeCountScopesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlatformAdministratorGrantScopeAssignmentWhereInput
+}
+
 
 export type PlatformAdministratorGrantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -676,6 +798,8 @@ export type PlatformAdministratorGrantSelect<ExtArgs extends runtime.Types.Exten
   updatedAt?: boolean
   user?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   sessionPolicy?: boolean | Prisma.PlatformAdministratorGrant$sessionPolicyArgs<ExtArgs>
+  scopes?: boolean | Prisma.PlatformAdministratorGrant$scopesArgs<ExtArgs>
+  _count?: boolean | Prisma.PlatformAdministratorGrantCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["platformAdministratorGrant"]>
 
 export type PlatformAdministratorGrantSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -717,6 +841,8 @@ export type PlatformAdministratorGrantOmit<ExtArgs extends runtime.Types.Extensi
 export type PlatformAdministratorGrantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   sessionPolicy?: boolean | Prisma.PlatformAdministratorGrant$sessionPolicyArgs<ExtArgs>
+  scopes?: boolean | Prisma.PlatformAdministratorGrant$scopesArgs<ExtArgs>
+  _count?: boolean | Prisma.PlatformAdministratorGrantCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PlatformAdministratorGrantIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
@@ -730,6 +856,7 @@ export type $PlatformAdministratorGrantPayload<ExtArgs extends runtime.Types.Ext
   objects: {
     user: Prisma.$UserAccountPayload<ExtArgs>
     sessionPolicy: Prisma.$AdministratorSessionPolicyPayload<ExtArgs> | null
+    scopes: Prisma.$PlatformAdministratorGrantScopeAssignmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1136,6 +1263,7 @@ export interface Prisma__PlatformAdministratorGrantClient<T, Null = never, ExtAr
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserAccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccountDefaultArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   sessionPolicy<T extends Prisma.PlatformAdministratorGrant$sessionPolicyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PlatformAdministratorGrant$sessionPolicyArgs<ExtArgs>>): Prisma.Prisma__AdministratorSessionPolicyClient<runtime.Types.Result.GetResult<Prisma.$AdministratorSessionPolicyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  scopes<T extends Prisma.PlatformAdministratorGrant$scopesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PlatformAdministratorGrant$scopesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlatformAdministratorGrantScopeAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1590,6 +1718,30 @@ export type PlatformAdministratorGrant$sessionPolicyArgs<ExtArgs extends runtime
    */
   include?: Prisma.AdministratorSessionPolicyInclude<ExtArgs> | null
   where?: Prisma.AdministratorSessionPolicyWhereInput
+}
+
+/**
+ * PlatformAdministratorGrant.scopes
+ */
+export type PlatformAdministratorGrant$scopesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlatformAdministratorGrantScopeAssignment
+   */
+  select?: Prisma.PlatformAdministratorGrantScopeAssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlatformAdministratorGrantScopeAssignment
+   */
+  omit?: Prisma.PlatformAdministratorGrantScopeAssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlatformAdministratorGrantScopeAssignmentInclude<ExtArgs> | null
+  where?: Prisma.PlatformAdministratorGrantScopeAssignmentWhereInput
+  orderBy?: Prisma.PlatformAdministratorGrantScopeAssignmentOrderByWithRelationInput | Prisma.PlatformAdministratorGrantScopeAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.PlatformAdministratorGrantScopeAssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlatformAdministratorGrantScopeAssignmentScalarFieldEnum | Prisma.PlatformAdministratorGrantScopeAssignmentScalarFieldEnum[]
 }
 
 /**

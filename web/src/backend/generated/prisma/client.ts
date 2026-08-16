@@ -182,6 +182,11 @@ export type CompanyMembership = Prisma.CompanyMembershipModel
  */
 export type PlatformAdministratorGrant = Prisma.PlatformAdministratorGrantModel
 /**
+ * Model PlatformAdministratorGrantScopeAssignment
+ * 
+ */
+export type PlatformAdministratorGrantScopeAssignment = Prisma.PlatformAdministratorGrantScopeAssignmentModel
+/**
  * Model AdministratorSessionPolicy
  * 
  */
@@ -291,6 +296,36 @@ export type JobPosting = Prisma.JobPostingModel
  * 
  */
 export type JobPostReviewAggregate = Prisma.JobPostReviewAggregateModel
+/**
+ * Model JobPostRevisionRequest
+ * 
+ */
+export type JobPostRevisionRequest = Prisma.JobPostRevisionRequestModel
+/**
+ * Model JobPostFeaturedPlacement
+ * 
+ */
+export type JobPostFeaturedPlacement = Prisma.JobPostFeaturedPlacementModel
+/**
+ * Model JobPostEnforcementAction
+ * 
+ */
+export type JobPostEnforcementAction = Prisma.JobPostEnforcementActionModel
+/**
+ * Model JobPostEnforcementTarget
+ * 
+ */
+export type JobPostEnforcementTarget = Prisma.JobPostEnforcementTargetModel
+/**
+ * Model ModerationReportEnforcementLink
+ * 
+ */
+export type ModerationReportEnforcementLink = Prisma.ModerationReportEnforcementLinkModel
+/**
+ * Model JobPostOperationalHistory
+ * 
+ */
+export type JobPostOperationalHistory = Prisma.JobPostOperationalHistoryModel
 /**
  * Model JobPostReviewVersion
  * 

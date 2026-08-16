@@ -107,7 +107,7 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
     Prisma.sql`j."approvedAt" IS NOT NULL`,
     Prisma.sql`j."publishedAt" IS NOT NULL AND j."publishedAt" <= ${now}`,
     Prisma.sql`(j."applicationDeadline" IS NULL OR j."applicationDeadline" > ${now})`,
-    Prisma.sql`EXISTS (SELECT 1 FROM "Company" c WHERE c."id" = j."companyId" AND c."verifiedAt" IS NOT NULL)`,
+    Prisma.sql`EXISTS (SELECT 1 FROM "Company" c WHERE c."id" = j."companyId" AND c."verifiedAt" IS NOT NULL AND c."verificationState" = 'ACTIVE'::"CompanyVerificationState" AND c."verificationInactiveAt" IS NULL)`,
     Prisma.sql`(
       NOT EXISTS (SELECT 1 FROM "JobPostReviewAggregate" r WHERE r."publicJobPostingId" = j."id")
       OR EXISTS (
@@ -115,6 +115,7 @@ function publicClauses(input: NormalizedJobSearch, now: Date) {
         WHERE r."publicJobPostingId" = j."id"
           AND r."approvedVersionId" IS NOT NULL
           AND r."closedAt" IS NULL
+          AND r."visibilityState" = 'PUBLISHED'::"JobPostVisibilityState"
       )
     )`,
   ];
@@ -299,15 +300,24 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
           },
           {
             reviewAggregate: {
-              is: { approvedVersionId: { not: null }, closedAt: null },
+              is: {
+                approvedVersionId: { not: null },
+                closedAt: null,
+                visibilityState: "PUBLISHED",
+              },
             },
-            status: "ACTIVE",
-            applicationDeadline: { gt: now },
+            // A closed managed job remains readable as public history, but is
+            // excluded from discovery by the ACTIVE-only discovery queries.
+            status: { in: ["ACTIVE", "CLOSED"] },
           },
         ],
         approvedAt: { not: null },
         publishedAt: { not: null, lte: now },
-        company: { verifiedAt: { not: null } },
+        company: {
+          verifiedAt: { not: null },
+          verificationState: "ACTIVE",
+          verificationInactiveAt: null,
+        },
       },
       include: publicInclude(actorUserId),
     });
@@ -325,7 +335,11 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
         status: "ACTIVE",
         approvedAt: { not: null },
         publishedAt: { not: null, lte: now },
-        company: { verifiedAt: { not: null } },
+        company: {
+          verifiedAt: { not: null },
+          verificationState: "ACTIVE",
+          verificationInactiveAt: null,
+        },
         AND: [
           {
             OR: [
@@ -338,7 +352,11 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
               { reviewAggregate: null },
               {
                 reviewAggregate: {
-                  is: { approvedVersionId: { not: null }, closedAt: null },
+                  is: {
+                    approvedVersionId: { not: null },
+                    closedAt: null,
+                    visibilityState: "PUBLISHED",
+                  },
                 },
               },
             ],
@@ -361,7 +379,11 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
         status: "ACTIVE",
         approvedAt: { not: null },
         publishedAt: { not: null, lte: now },
-        company: { verifiedAt: { not: null } },
+        company: {
+          verifiedAt: { not: null },
+          verificationState: "ACTIVE",
+          verificationInactiveAt: null,
+        },
         AND: [
           {
             OR: [
@@ -374,7 +396,11 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
               { reviewAggregate: null },
               {
                 reviewAggregate: {
-                  is: { approvedVersionId: { not: null }, closedAt: null },
+                  is: {
+                    approvedVersionId: { not: null },
+                    closedAt: null,
+                    visibilityState: "PUBLISHED",
+                  },
                 },
               },
             ],
@@ -395,12 +421,20 @@ export class PrismaPublicJobRepository implements PublicJobRepository {
         status: { in: ["ACTIVE", "CLOSED", "EXPIRED"] },
         approvedAt: { not: null },
         publishedAt: { not: null, lte: now },
-        company: { verifiedAt: { not: null } },
+        company: {
+          verifiedAt: { not: null },
+          verificationState: "ACTIVE",
+          verificationInactiveAt: null,
+        },
         OR: [
           { reviewAggregate: null },
           {
             reviewAggregate: {
-              is: { approvedVersionId: { not: null }, closedAt: null },
+              is: {
+                approvedVersionId: { not: null },
+                closedAt: null,
+                visibilityState: "PUBLISHED",
+              },
             },
           },
         ],

@@ -1,0 +1,201 @@
+openapi: 3.1.0
+info:
+  title: SmartHire Administrator Job Post Management API
+  version: 1.0.0
+  description: Protected post-publication management contracts for review-managed jobs.
+servers:
+  - url: /
+security:
+  - browserSession: []
+paths:
+  /api/admin/job-postings:
+    get:
+      operationId: listManagedJobPosts
+      summary: List safe management projections for review-managed jobs.
+      parameters:
+        - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - { name: perPage, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 25 } }
+        - { name: q, in: query, schema: { type: string, minLength: 1, maxLength: 200 } }
+        - { name: visibility, in: query, schema: { $ref: '#/components/schemas/VisibilityState' } }
+        - { name: applicationState, in: query, schema: { $ref: '#/components/schemas/ApplicationState' } }
+        - { name: reportState, in: query, schema: { type: string, enum: [ANY, REPORTED, UNREPORTED] } }
+        - { name: featured, in: query, schema: { type: boolean } }
+        - { name: companyId, in: query, schema: { type: string, minLength: 1, maxLength: 128 } }
+        - { name: recruiterId, in: query, schema: { type: string, minLength: 1, maxLength: 128 } }
+        - { name: approverId, in: query, schema: { type: string, minLength: 1, maxLength: 128 } }
+        - { name: approvedFrom, in: query, schema: { type: string, format: date-time } }
+        - { name: approvedTo, in: query, schema: { type: string, format: date-time } }
+        - { name: publishedFrom, in: query, schema: { type: string, format: date-time } }
+        - { name: publishedTo, in: query, schema: { type: string, format: date-time } }
+        - { name: minimumReports, in: query, schema: { type: integer, minimum: 1, maximum: 100000 } }
+      responses:
+        '200': { $ref: '#/components/responses/ManagedJobPage' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /api/admin/job-postings/{jobId}:
+    get:
+      operationId: getManagedJobPost
+      summary: Read protected post-publication job detail.
+      parameters: [ { $ref: '#/components/parameters/JobId' } ]
+      responses:
+        '200': { $ref: '#/components/responses/ManagedJobDetail' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+  /api/admin/job-postings/{jobId}/{action}:
+    post:
+      operationId: commandManagedJobPost
+      summary: Execute a versioned administrative lifecycle, correction, feature, or enforcement command.
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+        - name: action
+          in: path
+          required: true
+          schema: { type: string, enum: [hide, restore, close-applications, reopen-applications, archive, request-changes, soft-delete, feature, amend-feature, unfeature, enforce] }
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/ExpectedVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/JobManagementCommand' }
+      responses:
+        '200': { $ref: '#/components/responses/CommandResult' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/Unavailable' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+components:
+  securitySchemes:
+    browserSession:
+      type: apiKey
+      in: cookie
+      name: better-auth.session_token
+  parameters:
+    JobId: { name: jobId, in: path, required: true, schema: { type: string, minLength: 1, maxLength: 128 } }
+    IdempotencyKey: { name: idempotency-key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128 } }
+    ExpectedVersion: { name: if-match, in: header, required: true, schema: { type: string, pattern: '^"[1-9][0-9]*"$' } }
+  schemas:
+    VisibilityState: { type: string, enum: [PUBLISHED, HIDDEN, ARCHIVED] }
+    ApplicationState: { type: string, enum: [OPEN, CLOSED] }
+    ManagedJobRow:
+      type: object
+      additionalProperties: false
+      required: [id, title, company, recruiter, visibility, applicationState, approvedAt, publishedAt, reportSummary, featured, version]
+      properties:
+        id: { type: string }
+        title: { type: string, maxLength: 200 }
+        company: { type: string, maxLength: 200 }
+        recruiter: { type: [string, 'null'], maxLength: 200 }
+        visibility: { $ref: '#/components/schemas/VisibilityState' }
+        applicationState: { $ref: '#/components/schemas/ApplicationState' }
+        approvedAt: { type: [string, 'null'], format: date-time }
+        publishedAt: { type: [string, 'null'], format: date-time }
+        reportSummary: { $ref: '#/components/schemas/ReportSummary' }
+        featured: { type: boolean }
+        version: { type: integer, minimum: 1 }
+    ReportSummary:
+      type: object
+      additionalProperties: false
+      required: [activeCount, distinctReporterCount, highestPriority]
+      properties:
+        activeCount: { type: integer, minimum: 0 }
+        distinctReporterCount: { type: integer, minimum: 0 }
+        highestPriority: { type: [string, 'null'], enum: [CRITICAL, HIGH, NORMAL, null] }
+    JobManagementCommand:
+      oneOf:
+        - $ref: '#/components/schemas/ReasonCommand'
+        - $ref: '#/components/schemas/RequestChangesCommand'
+        - $ref: '#/components/schemas/FeatureCommand'
+        - $ref: '#/components/schemas/AmendFeatureCommand'
+        - $ref: '#/components/schemas/UnfeatureCommand'
+        - $ref: '#/components/schemas/EnforceCommand'
+      discriminator: { propertyName: command }
+    ReasonCommand:
+      type: object
+      additionalProperties: false
+      required: [command, confirmation, reason]
+      properties:
+        command: { type: string, enum: [HIDE, RESTORE, CLOSE_APPLICATIONS, REOPEN_APPLICATIONS, ARCHIVE, SOFT_DELETE] }
+        confirmation: { const: true }
+        reason: { type: string, minLength: 1, maxLength: 1000 }
+    RequestChangesCommand:
+      type: object
+      additionalProperties: false
+      required: [command, confirmation, publicExplanation, hideImmediately]
+      properties:
+        command: { const: REQUEST_CHANGES }
+        confirmation: { const: true }
+        publicExplanation: { type: string, minLength: 20, maxLength: 1000 }
+        hideImmediately: { type: boolean }
+    FeatureCommand:
+      type: object
+      additionalProperties: false
+      required: [command, confirmation, placement, startsAt, endsAt, priority, reason]
+      properties:
+        command: { const: FEATURE }
+        confirmation: { const: true }
+        placement: { type: string, enum: [HOME_FEATURED, SEARCH_FEATURED] }
+        startsAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+        priority: { type: integer, minimum: 1, maximum: 100 }
+        reason: { type: string, minLength: 1, maxLength: 1000 }
+    AmendFeatureCommand:
+      type: object
+      additionalProperties: false
+      required: [command, confirmation, featureId, placement, startsAt, endsAt, priority, reason]
+      properties:
+        command: { const: AMEND_FEATURE }
+        confirmation: { const: true }
+        featureId: { type: string, minLength: 1, maxLength: 128 }
+        placement: { type: string, enum: [HOME_FEATURED, SEARCH_FEATURED] }
+        startsAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+        priority: { type: integer, minimum: 1, maximum: 100 }
+        reason: { type: string, minLength: 1, maxLength: 1000 }
+    UnfeatureCommand:
+      type: object
+      additionalProperties: false
+      required: [command, confirmation, featureId, reason]
+      properties:
+        command: { const: UNFEATURE }
+        confirmation: { const: true }
+        featureId: { type: string, minLength: 1, maxLength: 128 }
+        reason: { type: string, minLength: 1, maxLength: 1000 }
+    EnforceCommand:
+      type: object
+      additionalProperties: false
+      required: [command, confirmation, type, reason, reportIds]
+      properties:
+        command: { const: ENFORCE }
+        confirmation: { const: true }
+        type: { type: string, enum: [HIDE_JOB, CLOSE_APPLICATIONS, REQUEST_CHANGES, SOFT_DELETE_JOB, SUSPEND_COMPANY, SUSPEND_RECRUITER] }
+        reason: { type: string, minLength: 1, maxLength: 1000 }
+        publicExplanation: { type: [string, 'null'], minLength: 20, maxLength: 1000, description: Required when type is REQUEST_CHANGES; visible only to the authorized recruiter. }
+        reportIds: { type: array, minItems: 1, maxItems: 100, items: { type: string, minLength: 1, maxLength: 128 } }
+    CommandResult:
+      type: object
+      additionalProperties: false
+      required: [jobId, version, correlationId, status]
+      properties:
+        jobId: { type: string }
+        version: { type: integer, minimum: 1 }
+        correlationId: { type: string }
+        status: { type: string, enum: [SUCCESS, ACTION_BLOCKED] }
+        replayed: { type: boolean }
+  responses:
+    ManagedJobPage:
+      description: Paginated safe management projections.
+      content: { application/json: { schema: { type: object, required: [data, total], properties: { data: { type: array, items: { $ref: '#/components/schemas/ManagedJobRow' } }, total: { type: integer, minimum: 0 } } } } }
+    ManagedJobDetail:
+      description: Protected detail including versions, operations, authorized reports, and features.
+      content: { application/json: { schema: { type: object } } }
+    CommandResult:
+      description: Authoritative result or idempotent replay.
+      content: { application/json: { schema: { $ref: '#/components/schemas/CommandResult' } } }
+    Unauthorized: { description: Authentication required. }
+    Forbidden: { description: Current authority is insufficient. }
+    Unavailable: { description: Target unavailable without existence disclosure. }
+    Conflict: { description: Stale version, idempotency, or feature-capacity conflict. }
+    ValidationFailed: { description: Strict input validation failed. }
