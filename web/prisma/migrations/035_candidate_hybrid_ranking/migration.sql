@@ -522,67 +522,67 @@ ALTER TABLE "ScoringWorkItem" RENAME CONSTRAINT "ScoringWorkItem_operation_fkey"
 ALTER TABLE "SkillEvidenceExtraction" RENAME CONSTRAINT "SkillEvidenceExtraction_result_fkey" TO "SkillEvidenceExtraction_automaticMatchResultId_fkey";
 
 -- RenameIndex
-ALTER INDEX "AiAssessment_application_computed_idx" RENAME TO "AiAssessment_jobApplicationId_computedAt_idx";
+ALTER INDEX IF EXISTS "AiAssessment_application_computed_idx" RENAME TO "AiAssessment_jobApplicationId_computedAt_idx";
 
 -- RenameIndex
-ALTER INDEX "ApplicationDocumentLegalHold_jobApplicationId_endsAt_releasedAt" RENAME TO "ApplicationDocumentLegalHold_jobApplicationId_endsAt_releas_idx";
+ALTER INDEX IF EXISTS "ApplicationDocumentLegalHold_jobApplicationId_endsAt_releasedAt" RENAME TO "ApplicationDocumentLegalHold_jobApplicationId_endsAt_releas_idx";
 
 -- RenameIndex
-ALTER INDEX "ApplicationScoringResult_application_generation_key" RENAME TO "ApplicationScoringResult_jobApplicationId_generation_key";
+ALTER INDEX IF EXISTS "ApplicationScoringResult_application_generation_key" RENAME TO "ApplicationScoringResult_jobApplicationId_generation_key";
 
 -- RenameIndex
-ALTER INDEX "ApplicationScoringResult_final_published_idx" RENAME TO "ApplicationScoringResult_finalScore_publishedAt_idx";
+ALTER INDEX IF EXISTS "ApplicationScoringResult_final_published_idx" RENAME TO "ApplicationScoringResult_finalScore_publishedAt_idx";
 
 -- RenameIndex
-ALTER INDEX "AutomaticMatchResult_application_computed_idx" RENAME TO "AutomaticMatchResult_jobApplicationId_computedAt_idx";
+ALTER INDEX IF EXISTS "AutomaticMatchResult_application_computed_idx" RENAME TO "AutomaticMatchResult_jobApplicationId_computedAt_idx";
 
 -- RenameIndex
-ALTER INDEX "BusinessRegistryLookupSnapshot_applicant_tax_expiry_idx" RENAME TO "BusinessRegistryLookupSnapshot_applicantUserId_normalizedTa_idx";
+ALTER INDEX IF EXISTS "BusinessRegistryLookupSnapshot_applicant_tax_expiry_idx" RENAME TO "BusinessRegistryLookupSnapshot_applicantUserId_normalizedTa_idx";
 
 -- RenameIndex
-ALTER INDEX "BusinessRegistryLookupSnapshot_expiry_acceptance_idx" RENAME TO "BusinessRegistryLookupSnapshot_expiresAt_acceptedRequestId__idx";
+ALTER INDEX IF EXISTS "BusinessRegistryLookupSnapshot_expiry_acceptance_idx" RENAME TO "BusinessRegistryLookupSnapshot_expiresAt_acceptedRequestId__idx";
 
 -- RenameIndex
-ALTER INDEX "CompanyContactEmailChallenge_binding_state_idx" RENAME TO "CompanyContactEmailChallenge_applicantUserId_lookupSnapshot_idx";
+ALTER INDEX IF EXISTS "CompanyContactEmailChallenge_binding_state_idx" RENAME TO "CompanyContactEmailChallenge_applicantUserId_lookupSnapshot_idx";
 
 -- RenameIndex
-ALTER INDEX "CvEvidenceExcerpt_retention_idx" RENAME TO "CvEvidenceExcerpt_deleteAfter_deletedAt_idx";
+ALTER INDEX IF EXISTS "CvEvidenceExcerpt_retention_idx" RENAME TO "CvEvidenceExcerpt_deleteAfter_deletedAt_idx";
 
 -- RenameIndex
-ALTER INDEX "DocumentParseResult_result_kind_idx" RENAME TO "DocumentParseResult_automaticMatchResultId_documentKind_idx";
+ALTER INDEX IF EXISTS "DocumentParseResult_result_kind_idx" RENAME TO "DocumentParseResult_automaticMatchResultId_documentKind_idx";
 
 -- RenameIndex
-ALTER INDEX "ManualApplicationPriority_application_active_idx" RENAME TO "ManualApplicationPriority_jobApplicationId_active_idx";
+ALTER INDEX IF EXISTS "ManualApplicationPriority_application_active_idx" RENAME TO "ManualApplicationPriority_jobApplicationId_active_idx";
 
 -- RenameIndex
-ALTER INDEX "ManualApplicationPriority_application_version_key" RENAME TO "ManualApplicationPriority_jobApplicationId_version_key";
+ALTER INDEX IF EXISTS "ManualApplicationPriority_application_version_key" RENAME TO "ManualApplicationPriority_jobApplicationId_version_key";
 
 -- RenameIndex
-ALTER INDEX "RankingSnapshot_job_expiry_idx" RENAME TO "RankingSnapshot_jobPostingId_expiresAt_idx";
+ALTER INDEX IF EXISTS "RankingSnapshot_job_expiry_idx" RENAME TO "RankingSnapshot_jobPostingId_expiresAt_idx";
 
 -- RenameIndex
-ALTER INDEX "RankingSnapshot_job_generation_key" RENAME TO "RankingSnapshot_jobPostingId_generation_key";
+ALTER INDEX IF EXISTS "RankingSnapshot_job_generation_key" RENAME TO "RankingSnapshot_jobPostingId_generation_key";
 
 -- RenameIndex
-ALTER INDEX "RankingSnapshotRow_snapshot_application_key" RENAME TO "RankingSnapshotRow_rankingSnapshotId_applicationId_key";
+ALTER INDEX IF EXISTS "RankingSnapshotRow_snapshot_application_key" RENAME TO "RankingSnapshotRow_rankingSnapshotId_applicationId_key";
 
 -- RenameIndex
-ALTER INDEX "RankingSnapshotRow_snapshot_rank_key" RENAME TO "RankingSnapshotRow_rankingSnapshotId_rankPosition_key";
+ALTER INDEX IF EXISTS "RankingSnapshotRow_snapshot_rank_key" RENAME TO "RankingSnapshotRow_rankingSnapshotId_rankPosition_key";
 
 -- RenameIndex
-ALTER INDEX "ScoringOperation_job_state_created_idx" RENAME TO "ScoringOperation_jobPostingId_state_createdAt_idx";
+ALTER INDEX IF EXISTS "ScoringOperation_job_state_created_idx" RENAME TO "ScoringOperation_jobPostingId_state_createdAt_idx";
 
 -- RenameIndex
-ALTER INDEX "ScoringWorkItem_operation_application_key" RENAME TO "ScoringWorkItem_operationId_jobApplicationId_key";
+ALTER INDEX IF EXISTS "ScoringWorkItem_operation_application_key" RENAME TO "ScoringWorkItem_operationId_jobApplicationId_key";
 
 -- RenameIndex
-ALTER INDEX "ScoringWorkItem_state_next_idx" RENAME TO "ScoringWorkItem_state_nextAttemptAt_idx";
+ALTER INDEX IF EXISTS "ScoringWorkItem_state_next_idx" RENAME TO "ScoringWorkItem_state_nextAttemptAt_idx";
 
 -- RenameIndex
-ALTER INDEX "SkillEvidenceExtraction_result_skill_requirement_key" RENAME TO "SkillEvidenceExtraction_automaticMatchResultId_skillCanonic_key";
+ALTER INDEX IF EXISTS "SkillEvidenceExtraction_result_skill_requirement_key" RENAME TO "SkillEvidenceExtraction_automaticMatchResultId_skillCanonic_key";
 
 -- RenameIndex
-ALTER INDEX "VerificationNotificationEvent_emailStatus_inAppStatus_updatedAt" RENAME TO "VerificationNotificationEvent_emailStatus_inAppStatus_updat_idx";
+ALTER INDEX IF EXISTS "VerificationNotificationEvent_emailStatus_inAppStatus_updatedAt" RENAME TO "VerificationNotificationEvent_emailStatus_inAppStatus_updat_idx";
 
 -- RenameIndex
-ALTER INDEX "VerificationNotificationEvent_verificationRequestId_eventKind_i" RENAME TO "VerificationNotificationEvent_verificationRequestId_eventKi_idx";
+ALTER INDEX IF EXISTS "VerificationNotificationEvent_verificationRequestId_eventKind_i" RENAME TO "VerificationNotificationEvent_verificationRequestId_eventKi_idx";
